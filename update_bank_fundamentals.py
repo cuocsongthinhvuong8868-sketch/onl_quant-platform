@@ -88,7 +88,7 @@ def fetch_bank_fundamentals() -> pd.DataFrame:
         except Exception as e:
             logger.warning("%s: %s", bank, e)
 
-        time.sleep(1)
+        time.sleep(1.1)
 
     return pd.DataFrame(rows)
 
