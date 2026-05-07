@@ -129,7 +129,7 @@ def update():
             series_list.append(s)
         else:
             failed.append(symbol)
-        time.sleep(1)   # tránh rate limit API
+        time.sleep(1.1)   # tránh rate limit API
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(series_list), len(stock_tickers))
