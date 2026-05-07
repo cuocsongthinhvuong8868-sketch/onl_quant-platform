@@ -37,11 +37,10 @@ jobs:
           # echo "DB_PASS=${{ secrets.DB_PASS }}" >> .env
 
       - name: Run update_data.py
-        run: python commnand/update_data.py
+        run: python update_data.py
 
       - name: Run update_bank_fundamentals.py
-        run: python commnand/update_bank_fundamentals.py
-
+        run: python update_bank_fundamentals.py
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
