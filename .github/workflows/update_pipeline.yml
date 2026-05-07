@@ -37,9 +37,13 @@ jobs:
           # echo "DB_PASS=${{ secrets.DB_PASS }}" >> .env
 
       - name: Run update_data.py
+        env:
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python update_data.py
 
       - name: Run update_bank_fundamentals.py
+        env:
+          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python update_bank_fundamentals.py
       - name: Commit and Push changes
         run: |
