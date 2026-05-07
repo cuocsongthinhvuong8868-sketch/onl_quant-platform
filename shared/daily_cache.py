@@ -21,22 +21,31 @@ def _cache_file(namespace: str, payload_key: dict) -> Path:
     return CACHE_DIR / f"{namespace}_{_stable_hash(payload_key)}.pkl"
 
 
-def load_daily_cache(namespace: str, payload_key: dict):
+def load_daily_cache(namespace: str, payload_key: dict, data_date: str = None):
     p = _cache_file(namespace, payload_key)
     if not p.exists():
         return None
     try:
         with p.open("rb") as f:
             obj = pickle.load(f)
-        if obj.get("cache_date") != str(date.today()):
+        
+        # Dùng ngày dữ liệu làm chuẩn, nếu không có thì fallback về ngày hệ thống
+        check_date = data_date if data_date else str(date.today())
+        
+        # Khớp key "data_date" thay vì "cache_date" cũ
+        if obj.get("data_date") != check_date:
             return None
+            
         return obj.get("payload")
     except Exception:
         return None
 
 
-def save_daily_cache(namespace: str, payload_key: dict, payload) -> Path:
+def save_daily_cache(namespace: str, payload_key: dict, payload, data_date: str = None) -> Path:
     p = _cache_file(namespace, payload_key)
+    save_date = data_date if data_date else str(date.today())
+    
     with p.open("wb") as f:
-        pickle.dump({"cache_date": str(date.today()), "payload": payload}, f, protocol=pickle.HIGHEST_PROTOCOL)
+        # Lưu vào key mới "data_date" để ép các file cache cũ (dùng "cache_date") bị vô hiệu hóa
+        pickle.dump({"data_date": save_date, "payload": payload}, f, protocol=pickle.HIGHEST_PROTOCOL)
     return p
