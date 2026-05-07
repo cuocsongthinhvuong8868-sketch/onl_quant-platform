@@ -1,9 +1,10 @@
 name: Quant Data Auto-Update Pipeline
 
 on:
-  workflow_dispatch:
+  workflow_dispatch: # Vẫn giữ dòng này để lúc nào thích thì bấm chạy bằng tay
   schedule:
-    - cron: '0 11 * * *'
+    # Chạy tự động vào lúc 16:00 giờ Việt Nam (tức 09:00 UTC), từ Thứ 2 đến Thứ 6
+    - cron: '0 9 * * 1-5'
 
 permissions:
   contents: write
