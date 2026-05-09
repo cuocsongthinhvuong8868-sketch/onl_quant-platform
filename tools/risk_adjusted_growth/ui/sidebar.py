@@ -16,12 +16,16 @@ def render_sidebar() -> dict:
     with st.sidebar:
         st.header("Cài đặt Biến Số Căn Bản")
         selected_k = st.selectbox("Chọn Viễn cảnh (Hệ số K):", list(K_OPTIONS.keys()), index=3)
-        coe_input = st.number_input("Cost of Equity (COE) %:", min_value=1.0, max_value=30.0, value=12.0, step=0.5)
+        coe_input = st.number_input("Cost of Equity (COE) %:", min_value=1.0, max_value=30.0, value=14.0, step=0.5)
 
         st.markdown("---")
         st.header("Kiểm tra Kịch bản")
         bvps_change_pct = st.number_input("Thay đổi BVPS (%):", min_value=-99.0, max_value=200.0, value=0.0, step=1.0)
         pb_penalty_pct = st.number_input("Mức phạt P/B (%):", min_value=0.0, max_value=200.0, value=0.0, step=1.0)
+
+        st.markdown("---")
+        st.subheader("🧠 Tích hợp AI")
+        kimi_key = st.sidebar.text_input("Kimi API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
 
     return {
         "selected_k": selected_k,
@@ -30,4 +34,5 @@ def render_sidebar() -> dict:
         "coe_input": coe_input,
         "bvps_change_pct": bvps_change_pct,
         "pb_penalty_pct": pb_penalty_pct,
+        "kimi_key": kimi_key,
     }

@@ -27,7 +27,7 @@ def build_base_table(df_fund: pd.DataFrame, df_div: pd.DataFrame, price_row: pd.
         bvps = float(r["BVPS"])
         price = float(price_row.get(ticker, 0.0)) if price_row is not None else 0.0
 
-        pb = (price / bvps) if (bvps > 0 and price > 0) else 0.0
+        pb = (price * 1000 / bvps) if (bvps > 0 and price > 0) else 0.0
         cash_payout = average_cash_payout(ticker, df_div)
 
         rows.append(

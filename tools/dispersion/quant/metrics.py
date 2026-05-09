@@ -4,7 +4,7 @@ import pandas as pd
 from sklearn.covariance import LedoitWolf
 
 
-def calculate_dispersion_metrics(df_prices: pd.DataFrame, index_series: pd.Series, zscore_window: int, dpi_window: int):
+def calculate_dispersion_metrics(df_prices: pd.DataFrame, index_series: pd.Series, zscore_type: str, zscore_window: int, dpi_window: int):
     stock_returns = df_prices.pct_change().dropna(how="all")
     market_returns = index_series.pct_change().reindex(stock_returns.index)
 
@@ -15,13 +15,19 @@ def calculate_dispersion_metrics(df_prices: pd.DataFrame, index_series: pd.Serie
     cssd = np.sqrt((deviations ** 2).sum(axis=1, skipna=True) / (n_eff - 1).clip(lower=1))
     spread = cssd - csad
 
-    min_p = max(1, zscore_window // 2)
-    spread_ewma_mean = spread.ewm(span=zscore_window, min_periods=min_p).mean()
-    spread_ewma_std = spread.ewm(span=zscore_window, min_periods=min_p).std()
-    spread_z = (spread - spread_ewma_mean) / spread_ewma_std.replace(0, np.nan)
+    min_p = max(2, zscore_window // 2)
+    if zscore_type == 'EWMA':
+        spread_mean = spread.ewm(span=zscore_window, min_periods=min_p).mean()
+        spread_std = spread.ewm(span=zscore_window, min_periods=min_p).std()
+    else:
+        spread_mean = spread.rolling(window=zscore_window, min_periods=min_p).mean()
+        spread_std = spread.rolling(window=zscore_window, min_periods=min_p).std()
+        
+    spread_z = (spread - spread_mean) / spread_std.replace(0, np.nan)
 
     is_elevated = (spread_z > 0).astype(int)
-    dpi = is_elevated.rolling(window=dpi_window, min_periods=dpi_window // 2).sum() / dpi_window * 100.0
+    dpi_min_p = max(1, dpi_window // 2)
+    dpi = is_elevated.rolling(window=dpi_window, min_periods=dpi_min_p).mean() * 100.0
 
     out = pd.DataFrame(
         {
@@ -80,12 +86,3 @@ def fit_rolling_correlation(stock_returns: pd.DataFrame, window: int = 30, refit
     gc.collect()
     return pd.Series(corr_arr, index=dates, name="Ledoit_Correlation")
 
-
-def determine_macro_regime(df_metrics: pd.DataFrame, dpi_thresh: float, corr_dist: float, corr_cap: float):
-    regime = np.full(len(df_metrics), "NORMAL", dtype=object)
-    dpi = df_metrics["DPI"].values
-    corr = df_metrics["Ledoit_Correlation"].values
-
-    regime[(dpi >= dpi_thresh) & (corr <= corr_dist)] = "DISTRIBUTION_PEAK"
-    regime[(dpi >= dpi_thresh) & (corr >= corr_cap)] = "CAPITULATION_BOTTOM"
-    return pd.Series(regime, index=df_metrics.index, name="Macro_Regime")

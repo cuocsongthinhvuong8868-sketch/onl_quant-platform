@@ -21,6 +21,10 @@ def render_sidebar() -> dict:
     )
 
     st.sidebar.markdown("---")
+    st.sidebar.subheader("🧠 Tích hợp AI")
+    kimi_key = st.sidebar.text_input("Kimi API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
+
+    st.sidebar.markdown("---")
     st.sidebar.caption(
         "**Mô hình** \n"
         "- Market Factor: PCA (PC1) \n"
@@ -29,4 +33,4 @@ def render_sidebar() -> dict:
         "- Skewness: Kelly non-parametric"
     )
 
-    return {"window_size": window_size}
+    return {"window_size": window_size, "kimi_key": kimi_key}

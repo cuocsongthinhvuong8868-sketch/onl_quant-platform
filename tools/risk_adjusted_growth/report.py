@@ -25,7 +25,7 @@ def snapshot(df_close, load_custom):
 
     latest_prices = df_close.ffill().iloc[-1]
     base = build_base_table(df_fund, df_div, latest_prices)
-    scored = compute_scores(base, k_value=1.0, coe_decimal=0.12, bvps_change_pct=0.0, pb_penalty_pct=0.0)
+    scored = compute_scores(base, k_value=1.0, coe_decimal=0.14, bvps_change_pct=0.0, pb_penalty_pct=0.0)
     top = scored.iloc[0]
     return {
         "snapshot_date": df_close.index[-1].strftime("%Y-%m-%d"),

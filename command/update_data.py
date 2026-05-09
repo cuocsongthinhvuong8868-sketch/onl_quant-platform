@@ -17,6 +17,8 @@ import time
 import logging
 import pandas as pd
 from datetime import datetime, timedelta
+import sys
+from pathlib import Path
 
 logging.basicConfig(
     level=logging.INFO,
@@ -24,6 +26,11 @@ logging.basicConfig(
     datefmt="%H:%M:%S",
 )
 logger = logging.getLogger(__name__)
+
+# Ép import config ở ROOT project thay vì command/config.py
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from config import (
     VNSTOCK_API_KEY,
@@ -54,14 +61,14 @@ def load_tickers() -> list:
         return []
 
 
-def fetch_close(symbol: str, start: str, end: str) -> pd.Series | None:
+def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Series | None:
     """
     Tải giá đóng cửa cho 1 mã.
     Trả về None nếu không tải được — KHÔNG raise exception.
     """
     try:
         from vnstock import Quote
-        df = Quote(symbol=symbol, source="KBS").history(
+        df = Quote(symbol=symbol, source=source).history(
             start=start, end=end, interval="1D"
         )
         if df is None or df.empty:
@@ -75,11 +82,11 @@ def fetch_close(symbol: str, start: str, end: str) -> pd.Series | None:
         )
         s.index = pd.to_datetime(s.index).normalize().tz_localize(None)
         s = s[~s.index.duplicated(keep="last")]
-        logger.info("✓ %-6s — %d ngày", symbol, len(s))
+        logger.info("✓ %-8s [%s] — %d ngày", symbol, source, len(s))
         return s[symbol]
 
     except Exception as e:
-        logger.warning("✗ %-6s — %s — bỏ qua.", symbol, e)
+        logger.warning("✗ %-8s [%s] — %s — bỏ qua.", symbol, source, e)
         return None
 
 
@@ -87,9 +94,13 @@ def update_vnindex(start: str, end: str) -> bool:
     """
     Tải và lưu dữ liệu VNINDEX vào data_lake/vnindex_cache.csv.
     Trả về True nếu thành công.
+    Ưu tiên VCI, fallback KBS.
     """
     logger.info("Đang tải VNINDEX...")
-    s = fetch_close("VNINDEX", start, end)
+    s = fetch_close("VNINDEX", start, end, source="VCI")
+    if s is None:
+        logger.info("VNINDEX VCI thất bại, thử fallback KBS...")
+        s = fetch_close("VNINDEX", start, end, source="KBS")
     if s is None:
         logger.warning("Không tải được VNINDEX, bỏ qua lưu file VNINDEX.")
         return False
@@ -102,6 +113,12 @@ def update_vnindex(start: str, end: str) -> bool:
 
 
 def update():
+    logger.info("Dùng DATA_LAKE: %s", DATA_LAKE)
+    logger.info("Dùng MARKET_DATA: %s", MARKET_DATA)
+    logger.info("Dùng TICKERS_FILE: %s", TICKERS_FILE)
+    if "/command/data_lake" in str(DATA_LAKE).replace("\\", "/"):
+        raise RuntimeError(f"Sai output path: {DATA_LAKE} (phải là root data_lake)")
+
     tickers = load_tickers()
     if not tickers:
         logger.error("tickers.csv trống. Thêm mã vào rồi chạy lại.")
@@ -124,12 +141,16 @@ def update():
 
     for i, symbol in enumerate(stock_tickers, 1):
         logger.info("[%d/%d] Đang tải %s...", i, len(stock_tickers), symbol)
-        s = fetch_close(symbol, start, end)
+        # Ưu tiên VCI, fallback KBS
+        s = fetch_close(symbol, start, end, source="VCI")
+        if s is None:
+            logger.info("  %s VCI thất bại, thử fallback KBS...", symbol)
+            s = fetch_close(symbol, start, end, source="KBS")
         if s is not None:
             series_list.append(s)
         else:
             failed.append(symbol)
-        time.sleep(1.1)   # tránh rate limit API
+        time.sleep(1)   # tránh rate limit API
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(series_list), len(stock_tickers))
