@@ -125,7 +125,7 @@ Lưu ý: report screenshot tự quét `pages/*.py`, nên thêm page mới là re
   - chụp full-page screenshot
   - ghép toàn bộ thành 1 PDF
 - Tên file output: `ddmmyy_quant_report.pdf`
-- Nơi lưu: Desktop user (ví dụ `/Users/macos/Desktop/070526_quant_report.pdf`)
+- Nơi lưu: Thư mục reports của dự án (ví dụ `reports/070526_quant_report.pdf`)
 
 ---
 
@@ -179,17 +179,17 @@ Checklist chuẩn hóa:
   - `streamlit run /Users/macos/Desktop/quant_platform/app.py`
 
 - Update giá + VNINDEX:
-  - `python3 /Users/macos/Desktop/quant_platform/commnand/update_data.py`
+  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py`
 
 - Update fundamentals bank:
-  - `python3 /Users/macos/Desktop/quant_platform/commnand/update_bank_fundamentals.py`
+  - `python3 /Users/macos/Desktop/quant_platform/command/update_bank_fundamentals.py`
 
 - Tạo report PDF screenshot (ngoài UI):
   - đảm bảo app đang chạy ở `http://localhost:8501`
-  - `python3 /Users/macos/Desktop/quant_platform/commnand/generate_visual_report.py`
+  - `python3 /Users/macos/Desktop/quant_platform/command/generate_visual_report.py`
 
 - Tạo report CSV snapshot:
-  - `python3 /Users/macos/Desktop/quant_platform/commnand/generate_report.py`
+  - `python3 /Users/macos/Desktop/quant_platform/command/generate_report.py`
 
 ---
 
@@ -231,3 +231,140 @@ UI hiển thị trạng thái cache:
 - `⚡ Dùng cache cùng ngày...`
 - `💾 Đã tạo cache ngày mới...`
 
+
+---
+
+## 13) Phiên cập nhật 2026-05-09
+
+### 13.1 AI CIO (`shared/ai_cio.py`) — Fix lỗi import + Mở rộng 7 tool
+
+**Lỗi đã fix:**
+1. `calculate_risk_score` trả về `pd.DataFrame` (không phải tuple) → sửa logic lấy `latest`, `prev`, `score` từ DataFrame
+2. `run_upside_downside_simulation` không tồn tại → thay bằng `build_breadth_series` + `run_hybrid_ensemble_mc`
+3. `load_bank_fundamentals` không tồn tại → thay bằng `load_custom("bank_fundamentals.csv")` + `build_base_table` để tính `P/B Gốc` và `Cash Payout Ratio`
+
+**Mở rộng từ 5 → 7 báo cáo:**
+- Thêm `run_market_breadth()`: chạy `compute_breadth()`, lấy số mã >MA20/60/125/252 + tỷ lệ %, top volume leaders, gọi Kimi API, cache
+- Thêm `run_esr_monitor()`: chạy `calculate_esr()`, lấy SSI, status, top 3 PCA weights, gọi Kimi API, cache
+- `run_executive_summary()` giờ gộp 7 báo cáo vào `all_reports`
+
+### 13.2 Tích hợp AI analysis cho Market Breadth
+
+File sửa:
+- `tools/market_breadth/ui/sidebar.py`: thêm `Kimi API Key` input
+- `tools/market_breadth/page.py`: thêm section AI analysis sau phần hiển thị metrics
+  - Thu thập: ngày, tổng số mã, số mã >MA20/60/125/252 + tỷ lệ %, top 10 volume giữ MA20 và MA252
+  - Đọc prompt `promt/Market Breadth promt.md`, replace placeholder bằng dữ liệu thực
+  - Gọi Kimi API (`moonshot-v1-128k`), lưu cache `daily_cache/market_breadth_{date}.txt`
+  - Nút "Chạy lại" để xóa cache
+
+### 13.3 Tích hợp AI analysis cho ESR Monitor
+
+File sửa:
+- `tools/esr_monitor/page.py`: thêm `Kimi API Key` input vào sidebar + section AI analysis sau chart
+  - Thu thập: ngày, điểm VN30, trạng thái so với MA, SSI (%), SAFE/WARNING/CRITICAL, top 3 PCA weights
+  - Đọc prompt `promt/ESR monitor promt.md`, replace placeholder bằng dữ liệu thực
+  - Gọi Kimi API (`moonshot-v1-128k`), lưu cache `daily_cache/esr_monitor_{date}.txt`
+  - Nút "Chạy lại" để xóa cache
+
+### 13.4 Cập nhật Executive Summary Prompt
+
+- `promt/executive_summary_promt.md`: cập nhật từ 5 phòng ban → 7 phòng ban (thêm Market Breadth và ESR Monitor)
+
+### 13.5 Đổi nguồn chính data update từ KBS → VCI
+
+File sửa: `command/update_data.py`
+- `fetch_close()`: default `source="VCI"` (trước là `"KBS"`)
+- `update_vnindex()`: ưu tiên VCI, fallback KBS
+- Loop stock tickers: gọi VCI trước, nếu `None` thì log và thử fallback KBS
+- Bỏ hàm `fetch_f1_vci()` riêng lẻ (VN30F1M giờ dùng `fetch_close` chung với source VCI)
+
+### 13.6 Cache reuse cross-tool
+
+AI CIO tuân thủ nguyên tắc: trước khi gọi Kimi API, kiểm tra `daily_cache/{tool}_{date}.txt`. Nếu user đã chạy AI ở tool riêng lẻ trước đó → lấy cache dùng luôn, không tốn token gọi lại.
+
+### 13.6 Bỏ Report Generation, thay bằng Xuất PDF AI CIO
+
+File sửa: `app.py`
+- Bỏ toàn bộ logic `subprocess` gọi `generate_visual_report.py` (Report Generation)
+- Thay nút trái thành **"📄 Xuất PDF Report AI CIO"**
+  - Dùng `fpdf2` tạo PDF với font Arial Unicode (hỗ trợ tiếng Việt)
+  - Ưu tiên đọc từ `st.session_state["cio_report"]` → fallback file cache `executive_summary_{date}.txt`
+  - Nếu chưa có báo cáo: báo lỗi "Chưa có báo cáo AI CIO. Vui lòng chạy Executive Summary trước."
+  - Nếu đã có: tạo PDF lưu `reports/ddmmyy_executive_summary.pdf` + hiển thị nút download
+- Thêm status AI CIO trên trang chủ (tương tự Data lake):
+  - `✅ Report AI CIO đã sẵn sàng — dd/mm/YYYY HH:MM`
+  - `ℹ️ Chưa có report AI CIO. Chạy '🔥 Executive Summary (AI CIO)' để tạo.`
+
+### 13.7 Đổi COE mặc định từ 12% → 14%
+
+File sửa:
+- `tools/risk_adjusted_growth/ui/sidebar.py`: `value=12.0` → `value=14.0`
+- `shared/ai_cio.py`: `coe_decimal=0.12` → `0.14`, prompt replace `"12.0"` → `"14.0"`
+- `tools/risk_adjusted_growth/report.py`: `coe_decimal=0.12` → `0.14`
+
+---
+
+## 15) Phiên cập nhật 2026-05-09 (tiếp) — Model AI Configurable + Cross-platform fix
+
+### 15.1 Chuyển model AI sang `moonshot-v1-128k` + Configurable qua `config.py`
+
+**Vấn đề:** User muốn dùng `moonshot-v1-128k` thay vì `kimi-k2.6`, và có thể tự thay đổi model/temperature từ 1 chỗ.
+
+**Thay đổi:**
+- `config.py`: thêm 2 biến cấu hình:
+  ```python
+  AI_MODEL       = os.getenv("AI_MODEL", "kimi-k2.6")
+  AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))
+  ```
+  - Mặc định: `kimi-k2.6`, temperature `1.0`
+  - Có thể override qua biến môi trường hoặc sửa trực tiếp `config.py`
+- `shared/ai_cio.py`: hàm `call_kimi()` đọc `AI_MODEL`, `AI_TEMPERATURE` từ config
+- Các file page (7 tool): đều import `AI_MODEL`, `AI_TEMPERATURE` từ config, truyền vào `client.chat.completions.create(...)`
+- Cập nhật button labels: `(Kimi AI k1.5/k2.6)` → `(Moonshot AI v1 128k)` (tạm thờ)
+
+### 15.2 Fix hardcode Windows path cho prompt files
+
+**Vấn đề:** File Python hardcode đường dẫn Windows tuyệt đối:
+```python
+r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
+```
+→ Lỗi `No such file or directory` khi chạy trên macOS.
+
+**Thay đổi:**
+- Tất cả đường dẫn prompt chuyển sang dùng `ROOT_DIR` từ `config.py`:
+  ```python
+  str(ROOT_DIR / "promt" / "fear greed promt.md")
+  ```
+- Các file đã sửa:
+  - `shared/ai_cio.py` — 8 prompt paths
+  - `tools/dispersion/page.py`, `esr_monitor/page.py`, `fear_greed/page.py`, `manipulation/page.py`, `market_breadth/page.py`, `risk_adjusted_growth/page.py`, `upside_ratio/page.py`
+
+### 15.3 Fix lỗi tạo PDF trên macOS (font + library)
+
+**Vấn đề 1:** `fpdf` 1.7.2 không hỗ trợ TTF Unicode → lỗi `can only concatenate str (not "int") to str`
+**Vấn đề 2:** Font DejaVu tải về bị corrupt (file ~300KB, thiếu data)
+
+**Thay đổi:**
+1. Gỡ `fpdf`, cài `fpdf2>=2.7.0` (hỗ trợ Unicode TTF đúng chuẩn)
+2. Tải lại font **DejaVuSans.ttf** và **DejaVuSans-Bold.ttf** đúng bản release 2.37 (từ GitHub official) vào `fonts/`
+3. Sửa `app.py`:
+   - `text_width = int(pdf.w - 20)` (fpdf 1.7 cần int, fpdf2 chấp nhận float nhưng vẫn giữ int cho an toàn)
+   - Dùng `ln=1` thay vì `ln=True`
+   - Đổi toàn bộ font name từ `ArialUnicode` → `DejaVu`
+4. Cập nhật `requirements.txt`: thêm `fpdf2>=2.7.0`
+
+**Kết quả:** Xuất PDF AI CIO trên macBook hoạt động bình thường, tiếng Việt có dấu hiển thị đúng.
+
+---
+
+## 16) Nguyên tắc làm việc tiếp theo (cập nhật)
+
+- AI CIO hiện tại tổng hợp **7 phòng ban** (Fear Greed, Manipulation, Dispersion, Upside Ratio, Risk Adjusted Growth, Market Breadth, ESR Monitor)
+- Tất cả tool đều có AI analysis riêng lẻ + cache cross-tool
+- **Model AI & temperature configurable từ 1 chỗ** (`config.py`): đổi `AI_MODEL` / `AI_TEMPERATURE` là toàn bộ platform cùng đổi theo
+- Nguồn data chính: **VCI**, fallback **KBS**
+- Report duy nhất trên app: **PDF Export của AI CIO** (thay thế screenshot PDF)
+- COE mặc định: **14%**
+- **Không hardcode đường dẫn tuyệt đối theo OS** (Windows/macOS); luôn dùng `ROOT_DIR` hoặc `Path(__file__)`
+- **Font PDF:** dùng `fpdf2` + font `DejaVuSans` trong `fonts/` (không dựa vào system font)

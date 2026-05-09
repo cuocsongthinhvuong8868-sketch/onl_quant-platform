@@ -16,6 +16,10 @@ def render_sidebar(df_breadth: pd.DataFrame):
     if start_date > end_date:
         st.sidebar.error("'Từ ngày' phải trước hoặc bằng 'Đến ngày'.")
 
+    st.sidebar.divider()
+    st.sidebar.header("🤖 AI Analysis")
+    kimi_key = st.sidebar.text_input("Kimi API Key", type="password", key="mb_kimi_key")
+
     start_dt = pd.to_datetime(start_date)
     end_dt = pd.to_datetime(end_date)
-    return start_date, end_date, start_dt, end_dt
+    return start_date, end_date, start_dt, end_dt, kimi_key

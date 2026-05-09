@@ -24,3 +24,8 @@ SCORE_BANDS = [
     (60, 80, "rgba(173, 255, 47,  0.2)", "GREED"),
     (80,100, "rgba(0,   180, 0,   0.2)", "EXTREME GREED"),
 ]
+
+# ── AI Model Configuration ──
+# Đổi model / temperature tại đây — tất cả tools sẽ đọc từ đây
+AI_MODEL       = os.getenv("AI_MODEL", "kimi-k2.6")
+AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))

@@ -7,6 +7,13 @@ import time
 import logging
 import pandas as pd
 from scipy.stats import gmean
+import sys
+from pathlib import Path
+
+# Ép import config ở ROOT project thay vì command/config.py
+ROOT_DIR = Path(__file__).resolve().parent.parent
+if str(ROOT_DIR) not in sys.path:
+    sys.path.insert(0, str(ROOT_DIR))
 
 from config import VNSTOCK_API_KEY, DATA_LAKE
 
@@ -88,12 +95,16 @@ def fetch_bank_fundamentals() -> pd.DataFrame:
         except Exception as e:
             logger.warning("%s: %s", bank, e)
 
-        time.sleep(1.1)
+        time.sleep(1)
 
     return pd.DataFrame(rows)
 
 
 def main():
+    logger.info("Dùng DATA_LAKE: %s", DATA_LAKE)
+    if "/command/data_lake" in str(DATA_LAKE).replace("\\", "/"):
+        raise RuntimeError(f"Sai output path: {DATA_LAKE} (phải là root data_lake)")
+
     DATA_LAKE.mkdir(parents=True, exist_ok=True)
     df = fetch_bank_fundamentals()
     if df.empty:

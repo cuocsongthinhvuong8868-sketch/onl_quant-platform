@@ -7,7 +7,7 @@ def snapshot(df_close, _load_custom):
     idx_col = "VNINDEX" if "VNINDEX" in df_idx.columns else df_idx.columns[0]
     s = df_idx[idx_col]
 
-    stock_returns, metrics = calculate_dispersion_metrics(df_close, s, zscore_window=60, dpi_window=20)
+    stock_returns, metrics = calculate_dispersion_metrics(df_close, s, zscore_window=60, dpi_window=60)
     metrics["Ledoit_Correlation"] = fit_rolling_correlation(stock_returns, window=30, refit_every=1)
     metrics["Macro_Regime"] = determine_macro_regime(metrics, dpi_thresh=50, corr_dist=0.20, corr_cap=0.35)
     metrics = metrics.dropna(subset=["DPI", "Ledoit_Correlation"])

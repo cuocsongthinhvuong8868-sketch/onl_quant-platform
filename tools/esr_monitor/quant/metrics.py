@@ -9,7 +9,7 @@ VN30_LIST = [
 ]
 
 
-def calculate_esr(df_close: pd.DataFrame, df_index: pd.DataFrame, ma_period: int = 125, pca_window: int = 60):
+def calculate_esr(df_close: pd.DataFrame, df_index: pd.DataFrame, ma_period: int = 125, pca_window: int = 60, bond_yield: float = 0.042):
     tickers = [t for t in VN30_LIST if t in df_close.columns]
     if len(tickers) < 10:
         raise ValueError("Không đủ mã VN30 trong market_data để tính ESR.")
@@ -50,7 +50,7 @@ def calculate_esr(df_close: pd.DataFrame, df_index: pd.DataFrame, ma_period: int
     s_liq = rets.abs().median(axis=1).rolling(20).mean()
 
     # valuation proxy from inverse index level
-    s_val = -(1.0 / (idx["INDEX"] / 100.0))
+    s_val = -( (1.0 / (idx["INDEX"] / 100.0)) - bond_yield )
 
     pillars = pd.DataFrame({
         "S_VOL": s_vol,
