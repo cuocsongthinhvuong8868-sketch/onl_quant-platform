@@ -6,13 +6,6 @@ import streamlit as st
 from pathlib import Path
 from shared.page_layout import setup_page
 
-# Lấy GITHUB_TOKEN từ Streamlit secrets nếu có
-if "GITHUB_TOKEN" not in os.environ:
-    try:
-        os.environ["GITHUB_TOKEN"] = st.secrets["GITHUB_TOKEN"]
-    except Exception:
-        pass
-
 setup_page("Quant Platform")
 
 st.title("📊 Quant Platform")
@@ -243,6 +236,6 @@ if st.session_state.show_cio_input:
                             )
                             st.success("✅ Đã đồng bộ báo cáo lên GitHub!")
                         except Exception as gh_err:
-                            st.info(f"ℹ️ Chưa đồng bộ GitHub: {gh_err}")
+                            st.warning(f"⚠️ Chưa đồng bộ GitHub: {gh_err}")
                     except Exception as e:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")
