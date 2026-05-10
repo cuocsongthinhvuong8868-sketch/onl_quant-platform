@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-Phiên cập nhật: 2026-05-07  
+Phiên cập nhật: 2026-05-10  
 Mục tiêu: Bảo toàn ngữ cảnh để resume công việc ngay khi upload lại file này.
 
 ---
@@ -75,6 +75,31 @@ Cấu trúc chuẩn:
   - `market_data.csv`
   - `vnindex_cache.csv`
 
+### 3.6 Dispersion
+- Port vào: `tools/dispersion/`
+- Tính phân tán (volatility skew, term structure) của thị trường
+
+### 3.7 Manipulation
+- Port vào: `tools/manipulation/`
+- Phát hiện dấu hiệu thao túng giá qua các metrics đặc biệt
+
+### 3.8 VaRES Engine
+- Port từ: `Desktop/VaR-ES Engine.py`
+- Chuẩn hóa vào: `tools/va_res/`
+- 3 module: A (Single Ticker), B (VN30 Stress), C (Market Complacency)
+- AI analysis chỉ ở Module C (kèm data Module B inline)
+- Self-Baseline Complacency: rolling quantile 0.1 của chính Spread từng cổ phiếu (không dùng benchmark VNINDEX)
+- Inputs:
+  - `market_data.csv` (giá tất cả mã cho Module A/C)
+  - `vnindex_cache.csv` (VNINDEX real cho Module C, thay thế synthetic mean)
+
+### 3.9 Var-CVaR(ES) VNINDEX
+- Tạo mới hoàn toàn
+- Chuẩn hóa vào: `tools/var_cvar_vnindex/`
+- Chỉ focus VNINDEX
+- Tính: rolling σ30, Parametric VaR 95%, Historical VaR 95% (3 năm), ES 95%
+- Input: `vnindex_cache.csv`
+
 ---
 
 ## 4) Pages đã đăng ký
@@ -84,6 +109,10 @@ Cấu trúc chuẩn:
 - `pages/3_Risk_Adjusted_Growth.py`
 - `pages/4_Market_Breadth.py`
 - `pages/5_ESR_Monitor.py`
+- `pages/6_Dispersion.py`
+- `pages/7_VaRES_Engine.py`
+- `pages/8_Manipulation.py`
+- `pages/9_Var_CVaR_VNINDEX.py`
 
 Lưu ý: report screenshot tự quét `pages/*.py`, nên thêm page mới là report tự bao gồm page đó.
 
@@ -94,7 +123,8 @@ Lưu ý: report screenshot tự quét `pages/*.py`, nên thêm page mới là re
 ## 5.1 Giá thị trường chính (Smart Incremental)
 - File: `data_lake/market_data.csv`
 - Script cập nhật: `command/update_data.py`
-- **Incremental mode (default):** Nếu file đã tồn tại → chỉ tải ngày mới từ `last_date - 3 ngày` đến `today`, merge vào file cũ (không ghi đè NaN).
+- **Incremental mode (default):** Nếu file đã tồn tại → chỉ tải ngày mới từ `last_date - 3 ngày` đến `today`, merge bằng `combine_first()` (union indices, giữ old data nếu new là NaN).
+  - **Lưu ý quan trọng:** Không dùng `.loc[df_new.index, col] = df_new[col]` vì silently drop các ngày chưa có trong old DataFrame.
 - **Backfill mode:**
   - `python command/update_data.py --backfill 2190` (~6 năm)
   - `python command/update_data.py --from-date 2020-01-01`
@@ -233,7 +263,10 @@ Các page đã áp dụng:
 - Risk Adjusted Growth
 - Market Breadth
 - ESR Monitor
-- Dispersion (đã có cache theo ngày riêng trong `data_lake` + kiểm tra `cache_date`)
+- Dispersion
+- VaRES Engine
+- Manipulation
+- Var-CVaR VNINDEX
 
 UI hiển thị trạng thái cache:
 - `⚡ Dùng cache cùng ngày...`
@@ -453,9 +486,142 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 
 ---
 
-## 18) Nguyên tắc làm việc tiếp theo (cập nhật)
+## 19) Phiên cập nhật 2026-05-10 (tiếp) — VaRES Engine + Var-CVaR VNINDEX + Pipeline Refactor
 
-- AI CIO hiện tại tổng hợp **7 phòng ban** (Fear Greed, Manipulation, Dispersion, Upside Ratio, Risk Adjusted Growth, Market Breadth, ESR Monitor)
+### 19.1 Tích hợp VaRES Engine (Tool #8)
+
+**File gốc:** `Desktop/VaR-ES Engine.py` (297 dòng, Polars/Numba backend)
+
+**Chuẩn hóa vào:** `tools/va_res/`
+- `quant/metrics.py`: `SystemicRiskEngine` với `RiskConfig`, `numba_historical_risk()`, `calculate_risk_metrics()` (Cornish-Fisher + Historical), `calculate_contagion_index()`, `calculate_complacency_index()`, `get_latest_risk_status()`
+- `ui/sidebar.py`: Menu radio (A/B/C) + date picker
+- `ui/charts.py`: 3 plotly charts (individual risk, systemic risk, complacency index)
+- `page.py`: 3 module (A: single ticker, B: VN30 stress, C: market complacency) + AI analysis block
+- `report.py`: `snapshot()` cho AI CIO — tính Stress Index + Complacency Index + top 3 crash/mispriced
+
+**Pages:** `pages/7_VaRES_Engine.py`
+
+**Prompt:** `promt/va_res_promt.md`
+
+**Tích hợp AI CIO:**
+- `shared/ai_cio.py`: thêm `run_va_res()` → gọi `vares_snapshot()`, gọi AI, cache
+- `run_executive_summary()`: gộp 8 báo cáo
+- `promt/executive_summary_promt.md`: thêm section 8 (toán học VaRES)
+- `app.py`: spinner "8 báo cáo"
+
+### 19.2 Fix lỗi Polars ColumnNotFoundError trong VaRES
+
+**Nguyên nhân:** `.with_columns([...])` chuỗi trong `calculate_risk_metrics` — cột `mean`/`std` vừa tạo không thể tham chiếu ngay trong cùng block khi tính `kurtosis`.
+
+**Fix:** Tách thành 2 `.with_columns()` riêng biệt (chain).
+- File sửa: `tools/va_res/quant/metrics.py` + `Desktop/VaR-ES Engine.py`
+
+### 19.3 Cập nhật calculate_complacency_index — Self-Baseline
+
+**Thay đổi cốt lõi:**
+- Bỏ `bench_spread` từ benchmark VNINDEX
+- Thay bằng `self_baseline_spread` = rolling quantile 0.1 của chính Spread của cổ phiếu đó (252 phiên)
+- `dynamic_threshold = self_baseline_spread × multiplier`
+
+**File tham khảo:** `Desktop/calculate_complacency_index.txt`
+
+**File sửa:** `tools/va_res/quant/metrics.py`
+
+### 19.4 Restructure AI VaRES — Chỉ Module C, kèm data Module B
+
+**Thay đổi:**
+- Module A/B không còn AI analysis riêng
+- Module C (Complacency) khi bấm AI → tính Module B (VN30 Stress) inline → gộp cả B + C vào prompt
+- Prompt `promt/va_res_promt.md` cập nhật: 2 section MODULE B và MODULE C + placeholder [Breached Count], [Mispriced Count]
+
+**File sửa:** `tools/va_res/page.py`, `tools/va_res/report.py`, `shared/ai_cio.py`, `promt/va_res_promt.md`
+
+### 19.5 VNINDEX data source cho Module C
+
+**Thay đổi:** Thay vì tính Synthetic Index = mean(tickers), giờ load VNINDEX từ `data_lake/vnindex_cache.csv` qua `load_custom()`.
+
+**File sửa:** `tools/va_res/page.py`, `tools/va_res/report.py`
+
+### 19.6 Tinh chỉnh Prompt VaRES — Đúng bản chất Complacency
+
+**Vấn đề:** AI hiểu nhầm "Complacency Index thấp = thị trường an toàn".
+
+**Fix trong `promt/va_res_promt.md`:**
+- Thêm section `# LƯU Ý QUAN TRỌNG VỀ CÁCH HIỂU COMPLACENCY INDEX`
+- Complacency chỉ xảy ra 2 regime: Phân phối đỉnh + Tích lũy đi ngang
+- Complacency thấp KHÔNG đồng nghĩa an toàn (có thể đang hoảng loạn/sụp đổ/uptrend)
+- Tuyệt đối không viết "thị trường bình thường" chỉ vì Complacency thấp
+
+### 19.7 Data Pipeline — Smart Incremental Refactor
+
+**Vấn đề:** Mỗi ngày cron tải lại toàn bộ lookback (~3 năm) → chậm, dễ hit rate limit.
+
+**Giải pháp:**
+- `command/update_data.py`: refactor thành incremental + backfill mode
+  - **Incremental (default):** Đọc file cũ, chỉ tải từ `last_date - 3 ngày` → `today`, merge bằng `combine_first()`
+  - **`--backfill N`:** Tải N ngày lịch sử
+  - **`--from-date YYYY-MM-DD`:** Tải từ ngày cụ thể
+- `config.py`: thêm `DEFAULT_BACKFILL_DAYS = 2190` (~6 năm)
+- `.github/workflows/update_pipeline.yml`: thêm `workflow_dispatch` inputs `backfill_days` + `from_date`
+
+**Kết quả test:** Incremental chạy 251 mã × 6 ngày ≈ 5 phút. Market_data mở rộng từ 925 → 1708 ngày (~7 năm, 2019–2026).
+
+### 19.8 Tạo tool mới: Var-CVaR(ES) VNINDEX (Tool #9)
+
+**Yêu cầu:** Tool chỉ focus VNINDEX, tính rolling σ30, Parametric VaR 95%, Historical VaR 3 năm, ES 95%.
+
+**Files mới:**
+- `tools/var_cvar_vnindex/quant/metrics.py`: `calculate_var_cvar_metrics()` — log-return, σ30, Param VaR (z=-1.645), Historical VaR (rolling 5th percentile, 756 ngày), ES (mean of tail ≤ VaR)
+- `tools/var_cvar_vnindex/ui/sidebar.py`: Date picker + AI provider + API key
+- `tools/var_cvar_vnindex/ui/charts.py`: Plotly 4 traces (σ, Param VaR, Hist VaR, ES + fill)
+- `tools/var_cvar_vnindex/page.py`: Compute → session_state → display (lọc theo plot_start_date) + AI block
+- `tools/var_cvar_vnindex/report.py`: `snapshot()` cho AI CIO
+- `pages/9_Var_CVaR_VNINDEX.py`: Entry page
+- `promt/var_cvar_vnindex_promt.md`: AI prompt — so sánh Parametric vs Historical VaR, đánh giá ES spread, fat tail
+
+**Files sửa:**
+- `shared/ai_cio.py`: thêm `run_var_cvar_vnindex()`, executive summary → 9 báo cáo
+- `promt/executive_summary_promt.md`: thêm section 9 (toán học Var-CVaR)
+- `app.py`: spinner "9 báo cáo"
+- `docs/skill.md`: cập nhật danh sách tool
+
+**Kết quả test:**
+```
+VNINDEX: 1,915.37 | σ30: 1.22% | Param VaR: -1.43% | Hist VaR: -1.64% | ES: -3.00%
+```
+
+### 19.9 Module B VaRES — Thêm chi tiết kết quả tính toán
+
+**Thay đổi:**
+- Thêm 3 metrics cards (Tổng mã VN30, Số mã thủng VaR, Stress Index)
+- Thêm top 3 breach margin chi tiết (ticker + margin% + return% + VaR%)
+- Bảng trạng thái thêm cột Breach Margin (%)
+
+**File sửa:** `tools/va_res/page.py`
+
+### 19.10 Module C VaRES — Bỏ phân ngành, dùng toàn bộ universe
+
+**Thay đổi:**
+- Bỏ `MARKET_TICKERS` dict hardcode, `ALL_MARKET_TICKERS` list
+- Universe = toàn bộ columns trong `market_data.csv` (trừ date_col và VNINDEX)
+- Bảng kết quả bỏ cột "Ngành"
+- Bỏ `benchmark_ticker` trong `get_latest_risk_status()` (vì Self-Baseline không cần benchmark)
+
+**File sửa:** `tools/va_res/page.py`, `tools/va_res/quant/metrics.py`
+
+### 19.11 Fix plot_start_date không phản ứng trong VaRES
+
+**Nguyên nhân:** `st.button` chỉ return True 1 lần. Khi đổi ngày trong sidebar, script rerun, button về False, block tính toán + vẽ không chạy lại.
+
+**Fix:** Refactor tách tính toán (lưu session_state khi bấm button) và hiển thị (đọc từ session_state + lọc theo plot_start_date) cho cả 3 module A/B/C.
+
+**File sửa:** `tools/va_res/page.py`
+
+---
+
+## 20) Nguyên tắc làm việc tiếp theo (cập nhật)
+
+- AI CIO hiện tại tổng hợp **9 phòng ban** (Fear Greed, Manipulation, Dispersion, Upside Ratio, Risk Adjusted Growth, Market Breadth, ESR Monitor, VaRES Engine, Var-CVaR VNINDEX)
 - Tất cả tool đều có AI analysis riêng lẻ + cache cross-tool
 - **Model AI & temperature configurable từ 1 chỗ** (`config.py`): đổi `AI_MODEL` / `AI_TEMPERATURE` là toàn bộ platform cùng đổi theo
 - **Multi-provider AI**: Kimi 2.6 + DeepSeek V4 Pro; cache tách biệt; UI chọn model ở tất cả tool
@@ -466,6 +632,7 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 - **Manual-sync**: Streamlit Cloud tự động upload cache lên GitHub sau khi chạy AI CIO (cần `GITHUB_TOKEN` trong Secrets)
 - **Force refresh**: Cho phép user ghi đè cache cùng ngày nếu muốn tái tạo báo cáo
 - **GitHub Actions permissions**: Đảm bảo bật `Read and write permissions` cho workflow
+- **Data pipeline**: Incremental daily + Backfill qua `--backfill` / `--from-date` / workflow_dispatch
 - Nguồn data chính: **VCI**, fallback **KBS**
 - Report duy nhất trên app: **PDF Export của AI CIO** (thay thế screenshot PDF)
 - COE mặc định: **14%**
