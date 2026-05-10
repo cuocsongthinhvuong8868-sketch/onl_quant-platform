@@ -29,6 +29,12 @@ def render_sidebar() -> dict:
     """
     st.sidebar.title("⚙️ Cài đặt")
 
+    time_interval = st.sidebar.selectbox(
+        "📅 Khung thời gian hiển thị",
+        options=["1M", "3M", "6M", "YTD", "1Y", "All"],
+        index=4,
+    )
+
     window_size = st.sidebar.slider(
         "⏳ Quant Window (ngày)",
         min_value=20, max_value=60, value=60, step=10,
@@ -54,4 +60,4 @@ def render_sidebar() -> dict:
         "- Skewness: Kelly non-parametric"
     )
 
-    return {"window_size": window_size, "ai_provider": ai_provider, "api_key": api_key}
+    return {"window_size": window_size, "time_interval": time_interval, "ai_provider": ai_provider, "api_key": api_key}
