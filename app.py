@@ -1,9 +1,17 @@
 """
 app.py — Trang chủ Streamlit.
 """
+import os
 import streamlit as st
 from pathlib import Path
 from shared.page_layout import setup_page
+
+# Lấy GITHUB_TOKEN từ Streamlit secrets nếu có
+if "GITHUB_TOKEN" not in os.environ:
+    try:
+        os.environ["GITHUB_TOKEN"] = st.secrets["GITHUB_TOKEN"]
+    except Exception:
+        pass
 
 setup_page("Quant Platform")
 
@@ -36,10 +44,10 @@ else:
     st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
 
 # ── AI CIO Report status (quét tất cả provider) ──
-_today_str = date.today().strftime('%d%m%y')
+TODAY_STR = date.today().strftime('%d%m%y')
 _available_cio = []
 for _pk, _pv in AI_PROVIDER_MAP.items():
-    _rp = DATA_LAKE / "daily_cache" / f"executive_summary_{_pk}_{_today_str}.txt"
+    _rp = DATA_LAKE / "daily_cache" / f"executive_summary_{_pk}_{TODAY_STR}.txt"
     if _rp.exists():
         _rm = datetime.fromtimestamp(_rp.stat().st_mtime)
         _available_cio.append((_pk, _pv["display"], _rm))
@@ -182,6 +190,7 @@ if st.session_state.show_cio_input:
                 with st.spinner("AI CIO đang tổng hợp 7 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
                     try:
                         from shared.ai_cio import run_executive_summary, _read_cache
+                        from shared.github_sync import upload_file
                         
                         # Hiển thị nếu đã có cache
                         cached_sum = _read_cache("executive_summary", cio_provider)
@@ -190,11 +199,25 @@ if st.session_state.show_cio_input:
                             st.session_state["cio_provider"] = cio_provider
                             st.success("Tải kết quả AI CIO từ bộ nhớ tạm!")
                             st.markdown(cached_sum)
+                            report_text = cached_sum
                         else:
                             summary_report = run_executive_summary(cio_key, cio_provider)
                             st.session_state["cio_report"] = summary_report
                             st.session_state["cio_provider"] = cio_provider
                             st.success("Hoàn thành Báo cáo Tổng lệnh!")
                             st.markdown(summary_report)
+                            report_text = summary_report
+                        
+                        # ── Đồng bộ lên GitHub (cả cache & mới tạo) ──
+                        try:
+                            cache_path = f"data_lake/daily_cache/executive_summary_{cio_provider}_{TODAY_STR}.txt"
+                            upload_file(
+                                cache_path,
+                                report_text.encode("utf-8"),
+                                f"Auto: AI CIO {cio_provider} report {TODAY_STR}",
+                            )
+                            st.success("✅ Đã đồng bộ báo cáo lên GitHub!")
+                        except Exception as gh_err:
+                            st.info(f"ℹ️ Chưa đồng bộ GitHub: {gh_err}")
                     except Exception as e:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")

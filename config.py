@@ -40,7 +40,7 @@ AI_PROVIDER_MAP = {
     },
     "deepseek-v4-pro": {
         "display": "DeepSeek V4 Pro",
-        "api_model": "deepseek-chat",   # DeepSeek-V3 chat endpoint
+        "api_model": "DeepSeek-V4-Pro",   # DeepSeek-V3 chat endpoint
         "base_url": "https://api.deepseek.com/v1",
     },
 }
