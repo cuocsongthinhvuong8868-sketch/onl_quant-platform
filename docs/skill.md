@@ -91,15 +91,19 @@ Lưu ý: report screenshot tự quét `pages/*.py`, nên thêm page mới là re
 
 ## 5) Data pipeline hiện tại
 
-## 5.1 Giá thị trường chính
+## 5.1 Giá thị trường chính (Smart Incremental)
 - File: `data_lake/market_data.csv`
-- Script cập nhật: `update_data.py`
+- Script cập nhật: `command/update_data.py`
+- **Incremental mode (default):** Nếu file đã tồn tại → chỉ tải ngày mới từ `last_date - 3 ngày` đến `today`, merge vào file cũ (không ghi đè NaN).
+- **Backfill mode:**
+  - `python command/update_data.py --backfill 2190` (~6 năm)
+  - `python command/update_data.py --from-date 2020-01-01`
 - `VNINDEX` đã thêm vào `tickers.csv`, nhưng lưu riêng file index.
 
 ## 5.2 VNINDEX riêng
 - File: `data_lake/vnindex_cache.csv`
 - Script: `update_data.py` có hàm `update_vnindex(start, end)`
-- Trong `update()` sẽ gọi cập nhật VNINDEX trước.
+- Trong `update()` sẽ gọi cập nhật VNINDEX trước, cùng logic incremental/backfill.
 
 ## 5.3 Fundamentals ngân hàng
 - File: `data_lake/bank_fundamentals.csv`
@@ -178,8 +182,12 @@ Checklist chuẩn hóa:
 - Chạy app:
   - `streamlit run /Users/macos/Desktop/quant_platform/app.py`
 
-- Update giá + VNINDEX:
+- Update giá + VNINDEX (incremental — chỉ tải ngày mới):
   - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py`
+- Backfill lịch sử dài (~6 năm):
+  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py --backfill 2190`
+- Backfill từ ngày cụ thể:
+  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py --from-date 2020-01-01`
 
 - Update fundamentals bank:
   - `python3 /Users/macos/Desktop/quant_platform/command/update_bank_fundamentals.py`

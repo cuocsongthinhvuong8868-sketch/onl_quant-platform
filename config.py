@@ -13,7 +13,8 @@ TICKERS_FILE = ROOT_DIR / "tickers.csv"
 DATA_LAKE.mkdir(parents=True, exist_ok=True)
 
 VNSTOCK_API_KEY       = os.getenv("VNSTOCK_API_KEY", "")
-DEFAULT_LOOKBACK_DAYS = 1095
+DEFAULT_LOOKBACK_DAYS = 1095      # ~3 năm — dùng khi file chưa tồn tại
+DEFAULT_BACKFILL_DAYS = 2190      # ~6 năm — gợi ý cho --backfill
 DEFAULT_WINDOW        = 60
 RANK_WINDOW           = 252
 

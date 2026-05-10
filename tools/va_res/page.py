@@ -40,7 +40,7 @@ STRESS_THRESHOLD_VN30 = 0.40
 COMPLACENCY_THRESHOLD_MKT = 0.80
 
 def show():
-    st.title("Hệ Thống Phân Tích Rủi Ro Vĩ Mô & Định Giá Sai (VaRES)")
+    st.title("Hệ Thống Phân Tích Hệ Số Tự Mãn  & Định Giá Sai (VaR-ES)")
     st.caption("Công cụ giám sát Value at Risk & Expected Shortfall (Polars/Numba backend).")
 
     menu, plot_start_date = render_sidebar()
