@@ -218,7 +218,7 @@ if st.session_state.show_cio_input:
             if not cio_key:
                 st.error("Vui lòng nhập API Key!")
             else:
-                with st.spinner("AI CIO đang tổng hợp 8 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
+                with st.spinner("AI CIO đang tổng hợp 9 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
                     try:
                         from shared.ai_cio import run_executive_summary, _read_cache
                         from shared.github_sync import upload_file

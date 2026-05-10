@@ -41,6 +41,8 @@ from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 from tools.esr_monitor.quant.metrics import calculate_esr
 # Import logic VaRES Engine
 from tools.va_res.report import snapshot as vares_snapshot
+# Import logic Var-CVaR VNINDEX
+from tools.var_cvar_vnindex.report import snapshot as var_cvar_snapshot
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
@@ -438,6 +440,31 @@ def run_va_res(client, df_stocks, provider_key: str = "kimi-2.6", model: str = N
     _write_cache("va_res", res, provider_key)
     return res
 
+def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("var_cvar_vnindex", provider_key)
+    if cached: return cached
+    
+    snap = var_cvar_snapshot(df_stocks)
+    
+    with open(str(ROOT_DIR / "promt" / "var_cvar_vnindex_promt.md"), "r", encoding="utf-8") as f:
+        prompt_template = f.read()
+    
+    full_prompt = prompt_template.replace("[Nhập ngày]", snap['date'])\
+                                 .replace("[Giá VNINDEX]", f"{snap['vnindex_price']:,.2f}")\
+                                 .replace("[σ 30 ngày]", f"{snap['stdev_30']*100:.2f}%")\
+                                 .replace("[Parametric VaR]", f"{snap['parametric_var']*100:.2f}%")\
+                                 .replace("[Historical VaR]", f"{snap['historical_var']*100:.2f}%")\
+                                 .replace("[Expected Shortfall]", f"{snap['expected_shortfall']*100:.2f}%")\
+                                 .replace("[ES - VaR Spread]", f"{snap['es_var_spread']*100:.2f}%")
+    
+    parts = full_prompt.split("# INPUT DATA")
+    sys_p = parts[0].strip()
+    usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("var_cvar_vnindex", res, provider_key)
+    return res
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
@@ -454,6 +481,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     r6 = run_market_breadth(client, df_stocks, provider_key, model)
     r7 = run_esr_monitor(client, df_stocks, provider_key, model)
     r8 = run_va_res(client, df_stocks, provider_key, model)
+    r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     
     all_reports = (
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
@@ -463,7 +491,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
         f"=== 5. RISK ADJUSTED GROWTH ===\n{r5}\n\n"
         f"=== 6. MARKET BREADTH ===\n{r6}\n\n"
         f"=== 7. ESR MONITOR ===\n{r7}\n\n"
-        f"=== 8. VARES ENGINE ===\n{r8}"
+        f"=== 8. VARES ENGINE ===\n{r8}\n\n"
+        f"=== 9. VAR-CVAR VNINDEX ===\n{r9}"
     )
     
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:

@@ -41,45 +41,54 @@ def show():
 
     try:
         df_price_pandas = load_close_prices()
-        # Reset index to make Date a column for Polars
         df_price_pandas = df_price_pandas.reset_index()
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
 
     engine = SystemicRiskEngine()
+    date_col = df_price_pandas.columns[0]
 
+    # ============================================================
+    # MODULE A — Phân tích Cổ phiếu Riêng lẻ
+    # ============================================================
     if menu == "A. Phân tích Cổ phiếu Riêng lẻ":
         st.subheader("Phân Tích Rủi Ro Cổ Phiếu Riêng Lẻ")
         ticker = st.text_input("Nhập mã cổ phiếu (VD: STB, HPG):", "STB").upper()
-        if st.button("Chạy Phân Tích"):
+        
+        if st.button("Chạy Phân Tích", key="va_res_a_run"):
             if ticker not in df_price_pandas.columns:
                 st.error(f"Không tìm thấy dữ liệu cho mã {ticker}.")
             else:
-                date_col = df_price_pandas.columns[0]
-                df_ticker_pandas = df_price_pandas[[date_col, ticker]].dropna()
-                df_ticker_pl = pl.from_pandas(df_ticker_pandas)
-                
                 with st.spinner(f"Đang xử lý dữ liệu cho {ticker}..."):
+                    df_ticker_pandas = df_price_pandas[[date_col, ticker]].dropna()
+                    df_ticker_pl = pl.from_pandas(df_ticker_pandas)
                     df_metrics = engine.calculate_risk_metrics(df_ticker_pl, method='cornish_fisher')
-                    
-                    # Convert to pandas for plotting
-                    df_plot = df_metrics.to_pandas().set_index(date_col)
-                    df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
-                    
-                    p_ret = df_plot['return']
-                    p_std20 = p_ret.rolling(window=20, min_periods=1).std() * -1
-                    p_var = df_plot['VaR']
-                    p_es = df_plot['ES']
-                    
-                    fig_ply = plot_individual_risk(p_std20, p_var, p_es, ticker)
-                    st.plotly_chart(fig_ply, use_container_width=True)
+                    st.session_state.vares_a = {
+                        'ticker': ticker,
+                        'df_metrics': df_metrics.to_pandas().set_index(date_col),
+                    }
 
+        if 'vares_a' in st.session_state and st.session_state.vares_a['ticker'] == ticker:
+            df_plot = st.session_state.vares_a['df_metrics']
+            df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
+            
+            p_ret = df_plot['return']
+            p_std20 = p_ret.rolling(window=20, min_periods=1).std() * -1
+            p_var = df_plot['VaR']
+            p_es = df_plot['ES']
+            
+            fig_ply = plot_individual_risk(p_std20, p_var, p_es, ticker)
+            st.plotly_chart(fig_ply, use_container_width=True)
+
+    # ============================================================
+    # MODULE B — Cảnh báo Sập gãy (Rổ VN30)
+    # ============================================================
     elif menu == "B. Cảnh báo Sập gãy (Rổ VN30)":
         st.subheader("Cảnh báo Sập gãy - Lây lan Khủng hoảng (VN30)")
-        if st.button("Quét Rủi Ro Hệ Thống"):
+        
+        if st.button("Quét Rủi Ro Hệ Thống", key="va_res_b_run"):
             available_vn30 = [t for t in VN30_TICKERS if t in df_price_pandas.columns]
-            date_col = df_price_pandas.columns[0]
             df_vn30_pandas = df_price_pandas[[date_col] + available_vn30]
             df_vn30_pl = pl.from_pandas(df_vn30_pandas)
             
@@ -87,58 +96,74 @@ def show():
                 df_metrics = engine.calculate_risk_metrics(df_vn30_pl, method='cornish_fisher')
                 df_contagion = engine.calculate_contagion_index(df_metrics)
                 
-                df_plot = df_contagion.to_pandas().set_index(date_col)
-                df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
-                stress_index = df_plot['Contagion_Index']
-                
-                fig_ply = plot_systemic_risk(stress_index, STRESS_THRESHOLD_VN30)
-                st.plotly_chart(fig_ply, use_container_width=True)
-                
-                # ── Chi tiết kết quả tính toán VN30 ──
-                latest_date = df_metrics[date_col].max()
-                df_latest = df_metrics.filter(pl.col(date_col) == latest_date).to_pandas()
-                df_latest['breach_margin'] = df_latest['VaR'] - df_latest['return']
-                breached = df_latest[df_latest['return'] < df_latest['VaR']]
-                total_vn30 = len(available_vn30)
-                breached_count = len(breached)
-                breach_pct = (breached_count / total_vn30 * 100.0) if total_vn30 > 0 else 0.0
-                
-                col_m1, col_m2, col_m3 = st.columns(3)
-                with col_m1:
-                    st.metric("Tổng số mã VN30", total_vn30)
-                with col_m2:
-                    st.metric("Số mã thủng VaR", breached_count, delta=f"{breach_pct:.1f}%")
-                with col_m3:
-                    latest_stress = stress_index.iloc[-1] if not stress_index.empty else 0.0
-                    st.metric("Stress Index", f"{latest_stress:.2f}%", delta="🔴 Vượt ngưỡng" if latest_stress > STRESS_THRESHOLD_VN30 * 100 else "🟢 An toàn")
-                
-                if not breached.empty:
-                    top3_breach = breached.sort_values(by='breach_margin', ascending=False).head(3)
-                    st.markdown("**🔥 Top 3 mã thủng VaR sâu nhất (theo breach margin):**")
-                    for idx, row in top3_breach.iterrows():
-                        st.markdown(f"- **{row['ticker']}**: breach margin = `{row['breach_margin']*100:.2f}%`, Return = `{row['return']*100:.2f}%`, VaR = `{row['VaR']*100:.2f}%`")
-                else:
-                    st.success("✅ Không có mã nào trong rổ VN30 thủng VaR hôm nay.")
-                
-                # Bảng trạng thái T0 đầy đủ
-                risk_table = pd.DataFrame({
-                    'Return (%)': df_latest['return'] * 100, 
-                    'CF VaR 95% (%)': df_latest['VaR'] * 100, 
-                    'ES (%)': df_latest['ES'] * 100,
-                    'Breach Margin (%)': df_latest['breach_margin'] * 100,
-                    'Tình trạng': np.where(df_latest['return'] < df_latest['VaR'], 'Cảnh báo Lây lan', 'Bình thường')
-                }, index=df_latest['ticker']).round(2).dropna().sort_values(by=['Tình trạng', 'Breach Margin (%)'], ascending=[True, False])
-                
-                def highlight_crash(row):
-                    if row['Tình trạng'] == 'Cảnh báo Lây lan': return ['font-weight: bold; color: red'] * len(row)
-                    return [''] * len(row)
-                st.dataframe(risk_table.style.apply(highlight_crash, axis=1), use_container_width=True)
+                st.session_state.vares_b = {
+                    'available_vn30': available_vn30,
+                    'df_contagion': df_contagion.to_pandas(),
+                    'df_metrics': df_metrics.to_pandas(),
+                    'date_col': date_col,
+                }
 
+        if 'vares_b' in st.session_state:
+            data = st.session_state.vares_b
+            available_vn30 = data['available_vn30']
+            df_contagion = data['df_contagion']
+            df_metrics = data['df_metrics']
+            date_col = data['date_col']
+            
+            # Plot — lọc theo plot_start_date
+            df_plot = df_contagion.set_index(date_col)
+            df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
+            stress_index = df_plot['Contagion_Index']
+            
+            fig_ply = plot_systemic_risk(stress_index, STRESS_THRESHOLD_VN30)
+            st.plotly_chart(fig_ply, use_container_width=True)
+            
+            # Chi tiết T0
+            latest_date = df_metrics[date_col].max()
+            df_latest = df_metrics[df_metrics[date_col] == latest_date].copy()
+            df_latest['breach_margin'] = df_latest['VaR'] - df_latest['return']
+            breached = df_latest[df_latest['return'] < df_latest['VaR']]
+            total_vn30 = len(available_vn30)
+            breached_count = len(breached)
+            breach_pct = (breached_count / total_vn30 * 100.0) if total_vn30 > 0 else 0.0
+            
+            col_m1, col_m2, col_m3 = st.columns(3)
+            with col_m1:
+                st.metric("Tổng số mã VN30", total_vn30)
+            with col_m2:
+                st.metric("Số mã thủng VaR", breached_count, delta=f"{breach_pct:.1f}%")
+            with col_m3:
+                latest_stress = stress_index.iloc[-1] if not stress_index.empty else 0.0
+                st.metric("Stress Index", f"{latest_stress:.2f}%", delta="🔴 Vượt ngưỡng" if latest_stress > STRESS_THRESHOLD_VN30 * 100 else "🟢 An toàn")
+            
+            if not breached.empty:
+                top3_breach = breached.sort_values(by='breach_margin', ascending=False).head(3)
+                st.markdown("**🔥 Top 3 mã thủng VaR sâu nhất (theo breach margin):**")
+                for _, row in top3_breach.iterrows():
+                    st.markdown(f"- **{row['ticker']}**: breach margin = `{row['breach_margin']*100:.2f}%`, Return = `{row['return']*100:.2f}%`, VaR = `{row['VaR']*100:.2f}%`")
+            else:
+                st.success("✅ Không có mã nào trong rổ VN30 thủng VaR hôm nay.")
+            
+            risk_table = pd.DataFrame({
+                'Return (%)': df_latest['return'] * 100, 
+                'CF VaR 95% (%)': df_latest['VaR'] * 100, 
+                'ES (%)': df_latest['ES'] * 100,
+                'Breach Margin (%)': df_latest['breach_margin'] * 100,
+                'Tình trạng': np.where(df_latest['return'] < df_latest['VaR'], 'Cảnh báo Lây lan', 'Bình thường')
+            }, index=df_latest['ticker']).round(2).dropna().sort_values(by=['Tình trạng', 'Breach Margin (%)'], ascending=[True, False])
+            
+            def highlight_crash(row):
+                if row['Tình trạng'] == 'Cảnh báo Lây lan': return ['font-weight: bold; color: red'] * len(row)
+                return [''] * len(row)
+            st.dataframe(risk_table.style.apply(highlight_crash, axis=1), use_container_width=True)
+
+    # ============================================================
+    # MODULE C — Cảnh báo Định giá sai Rủi ro (Toàn thị trường)
+    # ============================================================
     elif menu == "C. Cảnh báo Định giá sai Rủi ro (Toàn thị trường)":
         st.subheader("Cảnh báo Định giá sai Rủi ro & Bất cân xứng Mức Bù Rủi Ro")
-        if st.button("Quét Định Giá Rủi Ro"):
-            date_col = df_price_pandas.columns[0]
-            # Universe = toàn bộ mã có trong data lake (trừ date_col và VNINDEX)
+        
+        if st.button("Quét Định Giá Rủi Ro", key="va_res_c_run"):
             available_tickers = [t for t in df_price_pandas.columns if t not in (date_col, 'VNINDEX')]
             
             cols_to_select = [date_col] + available_tickers
@@ -163,44 +188,54 @@ def show():
                 except FileNotFoundError:
                     st.warning("Không có dữ liệu VNINDEX, dùng Synthetic Index.")
                     df_mkt_pandas['VNINDEX'] = df_mkt_pandas[available_tickers].mean(axis=1)
-                
+            
             df_mkt_pl = pl.from_pandas(df_mkt_pandas)
             
             with st.spinner("Đang tính toán hệ số trượt động & rủi ro nền (Polars)..."):
                 df_metrics = engine.calculate_risk_metrics(df_mkt_pl, method='cornish_fisher')
                 df_complacency = engine.calculate_complacency_index(df_metrics)
-                
-                # Plot Complacency Index
                 df_comp_agg = df_complacency.group_by(date_col).agg(
                     (pl.col("is_mispriced").sum() / len(available_tickers) * 100).alias("Complacency_Index")
                 ).sort(date_col)
-                
-                df_plot = df_comp_agg.to_pandas().set_index(date_col)
-                df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
-                
-                fig_ply = plot_complacency_index(df_plot['Complacency_Index'], COMPLACENCY_THRESHOLD_MKT)
-                st.plotly_chart(fig_ply, use_container_width=True)
-
-                # Status Table
                 df_status = engine.get_latest_risk_status(df_complacency)
-                
                 df_status_pd = df_status.to_pandas()
                 
-                # Format table
-                df_status_pd['Spread (%)'] = (df_status_pd['Spread'] * 100).round(2)
-                df_status_pd['Ngưỡng động (%)'] = (df_status_pd['dynamic_threshold'] * 100).round(2)
-                df_display = df_status_pd[['ticker', 'Spread (%)', 'Ngưỡng động (%)', 'Status']].set_index('ticker')
-                df_display.rename(columns={'Status': 'Tình trạng'}, inplace=True)
-                
-                def highlight_mispriced(row):
-                    if row['Tình trạng'] == 'Risk Mispriced': return ['font-weight: bold; color: darkorange'] * len(row)
-                    return [''] * len(row)
-                st.dataframe(df_display.style.apply(highlight_mispriced, axis=1), use_container_width=True)
+                st.session_state.vares_c = {
+                    'df_comp_agg': df_comp_agg.to_pandas(),
+                    'df_status_pd': df_status_pd,
+                    'available_tickers': available_tickers,
+                    'date_col': date_col,
+                }
 
-                # Lưu vào session_state để AI block sử dụng
-                st.session_state.vares_c_complacency = float(df_comp_agg.to_pandas().iloc[-1]['Complacency_Index'])
-                st.session_state.vares_c_status_pd = df_status_pd
-                st.session_state.vares_c_datecol = date_col
+        if 'vares_c' in st.session_state:
+            data = st.session_state.vares_c
+            df_comp_agg = data['df_comp_agg']
+            df_status_pd = data['df_status_pd']
+            available_tickers = data['available_tickers']
+            date_col = data['date_col']
+            
+            # Plot — lọc theo plot_start_date
+            df_plot = df_comp_agg.set_index(date_col)
+            df_plot = df_plot[df_plot.index >= pd.to_datetime(plot_start_date)]
+            
+            fig_ply = plot_complacency_index(df_plot['Complacency_Index'], COMPLACENCY_THRESHOLD_MKT)
+            st.plotly_chart(fig_ply, use_container_width=True)
+
+            # Status Table
+            df_status_pd['Spread (%)'] = (df_status_pd['Spread'] * 100).round(2)
+            df_status_pd['Ngưỡng động (%)'] = (df_status_pd['dynamic_threshold'] * 100).round(2)
+            df_display = df_status_pd[['ticker', 'Spread (%)', 'Ngưỡng động (%)', 'Status']].set_index('ticker')
+            df_display.rename(columns={'Status': 'Tình trạng'}, inplace=True)
+            
+            def highlight_mispriced(row):
+                if row['Tình trạng'] == 'Risk Mispriced': return ['font-weight: bold; color: darkorange'] * len(row)
+                return [''] * len(row)
+            st.dataframe(df_display.style.apply(highlight_mispriced, axis=1), use_container_width=True)
+
+            # Lưu vào session_state để AI block sử dụng
+            st.session_state.vares_c_complacency = float(df_comp_agg.iloc[-1]['Complacency_Index'])
+            st.session_state.vares_c_status_pd = df_status_pd
+            st.session_state.vares_c_datecol = date_col
 
         # ── AI Analysis: chỉ ở Module C, kèm dữ liệu Module B (VN30 Stress) ──
         from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
