@@ -161,6 +161,16 @@ def render():
                         ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                         with open(ai_cache_file, "w", encoding="utf-8") as f:
                             f.write(result_text)
+                            
+                        # Đồng bộ lên GitHub
+                        try:
+                            from shared.github_sync import upload_file
+                            import os as _os
+                            if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in _os.environ:
+                                repo_path = f"data_lake/daily_cache/{ai_cache_file.name}"
+                                upload_file(repo_path, result_text.encode("utf-8"), f"Auto sync cache: {ai_cache_file.name}")
+                        except Exception as e:
+                            print(f"[GH Sync Error] {e}")
 
                         st.success("Hoàn thành phân tích!")
                         with st.container(border=True):
