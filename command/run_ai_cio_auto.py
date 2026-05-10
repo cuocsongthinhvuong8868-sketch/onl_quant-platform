@@ -7,17 +7,14 @@ Environment variables (from GitHub Secrets):
 - TELEGRAM_BOT_TOKEN
 - TELEGRAM_CHAT_ID
 
-Logic:
-1. Check if today's cache already exists → skip if yes (use --force to override).
-2. Run run_executive_summary() with DeepSeek.
-3. Create PDF from report text.
-4. Parse final line for score & regime.
-5. Send Telegram message + PDF document.
+Logic (default mode — dùng cho cron):
+1. Kiểm tra cache hôm nay.
+   - CÓ cache → đọc cache, tạo PDF, gửi Telegram (KHÔNG gọi API).
+   - KHÔNG cache → gọi API DeepSeek → lưu cache → tạo PDF → gửi Telegram.
 
 Usage:
-    python command/run_ai_cio_auto.py           # normal (skip if cache exists)
-    python command/run_ai_cio_auto.py --force   # force re-run API even if cache exists
-    python command/run_ai_cio_auto.py --resend  # read existing cache, create PDF, send Telegram
+    python command/run_ai_cio_auto.py           # default: ưu tiên cache, nếu thiếu thì gọi API
+    python command/run_ai_cio_auto.py --force   # force gọi API mới (xóa cache cũ nếu có)
 """
 import os
 import re
@@ -46,24 +43,18 @@ TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
 
 FORCE = "--force" in sys.argv or "-f" in sys.argv
-RESEND = "--resend" in sys.argv or "-r" in sys.argv
 
 
 # ── Helpers ──
 def _get_report_text() -> str:
-    """Lấy nội dung báo cáo: từ cache hoặc gọi API mới."""
-    if RESEND and CACHE_PATH.exists():
-        print(f"[RESEND] Reading existing cache: {CACHE_PATH.name}")
+    """Lấy nội dung báo cáo: ưu tiên cache, thiếu thì gọi API."""
+    if CACHE_PATH.exists() and not FORCE:
+        print(f"[CACHE] Found existing cache: {CACHE_PATH.name}")
         cached = _read_cache("executive_summary", PROVIDER_KEY)
         if cached:
+            print("[CACHE] Using cached report.")
             return cached
-        print("[WARN] Cache file exists but empty/corrupt. Will try API.")
-
-    if CACHE_PATH.exists() and not FORCE and not RESEND:
-        print(f"[SKIP] Cache already exists: {CACHE_PATH.name}")
-        print(f"[HINT] Use --force to override and re-run API.")
-        print(f"[HINT] Use --resend to read cache and send Telegram only.")
-        sys.exit(0)
+        print("[WARN] Cache file exists but empty/corrupt. Will call API.")
 
     if FORCE and CACHE_PATH.exists():
         print(f"[FORCE] Removing existing cache: {CACHE_PATH.name}")
