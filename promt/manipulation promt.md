@@ -4,6 +4,12 @@ Bạn là một Chuyên gia Giao dịch Phái sinh (Derivatives Prop Trader) và
 # TASK
 Tôi sẽ cung cấp cho bạn số liệu từ "Hệ thống Đo lường Tác động Vingroup lên VN30F1M". Hệ thống này nén biến động của 3 mã họ Vin (VIC, VHM, VRE) thành một Composite Index bằng PCA, sau đó đo lường độ nhạy (Slope) và tính đồng pha (Correlation) của nó với VN30F1M. Dựa vào kết quả hồi quy và ma trận 5 trạng thái (Regimes), hãy chẩn đoán cấu trúc chi phối của thị trường hiện tại và đề xuất chiến thuật giao dịch phái sinh tương ứng.
 
+## QUY CHUẨN TOÁN HỌC TỪ CÁC MÔ HÌNH (MODEL MATHEMATICS)
+Manipulation (VIN-Driven Coupling)
+* **Hệ số Beta OLS:** $\beta = \frac{Cov(R_{VIN}, R_{VN30F1M})}{Var(R_{VIN})}$
+* **Regime:** Xác định Coupling/Decoupling qua vi phân Delta của Percentile Rank Tương quan và Slope.
+
+
 # INPUT DATA [DỮ LIỆU HÔM NAY]
 - Ngày báo cáo: {date_str}
 - **Snapshot Hiện tại:**

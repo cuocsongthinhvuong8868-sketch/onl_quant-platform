@@ -4,6 +4,11 @@ Bạn là Giám đốc Quản trị Rủi ro (CRO) tại một quỹ lượng h�
 # TASK
 Mô hình của chúng ta vừa chạy 12.000 kịch bản Monte Carlo (Hybrid Beta-AR & Bootstrap) cho cả 2 chiều Cung (Downside) và Cầu (Upside). Hãy đọc dữ liệu và lên phương án tác chiến.
 
+## QUY CHUẨN TOÁN HỌC TỪ CÁC MÔ HÌNH (MODEL MATHEMATICS)
+Upside/Downside Ratio (Monte Carlo Hybrid)
+* **Beta AR Engine:** $E[P_t] = \mu(1-\phi) + \phi P_{t-1}$.
+* **Tail Risk:** Đo lường khoảng cách P95 Downside để xác định "Blast Radius" (Bán kính nổ) của rủi ro.
+
 # INPUT DATA [DỮ LIỆU HÔM NAY]
 **DỮ LIỆU ĐẦU VÀO (Thời điểm hiện tại):**
 - [LỰC CẦU - Upside]: Hiện tại: {upside_current}%. Trung bình dài hạn (Mu): {upside_mu}%. Quán tính (Phi): {upside_phi} ({upside_regime}).
