@@ -35,12 +35,18 @@ if MARKET_DATA.exists():
 else:
     st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
 
-# AI CIO Report status (default provider)
-_default_provider = st.session_state.get("cio_provider", "kimi-2.6")
-ai_report_path = DATA_LAKE / "daily_cache" / f"executive_summary_{_default_provider}_{date.today().strftime('%d%m%y')}.txt"
-if ai_report_path.exists():
-    ai_mod = datetime.fromtimestamp(ai_report_path.stat().st_mtime)
-    st.success(f"✅ Report AI CIO ({AI_PROVIDER_MAP[_default_provider]['display']}) đã sẵn sàng — {ai_mod.strftime('%d/%m/%Y %H:%M')}")
+# ── AI CIO Report status (quét tất cả provider) ──
+_today_str = date.today().strftime('%d%m%y')
+_available_cio = []
+for _pk, _pv in AI_PROVIDER_MAP.items():
+    _rp = DATA_LAKE / "daily_cache" / f"executive_summary_{_pk}_{_today_str}.txt"
+    if _rp.exists():
+        _rm = datetime.fromtimestamp(_rp.stat().st_mtime)
+        _available_cio.append((_pk, _pv["display"], _rm))
+
+if _available_cio:
+    for _pk, _disp, _rm in _available_cio:
+        st.success(f"✅ Report AI CIO ({_disp}) đã sẵn sàng — {_rm.strftime('%d/%m/%Y %H:%M')}")
 else:
     st.info("ℹ️ Chưa có report AI CIO. Chạy '🔥 Executive Summary (AI CIO)' để tạo.")
 
@@ -87,37 +93,69 @@ def _create_pdf(text: str, path: str):
             pdf.multi_cell(text_width, 6, line.replace('**', ''))
     pdf.output(path)
 
+# ── Xuất PDF AI CIO (cho phép chọn model khi có nhiều bản) ──
+if "cio_pdf_choice" not in st.session_state:
+    st.session_state.cio_pdf_choice = None
+
 col1, col2 = st.columns([1, 1])
 with col1:
     if st.button("📄 Xuất PDF Report AI CIO", type="primary", use_container_width=True):
-        # Ưu tiên session_state, fallback cache file
-        report_text = st.session_state.get("cio_report", "")
-        cio_provider = st.session_state.get("cio_provider", "kimi-2.6")
-        if not report_text:
-            from shared.ai_cio import _read_cache
-            report_text = _read_cache("executive_summary", cio_provider) or ""
-        
-        if not report_text:
-            st.error("⚠️ Chưa có báo cáo AI CIO. Vui lòng chạy 'Executive Summary (AI CIO)' trước.")
+        # Nếu chỉ có 1 bản → dùng luôn; nếu nhiều bản → hiện dropdown chọn
+        if len(_available_cio) == 1:
+            st.session_state.cio_pdf_choice = _available_cio[0][0]
+        elif len(_available_cio) > 1:
+            st.session_state.cio_pdf_choice = "__choose__"
         else:
-            with st.spinner("Đang tạo PDF..."):
-                try:
-                    reports_dir = Path(__file__).resolve().parent / "reports"
-                    reports_dir.mkdir(parents=True, exist_ok=True)
-                    provider_prefix = cio_provider.replace("-", "_")
-                    pdf_path = reports_dir / f"{date.today().strftime('%d%m%y')}_{provider_prefix}_executive_summary.pdf"
-                    _create_pdf(report_text, str(pdf_path))
-                    st.success(f"Đã tạo PDF: {pdf_path.name}")
-                    with open(pdf_path, "rb") as f:
-                        st.download_button(
-                            label="⬇️ Tải xuống PDF",
-                            data=f,
-                            file_name=pdf_path.name,
-                            mime="application/pdf",
-                            use_container_width=True
-                        )
-                except Exception as e:
-                    st.error(f"Lỗi tạo PDF: {e}")
+            st.session_state.cio_pdf_choice = None
+            st.error("⚠️ Chưa có báo cáo AI CIO. Vui lòng chạy 'Executive Summary (AI CIO)' trước.")
+
+# Hiện dropdown chọn model khi có nhiều bản báo cáo
+if st.session_state.cio_pdf_choice == "__choose__" and len(_available_cio) > 1:
+    with st.container(border=True):
+        st.markdown("### 📄 Chọn bản báo cáo để xuất PDF")
+        chosen = st.selectbox(
+            "Model AI:",
+            options=[pk for pk, _, _ in _available_cio],
+            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+            key="cio_pdf_model_select",
+        )
+        if st.button("⬇️ Tạo & Tải PDF", use_container_width=True):
+            st.session_state.cio_pdf_choice = chosen
+
+# Thực hiện tạo PDF khi đã có lựa chọn hợp lệ
+if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__choose__":
+    cio_provider = st.session_state.cio_pdf_choice
+    # Ưu tiên session_state nếu khớp provider đang chọn
+    report_text = ""
+    if st.session_state.get("cio_provider") == cio_provider:
+        report_text = st.session_state.get("cio_report", "")
+    if not report_text:
+        from shared.ai_cio import _read_cache
+        report_text = _read_cache("executive_summary", cio_provider) or ""
+
+    if not report_text:
+        st.error("⚠️ Không đọc được nội dung báo cáo. Vui lòng chạy lại Executive Summary.")
+        st.session_state.cio_pdf_choice = None
+    else:
+        with st.spinner("Đang tạo PDF..."):
+            try:
+                reports_dir = Path(__file__).resolve().parent / "reports"
+                reports_dir.mkdir(parents=True, exist_ok=True)
+                provider_prefix = cio_provider.replace("-", "_")
+                pdf_path = reports_dir / f"{date.today().strftime('%d%m%y')}_{provider_prefix}_executive_summary.pdf"
+                _create_pdf(report_text, str(pdf_path))
+                st.success(f"Đã tạo PDF: {pdf_path.name}")
+                with open(pdf_path, "rb") as f:
+                    st.download_button(
+                        label="⬇️ Tải xuống PDF",
+                        data=f,
+                        file_name=pdf_path.name,
+                        mime="application/pdf",
+                        use_container_width=True
+                    )
+            except Exception as e:
+                st.error(f"Lỗi tạo PDF: {e}")
+        st.session_state.cio_pdf_choice = None
 
 with col2:
     if "show_cio_input" not in st.session_state:
