@@ -172,6 +172,9 @@ with col2:
     if st.button("🔥 Executive Summary (AI CIO)", type="primary", use_container_width=True):
         st.session_state.show_cio_input = True
 
+if "cio_force_refresh" not in st.session_state:
+    st.session_state.cio_force_refresh = False
+
 if st.session_state.show_cio_input:
     with st.container(border=True):
         st.markdown("### 🤖 Kích hoạt AI CIO")
@@ -183,7 +186,21 @@ if st.session_state.show_cio_input:
             key="cio_ai_provider",
         )
         cio_key = st.text_input("Nhập API Key:", type="password", key="cio_api_key")
-        if st.button("🚀 Bắt đầu Tổng hợp", use_container_width=True):
+        
+        # Kiểm tra cache trước
+        from shared.ai_cio import _read_cache as _cio_read_cache
+        _cached_sum = _cio_read_cache("executive_summary", cio_provider)
+        
+        col_run, col_refresh = st.columns([1, 1])
+        with col_run:
+            run_btn = st.button("🚀 Bắt đầu Tổng hợp", use_container_width=True)
+        with col_refresh:
+            if _cached_sum:
+                refresh_btn = st.button("🔄 Tạo lại (ghi đè cache)", use_container_width=True, type="secondary")
+            else:
+                refresh_btn = False
+        
+        if run_btn or refresh_btn:
             if not cio_key:
                 st.error("Vui lòng nhập API Key!")
             else:
@@ -191,10 +208,18 @@ if st.session_state.show_cio_input:
                     try:
                         from shared.ai_cio import run_executive_summary, _read_cache
                         from shared.github_sync import upload_file
+                        import os as _os
                         
-                        # Hiển thị nếu đã có cache
+                        # Nếu bấm "Tạo lại" hoặc force_refresh → xóa cache hiện tại
+                        if refresh_btn:
+                            cache_file = DATA_LAKE / "daily_cache" / f"executive_summary_{cio_provider}_{TODAY_STR}.txt"
+                            if cache_file.exists():
+                                _os.remove(cache_file)
+                                st.info("🗑️ Đã xóa cache cũ, đang tạo báo cáo mới...")
+                        
+                        # Chạy (sẽ dùng cache nếu còn, hoặc gọi API nếu đã xóa)
                         cached_sum = _read_cache("executive_summary", cio_provider)
-                        if cached_sum:
+                        if cached_sum and not refresh_btn:
                             st.session_state["cio_report"] = cached_sum
                             st.session_state["cio_provider"] = cio_provider
                             st.success("Tải kết quả AI CIO từ bộ nhớ tạm!")
