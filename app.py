@@ -250,12 +250,14 @@ if st.session_state.show_cio_input:
                         # ── Đồng bộ lên GitHub (cả cache & mới tạo) ──
                         try:
                             cache_path = f"data_lake/daily_cache/executive_summary_{cio_provider}_{TODAY_STR}.txt"
-                            upload_file(
+                            gh_result = upload_file(
                                 cache_path,
                                 report_text.encode("utf-8"),
                                 f"Auto: AI CIO {cio_provider} report {TODAY_STR}",
                             )
                             st.success("✅ Đã đồng bộ báo cáo lên GitHub!")
+                            if gh_result.get("file_url"):
+                                st.markdown(f"🔗 [Xem file trên GitHub]({gh_result['file_url']})")
                         except Exception as gh_err:
                             st.warning(f"⚠️ Chưa đồng bộ GitHub: {gh_err}")
                     except Exception as e:

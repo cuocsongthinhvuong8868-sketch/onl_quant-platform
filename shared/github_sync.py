@@ -154,4 +154,24 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
         except Exception:
             err_body = resp.text
         raise RuntimeError(f"GitHub PUT failed ({resp.status_code}): {err_body}")
-    return resp.json()
+
+    data = resp.json()
+    content = data.get("content", {})
+    file_url = content.get("html_url", "")
+    download_url = content.get("download_url", "")
+
+    # Kiểm tra file thực sự có thể download được
+    if download_url:
+        check = requests.get(download_url, headers=headers, timeout=15)
+        if check.status_code != 200:
+            raise RuntimeError(
+                f"GitHub PUT returned success nhưng file không tải được ({check.status_code}). "
+                f"Có thể do cache CDN. URL: {file_url}"
+            )
+
+    return {
+        "ok": True,
+        "file_url": file_url,
+        "download_url": download_url,
+        "sha": content.get("sha", ""),
+    }
