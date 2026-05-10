@@ -8,6 +8,15 @@ from shared.page_layout import setup_page
 
 setup_page("Quant Platform")
 
+# ── Đọc GitHub token từ Streamlit Secrets hoặc env ──
+_github_token = os.getenv("GITHUB_TOKEN", "")
+if not _github_token:
+    try:
+        _github_token = st.secrets["GITHUB_TOKEN"]
+        os.environ["GITHUB_TOKEN"] = _github_token
+    except Exception:
+        _github_token = ""
+
 st.title("📊 Quant Platform")
 st.markdown("Chọn công cụ từ menu bên trái để bắt đầu.")
 st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI Hoặc Deepseek AI .")
@@ -35,6 +44,18 @@ if MARKET_DATA.exists():
     st.success(f"✅ Data lake sẵn sàng — cập nhật lần cuối: {mod.strftime('%d/%m/%Y %H:%M')}")
 else:
     st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
+
+# ── Debug GitHub Sync ──
+with st.expander("🔧 Kiểm tra GitHub Sync"):
+    try:
+        from shared.github_sync import test_connection
+        gh_test = test_connection()
+        if gh_test["ok"]:
+            st.success(f"✅ GitHub OK — User: {gh_test['user']} | Repo: {gh_test['repo']} | Push: {gh_test['can_push']}")
+        else:
+            st.error(f"❌ GitHub lỗi: {gh_test['error']}")
+    except Exception as gh_debug_err:
+        st.error(f"❌ Không kiểm tra được GitHub: {gh_debug_err}")
 
 # ── AI CIO Report status (quét tất cả provider) ──
 TODAY_STR = date.today().strftime('%d%m%y')
