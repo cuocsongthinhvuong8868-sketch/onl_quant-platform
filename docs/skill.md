@@ -358,11 +358,79 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 
 ---
 
-## 16) Nguyên tắc làm việc tiếp theo (cập nhật)
+---
+
+## 17) Phiên cập nhật 2026-05-10 — Multi-Provider AI + Auto Workflow + GitHub Sync
+
+### 17.1 Thêm DeepSeek V4 Pro vào toàn bộ AI analysis
+
+**File sửa:**
+- `config.py`: thêm `AI_PROVIDER_MAP` định nghĩa 2 provider: `kimi-2.6` và `deepseek-v4-pro`
+- `shared/ai_cio.py`: refactor `call_kimi()` → `call_ai()`; cache tách biệt theo provider (`{tool}_{provider}_{date}.txt`); `run_executive_summary()` nhận `provider_key`
+- 7 tool `page.py` + 6 `sidebar.py` + `app.py`: thêm dropdown chọn model AI, textbox API Key chung (không còn ghi cứng "Kimi"), button AI tự động hiển thị tên model
+
+**Kết quả:** User có thể chọn Kimi hoặc DeepSeek ở bất kỳ tool nào. Cache độc lập theo model, không ghi đè.
+
+### 17.2 Fix AI CIO status + PDF selector đa model
+
+**File sửa:** `app.py`
+- Status trên trang chủ: **quét tất cả provider** để hiển thị, thay vì chỉ kiểm tra provider mặc định
+- Xuất PDF: nếu có **nhiều bản** báo cáo (Kimi + DeepSeek) → hiện dropdown chọn model trước khi tạo PDF
+- Tên file PDF có prefix model: `ddmmyy_kimi_2_6_executive_summary.pdf` / `ddmmyy_deepseek_v4_pro_executive_summary.pdf`
+
+### 17.3 Prompt AI CIO thêm dòng cuối bắt buộc
+
+**File sửa:** `promt/executive_summary_promt.md`
+- Thêm yêu cầu AI viết dòng cuối cùng chính xác theo format:
+  ```
+  final score & regime : <score> ; regime : <regime>
+  ```
+- Phục vụ cho việc parse tự động trong workflow
+
+### 17.4 Workflow GitHub Actions tự động chạy AI CIO
+
+**File mới:**
+- `.github/workflows/ai_cio_daily.yml` — Cron `0 20 * * 0-4` (3h sáng VN, T2–T6)
+- `command/run_ai_cio_auto.py` — Script auto-run AI CIO bằng DeepSeek
+
+**Logic:**
+1. Kiểm tra cache ngày hiện tại → skip nếu đã có
+2. Chạy `run_executive_summary()` với DeepSeek
+3. Tạo PDF từ báo cáo
+4. Parse dòng cuối `final score & regime`
+5. Gửi Telegram (tin nhắn + file PDF)
+6. Auto-commit cache + PDF về GitHub repo
+
+**Secrets cần thiết lập trên GitHub:**
+- `DEEPSEEK_API_KEY`
+- `TELEGRAM_BOT_TOKEN`
+- `TELEGRAM_CHAT_ID`
+
+### 17.5 GitHub Sync từ Streamlit Cloud
+
+**File mới:** `shared/github_sync.py` — Upload file lên GitHub qua REST API
+
+**File sửa:** `app.py`
+- Sau khi chạy AI CIO (manual), tự động upload cache lên GitHub repo
+- Lấy `GITHUB_TOKEN` từ `st.secrets` hoặc env
+- Giúp file báo cáo xuất hiện trên GitHub ngay cả khi chạy từ Streamlit Cloud container
+
+### 17.6 Thêm nút "Tạo lại (ghi đè cache)" cho AI CIO
+
+**File sửa:** `app.py`
+- Khi đã có cache, UI hiện 2 nút: `🚀 Bắt đầu Tổng hợp` (đọc cache) và `🔄 Tạo lại (ghi đè cache)` (xóa cache cũ → gọi API mới)
+
+---
+
+## 18) Nguyên tắc làm việc tiếp theo (cập nhật)
 
 - AI CIO hiện tại tổng hợp **7 phòng ban** (Fear Greed, Manipulation, Dispersion, Upside Ratio, Risk Adjusted Growth, Market Breadth, ESR Monitor)
 - Tất cả tool đều có AI analysis riêng lẻ + cache cross-tool
 - **Model AI & temperature configurable từ 1 chỗ** (`config.py`): đổi `AI_MODEL` / `AI_TEMPERATURE` là toàn bộ platform cùng đổi theo
+- **Multi-provider AI**: Kimi 2.6 + DeepSeek V4 Pro; cache tách biệt; UI chọn model ở tất cả tool
+- **Auto-report**: Workflow cron 3h sáng T2–T6 chạy DeepSeek, gửi Telegram + commit cache/PDF về GitHub
+- **Manual-sync**: Streamlit Cloud tự động upload cache lên GitHub sau khi chạy AI CIO
+- **Force refresh**: Cho phép user ghi đè cache cùng ngày nếu muốn tái tạo báo cáo
 - Nguồn data chính: **VCI**, fallback **KBS**
 - Report duy nhất trên app: **PDF Export của AI CIO** (thay thế screenshot PDF)
 - COE mặc định: **14%**
