@@ -26,3 +26,20 @@ SCORE_BANDS = [
     (60, 80, "rgba(173, 255, 47,  0.2)", "GREED"),
     (80,100, "rgba(0,   180, 0,   0.2)", "EXTREME GREED"),
 ]
+
+# ── AI Model Configuration ──
+AI_MODEL       = os.getenv("AI_MODEL", "kimi-k2.6")
+AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))
+
+AI_PROVIDER_MAP = {
+    "kimi-2.6": {
+        "display": "Kimi 2.6",
+        "api_model": "kimi-k2.6",
+        "base_url": "https://api.moonshot.ai/v1",
+    },
+    "deepseek-v4-pro": {
+        "display": "DeepSeek V4 Pro",
+        "api_model": "deepseek-chat",
+        "base_url": "https://api.deepseek.com/v1",
+    },
+}
