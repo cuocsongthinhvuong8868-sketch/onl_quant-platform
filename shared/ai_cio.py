@@ -39,6 +39,8 @@ from tools.risk_adjusted_growth.quant.scoring import compute_scores
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
 from tools.esr_monitor.quant.metrics import calculate_esr
+# Import logic VaRES Engine
+from tools.va_res.report import snapshot as vares_snapshot
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
@@ -411,6 +413,31 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     _write_cache("esr_monitor", res, provider_key)
     return res
 
+def run_va_res(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("va_res", provider_key)
+    if cached: return cached
+    
+    snap = vares_snapshot(df_stocks)
+    
+    with open(str(ROOT_DIR / "promt" / "va_res_promt.md"), "r", encoding="utf-8") as f:
+        prompt_template = f.read()
+    
+    full_prompt = prompt_template.replace("[Nhập ngày]", snap['date'])\
+                                 .replace("[Stress Index %]", f"{snap['stress_index']:.2f}%")\
+                                 .replace("[Breached Count]", str(snap.get('breached_count', 0)))\
+                                 .replace("[Top 3 Crash]", ", ".join(snap['top_3_crash']))\
+                                 .replace("[Complacency Index %]", f"{snap['complacency_index']:.2f}%")\
+                                 .replace("[Mispriced Count]", str(snap.get('mispriced_count', 0)))\
+                                 .replace("[Top 3 Mispriced]", ", ".join(snap['top_3_mispriced']))
+    
+    parts = full_prompt.split("# INPUT DATA")
+    sys_p = parts[0].strip()
+    usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("va_res", res, provider_key)
+    return res
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
@@ -426,6 +453,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     r5 = run_risk_adjusted(client, df_stocks, provider_key, model)
     r6 = run_market_breadth(client, df_stocks, provider_key, model)
     r7 = run_esr_monitor(client, df_stocks, provider_key, model)
+    r8 = run_va_res(client, df_stocks, provider_key, model)
     
     all_reports = (
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
@@ -434,7 +462,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
         f"=== 4. UPSIDE RATIO ===\n{r4}\n\n"
         f"=== 5. RISK ADJUSTED GROWTH ===\n{r5}\n\n"
         f"=== 6. MARKET BREADTH ===\n{r6}\n\n"
-        f"=== 7. ESR MONITOR ===\n{r7}"
+        f"=== 7. ESR MONITOR ===\n{r7}\n\n"
+        f"=== 8. VARES ENGINE ===\n{r8}"
     )
     
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:
