@@ -3,6 +3,7 @@ from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.esr_monitor.quant.metrics import calculate_esr
 from tools.esr_monitor.ui.charts import render_esr_chart
+from config import AI_PROVIDER_MAP
 
 
 def render():
@@ -15,7 +16,14 @@ def render():
 
     st.sidebar.divider()
     st.sidebar.header("🤖 AI Analysis")
-    kimi_key = st.sidebar.text_input("Kimi API Key", type="password", key="esr_kimi_key")
+    ai_provider = st.sidebar.selectbox(
+        "🤖 Chọn Model AI",
+        options=list(AI_PROVIDER_MAP.keys()),
+        format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+        index=0,
+        key="esr_ai_provider",
+    )
+    api_key = st.sidebar.text_input("API Key", type="password", key="esr_api_key")
 
     try:
         df_close = load_close_prices()
@@ -59,12 +67,12 @@ def render():
     st.subheader("✨ Trợ lý AI Phân tích Rủi ro Hệ thống")
 
     import os
-    from config import DATA_LAKE, AI_MODEL, AI_TEMPERATURE, ROOT_DIR
+    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
     from datetime import date
     from openai import OpenAI
 
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"esr_monitor_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"esr_monitor_{ai_provider}_{today_str}.txt"
 
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -77,16 +85,15 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        if st.button("🐺 Phân tích ESR Rủi ro Hệ thống (Moonshot AI v1 128k)", type="primary", use_container_width=True, key="esr_run_ai"):
-            if not kimi_key:
-                st.error("⚠️ Bạn chưa nhập Kimi API Key ở thanh menu bên trái.")
+        btn_label = f"🐺 Phân tích ESR Rủi ro Hệ thống ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        if st.button(btn_label, type="primary", use_container_width=True, key="esr_run_ai"):
+            if not api_key:
+                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
                 with st.spinner("AI đang phân tích rủi ro hệ thống và phân rã PCA..."):
                     try:
-                        client = OpenAI(
-                            api_key=kimi_key.strip(),
-                            base_url="https://api.moonshot.ai/v1"
-                        )
+                        cfg = AI_PROVIDER_MAP[ai_provider]
+                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
 
                         with open(str(ROOT_DIR / "promt" / "ESR monitor promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
@@ -126,7 +133,7 @@ def render():
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
                         response = client.chat.completions.create(
-                            model=AI_MODEL,
+                            model=cfg["api_model"],
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
@@ -146,4 +153,4 @@ def render():
                             st.markdown(result_text)
 
                     except Exception as e:
-                        st.error(f"Lỗi kết nối API Kimi: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")

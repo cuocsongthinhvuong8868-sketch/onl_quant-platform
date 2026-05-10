@@ -8,6 +8,7 @@ from tools.upside_ratio.quant.metrics import build_breadth_series, compute_actua
 from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
 from tools.upside_ratio.ui.sidebar import render_sidebar
 from tools.upside_ratio.ui.charts import render_history_chart, render_projection_tabs, render_diagnostics
+from config import AI_PROVIDER_MAP
 
 logging.basicConfig(
     level=logging.INFO,
@@ -32,6 +33,8 @@ def render():
         df_index = None
 
     params = render_sidebar(df_close=df_close)
+    ai_provider = params["ai_provider"]
+    api_key     = params["api_key"]
 
     st.caption(f"📅 Dữ liệu chốt phiên gần nhất: {df_close.index.max().strftime('%d/%m/%Y')}")
 
@@ -174,11 +177,11 @@ def render():
     st.subheader("✨ Trợ lý AI Quant Phân tích Đa chiều")
 
     import os
-    from config import DATA_LAKE, AI_MODEL, AI_TEMPERATURE, ROOT_DIR
+    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
     from datetime import date
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"upside_ratio_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"upside_ratio_{ai_provider}_{today_str}.txt"
     
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -191,17 +194,16 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        if st.button("🐺 Phân tích Rủi ro 2 chiều (Moonshot AI v1 128k)", type="primary", use_container_width=True):
-            if not params["kimi_key"]:
-                st.error("⚠️ Bạn chưa nhập Kimi API Key ở thanh menu bên trái.")
+        btn_label = f"🐺 Phân tích Rủi ro 2 chiều ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        if st.button(btn_label, type="primary", use_container_width=True):
+            if not api_key:
+                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
                 with st.spinner("AI đang quét ma trận 12.000 kịch bản Cung - Cầu..."):
                     try:
                         from openai import OpenAI
-                        client = OpenAI(
-                            api_key=params["kimi_key"].strip(),
-                            base_url="https://api.moonshot.ai/v1"
-                        )
+                        cfg = AI_PROVIDER_MAP[ai_provider]
+                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
                         
                         with open(str(ROOT_DIR / "promt" / "upside ratio promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
@@ -223,7 +225,7 @@ def render():
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
                         response = client.chat.completions.create(
-                            model=AI_MODEL,
+                            model=cfg["api_model"],
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
@@ -243,6 +245,6 @@ def render():
                             st.markdown(result_text)
     
                     except Exception as e:
-                        st.error(f"Lỗi kết nối API Kimi: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
 
     render_diagnostics(data["raw_upside"], data["raw_downside"], resid_up, resid_dn)

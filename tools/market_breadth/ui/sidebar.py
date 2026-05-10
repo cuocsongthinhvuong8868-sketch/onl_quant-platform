@@ -1,6 +1,7 @@
 from datetime import timedelta
 import pandas as pd
 import streamlit as st
+from config import AI_PROVIDER_MAP
 
 
 def render_sidebar(df_breadth: pd.DataFrame):
@@ -18,8 +19,15 @@ def render_sidebar(df_breadth: pd.DataFrame):
 
     st.sidebar.divider()
     st.sidebar.header("🤖 AI Analysis")
-    kimi_key = st.sidebar.text_input("Kimi API Key", type="password", key="mb_kimi_key")
+    ai_provider = st.sidebar.selectbox(
+        "🤖 Chọn Model AI",
+        options=list(AI_PROVIDER_MAP.keys()),
+        format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+        index=0,
+        key="mb_ai_provider",
+    )
+    api_key = st.sidebar.text_input("API Key", type="password", key="mb_api_key")
 
     start_dt = pd.to_datetime(start_date)
     end_dt = pd.to_datetime(end_date)
-    return start_date, end_date, start_dt, end_dt, kimi_key
+    return start_date, end_date, start_dt, end_dt, ai_provider, api_key
