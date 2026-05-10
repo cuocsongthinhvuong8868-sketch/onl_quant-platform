@@ -56,6 +56,17 @@ def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+        
+    # Đồng bộ lên GitHub
+    try:
+        from shared.github_sync import upload_file
+        import streamlit as st
+        # Chỉ upload nếu có GitHub token (chạy trên cloud)
+        if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in os.environ:
+            repo_path = f"data_lake/daily_cache/{path.name}"
+            upload_file(repo_path, content.encode("utf-8"), f"Auto sync cache: {path.name}")
+    except Exception as e:
+        print(f"[GH Sync Error] {e}")
 
 def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
     response = client.chat.completions.create(
