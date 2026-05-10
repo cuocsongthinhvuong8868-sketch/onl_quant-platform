@@ -1,6 +1,7 @@
 from datetime import datetime, timedelta
 
 import streamlit as st
+from config import AI_PROVIDER_MAP
 
 
 def render_sidebar(df_close: object = None) -> dict:
@@ -33,7 +34,13 @@ def render_sidebar(df_close: object = None) -> dict:
 
         st.divider()
         st.subheader("🧠 Tích hợp AI")
-        kimi_key = st.text_input("Kimi API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
+        ai_provider = st.selectbox(
+            "🤖 Chọn Model AI",
+            options=list(AI_PROVIDER_MAP.keys()),
+            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+            index=0,
+        )
+        api_key = st.text_input("API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
 
     return {
         "upside_x": float(upside_x),
@@ -42,5 +49,6 @@ def render_sidebar(df_close: object = None) -> dict:
         "sim_days": int(sim_days),
         "run_mode": str(run_mode),
         "backtest_date": backtest_date,
-        "kimi_key": kimi_key,
+        "ai_provider": ai_provider,
+        "api_key": api_key,
     }

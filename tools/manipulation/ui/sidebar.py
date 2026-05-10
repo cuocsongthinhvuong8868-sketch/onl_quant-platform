@@ -1,4 +1,5 @@
 import streamlit as st
+from config import AI_PROVIDER_MAP
 
 
 def render_sidebar(default_threshold: float):
@@ -8,7 +9,13 @@ def render_sidebar(default_threshold: float):
     
     st.sidebar.markdown("---")
     st.sidebar.subheader("🧠 Tích hợp AI")
-    kimi_key = st.sidebar.text_input("Kimi API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
+    ai_provider = st.sidebar.selectbox(
+        "🤖 Chọn Model AI",
+        options=list(AI_PROVIDER_MAP.keys()),
+        format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+        index=0,
+    )
+    api_key = st.sidebar.text_input("API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
     
-    return {"window": int(window), "threshold": float(threshold), "kimi_key": kimi_key}
+    return {"window": int(window), "threshold": float(threshold), "ai_provider": ai_provider, "api_key": api_key}
 

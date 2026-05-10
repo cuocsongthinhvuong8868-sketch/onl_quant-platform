@@ -29,3 +29,18 @@ SCORE_BANDS = [
 # Đổi model / temperature tại đây — tất cả tools sẽ đọc từ đây
 AI_MODEL       = os.getenv("AI_MODEL", "kimi-k2.6")
 AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))
+
+# ── Multi-provider AI map ──
+# Key dùng trong UI  ->  {display_name, api_model_name, base_url}
+AI_PROVIDER_MAP = {
+    "kimi-2.6": {
+        "display": "Kimi 2.6",
+        "api_model": "kimi-k2.6",
+        "base_url": "https://api.moonshot.ai/v1",
+    },
+    "deepseek-v4-pro": {
+        "display": "DeepSeek V4 Pro",
+        "api_model": "deepseek-chat",   # DeepSeek-V3 chat endpoint
+        "base_url": "https://api.deepseek.com/v1",
+    },
+}

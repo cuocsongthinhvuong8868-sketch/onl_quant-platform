@@ -6,6 +6,7 @@ from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
 from tools.manipulation.ui.sidebar import render_sidebar
 from tools.manipulation.ui.charts import render_core, render_event
+from config import AI_PROVIDER_MAP
 
 
 def render():
@@ -23,6 +24,8 @@ def render():
 
     default_threshold = 0.15
     p = render_sidebar(default_threshold)
+    ai_provider = p["ai_provider"]
+    api_key     = p["api_key"]
 
     data_date = str(df_prices.index.max().date())
     key = {"cache_version": 1, "window": p["window"]}
@@ -74,11 +77,11 @@ def render():
     st.subheader("✨ Trợ lý AI Quant Phân tích Tác động (Manipulation)")
 
     import os
-    from config import DATA_LAKE, AI_MODEL, AI_TEMPERATURE, ROOT_DIR
+    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
     from datetime import date
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{today_str}.txt"
     
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -91,17 +94,16 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        if st.button("🐺 Phân tích Dòng tiền & Tác động (Moonshot AI v1 128k)", type="primary", use_container_width=True):
-            if not p.get("kimi_key"):
-                st.error("⚠️ Bạn chưa nhập Kimi API Key ở thanh menu bên trái.")
+        btn_label = f"🐺 Phân tích Dòng tiền & Tác động ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        if st.button(btn_label, type="primary", use_container_width=True):
+            if not api_key:
+                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
                 with st.spinner("AI đang tổng hợp và phân tích dữ liệu manipulation..."):
                     try:
                         from openai import OpenAI
-                        client = OpenAI(
-                            api_key=p["kimi_key"].strip(),
-                            base_url="https://api.moonshot.ai/v1"
-                        )
+                        cfg = AI_PROVIDER_MAP[ai_provider]
+                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     
                         with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
@@ -140,7 +142,7 @@ def render():
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
                         response = client.chat.completions.create(
-                            model=AI_MODEL,
+                            model=cfg["api_model"],
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
@@ -160,5 +162,5 @@ def render():
                             st.markdown(result_text)
     
                     except Exception as e:
-                        st.error(f"Lỗi kết nối API Kimi: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
 

@@ -11,7 +11,7 @@ st.title("📊 Quant Platform")
 st.markdown("Chọn công cụ từ menu bên trái để bắt đầu.")
 st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI.")
 
-from config import MARKET_DATA, DATA_LAKE, ROOT_DIR
+from config import MARKET_DATA, DATA_LAKE, ROOT_DIR, AI_PROVIDER_MAP
 from datetime import datetime, date
 
 if MARKET_DATA.exists():
@@ -20,11 +20,12 @@ if MARKET_DATA.exists():
 else:
     st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
 
-# AI CIO Report status
-ai_report_path = DATA_LAKE / "daily_cache" / f"executive_summary_{date.today().strftime('%d%m%y')}.txt"
+# AI CIO Report status (default provider)
+_default_provider = st.session_state.get("cio_provider", "kimi-2.6")
+ai_report_path = DATA_LAKE / "daily_cache" / f"executive_summary_{_default_provider}_{date.today().strftime('%d%m%y')}.txt"
 if ai_report_path.exists():
     ai_mod = datetime.fromtimestamp(ai_report_path.stat().st_mtime)
-    st.success(f"✅ Report AI CIO đã sẵn sàng — {ai_mod.strftime('%d/%m/%Y %H:%M')}")
+    st.success(f"✅ Report AI CIO ({AI_PROVIDER_MAP[_default_provider]['display']}) đã sẵn sàng — {ai_mod.strftime('%d/%m/%Y %H:%M')}")
 else:
     st.info("ℹ️ Chưa có report AI CIO. Chạy '🔥 Executive Summary (AI CIO)' để tạo.")
 
@@ -76,9 +77,10 @@ with col1:
     if st.button("📄 Xuất PDF Report AI CIO", type="primary", use_container_width=True):
         # Ưu tiên session_state, fallback cache file
         report_text = st.session_state.get("cio_report", "")
+        cio_provider = st.session_state.get("cio_provider", "kimi-2.6")
         if not report_text:
             from shared.ai_cio import _read_cache
-            report_text = _read_cache("executive_summary") or ""
+            report_text = _read_cache("executive_summary", cio_provider) or ""
         
         if not report_text:
             st.error("⚠️ Chưa có báo cáo AI CIO. Vui lòng chạy 'Executive Summary (AI CIO)' trước.")
@@ -87,7 +89,8 @@ with col1:
                 try:
                     reports_dir = Path(__file__).resolve().parent / "reports"
                     reports_dir.mkdir(parents=True, exist_ok=True)
-                    pdf_path = reports_dir / f"{date.today().strftime('%d%m%y')}_executive_summary.pdf"
+                    provider_prefix = cio_provider.replace("-", "_")
+                    pdf_path = reports_dir / f"{date.today().strftime('%d%m%y')}_{provider_prefix}_executive_summary.pdf"
                     _create_pdf(report_text, str(pdf_path))
                     st.success(f"Đã tạo PDF: {pdf_path.name}")
                     with open(pdf_path, "rb") as f:
@@ -111,7 +114,14 @@ with col2:
 if st.session_state.show_cio_input:
     with st.container(border=True):
         st.markdown("### 🤖 Kích hoạt AI CIO")
-        cio_key = st.text_input("Nhập Kimi API Key:", type="password", key="cio_api_key")
+        cio_provider = st.selectbox(
+            "Chọn Model AI:",
+            options=list(AI_PROVIDER_MAP.keys()),
+            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+            index=0,
+            key="cio_ai_provider",
+        )
+        cio_key = st.text_input("Nhập API Key:", type="password", key="cio_api_key")
         if st.button("🚀 Bắt đầu Tổng hợp", use_container_width=True):
             if not cio_key:
                 st.error("Vui lòng nhập API Key!")
@@ -121,14 +131,16 @@ if st.session_state.show_cio_input:
                         from shared.ai_cio import run_executive_summary, _read_cache
                         
                         # Hiển thị nếu đã có cache
-                        cached_sum = _read_cache("executive_summary")
+                        cached_sum = _read_cache("executive_summary", cio_provider)
                         if cached_sum:
                             st.session_state["cio_report"] = cached_sum
+                            st.session_state["cio_provider"] = cio_provider
                             st.success("Tải kết quả AI CIO từ bộ nhớ tạm!")
                             st.markdown(cached_sum)
                         else:
-                            summary_report = run_executive_summary(cio_key)
+                            summary_report = run_executive_summary(cio_key, cio_provider)
                             st.session_state["cio_report"] = summary_report
+                            st.session_state["cio_provider"] = cio_provider
                             st.success("Hoàn thành Báo cáo Tổng lệnh!")
                             st.markdown(summary_report)
                     except Exception as e:

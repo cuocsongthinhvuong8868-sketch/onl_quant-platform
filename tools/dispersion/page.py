@@ -1,7 +1,7 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
+from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE, AI_PROVIDER_MAP
 from shared.data_loader import load_close_prices, load_custom
 from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
 from tools.dispersion.ui.sidebar import render_sidebar
@@ -60,6 +60,8 @@ def render():
     st.caption("Pure observation tool: Dispersion Persistence Index (DPI) & Systemic Correlation")
 
     p = render_sidebar()
+    ai_provider = p["ai_provider"]
+    api_key     = p["api_key"]
     if p["cov_refit_freq"] <= 1:
         st.warning("Thiết lập `refit Cov = 1` rất nặng với universe lớn. Nên dùng >= 3 để tăng tốc.")
 
@@ -110,7 +112,7 @@ def render():
     from datetime import date
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"dispersion_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"dispersion_{ai_provider}_{today_str}.txt"
     
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -123,17 +125,16 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        if st.button("🐺 Chẩn đoán Cấu trúc & Đứt gãy (Moonshot AI v1 128k)", type="primary", use_container_width=True):
-            if not p.get("kimi_key"):
-                st.error("⚠️ Bạn chưa nhập Kimi API Key ở thanh menu bên trái.")
+        btn_label = f"🐺 Chẩn đoán Cấu trúc & Đứt gãy ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        if st.button(btn_label, type="primary", use_container_width=True):
+            if not api_key:
+                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
                 with st.spinner("AI đang phân tích cấu trúc rủi ro phân tán..."):
                     try:
                         from openai import OpenAI
-                        client = OpenAI(
-                            api_key=p["kimi_key"].strip(),
-                            base_url="https://api.moonshot.ai/v1"
-                        )
+                        cfg = AI_PROVIDER_MAP[ai_provider]
+                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     
                         with open(str(ROOT_DIR / "promt" / "dispersion promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
@@ -164,7 +165,7 @@ def render():
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
                         response = client.chat.completions.create(
-                            model=AI_MODEL,
+                            model=cfg["api_model"],
                             messages=[
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
@@ -184,6 +185,6 @@ def render():
                             st.markdown(result_text)
     
                     except Exception as e:
-                        st.error(f"Lỗi kết nối API Kimi: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
 
 

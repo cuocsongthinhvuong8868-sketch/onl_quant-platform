@@ -3,7 +3,7 @@ from datetime import date
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
-from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
+from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE, AI_PROVIDER_MAP
 from shared.data_loader import load_close_prices, load_custom
 
 # Import logic Fear Greed
@@ -25,36 +25,39 @@ from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
 from tools.esr_monitor.quant.metrics import calculate_esr
 
-def _get_cache_path(tool_name: str) -> str:
+def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
-    return DATA_LAKE / "daily_cache" / f"{tool_name}_{today_str}.txt"
+    return DATA_LAKE / "daily_cache" / f"{tool_name}_{provider_key}_{today_str}.txt"
 
-def _read_cache(tool_name: str) -> str:
-    path = _get_cache_path(tool_name)
+def _read_cache(tool_name: str, provider_key: str = "kimi-2.6") -> str:
+    path = _get_cache_path(tool_name, provider_key)
     if path.exists():
         with open(path, "r", encoding="utf-8") as f:
             return f.read()
     return None
 
-def _write_cache(tool_name: str, content: str):
-    path = _get_cache_path(tool_name)
+def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
+    path = _get_cache_path(tool_name, provider_key)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
-def call_kimi(client, system_prompt, user_prompt):
+def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
     response = client.chat.completions.create(
-        model=AI_MODEL,
+        model=model or AI_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        temperature=AI_TEMPERATURE
+        temperature=temperature or AI_TEMPERATURE
     )
     return response.choices[0].message.content
 
-def run_fear_greed(client, df_stocks):
-    cached = _read_cache("feargreed")
+# backward-compat alias
+call_kimi = call_ai
+
+def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("feargreed", provider_key)
     if cached: return cached
     
     metrics_df = calculate_quant_metrics(df_stocks, window_size=60)
@@ -83,12 +86,12 @@ def run_fear_greed(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("feargreed", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("feargreed", res, provider_key)
     return res
 
-def run_manipulation(client, df_stocks):
-    cached = _read_cache("manipulation")
+def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("manipulation", provider_key)
     if cached: return cached
     
     df_prices = prep_mani(df_stocks)
@@ -135,12 +138,12 @@ def run_manipulation(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("manipulation", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("manipulation", res, provider_key)
     return res
 
-def run_dispersion(client, df_stocks):
-    cached = _read_cache("dispersion")
+def run_dispersion(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("dispersion", provider_key)
     if cached: return cached
     
     df_idx = load_custom("vnindex_cache.csv")
@@ -180,12 +183,12 @@ def run_dispersion(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("dispersion", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("dispersion", res, provider_key)
     return res
 
-def run_upside_ratio(client, df_stocks):
-    cached = _read_cache("upside_ratio")
+def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("upside_ratio", provider_key)
     if cached: return cached
     
     data = build_breadth_series(df_stocks, upside_x=2.0, downside_y=-2.0, lookback_days=90)
@@ -225,12 +228,12 @@ def run_upside_ratio(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("upside_ratio", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("upside_ratio", res, provider_key)
     return res
 
-def run_risk_adjusted(client, df_stocks):
-    cached = _read_cache("risk_adjusted_growth")
+def run_risk_adjusted(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("risk_adjusted_growth", provider_key)
     if cached: return cached
     
     # 1. Load & normalize fundamentals
@@ -277,12 +280,12 @@ def run_risk_adjusted(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("risk_adjusted_growth", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("risk_adjusted_growth", res, provider_key)
     return res
 
-def run_market_breadth(client, df_stocks):
-    cached = _read_cache("market_breadth")
+def run_market_breadth(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("market_breadth", provider_key)
     if cached: return cached
     
     breadth, masks = compute_breadth(df_stocks)
@@ -329,12 +332,12 @@ def run_market_breadth(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("market_breadth", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("market_breadth", res, provider_key)
     return res
 
-def run_esr_monitor(client, df_stocks):
-    cached = _read_cache("esr_monitor")
+def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("esr_monitor", provider_key)
     if cached: return cached
     
     df_index = load_custom("vnindex_cache.csv")
@@ -378,23 +381,25 @@ def run_esr_monitor(client, df_stocks):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-    res = call_kimi(client, sys_p, usr_p)
-    _write_cache("esr_monitor", res)
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("esr_monitor", res, provider_key)
     return res
 
-def run_executive_summary(api_key: str):
-    client = OpenAI(api_key=api_key.strip(), base_url="https://api.moonshot.ai/v1")
+def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
+    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
+    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    model = cfg["api_model"]
     
     df_stocks = load_close_prices()
     
     # Run tools (will use cache if already ran today)
-    r1 = run_fear_greed(client, df_stocks)
-    r2 = run_manipulation(client, df_stocks)
-    r3 = run_dispersion(client, df_stocks)
-    r4 = run_upside_ratio(client, df_stocks)
-    r5 = run_risk_adjusted(client, df_stocks)
-    r6 = run_market_breadth(client, df_stocks)
-    r7 = run_esr_monitor(client, df_stocks)
+    r1 = run_fear_greed(client, df_stocks, provider_key, model)
+    r2 = run_manipulation(client, df_stocks, provider_key, model)
+    r3 = run_dispersion(client, df_stocks, provider_key, model)
+    r4 = run_upside_ratio(client, df_stocks, provider_key, model)
+    r5 = run_risk_adjusted(client, df_stocks, provider_key, model)
+    r6 = run_market_breadth(client, df_stocks, provider_key, model)
+    r7 = run_esr_monitor(client, df_stocks, provider_key, model)
     
     all_reports = (
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
@@ -415,7 +420,7 @@ def run_executive_summary(api_key: str):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else master_full
     
-    final_res = call_kimi(client, sys_p, usr_p)
-    _write_cache("executive_summary", final_res)
+    final_res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("executive_summary", final_res, provider_key)
     
     return final_res
