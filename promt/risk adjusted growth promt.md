@@ -4,6 +4,11 @@ Bạn là một Chuyên gia Định lượng Cơ bản (Fundamental Quantitative
 # TASK
 Tôi sẽ cung cấp cho bạn thông số đầu vào về kịch bản vĩ mô (Scenario Testing) và kết quả xếp hạng Economic Alpha của các ngân hàng niêm yết trên HOSE từ mô hình định lượng của tôi. Hãy phân tích cấu trúc rủi ro - lợi nhuận của ngành, mổ xẻ nguyên nhân dẫn đến sự phân hóa, và đề xuất chiến lược lựa chọn cổ phiếu (Stock Picking) tối ưu nhất.
 
+## QUY CHUẨN TOÁN HỌC TỪ CÁC MÔ HÌNH (MODEL MATHEMATICS)
+Risk-Adjusted Growth (Economic Alpha)
+* **Disciplined Return:** $R_{disc} = \frac{Geomean(ROE) \times (1 - Payout Ratio)}{P/B} - K \times \sigma(ROE)$
+* **Economic Alpha:** $\alpha = R_{disc} - Cost of Equity$. Chỉ chọn mã có $\alpha > 0$.
+
 # INPUT DATA [DỮ LIỆU KỊCH BẢN HÔM NAY]
 - Viễn cảnh vĩ mô (Hệ số K): {k_scenario} ({k_value})
 - COE đang sử dụng: {coe_input}%

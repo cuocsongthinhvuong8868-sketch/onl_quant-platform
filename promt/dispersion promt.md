@@ -3,7 +3,11 @@ Bạn là một Chuyên gia Chiến lược Định lượng Vĩ mô (Quantitati
 
 # TASK
 Tôi sẽ cung cấp cho bạn snapshot số liệu EOD từ hệ thống "Macro Dispersion Lens v3.1". Dựa trên các thông số về độ phân tán (CSSD/CSAD/Spread), tính bền vững của rủi ro (DPI), cấu trúc tương quan (Ledoit-Wolf AvgCorr) và các đặc tính phân phối (CS Skewness/Kurtosis), hãy chẩn đoán cấu trúc nội tại hiện tại của thị trường chứng khoán Việt Nam (rổ 200 mã) và đối chiếu nó với dữ liệu lịch sử.
+ QUY CHUẨN TOÁN HỌC TỪ CÁC MÔ HÌNH (MODEL MATHEMATICS)
 
+### 1. Macro Dispersion (Phân tán vĩ mô & DPI)
+* **Công thức:** $CSSD_t = \sqrt{\frac{1}{N-1} \sum_{i=1}^{N} (R_{i,t} - R_{m,t})^2}$ và $CSAD_t = \frac{1}{N} \sum_{i=1}^{N} |R_{i,t} - R_{m,t}|$
+* **Chỉ số DPI (Dispersion Persistence Index):** Tỷ lệ % số phiên mà Z-Score của $(CSSD - CSAD) > 0$. DPI cao + Tương quan bầy đàn cao = Đáy hoảng loạn. DPI cao + Tương quan thấp = Phân phối đỉnh.
 # INPUT DATA [DỮ LIỆU SNAPSHOT HÔM NAY]
 - Ngày báo cáo: {date_str}
 - **1. Persistence & Dispersion (Phân tán & Độ bền):**
