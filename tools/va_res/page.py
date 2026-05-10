@@ -19,23 +19,6 @@ except ImportError:
 
 VN30_TICKERS = ['ACB', 'BCM', 'BID', 'BVH', 'CTG', 'FPT', 'GAS', 'GVR', 'HDB', 'HPG', 'MBB', 'MSN', 'MWG', 'PLX', 'POW', 'SAB', 'SHB', 'SSB', 'SSI', 'STB', 'TCB', 'TPB', 'VCB', 'VHM', 'VIB', 'VIC', 'VJC', 'VNM', 'VPB', 'VRE']
 
-MARKET_TICKERS = {
-    'Ngân Hàng': ['VCB', 'BID', 'CTG', 'MBB', 'TCB', 'VPB', 'ACB', 'STB', 'HDB', 'VIB', 'SHB', 'TPB', 'SSB', 'LPB', 'MSB', 'OCB', 'EIB'],
-    'Bất Động Sản': ['VIC', 'VHM', 'VRE', 'NVL', 'DIG', 'DXG', 'KDH', 'NLG', 'PDR', 'SCR', 'HDG', 'CRE', 'IJC', 'HQC', 'CEO'],
-    'Chứng Khoán': ['SSI', 'VND', 'VCI', 'HCM', 'FTS', 'BSI', 'VIX', 'CTS', 'ORS', 'AGR', 'VDS'], 
-    'Thép / Vật Liệu': ['HPG', 'HSG', 'NKG', 'HT1', 'BCC', 'SMC', 'TLH', 'BMP', 'KSB'],
-    'Xây Dựng / Đầu Tư Công': ['VCG', 'CTD', 'CII', 'HHV', 'LCG', 'FCN', 'PC1'],
-    'Hóa Chất / Phân Bón': ['DGC', 'DPM', 'DCM', 'CSV', 'LAS'],
-    'Dầu Khí': ['GAS', 'PLX', 'PVD', 'PVT', 'PVS', 'BSR', 'CNG', 'VIP', 'VTO'], 
-    'Bán Lẻ': ['MWG', 'PNJ', 'FRT', 'DGW', 'PET', 'HAX'],
-    'Khu Công Nghiệp': ['BCM', 'KBC', 'SZC', 'VGC', 'PHR', 'ITA', 'D2D', 'IDC'],
-    'Công Nghệ': ['FPT', 'CMG', 'ELC', 'SAM', 'VGI'],
-    'Cảng Biển / Logistics': ['GMD', 'HAH', 'VSC', 'TCL', 'VOS'],
-    'Nông Nghiệp / Thủy Sản': ['VHC', 'ANV', 'DBC', 'HAG', 'HNG', 'FMC', 'IDI', 'PAN', 'BAF'],
-    'Tiện Ích': ['POW', 'REE', 'NT2', 'GEG', 'VSH', 'BWE']
-}
-ALL_MARKET_TICKERS = [ticker for sublist in MARKET_TICKERS.values() for ticker in sublist]
-
 STRESS_THRESHOLD_VN30 = 0.40
 COMPLACENCY_THRESHOLD_MKT = 0.80
 
@@ -154,8 +137,9 @@ def show():
     elif menu == "C. Cảnh báo Định giá sai Rủi ro (Toàn thị trường)":
         st.subheader("Cảnh báo Định giá sai Rủi ro & Bất cân xứng Mức Bù Rủi Ro")
         if st.button("Quét Định Giá Rủi Ro"):
-            available_tickers = [t for t in ALL_MARKET_TICKERS if t in df_price_pandas.columns]
             date_col = df_price_pandas.columns[0]
+            # Universe = toàn bộ mã có trong data lake (trừ date_col và VNINDEX)
+            available_tickers = [t for t in df_price_pandas.columns if t not in (date_col, 'VNINDEX')]
             
             cols_to_select = [date_col] + available_tickers
             if 'VNINDEX' in df_price_pandas.columns:
@@ -200,18 +184,12 @@ def show():
                 # Status Table
                 df_status = engine.get_latest_risk_status(df_complacency)
                 
-                # Add Sector info
                 df_status_pd = df_status.to_pandas()
-                sectors = []
-                for t in df_status_pd['ticker']:
-                    sector = next((s for s, t_list in MARKET_TICKERS.items() if t in t_list), "Khác")
-                    sectors.append(sector)
-                df_status_pd['Ngành'] = sectors
                 
                 # Format table
                 df_status_pd['Spread (%)'] = (df_status_pd['Spread'] * 100).round(2)
                 df_status_pd['Ngưỡng động (%)'] = (df_status_pd['dynamic_threshold'] * 100).round(2)
-                df_display = df_status_pd[['ticker', 'Ngành', 'Spread (%)', 'Ngưỡng động (%)', 'Status']].set_index('ticker')
+                df_display = df_status_pd[['ticker', 'Spread (%)', 'Ngưỡng động (%)', 'Status']].set_index('ticker')
                 df_display.rename(columns={'Status': 'Tình trạng'}, inplace=True)
                 
                 def highlight_mispriced(row):
