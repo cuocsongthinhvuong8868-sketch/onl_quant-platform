@@ -39,7 +39,7 @@ AI_PROVIDER_MAP = {
         "base_url": "https://api.moonshot.ai/v1",
     },
     "deepseek-v4-pro": {
-        "display": "DeepSeek V4 Pro",
+        "display": deepseek-v4-pro",
         "api_model": "DeepSeek-V4-Pro",   # DeepSeek-V3 chat endpoint
         "base_url": "https://api.deepseek.com/v1",
     },
