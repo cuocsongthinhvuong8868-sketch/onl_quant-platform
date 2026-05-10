@@ -11,7 +11,22 @@ st.title("📊 Quant Platform")
 st.markdown("Chọn công cụ từ menu bên trái để bắt đầu.")
 st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI.")
 
-from config import MARKET_DATA, DATA_LAKE, ROOT_DIR, AI_PROVIDER_MAP
+from config import MARKET_DATA, DATA_LAKE, ROOT_DIR
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 from datetime import datetime, date
 
 if MARKET_DATA.exists():

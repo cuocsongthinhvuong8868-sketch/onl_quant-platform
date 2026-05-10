@@ -6,7 +6,21 @@ from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
 from tools.manipulation.ui.sidebar import render_sidebar
 from tools.manipulation.ui.charts import render_core, render_event
-from config import AI_PROVIDER_MAP
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 
 
 def render():
@@ -163,4 +177,3 @@ def render():
     
                     except Exception as e:
                         st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
-

@@ -6,7 +6,21 @@ from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 from tools.market_breadth.ui.sidebar import render_sidebar
 from tools.market_breadth.ui.charts import render_breadth_chart
-from config import AI_PROVIDER_MAP
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 
 
 @st.cache_data(show_spinner=False)
