@@ -24,12 +24,71 @@ def _get_token() -> str:
         # Thử đọc từ streamlit secrets nếu có
         try:
             import streamlit as st
-            token = st.secrets.get("GITHUB_TOKEN", "")
+            # Thử cả dict access và .get()
+            try:
+                token = st.secrets["GITHUB_TOKEN"]
+            except Exception:
+                token = st.secrets.get("GITHUB_TOKEN", "")
             if token:
                 os.environ["GITHUB_TOKEN"] = token
         except Exception:
             pass
     return token
+
+
+def _build_headers(token: str) -> dict:
+    """Build headers cho GitHub API."""
+    return {
+        "Authorization": f"Bearer {token}",
+        "Accept": "application/vnd.github.v3+json",
+        "X-GitHub-Api-Version": "2022-11-28",
+    }
+
+
+def test_connection() -> dict:
+    """Test kết nối GitHub API và trả về thông tin token."""
+    token = _get_token()
+    if not token:
+        return {"ok": False, "error": "GITHUB_TOKEN chưa được thiết lập."}
+
+    # Test 1: Kiểm tra rate limit / auth
+    r = requests.get(
+        "https://api.github.com/user",
+        headers=_build_headers(token),
+        timeout=15,
+    )
+    if r.status_code != 200:
+        try:
+            msg = r.json().get("message", r.text)
+        except Exception:
+            msg = r.text
+        return {"ok": False, "error": f"Auth test failed ({r.status_code}): {msg}"}
+
+    user = r.json().get("login", "unknown")
+
+    # Test 2: Kiểm tra quyền truy cập repo
+    r2 = requests.get(
+        f"{API_BASE}",
+        headers=_build_headers(token),
+        timeout=15,
+    )
+    if r2.status_code != 200:
+        try:
+            msg = r2.json().get("message", r2.text)
+        except Exception:
+            msg = r2.text
+        return {"ok": False, "error": f"Repo access failed ({r2.status_code}): {msg}", "user": user}
+
+    repo_info = r2.json()
+    permissions = repo_info.get("permissions", {})
+
+    return {
+        "ok": True,
+        "user": user,
+        "repo": f"{OWNER}/{REPO}",
+        "permissions": permissions,
+        "can_push": permissions.get("push", False) or permissions.get("admin", False),
+    }
 
 
 def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
@@ -53,13 +112,18 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
     if not token:
         raise ValueError("GITHUB_TOKEN chưa được thiết lập. Vui lòng thêm vào Streamlit Secrets hoặc environment variable.")
 
+    # Test kết nối trước
+    conn = test_connection()
+    if not conn["ok"]:
+        raise RuntimeError(f"GitHub connection test failed: {conn['error']}")
+    if not conn.get("can_push"):
+        raise RuntimeError(
+            f"Token của user '{conn['user']}' không có quyền ghi (push) vào repo {conn['repo']}. "
+            "Vui lòng kiểm tra lại quyền của GitHub Token."
+        )
+
     url = f"{API_BASE}/contents/{repo_path}"
-    # Hỗ trợ cả classic token (token) và fine-grained token (Bearer)
-    headers = {
-        "Authorization": f"Bearer {token}",
-        "Accept": "application/vnd.github.v3+json",
-        "X-GitHub-Api-Version": "2022-11-28",
-    }
+    headers = _build_headers(token)
 
     # Lấy SHA nếu file đã tồn tại (để update thay vì create)
     sha = None
@@ -69,7 +133,6 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
     elif resp.status_code == 404:
         pass  # File chưa tồn tại, sẽ tạo mới
     else:
-        # Log lỗi GET để debug
         try:
             err_body = resp.json().get("message", resp.text)
         except Exception:
