@@ -8,11 +8,15 @@ Environment variables (from GitHub Secrets):
 - TELEGRAM_CHAT_ID
 
 Logic:
-1. Check if today's cache already exists → skip if yes.
+1. Check if today's cache already exists → skip if yes (use --force to override).
 2. Run run_executive_summary() with DeepSeek.
 3. Create PDF from report text.
 4. Parse final line for score & regime.
 5. Send Telegram message + PDF document.
+
+Usage:
+    python command/run_ai_cio_auto.py           # normal (skip if cache exists)
+    python command/run_ai_cio_auto.py --force   # force re-run even if cache exists
 """
 import os
 import re
@@ -40,10 +44,17 @@ DEEPSEEK_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
 
+FORCE = "--force" in sys.argv or "-f" in sys.argv
+
 # ── 1. Skip if cache exists ──
-if CACHE_PATH.exists():
+if CACHE_PATH.exists() and not FORCE:
     print(f"[SKIP] Cache already exists: {CACHE_PATH.name}")
+    print(f"[HINT] Use --force to override and re-run.")
     sys.exit(0)
+
+if FORCE and CACHE_PATH.exists():
+    print(f"[FORCE] Removing existing cache: {CACHE_PATH.name}")
+    os.remove(CACHE_PATH)
 
 if not DEEPSEEK_KEY:
     print("[ERROR] DEEPSEEK_API_KEY not set.")
