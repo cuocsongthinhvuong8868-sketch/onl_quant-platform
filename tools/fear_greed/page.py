@@ -38,6 +38,7 @@ def render():
 
     params      = render_sidebar()
     window_size = params["window_size"]
+    time_interval = params.get("time_interval", "1Y")
     ai_provider = params["ai_provider"]
     api_key     = params["api_key"]
 
@@ -171,4 +172,25 @@ def render():
                         st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
 
     st.markdown("### 📈 Phân tích Định lượng")
-    render_analysis_chart(scored_df)
+    
+    import pandas as pd
+    end_date = scored_df.index.max()
+    if time_interval == "1M":
+        start_date = end_date - pd.DateOffset(months=1)
+        plot_df = scored_df[scored_df.index >= start_date]
+    elif time_interval == "3M":
+        start_date = end_date - pd.DateOffset(months=3)
+        plot_df = scored_df[scored_df.index >= start_date]
+    elif time_interval == "6M":
+        start_date = end_date - pd.DateOffset(months=6)
+        plot_df = scored_df[scored_df.index >= start_date]
+    elif time_interval == "YTD":
+        start_date = pd.Timestamp(year=end_date.year, month=1, day=1)
+        plot_df = scored_df[scored_df.index >= start_date]
+    elif time_interval == "1Y":
+        start_date = end_date - pd.DateOffset(years=1)
+        plot_df = scored_df[scored_df.index >= start_date]
+    else: # "All"
+        plot_df = scored_df
+
+    render_analysis_chart(plot_df)
