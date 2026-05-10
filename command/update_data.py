@@ -1,20 +1,22 @@
 """
-update_data.py — Script cập nhật dữ liệu hằng ngày.
+update_data.py — Script cập nhật dữ liệu hằng ngày (Smart Incremental).
 
 Luồng:
     1. Đọc danh sách mã từ tickers.csv
-    2. Gọi VNStock API lấy giá đóng cửa từng mã
-    3. Gộp thành 1 DataFrame (index=ngày, columns=mã)
-    4. Lưu vào data_lake/market_data.csv
+    2. Nếu market_data.csv đã tồn tại → incremental (chỉ tải ngày mới)
+    3. Nếu chưa có hoặc --backfill → tải toàn bộ lookback
+    4. Gộp thành 1 DataFrame (index=ngày, columns=mã)
+    5. Lưu vào data_lake/market_data.csv
 
-Lưu ý:
-    - Nếu 1 mã không tải được → bỏ qua, KHÔNG fallback, KHÔNG dừng chương trình.
-    - Chạy tay: python update_data.py
-    - Hoặc đặt lịch tự động bằng cron / Task Scheduler.
+Usage:
+    python command/update_data.py                    # incremental (default)
+    python command/update_data.py --backfill 2190    # backfill ~6 năm
+    python command/update_data.py --from-date 2019-01-01
 """
 import os
 import time
 import logging
+import argparse
 import pandas as pd
 from datetime import datetime, timedelta
 import sys
@@ -90,6 +92,35 @@ def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Se
         return None
 
 
+def _load_existing_market_data(path: Path) -> pd.DataFrame | None:
+    """Đọc file market_data.csv hiện có, trả về DataFrame hoặc None."""
+    if not path.exists():
+        return None
+    try:
+        df = pd.read_csv(path, index_col=0, parse_dates=True)
+        logger.info("Đã đọc file hiện có: %d ngày × %d mã, last_date=%s",
+                    df.shape[0], df.shape[1], df.index.max().strftime('%Y-%m-%d'))
+        return df
+    except Exception as e:
+        logger.warning("Không đọc được file cũ %s: %s — sẽ tạo mới.", path, e)
+        return None
+
+
+def _merge_and_save(df_new: pd.DataFrame, path: Path) -> pd.DataFrame:
+    """Merge data mới vào file cũ (nếu có). df_new ưu tiên, NaN không ghi đè data cũ."""
+    df_old = _load_existing_market_data(path)
+    if df_old is not None:
+        # df_new.combine_first(df_old): union index, ưu tiên df_new (nếu non-NaN), fallback df_old
+        df_merged = df_new.combine_first(df_old).sort_index()
+    else:
+        df_merged = df_new.sort_index()
+
+    DATA_LAKE.mkdir(parents=True, exist_ok=True)
+    df_merged.to_csv(path)
+    logger.info("Đã lưu: %d ngày × %d mã → %s", df_merged.shape[0], df_merged.shape[1], path)
+    return df_merged
+
+
 def update_vnindex(start: str, end: str) -> bool:
     """
     Tải và lưu dữ liệu VNINDEX vào data_lake/vnindex_cache.csv.
@@ -105,14 +136,12 @@ def update_vnindex(start: str, end: str) -> bool:
         logger.warning("Không tải được VNINDEX, bỏ qua lưu file VNINDEX.")
         return False
 
-    df_vni = s.to_frame(name="VNINDEX").sort_index().ffill()
-    DATA_LAKE.mkdir(parents=True, exist_ok=True)
-    df_vni.to_csv(VNINDEX_DATA)
-    logger.info("Đã lưu VNINDEX: %d ngày → %s", len(df_vni), VNINDEX_DATA)
+    df_new = s.to_frame(name="VNINDEX").sort_index().ffill()
+    _merge_and_save(df_new, VNINDEX_DATA)
     return True
 
 
-def update():
+def update(backfill_days: int | None = None, from_date: str | None = None):
     logger.info("Dùng DATA_LAKE: %s", DATA_LAKE)
     logger.info("Dùng MARKET_DATA: %s", MARKET_DATA)
     logger.info("Dùng TICKERS_FILE: %s", TICKERS_FILE)
@@ -124,9 +153,29 @@ def update():
         logger.error("tickers.csv trống. Thêm mã vào rồi chạy lại.")
         return
 
-    start = (datetime.now() - timedelta(days=DEFAULT_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
-    end   = datetime.now().strftime("%Y-%m-%d")
-    logger.info("Khoảng thời gian: %s → %s", start, end)
+    # Xác định khoảng thờ gian cần tải
+    df_existing = _load_existing_market_data(MARKET_DATA)
+    today_str = datetime.now().strftime("%Y-%m-%d")
+
+    if from_date:
+        start = from_date
+        logger.info("Mode: BACKFILL from %s", start)
+    elif backfill_days:
+        start = (datetime.now() - timedelta(days=backfill_days)).strftime("%Y-%m-%d")
+        logger.info("Mode: BACKFILL %d days → %s", backfill_days, start)
+    elif df_existing is not None:
+        # Incremental: tải từ ngày cuối file đến hôm nay
+        last_date = df_existing.index.max()
+        # Lùi 3 ngày để catch-up nếu có gap
+        start_date = last_date - timedelta(days=3)
+        start = start_date.strftime("%Y-%m-%d")
+        logger.info("Mode: INCREMENTAL from %s (last_date=%s)", start, last_date.strftime('%Y-%m-%d'))
+    else:
+        start = (datetime.now() - timedelta(days=DEFAULT_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+        logger.info("Mode: FULL (file chưa tồn tại) from %s", start)
+
+    end = datetime.now().strftime("%Y-%m-%d")
+    logger.info("Khoảng thờ gian: %s → %s", start, end)
 
     update_vnindex(start, end)
 
@@ -137,11 +186,10 @@ def update():
         return
 
     series_list = []
-    failed      = []
+    failed = []
 
     for i, symbol in enumerate(stock_tickers, 1):
         logger.info("[%d/%d] Đang tải %s...", i, len(stock_tickers), symbol)
-        # Ưu tiên VCI, fallback KBS
         s = fetch_close(symbol, start, end, source="VCI")
         if s is None:
             logger.info("  %s VCI thất bại, thử fallback KBS...", symbol)
@@ -150,7 +198,7 @@ def update():
             series_list.append(s)
         else:
             failed.append(symbol)
-        time.sleep(1)   # tránh rate limit API
+        time.sleep(1)  # rate limit
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(series_list), len(stock_tickers))
@@ -162,11 +210,16 @@ def update():
         logger.error("Chưa đủ dữ liệu (< 2 mã) — không lưu file.")
         return
 
-    df = pd.concat(series_list, axis=1).sort_index().ffill()
-    DATA_LAKE.mkdir(parents=True, exist_ok=True)
-    df.to_csv(MARKET_DATA)
-    logger.info("Đã lưu: %d mã × %d ngày → %s", df.shape[1], df.shape[0], MARKET_DATA)
+    df_new = pd.concat(series_list, axis=1).sort_index().ffill()
+    _merge_and_save(df_new, MARKET_DATA)
 
 
 if __name__ == "__main__":
-    update()
+    parser = argparse.ArgumentParser(description="Cập nhật dữ liệu giá từ VNStock")
+    parser.add_argument("--backfill", type=int, metavar="DAYS",
+                        help="Backfill N ngày lịch sử (ví dụ: 2190 ~ 6 năm)")
+    parser.add_argument("--from-date", type=str, metavar="YYYY-MM-DD",
+                        help="Backfill từ ngày cụ thể")
+    args = parser.parse_args()
+
+    update(backfill_days=args.backfill, from_date=args.from_date)

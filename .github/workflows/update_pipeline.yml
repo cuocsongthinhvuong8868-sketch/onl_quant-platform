@@ -1,7 +1,16 @@
 name: Quant Data Auto-Update Pipeline
 
 on:
-  workflow_dispatch: # Vẫn giữ dòng này để lúc nào thích thì bấm chạy bằng tay
+  workflow_dispatch:
+    inputs:
+      backfill_days:
+        description: 'Số ngày backfill (vd: 2190 ~ 6 năm). Để trống = incremental.'
+        required: false
+        default: ''
+      from_date:
+        description: 'Backfill từ ngày cụ thể (YYYY-MM-DD). Để trống = incremental.'
+        required: false
+        default: ''
   schedule:
     # Chạy tự động vào lúc 16:00 giờ Việt Nam (tức 09:00 UTC), từ Thứ 2 đến Thứ 6
     - cron: '0 9 * * 1-5'
@@ -29,7 +38,7 @@ jobs:
           python -m pip install --upgrade pip
           if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
 
-      # --- BƯỚC MỚI: TẠO FILE .ENV TỪ GITHUB SECRETS ---
+      # --- TẠO FILE .ENV TỪ GITHUB SECRETS ---
       - name: Create .env file
         run: |
           echo "MY_API_KEY=${{ secrets.MY_API_KEY }}" >> .env
@@ -37,10 +46,20 @@ jobs:
           # echo "DB_HOST=${{ secrets.DB_HOST }}" >> .env
           # echo "DB_PASS=${{ secrets.DB_PASS }}" >> .env
 
-      - name: Run update_data.py
+      - name: Run update_data.py (incremental / backfill)
         env:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-        run: python command/update_data.py
+        run: |
+          if [ -n "${{ github.event.inputs.backfill_days }}" ]; then
+            echo "Backfill mode: ${{ github.event.inputs.backfill_days }} days"
+            python command/update_data.py --backfill ${{ github.event.inputs.backfill_days }}
+          elif [ -n "${{ github.event.inputs.from_date }}" ]; then
+            echo "Backfill mode: from ${{ github.event.inputs.from_date }}"
+            python command/update_data.py --from-date ${{ github.event.inputs.from_date }}
+          else
+            echo "Incremental mode: chỉ tải ngày mới"
+            python command/update_data.py
+          fi
 
       - name: Run update_bank_fundamentals.py
         env:
