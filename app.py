@@ -17,7 +17,7 @@ setup_page("Quant Platform")
 
 st.title("📊 Quant Platform")
 st.markdown("Chọn công cụ từ menu bên trái để bắt đầu.")
-st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI.")
+st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI Hoặc Deepseek AI .")
 
 from config import MARKET_DATA, DATA_LAKE, ROOT_DIR
 try:
