@@ -6,7 +6,21 @@ from tools.risk_adjusted_growth.ui.sidebar import render_sidebar
 from tools.risk_adjusted_growth.quant.data_prep import build_base_table
 from tools.risk_adjusted_growth.quant.scoring import compute_scores
 from tools.risk_adjusted_growth.ui.charts import render_table, render_alpha_chart
-from config import AI_PROVIDER_MAP
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 
 
 @st.cache_data(show_spinner=False)

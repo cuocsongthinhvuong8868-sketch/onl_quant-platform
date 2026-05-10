@@ -1,7 +1,22 @@
 import streamlit as st
 import pandas as pd
 from datetime import date
-from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE, AI_PROVIDER_MAP
+from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 from shared.data_loader import load_close_prices, load_custom
 from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
 from tools.dispersion.ui.sidebar import render_sidebar
@@ -186,5 +201,4 @@ def render():
     
                     except Exception as e:
                         st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
-
 

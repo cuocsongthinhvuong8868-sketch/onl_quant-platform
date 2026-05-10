@@ -3,7 +3,21 @@ from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.esr_monitor.quant.metrics import calculate_esr
 from tools.esr_monitor.ui.charts import render_esr_chart
-from config import AI_PROVIDER_MAP
+try:
+    from config import AI_PROVIDER_MAP
+except ImportError:
+    AI_PROVIDER_MAP = {
+        "kimi-2.6": {
+            "display": "Kimi 2.6",
+            "api_model": "kimi-k2.6",
+            "base_url": "https://api.moonshot.ai/v1",
+        },
+        "deepseek-v4-pro": {
+            "display": "DeepSeek V4 Pro",
+            "api_model": "deepseek-chat",
+            "base_url": "https://api.deepseek.com/v1",
+        },
+    }
 
 
 def render():
