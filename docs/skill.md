@@ -393,13 +393,17 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 - `.github/workflows/ai_cio_daily.yml` — Cron `0 20 * * 0-4` (3h sáng VN, T2–T6)
 - `command/run_ai_cio_auto.py` — Script auto-run AI CIO bằng DeepSeek
 
-**Logic:**
-1. Kiểm tra cache ngày hiện tại → skip nếu đã có
-2. Chạy `run_executive_summary()` với DeepSeek
-3. Tạo PDF từ báo cáo
-4. Parse dòng cuối `final score & regime`
-5. Gửi Telegram (tin nhắn + file PDF)
-6. Auto-commit cache + PDF về GitHub repo
+**Logic (đã cập nhật):**
+1. Kiểm tra cache ngày hiện tại
+   - **CÓ cache** → đọc cache, tạo PDF, gửi Telegram (KHÔNG gọi API)
+   - **KHÔNG cache** → gọi API DeepSeek → lưu cache → tạo PDF → gửi Telegram
+2. Tạo PDF từ báo cáo
+3. Parse dòng cuối `final score & regime`
+4. Gửi Telegram (tin nhắn + file PDF)
+5. Auto-commit cache + PDF về GitHub repo
+
+**Flags:**
+- `--force` / `-f`: xóa cache cũ, gọi API mới
 
 **Secrets cần thiết lập trên GitHub:**
 - `DEEPSEEK_API_KEY`
@@ -420,6 +424,25 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 **File sửa:** `app.py`
 - Khi đã có cache, UI hiện 2 nút: `🚀 Bắt đầu Tổng hợp` (đọc cache) và `🔄 Tạo lại (ghi đè cache)` (xóa cache cũ → gọi API mới)
 
+### 17.7 Fix GitHub Actions workflow permissions
+
+**File sửa:** `.github/workflows/ai_cio_daily.yml`
+- Lỗi `403 Permission denied` khi `git push` từ GitHub Actions → cần bật **Workflow permissions: Read and write** trong repo Settings → Actions → General
+- Không dùng `token: ${{ secrets.PAT_TOKEN }}` nếu chưa thiết lập PAT; dùng default `GITHUB_TOKEN` với đúng quyền
+
+### 17.8 Fix GitHub Sync robustness
+
+**File sửa:** `shared/github_sync.py`
+- Đọc token động mỗi lần gọi (`_get_token()`), hỗ trợ cả `st.secrets["GITHUB_TOKEN"]` và `st.secrets.get()`
+- Chuyển auth sang `Bearer` thay vì `token` để tương thích cả Classic PAT và Fine-grained PAT
+- Thêm `test_connection()` kiểm tra auth + quyền repo trước khi upload
+- Thêm `X-GitHub-Api-Version` header
+- Trả về `file_url` sau upload để UI hiển thị link trực tiếp
+
+**File sửa:** `app.py`
+- Thêm collapsible **"🔧 Kiểm tra GitHub Sync"** trên trang chủ để debug connection
+- Đổi `st.info` → `st.warning` khi sync lỗi để user dễ thấy
+
 ---
 
 ## 18) Nguyên tắc làm việc tiếp theo (cập nhật)
@@ -428,9 +451,13 @@ r"c:\Users\ADMIN\Desktop\quant_platform\promt\fear greed promt.md"
 - Tất cả tool đều có AI analysis riêng lẻ + cache cross-tool
 - **Model AI & temperature configurable từ 1 chỗ** (`config.py`): đổi `AI_MODEL` / `AI_TEMPERATURE` là toàn bộ platform cùng đổi theo
 - **Multi-provider AI**: Kimi 2.6 + DeepSeek V4 Pro; cache tách biệt; UI chọn model ở tất cả tool
-- **Auto-report**: Workflow cron 3h sáng T2–T6 chạy DeepSeek, gửi Telegram + commit cache/PDF về GitHub
-- **Manual-sync**: Streamlit Cloud tự động upload cache lên GitHub sau khi chạy AI CIO
+- **Auto-report**: Workflow cron 3h sáng T2–T6 chạy DeepSeek
+  - Có cache → đọc cache → tạo PDF → gửi Telegram
+  - Không cache → gọi API → lưu cache → tạo PDF → gửi Telegram
+  - Auto-commit cache + PDF về GitHub repo
+- **Manual-sync**: Streamlit Cloud tự động upload cache lên GitHub sau khi chạy AI CIO (cần `GITHUB_TOKEN` trong Secrets)
 - **Force refresh**: Cho phép user ghi đè cache cùng ngày nếu muốn tái tạo báo cáo
+- **GitHub Actions permissions**: Đảm bảo bật `Read and write permissions` cho workflow
 - Nguồn data chính: **VCI**, fallback **KBS**
 - Report duy nhất trên app: **PDF Export của AI CIO** (thay thế screenshot PDF)
 - COE mặc định: **14%**
