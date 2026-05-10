@@ -84,3 +84,13 @@ Trình bày báo cáo sắc bén cho C-Level theo 4 phần:
 **4. Executive Order (Lệnh Tác chiến)**
 * Khuyến nghị tỷ lệ Cash/Equity và tỷ lệ Hedge phái sinh. **(LƯU Ý QUAN TRỌNG: Tỷ lệ Equity tuyệt đối KHÔNG ĐƯỢC VƯỢT QUÁ giới hạn quy định trong STRICT CAPITAL ALLOCATION MATRIX tương ứng với Điểm số ở phần 3).**
 * Chỉ đích danh cổ phiếu trong nhóm Core/Tactical dựa vào Economic Alpha dương. Cấm mua các bẫy định giá/tăng trưởng.
+
+**DÒNG CUỐI CÙNG (MANDATORY FORMAT — KHÔNG THAY ĐỔI):**
+Dòng cuối cùng của toàn bộ báo cáo phải viết chính xác theo mẫu sau (không thêm bất kỳ ký tự nào khác trước hoặc sau):
+```
+final score & regime : <số điểm 0-100> ; regime : <tên trạng thái từ STRICT CAPITAL ALLOCATION MATRIX>
+```
+Ví dụ:
+```
+final score & regime : 72 ; regime : Uptrend / Mở rộng
+```
