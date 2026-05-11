@@ -1,83 +1,80 @@
 **1. MACRO SYNTHESIS (GIAO THOA & TỔNG HỢP)**
 
-Thị trường đang vận hành dưới chế độ **"Mặt nạ ổn định" (Facade Stability)** được chống đỡ nhân tạo bởi cần gạt VIN trên phái sinh. Chỉ số VN30 duy trì trên MA125 nhưng bản chất bên dưới là một cấu trúc **Zombification** — trạng thái cân bằng chết chóc nơi cả Cung (8.76%) và Cầu (3.98%) đều nằm dưới trung bình dài hạn (Mu), với quán tính bán tự cường hóa ($\phi_{down}=0.254$ gấp 1.85 lần $\phi_{up}=0.137$).
+Bức tranh toàn cảnh là một **“Bình yên Giả tạo”** — VN30 giữ trên MA125 (1.915,37 điểm), Fear & Greed Risk Score 50.3 và thiếu xung lượng chuyển chế độ, nhưng toàn bộ cấu trúc nội tại đang phân rã dưới bề mặt. Đây là trạng thái **“Silent Fragility”** mà các mô hình định lượng đo lường được nhưng giá chưa phản ánh đầy đủ.
 
-Cơ chế dẫn dắt chính không phải kỳ vọng vĩ mô, mà là **đồng pha hóa nhân tạo (Engineered Correlation)**: hệ số Beta OLS VIN→VN30F1M ở mức 0.37 tại Percentile 98.3, biến hợp đồng tương lai thành sản phẩm đòn bẩy thuần túy của 3 mã Vin. Điều này phá vỡ tính đại diện của chỉ số và tạo ảo giác thanh khoản trong khi order book đang mỏng đi (ESR $S_{LIQ}$ đóng góp 28% vào SSI).
+*Cơ chế dẫn dắt dựa trên toán học:*
 
-Cùng lúc, **Breadth toàn thị trường** ($Breadth_{20}=31.9\%$, $Breadth_{60}=33.9\%$, $Breadth_{125}=30.3\%$, $Breadth_{252}=36.7\%$) xác nhận chế độ Bear Market với độ nén cực đại (6.4% spread). Tuy nhiên, **Stress Index** chỉ 3.33% và **Avg Pairwise Corr** = 0.172 cho thấy rủi ro chưa lan tỏa hệ thống — đây là **giai đoạn phân phối có chọn lọc (selective markdown)**, không phải bán tháo đồng loạt.
+- **Rủi ro Đuôi (Tail Risk) đang bị đánh giá thấp nghiêm trọng bởi phân phối Gaussian:** Var-CVaR Engine chỉ ra khoảng cách 21 bps giữa Parametric VaR (−1,43%) và Historical VaR (−1,64%), tức mô hình chuẩn đang mù lòa trước độ nặng đuôi thực. ES (CVaR) −3,00% cho thấy khi vỡ ngưỡng, thiệt hại trung bình gấp ~1,83 lần VaR — đặc trưng của **fat tail**. Upside Ratio Engine củng cố bằng **Blast Radius 19,59 điểm phần trăm** (khoảng cách từ Downside hiện tại 8,76% đến P95 Downside T+19 là 28,35%), với phân phối nghiêng âm rõ rệt (P95 Upside 25,63% thấp hơn Downside 2,72pp).
+- **Thanh khoản hệ thống đang mỏng đi có cấu trúc:** ESR Monitor ghi nhận SSI 56,9% (WARNING), trong đó S_VOL chiếm 33% và S_LIQ (Amihud) chiếm 28% trong phân rã eigenvector PCA. Điều này tạo ra chế độ **“Thin Market, Wide Swing”** — thanh khoản kém hấp thụ khiến các cú sốc ngoại sinh bị khuếch đại giá mạnh hơn bình thường.
+- **Phân tán nén & Khả năng bùng nổ tương quan:** Dispersion Engine đo DPI = 41,7% (<50%) và tương quan trung bình rổ 200 mã chỉ 0,172 — thị trường đang ở **Idiosyncratic Regime**. Tuy nhiên, ma trận hiệp phương sai ở trạng thái “mỏng” này đồng nghĩa một **Correlation Regime Shift** (từ 0,172 bật vọt >0,4) sẽ gây **covariance shock** cực đoan nếu xuất hiện kích thích vĩ mô.
+- **Cấu trúc vi mô bị bóp méo bởi đòn bẩy VIN:** Manipulation Engine xác nhận trạng thái **Extreme Coupling** với OLS Slope 0,37 tại Percentile 98,3 và Correlation 0,64 tại Percentile 85,0. VIN Composite đang hoạt động như cần gạt đòn bẩy (lever) lên VN30F1M. Mức slope P98,3 mang tính **phá hủy mean-reversion** — một cú giật ngược nhẹ của VIN (−1,5%) có thể kéo F1 sập gấp rưỡi do forced unwind.
+- **Độ rộng thị trường suy kiệt dạng Inverted Pyramid:** Breadth Engine cho thấy MA252 (36,7%) > MA60 (33,9%) > MA20 (31,9%) > MA125 (30,3%). Đây là phân kỳ cực đoan, phản ánh chu kỳ **Markdown** 6 tháng qua (MA125 thấp nhất). Xu hướng dài hạn chưa gãy hoàn toàn nhưng đang ở ranh giới mong manh.
 
-Điểm mù nguy hiểm nhất là **tail risk bị định giá sai**. $VaR_{Parametric}$ (-1.43%) thất bại thảm hại so với $VaR_{Historical}$ (-1.64%) và $ES$ (-3.00%), phơi bày đuôi phân phối béo (fat tail) với khoảng cách ES-VaR 1.36%. Khi điều này kết hợp với **Blast Radius** 20.13% từ mô hình Monte Carlo Hybrid, bất kỳ cú sốc ngoại sinh nào trong bối cảnh thanh khoản cạn kiệt đều kích hoạt **Liquidity Black Hole** — thị trường rơi tự do trong chân không do thiếu lệnh giới hạn (bid-ask gap).
-
-Fear & Greed Risk Score 50.3 và EGARCH Vol 6.0% ở trạng thái "bình yên" là **dữ liệu lagging và mang tính đánh lừa** khi skewness dương (+0.18) không bù đắp được động lực nén lệch âm trong order-book. Chúng ta bác bỏ tín hiệu lạc quan tếu này và ưu tiên tín hiệu từ Upside Ratio, Market Breadth và ESR.
+*Điểm mâu thuẫn then chốt:* Fear & Greed (Risk Score 50,3, EGARCH Vol 6,0%, Upside Skewness +0,18) đưa ra khuyến nghị mang tính **Long-bias** (Equity 75–85%, Beta ~1x, không hedge chỉ số). Điều này **mâu thuẫn trực tiếp** với Upside Ratio (max Equity 30–35%), ESR (Cash 25–30%, Margin 0), Var-CVaR (kích hoạt phòng vệ đuôi ngay lập tức) và Market Breadth (Selective Mean-Reversion với Margin tối đa 0–20%). Giải quyết mâu thuẫn: Fear & Greed đo lường **moment bậc hai** (phương sai có điều kiện) và moment bậc ba nhẹ (skew dương), nhưng hoàn toàn bỏ sót **moment bậc bốn** (kurtosis/fat tail) và rủi ro thanh khoản hệ thống (S_LIQ). Trong kỷ luật định lượng, tail risk và systemic fragility luôn ghi đè sentiment trung tính.
 
 ---
 
 **2. REGIME POSITIONING (ĐỊNH VỊ TRẠNG THÁI)**
 
-**Nhãn Regime:** **"Phân phối ngầm dưới vỏ bọc VIN – Pre-Crash Fragility"**
+**Nhãn chế độ: PRE-CRASH FRAGILITY / STEALTH DISTRIBUTION (Idiosyncratic Drift)**
 
-**Biện luận định lượng:**
-- **ESR SSI = 56.9%** (Warning Zone): Các trụ cột thanh khoản ($S_{LIQ}$, 28%) và biến động ($S_{VOL}$, 33%) đang xói mòn nền móng trong khi giá vẫn trên MA125 → **Phân kỳ rủi ro cấp trung gian (Fragile Bull)**.
-- **Market Breadth Bear Market Compression**: Toàn bộ các khung $Breadth_k$ nén dưới 40%, MA125 thấp nhất (30.3%) → Distribution đã hoàn tất, đang trong Markdown có chọn lọc.
-- **Zombification Signal**: Upside Ratio 2.2:1 ủng hộ phe bán; lực cầu nhiễu phi cấu trúc, không đủ tổ chức thành xu hướng.
-- **VIN-Driven Coupling Cực đoan**: OLS Slope P98.3 + Correlation P85. F1 không còn là chỉ số 30 cổ phiếu, mà là chứng khoán phái sinh thuần túy của Vingroup. Slope mean-reversion rủi ro tích lũy từng giờ.
-- **Tail Risk Fat**: ES gấp ~1.83 lần Historical VaR; Cornish-Fisher adjustment bị vô hiệu hóa bởi đuôi thực tế nặng hơn lý thuyết Gaussian.
-- **Dispersion Illusion**: Tương quan trung bình 0.172 tạo ảo giác đa dạng hóa, nhưng DPI 41.7% và thiếu Kurtosis/Skewness đồng bộ nghĩa là một macro shock bất ngờ sẽ khiến tương quan spike về >0.40 và phá vỡ danh mụch trong vài phiên.
-
-Đây không phải thị trường trung tính. Đây là giai đoạn **nền tảng bị lún trong khi mặt tiền được sơn lại bởi thanh khoản có chọn lọc**.
+Biện luận định lượng:
+- **SSI 56,9% (WARNING) + VN30 trên MA125:** Đây là **divergence nguy hiểm** giữa giá và rủi ro hệ thống. Lịch sử PCA cho thấy khi SSI dẫn trước giá trong việc phá vỡ cân bằng, xác suất hình thành **Bull Trap** trong 15–25 phiên tới là đáng kể. Thị trường chưa sụp đổ, nhưng đang **“Walking on Thin Ice”**.
+- **Inverted Pyramid Breadth + Zombification:** Breadth cho thấy không phải Capitulation (<20%) mà là **Complex Bottoming / Phân phối tiếp diễn** với lực cầu kiệt quệ nhưng chưa hoảng loạn. Upside Ratio xác nhận chế độ **Zombification** — thanh khoản bị hút khô, lò xo bên bán (Downside) được nén chặt hơn bên mua (Upside), với quán tính cung (Φ = 0,254) cao gấp 1,85 lần quán tính cầu (Φ = 0,137).
+- **Extreme Coupling (Slope P98,3):** Cấu trúc VIN-VN30F1M không phải trạng thái tự nhiên của thị trường. Nó là dấu hiệu của **leverage concentration** vào 3 mã Vin. Bất kỳ sự phân kỳ nào giữa VIN xanh và Basis thu hẹp đều là tín hiệu **Ghost Coupling** — cấu trúc giòn dễ vỡ.
+- **Fat Tail xác nhận qua VaR-ES Spread:** Spread ES − VaR = −1,36% cho thấy đuôi trái không chỉ dài mà còn **nặng (fat)**. Gaussian đang bị mù lòa.
 
 ---
 
 **3. RISK/REWARD SCORE (ĐIỂM SỐ TỔNG HỢP)**
 
-**Điểm số: 32/100**
+**Điểm số: 38/100**
 
-*(Rơi vào nhóm Phân phối / Rủi ro cao / Pre-Crash)*
+*(Chế độ phân bổ: Score 20 – 39 / Phân phối – Rủi ro cao – Pre-Crash)*
 
-**Giải thích điểm số:**
-- Khấu trừ nghiêm khắc từ trạng thái Zombification (thiếu vắng cả Cung lẫn Cầu, phía Cung chiếm quán tính áp đảo).
-- Khấu trừ từ cấu trúc Bear Market Breadth (toàn bộ MA dưới 40%, không có dòng tiền dẫn dắt rộng).
-- Khấu trừ từ Tail Risk định lượng (ES -3.00%, Blast Radius 20.13%).
-- Khấu trừ từ Microstructure Distortion (VIN Coupling P98.3 làm méo mó price discovery).
-- Điểm cộng duy nhất hạn chế: Thiếu vắng contagion hiện hữu (Stress Index 3.33%, S_COR/S_LEV chưa bùng nổ) và VN30 vẫn trên MA125, ngăn chặn xếp loại Khủng hoảng (<20 điểm).
+**Tail Risk lớn nhất:**
+- **Blast Radius 19,59 điểm %** (P95 Downside T+19 đạt 28,35%, tham chiếu từ Upside Ratio Monte Carlo Hybrid). Đây là bán kính nổ tối đa có xác suất thống kê rõ ràng trong khung 19 phiên.
+- **Fat Tail Factor 1,83x** (ES −3,00% so với Historical VaR −1,64% tại cấp độ VNINDEX, tham chiếu từ Var-CVaR Engine).
+- **Rủi ro phụ trợ:** Ghost Coupling unwind ở VIN (Slope mean-revert từ P98,3) có thể tạo **gap risk** mà không có mô hình chuẩn nào đo lường được kịp trong phiên.
 
-**Tail Risk lớn nhất:** **Liquidity-Volatility Feedback Loop dẫn đến Gap-Down Cascade.** Với $S_{VOL}$ và $S_{LIQ}$ chiếm 61% phân rã PCA của SSI, bất kỳ cú sốc VIN-specific (Basis Shock) hoặc tin tức vĩ mô bất lợi nào sẽ không được hấp thụ bởi order book mỏng. Kịch bản P95 Downside 28.89% trong vòng 19 phiên cho thấy thị trường có khả năng bốc hơi >20% nếu ngưỡng hỗ trợ bị thủng trong chân không thanh khoản.
+**Cơ sở điểm 38:** Mặc dù không có systemic contagion (Stress Index 3,3%, Complacency 4,95%) và vẫn tồn tại alpha cổ phiếu cá biệt (Dispersion thấp), nhưng sự kết hợp của SSI WARNING + Inverted Breadth + Extreme Coupling + Fat Tail + Blast Radius >15pp vượt quá ngưỡng an toàn. Thị trường không ở trạng thái Trung tính an toàn; nó đang tích lũy rủi ro ngầm với độ bất đối xứng xuống cực đại.
 
 ---
 
 **4. EXECUTIVE ORDER (LỆNH TÁC CHIẾN)**
 
-**A. PHÂN BỔ VỐN (HARD LIMIT – KHÔNG THỎA HIỆP)**
-- **Tỷ trọng Cổ phiếu (Gross Equity Exposure): TỐI ĐA 15%** (nằm trong trần 10–25% của Ma trận đi vốn).
-- **Tiền mặt / Tài sản phi rủi ro: 85%**.
-- **Margin Utilization: 0%** (Lệnh cấm tuyệt đối đòn bẩy).
-- **Hedge Phái sinh (VN30F): 0%** (Không kích hoạt short index ở thời điểm này do S_COR thấp, basis risk cao từ VIN manipulation, và cost-of-carry không được bù đắp. Sẵn sàng kích hoạt 20–30% hedge ratio nếu SSI vượt 65% hoặc VN30 thủng MA125 bằng thanh khoản xác nhận).
+**A. PHÂN BỔ VỐN TUYỆT ĐỐI (TUÂN THỦ MA TRẬN 20–39)**
 
-**B. CẤU TRÚC DANH MỤC – CHỈ GIỮ FORTRESS ALPHA**
-Toàn bộ 15% vốn cổ phiếu tập trung vào 3 mã ngân hàng duy nhất có $\alpha > 0$ qua bộ lọc $R_{disc}$ với $K=1.0$ và $COE=14\%$:
-- **HDB (8%)**: Alpha +4.5%, P/B 1.35. Cổ trụ Growth-at-Reasonable-Price duy nhất của hệ thống. Chất lượng sinh lời bền vững, biến động ROE thấp.
-- **SHB (4%)**: Alpha +3.3%, P/B ~0.96. Deep Value với đệm an toàn cực lớn. Sai lệch định giá rõ ràng.
-- **TPB (3%)**: Alpha +3.2%, P/B ~0.96. Bổ sung thanh khoản cho nhánh value của barbell.
+- **Tỷ trọng Cổ phiếu Cơ sở (Gross Equity Exposure): Tối đa 20% – 25%.** *(Hard Limit của chế độ Score 20–39: 10%–25%. Đặt tại biên trên nhưng không vượt quá 25% để dự phòng nhịp nảy kỹ thuật ngắn hạn.)*
+- **Tiền mặt / Tài sản Phi rủi ro: 75% – 80%.**
+- **Đòn bẩy (Margin): 0%.** Cấm tuyệt đối mở mới vị thế margin.
+- **Hedge Phái sinh:** Với tỷ trọng equity đã thấp, cash là lá chắn chính. Chỉ sử dụng **Short VN30F tối đa 10% – 15%** giá trị danh mục nếu buộc phải giữ các vị thế Core không thanh khoản được. Ưu tiên **Long Gamma (Put Spread)** thay vì Short Futures để tránh basis risk trong điều kiện thanh khoản mỏng (S_LIQ cao).
 
-**C. DANH SÁCH CẤM VÀO (ZERO TOLERANCE)**
-- **EIB, LPB, VCB**: Alpha âm sâu (-12.8%, -7.9%, -7.1%). Value traps định lượng.
-- **VJC**: Breach VaR đơn lẻ, rủi ro idiosyncratic hiện hữu.
-- **HSG, HPG, BID**: Spread bị nén chặt nhất toàn thị trường, định giá sai rủi ro.
-- **Toàn bộ nhóm BĐS, Chứng khoán, Thép, Small/Mid-cap**: Không nằm trong Top Volume liquidity haven, thanh khoản mỏng trong bối cảnh $S_{LIQ}$ xấu đi.
-- **VIC, VHM, VRE**: Tuyệt đối không nắm giữ hay đầu cơ. Slope mean-reversion từ P98.3 có thể gây Basis Shock bất cứ lúc nào.
+**B. CƠ CẤU DANH MỤC — CHỈ GIỮ FORTRESS CÓ ALPHA DƯƠNG**
 
-**D. ĐIỀU KIỆN TÁI GIẢI NGÂN (CHỈ XEM XÉT KHI)**
-- (i) Upside Ratio hiện tại cắt lên trên 10%; hoặc
-- (ii) $\phi_{up}$ vượt qua $\phi_{down}$; hoặc
-- (iii) Breadth MA20 vượt MA60 và cả hai vượt ngưỡng 40%; hoặc
-- (iv) SSI hạ nhiệt dưới 50% kết hợp VIN Decoupling (Slope về dưới P80).
-Cho đến khi đó, **đứng ngoài quan sát**.
+Theo nguyên tắc **Zero Weight on Negative Alpha**, danh mục chỉ được phép tồn tại các mã sinh lời sau khi điều chỉnh rủi ro vượt Cost of Equity 14%:
 
-**E. RÀO CHẮN RỦI RO CƠ HỌC**
-- Cắt lỗ cứng từng mã: **-3%**.
-- Nếu VN30 đóng cửa thủng MA125: **Thanh lý toàn bộ vị thế cổ phiếu, chuyển 100% cash.**
-- Nếu Upside Ratio P95 Downside được kích hoạt (thị trường rơi vào tail event): **Không dùng lệnh limit mà dùng market order thoát hàng bảo toàn vốn.**
+| Nhóm | Mã CK | Tỷ trọng đề xuất trong Equity Sleeve | Lý do chiến lược |
+|------|-------|-------------------------------------|------------------|
+| **CORE** | **HDB** | 45 – 50% của phần Equity | Economic Alpha +4,5% cao nhất ngành ngân hàng; P/B 1,35 hợp lý; ROE bền vững, σ(ROE) thấp (K=1,0); đồng thời nằm trong nhóm Leadership Breadth (Top MA20 & Top MA252). Đây là trụ cột phòng thủ duy nhất đáng tin. |
+| **SATELLITE** | **SHB** | 25 – 30% của phần Equity | Alpha +3,3%, P/B 0,96 < 1 — Margin of Safety cực lớn; deep value với đòn bẩy hoạt động. |
+| **SATELLITE** | **TPB** | 20 – 25% của phần Equity | Alpha +3,2%, P/B 0,96; thu nhập phi tín dụng smoothen ROE; tận dụng asymmetric upside từ định giá rẻ. |
+
+**C. DANH SÁCH CẤM KỴ (ZERO WEIGHT — AVOID)**
+
+- **Ngân hàng:** EIB (Alpha −12,8%, governance risk), LPB (Alpha −7,9%, growth trap P/B 3,28), VCB (Alpha −7,1%, overpriced quality trap P/B 2,23).
+- **VaRES Mispriced Risk:** HSG, HPG, BID (spread bị nén chặt nhất toàn thị trường, dễ tổn thương trước sốc thanh khoản).
+- **VaR Breach / Momentum yếu:** VJC (idiosyncratic breach sâu nhất rổ VN30), DXG, VIX (Breadth: dead cat bounce plays), NVL (chỉ còn trên MA252, mong manh).
+- **Manipulation / Liquidity Gap:** VHM, VRE (thuộc VIN Composite, nằm trong tâm bão Extreme Coupling; dù có dòng tiền Smart Money nhưng rủi ro Ghost Coupling và Liquidity Gap vượt quá lợi thế phòng thủ).
+
+**D. QUY TẮC THỰC THI VÀ QUẢN TRỊ RỦI RO**
+
+1. **Không Đuổi, Không Bắt Đáy Tự do:** Cấm mua đuổi (No Chasing). Chỉ giải ngân bằng **lưới mua với bước nhảy tối thiểu 8–10%** và kích thước vị thế giảm 50% so với bình thường.
+2. **Điều kiện Giải ngân:** Chỉ được phép triển khai lưới mua khi Breadth MA20 dừng rơi và VNINDEX có tín hiệu phản ứng tích cực rõ ràng. Nếu không, toàn bộ phần Equity Sleeve giữ nguyên dưới dạng tiền mặt.
+3. **Kill Switch Toàn hệ thống:** Nếu Downside Ratio vượt Mu (13,68%) và đóng cửa trên đó, HOẶC VN30 thủng MA125 đồng thời SSI > 60%, kích hoạt lệnh **cắt lỗ toàn bộ vị thế Long** và nâng Cash lên 90%+.
+4. **Phái sinh Ngắn hạn (Nếu tham gia):** Tuyệt đối **không short VN30F overnight** khi VIN giữ trạng thái tăng mạnh (rủi ro short squeeze). Intraday F1 chỉ được phép theo chiều VIN với stop loss chặt dưới pivotal intraday, sizing giảm 40–50%.
+5. **Tail Hedge Bắt buộc:** Triển khai Long Gamma/Convexity (Put Spread). **Cấm tuyệt đối bán khống quyền chọn** (Short Gamma) khi Blast Radius > 15pp.
 
 ---
 
-final score & regime : 32 ; regime : Phân phối / Rủi ro cao / Pre-Crash
+final score & regime : 38 ; regime : Phân phối / Rủi ro cao / Pre-Crash
