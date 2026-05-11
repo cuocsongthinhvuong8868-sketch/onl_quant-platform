@@ -72,6 +72,19 @@ def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     except Exception as e:
         print(f"[GH Sync Error] {e}")
 
+def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
+    """Xoá toàn bộ cache AI text của 9 công cụ con + executive_summary cho provider_key cụ thể."""
+    tool_names = [
+        "feargreed", "manipulation", "dispersion", "upside_ratio",
+        "risk_adjusted_growth", "market_breadth", "esr_monitor",
+        "va_res", "var_cvar_vnindex", "executive_summary"
+    ]
+    for tool in tool_names:
+        path = _get_cache_path(tool, provider_key)
+        if path.exists():
+            path.unlink()
+            print(f"[Cache Clear] Deleted: {path.name}")
+
 def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
     response = client.chat.completions.create(
         model=model or AI_MODEL,
@@ -465,11 +478,16 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
 
-def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
+def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     model = cfg["api_model"]
     temperature = cfg.get("temperature", 1.0)
+    
+    # Nếu force=True → xoá toàn bộ cache của 9 tool con và executive_summary
+    # để buộc gọi lại API từ đầu
+    if force:
+        _clear_all_tool_caches(provider_key)
     
     df_stocks = load_close_prices()
     

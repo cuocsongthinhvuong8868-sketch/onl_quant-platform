@@ -19,7 +19,7 @@ Refactor các tool quant rời rạc (thường dạng 1 file Streamlit lớn) t
 
 ## 2) Root project và cấu trúc chuẩn
 
-Root chính: `/Users/macos/Desktop/quant_platform`
+Root chính: `C:\Users\ADMIN\Documents\GitHub\onl_quant-platform`
 
 Cấu trúc chuẩn:
 
@@ -28,10 +28,11 @@ Cấu trúc chuẩn:
 - `data_lake/`: hồ dữ liệu CSV dùng chung
 - `shared/data_loader.py`: loader chuẩn (đọc từ data_lake)
 - `pages/`
-  - `1_Macro_Analysis.py`: Nhánh Phân tích Vĩ mô (🚧 đang phát triển)
-  - `2_Micro_Analysis.py`: Nhánh Phân tích Vi mô (🚧 đang phát triển)
-  - `3_Behavioral_Finance.py`: Nhánh Tài chính Hành vi — **gộp 9 tool hiện tại** dạng grid menu + gọi render() động
-  - `_1_Fear_Greed.py` … `_9_Var_CVaR_VNINDEX.py`: Các entry cũ (ẩn, tiền tố `_` để Streamlit bỏ qua)
+  - `A_Macro_Analysis.py`: Nhánh Vĩ mô (🚧 đang phát triển)
+  - `B_Micro_Analysis.py`: Nhánh Vi mô (🚧 đang phát triển)
+  - `C_Behavioral_Finance.py`: Nhánh Tài chính Hành vi — **gộp 9 tool hiện tại** dạng grid menu + gọi render() động
+  - `tools_page_C/`: thư mục chứa 9 entry tool (ẩn khỏi sidebar)
+    - `_1_Fear_Greed.py` … `_9_Var_CVaR_VNINDEX.py`
 - `tools/<tool_name>/`
   - `quant/`: mô hình/tính toán
   - `ui/`: component hiển thị
@@ -112,9 +113,9 @@ Cấu trúc chuẩn:
 
 ```
 app.py (Trang chủ)
-  ├── 📈 1_Macro_Analysis.py         — Nhánh Vĩ mô (🚧 đang phát triển)
-  ├── 🔬 2_Micro_Analysis.py         — Nhánh Vi mô (🚧 đang phát triển)
-  └── 🧠 3_Behavioral_Finance.py     — Nhánh Tài chính Hành vi
+  ├── 📈 A_Macro_Analysis.py         — Nhánh Vĩ mô (🚧 đang phát triển)
+  ├── 🔬 B_Micro_Analysis.py         — Nhánh Vi mô (🚧 đang phát triển)
+  └── 🧠 C_Behavioral_Finance.py     — Nhánh Tài chính Hành vi
         ├── 🎯 Fear & Greed
         ├── 🧬 Upside/Downside Ratio
         ├── 📊 Risk-Adjusted Growth
@@ -129,20 +130,20 @@ app.py (Trang chủ)
 ### 4.2 Pages đăng ký trên sidebar (Streamlit multi-page)
 
 **Pages hiển thị trên sidebar (3 page chính):**
-- `pages/1_Macro_Analysis.py`
-- `pages/2_Micro_Analysis.py`
-- `pages/3_Behavioral_Finance.py`
+- `pages/A_Macro_Analysis.py`
+- `pages/B_Micro_Analysis.py`
+- `pages/C_Behavioral_Finance.py`
 
-**Pages ẩn (đã đổi tên với tiền tố `_` — Streamlit bỏ qua):**
-- `pages/_1_Fear_Greed.py` → gọi `tools.fear_greed.page.render()`
-- `pages/_2_Upside_Ratio.py` → gọi `tools.upside_ratio.page.render()`
-- `pages/_3_Risk_Adjusted_Growth.py` → gọi `tools.risk_adjusted_growth.page.render()`
-- `pages/_4_Market_Breadth.py` → gọi `tools.market_breadth.page.render()`
-- `pages/_5_ESR_Monitor.py` → gọi `tools.esr_monitor.page.render()`
-- `pages/_6_Dispersion.py` → gọi `tools.dispersion.page.render()`
-- `pages/_7_VaRES_Engine.py` → gọi `tools.va_res.page.show()`
-- `pages/_8_Manipulation.py` → gọi `tools.manipulation.page.render()`
-- `pages/_9_Var_CVaR_VNINDEX.py` → gọi `tools.var_cvar_vnindex.page.show()`
+**Pages ẩn (trong `pages/tools_page_C/` — Streamlit bỏ qua vì nằm trong thư mục con + tiền tố `_`):**
+- `pages/tools_page_C/_1_Fear_Greed.py` → gọi `tools.fear_greed.page.render()`
+- `pages/tools_page_C/_2_Upside_Ratio.py` → gọi `tools.upside_ratio.page.render()`
+- `pages/tools_page_C/_3_Risk_Adjusted_Growth.py` → gọi `tools.risk_adjusted_growth.page.render()`
+- `pages/tools_page_C/_4_Market_Breadth.py` → gọi `tools.market_breadth.page.render()`
+- `pages/tools_page_C/_5_ESR_Monitor.py` → gọi `tools.esr_monitor.page.render()`
+- `pages/tools_page_C/_6_Dispersion.py` → gọi `tools.dispersion.page.render()`
+- `pages/tools_page_C/_7_VaRES_Engine.py` → gọi `tools.va_res.page.show()`
+- `pages/tools_page_C/_8_Manipulation.py` → gọi `tools.manipulation.page.render()`
+- `pages/tools_page_C/_9_Var_CVaR_VNINDEX.py` → gọi `tools.var_cvar_vnindex.page.show()`
 
 Lưu ý:
 - VaRES Engine và Var-CVaR VNINDEX dùng `show()` thay vì `render()` vì lịch sử code cũ.
@@ -243,17 +244,17 @@ Checklist chuẩn hóa:
 ## 10) Lệnh vận hành nhanh
 
 - Chạy app:
-  - `streamlit run /Users/macos/Desktop/quant_platform/app.py`
+  - `streamlit run C:\Users\ADMIN\Documents\GitHub\onl_quant-platform\app.py`
 
 - Update giá + VNINDEX (incremental — chỉ tải ngày mới):
-  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py`
+  - `python C:\Users\ADMIN\Documents\GitHub\onl_quant-platform\command\update_data.py`
 - Backfill lịch sử dài (~6 năm):
-  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py --backfill 2190`
+  - `python C:\Users\ADMIN\Documents\GitHub\onl_quant-platform\command\update_data.py --backfill 2190`
 - Backfill từ ngày cụ thể:
-  - `python3 /Users/macos/Desktop/quant_platform/command/update_data.py --from-date 2020-01-01`
+  - `python C:\Users\ADMIN\Documents\GitHub\onl_quant-platform\command\update_data.py --from-date 2020-01-01`
 
 - Update fundamentals bank:
-  - `python3 /Users/macos/Desktop/quant_platform/command/update_bank_fundamentals.py`
+  - `python C:\Users\ADMIN\Documents\GitHub\onl_quant-platform\command\update_bank_fundamentals.py`
 
 - Tạo report PDF screenshot (ngoài UI):
   - đảm bảo app đang chạy ở `http://localhost:8501`
@@ -768,3 +769,36 @@ Sidebar Streamlit ch? hi?n th? 3 trang ch�nh:
 - Sidebar ch? hi?n: **A_Macro_Analysis**, **B_Micro_Analysis**, **C_Behavioral_Finance**
 - B?m C ? v�o trang grid 9 tool ? ch?n c�ng c? ? ph�n t�ch
 - B?m "?? Danh m?c" d? quay l?i grid tool
+
+---
+
+## 26) Phi�n c?p nh?t 2026-05-11 � Force Refresh AI CIO xo� to�n b? cache 9 tool con
+
+### 26.1 V?n d?
+Khi user b?m "?? T?o l?i (ghi d� cache)" ? AI CIO, ch? xo� cache executive_summary m� kh�ng xo� cache c?a 9 tool con. K?t qu?:
+- AI CIO ch?y l?i nhung d?c cache cu c?a tool con (kh�ng g?i API m?i)
+- B�o c�o t?ng h?p kh�ng thay d?i so v?i l?n ch?y tru?c
+
+### 26.2 Gi?i ph�p
+Th�m h�m _clear_all_tool_caches(provider_key) trong shared/ai_cio.py:
+- Xo� to�n b? cache AI text c?a 9 tool con + executive_summary
+- D�ng khi force refresh
+
+### 26.3 Files d� s?a
+
+**shared/ai_cio.py:**
+- Th�m h�m _clear_all_tool_caches(provider_key): xo� cache 9 tool con + executive_summary
+- run_executive_summary(): th�m tham s? force=False ? n?u True th� g?i _clear_all_tool_caches() tru?c khi ch?y
+- Danh s�ch tool: feargreed, manipulation, dispersion, upside_ratio, risk_adjusted_growth, market_breadth, esr_monitor, va_res, var_cvar_vnindex, executive_summary
+
+**app.py:**
+- N�t "?? T?o l?i (ghi d� cache)": thay v� ch? xo� cache executive_summary, g?i _clear_all_tool_caches(cio_provider) d? xo� to�n b? cache 9 tool con
+
+**command/run_ai_cio_auto.py:**
+- Import th�m _clear_all_tool_caches
+- --force: g?i _clear_all_tool_caches() thay v� ch? xo� 1 file cache executive_summary
+
+### 26.4 C�ch ho?t d?ng
+- User b?m "T?o l?i" ? xo� cache 9 tool con + executive_summary
+- AI CIO ch?y ? cache r?ng ? g?i API cho t?ng tool (9 l?n) + 1 l?n t?ng h?p = 10 l?n g?i API
+- K?t qu?: b�o c�o ho�n to�n m?i, kh�ng d�ng cache cu c?a b?t k? tool n�o

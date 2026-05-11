@@ -12,8 +12,8 @@ on:
         required: false
         default: ''
   schedule:
-    # Chạy tự động vào lúc 16:00 giờ Việt Nam (tức 09:00 UTC), từ Thứ 2 đến Thứ 6
-    - cron: '0 8 * * 1-5'
+        # Chạy tự động lúc 14:30 giờ Việt Nam (07:30 UTC), từ Thứ 2 đến Thứ 6
+    - cron: '30 7 * * 1-5'
 
 permissions:
   contents: write
@@ -79,3 +79,4 @@ jobs:
           else
             echo "No data changes detected. Skipping commit."
           fi
+

@@ -331,10 +331,10 @@ if st.session_state.show_cio_input:
                         import os as _os
                         
                         if refresh_btn:
-                            cache_file = DATA_LAKE / "daily_cache" / f"executive_summary_{cio_provider}_{TODAY_STR}.txt"
-                            if cache_file.exists():
-                                _os.remove(cache_file)
-                                st.info("🗑️ Đã xóa cache cũ, đang tạo báo cáo mới...")
+                            # Xoá toàn bộ cache của 9 tool con + executive_summary trước khi chạy
+                            from shared.ai_cio import _clear_all_tool_caches
+                            _clear_all_tool_caches(cio_provider)
+                            st.info("🗑️ Đã xóa toàn bộ cache cũ của 9 công cụ con, đang tạo mới hoàn toàn từ đầu...")
                         
                         cached_sum = _read_cache("executive_summary", cio_provider)
                         if cached_sum and not refresh_btn:
