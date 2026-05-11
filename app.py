@@ -43,7 +43,8 @@ with col1:
         )
         st.markdown("🚧 **Đang phát triển**")
         if st.button("📈 Vào Macro Analysis", key="btn_macro", use_container_width=True):
-            st.switch_page("pages/1_Macro_Analysis.py")
+
+            st.switch_page("pages/A_Macro_Analysis.py")
 
 with col2:
     with st.container(border=True, height=280):
@@ -57,7 +58,8 @@ with col2:
         )
         st.markdown("🚧 **Đang phát triển**")
         if st.button("🔬 Vào Micro Analysis", key="btn_micro", use_container_width=True):
-            st.switch_page("pages/2_Micro_Analysis.py")
+
+            st.switch_page("pages/B_Micro_Analysis.py")
 
 with col3:
     with st.container(border=True, height=280):
@@ -72,7 +74,7 @@ with col3:
             "- & nhiều hơn nữa..."
         )
         if st.button("🧠 Vào Behavioral Finance", key="btn_bf", use_container_width=True):
-            st.switch_page("pages/3_Behavioral_Finance.py")
+            st.switch_page("pages/C_Behavioral_Finance.py")
 
 st.markdown("---")
 
