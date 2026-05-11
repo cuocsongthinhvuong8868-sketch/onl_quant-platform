@@ -733,3 +733,36 @@ Thêm các c?i ti?n sau vào ph?n AI CIO:
    - 402: H?t quota
    - 429: Rate limit
    - Connection: L?i m?ng/base_url
+
+---
+
+## 23) Phiên c?p nh?t 2026-05-11 — Sidebar ch? hi?n 3 nhánh chính A_, B_, C_
+
+### 23.1 M?c tiêu
+Sidebar Streamlit ch? hi?n th? 3 trang chính:
+- A_Macro_Analysis
+- B_Micro_Analysis
+- C_Behavioral_Finance
+
+?n 9 tool con c?a Behavioral Finance kh?i sidebar.
+
+### 23.2 Thay d?i
+
+**Ð?i tên file:**
+- pages/1_Macro_Analysis.py ? pages/A_Macro_Analysis.py
+- pages/2_Micro_Analysis.py ? pages/B_Micro_Analysis.py
+- pages/3_Behavioral_Finance.py ? pages/C_Behavioral_Finance.py
+
+**C?p nh?t du?ng d?n trong pp.py:**
+- st.switch_page("pages/1_Macro_Analysis.py") ? st.switch_page("pages/A_Macro_Analysis.py")
+- st.switch_page("pages/2_Micro_Analysis.py") ? st.switch_page("pages/B_Micro_Analysis.py")
+- st.switch_page("pages/3_Behavioral_Finance.py") ? st.switch_page("pages/C_Behavioral_Finance.py")
+
+**Co ch?:**
+- 9 tool con (_1_Fear_Greed.py, _2_Upside_Ratio.py, ...) dã có ti?n t? _ ? t? d?ng ?n kh?i sidebar Streamlit
+- C_Behavioral_Finance.py hi?n th? grid danh m?c 9 tool ? ch?n tool ? render inline
+
+### 23.3 Cách ho?t d?ng
+- Sidebar ch? hi?n: **A_Macro_Analysis**, **B_Micro_Analysis**, **C_Behavioral_Finance**
+- B?m C ? vào trang grid 9 tool ? ch?n công c? ? phân tích
+- B?m "?? Danh m?c" d? quay l?i grid tool
