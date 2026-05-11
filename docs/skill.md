@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-Phiên cập nhật: 2026-05-10  
+Phiên cập nhật: 2026-05-11  
 Mục tiêu: Bảo toàn ngữ cảnh để resume công việc ngay khi upload lại file này.
 
 ---
@@ -23,15 +23,19 @@ Root chính: `/Users/macos/Desktop/quant_platform`
 
 Cấu trúc chuẩn:
 
-- `app.py`: Trang chủ + nút Report Generation
+- `app.py`: Trang chủ — 3 nhánh điều hướng (Macro, Micro, Behavioral Finance) + AI CIO Executive Summary + PDF export
 - `config.py`: biến cấu hình toàn cục
 - `data_lake/`: hồ dữ liệu CSV dùng chung
 - `shared/data_loader.py`: loader chuẩn (đọc từ data_lake)
-- `pages/*.py`: streamlit multipage entry (mỏng)
+- `pages/`
+  - `1_Macro_Analysis.py`: Nhánh Phân tích Vĩ mô (🚧 đang phát triển)
+  - `2_Micro_Analysis.py`: Nhánh Phân tích Vi mô (🚧 đang phát triển)
+  - `3_Behavioral_Finance.py`: Nhánh Tài chính Hành vi — **gộp 9 tool hiện tại** dạng grid menu + gọi render() động
+  - `_1_Fear_Greed.py` … `_9_Var_CVaR_VNINDEX.py`: Các entry cũ (ẩn, tiền tố `_` để Streamlit bỏ qua)
 - `tools/<tool_name>/`
   - `quant/`: mô hình/tính toán
   - `ui/`: component hiển thị
-  - `page.py`: bridge giữa UI và quant
+  - `page.py`: bridge giữa UI và quant (hàm `render()` hoặc `show()`)
   - `report.py`: snapshot hook cho report tổng hợp
 
 ---
@@ -102,19 +106,48 @@ Cấu trúc chuẩn:
 
 ---
 
-## 4) Pages đã đăng ký
+## 4) Pages & Cấu trúc 3 nhánh
 
-- `pages/1_Fear_Greed.py`
-- `pages/2_Upside_Ratio.py`
-- `pages/3_Risk_Adjusted_Growth.py`
-- `pages/4_Market_Breadth.py`
-- `pages/5_ESR_Monitor.py`
-- `pages/6_Dispersion.py`
-- `pages/7_VaRES_Engine.py`
-- `pages/8_Manipulation.py`
-- `pages/9_Var_CVaR_VNINDEX.py`
+### 4.1 Sơ đồ 3 nhánh
 
-Lưu ý: report screenshot tự quét `pages/*.py`, nên thêm page mới là report tự bao gồm page đó.
+```
+app.py (Trang chủ)
+  ├── 📈 1_Macro_Analysis.py         — Nhánh Vĩ mô (🚧 đang phát triển)
+  ├── 🔬 2_Micro_Analysis.py         — Nhánh Vi mô (🚧 đang phát triển)
+  └── 🧠 3_Behavioral_Finance.py     — Nhánh Tài chính Hành vi
+        ├── 🎯 Fear & Greed
+        ├── 🧬 Upside/Downside Ratio
+        ├── 📊 Risk-Adjusted Growth
+        ├── 📈 Market Breadth
+        ├── ⚡ ESR Monitor
+        ├── 🔄 Dispersion
+        ├── 🛡️ VaRES Engine
+        ├── 🔍 Manipulation Detection
+        └── 📉 Var-CVaR VNINDEX
+```
+
+### 4.2 Pages đăng ký trên sidebar (Streamlit multi-page)
+
+**Pages hiển thị trên sidebar (3 page chính):**
+- `pages/1_Macro_Analysis.py`
+- `pages/2_Micro_Analysis.py`
+- `pages/3_Behavioral_Finance.py`
+
+**Pages ẩn (đã đổi tên với tiền tố `_` — Streamlit bỏ qua):**
+- `pages/_1_Fear_Greed.py` → gọi `tools.fear_greed.page.render()`
+- `pages/_2_Upside_Ratio.py` → gọi `tools.upside_ratio.page.render()`
+- `pages/_3_Risk_Adjusted_Growth.py` → gọi `tools.risk_adjusted_growth.page.render()`
+- `pages/_4_Market_Breadth.py` → gọi `tools.market_breadth.page.render()`
+- `pages/_5_ESR_Monitor.py` → gọi `tools.esr_monitor.page.render()`
+- `pages/_6_Dispersion.py` → gọi `tools.dispersion.page.render()`
+- `pages/_7_VaRES_Engine.py` → gọi `tools.va_res.page.show()`
+- `pages/_8_Manipulation.py` → gọi `tools.manipulation.page.render()`
+- `pages/_9_Var_CVaR_VNINDEX.py` → gọi `tools.var_cvar_vnindex.page.show()`
+
+Lưu ý:
+- VaRES Engine và Var-CVaR VNINDEX dùng `show()` thay vì `render()` vì lịch sử code cũ.
+- Behavioral Finance page dùng `__import__()` động + `getattr()` để gọi đúng hàm theo từng tool.
+- Các tool vẫn có thể truy cập riêng lẻ qua URL trực tiếp (vd: `/_1_Fear_Greed`), nhưng không hiển thị trên sidebar.
 
 ---
 
@@ -638,3 +671,65 @@ VNINDEX: 1,915.37 | σ30: 1.22% | Param VaR: -1.43% | Hist VaR: -1.64% | ES: -3.
 - COE mặc định: **14%**
 - **Không hardcode đường dẫn tuyệt đối theo OS** (Windows/macOS); luôn dùng `ROOT_DIR` hoặc `Path(__file__)`
 - **Font PDF:** dùng `fpdf2` + font `DejaVuSans` trong `fonts/` (không dựa vào system font)
+
+---
+
+## 22) Phi�n c?p nh?t 2026-05-11 � Temperature ri�ng cho t?ng model AI
+
+### 22.1 M?c ti�u
+Ph�n bi?t temperature cho t?ng provider AI thay v� d�ng chung AI_TEMPERATURE:
+- **Kimi 2.6**: temperature = **1.0** (s�ng t?o, ph�n t�ch t?ng quan)
+- **DeepSeek V4 Pro**: temperature = **0.5** (ch�nh x�c, �t ?o gi�c)
+
+### 22.2 Thay d?i
+
+**File s?a:**
+- config.py: th�m field 	emperature v�o t?ng entry trong AI_PROVIDER_MAP
+  `python
+  AI_PROVIDER_MAP = {
+      "kimi-2.6": {
+          "display": "Kimi 2.6",
+          "api_model": "kimi-k2.6",
+          "base_url": "https://api.moonshot.ai/v1",
+          "temperature": 1.0,
+      },
+      "deepseek-v4-pro": {
+          "display": "DeepSeek V4 Pro",
+          "api_model": "deepseek-chat",
+          "base_url": "https://api.deepseek.com/v1",
+          "temperature": 0.5,
+      },
+  }
+  `
+- shared/ai_cio.py:
+  - H�m call_ai(): b? fallback or AI_TEMPERATURE, gi? 	emperature l� optional param, n?u None th� API d�ng default ri�ng
+  - un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) v� truy?n v�o call_ai()
+- 9 tool page: t?t c? ch? 	emperature=AI_TEMPERATURE ? 	emperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
+  - 	ools/fear_greed/page.py
+  - 	ools/upside_ratio/page.py
+  - 	ools/risk_adjusted_growth/page.py
+  - 	ools/market_breadth/page.py
+  - 	ools/esr_monitor/page.py
+  - 	ools/dispersion/page.py
+  - 	ools/manipulation/page.py
+  - 	ools/va_res/page.py
+  - 	ools/var_cvar_vnindex/page.py
+
+### 22.3 C�ch ho?t d?ng
+- Khi ch?n Kimi 2.6 ? temperature = 1.0 (s�ng t?o, ph� h?p ph�n t�ch t?ng quan)
+- Khi ch?n DeepSeek V4 Pro ? temperature = 0.5 (ch�nh x�c, gi?m ?o gi�c)
+- AI_TEMPERATURE global v?n t?n t?i trong config.py d? gi? backward compatibility, nhung kh�ng c�n du?c d�ng trong c�c tool page n?a
+
+### 22.4 API Key ki?m tra tru?c khi ch?y AI CIO
+
+**File s?a:** pp.py
+
+Th�m c�c c?i ti?n sau v�o ph?n AI CIO:
+
+1. **N�t ?? Ki?m tra API Key ri�ng**: G?i 1 request nh? (max_tokens=5) d? test key tru?c, kh�ng c?n ch?y c? pipeline
+2. **T? d?ng ki?m tra key tru?c khi ch?y pipeline**: N?u key sai ? b�o l?i ngay (kh�ng d?i 1-2 ph�t)
+3. **Ph�n lo?i l?i chi ti?t**:
+   - 401: Key kh�ng h?p l? + hu?ng d?n l?y key t? platform.moonshot.cn
+   - 402: H?t quota
+   - 429: Rate limit
+   - Connection: L?i m?ng/base_url

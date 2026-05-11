@@ -1,7 +1,11 @@
 import streamlit as st
 import pandas as pd
-from datetime import date
-from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+
+from shared.data_loader import load_close_prices
+from shared.daily_cache import load_daily_cache, save_daily_cache
+from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
+from tools.manipulation.ui.sidebar import render_sidebar
+from tools.manipulation.ui.charts import render_core, render_event
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -17,117 +21,81 @@ except ImportError:
             "base_url": "https://api.deepseek.com/v1",
         },
     }
-from shared.data_loader import load_close_prices, load_custom
-from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
-from tools.dispersion.ui.sidebar import render_sidebar
-from tools.dispersion.ui.charts import render_main_chart
-
-
-def _cache_path(params: dict) -> str:
-    key = (
-        f"mc{params['mc_window']}_rf{params['cov_refit_freq']}_"
-        f"zt{params['zscore_type']}_z{params['zscore_window']}_"
-        f"dpi{params['dpi_window']}"
-    ).replace(".", "p")
-    return str(DATA_LAKE / "daily_cache" / f"dispersion_cache_{key}.csv")
-
-
-def _load_daily_cache(path: str):
-    try:
-        df = pd.read_csv(path, parse_dates=["time"])
-    except Exception:
-        return None
-    if df.empty or "cache_date" not in df.columns:
-        return None
-    cache_day = str(df["cache_date"].iloc[0])
-    if cache_day != str(date.today()):
-        return None
-    df["time"] = pd.to_datetime(df["time"])
-    df = df.set_index("time")
-    return df
-
-
-def _save_daily_cache(path: str, df_metrics: pd.DataFrame):
-    cache_dir = (DATA_LAKE / "daily_cache")
-    cache_dir.mkdir(parents=True, exist_ok=True)
-    out = df_metrics.copy()
-    out = out.reset_index().rename(columns={"index": "time"})
-    out["cache_date"] = str(date.today())
-    out.to_csv(path, index=False)
-
-
-@st.cache_data(show_spinner=False, ttl=86400)
-def _compute_metrics_cached(df_prices, index_series, p: dict):
-    stock_returns, metrics = calculate_dispersion_metrics(
-        df_prices, index_series, p["zscore_type"], p["zscore_window"], p["dpi_window"]
-    )
-    corr = fit_rolling_correlation(
-        stock_returns,
-        window=p["mc_window"],
-        refit_every=p["cov_refit_freq"],
-    )
-    metrics["Ledoit_Correlation"] = corr
-    return metrics.dropna(subset=["DPI", "Ledoit_Correlation"])
 
 
 def render():
-    st.title("Macro Dispersion Radar")
-    st.caption("Pure observation tool: Dispersion Persistence Index (DPI) & Systemic Correlation")
-
-    p = render_sidebar()
-    ai_provider = p["ai_provider"]
-    api_key     = p["api_key"]
-    if p["cov_refit_freq"] <= 1:
-        st.warning("Thiết lập `refit Cov = 1` rất nặng với universe lớn. Nên dùng >= 3 để tăng tốc.")
+    st.title("Manipulation Quant Radar")
+    st.caption("Tác động VIC/VHM/VRE lên VN30F1M: PCA weights, risk band, event regime.")
 
     try:
-        df_prices = load_close_prices()
-        df_idx = load_custom("vnindex_cache.csv")
-    except FileNotFoundError as e:
-        st.error(str(e))
+        df_close = load_close_prices()
+        df_prices = prepare_data(df_close)
+    except Exception as e:
+        st.error(f"Lỗi dữ liệu manipulation: {e}")
         st.stop()
+
     st.caption(f"📅 Dữ liệu cuối cùng: {df_prices.index.max().strftime('%d/%m/%Y')}")
 
-    idx_col = "VNINDEX" if "VNINDEX" in df_idx.columns else df_idx.columns[0]
-    index_series = df_idx[idx_col]
-    cache_file = _cache_path(p)
+    default_threshold = 0.15
+    p = render_sidebar(default_threshold)
+    ai_provider = p["ai_provider"]
+    api_key     = p["api_key"]
 
-    metrics = _load_daily_cache(cache_file)
-    if metrics is not None:
-        st.caption(f"⚡ Dùng cache cùng ngày: {cache_file}")
+    data_date = str(df_prices.index.max().date())
+    key = {"cache_version": 1, "window": p["window"]}
+    cached = load_daily_cache("manipulation", key, data_date=data_date)
+
+    if cached is not None:
+        weights_df = cached["weights_df"]
+        result_df = cached["result_df"]
+        st.caption("⚡ Dùng cache theo ngày dữ liệu (Manipulation).")
     else:
-        with st.spinner("Đang tính Dispersion metrics..."):
-            metrics = _compute_metrics_cached(df_prices, index_series, p)
+        with st.spinner("Đang tính manipulation metrics..."):
             try:
-                _save_daily_cache(cache_file, metrics)
-                st.caption(f"💾 Đã tạo cache ngày mới: {cache_file}")
+                weights_df, result_df = compute_metrics(df_prices, p["window"])
             except Exception as e:
-                st.warning(f"Tính xong nhưng không ghi được cache file: {e}")
+                st.error(f"Lỗi tính toán manipulation: {e}")
+                st.stop()
+        save_daily_cache("manipulation", key, {"weights_df": weights_df, "result_df": result_df}, data_date=data_date)
+        st.caption("💾 Đã tạo cache ngày mới (Manipulation).")
 
-    if metrics.empty:
-        st.warning("Không đủ dữ liệu để tạo tín hiệu dispersion.")
+    if result_df.empty:
+        st.warning("Không đủ dữ liệu sau warm-up.")
         return
 
-    latest = metrics.iloc[-1]
-    
-    c1, c2, c3 = st.columns(3)
-    c1.metric(f"Spread_Z ({p['zscore_type']})", f"{latest['Spread_Z']:+.2f}σ")
-    c2.metric(f"DPI ({p['dpi_window']}d)", f"{latest['DPI']:.1f}%")
-    c3.metric("Ledoit Corr", f"{latest['Ledoit_Correlation']:.3f}")
+    # date filter
+    min_date, max_date = result_df.index.min().date(), result_df.index.max().date()
+    date_selection = st.sidebar.date_input("Khoảng thời gian hiển thị", value=(min_date, max_date), min_value=min_date, max_value=max_date)
+    if len(date_selection) == 2:
+        start_date, end_date = date_selection
+    else:
+        start_date, end_date = min_date, max_date
 
-    render_main_chart(
-        metrics,
-        recent_window_2d=p["recent_window_2d"]
-    )
+    mask_result = (result_df.index.date >= start_date) & (result_df.index.date <= end_date)
+    plot_df = result_df.loc[mask_result]
+    mask_weights = (weights_df.index.date >= start_date) & (weights_df.index.date <= end_date)
+    plot_weights = weights_df.loc[mask_weights]
+
+    render_core(plot_df, plot_weights, result_df)
 
     st.divider()
-    st.subheader("✨ Trợ lý AI Quant Phân tích Dispersion")
+    st.subheader("4) Event Study 2D")
+    available_dates = result_df.index.date
+    target_t0 = pd.to_datetime("2026-03-02").date()
+    default_t0 = target_t0 if len(available_dates) > 0 and available_dates[0] <= target_t0 <= available_dates[-1] else (available_dates[-min(60, len(available_dates)-1)] if len(available_dates) > 1 else available_dates[0])
+    t0_date = st.date_input("Chọn ngày sự kiện t0", value=default_t0, min_value=available_dates[0], max_value=available_dates[-1])
+    re_df = classify_regime(result_df, p["threshold"], pd.to_datetime(t0_date))
+    render_event(re_df, p["threshold"])
+
+    st.divider()
+    st.subheader("✨ Trợ lý AI Quant Phân tích Tác động (Manipulation)")
 
     import os
+    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
     from datetime import date
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"dispersion_{ai_provider}_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{today_str}.txt"
     
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -140,40 +108,48 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        btn_label = f"🐺 Chẩn đoán Cấu trúc & Đứt gãy ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        btn_label = f"🐺 Phân tích Dòng tiền & Tác động ({AI_PROVIDER_MAP[ai_provider]['display']})"
         if st.button(btn_label, type="primary", use_container_width=True):
             if not api_key:
                 st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
-                with st.spinner("AI đang phân tích cấu trúc rủi ro phân tán..."):
+                with st.spinner("AI đang tổng hợp và phân tích dữ liệu manipulation..."):
                     try:
                         from openai import OpenAI
                         cfg = AI_PROVIDER_MAP[ai_provider]
                         client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     
-                        with open(str(ROOT_DIR / "promt" / "dispersion promt.md"), "r", encoding="utf-8") as f:
+                        with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
     
-                        date_str = metrics.index.max().strftime('%d/%m/%Y')
-                        
-                        spread_val = latest.get("Spread", 0) * 100 * (252**0.5)
-                        spread_z = latest.get("Spread_Z", 0)
-                        dpi_val = latest.get("DPI", 0)
-                        
-                        corr_val = latest.get("Ledoit_Correlation", 0)
-                        
-                        cs_skew = latest.get("CS_Skewness", "N/A")
-                        if isinstance(cs_skew, (int, float)) and not pd.isna(cs_skew): cs_skew = f"{cs_skew:+.2f}"
-                        cs_kurt = latest.get("CS_Kurtosis", "N/A")
-                        if isinstance(cs_kurt, (int, float)) and not pd.isna(cs_kurt): cs_kurt = f"{cs_kurt:.2f}"
+                        date_str = result_df.index.max().strftime('%d/%m/%Y')
+                        latest = result_df.iloc[-1]
+    
+                        slope_val = latest["OLS_Slope"]
+                        slope_pr = latest["PR_Slope"] * 100
+                        slope_status = "🔴 Cao" if slope_pr >= 80 else "🟢 Thấp" if slope_pr <= 20 else "🟡 Trung bình"
+    
+                        corr_val = latest["Correlation"]
+                        corr_pr = latest["PR_Corr"] * 100
+                        corr_status = "🔴 Rất chặt" if corr_pr >= 80 else "🟢 Phân kỳ" if corr_pr <= 20 else "🟡 Lỏng"
+    
+                        t0_str = pd.to_datetime(t0_date).strftime('%d/%m/%Y')
+                        regime = re_df["Regime"].iloc[-1] if not re_df.empty else "N/A"
+                        d_corr = re_df["Delta_PR_Corr"].iloc[-1] if not re_df.empty else 0
+                        d_slope = re_df["Delta_PR_Slope"].iloc[-1] if not re_df.empty else 0
+    
+                        momentum_str = f"ΔCorr = {d_corr:.2f}, ΔSlope = {d_slope:.2f}"
     
                         full_prompt = prompt_template.replace("{date_str}", date_str)\
-                                                     .replace("{spread_val}", f"{spread_val:.2f}")\
-                                                     .replace("{spread_z}", f"{spread_z:+.2f}")\
-                                                     .replace("{dpi_val}", f"{dpi_val:.1f}")\
-                                                     .replace("{corr_val}", f"{corr_val:.3f}")\
-                                                     .replace("{cs_skew}", cs_skew)\
-                                                     .replace("{cs_kurt}", cs_kurt)
+                                                     .replace("{slope_val}", f"{slope_val:.2f}")\
+                                                     .replace("{slope_pr}", f"{slope_pr:.1f}")\
+                                                     .replace("{slope_status}", slope_status)\
+                                                     .replace("{corr_val}", f"{corr_val:.2f}")\
+                                                     .replace("{corr_pr}", f"{corr_pr:.1f}")\
+                                                     .replace("{corr_status}", corr_status)\
+                                                     .replace("{t0_str}", t0_str)\
+                                                     .replace("{regime}", regime)\
+                                                     .replace("{momentum_str}", momentum_str)
 
                         parts = full_prompt.split("# INPUT DATA")
                         system_prompt = parts[0].strip()
@@ -185,7 +161,7 @@ def render():
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
                             ],
-                            temperature=AI_TEMPERATURE
+
                         )
     
                         result_text = response.choices[0].message.content
@@ -211,4 +187,3 @@ def render():
     
                     except Exception as e:
                         st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
-

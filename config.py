@@ -32,16 +32,18 @@ AI_MODEL       = os.getenv("AI_MODEL", "kimi-k2.6")
 AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))
 
 # ── Multi-provider AI map ──
-# Key dùng trong UI  ->  {display_name, api_model_name, base_url}
+# Key dùng trong UI  ->  {display_name, api_model_name, base_url, temperature}
 AI_PROVIDER_MAP = {
     "kimi-2.6": {
         "display": "Kimi 2.6",
         "api_model": "kimi-k2.6",
         "base_url": "https://api.moonshot.ai/v1",
+        "temperature": 1.0,
     },
     "deepseek-v4-pro": {
         "display": "DeepSeek V4 Pro",
-        "api_model": "deepseek-v4-pro",   # DeepSeek-V3 chat endpoint
+        "api_model": "deepseek-chat",
         "base_url": "https://api.deepseek.com/v1",
+        "temperature": 0.5,
     },
 }

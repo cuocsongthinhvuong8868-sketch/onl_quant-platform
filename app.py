@@ -1,12 +1,13 @@
 """
-app.py — Trang chủ Streamlit.
+app.py — Trang chủ Quant Platform.
+Điều hướng đến 3 nhánh chính: Macro Analysis, Micro Analysis, Behavioral Finance.
 """
 import os
 import streamlit as st
 from pathlib import Path
 from shared.page_layout import setup_page
 
-setup_page("Quant Platform")
+setup_page("Quant Platform — Trang chủ")
 
 # ── Đọc GitHub token từ Streamlit Secrets hoặc env ──
 _github_token = os.getenv("GITHUB_TOKEN", "")
@@ -17,11 +18,74 @@ if not _github_token:
     except Exception:
         _github_token = ""
 
+# ── Header ──
 st.title("📊 Quant Platform")
-st.markdown("Chọn công cụ từ menu bên trái để bắt đầu.")
-st.markdown("Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI Hoặc Deepseek AI .")
+st.markdown(
+    "Nền tảng phân tích định lượng đa chiều — **3 nhánh phân tích** chuyên sâu.  \n"
+    "Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI Hoặc Deepseek AI."
+)
 
+# ── Navigation Cards ──
+st.markdown("## 🚀 Chọn Nhánh Phân Tích")
+st.markdown("---")
+
+col1, col2, col3 = st.columns(3)
+
+with col1:
+    with st.container(border=True, height=280):
+        st.markdown("### 📈 Phân tích Vĩ mô")
+        st.markdown("**Macro Analysis**")
+        st.markdown(
+            "- Lãi suất & Chính sách tiền tệ\n"
+            "- Tỷ giá & Dự trữ ngoại hối\n"
+            "- Tăng trưởng GDP & CPI\n"
+            "- Kinh tế toàn cầu"
+        )
+        st.markdown("🚧 **Đang phát triển**")
+        if st.button("📈 Vào Macro Analysis", key="btn_macro", use_container_width=True):
+            st.switch_page("pages/1_Macro_Analysis.py")
+
+with col2:
+    with st.container(border=True, height=280):
+        st.markdown("### 🔬 Phân tích Vi mô")
+        st.markdown("**Micro Analysis**")
+        st.markdown(
+            "- Báo cáo tài chính doanh nghiệp\n"
+            "- Mô hình định giá DCF\n"
+            "- Phân tích kỹ thuật cá nhân\n"
+            "- Screening cổ phiếu"
+        )
+        st.markdown("🚧 **Đang phát triển**")
+        if st.button("🔬 Vào Micro Analysis", key="btn_micro", use_container_width=True):
+            st.switch_page("pages/2_Micro_Analysis.py")
+
+with col3:
+    with st.container(border=True, height=280):
+        st.markdown("### 🧠 Tài chính Hành vi")
+        st.markdown("**Behavioral Finance**")
+        st.markdown(
+            "✅ **9 công cụ sẵn sàng:**\n"
+            "- Fear & Greed\n"
+            "- Market Breadth / Dispersion\n"
+            "- VaRES / Var-CVaR\n"
+            "- ESR Monitor\n"
+            "- & nhiều hơn nữa..."
+        )
+        if st.button("🧠 Vào Behavioral Finance", key="btn_bf", use_container_width=True):
+            st.switch_page("pages/3_Behavioral_Finance.py")
+
+st.markdown("---")
+
+# ── Data lake status ──
 from config import MARKET_DATA, DATA_LAKE, ROOT_DIR
+from datetime import datetime, date
+
+if MARKET_DATA.exists():
+    mod = datetime.fromtimestamp(MARKET_DATA.stat().st_mtime)
+    st.success(f"✅ Data lake sẵn sàng — cập nhật lần cuối: {mod.strftime('%d/%m/%Y %H:%M')}")
+else:
+    st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
+
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -37,27 +101,8 @@ except ImportError:
             "base_url": "https://api.deepseek.com/v1",
         },
     }
-from datetime import datetime, date
 
-if MARKET_DATA.exists():
-    mod = datetime.fromtimestamp(MARKET_DATA.stat().st_mtime)
-    st.success(f"✅ Data lake sẵn sàng — cập nhật lần cuối: {mod.strftime('%d/%m/%Y %H:%M')}")
-else:
-    st.warning("⚠️ Data lake chưa có dữ liệu. Chạy `python update_data.py` trước.")
-
-# ── Debug GitHub Sync ──
-with st.expander("🔧 Kiểm tra GitHub Sync"):
-    try:
-        from shared.github_sync import test_connection
-        gh_test = test_connection()
-        if gh_test["ok"]:
-            st.success(f"✅ GitHub OK — User: {gh_test['user']} | Repo: {gh_test['repo']} | Push: {gh_test['can_push']}")
-        else:
-            st.error(f"❌ GitHub lỗi: {gh_test['error']}")
-    except Exception as gh_debug_err:
-        st.error(f"❌ Không kiểm tra được GitHub: {gh_debug_err}")
-
-# ── AI CIO Report status (quét tất cả provider) ──
+# ── AI CIO Report status ──
 TODAY_STR = date.today().strftime('%d%m%y')
 _available_cio = []
 for _pk, _pv in AI_PROVIDER_MAP.items():
@@ -72,6 +117,19 @@ if _available_cio:
 else:
     st.info("ℹ️ Chưa có report AI CIO. Chạy '🔥 Executive Summary (AI CIO)' để tạo.")
 
+# ── Debug GitHub Sync ──
+with st.expander("🔧 Kiểm tra GitHub Sync"):
+    try:
+        from shared.github_sync import test_connection
+        gh_test = test_connection()
+        if gh_test["ok"]:
+            st.success(f"✅ GitHub OK — User: {gh_test['user']} | Repo: {gh_test['repo']} | Push: {gh_test['can_push']}")
+        else:
+            st.error(f"❌ GitHub lỗi: {gh_test['error']}")
+    except Exception as gh_debug_err:
+        st.error(f"❌ Không kiểm tra được GitHub: {gh_debug_err}")
+
+# ── Import PDF generator ──
 from fpdf import FPDF
 
 def _create_pdf(text: str, path: str):
@@ -84,15 +142,13 @@ def _create_pdf(text: str, path: str):
     pdf.add_font("DejaVu", "", str(font_dir / "DejaVuSans.ttf"), uni=True)
     pdf.add_font("DejaVu", "B", str(font_dir / "DejaVuSans-Bold.ttf"), uni=True)
     
-    text_width = int(pdf.w - 20)  # 10mm margin each side — phải là int cho fpdf 1.7
+    text_width = int(pdf.w - 20)
     
-    # Title
     pdf.set_font("DejaVu", "B", 16)
     pdf.set_xy(10, 10)
     pdf.cell(text_width, 10, f"Executive Summary Report — {date.today().strftime('%d/%m/%Y')}", border=0, ln=1, align="C")
     pdf.ln(5)
     
-    # Body
     pdf.set_font("DejaVu", "", 11)
     for raw_line in text.split('\n'):
         line = raw_line.strip().replace('\t', ' ')
@@ -115,14 +171,13 @@ def _create_pdf(text: str, path: str):
             pdf.multi_cell(text_width, 6, line.replace('**', ''))
     pdf.output(path)
 
-# ── Xuất PDF AI CIO (cho phép chọn model khi có nhiều bản) ──
+# ── Xuất PDF AI CIO ──
 if "cio_pdf_choice" not in st.session_state:
     st.session_state.cio_pdf_choice = None
 
 col1, col2 = st.columns([1, 1])
 with col1:
     if st.button("📄 Xuất PDF Report AI CIO", type="primary", use_container_width=True):
-        # Nếu chỉ có 1 bản → dùng luôn; nếu nhiều bản → hiện dropdown chọn
         if len(_available_cio) == 1:
             st.session_state.cio_pdf_choice = _available_cio[0][0]
         elif len(_available_cio) > 1:
@@ -131,7 +186,6 @@ with col1:
             st.session_state.cio_pdf_choice = None
             st.error("⚠️ Chưa có báo cáo AI CIO. Vui lòng chạy 'Executive Summary (AI CIO)' trước.")
 
-# Hiện dropdown chọn model khi có nhiều bản báo cáo
 if st.session_state.cio_pdf_choice == "__choose__" and len(_available_cio) > 1:
     with st.container(border=True):
         st.markdown("### 📄 Chọn bản báo cáo để xuất PDF")
@@ -144,10 +198,8 @@ if st.session_state.cio_pdf_choice == "__choose__" and len(_available_cio) > 1:
         if st.button("⬇️ Tạo & Tải PDF", use_container_width=True):
             st.session_state.cio_pdf_choice = chosen
 
-# Thực hiện tạo PDF khi đã có lựa chọn hợp lệ
 if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__choose__":
     cio_provider = st.session_state.cio_pdf_choice
-    # Ưu tiên session_state nếu khớp provider đang chọn
     report_text = ""
     if st.session_state.get("cio_provider") == cio_provider:
         report_text = st.session_state.get("cio_report", "")
@@ -201,7 +253,37 @@ if st.session_state.show_cio_input:
         )
         cio_key = st.text_input("Nhập API Key:", type="password", key="cio_api_key")
         
-        # Kiểm tra cache trước
+        # ── Nút kiểm tra API Key ──
+        _test_btn = st.button("🔑 Kiểm tra API Key", use_container_width=True, type="secondary")
+        if _test_btn:
+            if not cio_key:
+                st.error("⚠️ Vui lòng nhập API Key trước!")
+            else:
+                with st.spinner(f"⏳ Đang kiểm tra API Key {AI_PROVIDER_MAP[cio_provider]['display']}..."):
+                    try:
+                        from openai import OpenAI
+                        _cfg = AI_PROVIDER_MAP[cio_provider]
+                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"])
+                        _resp = _client.chat.completions.create(
+                            model=_cfg["api_model"],
+                            messages=[{"role": "user", "content": "Hello"}],
+                            max_tokens=5
+                        )
+                        st.success(f"✅ API Key hợp lệ! Model: {_cfg['api_model']} — Phản hồi: {_resp.choices[0].message.content}")
+                    except Exception as _test_err:
+                        _err_str = str(_test_err)
+                        if "401" in _err_str or "Invalid Authentication" in _err_str:
+                            st.error(f"❌ API Key không hợp lệ! Vui lòng kiểm tra lại key của {AI_PROVIDER_MAP[cio_provider]['display']}.")
+                            st.info("💡 Mẹo: Key Kimi có dạng 'sk-...' (thường bắt đầu bằng 'sk-'). Hãy copy chính xác từ https://platform.moonshot.cn")
+                        elif "402" in _err_str or "insufficient_quota" in _err_str:
+                            st.error("❌ API Key đã hết hạn mức sử dụng (quota). Vui lòng nạp thêm hoặc dùng key khác.")
+                        elif "429" in _err_str or "Rate limit" in _err_str:
+                            st.error("⏳ Bị giới hạn tốc độ (Rate Limit). Vui lòng đợi 1-2 phút rồi thử lại.")
+                        elif "Connection" in _err_str or "timeout" in _err_str:
+                            st.error(f"🌐 Lỗi kết nối đến {AI_PROVIDER_MAP[cio_provider]['display']}. Kiểm tra internet hoặc base_url.")
+                        else:
+                            st.error(f"❌ Lỗi không xác định: {_test_err}")
+        
         from shared.ai_cio import _read_cache as _cio_read_cache
         _cached_sum = _cio_read_cache("executive_summary", cio_provider)
         
@@ -216,22 +298,42 @@ if st.session_state.show_cio_input:
         
         if run_btn or refresh_btn:
             if not cio_key:
-                st.error("Vui lòng nhập API Key!")
+                st.error("⚠️ Vui lòng nhập API Key!")
             else:
+                # ── Kiểm tra API Key trước khi chạy toàn bộ pipeline ──
+                with st.spinner(f"⏳ Đang xác thực API Key {AI_PROVIDER_MAP[cio_provider]['display']}..."):
+                    try:
+                        from openai import OpenAI
+                        _cfg = AI_PROVIDER_MAP[cio_provider]
+                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"])
+                        _client.chat.completions.create(
+                            model=_cfg["api_model"],
+                            messages=[{"role": "user", "content": "Hi"}],
+                            max_tokens=5
+                        )
+                    except Exception as _auth_e:
+                        _err_str = str(_auth_e)
+                        if "401" in _err_str or "Invalid Authentication" in _err_str:
+                            st.error(f"❌ API Key {AI_PROVIDER_MAP[cio_provider]['display']} không hợp lệ! Vui lòng kiểm tra lại key.")
+                            st.info("💡 Vào https://platform.moonshot.cn để lấy API Key Kimi hợp lệ.")
+                        elif "402" in _err_str or "insufficient_quota" in _err_str:
+                            st.error(f"❌ API Key đã hết quota! Vui lòng nạp thêm hoặc dùng key khác.")
+                        else:
+                            st.error(f"❌ Lỗi kết nối API: {_auth_e}")
+                        st.stop()
+                
                 with st.spinner("AI CIO đang tổng hợp 9 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
                     try:
                         from shared.ai_cio import run_executive_summary, _read_cache
                         from shared.github_sync import upload_file
                         import os as _os
                         
-                        # Nếu bấm "Tạo lại" hoặc force_refresh → xóa cache hiện tại
                         if refresh_btn:
                             cache_file = DATA_LAKE / "daily_cache" / f"executive_summary_{cio_provider}_{TODAY_STR}.txt"
                             if cache_file.exists():
                                 _os.remove(cache_file)
                                 st.info("🗑️ Đã xóa cache cũ, đang tạo báo cáo mới...")
                         
-                        # Chạy (sẽ dùng cache nếu còn, hoặc gọi API nếu đã xóa)
                         cached_sum = _read_cache("executive_summary", cio_provider)
                         if cached_sum and not refresh_btn:
                             st.session_state["cio_report"] = cached_sum
@@ -247,7 +349,6 @@ if st.session_state.show_cio_input:
                             st.markdown(summary_report)
                             report_text = summary_report
                         
-                        # ── Đồng bộ lên GitHub (cả cache & mới tạo) ──
                         try:
                             cache_path = f"data_lake/daily_cache/executive_summary_{cio_provider}_{TODAY_STR}.txt"
                             gh_result = upload_file(
@@ -262,3 +363,6 @@ if st.session_state.show_cio_input:
                             st.warning(f"⚠️ Chưa đồng bộ GitHub: {gh_err}")
                     except Exception as e:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")
+
+st.markdown("---")
+st.caption("© Quant Platform — 3 nhánh phân tích: Macro Analysis • Micro Analysis • Behavioral Finance")

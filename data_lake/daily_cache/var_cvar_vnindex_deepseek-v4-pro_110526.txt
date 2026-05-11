@@ -1,0 +1,23 @@
+## Phân tích Rủi ro Đuôi – VNINDEX ngày 08/05/2026
+
+**Dữ liệu thị trường:** Chỉ số đóng cửa 1,915.37, biến động 30 ngày (σ₃₀) 1.22%.
+
+### 1. Đánh giá rủi ro đuôi qua so sánh VaR
+
+- **Parametric VaR 95% (Gaussian): -1.43%** → mức lỗ kỳ vọng tối đa theo giả định phân phối chuẩn.
+- **Historical VaR 95% (dữ liệu 3 năm): -1.64%** → mức lỗ thực tế tại phân vị 5%.
+
+Historical VaR sâu hơn 21 điểm cơ bản, cho thấy phân phối lợi nhuận có **đuôi trái dày hơn phân phối chuẩn**. Mô hình Gaussian đang **đánh giá thấp rủi ro**, khiến nhà đầu tư có thể bất ngờ nếu chỉ dựa vào tham số chuẩn.
+
+### 2. Phân tích Expected Shortfall (CVaR)
+
+- **ES 95%: -3.00%**, phản ánh mức lỗ trung bình trong 5% kịch bản xấu nhất.
+- **Chênh lệch ES – Historical VaR: -1.36%**, rất lớn. Mỗi khi VNINDEX phá vỡ ngưỡng VaR, mức lỗ trung bình lên tới 3% – **gấp 1.83 lần Historical VaR**.
+
+Tỷ số ES/VaR = 1.83 so với mức ~1.25 của phân phối chuẩn là minh chứng rõ ràng cho **đuôi béo (fat tail)**. Rủi ro đuôi hiện hữu và mang tính hệ thống; tổn thất vượt VaR không chỉ lớn mà còn dai dẳng.
+
+### 3. Gaussian vs Thực tế
+
+Mô hình chuẩn hóa rủi ro bằng σ 1.22% cho ra VaR paramaetric -1.43%, trong khi thực tế lịch sử đòi hỏi mức lỗ -1.64%. Thị trường đang thể hiện **phân phối lệch và nhọn** (skewed, leptokurtic) – đuôi trái chứa nhiều sự kiện cực đoan hơn dự báo toán học.
+
+Kết hợp ES -3.00%, tín hiệu quá rõ: **VNINDEX đang tiềm ẩn rủi ro đuôi đáng kể**, và bất kỳ chiến lược quản trị rủi ro nào chỉ dựa vào VaR tham số đều sẽ thiếu an toàn. Cần áp dụng biện pháp stress-test và phòng hộ cho các cú sốc vượt xa ngưỡng 1.64% lịch sử.
