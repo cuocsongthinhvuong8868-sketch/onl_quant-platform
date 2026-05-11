@@ -331,7 +331,6 @@ def show():
                                         {"role": "system", "content": system_prompt},
                                         {"role": "user", "content": user_prompt}
                                     ],
-                                    temperature=AI_TEMPERATURE
                                 )
                                 result_text = response.choices[0].message.content
 

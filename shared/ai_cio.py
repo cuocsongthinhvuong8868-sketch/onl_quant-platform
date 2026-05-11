@@ -79,7 +79,7 @@ def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        temperature=temperature or AI_TEMPERATURE
+        temperature=temperature
     )
     return response.choices[0].message.content
 
@@ -469,6 +469,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     model = cfg["api_model"]
+    temperature = cfg.get("temperature", 1.0)
     
     df_stocks = load_close_prices()
     
@@ -504,7 +505,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6"):
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else master_full
     
-    final_res = call_ai(client, sys_p, usr_p, model=model)
+    final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
     _write_cache("executive_summary", final_res, provider_key)
     
     return final_res
