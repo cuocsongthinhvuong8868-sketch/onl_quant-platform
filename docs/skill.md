@@ -674,17 +674,17 @@ VNINDEX: 1,915.37 | Ïƒ30: 1.22% | Param VaR: -1.43% | Hist VaR: -1.64% | ES: -3.
 
 ---
 
-## 22) Phiên c?p nh?t 2026-05-11 — Temperature riêng cho t?ng model AI
+## 22) Phiï¿½n c?p nh?t 2026-05-11 ï¿½ Temperature riï¿½ng cho t?ng model AI
 
-### 22.1 M?c tiêu
-Phân bi?t temperature cho t?ng provider AI thay vì dùng chung AI_TEMPERATURE:
-- **Kimi 2.6**: temperature = **1.0** (sáng t?o, phân tích t?ng quan)
-- **DeepSeek V4 Pro**: temperature = **0.5** (chính xác, ít ?o giác)
+### 22.1 M?c tiï¿½u
+Phï¿½n bi?t temperature cho t?ng provider AI thay vï¿½ dï¿½ng chung AI_TEMPERATURE:
+- **Kimi 2.6**: temperature = **1.0** (sï¿½ng t?o, phï¿½n tï¿½ch t?ng quan)
+- **DeepSeek V4 Pro**: temperature = **0.5** (chï¿½nh xï¿½c, ï¿½t ?o giï¿½c)
 
 ### 22.2 Thay d?i
 
 **File s?a:**
-- config.py: thêm field 	emperature vào t?ng entry trong AI_PROVIDER_MAP
+- config.py: thï¿½m field 	emperature vï¿½o t?ng entry trong AI_PROVIDER_MAP
   `python
   AI_PROVIDER_MAP = {
       "kimi-2.6": {
@@ -702,8 +702,10 @@ Phân bi?t temperature cho t?ng provider AI thay vì dùng chung AI_TEMPERATURE:
   }
   `
 - shared/ai_cio.py:
-  - Hàm call_ai(): b? fallback or AI_TEMPERATURE, gi? 	emperature là optional param, n?u None thì API dùng default riêng
-  - un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) và truy?n vào call_ai()
+  - Hï¿½m call_ai(): b? fallback or AI_TEMPERATURE, gi? 	emperature lï¿½ optional param, n?u None thï¿½ API dï¿½ng default riï¿½ng
+  - 
+un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) vï¿½ truy?n vï¿½o call_ai()
+un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) vï¿½ truy?n vï¿½o call_ai()
 - 9 tool page: t?t c? ch? 	emperature=AI_TEMPERATURE ? 	emperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
   - 	ools/fear_greed/page.py
   - 	ools/upside_ratio/page.py
@@ -715,31 +717,31 @@ Phân bi?t temperature cho t?ng provider AI thay vì dùng chung AI_TEMPERATURE:
   - 	ools/va_res/page.py
   - 	ools/var_cvar_vnindex/page.py
 
-### 22.3 Cách ho?t d?ng
-- Khi ch?n Kimi 2.6 ? temperature = 1.0 (sáng t?o, phù h?p phân tích t?ng quan)
-- Khi ch?n DeepSeek V4 Pro ? temperature = 0.5 (chính xác, gi?m ?o giác)
-- AI_TEMPERATURE global v?n t?n t?i trong config.py d? gi? backward compatibility, nhung không còn du?c dùng trong các tool page n?a
+### 22.3 Cï¿½ch ho?t d?ng
+- Khi ch?n Kimi 2.6 ? temperature = 1.0 (sï¿½ng t?o, phï¿½ h?p phï¿½n tï¿½ch t?ng quan)
+- Khi ch?n DeepSeek V4 Pro ? temperature = 0.5 (chï¿½nh xï¿½c, gi?m ?o giï¿½c)
+- AI_TEMPERATURE global v?n t?n t?i trong config.py d? gi? backward compatibility, nhung khï¿½ng cï¿½n du?c dï¿½ng trong cï¿½c tool page n?a
 
 ### 22.4 API Key ki?m tra tru?c khi ch?y AI CIO
 
 **File s?a:** pp.py
 
-Thêm các c?i ti?n sau vào ph?n AI CIO:
+Thï¿½m cï¿½c c?i ti?n sau vï¿½o ph?n AI CIO:
 
-1. **Nút ?? Ki?m tra API Key riêng**: G?i 1 request nh? (max_tokens=5) d? test key tru?c, không c?n ch?y c? pipeline
-2. **T? d?ng ki?m tra key tru?c khi ch?y pipeline**: N?u key sai ? báo l?i ngay (không d?i 1-2 phút)
-3. **Phân lo?i l?i chi ti?t**:
-   - 401: Key không h?p l? + hu?ng d?n l?y key t? platform.moonshot.cn
+1. **Nï¿½t ?? Ki?m tra API Key riï¿½ng**: G?i 1 request nh? (max_tokens=5) d? test key tru?c, khï¿½ng c?n ch?y c? pipeline
+2. **T? d?ng ki?m tra key tru?c khi ch?y pipeline**: N?u key sai ? bï¿½o l?i ngay (khï¿½ng d?i 1-2 phï¿½t)
+3. **Phï¿½n lo?i l?i chi ti?t**:
+   - 401: Key khï¿½ng h?p l? + hu?ng d?n l?y key t? platform.moonshot.cn
    - 402: H?t quota
    - 429: Rate limit
    - Connection: L?i m?ng/base_url
 
 ---
 
-## 23) Phiên c?p nh?t 2026-05-11 — Sidebar ch? hi?n 3 nhánh chính A_, B_, C_
+## 23) Phiï¿½n c?p nh?t 2026-05-11 ï¿½ Sidebar ch? hi?n 3 nhï¿½nh chï¿½nh A_, B_, C_
 
-### 23.1 M?c tiêu
-Sidebar Streamlit ch? hi?n th? 3 trang chính:
+### 23.1 M?c tiï¿½u
+Sidebar Streamlit ch? hi?n th? 3 trang chï¿½nh:
 - A_Macro_Analysis
 - B_Micro_Analysis
 - C_Behavioral_Finance
@@ -748,7 +750,7 @@ Sidebar Streamlit ch? hi?n th? 3 trang chính:
 
 ### 23.2 Thay d?i
 
-**Ð?i tên file:**
+**ï¿½?i tï¿½n file:**
 - pages/1_Macro_Analysis.py ? pages/A_Macro_Analysis.py
 - pages/2_Micro_Analysis.py ? pages/B_Micro_Analysis.py
 - pages/3_Behavioral_Finance.py ? pages/C_Behavioral_Finance.py
@@ -759,10 +761,10 @@ Sidebar Streamlit ch? hi?n th? 3 trang chính:
 - st.switch_page("pages/3_Behavioral_Finance.py") ? st.switch_page("pages/C_Behavioral_Finance.py")
 
 **Co ch?:**
-- 9 tool con (_1_Fear_Greed.py, _2_Upside_Ratio.py, ...) dã có ti?n t? _ ? t? d?ng ?n kh?i sidebar Streamlit
+- 9 tool con (_1_Fear_Greed.py, _2_Upside_Ratio.py, ...) dï¿½ cï¿½ ti?n t? _ ? t? d?ng ?n kh?i sidebar Streamlit
 - C_Behavioral_Finance.py hi?n th? grid danh m?c 9 tool ? ch?n tool ? render inline
 
-### 23.3 Cách ho?t d?ng
+### 23.3 Cï¿½ch ho?t d?ng
 - Sidebar ch? hi?n: **A_Macro_Analysis**, **B_Micro_Analysis**, **C_Behavioral_Finance**
-- B?m C ? vào trang grid 9 tool ? ch?n công c? ? phân tích
+- B?m C ? vï¿½o trang grid 9 tool ? ch?n cï¿½ng c? ? phï¿½n tï¿½ch
 - B?m "?? Danh m?c" d? quay l?i grid tool

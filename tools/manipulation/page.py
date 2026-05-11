@@ -1,136 +1,90 @@
+"""
+tools/manipulation/page.py
+Hàm render() được gọi bởi pages/tools_page_C/_8_Manipulation.py hoặc từ C_Behavioral_Finance.py
+Phát hiện dấu hiệu thao túng giá qua PCA trên VIC/VHM/VRE vs VN30F1M
+"""
+import logging
+import warnings
+import os
+import pandas as pd
 import streamlit as st
 
-from shared.data_loader import load_close_prices, load_custom
+warnings.filterwarnings("ignore")
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)s — %(message)s",
+    datefmt="%H:%M:%S",
+)
+
+from config import AI_PROVIDER_MAP
+from shared.data_loader import load_close_prices
 from shared.daily_cache import load_daily_cache, save_daily_cache
-from tools.risk_adjusted_growth.ui.sidebar import render_sidebar
-from tools.risk_adjusted_growth.quant.data_prep import build_base_table
-from tools.risk_adjusted_growth.quant.scoring import compute_scores
-from tools.risk_adjusted_growth.ui.charts import render_table, render_alpha_chart
-try:
-    from config import AI_PROVIDER_MAP
-except ImportError:
-    AI_PROVIDER_MAP = {
-        "kimi-2.6": {
-            "display": "Kimi 2.6",
-            "api_model": "kimi-k2.6",
-            "base_url": "https://api.moonshot.ai/v1",
-        },
-        "deepseek-v4-pro": {
-            "display": "DeepSeek V4 Pro",
-            "api_model": "deepseek-chat",
-            "base_url": "https://api.deepseek.com/v1",
-        },
-    }
-
-
-@st.cache_data(show_spinner=False)
-def _load_base_data(df_close):
-    df_fund = load_custom("bank_fundamentals.csv")
-    try:
-        df_div = load_custom("dividend_cache.csv")
-    except FileNotFoundError:
-        df_div = None
-
-    # load_custom dùng index_col=0, nên dividend có thể bị đẩy mã cổ phiếu vào index.
-    if df_div is not None and not df_div.empty:
-        div_cols = {str(c) for c in df_div.columns}
-        has_symbol_col = ("Ma CP" in div_cols) or ("ticker" in div_cols)
-        if not has_symbol_col:
-            if df_div.index.name:
-                idx_name = str(df_div.index.name)
-                if idx_name.lower() == "ma cp":
-                    df_div = df_div.reset_index().rename(columns={idx_name: "Ma CP"})
-                elif idx_name.lower() == "ticker":
-                    df_div = df_div.reset_index().rename(columns={idx_name: "ticker"})
-                else:
-                    df_div = df_div.reset_index().rename(columns={"index": "ticker"})
-            else:
-                df_div = df_div.reset_index().rename(columns={"index": "ticker"})
-
-    # load_custom dùng index_col=0, nên CSV fundamentals có thể bị đẩy ticker vào index.
-    if "ticker" not in df_fund.columns:
-        if df_fund.index.name and str(df_fund.index.name).lower() == "ticker":
-            df_fund = df_fund.reset_index()
-        elif "Unnamed: 0" in df_fund.columns:
-            df_fund = df_fund.rename(columns={"Unnamed: 0": "ticker"})
-        else:
-            df_fund = df_fund.reset_index().rename(columns={"index": "ticker"})
-
-    if "ticker" not in df_fund.columns:
-        raise ValueError("bank_fundamentals.csv thiếu cột 'ticker'.")
-
-    if df_close.empty:
-        raise ValueError("market_data.csv rỗng, chưa có dữ liệu giá.")
-
-    latest_prices = df_close.ffill().iloc[-1]
-    return build_base_table(df_fund, df_div, latest_prices)
+from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
+from tools.manipulation.ui.sidebar import render_sidebar
+from tools.manipulation.ui.charts import render_core, render_event
 
 
 def render():
-    st.title("Risk-Adjusted Growth Rate")
-    st.caption("Economic Alpha cho nhóm ngân hàng, tách quant/UI theo pipeline data_lake")
-    st.caption("Build: RAG fix v3 (PB unit-normalized + dividend index normalization)")
+    st.title("🔍 Manipulation Detection — VIC/VHM/VRE vs VN30F1M")
+    st.caption(
+        "PCA Composite · Rolling VaR/CVaR · Percentile Rank Correlation · "
+        "Event Study Regime Classification"
+    )
 
-    params = render_sidebar()
+    params = render_sidebar(default_threshold=0.15)
+    window = params["window"]
+    threshold = params["threshold"]
     ai_provider = params["ai_provider"]
-    api_key     = params["api_key"]
+    api_key = params["api_key"]
 
     try:
-        df_close = load_close_prices()
+        df_prices = load_close_prices()
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
-    st.caption(f"📅 Dữ liệu cuối cùng: {df_close.index.max().strftime('%d/%m/%Y')}")
+    st.caption(f"📅 Dữ liệu cuối cùng: {df_prices.index.max().strftime('%d/%m/%Y')}")
 
-    with st.spinner("Đang tải fundamentals + xây bảng cơ sở..."):
-        try:
-            df_base = _load_base_data(df_close)
-        except (FileNotFoundError, ValueError) as e:
-            st.error(str(e))
-            st.info("Chạy script `python3 update_bank_fundamentals.py` để tạo dữ liệu fundamentals trong data_lake.")
-            st.stop()
-
-    st.write(
-        f"**Viễn cảnh:** {params['selected_k'].split(' ')[0]} | "
-        f"**K:** {params['k_value']} | **COE:** {params['coe_input']}% | "
-        f"**Kịch bản P/B:** BVPS `{params['bvps_change_pct']}%`, Phạt P/B `{params['pb_penalty_pct']}%`"
-    )
-
-    key = {
-        "cache_version": 3,
-        "k_value": params["k_value"],
-        "coe_decimal": params["coe_decimal"],
-        "bvps_change_pct": params["bvps_change_pct"],
-        "pb_penalty_pct": params["pb_penalty_pct"],
-    }
-    force_recompute = st.button("Force Recompute (bỏ cache hôm nay)")
-    cached = load_daily_cache("risk_adjusted_growth", key)
-    if (cached is not None) and (not force_recompute):
-        df_result = cached["df_result"]
-        st.caption("⚡ Dùng cache cùng ngày (Risk-Adjusted Growth).")
+    key = {"window": window}
+    cached = load_daily_cache("manipulation", key)
+    if cached is not None:
+        weights = cached["weights"]
+        result = cached["result"]
+        st.caption("⚡ Dùng cache cùng ngày (Manipulation).")
     else:
-        df_result = compute_scores(
-            df_base=df_base,
-            k_value=params["k_value"],
-            coe_decimal=params["coe_decimal"],
-            bvps_change_pct=params["bvps_change_pct"],
-            pb_penalty_pct=params["pb_penalty_pct"],
-        )
-        save_daily_cache("risk_adjusted_growth", key, {"df_result": df_result})
-        st.caption("💾 Đã tạo cache ngày mới (Risk-Adjusted Growth).")
+        with st.spinner("Đang chạy PCA + Rolling Metrics..."):
+            try:
+                df_prepared = prepare_data(df_prices)
+                weights, result = compute_metrics(df_prepared, window=window)
+            except ValueError as e:
+                st.error(f"❌ Lỗi dữ liệu: {e}")
+                st.stop()
+        save_daily_cache("manipulation", key, {"weights": weights, "result": result})
+        st.caption("💾 Đã tạo cache ngày mới (Manipulation).")
 
-    render_table(df_result)
-    render_alpha_chart(df_result)
+    # ── Hiển thị Core Metrics ──
+    render_core(result, weights, result)
 
+    # ── Event Study ──
     st.divider()
-    st.subheader("✨ Trợ lý AI Phân tích Cấu trúc Ngành")
+    st.subheader("📅 Even Study — Trạng thái hiện tại tính từ ngày T0")
 
-    import os
-    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
+    t0_default = result.index[-60] if len(result) >= 60 else result.index[0]
+    t0_date = st.date_input("Chọn ngày gốc (t₀)", value=t0_default.date())
+    t0_dt = pd.Timestamp(t0_date)
+
+    re_df = classify_regime(result, threshold, t0_dt)
+    render_event(re_df, threshold)
+
+        # ── AI Analysis ──
+    st.divider()
+    st.subheader("✨ Trợ lý AI Phân tích Dấu hiệu Thao túng")
+
+    from config import DATA_LAKE, ROOT_DIR
     from datetime import date
+    from openai import OpenAI
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"risk_adjusted_growth_{ai_provider}_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{today_str}.txt"
     
     if ai_cache_file.exists():
         st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
@@ -143,34 +97,47 @@ def render():
             os.remove(ai_cache_file)
             st.rerun()
     else:
-        btn_label = f"🐺 Phân tích Economic Alpha ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        btn_label = f"🐺 Phân tích Thao túng ({AI_PROVIDER_MAP[ai_provider]['display']})"
         if st.button(btn_label, type="primary", use_container_width=True):
             if not api_key:
                 st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
             else:
-                with st.spinner("AI đang phân tích cấu trúc rủi ro và lợi nhuận..."):
+                with st.spinner("AI đang phân tích dấu hiệu thao túng..."):
                     try:
-                        from openai import OpenAI
                         cfg = AI_PROVIDER_MAP[ai_provider]
                         client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
                         
-                        with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
+                        with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
                             prompt_template = f.read()
     
-                        top_alpha = df_result.nlargest(3, "Economic Alpha")
-                        top_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(top_alpha.to_dict('records'))])
-                        
-                        bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
-                        bottom_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(bottom_alpha.to_dict('records'))])
+                        latest = result.iloc[-1]
+                        date_str = result.index[-1].strftime('%d/%m/%Y')
+                        corr_val = float(latest["Correlation"])
+                        slope_val = float(latest["OLS_Slope"])
+                        var_val = float(latest["VaR_95"])
+                        cvar_val = float(latest["CVaR_95"])
+                        pr_corr = float(latest["PR_Corr"])
+                        pr_slope = float(latest["PR_Slope"])
 
-                        full_prompt = prompt_template.replace("{k_scenario}", params['selected_k'].split(' ')[0])\
-                                                     .replace("{k_value}", str(params['k_value']))\
-                                                     .replace("{coe_input}", str(params['coe_input']))\
-                                                     .replace("{bvps_change_pct}", str(params['bvps_change_pct']))\
-                                                     .replace("{pb_penalty_pct}", str(params['pb_penalty_pct']))\
-                                                     .replace("{top_alpha_str}", top_alpha_str)\
-                                                     .replace("{bottom_alpha_str}", bottom_alpha_str)
+                        # Thống kê regime từ event study
+                        if re_df is not None and not re_df.empty:
+                            counts = re_df["Regime"].value_counts()
+                            dominant = counts.idxmax()
+                            coupling_pct = counts.get("COUPLING", 0) / len(re_df) * 100
+                        else:
+                            dominant = "N/A"
+                            coupling_pct = 0
 
+                        full_prompt = prompt_template.replace("{date_str}", date_str)\
+                                                     .replace("{corr}", f"{corr_val:.3f}")\
+                                                     .replace("{slope}", f"{slope_val:.3f}")\
+                                                     .replace("{var_95}", f"{var_val*100:.2f}%")\
+                                                     .replace("{cvar_95}", f"{cvar_val*100:.2f}%")\
+                                                     .replace("{pr_corr}", f"{pr_corr:.2%}")\
+                                                     .replace("{pr_slope}", f"{pr_slope:.2%}")\
+                                                     .replace("{dominant_regime}", dominant)\
+                                                     .replace("{coupling_pct}", f"{coupling_pct:.1f}%")
+                                                     
                         parts = full_prompt.split("# INPUT DATA")
                         system_prompt = parts[0].strip()
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
@@ -181,7 +148,7 @@ def render():
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
                             ],
-                            temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
+                            temperature=AI_PROVIDER_MAP[ai_provider].get("temperature")
                         )
                         
                         result_text = response.choices[0].message.content
@@ -191,7 +158,6 @@ def render():
                         with open(ai_cache_file, "w", encoding="utf-8") as f:
                             f.write(result_text)
                             
-                        # Đồng bộ lên GitHub
                         try:
                             from shared.github_sync import upload_file
                             import os as _os
