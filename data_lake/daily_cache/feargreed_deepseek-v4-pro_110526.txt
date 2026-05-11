@@ -1,32 +1,26 @@
-# BÁO CÁO CHIẾN LƯỢC ĐỊNH LƯỢNG
-**VN-Index | Ngày giao dịch: 11/05/2026**
+# BÁO CÁO PHÂN TÍCH CHIẾN LƯỢC ĐỊNH LƯỢNG
+**Ngày:** 11/05/2026
 
 ---
 
-## 1. MARKET REGIME
+## 1. Market Regime (Nhận diện Pha thị trường)
 
-**Risk Score 50.3/100 (Delta: +0.1 điểm):** Hệ thống duy trì trạng thái NEUTRAL - điểm số nằm tại ngưỡng trung tâm của thang đo, cho thấy tâm lý đám đông không có định hướng rõ rệt. Dòng tiền đang ở trạng thái "phân kỳ ngang" - không hội tụ vào một nhóm ngành duy nhất nhưng cũng chưa có dấu hiệu rút lui đồng loạt. Trạng thái STOCK PICKING được kích hoạt hàm ý cơ hội mang tính vi mô, không phải sóng thị trường tổng thể.
+- **Risk Score 50.3/100** duy trì tại vùng cân bằng - trạng thái NEUTRAL được xác nhận với Delta phiên +0.1 điểm không đáng kể. Thị trường đang vận hành không có bias định hướng rõ rệt.
+- **Tâm lý đám đông:** Không ở pha sợ hãi (Fear) hay tham lam (Greed) - trạng thái trung tính cho phép hành vi phân tích cơ bản và kỹ thuật chi phối thay vì cảm xúc. Dòng tiền không có xu hướng hội tụ hay phân kỳ mạnh, duy trì trạng thái phân tán trên diện rộng.
 
----
+## 2. Systemic Risk Assessment (Đánh giá Rủi ro Hệ thống)
 
-## 2. SYSTEMIC RISK ASSESSMENT
+- **EGARCH Vol 6.7% (+1.6%)** ghi nhận sự gia tăng biến động ngắn hạn, phản ánh sự bất ổn định trong cấu trúc giá cục bộ, song chưa đạt ngưỡng báo động rủi ro hệ thống.
+- **Rolling Skewness +0.20** duy trì dương, xác nhận phân phối lợi suất lệch phải. Tích hợp EGARCH tăng + Skewness dương cho thấy **đuôi rủi ro nghiêng về phía tăng giá (upside tail risk)** - biến động gia tăng chủ yếu đến từ các nhịp hồi phục mạnh hơn là sụt giảm đột ngột. Rủi ro hệ thống đang thu hẹp.
 
-**EGARCH 6.7% (+1.6%) kết hợp với Skewness +0.20:** Biến động kỳ vọng tăng đột biến 1.6% trong khi Skewness vẫn dương (+) cho thấy thị trường đang dịch chuyển từ vùng tích lũy biến động thấp sang vùng biến động cao hơn, nhưng vẫn giữ được cấu trúc đuôi rủi ro thiên về bên mua (positive tail). Đuôi rủi ro hiện tại nghiêng về phía tăng giá, song biến động gia tăng cảnh báo khả năng đảo chiều đột ngột. Rủi ro hệ thống đang thu hẹp dần do Skewness dương duy trì ổn định, nhưng chưa đủ an toàn để khẳng định xu hướng bền vững.
+## 3. Contagion & Dispersion (Hiệu ứng lây lan và Độ phân hóa)
 
----
+- **Downside Correlation 12.7%** ở mức thấp - các cổ phiếu không cùng giảm khi thị trường điều chỉnh, phản xạ phòng thủ cá nhân hóa.
+- **Upside Correlation 64.1%** ở mức cao phản ánh lực mua mang tính đồng thuận - dòng tiền tham gia tập trung nhưng chưa mang tính bầy đàn (herding) do độ phân hóa giữa hai chiều biến động lớn. Thị trường đang trong giai đoạn "bắt đáy có chọn lọc" với lực cầu lan tỏa trên các nhóm ngành nhưng không đồng nhất về thời điểm.
 
-## 3. CONTAGION & DISPERSION
+## 4. Actionable Strategy (Chiến lược Hành động)
 
-**Downside Corr 12.7% vs Upside Corr 64.1%:** Khoảng cách chênh lệch rất lớn giữa hai chiều tương quan - phản ánh hiệu ứng bầy đàn mạnh mẽ ở phía mua (upside contagion) trong khi áp lực bán mang tính phân tán, không có sự đồng thuận lan tỏa. Điều này xác nhận lực cầu có tính đầu cơ lan tỏa rộng, trong khi lực bán vẫn mang tính chọn lọc, tạo nền tảng cho một thị trường tăng giá có cấu trúc yếu (low-quality rally).
-
----
-
-## 4. ACTIONABLE STRATEGY
-
-**Tỷ trọng Beta đề xuất: 70% Beta thuần (Net Long) + 30% Cash**
-
-**Chiến lược cụ thể:**
-- **Chủ động giải ngân** vào các cổ phiếu có nền tảng cơ bản với mức biến động thấp hơn thị trường (Low-beta stocks) để tận dụng upside contagion đang lan tỏa
-- **Không sử dụng margin** trong giai đoạn này do EGARCH Vol đang tăng speed - rủi ro tái định giá danh mục cao nếu Skewness đảo chiều
-- **Cắt lỗ động (Trailing Stop)** ở mức -8% cho từng vị thế để bảo vệ lợi nhuận trước nguy cơ biến động gia tăng đột biến
-- **Ưu tiên Mid-cap** có thanh khoản tốt thay vì Small-cap do Downside Correlation thấp cho thấy rủi ro bị bán tháo lan truyền là thấp
+- **Tỷ trọng Beta (Rủi ro thị trường):** Duy trì **50-60% Beta** - không tham gia quá mức nhưng cũng không rút về phòng thủ hoàn toàn. Phù hợp với trạng thái STOCK PICKING và Skewness dương ủng hộ vị thế long.
+- **Chiến lược giải ngân/phòng thủ:**
+  - **Giải ngân:** Tận dụng Upside Correlation 64.1% - ưu tiên giải ngân theo chiến lược bottom-up, chọn cổ phiếu có động lực nội tại mạnh và dòng tiền riêng. Phân bổ danh mục đa dạng hóa để hấp thụ rủi ro từ Downside Correlation thấp.
+  - **Phòng thủ:** Sử dụng trailing stop linh hoạt cho các vị thế đã có lời - EGARCH tăng cảnh báo biến động giá mạnh có thể gây stop-out sớm nếu cài đặt quá chặt. Không khuyến nghị hedging bằng derivatives tại vùng NEUTRAL.
