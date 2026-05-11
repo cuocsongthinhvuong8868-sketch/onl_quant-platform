@@ -40,9 +40,9 @@ jobs:
           import os
           from datetime import date
 
-          df = pd.read_csv("data_lake/vnindex_cache.csv", parse_dates=["date"])
+          df = pd.read_csv("data_lake/vnindex_cache.csv", parse_dates=["time"])
           today_str = date.today().strftime("%Y-%m-%d")
-          latest_date = df["date"].max().strftime("%Y-%m-%d")
+          latest_date = df["time"].max().strftime("%Y-%m-%d")
           print(f"Latest data date: {latest_date}")
           print(f"Today: {today_str}")
 
