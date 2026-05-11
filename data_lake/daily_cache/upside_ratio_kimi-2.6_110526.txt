@@ -1,0 +1,16 @@
+Dữ liệu 12.000 kịch bản cho thấy thị trường đang ở chế độ nén ép với skew âm và quán tính yếu. Dưới đây là phán quyết dựa trên xác suất.
+
+• **Cuộc chiến Cung - Cầu: Zombification Bất đối xứng (Asymmetric Compression)**
+Cả hai vectơ đều nằm dưới trung bình dài hạn, nhưng mức độ lệch không đồng nhất. Upside hiện tại (3.98%) lệch âm 10.18 điểm phần trăm (pp) so với Mu (14.16%), trong khi Downside (8.76%) chỉ lệch âm 4.92pp so với Mu (13.68%). Điều này loại trừ khả năng Phân phối rõ ràng (vì cả hai dòng đều không dồn vào vùng cao) và cũng không phải Tích lũy cổ điển (do lực mua không tạo đáy). Trạng thái đúng là **Zombification**: thanh khoản bị hút khô, dòng tiền đóng băng. Tuy nhiên, chênh lệch Downside–Upside hiện tại là 4.78pp, tạo ra một "rủi ro tiềm ẩn" nghiêng về phía Cung. Thị trường đang trong trạng thái chờ bùng nổ, nhưng lò xo bên bán được nén chặt hơn.
+
+• **Đụng độ Quán tính: Chế độ Nhiễu Hồi quy Trung bình (Mean-Reverting Noise)**
+Hệ số Phi của cả hai đều nằm sâu trong vùng yếu: Cầu 0.137, Cung 0.254. Với ngưỡng phân biệt xu hướng có ý nghĩa thống kê (thường Φ > 0.3), cả hai đều thể hiện **không có gia tốc thực sự**. Đây không phải Random Walk mà là nhiễu có cấu trúc hồi quy. Mô hình Beta-AR cho thấy kỳ vọng t+1 của Upside là ~12.77% và Downside là ~12.43%, nghĩa là cả hai đều bị kéo về trung bình rất nhanh. Tuy nhiên, Phi của Cung cao gấp 1.85 lần Cầu. Điều này có nghĩa là nếu một cú sốc bán xuất hiện, độ bám (persistence) của nó sẽ cao hơn đáng kể so với cú sốc mua. Không bên nào kiểm soát xu hướng, nhưng bên Bán có ma sát thấp hơn để lan truyền.
+
+• **Stress-Test: Blast Radius 19.59 điểm phần trăm**
+P95 Downside T+19 là 28.35%. Khoảng cách từ điểm hiện tại (8.76%) đến ngưỡng thảm họa là **19.59pp** — đây là bán kính nổ (Blast Radius). So với Mu Downside (13.68%), độ lệch lên tới +14.67pp, tương đương xấp xỉ 1.65σ nếu chuẩn hóa. Điểm đáng sợ hơn: P95 Upside chỉ là 25.63%, thấp hơn Downside 2.72pp. Phân phối có **skewness âm rõ rệt**. Đuôi bên phải của rủi ro không chỉ dài hơn mà còn nặng hơn đuôi bên trái của cơ hội. Trong chế độ này, rủi ro bùng nổ không tuân theo tiến trình tuyến tính mà theo cơ chế "gap risk" — thanh khoản bốc hơi theo cấp số nhân khi các mức stop-loss được kích hoạt dây chuyền.
+
+• **Lệnh Tác Chiến: Phòng thủ chiến lược, Không Đuổi, Không Đòn bẩy**
+- **Tỷ trọng Ròng:** Cắt giảm xuống tối đa 30-35% (duy trì 65-70% tiền mặt hoặc tài sản phi rủi ro). Đây là mức phòng thủ bắt buộc trong chế độ nhiễu với đuôi phân phối bất đối xứng.
+- **Cơ cấu Vị thế:** Ưu tiên Long Gamma/Convexity thay vì Long Delta. Triển khai Tail Hedge qua Put Spread hoặc các công cụ Long Volatility trên chỉ số tham chiếu. **Tuyệt đối không bán khống quyền chọn** (Short Gamma) khi Blast Radius vượt quá 15pp.
+- **Chiến thuật Entry:** Cấm mua đuổi (No Chasing). Upside ở 3.98% với Φ=0.137 là bẫy cho thuật toán trend-following. Nếu tham gia bắt đáy, chỉ dùng **lưới mua với bước nhảy tối thiểu 8-10%** và giảm 50% kích thước vị thế bình thường để sinh tồn qua độ trượt 19.59pp.
+- **Điểm Cứng rắn:** Nếu Downside vượt ngưỡng Mu (13.68%) và đóng cửa trên đó, kích hoạt toàn bộ lệnh cắt lỗ (Kill Switch) cho vị thế Long. Margin cho vị thế đơn hướng phải bằng 0. Mô hình đã chỉ ra: cơ hội không biến mất, nhưng **sai lầm duy nhất trong chế độ này là đứng sai hướng khi đuôi phân phối bùng nổ**.
