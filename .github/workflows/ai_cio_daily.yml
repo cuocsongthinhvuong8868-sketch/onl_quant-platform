@@ -2,9 +2,9 @@ name: 🤖 AI CIO Daily Report (DeepSeek)
 
 on:
   schedule:
-    # 3:00 AM VN Time (UTC+7) = 20:00 UTC previous day
-    # Mon-Fri VN => Sun-Thu UTC
-    - cron: '0 8 * * 1-5'
+        # 15:30 VN Time (UTC+7) = 08:30 UTC
+    # Thứ 2 đến Thứ 6
+    - cron: '30 8 * * 1-5'
   workflow_dispatch:  # allow manual trigger
 
 jobs:
@@ -15,6 +15,7 @@ jobs:
       DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+      VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
 
     steps:
       - name: 📥 Checkout repo
@@ -31,8 +32,35 @@ jobs:
           pip install -r requirements.txt
           pip install requests
 
-      - name: 🤖 Run AI CIO Auto
-        run: python command/run_ai_cio_auto.py
+      - name: 🔍 Kiểm tra dữ liệu VNINDEX đã cập nhật hôm nay chưa?
+        id: check_data
+        run: |
+          python -c "
+import pandas as pd
+from datetime import date
+from pathlib import Path
+
+df = pd.read_csv('data_lake/vnindex_cache.csv', parse_dates=['date'])
+today_str = date.today().strftime('%Y-%m-%d')
+latest_date = df['date'].max().strftime('%Y-%m-%d')
+print(f'Latest data date: {latest_date}')
+print(f'Today: {today_str}')
+
+if latest_date >= today_str:
+    print('DATA_READY=true')
+else:
+    print('DATA_READY=false')
+" >> $GITHUB_OUTPUT
+
+      - name: 📥 Cập nhật dữ liệu (nếu thiếu)
+        if: steps.check_data.outputs.DATA_READY == 'false'
+        run: |
+          echo "Dữ liệu chưa cập nhật hôm nay. Đang chạy update_data.py..."
+          python command/update_data.py
+          python command/update_bank_fundamentals.py
+
+      - name: 🤖 Chạy AI CIO (force — không dùng cache cũ của tool con)
+        run: python command/run_ai_cio_auto.py --force
 
       - name: 📤 Commit cache + PDF if changed
         run: |
@@ -45,3 +73,4 @@ jobs:
             git commit -m "Auto: AI CIO report $(date +'%d%m%y')"
             git push
           fi
+

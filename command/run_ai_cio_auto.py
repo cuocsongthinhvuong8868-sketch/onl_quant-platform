@@ -8,13 +8,16 @@ Environment variables (from GitHub Secrets):
 - TELEGRAM_CHAT_ID
 
 Logic (default mode — dùng cho cron):
-1. Kiểm tra cache hôm nay.
-   - CÓ cache → đọc cache, tạo PDF, gửi Telegram (KHÔNG gọi API).
-   - KHÔNG cache → gọi API DeepSeek → lưu cache → tạo PDF → gửi Telegram.
+LUÔN chạy ở chế độ FORCE: xoá cache cũ của 9 tool con + executive_summary
+- Gọi API mới cho toàn bộ 9 tool con + tổng hợp (10 lần gọi API)
+- Tạo PDF → Gửi Telegram
+
+Lưu ý: Workflow bên ngoài (ai_cio_daily.yml) đã kiểm tra data VNINDEX trước khi gọi script này.
+Nếu thiếu data VNINDEX hôm nay → workflow tự chạy update_data.py trước.
 
 Usage:
-    python command/run_ai_cio_auto.py           # default: ưu tiên cache, nếu thiếu thì gọi API
-    python command/run_ai_cio_auto.py --force   # force gọi API mới (xóa cache cũ nếu có)
+    python command/run_ai_cio_auto.py           # force mode (xoá cache cũ, gọi API mới)
+    python command/run_ai_cio_auto.py --force   # giống default (luôn force)
 """
 import os
 import re
@@ -27,7 +30,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from config import DATA_LAKE, ROOT_DIR
-from shared.ai_cio import run_executive_summary, _read_cache
+from shared.ai_cio import run_executive_summary, _read_cache, _clear_all_tool_caches
 
 # ── Config ──
 PROVIDER_KEY = "deepseek-v4-pro"
@@ -42,31 +45,23 @@ DEEPSEEK_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
 
-FORCE = "--force" in sys.argv or "-f" in sys.argv
+FORCE = True  # luôn force — không dùng cache, gọi API mới mỗi lần
 
 
 # ── Helpers ──
 def _get_report_text() -> str:
-    """Lấy nội dung báo cáo: ưu tiên cache, thiếu thì gọi API."""
-    if CACHE_PATH.exists() and not FORCE:
-        print(f"[CACHE] Found existing cache: {CACHE_PATH.name}")
-        cached = _read_cache("executive_summary", PROVIDER_KEY)
-        if cached:
-            print("[CACHE] Using cached report.")
-            return cached
-        print("[WARN] Cache file exists but empty/corrupt. Will call API.")
-
-    if FORCE and CACHE_PATH.exists():
-        print(f"[FORCE] Removing existing cache: {CACHE_PATH.name}")
-        os.remove(CACHE_PATH)
+    """Luôn xoá cache cũ và tạo báo cáo mới từ đầu (force mode)."""
+    print(f"[FORCE] Clearing all tool caches for {PROVIDER_KEY}...")
+    _clear_all_tool_caches(PROVIDER_KEY)
+    print("[FORCE] All tool caches deleted. Will regenerate from scratch.")
 
     if not DEEPSEEK_KEY:
         print("[ERROR] DEEPSEEK_API_KEY not set.")
         sys.exit(1)
 
-    print("[RUN] Generating AI CIO Executive Summary via DeepSeek...")
+    print("[RUN] Generating AI CIO Executive Summary via DeepSeek (FORCE)...")
     try:
-        report_text = run_executive_summary(DEEPSEEK_KEY, provider_key=PROVIDER_KEY)
+        report_text = run_executive_summary(DEEPSEEK_KEY, provider_key=PROVIDER_KEY, force=True)
     except Exception as e:
         print(f"[ERROR] Failed to generate report: {e}")
         sys.exit(1)
