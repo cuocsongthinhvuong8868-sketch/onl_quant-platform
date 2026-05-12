@@ -1,0 +1,52 @@
+**BÁO CÁO CHẨN ĐOÁN CẤU TRÚC VN30F1M | 11/05/2026**
+*Người lập: Derivatives Prop Desk*
+
+---
+
+### 1. MARKET MICROSTRUCTURE ASSESSMENT
+**Vingroup đang nắm vô-lăng điều tiết VN30F1M. Đây là trạng thái cực đoan.**
+
+- **OLS Slope 0.39 (100.0th Percentile):** Mức Beta chưa từng xuất hiện trong lịch sử quan sát. PCA Composite của 3 mã VIN (VIC, VHM, VRE) đang truyền tác động mạnh gấp nhiều lần trọng số tự nhiên của chúng trong rổ VN30. Về bản chất, **VN30F1M hiện là một ETF đòn bẩy của Vingroup**, không phải một chỉ số phái sinh phản ánh 30 cổ phiếu.
+- **Correlation 0.67 (100.0th Percentile):** Đồng pha gần như tuyệt đối trong bối cảnh lịch sử. F1 không còn tính đa dạng hóa (diversification) mà đang đồng nhất hóa (synchronize) với nhịp thở của rổ VIN.
+- **Phán đoán về MM (Market Makers):** Có dấu hiệu rõ ràng rằng MMs đang sử dụng trụ VIN làm **cơ chế truyền dẫn (transmission mechanism)** để định giá và điều tiết F1. Liquidity provision trên F1 đang được thuật toán neo vào order flow của VIC/VHM thay vì trên toàn bộ VN30.
+- **Mức độ bất thường:** **🔴 EXTREME.** Khi cả Slope và Correlation cùng nằm ở vị trí thượng phong lịch sử (100th percentile), đây là outlier thống kê. Không phải trạng thái cân bằng, đây là **cấu trúc bị bóp méo (distorted microstructure)**, tiềm ẩn rủi ro unwind mạnh.
+
+---
+
+### 2. REGIME INTERPRETATION
+**Regime COUPLING – Dòng tiền đang "co cụm" vào VIN như một tài sản đơn nhất.**
+
+- **Event Study từ t₀ (02/03/2026):** Trạng thái áp đảo là COUPLING, nghĩa là trong suốt hơn 2 tháng qua, F1 không được định giá bởi vĩ mô hay phân ngành (Bank, Chứng, Thép), mà bởi **dòng tiền qua cửa VIN**. Nếu VIN tăng, F1 bắt buộc phải tăng; nếu VIN giảm, F1 không có lực đỡ nội tại từ 27 mã còn lại để đỡ.
+- **Động lượng (ΔCorr = 0.80, ΔSlope = 0.80):** Đây là bằng chứng của một **secular trend (xu hướng cấu trúc)** đang gia tốc, không phải một cú spike ngẫu nhiên. Sự hội tụ đồng bộ của cả hai chỉ số vi phân cho thấy coupling không hề yếu đi mà đang thắt chặt thêm.
+- **Rủi ro "Bẫy nhiễu" (Noise Trap):**
+  - *Hiện tại:* Không có phân kỳ giữa Slope và Correlation. Cả hai đang đồng thuận tại max percentile. Tín hiệu là **"sạch" nhưng nguy hiểm** vì nó tạo ảo giác an toàn.
+  - *Bẫy thực sự:* Trader bán khống F1 khi thấy nhóm Bank hoặc Chứng khoán giảm mạnh (logic vĩ mô đúng) nhưng bỏ qua VIN, sẽ bị cháy lệnh vì F1 lúc này không nghe theo vĩ mô — nó chỉ nghe theo VIN. Đây là **"Macro-Short Trap"** điển hình của regime coupling.
+  - *Rủi ro giật cục ảo:* Khi cả hai chỉ số đều ở biên 100%, chỉ cần một nhịp mean-reversion nhẹ trong vi phân Delta cũng có thể kích hoạt chuỗi cắt lỗ, tạo ra cú giật ngược chiều (whipsaw) cực mạnh trên F1 ngay cả khi VIN chỉ đi ngang.
+
+---
+
+### 3. TRADING ACTION PLAN
+
+#### A. Chiến thuật Giao dịch
+- **Intraday (Đánh trong phiên):** **"VIN Lead — F1 Follow"**.
+  - **Long F1:** Chỉ vào lệnh khi VIC và VHM cùng xanh với thanh khoản tăng đột biến (>150% TB 20 phiên). F1 là leg chậm, dùng VIN composite làm tín hiệu dẫn dắt. Stop-loss nếu VIC quay đầu >1.5% từ đỉnh phiên.
+  - **Short F1:** Chỉ xem xét khi cả VIC, VHM, VRE đồng loạt đỏ và VRE phá vỡ hỗ trợ intraday (xác nhận retail bán tháo). Không được short F1 dựa trên sự yếu đi của các nhóm khác khi VIN vẫn giữ giá.
+  - **Hedge Ratio:** Với Slope ~0.39, mỗi đơn vị biến động của rổ VIN cần được phản ứng với tỷ lệ tương ứng trên F1. Nếu scalp, đừng đánh ngược chiều VIN.
+
+- **Overnight (Giữ qua đêm):** **HẠ SIZE TỐI THIỂU 60-70%.**
+  - Ở percentile 100, phân phối xác suất bị méo hoàn toàn. Rủi ro gap sáng hôm sau (do tin nội bộ Vingroup, margin call, hoặc MMs rút thanh khoản) là rất cao. Nếu có lệnh overnight, đặt **hard stop** và giảm margin sử dụng xuống dưới 30%.
+
+#### B. Rủi ro lớn nhất hiện tại
+1. **Decoupling Shock đột ngột:** Nếu VIN bị bán tháo (VD: VIC sàn) nhưng F1 không rơi theo do lực cầu bắt đáy ở các nhóm khác (Bank, Chứng) hoặc do MM rút lệnh điều tiết, basis VN30-F1 sẽ nổ tung. Trader đang phóng đại F1 theo VIN sẽ bị kẹp.
+2. **Thanh khoản nghẽn ở VIN:** VIC hoặc VHM chạm limit up/down trong khi F1 vẫn giao dịch tự do → Arbitrageurs không thể hedge spot → Basis risk trở thành systemic risk trên tài khoản phái sinh.
+
+#### C. Tài sản chỉ báo (Leading Indicator) cần quan sát chặt
+Trên bảng điện, đặt **5 mã chỉ báo** vào watchlist tuyệt đối:
+1. **VIC:** Alpha chính. Nếu VIC xoay chiều, F1 sẽ xoay chiều trong tối đa 3-5 phút.
+2. **VHM:** Xác nhận dòng tiền tổ chức. VHM yếu trong khi VIC tăng = coupling có vết nứt.
+3. **VRE:** Cảm biến sentiment bán lẻ. Nếu VRE phân kỳ hoàn toàn với VIC/VHM, cảnh báo sớm decoupling.
+4. **VN30 Spot-F1 Basis:** Theo dõi chênh lệch cơ sở. Basis dương bất thường (>3 điểm) khi VIN tăng = F1 hết sức, đỉnh coupling có thể đã hình thành.
+5. **VCB / TCB (Nhóm Bank):** Nếu Bank xanh mạnh mà VIN đỏ và F1 vẫn đỏ → Chứng tỏ F1 đang bóp méo theo VIN bất chấp dòng tiền thật vào vĩ mô. Đây là tín hiệu **chuyển regime** sắp xảy ra, cần thoát hết vị thế F1 ngay lập tức.
+
+---
+**KẾT LUẬN:** Thị trường đang ở trạng thái **"VIN-Driven Coupling" cực đoan**. Không được phép giao dịch F1 bằng logic vĩ mô truyền thống. Chỉ có hai lựa chọn: **(1) Cưỡi sóng VIN với size nhỏ và stop sát, hoặc (2) Đứng ngoài chờ decoupling shock rồi mới vào lệnh lớn.** Giữ qua đêm lúc này là canh bạc, không phải đầu tư.
