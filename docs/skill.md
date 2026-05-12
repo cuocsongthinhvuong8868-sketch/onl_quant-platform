@@ -675,97 +675,76 @@ VNINDEX: 1,915.37 | σ30: 1.22% | Param VaR: -1.43% | Hist VaR: -1.64% | ES: -3.
 
 ---
 
-## 22) Phi�n c?p nh?t 2026-05-11 � Temperature ri�ng cho t?ng model AI
+## 24) Phiên cập nhật 2026-05-11 — Shortcut API Key 4 số + Xóa GitHub Sync tự động
 
-### 22.1 M?c ti�u
-Ph�n bi?t temperature cho t?ng provider AI thay v� d�ng chung AI_TEMPERATURE:
-- **Kimi 2.6**: temperature = **1.0** (s�ng t?o, ph�n t�ch t?ng quan)
-- **DeepSeek V4 Pro**: temperature = **0.5** (ch�nh x�c, �t ?o gi�c)
+### 24.1 Mục tiêu
 
-### 22.2 Thay d?i
+1. **Shortcut API Key:** Cho phép người dùng gõ 4 số (VD: `1234`) thay vì copy-paste API Key dài. Key thật được lưu trong Streamlit Cloud Secrets.
+2. **Xóa GitHub Sync tự động:** App không còn tự động push file lên GitHub sau mỗi lần chạy AI/tool → tránh vòng lặp reload trên Streamlit Cloud.
 
-**File s?a:**
-- config.py: th�m field 	emperature v�o t?ng entry trong AI_PROVIDER_MAP
-  `python
-  AI_PROVIDER_MAP = {
-      "kimi-2.6": {
-          "display": "Kimi 2.6",
-          "api_model": "kimi-k2.6",
-          "base_url": "https://api.moonshot.ai/v1",
-          "temperature": 1.0,
-      },
-      "deepseek-v4-pro": {
-          "display": "DeepSeek V4 Pro",
-          "api_model": "deepseek-chat",
-          "base_url": "https://api.deepseek.com/v1",
-          "temperature": 0.5,
-      },
-  }
-  `
-- shared/ai_cio.py:
-  - H�m call_ai(): b? fallback or AI_TEMPERATURE, gi? 	emperature l� optional param, n?u None th� API d�ng default ri�ng
-  - 
-un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) v� truy?n v�o call_ai()
-un_executive_summary(): d?c 	emperature t? cfg.get("temperature", 1.0) v� truy?n v�o call_ai()
-- 9 tool page: t?t c? ch? 	emperature=AI_TEMPERATURE ? 	emperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
-  - 	ools/fear_greed/page.py
-  - 	ools/upside_ratio/page.py
-  - 	ools/risk_adjusted_growth/page.py
-  - 	ools/market_breadth/page.py
-  - 	ools/esr_monitor/page.py
-  - 	ools/dispersion/page.py
-  - 	ools/manipulation/page.py
-  - 	ools/va_res/page.py
-  - 	ools/var_cvar_vnindex/page.py
+### 24.2 File tạo mới
 
-### 22.3 C�ch ho?t d?ng
-- Khi ch?n Kimi 2.6 ? temperature = 1.0 (s�ng t?o, ph� h?p ph�n t�ch t?ng quan)
-- Khi ch?n DeepSeek V4 Pro ? temperature = 0.5 (ch�nh x�c, gi?m ?o gi�c)
-- AI_TEMPERATURE global v?n t?n t?i trong config.py d? gi? backward compatibility, nhung kh�ng c�n du?c d�ng trong c�c tool page n?a
+**`shared/api_key_helper.py`** — Hàm `resolve_api_key()` dùng chung cho toàn platform.
 
-### 22.4 API Key ki?m tra tru?c khi ch?y AI CIO
+### 24.3 Cấu hình Streamlit Secrets
 
-**File s?a:** pp.py
+Thêm trong **Streamlit Cloud Dashboard → App → Settings → Secrets**:
+```toml
+AI_KEY_1234=sk-thực_tế_của_bạn...
+AI_KEY_5678=sk-thực_tế_khác...
+```
 
-Th�m c�c c?i ti?n sau v�o ph?n AI CIO:
+### 24.4 Cách hoạt động
 
-1. **N�t ?? Ki?m tra API Key ri�ng**: G?i 1 request nh? (max_tokens=5) d? test key tru?c, kh�ng c?n ch?y c? pipeline
-2. **T? d?ng ki?m tra key tru?c khi ch?y pipeline**: N?u key sai ? b�o l?i ngay (kh�ng d?i 1-2 ph�t)
-3. **Ph�n lo?i l?i chi ti?t**:
-   - 401: Key kh�ng h?p l? + hu?ng d?n l?y key t? platform.moonshot.cn
-   - 402: H?t quota
-   - 429: Rate limit
-   - Connection: L?i m?ng/base_url
+Trên tất cả ô nhập API Key:
+- Gõ `1234` → lookup `st.secrets["AI_KEY_1234"]` → ✅ "Đã dùng shortcut 1234"
+- Gõ `5678` → ✅
+- Gõ `sk-xxx...` → dùng key thật
+- Gõ số 4 digit không tồn tại → ❌ báo lỗi
 
----
+### 24.5 Danh sách file đã xử lý
 
-## 23) Phi�n c?p nh?t 2026-05-11 � Sidebar ch? hi?n 3 nh�nh ch�nh A_, B_, C_
+| File | Thay đổi |
+|------|----------|
+| **`shared/api_key_helper.py`** | **Mới** — Hàm `resolve_api_key()` dùng chung |
+| **`app.py`** | Import alias `_resolve_api_key`, áp dụng AI CIO |
+| **`tools/dispersion/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/fear_greed/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/manipulation/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/market_breadth/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/risk_adjusted_growth/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/upside_ratio/ui/sidebar.py`** | Import + dùng `resolve_api_key` |
+| **`tools/esr_monitor/page.py`** | Import + dùng `resolve_api_key` + **xóa GitHub sync tự động** |
+| **`tools/va_res/page.py`** | Import + dùng `resolve_api_key` + **xóa GitHub sync tự động** |
+| **`tools/var_cvar_vnindex/page.py`** | Import + dùng `resolve_api_key` + **xóa GitHub sync tự động** |
 
-### 23.1 M?c ti�u
-Sidebar Streamlit ch? hi?n th? 3 trang ch�nh:
-- A_Macro_Analysis
-- B_Micro_Analysis
-- C_Behavioral_Finance
+### 24.6 GitHub Sync tự động đã xóa
 
-?n 9 tool con c?a Behavioral Finance kh?i sidebar.
+Đã xóa block sau khỏi 3 file page (esr_monitor, va_res, var_cvar_vnindex):
+```python
+try:
+    from shared.github_sync import upload_file
+    ...
+    upload_file(...)
+except:
+    ...
+```
 
-### 23.2 Thay d?i
+**Kết quả:** Không còn commit tự động → GitHub không thay đổi → Streamlit Cloud không reload liên tục.
 
-**�?i t�n file:**
-- pages/1_Macro_Analysis.py ? pages/A_Macro_Analysis.py
-- pages/2_Micro_Analysis.py ? pages/B_Micro_Analysis.py
-- pages/3_Behavioral_Finance.py ? pages/C_Behavioral_Finance.py
+Vẫn giữ expander **"🔧 Kiểm tra & Đồng bộ GitHub"** ở cuối trang chủ để sync thủ công khi cần.
 
-**C?p nh?t du?ng d?n trong pp.py:**
-- st.switch_page("pages/1_Macro_Analysis.py") ? st.switch_page("pages/A_Macro_Analysis.py")
-- st.switch_page("pages/2_Micro_Analysis.py") ? st.switch_page("pages/B_Micro_Analysis.py")
-- st.switch_page("pages/3_Behavioral_Finance.py") ? st.switch_page("pages/C_Behavioral_Finance.py")
+### 24.7 Pattern cho tool mới trong tương lai
 
-**Co ch?:**
-- 9 tool con (_1_Fear_Greed.py, _2_Upside_Ratio.py, ...) d� c� ti?n t? _ ? t? d?ng ?n kh?i sidebar Streamlit
-- C_Behavioral_Finance.py hi?n th? grid danh m?c 9 tool ? ch?n tool ? render inline
+```python
+from shared.api_key_helper import resolve_api_key
 
-### 23.3 C�ch ho?t d?ng
-- Sidebar ch? hi?n: **A_Macro_Analysis**, **B_Micro_Analysis**, **C_Behavioral_Finance**
-- B?m C ? v�o trang grid 9 tool ? ch?n c�ng c? ? ph�n t�ch
-- B?m "?? Danh m?c" d? quay l?i grid tool
+api_key_raw = st.text_input("API Key (hoặc shortcut 4 số):", type="password",
+    placeholder="sk-... hoặc 4 số",
+    help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
+api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+if api_key_err:
+    st.error(api_key_msg)
+elif api_key_msg:
+    st.success(api_key_msg)
+```

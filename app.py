@@ -22,6 +22,9 @@ if not _github_token:
     except Exception:
         _github_token = ""
 
+# ── Helper: giải mã shortcut API Key từ Streamlit Secrets ──
+from shared.api_key_helper import resolve_api_key as _resolve_api_key
+
 # ── Header ──
 st.title("📊 Quant Platform")
 st.markdown(
@@ -238,12 +241,13 @@ with col1:
     with st.container(border=True):
         st.markdown("### 📄 Xuất PDF Report AI CIO")
         
-        # Quét tất cả cache executive_summary trong daily_cache
+        # Quét tất cả cache executive_summary trong daily_cache, chỉ lấy 10 cache gần nhất
         _all_cio_cache = sorted(
             list(DATA_LAKE.glob("daily_cache/executive_summary_*.txt")),
             key=lambda p: p.stat().st_mtime,
             reverse=True,
         )
+        _all_cio_cache = _all_cio_cache[:10]  # 🔥 Chỉ lấy 10 ngày gần nhất
         
         if not _all_cio_cache:
             st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở report AI CIO.")
@@ -339,7 +343,13 @@ if st.session_state.show_cio_input:
             index=0,
             key="cio_ai_provider",
         )
-        cio_key = st.text_input("Nhập API Key:", type="password", key="cio_api_key")
+        cio_key_raw = st.text_input("Nhập API Key (hoặc shortcut 4 số):", type="password", key="cio_api_key",
+            help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
+        cio_key, cio_key_msg, cio_key_err = _resolve_api_key(cio_key_raw) if cio_key_raw else ("", "", False)
+        if cio_key_err:
+            st.error(cio_key_msg)
+        elif cio_key_msg:
+            st.success(cio_key_msg)
         
         # ── Nút kiểm tra API Key ──
         _test_btn = st.button("🔑 Kiểm tra API Key", use_container_width=True, type="secondary")

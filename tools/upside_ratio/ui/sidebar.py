@@ -1,6 +1,6 @@
 from datetime import datetime, timedelta
-
 import streamlit as st
+from shared.api_key_helper import resolve_api_key
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -54,7 +54,13 @@ def render_sidebar(df_close: object = None) -> dict:
             format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
             index=0,
         )
-        api_key = st.text_input("API Key (Bảo mật)", type="password", value="", placeholder="sk-...")
+        api_key_raw = st.text_input("API Key (hoặc shortcut 4 số):", type="password", value="", placeholder="sk-... hoặc 4 số",
+            help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
+        api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+        if api_key_err:
+            st.error(api_key_msg)
+        elif api_key_msg:
+            st.success(api_key_msg)
 
     return {
         "upside_x": float(upside_x),

@@ -1,6 +1,7 @@
 import streamlit as st
 from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
+from shared.api_key_helper import resolve_api_key
 from tools.esr_monitor.quant.metrics import calculate_esr
 from tools.esr_monitor.ui.charts import render_esr_chart
 try:
@@ -37,7 +38,14 @@ def render():
         index=0,
         key="esr_ai_provider",
     )
-    api_key = st.sidebar.text_input("API Key", type="password", key="esr_api_key")
+    api_key_raw = st.sidebar.text_input("API Key (hoặc shortcut 4 số):", type="password", key="esr_api_key",
+        placeholder="sk-... hoặc 4 số",
+        help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    if api_key_err:
+        st.sidebar.error(api_key_msg)
+    elif api_key_msg:
+        st.sidebar.success(api_key_msg)
 
     try:
         df_close = load_close_prices()
@@ -157,20 +165,10 @@ def render():
 
                         result_text = response.choices[0].message.content
 
-                        # Lưu cache
+                                                # Lưu cache
                         ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                         with open(ai_cache_file, "w", encoding="utf-8") as f:
                             f.write(result_text)
-                            
-                        # Đồng bộ lên GitHub
-                        try:
-                            from shared.github_sync import upload_file
-                            import os as _os
-                            if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in _os.environ:
-                                repo_path = f"data_lake/daily_cache/{ai_cache_file.name}"
-                                upload_file(repo_path, result_text.encode("utf-8"), f"Auto sync cache: {ai_cache_file.name}")
-                        except Exception as e:
-                            print(f"[GH Sync Error] {e}")
 
                         st.success("Hoàn thành phân tích!")
                         with st.container(border=True):
