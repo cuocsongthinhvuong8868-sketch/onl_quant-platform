@@ -5,9 +5,13 @@ app.py — Trang chủ Quant Platform.
 import os
 import streamlit as st
 from pathlib import Path
-from shared.page_layout import setup_page
-
-setup_page("Quant Platform — Trang chủ")
+# ── Wrap import để tránh crash khi chạy trên Streamlit Cloud ──
+try:
+    from shared.page_layout import setup_page
+    setup_page("Quant Platform — Trang chủ")
+except Exception as _layout_err:
+    import streamlit as st
+    st.set_page_config(page_title="Quant Platform", layout="wide", initial_sidebar_state="expanded")
 
 # ── Đọc GitHub token từ Streamlit Secrets hoặc env ──
 _github_token = os.getenv("GITHUB_TOKEN", "")
@@ -117,17 +121,69 @@ if _available_cio:
     for _pk, _disp, _rm in _available_cio:
         st.success(f"✅ Report AI CIO ({_disp}) đã sẵn sàng — {_rm.strftime('%d/%m/%Y %H:%M')}")
 else:
-    st.info("ℹ️ Chưa có report AI CIO. Chạy '🔥 Executive Summary (AI CIO)' để tạo.")
+    st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở mục '📄 Xuất PDF Report AI CIO'.")
 
 # ── Debug GitHub Sync ──
-with st.expander("🔧 Kiểm tra GitHub Sync"):
+with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
     try:
-        from shared.github_sync import test_connection
+        from shared.github_sync import test_connection, upload_file
+        import glob as _glob
+        
         gh_test = test_connection()
         if gh_test["ok"]:
             st.success(f"✅ GitHub OK — User: {gh_test['user']} | Repo: {gh_test['repo']} | Push: {gh_test['can_push']}")
         else:
             st.error(f"❌ GitHub lỗi: {gh_test['error']}")
+        
+        st.markdown("---")
+        st.markdown("#### 📤 Đồng bộ cache lên GitHub")
+        st.caption("Đẩy toàn bộ file cache AI (executive_summary + các tool) lên GitHub. Chỉ bấm khi cần — tránh reload app không mong muốn.")
+        
+        _sync_provider = st.selectbox(
+            "Chọn model AI để đồng bộ:",
+            options=list(AI_PROVIDER_MAP.keys()),
+            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+            key="gh_sync_provider",
+        )
+        
+        if st.button("📤 Đồng bộ cache lên GitHub", use_container_width=True, type="secondary"):
+            if not _github_token:
+                st.error("❌ Chưa có GITHUB_TOKEN trong Secrets. Vui lòng cấu hình trong Streamlit Cloud Dashboard → Secrets.")
+            else:
+                with st.spinner(f"⏳ Đang đồng bộ cache {AI_PROVIDER_MAP[_sync_provider]['display']} lên GitHub..."):
+                    try:
+                        _cache_dir = DATA_LAKE / "daily_cache"
+                        _sync_files = list(_cache_dir.glob(f"*{_sync_provider}*.txt"))
+                        _sync_files += list(_cache_dir.glob(f"executive_summary_{_sync_provider}_*.txt"))
+                        # Deduplicate
+                        _sync_files = list(set(_sync_files))
+                        
+                        if not _sync_files:
+                            st.warning(f"⚠️ Không tìm thấy file cache nào cho {AI_PROVIDER_MAP[_sync_provider]['display']}.")
+                        else:
+                            _success = 0
+                            _fail = 0
+                            _progress = st.progress(0)
+                            for i, _fp in enumerate(_sync_files):
+                                try:
+                                    _rel_path = str(_fp.relative_to(ROOT_DIR))
+                                    _content = _fp.read_bytes()
+                                    _result = upload_file(
+                                        _rel_path,
+                                        _content,
+                                        f"Sync: {_fp.name}",
+                                    )
+                                    _success += 1
+                                except Exception:
+                                    _fail += 1
+                                _progress.progress((i + 1) / len(_sync_files))
+                            
+                            if _fail == 0:
+                                st.success(f"✅ Đã đồng bộ {_success} file lên GitHub thành công!")
+                            else:
+                                st.warning(f"⚠️ Đã đồng bộ {_success}/{len(_sync_files)} file ({_fail} lỗi).")
+                    except Exception as _sync_err:
+                        st.error(f"❌ Lỗi đồng bộ: {_sync_err}")
     except Exception as gh_debug_err:
         st.error(f"❌ Không kiểm tra được GitHub: {gh_debug_err}")
 
@@ -173,44 +229,74 @@ def _create_pdf(text: str, path: str):
             pdf.multi_cell(text_width, 6, line.replace('**', ''))
     pdf.output(path)
 
-# ── Xuất PDF AI CIO ──
+# ── Xuất PDF AI CIO (chọn ngày) ──
 if "cio_pdf_choice" not in st.session_state:
     st.session_state.cio_pdf_choice = None
 
 col1, col2 = st.columns([1, 1])
 with col1:
-    if st.button("📄 Xuất PDF Report AI CIO", type="primary", use_container_width=True):
-        if len(_available_cio) == 1:
-            st.session_state.cio_pdf_choice = _available_cio[0][0]
-        elif len(_available_cio) > 1:
-            st.session_state.cio_pdf_choice = "__choose__"
-        else:
-            st.session_state.cio_pdf_choice = None
-            st.error("⚠️ Chưa có báo cáo AI CIO. Vui lòng chạy 'Executive Summary (AI CIO)' trước.")
-
-if st.session_state.cio_pdf_choice == "__choose__" and len(_available_cio) > 1:
     with st.container(border=True):
-        st.markdown("### 📄 Chọn bản báo cáo để xuất PDF")
-        chosen = st.selectbox(
-            "Model AI:",
-            options=[pk for pk, _, _ in _available_cio],
-            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
-            key="cio_pdf_model_select",
+        st.markdown("### 📄 Xuất PDF Report AI CIO")
+        
+        # Quét tất cả cache executive_summary trong daily_cache
+        _all_cio_cache = sorted(
+            list(DATA_LAKE.glob("daily_cache/executive_summary_*.txt")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
         )
-        if st.button("⬇️ Tạo & Tải PDF", use_container_width=True):
-            st.session_state.cio_pdf_choice = chosen
+        
+        if not _all_cio_cache:
+            st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở report AI CIO.")
+        else:
+            # Gom nhóm theo ngày + provider
+            _cio_options = {}
+            for _fp in _all_cio_cache:
+                _fname = _fp.name  # executive_summary_{provider}_{ddmmyy}.txt
+                _parts = _fname.replace(".txt", "").split("_")
+                # _parts = ['executive', 'summary', 'kimi-2.6', '110526']
+                # hoặc ['executive', 'summary', 'deepseek', 'v4', 'pro', '110526']
+                if len(_parts) >= 4:
+                    _date_str = _parts[-1]  # ddmmyy
+                    _provider_parts = _parts[2:-1]
+                    _provider = "_".join(_provider_parts)
+                    _date_display = f"{_date_str[:2]}/{_date_str[2:4]}/{_date_str[4:]}"
+                    _provider_display = AI_PROVIDER_MAP.get(_provider, {}).get("display", _provider)
+                    _label = f"{_date_display} — {_provider_display}"
+                    _cio_options[_label] = {
+                        "path": _fp,
+                        "provider": _provider,
+                        "date_str": _date_str,
+                    }
+            
+            if _cio_options:
+                _selected_label = st.selectbox(
+                    "📅 Chọn ngày và model:",
+                    options=list(_cio_options.keys()),
+                    index=0,
+                    key="cio_pdf_date_selector",
+                )
+                _sel = _cio_options[_selected_label]
+                
+                if st.button("⬇️ Tạo & Tải PDF", use_container_width=True, type="primary"):
+                    st.session_state.cio_pdf_choice = _sel["provider"]
+                    st.session_state.cio_pdf_date_str = _sel["date_str"]
+                    st.session_state.cio_pdf_path = _sel["path"]
+            else:
+                st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở report AI CIO.")
 
+# Xử lý tạo PDF sau khi chọn
 if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__choose__":
     cio_provider = st.session_state.cio_pdf_choice
+    _pdf_date_str = st.session_state.get("cio_pdf_date_str", TODAY_STR)
+    _pdf_path_obj = st.session_state.get("cio_pdf_path", None)
+    
+    # Đọc report text
     report_text = ""
-    if st.session_state.get("cio_provider") == cio_provider:
-        report_text = st.session_state.get("cio_report", "")
+    if _pdf_path_obj and _pdf_path_obj.exists():
+        report_text = _pdf_path_obj.read_text(encoding="utf-8")
+    
     if not report_text:
-        from shared.ai_cio import _read_cache
-        report_text = _read_cache("executive_summary", cio_provider) or ""
-
-    if not report_text:
-        st.error("⚠️ Không đọc được nội dung báo cáo. Vui lòng chạy lại Executive Summary.")
+        st.error(f"⚠️ Không tìm thấy báo cáo cho ngày {_pdf_date_str[:2]}/{_pdf_date_str[2:4]}/{_pdf_date_str[4:]}. Vui lòng chạy Executive Summary cho ngày này trước.")
         st.session_state.cio_pdf_choice = None
     else:
         with st.spinner("Đang tạo PDF..."):
@@ -218,7 +304,7 @@ if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__cho
                 reports_dir = Path(__file__).resolve().parent / "reports"
                 reports_dir.mkdir(parents=True, exist_ok=True)
                 provider_prefix = cio_provider.replace("-", "_")
-                pdf_path = reports_dir / f"{date.today().strftime('%d%m%y')}_{provider_prefix}_executive_summary.pdf"
+                pdf_path = reports_dir / f"{_pdf_date_str}_{provider_prefix}_executive_summary.pdf"
                 _create_pdf(report_text, str(pdf_path))
                 st.success(f"Đã tạo PDF: {pdf_path.name}")
                 with open(pdf_path, "rb") as f:
@@ -326,13 +412,11 @@ if st.session_state.show_cio_input:
                 
                 with st.spinner("AI CIO đang tổng hợp 9 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
                     try:
-                        from shared.ai_cio import run_executive_summary, _read_cache
-                        from shared.github_sync import upload_file
+                        from shared.ai_cio import run_executive_summary, _read_cache, _clear_all_tool_caches
                         import os as _os
                         
                         if refresh_btn:
                             # Xoá toàn bộ cache của 9 tool con + executive_summary trước khi chạy
-                            from shared.ai_cio import _clear_all_tool_caches
                             _clear_all_tool_caches(cio_provider)
                             st.info("🗑️ Đã xóa toàn bộ cache cũ của 9 công cụ con, đang tạo mới hoàn toàn từ đầu...")
                         
@@ -350,19 +434,6 @@ if st.session_state.show_cio_input:
                             st.success("Hoàn thành Báo cáo Tổng lệnh!")
                             st.markdown(summary_report)
                             report_text = summary_report
-                        
-                        try:
-                            cache_path = f"data_lake/daily_cache/executive_summary_{cio_provider}_{TODAY_STR}.txt"
-                            gh_result = upload_file(
-                                cache_path,
-                                report_text.encode("utf-8"),
-                                f"Auto: AI CIO {cio_provider} report {TODAY_STR}",
-                            )
-                            st.success("✅ Đã đồng bộ báo cáo lên GitHub!")
-                            if gh_result.get("file_url"):
-                                st.markdown(f"🔗 [Xem file trên GitHub]({gh_result['file_url']})")
-                        except Exception as gh_err:
-                            st.warning(f"⚠️ Chưa đồng bộ GitHub: {gh_err}")
                     except Exception as e:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")
 
