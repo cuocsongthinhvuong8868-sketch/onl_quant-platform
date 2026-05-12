@@ -58,7 +58,7 @@ def render_esr_chart(pillars: pd.DataFrame, ssi_result=None,
         row=1, col=1, secondary_y=True,
     )
 
-    # MA overlay
+        # MA overlay
     ma = idx_close.rolling(ma_period).mean()
     fig.add_trace(
         go.Scatter(
@@ -68,7 +68,19 @@ def render_esr_chart(pillars: pd.DataFrame, ssi_result=None,
         row=1, col=1, secondary_y=True,
     )
 
-    # 4-state market regime shading
+    # Trend MA (luôn vẽ, không phụ thuộc HMM)
+    trend_ma = idx_close.rolling(trend_ma_window, min_periods=max(trend_ma_window // 2, 20)).mean()
+    if not trend_ma.dropna().empty:
+        fig.add_trace(
+            go.Scatter(
+                x=trend_ma.index, y=trend_ma,
+                name=f'Trend MA{trend_ma_window}',
+                line=dict(color='gray', width=1, dash='longdash'),
+            ),
+            row=1, col=1, secondary_y=True,
+        )
+
+    # 4-state market regime shading (chỉ khi HMM bật)
     if market_states is not None and not market_states.dropna().empty:
         states_filled = market_states.fillna('UNKNOWN')
         change_id = (states_filled != states_filled.shift()).cumsum()
@@ -84,7 +96,7 @@ def render_esr_chart(pillars: pd.DataFrame, ssi_result=None,
                 row=1, col=1,
             )
 
-        # HMM threshold line
+                # HMM threshold line
         if threshold is not None:
             fig.add_hline(
                 y=threshold, line=dict(color='red', dash='dash', width=1.3),
@@ -96,18 +108,6 @@ def render_esr_chart(pillars: pd.DataFrame, ssi_result=None,
                 y0=threshold, y1=1.0,
                 fillcolor="red", opacity=0.04, layer="below", line_width=0,
                 row=1, col=1, secondary_y=False,
-            )
-
-        # Trend MA
-        trend_ma = idx_close.rolling(trend_ma_window).mean()
-        if not trend_ma.dropna().empty:
-            fig.add_trace(
-                go.Scatter(
-                    x=trend_ma.index, y=trend_ma,
-                    name=f'Trend MA{trend_ma_window}',
-                    line=dict(color='gray', width=1, dash='longdash'),
-                ),
-                row=1, col=1, secondary_y=True,
             )
     else:
         # Manual thresholds when HMM not available
