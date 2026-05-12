@@ -39,7 +39,7 @@ def render():
     # ── Sidebar ──
     ma_period = st.sidebar.slider("VN30 MA Period", 20, 252, 125)
     pca_warmup = st.sidebar.number_input("PCA Warmup (ngày)", value=252, min_value=100, max_value=500, step=10)
-    ema_span = st.sidebar.number_input("EMA Smoothing (span)", value=20, min_value=1, max_value=100, step=1)
+    ema_span = st.sidebar.number_input("EMA Smoothing (span)", value=60, min_value=1, max_value=200, step=1)
     deposit_rate = st.sidebar.number_input("Deposit Rate (%)", value=6.0, step=0.1) / 100
     pillar_mode = st.sidebar.radio(
         "Pillar Mode",
