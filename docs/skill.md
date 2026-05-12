@@ -75,10 +75,28 @@ Cấu trúc chuẩn:
 
 ### 3.5 ESR Monitor
 - Port vào: `tools/esr_monitor/`
-- Bản hiện tại là proxy ESR theo pipeline data_lake, không dùng Telegram bot
-- Inputs:
+- **Đã nâng cấp hoàn chỉnh (2026-05-11):** từ proxy 3-pillar → **full 5-pillar SSI** port từ `Desktop/9999/ESR monitor/ESR.app.py`
+- **5 Pillar gốc:**
+  - `S_VOL`: Realized volatility annualized (20d)
+  - `S_PRES`: Selling pressure — down-day volume share (5d)
+  - `S_COR`: Systemic correlation — PCA-1 explained variance (60d)
+  - `S_LIQ`: Illiquidity — cross-sectional median Amihud (20d)
+  - `S_VAL`: Valuation tension — 252d return - deposit rate
+- **Downside variants:** `S_VOL_DOWN` (semi-deviation), `S_COR_DOWN` (down-days only), `S_LIQ_DOWN` (down-day Amihud)
+- **Aggregation:** Expanding-window PCA(1) on rank-transformed pillars, look-ahead-free, sign-aligned with anchor pillar `S_VOL`
+- **Output:** SSI ∈ [0, 1] + EMA smoothing
+- **HMM Regime Classifier:** 2-state Gaussian HMM on SSI → binary HIGH_STRESS regime + decision boundary threshold
+- **4-State Market Classification:** Kết hợp HMM regime + trend MA200 → `EUPHORIC_RISK`, `ACTIVE_STRESS`, `HEALTHY`, `CALM_CORRECTION`
+- **File cấu trúc mới:**
+  - `quant/metrics.py`: `PillarEngine`, `SSIResult`, `SSIAggregator`, `HMMRegimeClassifier`, `classify_market_state()`, `run_esr_pipeline()`
+  - `ui/charts.py`: `render_esr_chart()` (2 panel + 4-state shading + HMM threshold) + `render_pillar_diagnostics()` (3 tabs)
+  - `page.py`: Full UI mới với PCA warmup, EMA span, pillar mode toggle, trend MA, HMM toggle, market regime card, PCA weights bar chart
+  - `report.py`: snapshot dùng pipeline mới, thêm `pca_concentration`, `pca_weights`, `n_tickers`
+- **Inputs:**
   - `market_data.csv`
   - `vnindex_cache.csv`
+- **Volume proxy:** Dùng flat 1e9 (do data_lake không có real volume)
+- **Lưu ý:** Đã xóa hàm `calculate_esr()` cũ, thay bằng `run_esr_pipeline()`
 
 ### 3.6 Dispersion
 - Port vào: `tools/dispersion/`
@@ -333,14 +351,21 @@ File sửa:
   - Gọi Kimi API (`moonshot-v1-128k`), lưu cache `daily_cache/market_breadth_{date}.txt`
   - Nút "Chạy lại" để xóa cache
 
-### 13.3 Tích hợp AI analysis cho ESR Monitor
+### 13.3 Tích hợp AI analysis cho ESR Monitor (gốc)
 
-File sửa:
+**File sửa (phiên bản gốc, trước refactor):**
 - `tools/esr_monitor/page.py`: thêm `Kimi API Key` input vào sidebar + section AI analysis sau chart
   - Thu thập: ngày, điểm VN30, trạng thái so với MA, SSI (%), SAFE/WARNING/CRITICAL, top 3 PCA weights
   - Đọc prompt `promt/ESR monitor promt.md`, replace placeholder bằng dữ liệu thực
   - Gọi Kimi API (`moonshot-v1-128k`), lưu cache `daily_cache/esr_monitor_{date}.txt`
   - Nút "Chạy lại" để xóa cache
+
+**Nâng cấp (2026-05-11):** page.py được refactor hoàn toàn:
+- Sidebar mới: PCA warmup, EMA span, deposit rate, pillar mode (downside/classic), trend MA window, HMM toggle
+- Header: Market Regime card với 4-state color coding + emoji, PCA Concentration metric, state distribution, PCA weights bar chart
+- Chart: SSI 2-panel với HMM threshold line, 4-state shading, trend MA
+- Pillar diagnostics expander: 3 tabs (Raw Pillars, Expanding Ranks, Weight Evolution)
+- AI analysis: dữ liệu mới (SSI từ `result.ssi`, EVR, market state, threshold, pillar mode)
 
 ### 13.4 Cập nhật Executive Summary Prompt
 
@@ -748,3 +773,59 @@ if api_key_err:
 elif api_key_msg:
     st.success(api_key_msg)
 ```
+
+---
+
+## 25) Phiên cập nhật 2026-05-11 (tiếp) — ESR Monitor Refactor 5-Pillar Full
+
+### 25.1 Mục tiêu
+
+Port hoàn chỉnh ESR Monitor từ `Desktop/9999/ESR monitor/ESR.app.py` vào framework chuẩn, thay thế proxy cũ.
+
+### 25.2 Thay đổi chính
+
+**`tools/esr_monitor/quant/metrics.py` — Viết lại 100%**
+- Xóa hàm `calculate_esr()` (proxy 3 pillar)
+- Thêm:
+  - `VN30_TICKERS`: tuple 30 mã chuẩn
+  - `PillarEngine`: 5 pillar gốc (`s_vol`, `s_pressure`, `s_correlation`, `s_liquidity`, `s_valuation`) + 3 downside variant + `compute_all()`
+  - `SSIResult`: dataclass chứa `ssi`, `weights_history`, `pca_concentration`, `ranks`
+  - `SSIAggregator`: Expanding-window PCA(1) rank-based, look-ahead-free, sign-aligned
+  - `HMMRegimeClassifier`: 2-state Gaussian HMM + `implied_threshold()` (quadratic formula)
+  - `MARKET_STATES`: 4-state dict (EUPHORIC_RISK, ACTIVE_STRESS, HEALTHY, CALM_CORRECTION)
+  - `classify_market_state()`: kết hợp HMM regime + trend MA200
+  - `run_esr_pipeline()`: full pipeline từ raw data → (pillars, SSIResult, market_states, threshold)
+
+**`tools/esr_monitor/ui/charts.py` — Viết lại 100%**
+- Xóa `render_esr_chart(df)` cũ
+- Thêm:
+  - `render_esr_chart()`: 2 panel (SSI+index, PCA EVR), 4-state shading, HMM threshold + hrect, trend MA, manual thresholds fallback
+  - `render_pillar_diagnostics()`: expander với 3 tabs
+
+**`tools/esr_monitor/page.py` — Refactor toàn bộ**
+- Sidebar mới: PCA warmup (252), EMA span (20), deposit rate (6%), pillar mode radio, trend MA (200), HMM checkbox
+- Header metrics: Market Regime card (4-state color/emoji), PCA Concentration, state dist %, PCA weights bar chart
+- Chart: render_esr_chart() mới với HMM overlay
+- Diagnostics: render_pillar_diagnostics() expander
+- AI analysis: dùng dữ liệu mới (SSI từ result.ssi, EVR, market state, threshold...)
+
+**`tools/esr_monitor/report.py` — Cập nhật**
+- Dùng `run_esr_pipeline()` thay `calculate_esr()`
+- Thêm: `pca_concentration`, `pca_weights`, `n_tickers`
+
+**`shared/ai_cio.py` — Cập nhật**
+- Import: `run_esr_pipeline` thay `calculate_esr`
+- `run_esr_monitor()`: dùng pipeline mới, thêm EVR, market state, threshold vào prompt
+- Xóa GitHub auto-sync trong `_write_cache()`
+
+### 25.3 Prompt template
+
+Prompt đã cập nhật (thêm `[PCA_EVR]`, `[Market State]`, `[Pillar Mode]`, `[Threshold]`):
+- `promt/ESR monitor promt.md`
+
+### 25.4 Lưu ý
+
+- Có thể dùng volume proxy flat (1e9) do data_lake không có real volume
+- Amihud chỉ mang tính tương đối, không phải absolute
+- Downside mode mặc định (chỉ tính vol/corr/liq trên phiên giảm) — được khuyến nghị
+- PCA warmup = 252 ngày ~ 1 năm dữ liệu trước khi có SSI đầu tiên

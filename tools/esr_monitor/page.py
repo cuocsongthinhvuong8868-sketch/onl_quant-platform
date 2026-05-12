@@ -1,9 +1,17 @@
+"""
+ESR Monitor — Page layer
+=========================
+Full 5-pillar Systemic Stress Index (SSI) with HMM regime classifier,
+4-state market classification, and AI analysis.
+"""
 import streamlit as st
 from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.api_key_helper import resolve_api_key
-from tools.esr_monitor.quant.metrics import calculate_esr
-from tools.esr_monitor.ui.charts import render_esr_chart
+from tools.esr_monitor.quant.metrics import (
+    run_esr_pipeline, SSIResult, MARKET_STATES, VN30_TICKERS,
+)
+from tools.esr_monitor.ui.charts import render_esr_chart, render_pillar_diagnostics
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -22,12 +30,25 @@ except ImportError:
 
 
 def render():
-    st.title("ESR Monitor")
-    st.caption("Systemic stress monitor (proxy) cho VN30 cluster")
+    st.title("🔬 ESR Monitor")
+    st.caption(
+        "Systemic Stress Index (SSI) cho VN30 — 5 pillar (S_VOL, S_PRES, S_COR, S_LIQ, S_VAL) "
+        "kết hợp PCA(1) rank-based + HMM regime classifier + 4-state market matrix."
+    )
 
-    ma_period = st.sidebar.slider("MA period", 50, 250, 125)
-    pca_window = st.sidebar.slider("PCA window", 30, 120, 60)
-    bond_yield = st.sidebar.number_input("Bond Yield hiện tại (%)", value=4.20, step=0.1) / 100
+    # ── Sidebar ──
+    ma_period = st.sidebar.slider("VN30 MA Period", 20, 252, 125)
+    pca_warmup = st.sidebar.number_input("PCA Warmup (ngày)", value=252, min_value=100, max_value=500, step=10)
+    ema_span = st.sidebar.number_input("EMA Smoothing (span)", value=20, min_value=1, max_value=100, step=1)
+    deposit_rate = st.sidebar.number_input("Deposit Rate (%)", value=6.0, step=0.1) / 100
+    pillar_mode = st.sidebar.radio(
+        "Pillar Mode",
+        options=['downside', 'classic'],
+        index=0,
+        help="downside: S_VOL/S_COR/S_LIQ chỉ tính trên phiên giảm. classic: đối xứng.",
+    )
+    trend_ma_window = st.sidebar.number_input("Trend MA (ngày)", value=200, min_value=50, max_value=500, step=10)
+    enable_hmm = st.sidebar.checkbox("HMM Regime Overlay", value=True)
 
     st.sidebar.divider()
     st.sidebar.header("🤖 AI Analysis")
@@ -47,49 +68,128 @@ def render():
     elif api_key_msg:
         st.sidebar.success(api_key_msg)
 
+        # ── Load data ──
     try:
         df_close = load_close_prices()
-        df_index = load_custom("vnindex_cache.csv")
+        df_vn30 = load_custom("vn30_cache.csv")
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
-    st.caption(f"📅 Dữ liệu cuối cùng: {df_close.index.max().strftime('%d/%m/%Y')}")
+    st.caption(f"📅 Dữ liệu cuối: {df_close.index.max().strftime('%d/%m/%Y')}")
+    n_vn30 = sum(1 for t in VN30_TICKERS if t in df_close.columns)
+    st.caption(f"📊 Số mã VN30: {n_vn30}/30")
 
-    key = {"ma_period": ma_period, "pca_window": pca_window, "bond_yield": bond_yield}
-    cached = load_daily_cache("esr_monitor", key)
+    # ── Compute ESR ──
+    cache_key = {
+        "ma_period": ma_period, "pca_warmup": pca_warmup,
+        "ema_span": ema_span, "deposit_rate": deposit_rate,
+        "pillar_mode": pillar_mode, "trend_ma_window": trend_ma_window,
+        "enable_hmm": enable_hmm,
+    }
+    cached = load_daily_cache("esr_monitor", cache_key)
     if cached is not None:
-        df = cached["df"]
-        weights = cached["weights"]
+        pillars = cached["pillars"]
+        result = cached["result"]
+        market_states = cached.get("market_states")
+        threshold = cached.get("threshold")
         st.caption("⚡ Dùng cache cùng ngày (ESR Monitor).")
     else:
-        with st.spinner("Đang tính ESR..."):
+        with st.spinner("🔄 Đang tính ESR 5-pillar SSI..."):
             try:
-                df, weights = calculate_esr(df_close, df_index, ma_period=ma_period, pca_window=pca_window, bond_yield=bond_yield)
+                                pillars, result, market_states, threshold = run_esr_pipeline(
+                    df_close, df_vn30,
+                    deposit_rate=deposit_rate,
+                    pillar_mode=pillar_mode,
+                    pca_warmup=pca_warmup,
+                    ema_span=ema_span,
+                )
             except Exception as e:
-                st.error(f"Không tính được ESR: {e}")
+                st.error(f"Lỗi ESR: {e}")
                 st.stop()
-        save_daily_cache("esr_monitor", key, {"df": df, "weights": weights})
-        st.caption("💾 Đã tạo cache ngày mới (ESR Monitor).")
+        save_daily_cache("esr_monitor", cache_key, {
+            "pillars": pillars, "result": result,
+            "market_states": market_states, "threshold": threshold,
+        })
+        st.caption("💾 Đã tạo cache mới (ESR Monitor).")
 
-    last = df.iloc[-1]
-    status = "SAFE" if last["SSI_Index"] < 0.5 else "WARNING" if last["SSI_Index"] < 0.8 else "CRITICAL"
-    c1, c2, c3 = st.columns(3)
-    c1.metric("SSI", f"{last['SSI_Index']:.2%}")
-    c2.metric("Status", status)
-    c3.metric("Index", f"{last['INDEX_Close']:.2f}")
+    # ── Header metrics ──
+    last_ssi = result.ssi.dropna().iloc[-1]
+    last_evr = result.pca_concentration.dropna().iloc[-1]
+    last_idx = pillars['INDEX_Close'].dropna().iloc[-1]
 
-    st.subheader("Risk Contribution (PCA)")
-    st.bar_chart(weights)
+    hmm_ok = enable_hmm and market_states is not None and not market_states.empty
+    current_state_key = market_states.dropna().iloc[-1] if hmm_ok else None
 
-    st.subheader("SSI vs Index")
-    render_esr_chart(df)
+    if current_state_key is not None and current_state_key in MARKET_STATES:
+        info = MARKET_STATES[current_state_key]
+        status, color, bg_color, emoji = info['label'], info['color'], info['bg'], info['emoji']
+    elif hmm_ok:
+        regime_s = pillars.get('HMM_Regime')
+        in_stress = regime_s.dropna().iloc[-1] == 1 if regime_s is not None else False
+        status = "HIGH STRESS" if in_stress else "LOW STRESS"
+        color = "red" if in_stress else "green"
+        bg_color = "#f8f9fa"
+        emoji = "🔴" if in_stress else "🟢"
+    else:
+        status = "SAFE" if last_ssi < 0.5 else ("WARNING" if last_ssi < 0.8 else "CRITICAL")
+        color = {"SAFE": "green", "WARNING": "orange", "CRITICAL": "red"}[status]
+        bg_color = "#f8f9fa"
+        emoji = ""
+
+    extra_parts = []
+    if hmm_ok and threshold is not None:
+        gap = last_ssi - threshold
+        gc = "#c0392b" if gap >= 0 else "#27ae60"
+        extra_parts.append(f"HMM thr: <b>{threshold:.3f}</b> | Gap: <span style='color:{gc}'><b>{gap:+.3f}</b></span>")
+
+    c1, c2, c3 = st.columns([1, 1, 2])
+    with c1:
+        st.markdown(
+            f"<div style='padding:15px;border-radius:8px;background:{bg_color};"
+            f"border-left:5px solid {color}'>"
+            f"<h4 style='margin:0'>Market Regime</h4>"
+            f"<h2 style='color:{color};margin:5px 0'>{emoji} {status}</h2>"
+            f"<p style='margin:0'>SSI = <b>{last_ssi:.1%}</b></p>"
+            f"{'<br>'.join(extra_parts)}</div>",
+            unsafe_allow_html=True,
+        )
+    with c2:
+        st.metric("PCA Concentration", f"{last_evr:.1%}",
+                  help="PC1 EVR — cao = các pillar đồng pha (rủi ro hệ thống)")
+        st.metric("VN30 Close", f"{last_idx:,.2f}")
+        st.caption(f"⚙️ Pillar mode: **{pillar_mode}**")
+        if hmm_ok:
+            dist = market_states.dropna().value_counts(normalize=True)
+            dist_lines = [
+                f"{MARKET_STATES[k]['emoji']} {k.replace('_',' ').title()}: {v:.1%}"
+                for k, v in dist.items() if k in MARKET_STATES
+            ]
+            st.caption("📊 " + " | ".join(dist_lines))
+    with c3:
+        import plotly.express as px
+        last_w = result.weights_history.dropna().iloc[-1]
+        fig_w = px.bar(x=last_w.index, y=last_w.values,
+                       labels={'x': 'Pillar', 'y': 'Weight'},
+                       title="Latest PCA Weights")
+        fig_w.update_layout(height=200, margin=dict(l=0, r=0, t=30, b=0))
+        st.plotly_chart(fig_w, use_container_width=True)
+
+    # ── Main chart ──
+    st.subheader("📈 SSI vs VN30")
+    render_esr_chart(pillars, result, ma_period=ma_period,
+                     trend_ma_window=trend_ma_window,
+                     market_states=market_states if enable_hmm else None,
+                     threshold=threshold if enable_hmm else None)
+
+        # ── Pillar diagnostics ──
+    render_pillar_diagnostics(pillars, result)
 
     # ── AI Analysis ──
     st.divider()
     st.subheader("✨ Trợ lý AI Phân tích Rủi ro Hệ thống")
 
     import os
-    from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
+    from config import DATA_LAKE, ROOT_DIR
     from datetime import date
     from openai import OpenAI
 
@@ -121,16 +221,14 @@ def render():
                             prompt_template = f.read()
 
                         # Thu thập dữ liệu
-                        date_str = df.index[-1].strftime('%d/%m/%Y')
-                        index_close = last['INDEX_Close']
-                        ma_col = f"MA{ma_period}"
-                        ma_val = last.get(ma_col, 0)
-                        ma_status = "nằm trên" if index_close >= ma_val else "nằm dưới"
-                        ssi_pct = last['SSI_Index'] * 100
-                        status = "SAFE" if last['SSI_Index'] < 0.5 else "WARNING" if last['SSI_Index'] < 0.8 else "CRITICAL"
+                        date_str = pillars.index[-1].strftime('%d/%m/%Y')
+                        index_close = pillars['INDEX_Close'].dropna().iloc[-1]
+                        ssi_pct = last_ssi * 100
+                        evr_pct = last_evr * 100
 
-                        # Top 3 PCA weights
-                        sorted_w = weights.sort_values(ascending=False)
+                        # PCA weights top 3
+                        last_w = result.weights_history.dropna().iloc[-1]
+                        sorted_w = last_w.sort_values(ascending=False)
                         w1_name = sorted_w.index[0]
                         w1_val = sorted_w.iloc[0] * 100
                         w2_name = sorted_w.index[1]
@@ -138,21 +236,36 @@ def render():
                         w3_name = sorted_w.index[2]
                         w3_val = sorted_w.iloc[2] * 100
 
+                        # Market state info
+                        if hmm_ok and current_state_key is not None:
+                            state_info_str = f"{MARKET_STATES[current_state_key]['label']}: {MARKET_STATES[current_state_key]['description']}"
+                        elif hmm_ok:
+                            state_info_str = status
+                        else:
+                            state_info_str = status
+
                         # Replace placeholders
                         full_prompt = prompt_template
                         full_prompt = full_prompt.replace("[Nhập ngày, VD: 09/05/2026]", date_str)
                         full_prompt = full_prompt.replace("[Nhập điểm số VN30]", f"{index_close:.2f}")
-                        full_prompt = full_prompt.replace("[nằm trên/nằm dưới]", ma_status)
+                        full_prompt = full_prompt.replace("[nằm trên/nằm dưới]",
+                            "nằm trên" if index_close >= pillars['INDEX_Close'].rolling(ma_period).mean().iloc[-1] else "nằm dưới")
                         full_prompt = full_prompt.replace("[20/60/125/252]", str(ma_period))
                         full_prompt = full_prompt.replace("[Nhập %, VD: 85.5%]", f"{ssi_pct:.1f}%")
                         full_prompt = full_prompt.replace("[SAFE / WARNING / CRITICAL]", status)
                         full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w1_name} ({w1_val:.0f}%)", 1)
                         full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w2_name} ({w2_val:.0f}%)", 1)
                         full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w3_name} ({w3_val:.0f}%)", 1)
+                        # Extended fields
+                        full_prompt = full_prompt.replace("[PCA_EVR]", f"{evr_pct:.1f}%")
+                        full_prompt = full_prompt.replace("[Market State]", state_info_str)
+                        full_prompt = full_prompt.replace("[Pillar Mode]", pillar_mode)
 
                         parts = full_prompt.split("# INPUT DATA")
                         system_prompt = parts[0].strip()
                         user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+
+                        temperature = cfg.get("temperature", 1.0)
 
                         response = client.chat.completions.create(
                             model=cfg["api_model"],
@@ -160,12 +273,12 @@ def render():
                                 {"role": "system", "content": system_prompt},
                                 {"role": "user", "content": user_prompt}
                             ],
-                            temperature=AI_TEMPERATURE
+                            temperature=temperature
                         )
 
                         result_text = response.choices[0].message.content
 
-                                                # Lưu cache
+                        # Lưu cache
                         ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                         with open(ai_cache_file, "w", encoding="utf-8") as f:
                             f.write(result_text)

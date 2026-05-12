@@ -38,7 +38,7 @@ from tools.risk_adjusted_growth.quant.scoring import compute_scores
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
-from tools.esr_monitor.quant.metrics import calculate_esr
+from tools.esr_monitor.quant.metrics import run_esr_pipeline, VN30_TICKERS
 # Import logic VaRES Engine
 from tools.va_res.report import snapshot as vares_snapshot
 # Import logic Var-CVaR VNINDEX
@@ -60,17 +60,6 @@ def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
-        
-    # Đồng bộ lên GitHub
-    try:
-        from shared.github_sync import upload_file
-        import streamlit as st
-        # Chỉ upload nếu có GitHub token (chạy trên cloud)
-        if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in os.environ:
-            repo_path = f"data_lake/daily_cache/{path.name}"
-            upload_file(repo_path, content.encode("utf-8"), f"Auto sync cache: {path.name}")
-    except Exception as e:
-        print(f"[GH Sync Error] {e}")
 
 def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
     """Xoá toàn bộ cache AI text của 9 công cụ con + executive_summary cho provider_key cụ thể."""
@@ -383,22 +372,28 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     cached = _read_cache("esr_monitor", provider_key)
     if cached: return cached
     
-    df_index = load_custom("vnindex_cache.csv")
-    df, weights = calculate_esr(df_stocks, df_index, ma_period=125, pca_window=60, bond_yield=0.042)
-    
-    if df.empty:
+    df_vn30 = load_custom("vn30_cache.csv")
+    pillars, result, market_states, threshold = run_esr_pipeline(
+        df_stocks, df_vn30,
+        deposit_rate=0.06,
+        pillar_mode='downside',
+        pca_warmup=252,
+        ema_span=20,
+    )
+
+    if pillars.empty or result.ssi.dropna().empty:
         return "Không đủ dữ liệu ESR Monitor."
-    
-    last = df.iloc[-1]
-    date_str = df.index[-1].strftime('%d/%m/%Y')
-    index_close = last['INDEX_Close']
-    ma_col = "MA125"
-    ma_val = last.get(ma_col, 0)
-    ma_status = "nằm trên" if index_close >= ma_val else "nằm dưới"
-    ssi_pct = last['SSI_Index'] * 100
-    status = "SAFE" if last['SSI_Index'] < 0.5 else "WARNING" if last['SSI_Index'] < 0.8 else "CRITICAL"
-    
-    sorted_w = weights.sort_values(ascending=False)
+
+    last_ssi = result.ssi.dropna().iloc[-1]
+    last_idx = pillars['INDEX_Close'].dropna().iloc[-1]
+    last_evr = result.pca_concentration.dropna().iloc[-1]
+    last_w = result.weights_history.dropna().iloc[-1]
+    date_str = pillars.index[-1].strftime('%d/%m/%Y')
+
+    ssi_pct = last_ssi * 100
+    evr_pct = last_evr * 100
+
+    sorted_w = last_w.sort_values(ascending=False)
     w1_name = sorted_w.index[0]
     w1_val = sorted_w.iloc[0] * 100
     w2_name = sorted_w.index[1]
@@ -406,12 +401,27 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     w3_name = sorted_w.index[2]
     w3_val = sorted_w.iloc[2] * 100
     
+    # Determine status
+    if market_states is not None and not market_states.empty:
+        hmm_ok = True
+        current_key = market_states.dropna().iloc[-1]
+        from tools.esr_monitor.quant.metrics import MARKET_STATES as MS
+        if current_key in MS:
+            status = MS[current_key]['label']
+        else:
+            status = current_key
+    else:
+        hmm_ok = False
+        status = "SAFE" if last_ssi < 0.5 else "WARNING" if last_ssi < 0.8 else "CRITICAL"
+
+    ma_status = "nằm trên" if last_idx >= pillars['INDEX_Close'].rolling(125).mean().iloc[-1] else "nằm dưới"
+
     with open(str(ROOT_DIR / "promt" / "ESR monitor promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
     
     full_prompt = prompt_template
     full_prompt = full_prompt.replace("[Nhập ngày, VD: 09/05/2026]", date_str)
-    full_prompt = full_prompt.replace("[Nhập điểm số VN30]", f"{index_close:.2f}")
+    full_prompt = full_prompt.replace("[Nhập điểm số VN30]", f"{last_idx:.2f}")
     full_prompt = full_prompt.replace("[nằm trên/nằm dưới]", ma_status)
     full_prompt = full_prompt.replace("[20/60/125/252]", "125")
     full_prompt = full_prompt.replace("[Nhập %, VD: 85.5%]", f"{ssi_pct:.1f}%")
@@ -419,7 +429,13 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w1_name} ({w1_val:.0f}%)", 1)
     full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w2_name} ({w2_val:.0f}%)", 1)
     full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w3_name} ({w3_val:.0f}%)", 1)
-    
+    # Extended
+    full_prompt = full_prompt.replace("[PCA_EVR]", f"{evr_pct:.1f}%")
+    full_prompt = full_prompt.replace("[Market State]", status)
+    full_prompt = full_prompt.replace("[Pillar Mode]", "downside")
+    if "[Threshold]" in full_prompt:
+        full_prompt = full_prompt.replace("[Threshold]", f"{threshold:.3f}" if threshold is not None else "N/A")
+
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
