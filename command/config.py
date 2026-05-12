@@ -10,6 +10,7 @@ ROOT_DIR     = Path(__file__).resolve().parent.parent
 DATA_LAKE    = ROOT_DIR / "data_lake"
 MARKET_DATA  = DATA_LAKE / "market_data.csv"
 VNINDEX_DATA = DATA_LAKE / "vnindex_cache.csv"
+VN30_DATA    = DATA_LAKE / "vn30_cache.csv"
 TICKERS_FILE = ROOT_DIR / "tickers.csv"
 
 DATA_LAKE.mkdir(parents=True, exist_ok=True)

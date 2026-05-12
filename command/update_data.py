@@ -39,6 +39,7 @@ from config import (
     DATA_LAKE,
     MARKET_DATA,
     VNINDEX_DATA,
+    VN30_DATA,
     TICKERS_FILE,
     DEFAULT_LOOKBACK_DAYS,
 )
@@ -141,6 +142,26 @@ def update_vnindex(start: str, end: str) -> bool:
     return True
 
 
+def update_vn30(start: str, end: str) -> bool:
+    """
+    Tải và lưu dữ liệu VN30 index vào data_lake/vn30_cache.csv.
+    Trả về True nếu thành công.
+    Ưu tiên VCI, fallback KBS.
+    """
+    logger.info("Đang tải VN30...")
+    s = fetch_close("VN30", start, end, source="VCI")
+    if s is None:
+        logger.info("VN30 VCI thất bại, thử fallback KBS...")
+        s = fetch_close("VN30", start, end, source="KBS")
+    if s is None:
+        logger.warning("Không tải được VN30, bỏ qua lưu file VN30.")
+        return False
+
+    df_new = s.to_frame(name="VN30").sort_index().ffill()
+    _merge_and_save(df_new, VN30_DATA)
+    return True
+
+
 def update(backfill_days: int | None = None, from_date: str | None = None):
     logger.info("Dùng DATA_LAKE: %s", DATA_LAKE)
     logger.info("Dùng MARKET_DATA: %s", MARKET_DATA)
@@ -178,9 +199,10 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
     logger.info("Khoảng thờ gian: %s → %s", start, end)
 
     update_vnindex(start, end)
+    update_vn30(start, end)
 
-    # Dữ liệu cổ phiếu chỉ giữ universe equity/ETF, loại VNINDEX khỏi market_data
-    stock_tickers = [t for t in tickers if t != "VNINDEX"]
+    # Dữ liệu cổ phiếu — loại VNINDEX và VN30 khỏi market_data (lưu riêng)
+    stock_tickers = [t for t in tickers if t not in ("VNINDEX", "VN30")]
     if not stock_tickers:
         logger.error("Không có ticker cổ phiếu hợp lệ sau khi loại VNINDEX.")
         return
