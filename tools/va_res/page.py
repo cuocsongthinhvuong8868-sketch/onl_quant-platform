@@ -37,7 +37,15 @@ def show():
         index=0,
         key="va_res_ai_provider",
     )
-    api_key = st.sidebar.text_input("API Key", type="password", key="va_res_api_key")
+    api_key_raw = st.sidebar.text_input("API Key (hoặc shortcut 4 số):", type="password", key="va_res_api_key",
+        placeholder="sk-... hoặc 4 số",
+        help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
+    from shared.api_key_helper import resolve_api_key
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    if api_key_err:
+        st.sidebar.error(api_key_msg)
+    elif api_key_msg:
+        st.sidebar.success(api_key_msg)
 
     try:
         df_price_pandas = load_close_prices()
@@ -337,15 +345,6 @@ def show():
                                 ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                                 with open(ai_cache_file, "w", encoding="utf-8") as f:
                                     f.write(result_text)
-                                
-                                try:
-                                    from shared.github_sync import upload_file
-                                    import os as _os
-                                    if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in _os.environ:
-                                        repo_path = f"data_lake/daily_cache/{ai_cache_file.name}"
-                                        upload_file(repo_path, result_text.encode("utf-8"), f"Auto sync cache: {ai_cache_file.name}")
-                                except Exception as e:
-                                    print(f"[GH Sync Error] {e}")
 
                                 st.success("Hoàn thành phân tích!")
                                 with st.container(border=True):
