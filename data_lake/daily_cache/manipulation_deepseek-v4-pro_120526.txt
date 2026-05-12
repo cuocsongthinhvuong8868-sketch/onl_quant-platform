@@ -1,0 +1,52 @@
+# BÁO CÁO CHIẾN LƯỢC PHÁI SINH | 12/05/2026
+
+## 1. Market Microstructure Assessment
+
+**Chẩn đoán:** Thị trường đang trong trạng thái **VIN-Driven Extreme Coupling** - hiếm gặp trong lịch sử.
+
+- **OLS Slope = 0.42 (100.0th Percentile):** Độ nhạy của VN30F1M với biến động Vingroup đang ở mức **cao kỷ lục**. Mỗi 1% biến động của VIN composite kéo 0.42% VN30F1M.
+- **Correlation = 0.72 (100.0th Percentile):** Tính đồng pha đạt đỉnh lịch sử. Vingroup gần như là "remote control" của chỉ số phái sinh.
+
+**Đánh giá Market Makers:**
+- **MMs đang actively dùng Vingroup làm công cụ điều tiết.** Không phải ngẫu nhiên mà VIC/VHM/VRE và VN30F1M di chuyển gần như "cùng nhịp thở". Các lệnh block deal, margin call, hoặc tái cơ cấu danh mục từ các tổ chức lớn đang tập trung vào cụm VIN.
+- **Bất thường cực đoan:** 100.0th percentile = gần như chưa bao giờ mạnh hơn thế này trong lịch sử. Đây là tín hiệu của **thị trường một chiều (one-way market)** có tổ chức.
+
+**Kết luận Cấu trúc:** VN30F1M hiện tại là **VIN30F1M** - mọi phân tích kỹ thuật khác (MA, RSI) chỉ là nhiễu nếu không lọc qua biến động cụm Vingroup.
+
+---
+
+## 2. Regime Interpretation
+
+**Trạng thái Event Study: COUPLING**
+- ΔCorr = 0.80, ΔSlope = 0.80: Mức tăng đồng bộ tuyệt đối của cả hai tham số kể từ t₀ (02/03/2026). Điều này cho thấy **dòng tiền đã chảy cục bộ vào VIN** và kéo theo F1 một cách phi tuyến.
+
+**Hệ quả dòng tiền:**
+- **Dòng tiền tổng thể đang "phụ thuộc" vào VIN.** Từ 02/03, mỗi lần VIC/VHM/VRE tăng, F1 tăng; mỗi lần giảm, F1 giảm. Các nhóm Bank/Chứng/Thép đang mất vai trò dẫn dắt.
+- **Nguy cơ nhiễu:** Nếu tách biệt phân tích F1 thuần túy, mọi tín hiệu quá mua/bán đều bị méo mó. Ví dụ: F1 đang ở vùng quá mua RSI 75, nhưng vẫn có thể bị kéo lên tiếp nếu VIC tiếp tục đẩy.
+
+**Cảnh báo Bẫy Nhiễu:**
+- **Không sử dụng các chỉ báo phân kỳ (divergence) thông thường.** Phân kỳ RSI trên F1 lúc này KHÔNG có ý nghĩa vì F1 không tự vận động mà bị dẫn dắt.
+- **Rủi ro giả tạo:** Các nến "rút chân" (long wick) trên F1 có thể xuất hiện nhưng sẽ nhanh chóng bị VIN kéo ngược lại. Chỉ tin vào nến khi có xác nhận từ giao dịch VIC/VHM.
+
+---
+
+## 3. Trading Action Plan
+
+**Chiến thuật Intraday:**
+- **Long/Short F1 phải dựa vào orderflow của VIC.** Quan sát khớp lệnh cụm Vingroup (đặc biệt VIC): Nếu khối lượng giao dịch VIC vượt 300 tỷ/phiên và giá đang tạo đáy cao hơn → Long F1. Nếu VIC thủng EMA9 với volume đột biến → Short F1.
+- **Không trade F1 dựa vào hỗ trợ/kháng cự kỹ thuật đơn thuần.** Các ngưỡng 1,320 hay 1,300 chỉ còn ý nghĩa nếu VIC giao dịch tại đó.
+
+**Chiến thuật Overnight:**
+- **Giữ trạng thái nếu VIC đóng cửa trong vùng kiểm soát của MMs** (ví dụ: VIC > 42,500). Nếu VIC đóng cửa yếu dưới MA20 kèm volume thấp → đóng toàn bộ vị thế F1.
+- **Rủi ro lớn nhất:** **Sự kiện bất ngờ của Vingroup** (tin tức, giao dịch block deal lớn, margin call). Khi Coupling ở mức extreme, bất kỳ tin xấu riêng lẻ của VIC/VHM/VRE cũng sẽ kéo F1 lao dốc -30 đến -50 điểm.
+
+**Leading Indicator cần theo dõi:**
+- **Giá và Khối lượng VIC (mã chủ lực):** Theo dõi sàn HOSE, giá VIC và khối lượng khớp lệnh trong 15 phút đầu và cuối phiên.
+- **Chỉ báo Phái sinh:** Nếu basis (F1 - VN30) mở rộng > 10 điểm trong phiên → có dấu hiệu hedging khẩn cấp → chuẩn bị đảo chiều.
+
+**Hành động cụ thể:**
+- **Nếu VIC giữ trên EMA9 (dự kiến 41,500):** Long F1 với stop loss -15 điểm.
+- **Nếu VIC thủng 41,000:** Short F1 ngay, không chờ xác nhận từ nhóm khác.
+- **Không scale-in khi chưa thấy volume VIC breakout.**
+
+> **Nguyên tắc vàng tuần này:** "Giao dịch F1 mà không nhìn VIC là giao dịch trong bóng tối."
