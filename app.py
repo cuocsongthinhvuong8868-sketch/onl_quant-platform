@@ -281,10 +281,15 @@ with col1:
                 )
                 _sel = _cio_options[_selected_label]
                 
-                if st.button("⬇️ Tạo & Tải PDF", use_container_width=True, type="primary"):
-                    st.session_state.cio_pdf_choice = _sel["provider"]
-                    st.session_state.cio_pdf_date_str = _sel["date_str"]
-                    st.session_state.cio_pdf_path = _sel["path"]
+                col_btn1, col_btn2 = st.columns(2)
+                with col_btn1:
+                    if st.button("⬇️ Tạo & Tải PDF", use_container_width=True, type="primary"):
+                        st.session_state.cio_pdf_choice = _sel["provider"]
+                        st.session_state.cio_pdf_date_str = _sel["date_str"]
+                        st.session_state.cio_pdf_path = _sel["path"]
+                with col_btn2:
+                    if st.button("👁️ Xem trực tiếp TXT", use_container_width=True):
+                        st.session_state.cio_txt_view = _sel["path"]
             else:
                 st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở report AI CIO.")
 
@@ -322,6 +327,16 @@ if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__cho
             except Exception as e:
                 st.error(f"Lỗi tạo PDF: {e}")
         st.session_state.cio_pdf_choice = None
+
+# Xử lý hiển thị txt
+if st.session_state.get("cio_txt_view"):
+    _txt_path = st.session_state.cio_txt_view
+    if _txt_path and _txt_path.exists():
+        with st.expander("👁️ Nội dung Báo cáo TXT", expanded=True):
+            st.markdown(_txt_path.read_text(encoding="utf-8"))
+            if st.button("✖️ Đóng", key="btn_close_txt"):
+                st.session_state.cio_txt_view = None
+                st.rerun()
 
 with col2:
     if "show_cio_input" not in st.session_state:
