@@ -1,12 +1,20 @@
 **1. Market Regime (Nhận diện Pha thị trường):**
-Risk Score ở mức 50.4, ngưỡng NEUTRAL tuyệt đối, với mức thay đổi không đáng kể (+0.1) cho thấy tâm lý thị trường đang ở trạng thái cân bằng (“Fair Value” tâm lý). Hệ thống NEUTRAL / STOCK PICKING xác nhận dòng tiền không có xu hướng chủ đạo (non-directional) mà vận động theo cơ chế cơ hội giá trị (value-selective). Dòng tiền đang phân tán (dispersion) hơn là hội tụ vì không bị chi phối bởi sợ hãi (Greed) hay tham lam (Fear), dẫn đến thiếu động lực bứt phá đồng thuận.
+- Risk Score ở mức 50.4 (thay đổi +0.0 điểm) xác nhận thị trường đang vận hành tại điểm cân bằng tâm lý trung tính. Đám đông không thể hiện sự sợ hãi hay tham lam quá mức, dẫn đến trạng thái NEUTRAL / STOCK PICKING.
+- Dòng tiền đang ở trạng thái **phân kỳ ngang (lateral divergence)**. Không có tín hiệu hội tụ mạnh (momentum tăng) hay phân kỳ tiêu cực (áp lực bán tháo), cho thấy dòng tiền đang luân chuyển nội bộ giữa các nhóm ngành thay vì đổ vào/ra khỏi thị trường một cách đồng loạt.
 
 **2. Systemic Risk Assessment (Đánh giá Rủi ro Hệ thống):**
-EGARCH Volatility tăng 2% lên 8.7%, trong bối cảnh Skewness dương +0.18, chỉ ra biến động mở rộng nhưng không có tính bất đối xứng do sợ hãi (left-tail skew). Đuôi rủi ro đang nghiêng nhẹ về phía tăng (right-tail) chứ không phải giảm. Sự kết hợp này cho thấy rủi ro hệ thống không mở rộng một cách tiêu cực: biến động tăng chủ yếu đến từ các chuyển động mua chủ động (buying pressure) và dao động giá hợp lý, không phải từ rủi ro suy giảm cấu trúc.
+- Biến động EGARCH chuẩn hóa ở mức 4.8% có xu hướng giảm (-4.0%), phản ánh mức độ biến động ngắn hạn thu hẹp. Điều này kết hợp với Rolling Skewness dương (+0.27) tạo thành cấu trúc **đuôi phải (right-tail)**. Thị trường có xác suất cao hơn đối với các biến động tăng bất ngờ hơn là giảm sâu.
+- Rủi ro hệ thống đang **thu hẹp** khi biến động giảm và phân phối lợi nhuận lệch dương, cho thấy các cú sốc tiêu cực khó lan rộng ra toàn hệ thống.
 
 **3. Contagion & Dispersion (Hiệu ứng lây lan và Độ phân hóa):**
-Upside Correlation chiếm 65.1% so với Downside chỉ 12.9% – tỷ lệ lệch trội cho thấy các pha hồi phục có tính lan tỏa cao (systemic rally) nhưng pha điều chỉnh bị cô lập (idiosyncratic selling). Điều này phản ánh hiệu ứng bầy đàn chỉ diễn ra khi thị trường tăng; lực bán mang tính phân hóa mạnh do thiếu sự nhất quán về nỗi sợ. Không xảy ra hiệu ứng lây lan tiêu cực trên diện rộng.
+- Sự chênh lệch lớn giữa UpCorr (62.7%) và DownCorr (13.1%) phản ánh một thị trường có **cấu trúc phi đối xứng**:
+  - **Hiệu ứng lây lan yếu:** Downside Correlation thấp (13.1%) chứng tỏ áp lực bán mang tính cá biệt, không có hiệu ứng domino lây lan trên diện rộng.
+  - **Tính bầy đàn có điều kiện:** Upside Correlation cao (62.7%) hàm ý khi thị trường tăng điểm, dòng tiền có xu hướng đổ đồng loạt vào các nhóm ngành. Tuy nhiên, sự phân hóa vẫn hiện hữu ở chiều giảm.
+- Kết luận: Rủi ro bầy đàn ở chiều giảm là thấp; thị trường đang ưu tiên chiều tăng để thu hút dòng tiền.
 
 **4. Actionable Strategy (Chiến lược Hành động):**
-- **Tỷ trọng Beta:** Duy trì tỷ trọng Beta ở mức neutral (0.9–1.0) với biên độ điều chỉnh hẹp. Không cần phòng thủ tăng cường cũng không nên aggressive expansion.
-- **Hành động:** Áp dụng Bottom-up Selective Approach (Phương pháp chọn cổ phiếu từ nền tảng doanh nghiệp). Tìm kiếm cơ hội ở các mã có bộ đệm tài chính tốt và Skewness dương, tận dụng Upside Correlation để gia tăng trọng số ở phe mua lan tỏa. Kiểm soát rủi ro bằng Stop-loss hẹp dựa trên Downside Correlation thấp, vì nếu bị bán tháo, đà giảm sẽ mang tính cục bộ và nhanh chóng tiêu hao.
+- **Tỷ trọng Beta đề xuất:** 80-85% (Tích cực chủ động - Active Overweight). Với biến động thấp, đuôi rủi ro nghiêng phải và không có rủi ro lây lan giảm, đây là môi trường ưu ái cho việc gia tăng Beta thị trường.
+- **Chiến lược cụ thể:**
+  - **Giải ngân mới:** Tập trung vào các mã có động lượng (momentum) mạnh và thanh khoản cao, vì tỷ lệ UpCorr cao cho thấy dòng tiền sẽ ưu tiên rót vào các cổ phiếu dẫn dắt.
+  - **Chiến thuật:** Áp dụng lưới buy-dip (grid buying) trên các nhịp điều chỉnh ngắn hạn, tận dụng DownCorr thấp để mua vào mà không lo ngại hiệu ứng lây lan giá xuống.
+  - **Cắt lỗ:** Đặt stop-loss cứng trên các vị thế thua lỗ, vì nếu Skewness chuyển sang âm, cấu trúc rủi ro sẽ đảo chiều nhanh chóng.
