@@ -1,88 +1,60 @@
-# BÁO CÁO QUẢN TRỊ RỦI RO (RISK MANAGEMENT REPORT)
-
-**Ngày:** 12/05/2026  
-**Trạng thái Hệ thống:** SAFE  
-**Chỉ số SSI:** 48.2%  
-**VN30:** 2053.97 (Trên MA125)
+**DỮ LIỆU CHÍNH THỨC QUẢN TRỊ RỦI RO**
+**NGÀY BÁO CÁO:** 13/05/2026
+**GIÁM ĐỐC RỦI RO (CRO) - PHÊ DUYỆT LỆNH**
 
 ---
 
-## 1. Systemic Fragility Assessment (Đánh giá Độ mong manh của Hệ thống)
+### 1. ĐÁNH GIÁ ĐỘ MONG MANH CỦA HỆ THỐNG (SYSTEMIC FRAGILITY ASSESSMENT)
 
-**Trạng thái hiện tại: An toàn có điều kiện (Conditional Safety)**
-
-SSI hiện tại ở mức 48.2%, nằm dưới ngưỡng cảnh báo 50%. Điều này cho thấy thị trường chưa bước vào giai đoạn rủi ro hệ thống cấp tính. Tuy nhiên, con số này đang tiến sát đường biên WARNING - một tín hiệu yêu cầu giám sát chặt chẽ.
-
-**Phân tích Divergence:**
-
-- **Giá VN30 (2053.97):** Đang ở vùng đỉnh lịch sử, nằm trên MA125 thể hiện xu hướng tăng trung hạn vững chắc.
-- **SSI (48.2%):** Chỉ số này cho thấy rủi ro đang tăng dần nhưng chưa vượt ngưỡng quan trọng. Không có phân kỳ nguy hiểm tại thời điểm hiện tại (giá tăng, SSI vẫn dưới 50%).
-
-**Kết luận:** Thị trường đang ở pha tích lũy rủi ro giai đoạn đầu (Early Warning Stage). Chưa có dấu hiệu Bull Trap ngay lập tức, nhưng biên độ an toàn (SSI cách ngưỡng WARNING chỉ 1.8%) đang thu hẹp nhanh.
+- **Trạng thái SSI (46.8%):** Hệ thống đang ở ngưỡng **SAFE** nhưng là vùng **an toàn cận biên**. Chỉ số chưa chạm ngưỡng Warning (50%), tuy nhiên việc chỉ cách ngưỡng cảnh báo 3.2% cho thấy đệm rủi ro đang mỏng dần. Đây là giai đoạn tích lũy rủi ro tĩnh (Latent Risk), chưa phải đổ vỡ. Không có lệnh báo động khẩn cấp, nhưng yêu cầu tăng tần suất giám sát lên mức 4 giờ/lần.
+- **Độ vênh (Divergence) VN30 vs SSI:**
+    - **Giá:** Duy trì trên MA125, thể hiện xu hướng dương trung hạn (Xu hướng giá là bạn).
+    - **Rủi ro:** SSI dù ở SAFE nhưng đã tăng so với chu kỳ trước, trong khi VN30 vẫn duy trì ở vùng đỉnh lịch sử 2043.
+    - **Kết luận: PHÂN KỲ DƯƠNG (Positive Divergence) nhưng ở mức yếu.** Chưa phải Bull Trap. Tuy nhiên, nếu SSI vượt 50% trong khi VN30 vẫn cố thủ ở đỉnh, đó sẽ là tín hiệu "Bán khống chiến thuật" (Tactical Short) đầu tiên.
 
 ---
 
-## 2. Risk Decomposition (Bóc tách Nguồn gốc Rủi ro)
+### 2. BÓC TÁCH NGUỒN GỐC RỦI RO (RISK DECOMPOSITION)
 
-**Cấu trúc rủi ro theo PCA Weights:**
+Dựa trên trọng số PCA, rủi ro hiện tại được dẫn dắt bởi 3 yếu tố chính:
 
-| Trụ cột | Trọng số | Bản chất |
-|---------|----------|----------|
-| S_LIQ (Thanh khoản) | 30% | Áp lực cạn kiệt thanh khoản |
-| S_LEV (Áp lực bán) | 28% | Nguồn cung chủ động gia tăng |
-| S_VAL (Định giá) | 20% | Rủi ro định giá quá đắt |
+| Trụ cột | Trọng số | Bản chất rủi ro & Chẩn đoán |
+| :--- | :--- | :--- |
+| **S_LIQ (Thanh khoản)** | **31%** | **Rủi ro trung tâm.** Đây là áp lực lớn nhất. Độ sâu lệnh (Order book depth) đang suy yếu. Khối lượng giao dịch giảm so với khi giá tăng. Thị trường đang chuyển từ "thị trường có độ sâu" sang "thị trường mỏng". Lệnh lớn khó khớp. |
+| **S_LEV (Áp lực bán)** | **~28%** | Áp lực bán chủ động đang gia tăng, nhưng chưa đạt ngưỡng panic. Khối ngoại hoặc khối tự doanh có thể đang âm thầm phân phối. Rủi ro đến từ việc "kẻ mua cuối cùng" đang yếu dần. |
+| **S_VAL (Định giá)** | **~20%** | Rủi ro định giá tương đối. E/P so sánh với Bond yield không còn hấp dẫn. Điều này tạo ra chi phí cơ hội lớn cho dòng tiền dài hạn. |
 
-**Chẩn đoán:** Rủi ro hiện tại mang bản chất **"Thanh khoản - Định giá kép"** (Liquidity-Valuation Hybrid).
-
-- **S_LIQ chiếm trọng số cao nhất (30%):** Thanh khoản đang cạn kiệt ở các mã VN30. Amihud Illiquidity Index tăng đồng nghĩa chi phí giao dịch đang đắt đỏ.
-- **S_LEV (28%):** Áp lực bán chủ động đang tăng, cho thấy dòng tiền thông minh (smart money) đang âm thầm phân phối.
-- **S_VAL (20%):** ERP (Equity Risk Premium) thu hẹp, định giá VN30 đang đắt so với trái phiếu.
-
-**Mô hình rủi ro:** Thị trường đang chịu sức ép kép: (1) Thanh khoản kém khiến mỗi lệnh bán lớn dễ gây giảm sâu hơn mức bình thường, và (2) Định giá cao hạn chế lực cầu mua vào.
+> **Kết luận:** Rủi ro hiện tại mang bản chất **"THANH KHOẢN & PHÂN PHỐI" (Liquidity-Driven Distribution)**. Không phải hoảng loạn (Contagion - vì S_COR thấp), mà là sự kiệt quệ dần của dòng tiền mua. Đây là cấu trúc dễ tạo ra các nhịp giảm sâu (Gap down) hơn là giảm từ từ.
 
 ---
 
-## 3. Contagion & Tail Risk (Rủi ro Lây lan & Đuôi phân phối)
+### 3. RỦI RO LÂY LAN & ĐUÔI PHÂN PHỐI (CONTAGION & TAIL RISK)
 
-**Xác suất sự kiện đuôi (Tail Risk):** **Thấp đến Trung bình** (20-25% trong 10 phiên tới)
-
-**Lý do:**
-- SSI dưới ngưỡng CRITICAL nên xác suất xảy ra crash ngay lập tức là thấp.
-- Tuy nhiên, tổ hợp rủi ro S_LIQ + S_LEV là bộ đôi nguy hiểm: Nếu một sự kiện bất ngờ xảy ra, thanh khoản kém sẽ khuếch đại biên độ giảm.
-
-**Kịch bản Drawdown nếu xảy ra sự cố:**
-- Với S_LIQ 30% và S_LEV 28%, biên độ rớt giá kỳ vọng trong kịch bản xấu: **3-5%** trong 1-2 phiên.
-- Margin call sẽ kích hoạt nếu VN30 mất mốc 1990 (dưới MA125) — hiện cách 63 điểm (~3%).
-
-**Kết luận:** Rủi ro thiên nga đen chưa hiện hữu, nhưng hạ tầng thị trường (thanh khoản) đang yếu dần. Một cú sốc nhỏ cũng có thể gây ra biến động lớn hơn bình thường.
+- **Xác suất thiên nga đen (Tail Risk):** **Trung bình - Thấp**. Bởi vì ma trận tương quan (S_COR) chưa tăng đột biến, nghĩa là chưa có hiệu ứng bầy đàn bán tháo. Rủi ro lây lan từ ngành này sang ngành khác là thấp.
+- **Đặc điểm Drawdown nếu xảy ra sụp đổ:**
+    - **Biên độ:** LỚN. Vì lý do chính là **MẤT THANH KHOẢN (S_LIQ top 1)**. Khi thanh khoản cạn, lệnh bán Margin sẽ gây ra các cú sốc "Cascade". Biên độ rớt có thể từ 3-5% chỉ trong 1-2 phiên trước khi có lực mua đỡ.
+    - **Tốc độ:** NHANH. Khác với rủi ro định giá (giảm từ từ), rủi ro thanh khoản giết chết thị trường trong vài giờ.
+- **Kịch bản nghiêm trọng:** Nếu S_LEV vượt quá 35% và S_LIQ duy trì trên 30%, kích hoạt cảnh báo **"Liquidity Black Hole"** (Hố đen thanh khoản).
 
 ---
 
-## 4. Hedging & Portfolio Action (Chiến lược Phòng vệ & Hành động)
+### 4. CHIẾN LƯỢC PHÒNG VỆ & HÀNH ĐỘNG (HEDGING & PORTFOLIO ACTION)
 
-### Mệnh lệnh cho danh mục:
+**Tình huống:** SSI < 50% (SAFE) nhưng cấu trúc rủi ro là Thanh khoản – Phân phối.
+**Mệnh lệnh cho Danh mục:**
 
-**1. Tỷ lệ Cash (Tiền mặt):**
-- **Khuyến nghị: 20-25% danh mục**
-- Lý do: SSI gần ngưỡng WARNING (48.2%), cần duy trì "đạn dược" để tận dụng cơ hội nếu thị trường điều chỉnh về vùng định giá hấp dẫn hơn.
+1.  **Tỷ lệ Tiền mặt (Cash Weighting):**
+    - **Khuyến nghị: 15% - 20%.** Trong môi trường SAFE thuần túy (SSI < 30%) tỷ lệ cash chỉ nên là 5%. Nhưng với cấu trúc rủi ro hiện tại, cần có "Độ đàn hồi" (Resilience) cao hơn. Chúng ta đang mua bảo hiểm cho sự kiệt quệ thanh khoản.
 
-**2. Hành động Hedging:**
-- **Kích hoạt Short VN30F (Hợp đồng tương lai):** CÓ, với tỷ lệ Hedge 15-20% danh mục cơ sở.
-  - Chiến thuật: Short VN30F kỳ hạn gần (tháng 5 hoặc 6) để phòng vệ danh mục dài hạn.
-  - Không cần Long VN30F vì xu hướng chính vẫn tăng, chỉ Hedge phòng trường hợp xấu.
-- **Alternative Hedge:** Không khuyến nghị Put Option đơn thuần vì S_VOL chưa cao, phí Option đắt.
+2.  **Chiến thuật Hedging bằng Phái sinh (Short VN30F):**
+    - **Trạng thái hiện tại:** **KHÔNG KÍCH HOẠT SHORT VN30F.**
+    - **Lý do:** SSI chưa vào WARNING. Việc short khi xu hướng giá vẫn đang nằm trên MA125 là hành động "chơi dao". Chi phí carry (nếu futures cao hơn spot) sẽ làm hao mòn danh mục.
+    - **Lệnh chờ (Standing Order):** Nếu SSI vượt 50% hoặc VN30F phá vỡ MA125 với khối lượng lớn, lập tức kích hoạt **Hedge Ratio = 30% NAV** bằng Short VN30F.
 
-**3. Cơ cấu danh mục:**
-- **Tăng tỷ trọng cổ phiếu Beta thấp:** VNM, GAS, MSN (lợi suất cổ tức >4%).
-- **Giảm tỷ trọng cổ phiếu đầu cơ/đòn bẩy cao:** HPG, FPT, VRE.
-- **Cắt margin** ở các mã có P/E > 20x và S_LIQ cao.
-
-**4. Ngưỡng cảnh báo hành động:**
-- **Nếu SSI vượt 55%:** Tăng Cash lên 30%, nâng Hedge lên 30%.
-- **Nếu SSI chạm 70% (WARNING):** Kích hoạt Hedge toàn bộ danh mục, Cash lên 50%.
+3.  **Hành động Quản trị Danh mục Cơ sở (Stock Level):**
+    - **Cơ cấu:** Chuyển từ **Beta cao (Thép, Chứng khoán, BĐS)** sang **Beta thấp (Ngân hàng, Điện nước)** .
+    - **Loại trừ:** Mọi cổ phiếu có thanh khoản dưới 50 tỷ/phiên trong 5 ngày gần nhất. Đây là lệnh cấm tuyệt đối (Hard Ban) cho tới khi S_LIQ quay về dưới 20%.
+    - **Margin Call:** Hạ tỷ lệ Margin sử dụng xuống tối đa 50% hạn mức cho phép. Không mua bình quân giá xuống (DCA) bằng Margin.
 
 ---
-
-**Tổng kết:** Thị trường an toàn nhưng đang rời xa vùng an toàn. Chiến lược tối ưu: **Phòng vệ chủ động, duy trì thanh khoản, tránh định giá quá đắt.**
-
-**Trạng thái hệ thống:** 🟢 SAFE (Cảnh báo tầm trung)
+> **Tóm tắt lệnh:** Chưa kích hoạt phòng vệ khẩn cấp. Giai đoạn hiện tại yêu cầu sự thận trọng linh hoạt (Agile Caution): Duy trì 15-20% Cash, loại bỏ rủi ro thanh khoản khỏi danh mục, và chờ tín hiệu "SSI > 50%" để bật tím Short Hedge.
