@@ -507,6 +507,10 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     df_stocks = load_close_prices()
     
+    # Ngày dữ liệu gần nhất trong data_lake (T-1 so với ngày xuất bản)
+    data_date = df_stocks.index[-1].strftime('%d/%m/%Y')
+    report_date = date.today().strftime('%d/%m/%Y')
+    
     # Run tools (will use cache if already ran today)
     r1 = run_fear_greed(client, df_stocks, provider_key, model)
     r2 = run_manipulation(client, df_stocks, provider_key, model)
@@ -518,7 +522,10 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r8 = run_va_res(client, df_stocks, provider_key, model)
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     
+    data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
+    
     all_reports = (
+        f"=== {data_note} ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"
         f"=== 3. DISPERSION ===\n{r3}\n\n"
