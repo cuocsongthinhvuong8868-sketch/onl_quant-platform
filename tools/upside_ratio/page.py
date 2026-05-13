@@ -1,11 +1,13 @@
-import pandas as pd
+import logging
+
 import streamlit as st
 
 from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
-from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
-from tools.market_breadth.ui.sidebar import render_sidebar
-from tools.market_breadth.ui.charts import render_breadth_chart
+from tools.upside_ratio.quant.metrics import build_breadth_series, compute_actual_breadth
+from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
+from tools.upside_ratio.ui.sidebar import render_sidebar
+from tools.upside_ratio.ui.charts import render_history_chart, render_projection_tabs, render_diagnostics
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -22,183 +24,243 @@ except ImportError:
         },
     }
 
-
-@st.cache_data(show_spinner=False)
-def _load_optional_volume_cache() -> pd.DataFrame | None:
-    try:
-        df = load_custom("market_breadth_cache.csv")
-    except FileNotFoundError:
-        return None
-
-    # load_custom(index_col=0) giữ được index thời gian, columns dạng XXX_close / XXX_volume
-    vol = df.filter(regex="_volume$").rename(columns=lambda c: c.replace("_volume", ""))
-    if vol.empty:
-        return None
-    return vol.sort_index().fillna(0)
+logging.basicConfig(
+    level=logging.INFO,
+    format="%(asctime)s | %(levelname)-8s | %(name)s — %(message)s",
+    datefmt="%H:%M:%S",
+)
 
 
 def render():
-    st.title("Market Breadth")
-    st.caption("Độ rộng thị trường: số mã nằm trên MA20/60/125/252")
+    st.title("🧬 Hybrid MC Bidirectional Breadth Model")
+    st.caption("Upside/Downside breadth ratio với Hybrid Monte Carlo ensemble")
 
     try:
-        df_prices = load_close_prices()
+        df_close = load_close_prices()
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
-    st.caption(f"📅 Dữ liệu cuối cùng: {df_prices.index.max().strftime('%d/%m/%Y')}")
 
-    if df_prices.empty:
-        st.error("market_data.csv rỗng.")
-        st.stop()
+    try:
+        df_index = load_custom("vnindex_cache.csv")
+    except FileNotFoundError:
+        df_index = None
 
-    df_volumes = _load_optional_volume_cache()
+    params = render_sidebar(df_close=df_close)
+    ai_provider = params["ai_provider"]
+    api_key     = params["api_key"]
 
-    key = {"universe_cols": int(df_prices.shape[1])}
-    cached = load_daily_cache("market_breadth", key)
+    st.caption(f"📅 Dữ liệu chốt phiên gần nhất: {df_close.index.max().strftime('%d/%m/%Y')}")
+
+    # Cache key phải bao gồm cả backtest_date nếu có
+    key = {
+        "upside_x": params["upside_x"],
+        "downside_y": params["downside_y"],
+        "lookback_days": params["lookback_days"],
+        "sim_days": params["sim_days"],
+        "backtest_date": str(params["backtest_date"]) if params["backtest_date"] else None,
+    }
+
+    data_date = df_close.index.max().strftime("%Y-%m-%d")
+    cached = load_daily_cache("upside_ratio", key, data_date=data_date)
+
     if cached is not None:
-        breadth = cached["breadth"]
-        masks = cached["masks"]
-        st.caption("⚡ Dùng cache cùng ngày (Market Breadth).")
+        data = cached["data"]
+        up_tuple = cached["up_tuple"]
+        dn_tuple = cached["dn_tuple"]
+        actual_up = cached.get("actual_up")
+        actual_dn = cached.get("actual_dn")
+        st.caption("⚡ Dùng cache cùng ngày (Upside Ratio).")
     else:
-        breadth, masks = compute_breadth(df_prices)
-        save_daily_cache("market_breadth", key, {"breadth": breadth, "masks": masks})
-        st.caption("💾 Đã tạo cache ngày mới (Market Breadth).")
-    if breadth.empty:
-        st.warning("Không đủ dữ liệu để tính Market Breadth.")
-        st.stop()
+        with st.spinner("Đang tính breadth + mô phỏng Monte Carlo..."):
+            try:
+                data = build_breadth_series(
+                    df_close,
+                    upside_x=params["upside_x"],
+                    downside_y=params["downside_y"],
+                    lookback_days=params["lookback_days"],
+                    backtest_date=params["backtest_date"],
+                )
+                up_tuple = run_hybrid_ensemble_mc(
+                    data["raw_upside"], days_to_sim=params["sim_days"], num_sims=3000
+                )
+                dn_tuple = run_hybrid_ensemble_mc(
+                    data["raw_downside"], days_to_sim=params["sim_days"], num_sims=3000
+                )
+            except (ValueError, RuntimeError) as e:
+                st.error(f"Lỗi mô hình: {e}")
+                st.stop()
 
-    if breadth.index.tz is not None:
-        breadth.index = breadth.index.tz_localize(None)
+        # Tính actual breadth nếu backtest
+        actual_up = None
+        actual_dn = None
+        if params["backtest_date"] is not None and "future_returns" in data:
+            actual_up, actual_dn = compute_actual_breadth(
+                data["future_returns"],
+                data["target_date_pd"],
+                params["sim_days"],
+                params["upside_x"],
+                params["downside_y"],
+            )
 
-    start_date, end_date, start_dt, end_dt, ai_provider, api_key = render_sidebar(breadth)
-    df_plot = breadth[(breadth.index >= start_dt) & (breadth.index <= end_dt)]
+        payload = {
+            "data": data,
+            "up_tuple": up_tuple,
+            "dn_tuple": dn_tuple,
+            "actual_up": actual_up,
+            "actual_dn": actual_dn,
+        }
+        save_daily_cache("upside_ratio", key, payload, data_date=data_date)
+        st.caption("💾 Đã tạo cache ngày mới (Upside Ratio).")
 
-    if df_plot.empty:
-        st.warning("Không có dữ liệu trong khoảng thời gian đã chọn.")
-        return
+    p5_up, p25_up, p50_up, p75_up, p95_up, phi_up, mu_up, _, _ = up_tuple
+    p5_dn, p25_dn, p50_dn, p75_dn, p95_dn, phi_dn, mu_dn, _, _ = dn_tuple
 
-    render_breadth_chart(df_plot, start_date, end_date)
+    regime_up = (
+        "📈 Momentum (Đà Mua)" if phi_up > 0.1
+        else "🔄 Mean-reversion (Đảo chiều Mua)" if phi_up < -0.1
+        else "🎲 Random Walk (Nhiễu Mua)"
+    )
+    regime_dn = (
+        "🩸 Momentum (Đà Bán)" if phi_dn > 0.1
+        else "🔄 Mean-reversion (Đảo chiều Bán)" if phi_dn < -0.1
+        else "🎲 Random Walk (Nhiễu Bán)"
+    )
 
-    latest_date = df_plot.index[-1]
-    latest = df_plot.iloc[-1]
+    a, b, c, d = st.columns(4)
+    a.metric("Core Momentum Cầu (φ)", f"{phi_up:.3f}", regime_up)
+    b.metric("Long-run Mean Cầu (μ)", f"{mu_up*100:.1f}%")
+    c.metric("Core Momentum Cung (φ)", f"{phi_dn:.3f}", regime_dn)
+    d.metric("Long-run Mean Cung (μ)", f"{mu_dn*100:.1f}%")
 
-    st.subheader(f"Dữ liệu Market Breadth cuối kỳ ({latest_date.strftime('%d/%m/%Y')})")
+    # Header lịch sử
+    header_text = "1. Lịch sử Cung - Cầu & VN-Index"
+    if params["backtest_date"] is not None:
+        header_text += f" (Góc nhìn từ ngày {params['backtest_date'].strftime('%d/%m/%Y')})"
+    st.subheader(header_text)
+    render_history_chart(
+        data["raw_upside"], data["ma5_upside"],
+        data["raw_downside"], data["ma5_downside"],
+        mu_up, mu_dn, df_index=df_index,
+    )
 
-    cols = st.columns(4)
-    for i, bucket in enumerate(["> MA20", "> MA60", "> MA125", "> MA252"]):
-        with cols[i]:
-            valid = masks[bucket].loc[latest_date]
-            total = len(valid)
-            count = int(latest[bucket])
-            pct = (count / total * 100.0) if total > 0 else 0.0
-            st.metric(f"Cổ phiếu {bucket}", f"{count} ({pct:.1f}%)")
-            valid_stocks = valid[valid].index
-            with st.popover("Xem Top 10 Khối Lượng"):
-                top_df = top10_by_volume(df_volumes, latest_date, valid_stocks)
-                if top_df.empty:
-                    st.caption("Chưa có volume cache cho ngày này.")
-                else:
-                    st.dataframe(top_df, hide_index=True)
-
-    # ── AI Analysis ──
     st.divider()
-    st.subheader("✨ Trợ lý AI Phân tích Độ rộng Thị trường")
+    st.subheader(f"2. Dự phóng Monte Carlo — 6.000 kịch bản × {params['sim_days']} phiên")
+    resid_up, resid_dn = render_projection_tabs(
+        data["raw_upside"], data["ma5_upside"],
+        data["raw_downside"], data["ma5_downside"],
+        params["sim_days"], up_tuple, dn_tuple,
+        actual_up=actual_up, actual_dn=actual_dn,
+        backtest_date=params["backtest_date"],
+    )
+
+    # Kết luận chi tiết
+    current_vs_mu_up = "thấp hơn" if data["raw_upside"].values[-1] < mu_up * 100 else "cao hơn"
+    mean_reversion_note_up = (
+        "→ Khả năng **hồi phục**" if data["raw_upside"].values[-1] < mu_up * 100
+        else "→ Khả năng **điều chỉnh**"
+    )
+
+    current_vs_mu_dn = "thấp hơn" if data["raw_downside"].values[-1] < mu_dn * 100 else "cao hơn"
+    mean_reversion_note_dn = (
+        "→ Khả năng **gia tăng áp lực bán**" if data["raw_downside"].values[-1] < mu_dn * 100
+        else "→ Khả năng **hạ nhiệt bán tháo**"
+    )
+
+    st.info(
+        f"**📈 DỰ PHÓNG LỰC CẦU / UPSIDE (T+{params['sim_days']-1}):**\n\n"
+        f"Ensemble Median = **{p50_up[-1]:.1f}%** &nbsp;|&nbsp; "
+        f"Dải Core 50%: **{p25_up[-1]:.1f}% – {p75_up[-1]:.1f}%** &nbsp;|&nbsp; "
+        f"Dải Rủi ro 90%: **{p5_up[-1]:.1f}% – {p95_up[-1]:.1f}%**\n\n"
+        f"Giá trị tính đến ngày chốt **{data['raw_upside'].values[-1]:.1f}%** "
+        f"đang {current_vs_mu_up} Long-run mean {mu_up*100:.1f}%. "
+        f"{mean_reversion_note_up} về trung bình dài hạn."
+    )
+
+    st.error(
+        f"**🩸 DỰ PHÓNG LỰC CUNG / DOWNSIDE (T+{params['sim_days']-1}):**\n\n"
+        f"Ensemble Median = **{p50_dn[-1]:.1f}%** &nbsp;|&nbsp; "
+        f"Dải Core 50%: **{p25_dn[-1]:.1f}% – {p75_dn[-1]:.1f}%** &nbsp;|&nbsp; "
+        f"Dải Rủi ro 90%: **{p5_dn[-1]:.1f}% – {p95_dn[-1]:.1f}%**\n\n"
+        f"Giá trị tính đến ngày chốt **{data['raw_downside'].values[-1]:.1f}%** "
+        f"đang {current_vs_mu_dn} Long-run mean {mu_dn*100:.1f}%. "
+        f"{mean_reversion_note_dn} về trung bình dài hạn."
+    )
+
+    st.divider()
+    st.subheader("✨ Trợ lý AI Quant Phân tích Đa chiều")
 
     import os
     from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
     from datetime import date
-    from openai import OpenAI
-
+    
     today_str = date.today().strftime('%d%m%y')
     ai_cache_file = DATA_LAKE / "daily_cache" / f"upside_ratio_{ai_provider}_{today_str}.txt"
+    
+    if ai_cache_file.exists():
+        st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+        with open(ai_cache_file, "r", encoding="utf-8") as f:
+            cached_result = f.read()
+        with st.container(border=True):
+            st.markdown(cached_result)
+            
+        if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
+            os.remove(ai_cache_file)
+            st.rerun()
+    else:
+        btn_label = f"🐺 Phân tích Rủi ro 2 chiều ({AI_PROVIDER_MAP[ai_provider]['display']})"
+        if st.button(btn_label, type="primary", use_container_width=True):
+            if not api_key:
+                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+            else:
+                with st.spinner("AI đang quét ma trận 12.000 kịch bản Cung - Cầu..."):
+                    try:
+                        from openai import OpenAI
+                        cfg = AI_PROVIDER_MAP[ai_provider]
+                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                        
+                        with open(str(ROOT_DIR / "promt" / "upside ratio promt.md"), "r", encoding="utf-8") as f:
+                            prompt_template = f.read()
+    
+                        full_prompt = prompt_template.replace("{upside_current}", f"{data['raw_upside'].values[-1]:.2f}")\
+                                                     .replace("{upside_mu}", f"{mu_up*100:.2f}")\
+                                                     .replace("{upside_phi}", f"{phi_up:.3f}")\
+                                                     .replace("{upside_regime}", regime_up)\
+                                                     .replace("{downside_current}", f"{data['raw_downside'].values[-1]:.2f}")\
+                                                     .replace("{downside_mu}", f"{mu_dn*100:.2f}")\
+                                                     .replace("{downside_phi}", f"{phi_dn:.3f}")\
+                                                     .replace("{downside_regime}", regime_dn)\
+                                                     .replace("{sim_days}", str(params['sim_days']-1))\
+                                                     .replace("{p95_up}", f"{p95_up[-1]:.2f}")\
+                                                     .replace("{p95_dn}", f"{p95_dn[-1]:.2f}")
 
-    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
-    with tab_current:
-        if ai_cache_file.exists():
-            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-            with open(ai_cache_file, "r", encoding="utf-8") as f:
-                cached_result = f.read()
-            with st.container(border=True):
-                st.markdown(cached_result)
+                        parts = full_prompt.split("# INPUT DATA")
+                        system_prompt = parts[0].strip()
+                        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    
+                        response = client.chat.completions.create(
+                            model=cfg["api_model"],
+                            messages=[
+                                {"role": "system", "content": system_prompt},
+                                {"role": "user", "content": user_prompt}
+                            ],
+                            temperature=AI_TEMPERATURE
+                        )
+                        
+                        result_text = response.choices[0].message.content
+                        
+                        # Lưu cache
+                        ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                        with open(ai_cache_file, "w", encoding="utf-8") as f:
+                            f.write(result_text)
+                            
 
-            if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="mb_rerun_ai"):
-                os.remove(ai_cache_file)
-                st.rerun()
-        else:
-            btn_label = f"🐺 Phân tích Độ rộng Thị trường ({AI_PROVIDER_MAP[ai_provider]['display']})"
-            if st.button(btn_label, type="primary", use_container_width=True, key="mb_run_ai"):
-                if not api_key:
-                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-                else:
-                    with st.spinner("AI đang phân tích cấu trúc độ rộng và dòng tiền..."):
-                        try:
-                            cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    
+                        st.success("Hoàn thành phân tích!")
+                        with st.container(border=True):
+                            st.markdown(result_text)
+    
+                    except Exception as e:
+                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
 
-                            with open(str(ROOT_DIR / "promt" / "Market Breadth promt.md"), "r", encoding="utf-8") as f:
-                                prompt_template = f.read()
-
-                            # Thu thập dữ liệu
-                            date_str = latest_date.strftime('%d/%m/%Y')
-                            total_count = len(masks["> MA20"].loc[latest_date])
-
-                            ma20_count = int(latest["> MA20"])
-                            ma20_pct = (ma20_count / total_count * 100.0) if total_count > 0 else 0.0
-                            ma60_count = int(latest["> MA60"])
-                            ma60_pct = (ma60_count / total_count * 100.0) if total_count > 0 else 0.0
-                            ma125_count = int(latest["> MA125"])
-                            ma125_pct = (ma125_count / total_count * 100.0) if total_count > 0 else 0.0
-                            ma252_count = int(latest["> MA252"])
-                            ma252_pct = (ma252_count / total_count * 100.0) if total_count > 0 else 0.0
-
-                            # Top volume leaders
-                            valid_ma20 = masks["> MA20"].loc[latest_date]
-                            valid_ma20_stocks = valid_ma20[valid_ma20].index
-                            top_ma20_df = top10_by_volume(df_volumes, latest_date, valid_ma20_stocks)
-                            top_ma20_str = ", ".join(top_ma20_df["Mã CP"].tolist()) if not top_ma20_df.empty else "Không có dữ liệu khối lượng"
-
-                            valid_ma252 = masks["> MA252"].loc[latest_date]
-                            valid_ma252_stocks = valid_ma252[valid_ma252].index
-                            top_ma252_df = top10_by_volume(df_volumes, latest_date, valid_ma252_stocks)
-                            top_ma252_str = ", ".join(top_ma252_df["Mã CP"].tolist()) if not top_ma252_df.empty else "Không có dữ liệu khối lượng"
-
-                            # Replace placeholders trong prompt
-                            full_prompt = prompt_template
-                            full_prompt = full_prompt.replace("[Nhập ngày, VD: 09/05/2026]", date_str)
-                            full_prompt = full_prompt.replace("[Nhập số lượng, VD: 215 mã]", f"{total_count} mã")
-                            full_prompt = full_prompt.replace("Số mã > MA20: [Nhập số lượng] mã (Chiếm [Nhập tỷ lệ %] rổ)", f"Số mã > MA20: {ma20_count} mã (Chiếm {ma20_pct:.1f}% rổ)")
-                            full_prompt = full_prompt.replace("Số mã > MA60: [Nhập số lượng] mã (Chiếm [Nhập tỷ lệ %] rổ)", f"Số mã > MA60: {ma60_count} mã (Chiếm {ma60_pct:.1f}% rổ)")
-                            full_prompt = full_prompt.replace("Số mã > MA125: [Nhập số lượng] mã (Chiếm [Nhập tỷ lệ %] rổ)", f"Số mã > MA125: {ma125_count} mã (Chiếm {ma125_pct:.1f}% rổ)")
-                            full_prompt = full_prompt.replace("Số mã > MA252: [Nhập số lượng] mã (Chiếm [Nhập tỷ lệ %] rổ)", f"Số mã > MA252: {ma252_count} mã (Chiếm {ma252_pct:.1f}% rổ)")
-                            full_prompt = full_prompt.replace("[Liệt kê mã, VD: HPG, SSI, NVL, DIG...]", top_ma20_str, 1)
-                            full_prompt = full_prompt.replace("[Liệt kê mã, VD: VCB, FPT, ACB...]", top_ma252_str, 1)
-
-                            parts = full_prompt.split("# INPUT DATA")
-                            system_prompt = parts[0].strip()
-                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
-
-                            response = client.chat.completions.create(
-                                model=cfg["api_model"],
-                                messages=[
-                                    {"role": "system", "content": system_prompt},
-                                    {"role": "user", "content": user_prompt}
-                                ],
-
-                                temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
-                            )
-
-                            result_text = response.choices[0].message.content
-
-                            # Lưu cache
-                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                            with open(ai_cache_file, "w", encoding="utf-8") as f:
-                                f.write(result_text)
-
-                            # Đồng bộ lên GitHub
-                            st.success("Hoàn thành phân tích!")
-                            with st.container(border=True):
-                                st.markdown(result_text)
-
-                        except Exception as e:
-                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+    render_diagnostics(data["raw_upside"], data["raw_downside"], resid_up, resid_dn)
