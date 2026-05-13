@@ -95,95 +95,88 @@ def render():
     from datetime import date
     
     today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{today_str}.txt"
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"dispersion_{ai_provider}_{today_str}.txt"
     
-    if ai_cache_file.exists():
-        st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-        with open(ai_cache_file, "r", encoding="utf-8") as f:
-            cached_result = f.read()
-        with st.container(border=True):
-            st.markdown(cached_result)
-            
-        if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
-            os.remove(ai_cache_file)
-            st.rerun()
-    else:
-        btn_label = f"🐺 Phân tích Dòng tiền & Tác động ({AI_PROVIDER_MAP[ai_provider]['display']})"
-        if st.button(btn_label, type="primary", use_container_width=True):
-            if not api_key:
-                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-            else:
-                with st.spinner("AI đang tổng hợp và phân tích dữ liệu manipulation..."):
-                    try:
-                        from openai import OpenAI
-                        cfg = AI_PROVIDER_MAP[ai_provider]
-                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
-    
-                        with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
-                            prompt_template = f.read()
-    
-                        date_str = result_df.index.max().strftime('%d/%m/%Y')
-                        latest = result_df.iloc[-1]
-    
-                        slope_val = latest["OLS_Slope"]
-                        slope_pr = latest["PR_Slope"] * 100
-                        slope_status = "🔴 Cao" if slope_pr >= 80 else "🟢 Thấp" if slope_pr <= 20 else "🟡 Trung bình"
-    
-                        corr_val = latest["Correlation"]
-                        corr_pr = latest["PR_Corr"] * 100
-                        corr_status = "🔴 Rất chặt" if corr_pr >= 80 else "🟢 Phân kỳ" if corr_pr <= 20 else "🟡 Lỏng"
-    
-                        t0_str = pd.to_datetime(t0_date).strftime('%d/%m/%Y')
-                        regime = re_df["Regime"].iloc[-1] if not re_df.empty else "N/A"
-                        d_corr = re_df["Delta_PR_Corr"].iloc[-1] if not re_df.empty else 0
-                        d_slope = re_df["Delta_PR_Slope"].iloc[-1] if not re_df.empty else 0
-    
-                        momentum_str = f"ΔCorr = {d_corr:.2f}, ΔSlope = {d_slope:.2f}"
-    
-                        full_prompt = prompt_template.replace("{date_str}", date_str)\
-                                                     .replace("{slope_val}", f"{slope_val:.2f}")\
-                                                     .replace("{slope_pr}", f"{slope_pr:.1f}")\
-                                                     .replace("{slope_status}", slope_status)\
-                                                     .replace("{corr_val}", f"{corr_val:.2f}")\
-                                                     .replace("{corr_pr}", f"{corr_pr:.1f}")\
-                                                     .replace("{corr_status}", corr_status)\
-                                                     .replace("{t0_str}", t0_str)\
-                                                     .replace("{regime}", regime)\
-                                                     .replace("{momentum_str}", momentum_str)
+    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+    with tab_current:
+        if ai_cache_file.exists():
+            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+            with open(ai_cache_file, "r", encoding="utf-8") as f:
+                cached_result = f.read()
+            with st.container(border=True):
+                st.markdown(cached_result)
 
-                        parts = full_prompt.split("# INPUT DATA")
-                        system_prompt = parts[0].strip()
-                        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
-    
-                        response = client.chat.completions.create(
-                            model=cfg["api_model"],
-                            messages=[
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt}
-                            ],
-
-                        )
-    
-                        result_text = response.choices[0].message.content
-                        
-                        # Lưu cache
-                        ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(ai_cache_file, "w", encoding="utf-8") as f:
-                            f.write(result_text)
-                            
-                        # Đồng bộ lên GitHub
+            if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
+                os.remove(ai_cache_file)
+                st.rerun()
+        else:
+            btn_label = f"🐺 Phân tích Dòng tiền & Tác động ({AI_PROVIDER_MAP[ai_provider]['display']})"
+            if st.button(btn_label, type="primary", use_container_width=True):
+                if not api_key:
+                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                else:
+                    with st.spinner("AI đang tổng hợp và phân tích dữ liệu manipulation..."):
                         try:
-                            from shared.github_sync import upload_file
-                            import os as _os
-                            if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in _os.environ:
-                                repo_path = f"data_lake/daily_cache/{ai_cache_file.name}"
-                                upload_file(repo_path, result_text.encode("utf-8"), f"Auto sync cache: {ai_cache_file.name}")
+                            from openai import OpenAI
+                            cfg = AI_PROVIDER_MAP[ai_provider]
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+
+                            with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
+                                prompt_template = f.read()
+
+                            date_str = result_df.index.max().strftime('%d/%m/%Y')
+                            latest = result_df.iloc[-1]
+
+                            slope_val = latest["OLS_Slope"]
+                            slope_pr = latest["PR_Slope"] * 100
+                            slope_status = "🔴 Cao" if slope_pr >= 80 else "🟢 Thấp" if slope_pr <= 20 else "🟡 Trung bình"
+
+                            corr_val = latest["Correlation"]
+                            corr_pr = latest["PR_Corr"] * 100
+                            corr_status = "🔴 Rất chặt" if corr_pr >= 80 else "🟢 Phân kỳ" if corr_pr <= 20 else "🟡 Lỏng"
+
+                            t0_str = pd.to_datetime(t0_date).strftime('%d/%m/%Y')
+                            regime = re_df["Regime"].iloc[-1] if not re_df.empty else "N/A"
+                            d_corr = re_df["Delta_PR_Corr"].iloc[-1] if not re_df.empty else 0
+                            d_slope = re_df["Delta_PR_Slope"].iloc[-1] if not re_df.empty else 0
+
+                            momentum_str = f"ΔCorr = {d_corr:.2f}, ΔSlope = {d_slope:.2f}"
+
+                            full_prompt = prompt_template.replace("{date_str}", date_str)\
+                                                         .replace("{slope_val}", f"{slope_val:.2f}")\
+                                                         .replace("{slope_pr}", f"{slope_pr:.1f}")\
+                                                         .replace("{slope_status}", slope_status)\
+                                                         .replace("{corr_val}", f"{corr_val:.2f}")\
+                                                         .replace("{corr_pr}", f"{corr_pr:.1f}")\
+                                                         .replace("{corr_status}", corr_status)\
+                                                         .replace("{t0_str}", t0_str)\
+                                                         .replace("{regime}", regime)\
+                                                         .replace("{momentum_str}", momentum_str)
+
+                            parts = full_prompt.split("# INPUT DATA")
+                            system_prompt = parts[0].strip()
+                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+
+                            response = client.chat.completions.create(
+                                model=cfg["api_model"],
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    {"role": "user", "content": user_prompt}
+                                ],
+
+                            )
+
+                            result_text = response.choices[0].message.content
+
+                            # Lưu cache
+                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                            with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                f.write(result_text)
+
+                            # Đồng bộ lên GitHub
+                            st.success("Hoàn thành phân tích!")
+                            with st.container(border=True):
+                                st.markdown(result_text)
+
                         except Exception as e:
-                            print(f"[GH Sync Error] {e}")
-    
-                        st.success("Hoàn thành phân tích!")
-                        with st.container(border=True):
-                            st.markdown(result_text)
-    
-                    except Exception as e:
-                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")

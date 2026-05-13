@@ -259,96 +259,98 @@ def show():
             st.divider()
             st.subheader("✨ Trợ lý AI Phân tích VaRES Tổng hợp (VN30 Stress + Thị trường Complacency)")
             
-            if ai_cache_file.exists():
-                st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-                with open(ai_cache_file, "r", encoding="utf-8") as f:
-                    cached_result = f.read()
-                with st.container(border=True):
-                    st.markdown(cached_result)
+        tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+        with tab_current:
+                if ai_cache_file.exists():
+                    st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+                    with open(ai_cache_file, "r", encoding="utf-8") as f:
+                        cached_result = f.read()
+                    with st.container(border=True):
+                        st.markdown(cached_result)
 
-                if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="va_res_rerun_ai"):
-                    os.remove(ai_cache_file)
-                    st.rerun()
-            elif has_c_data:
-                btn_label = f"🐺 Phân tích VaRES Tổng hợp ({AI_PROVIDER_MAP[ai_provider]['display']})"
-                if st.button(btn_label, type="primary", use_container_width=True, key="va_res_run_ai"):
-                    if not api_key:
-                        st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-                    else:
-                        with st.spinner("AI đang phân tích rủi ro hệ thống VaRES..."):
-                            try:
-                                date_col = st.session_state.vares_c_datecol
-                                df_status_pd = st.session_state.vares_c_status_pd
-                                
-                                # ── Tính Module B (VN30 Stress) inline ──
-                                available_vn30 = [t for t in VN30_TICKERS if t in df_price_pandas.columns]
-                                df_vn30_pandas = df_price_pandas[[date_col] + available_vn30]
-                                df_vn30_pl = pl.from_pandas(df_vn30_pandas)
-                                df_metrics30 = engine.calculate_risk_metrics(df_vn30_pl, method='cornish_fisher')
-                                df_contagion = engine.calculate_contagion_index(df_metrics30)
-                                
-                                latest_date_b = df_metrics30[date_col].max()
-                                df_latest_30 = df_metrics30.filter(pl.col(date_col) == latest_date_b).to_pandas()
-                                df_latest_30['breach_margin'] = df_latest_30['VaR'] - df_latest_30['return']
-                                breached_30 = df_latest_30[df_latest_30['return'] < df_latest_30['VaR']]
-                                stress_index = df_contagion.to_pandas().iloc[-1]['Contagion_Index']
-                                
-                                if not breached_30.empty:
-                                    top_3_crash = breached_30.sort_values(by='breach_margin', ascending=False).head(3)
-                                    top_3_crash_str = ", ".join([f"{row['ticker']} (margin {row['breach_margin']*100:.2f}%)" for _, row in top_3_crash.iterrows()])
-                                    breached_count = len(breached_30)
-                                else:
-                                    top_3_crash_str = "Không có"
-                                    breached_count = 0
-                                
-                                # ── Module C data từ session_state ──
-                                latest_complacency = st.session_state.vares_c_complacency
-                                mispriced_df = df_status_pd[df_status_pd['Status'] == 'Risk Mispriced']
-                                if not mispriced_df.empty:
-                                    top_3_mis = mispriced_df.sort_values(by='Spread (%)', ascending=True).head(3)
-                                    top_3_mis_str = ", ".join([f"{row['ticker']} (Spread {row['Spread (%)']:.2f}%)" for _, row in top_3_mis.iterrows()])
-                                    mispriced_count = len(mispriced_df)
-                                else:
-                                    top_3_mis_str = "Không có"
-                                    mispriced_count = 0
-                                
-                                # ── Gọi AI ──
-                                cfg = AI_PROVIDER_MAP[ai_provider]
-                                client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                    if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="va_res_rerun_ai"):
+                        os.remove(ai_cache_file)
+                        st.rerun()
+                elif has_c_data:
+                    btn_label = f"🐺 Phân tích VaRES Tổng hợp ({AI_PROVIDER_MAP[ai_provider]['display']})"
+                    if st.button(btn_label, type="primary", use_container_width=True, key="va_res_run_ai"):
+                        if not api_key:
+                            st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                        else:
+                            with st.spinner("AI đang phân tích rủi ro hệ thống VaRES..."):
+                                try:
+                                    date_col = st.session_state.vares_c_datecol
+                                    df_status_pd = st.session_state.vares_c_status_pd
 
-                                with open(str(ROOT_DIR / "promt" / "va_res_promt.md"), "r", encoding="utf-8") as f:
-                                    prompt_template = f.read()
+                                    # ── Tính Module B (VN30 Stress) inline ──
+                                    available_vn30 = [t for t in VN30_TICKERS if t in df_price_pandas.columns]
+                                    df_vn30_pandas = df_price_pandas[[date_col] + available_vn30]
+                                    df_vn30_pl = pl.from_pandas(df_vn30_pandas)
+                                    df_metrics30 = engine.calculate_risk_metrics(df_vn30_pl, method='cornish_fisher')
+                                    df_contagion = engine.calculate_contagion_index(df_metrics30)
 
-                                date_str = latest_date_b.strftime('%d/%m/%Y') if hasattr(latest_date_b, 'strftime') else str(latest_date_b)
-                                full_prompt = prompt_template
-                                full_prompt = full_prompt.replace("[Nhập ngày]", date_str)
-                                full_prompt = full_prompt.replace("[Stress Index %]", f"{stress_index:.2f}%")
-                                full_prompt = full_prompt.replace("[Breached Count]", str(breached_count))
-                                full_prompt = full_prompt.replace("[Top 3 Crash]", top_3_crash_str)
-                                full_prompt = full_prompt.replace("[Complacency Index %]", f"{latest_complacency:.2f}%")
-                                full_prompt = full_prompt.replace("[Mispriced Count]", str(mispriced_count))
-                                full_prompt = full_prompt.replace("[Top 3 Mispriced]", top_3_mis_str)
+                                    latest_date_b = df_metrics30[date_col].max()
+                                    df_latest_30 = df_metrics30.filter(pl.col(date_col) == latest_date_b).to_pandas()
+                                    df_latest_30['breach_margin'] = df_latest_30['VaR'] - df_latest_30['return']
+                                    breached_30 = df_latest_30[df_latest_30['return'] < df_latest_30['VaR']]
+                                    stress_index = df_contagion.to_pandas().iloc[-1]['Contagion_Index']
 
-                                parts = full_prompt.split("# INPUT DATA")
-                                system_prompt = parts[0].strip()
-                                user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+                                    if not breached_30.empty:
+                                        top_3_crash = breached_30.sort_values(by='breach_margin', ascending=False).head(3)
+                                        top_3_crash_str = ", ".join([f"{row['ticker']} (margin {row['breach_margin']*100:.2f}%)" for _, row in top_3_crash.iterrows()])
+                                        breached_count = len(breached_30)
+                                    else:
+                                        top_3_crash_str = "Không có"
+                                        breached_count = 0
 
-                                response = client.chat.completions.create(
-                                    model=cfg["api_model"],
-                                    messages=[
-                                        {"role": "system", "content": system_prompt},
-                                        {"role": "user", "content": user_prompt}
-                                    ],
-                                )
-                                result_text = response.choices[0].message.content
+                                    # ── Module C data từ session_state ──
+                                    latest_complacency = st.session_state.vares_c_complacency
+                                    mispriced_df = df_status_pd[df_status_pd['Status'] == 'Risk Mispriced']
+                                    if not mispriced_df.empty:
+                                        top_3_mis = mispriced_df.sort_values(by='Spread (%)', ascending=True).head(3)
+                                        top_3_mis_str = ", ".join([f"{row['ticker']} (Spread {row['Spread (%)']:.2f}%)" for _, row in top_3_mis.iterrows()])
+                                        mispriced_count = len(mispriced_df)
+                                    else:
+                                        top_3_mis_str = "Không có"
+                                        mispriced_count = 0
 
-                                ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                                with open(ai_cache_file, "w", encoding="utf-8") as f:
-                                    f.write(result_text)
+                                    # ── Gọi AI ──
+                                    cfg = AI_PROVIDER_MAP[ai_provider]
+                                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
 
-                                st.success("Hoàn thành phân tích!")
-                                with st.container(border=True):
-                                    st.markdown(result_text)
+                                    with open(str(ROOT_DIR / "promt" / "va_res_promt.md"), "r", encoding="utf-8") as f:
+                                        prompt_template = f.read()
 
-                            except Exception as e:
-                                st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại!")
+                                    date_str = latest_date_b.strftime('%d/%m/%Y') if hasattr(latest_date_b, 'strftime') else str(latest_date_b)
+                                    full_prompt = prompt_template
+                                    full_prompt = full_prompt.replace("[Nhập ngày]", date_str)
+                                    full_prompt = full_prompt.replace("[Stress Index %]", f"{stress_index:.2f}%")
+                                    full_prompt = full_prompt.replace("[Breached Count]", str(breached_count))
+                                    full_prompt = full_prompt.replace("[Top 3 Crash]", top_3_crash_str)
+                                    full_prompt = full_prompt.replace("[Complacency Index %]", f"{latest_complacency:.2f}%")
+                                    full_prompt = full_prompt.replace("[Mispriced Count]", str(mispriced_count))
+                                    full_prompt = full_prompt.replace("[Top 3 Mispriced]", top_3_mis_str)
+
+                                    parts = full_prompt.split("# INPUT DATA")
+                                    system_prompt = parts[0].strip()
+                                    user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+
+                                    response = client.chat.completions.create(
+                                        model=cfg["api_model"],
+                                        messages=[
+                                            {"role": "system", "content": system_prompt},
+                                            {"role": "user", "content": user_prompt}
+                                        ],
+                                    )
+                                    result_text = response.choices[0].message.content
+
+                                    ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                                    with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                        f.write(result_text)
+
+                                    st.success("Hoàn thành phân tích!")
+                                    with st.container(border=True):
+                                        st.markdown(result_text)
+
+                                except Exception as e:
+                                    st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại!")
