@@ -132,78 +132,71 @@ def render():
     today_str = date.today().strftime('%d%m%y')
     ai_cache_file = DATA_LAKE / "daily_cache" / f"risk_adjusted_growth_{ai_provider}_{today_str}.txt"
     
-    if ai_cache_file.exists():
-        st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-        with open(ai_cache_file, "r", encoding="utf-8") as f:
-            cached_result = f.read()
-        with st.container(border=True):
-            st.markdown(cached_result)
-            
-        if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
-            os.remove(ai_cache_file)
-            st.rerun()
-    else:
-        btn_label = f"🐺 Phân tích Economic Alpha ({AI_PROVIDER_MAP[ai_provider]['display']})"
-        if st.button(btn_label, type="primary", use_container_width=True):
-            if not api_key:
-                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-            else:
-                with st.spinner("AI đang phân tích cấu trúc rủi ro và lợi nhuận..."):
-                    try:
-                        from openai import OpenAI
-                        cfg = AI_PROVIDER_MAP[ai_provider]
-                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
-                        
-                        with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
-                            prompt_template = f.read()
-    
-                        top_alpha = df_result.nlargest(3, "Economic Alpha")
-                        top_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(top_alpha.to_dict('records'))])
-                        
-                        bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
-                        bottom_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(bottom_alpha.to_dict('records'))])
+    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+    with tab_current:
+        if ai_cache_file.exists():
+            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+            with open(ai_cache_file, "r", encoding="utf-8") as f:
+                cached_result = f.read()
+            with st.container(border=True):
+                st.markdown(cached_result)
 
-                        full_prompt = prompt_template.replace("{k_scenario}", params['selected_k'].split(' ')[0])\
-                                                     .replace("{k_value}", str(params['k_value']))\
-                                                     .replace("{coe_input}", str(params['coe_input']))\
-                                                     .replace("{bvps_change_pct}", str(params['bvps_change_pct']))\
-                                                     .replace("{pb_penalty_pct}", str(params['pb_penalty_pct']))\
-                                                     .replace("{top_alpha_str}", top_alpha_str)\
-                                                     .replace("{bottom_alpha_str}", bottom_alpha_str)
-
-                        parts = full_prompt.split("# INPUT DATA")
-                        system_prompt = parts[0].strip()
-                        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
-    
-                        response = client.chat.completions.create(
-                            model=cfg["api_model"],
-                            messages=[
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt}
-                            ],
-                            temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
-                        )
-                        
-                        result_text = response.choices[0].message.content
-                        
-                        # Lưu cache
-                        ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(ai_cache_file, "w", encoding="utf-8") as f:
-                            f.write(result_text)
-                            
-                        # Đồng bộ lên GitHub
+            if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
+                os.remove(ai_cache_file)
+                st.rerun()
+        else:
+            btn_label = f"🐺 Phân tích Economic Alpha ({AI_PROVIDER_MAP[ai_provider]['display']})"
+            if st.button(btn_label, type="primary", use_container_width=True):
+                if not api_key:
+                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                else:
+                    with st.spinner("AI đang phân tích cấu trúc rủi ro và lợi nhuận..."):
                         try:
-                            from shared.github_sync import upload_file
-                            import os as _os
-                            if "GITHUB_TOKEN" in st.secrets or "GITHUB_TOKEN" in _os.environ:
-                                repo_path = f"data_lake/daily_cache/{ai_cache_file.name}"
-                                upload_file(repo_path, result_text.encode("utf-8"), f"Auto sync cache: {ai_cache_file.name}")
+                            from openai import OpenAI
+                            cfg = AI_PROVIDER_MAP[ai_provider]
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+
+                            with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
+                                prompt_template = f.read()
+
+                            top_alpha = df_result.nlargest(3, "Economic Alpha")
+                            top_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(top_alpha.to_dict('records'))])
+
+                            bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
+                            bottom_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(bottom_alpha.to_dict('records'))])
+
+                            full_prompt = prompt_template.replace("{k_scenario}", params['selected_k'].split(' ')[0])\
+                                                         .replace("{k_value}", str(params['k_value']))\
+                                                         .replace("{coe_input}", str(params['coe_input']))\
+                                                         .replace("{bvps_change_pct}", str(params['bvps_change_pct']))\
+                                                         .replace("{pb_penalty_pct}", str(params['pb_penalty_pct']))\
+                                                         .replace("{top_alpha_str}", top_alpha_str)\
+                                                         .replace("{bottom_alpha_str}", bottom_alpha_str)
+
+                            parts = full_prompt.split("# INPUT DATA")
+                            system_prompt = parts[0].strip()
+                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+
+                            response = client.chat.completions.create(
+                                model=cfg["api_model"],
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    {"role": "user", "content": user_prompt}
+                                ],
+                                temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
+                            )
+
+                            result_text = response.choices[0].message.content
+
+                            # Lưu cache
+                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                            with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                f.write(result_text)
+
+                            # Đồng bộ lên GitHub
+                            st.success("Hoàn thành phân tích!")
+                            with st.container(border=True):
+                                st.markdown(result_text)
+
                         except Exception as e:
-                            print(f"[GH Sync Error] {e}")
-    
-                        st.success("Hoàn thành phân tích!")
-                        with st.container(border=True):
-                            st.markdown(result_text)
-    
-                    except Exception as e:
-                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")

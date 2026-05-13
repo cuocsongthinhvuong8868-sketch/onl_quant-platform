@@ -196,96 +196,98 @@ def render():
     today_str = date.today().strftime('%d%m%y')
     ai_cache_file = DATA_LAKE / "daily_cache" / f"esr_monitor_{ai_provider}_{today_str}.txt"
 
-    if ai_cache_file.exists():
-        st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-        with open(ai_cache_file, "r", encoding="utf-8") as f:
-            cached_result = f.read()
-        with st.container(border=True):
-            st.markdown(cached_result)
+    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+    with tab_current:
+        if ai_cache_file.exists():
+            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+            with open(ai_cache_file, "r", encoding="utf-8") as f:
+                cached_result = f.read()
+            with st.container(border=True):
+                st.markdown(cached_result)
 
-        if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="esr_rerun_ai"):
-            os.remove(ai_cache_file)
-            st.rerun()
-    else:
-        btn_label = f"🐺 Phân tích ESR Rủi ro Hệ thống ({AI_PROVIDER_MAP[ai_provider]['display']})"
-        if st.button(btn_label, type="primary", use_container_width=True, key="esr_run_ai"):
-            if not api_key:
-                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-            else:
-                with st.spinner("AI đang phân tích rủi ro hệ thống và phân rã PCA..."):
-                    try:
-                        cfg = AI_PROVIDER_MAP[ai_provider]
-                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+            if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="esr_rerun_ai"):
+                os.remove(ai_cache_file)
+                st.rerun()
+        else:
+            btn_label = f"🐺 Phân tích ESR Rủi ro Hệ thống ({AI_PROVIDER_MAP[ai_provider]['display']})"
+            if st.button(btn_label, type="primary", use_container_width=True, key="esr_run_ai"):
+                if not api_key:
+                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                else:
+                    with st.spinner("AI đang phân tích rủi ro hệ thống và phân rã PCA..."):
+                        try:
+                            cfg = AI_PROVIDER_MAP[ai_provider]
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
 
-                        with open(str(ROOT_DIR / "promt" / "ESR monitor promt.md"), "r", encoding="utf-8") as f:
-                            prompt_template = f.read()
+                            with open(str(ROOT_DIR / "promt" / "ESR monitor promt.md"), "r", encoding="utf-8") as f:
+                                prompt_template = f.read()
 
-                        # Thu thập dữ liệu
-                        date_str = pillars.index[-1].strftime('%d/%m/%Y')
-                        index_close = pillars['INDEX_Close'].dropna().iloc[-1]
-                        ssi_pct = last_ssi * 100
-                        evr_pct = last_evr * 100
+                            # Thu thập dữ liệu
+                            date_str = pillars.index[-1].strftime('%d/%m/%Y')
+                            index_close = pillars['INDEX_Close'].dropna().iloc[-1]
+                            ssi_pct = last_ssi * 100
+                            evr_pct = last_evr * 100
 
-                        # PCA weights top 3
-                        last_w = result.weights_history.dropna().iloc[-1]
-                        sorted_w = last_w.sort_values(ascending=False)
-                        w1_name = sorted_w.index[0]
-                        w1_val = sorted_w.iloc[0] * 100
-                        w2_name = sorted_w.index[1]
-                        w2_val = sorted_w.iloc[1] * 100
-                        w3_name = sorted_w.index[2]
-                        w3_val = sorted_w.iloc[2] * 100
+                            # PCA weights top 3
+                            last_w = result.weights_history.dropna().iloc[-1]
+                            sorted_w = last_w.sort_values(ascending=False)
+                            w1_name = sorted_w.index[0]
+                            w1_val = sorted_w.iloc[0] * 100
+                            w2_name = sorted_w.index[1]
+                            w2_val = sorted_w.iloc[1] * 100
+                            w3_name = sorted_w.index[2]
+                            w3_val = sorted_w.iloc[2] * 100
 
-                        # Market state info
-                        if hmm_ok and current_state_key is not None:
-                            state_info_str = f"{MARKET_STATES[current_state_key]['label']}: {MARKET_STATES[current_state_key]['description']}"
-                        elif hmm_ok:
-                            state_info_str = status
-                        else:
-                            state_info_str = status
+                            # Market state info
+                            if hmm_ok and current_state_key is not None:
+                                state_info_str = f"{MARKET_STATES[current_state_key]['label']}: {MARKET_STATES[current_state_key]['description']}"
+                            elif hmm_ok:
+                                state_info_str = status
+                            else:
+                                state_info_str = status
 
-                        # Replace placeholders
-                        full_prompt = prompt_template
-                        full_prompt = full_prompt.replace("[Nhập ngày, VD: 09/05/2026]", date_str)
-                        full_prompt = full_prompt.replace("[Nhập điểm số VN30]", f"{index_close:.2f}")
-                        full_prompt = full_prompt.replace("[nằm trên/nằm dưới]",
-                            "nằm trên" if index_close >= pillars['INDEX_Close'].rolling(ma_period).mean().iloc[-1] else "nằm dưới")
-                        full_prompt = full_prompt.replace("[20/60/125/252]", str(ma_period))
-                        full_prompt = full_prompt.replace("[Nhập %, VD: 85.5%]", f"{ssi_pct:.1f}%")
-                        full_prompt = full_prompt.replace("[SAFE / WARNING / CRITICAL]", status)
-                        full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w1_name} ({w1_val:.0f}%)", 1)
-                        full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w2_name} ({w2_val:.0f}%)", 1)
-                        full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w3_name} ({w3_val:.0f}%)", 1)
-                        # Extended fields
-                        full_prompt = full_prompt.replace("[PCA_EVR]", f"{evr_pct:.1f}%")
-                        full_prompt = full_prompt.replace("[Market State]", state_info_str)
-                        full_prompt = full_prompt.replace("[Pillar Mode]", pillar_mode)
+                            # Replace placeholders
+                            full_prompt = prompt_template
+                            full_prompt = full_prompt.replace("[Nhập ngày, VD: 09/05/2026]", date_str)
+                            full_prompt = full_prompt.replace("[Nhập điểm số VN30]", f"{index_close:.2f}")
+                            full_prompt = full_prompt.replace("[nằm trên/nằm dưới]",
+                                "nằm trên" if index_close >= pillars['INDEX_Close'].rolling(ma_period).mean().iloc[-1] else "nằm dưới")
+                            full_prompt = full_prompt.replace("[20/60/125/252]", str(ma_period))
+                            full_prompt = full_prompt.replace("[Nhập %, VD: 85.5%]", f"{ssi_pct:.1f}%")
+                            full_prompt = full_prompt.replace("[SAFE / WARNING / CRITICAL]", status)
+                            full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w1_name} ({w1_val:.0f}%)", 1)
+                            full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w2_name} ({w2_val:.0f}%)", 1)
+                            full_prompt = full_prompt.replace("[Tên Pillar, VD: S_COR (35%)]", f"{w3_name} ({w3_val:.0f}%)", 1)
+                            # Extended fields
+                            full_prompt = full_prompt.replace("[PCA_EVR]", f"{evr_pct:.1f}%")
+                            full_prompt = full_prompt.replace("[Market State]", state_info_str)
+                            full_prompt = full_prompt.replace("[Pillar Mode]", pillar_mode)
 
-                        parts = full_prompt.split("# INPUT DATA")
-                        system_prompt = parts[0].strip()
-                        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+                            parts = full_prompt.split("# INPUT DATA")
+                            system_prompt = parts[0].strip()
+                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
-                        temperature = cfg.get("temperature", 1.0)
+                            temperature = cfg.get("temperature", 1.0)
 
-                        response = client.chat.completions.create(
-                            model=cfg["api_model"],
-                            messages=[
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt}
-                            ],
-                            temperature=temperature
-                        )
+                            response = client.chat.completions.create(
+                                model=cfg["api_model"],
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    {"role": "user", "content": user_prompt}
+                                ],
+                                temperature=temperature
+                            )
 
-                        result_text = response.choices[0].message.content
+                            result_text = response.choices[0].message.content
 
-                        # Lưu cache
-                        ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(ai_cache_file, "w", encoding="utf-8") as f:
-                            f.write(result_text)
+                            # Lưu cache
+                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                            with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                f.write(result_text)
 
-                        st.success("Hoàn thành phân tích!")
-                        with st.container(border=True):
-                            st.markdown(result_text)
+                            st.success("Hoàn thành phân tích!")
+                            with st.container(border=True):
+                                st.markdown(result_text)
 
-                    except Exception as e:
-                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        except Exception as e:
+                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")

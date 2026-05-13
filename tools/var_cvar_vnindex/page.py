@@ -99,61 +99,63 @@ def show():
         today_str = date.today().strftime('%d%m%y')
         ai_cache_file = DATA_LAKE / "daily_cache" / f"var_cvar_vnindex_{ai_provider}_{today_str}.txt"
 
-        if ai_cache_file.exists():
-            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-            with open(ai_cache_file, "r", encoding="utf-8") as f:
-                cached_result = f.read()
-            with st.container(border=True):
-                st.markdown(cached_result)
+        tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+        with tab_current:
+            if ai_cache_file.exists():
+                st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+                with open(ai_cache_file, "r", encoding="utf-8") as f:
+                    cached_result = f.read()
+                with st.container(border=True):
+                    st.markdown(cached_result)
 
-            if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="var_cvar_rerun_ai"):
-                os.remove(ai_cache_file)
-                st.rerun()
-        else:
-            btn_label = f"🐺 Phân tích VaR-CVaR ({AI_PROVIDER_MAP[ai_provider]['display']})"
-            if st.button(btn_label, type="primary", use_container_width=True, key="var_cvar_run_ai"):
-                if not api_key:
-                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-                else:
-                    with st.spinner("AI đang phân tích rủi ro đuôi VNINDEX..."):
-                        try:
-                            cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="var_cvar_rerun_ai"):
+                    os.remove(ai_cache_file)
+                    st.rerun()
+            else:
+                btn_label = f"🐺 Phân tích VaR-CVaR ({AI_PROVIDER_MAP[ai_provider]['display']})"
+                if st.button(btn_label, type="primary", use_container_width=True, key="var_cvar_run_ai"):
+                    if not api_key:
+                        st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                    else:
+                        with st.spinner("AI đang phân tích rủi ro đuôi VNINDEX..."):
+                            try:
+                                cfg = AI_PROVIDER_MAP[ai_provider]
+                                client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
 
-                            with open(str(ROOT_DIR / "promt" / "var_cvar_vnindex_promt.md"), "r", encoding="utf-8") as f:
-                                prompt_template = f.read()
+                                with open(str(ROOT_DIR / "promt" / "var_cvar_vnindex_promt.md"), "r", encoding="utf-8") as f:
+                                    prompt_template = f.read()
 
-                            date_str = latest_date.strftime('%d/%m/%Y')
-                            full_prompt = prompt_template
-                            full_prompt = full_prompt.replace("[Nhập ngày]", date_str)
-                            full_prompt = full_prompt.replace("[Giá VNINDEX]", f"{latest['price']:,.2f}")
-                            full_prompt = full_prompt.replace("[σ 30 ngày]", f"{latest['stdev_30']*100:.2f}%")
-                            full_prompt = full_prompt.replace("[Parametric VaR]", f"{latest['parametric_var']*100:.2f}%")
-                            full_prompt = full_prompt.replace("[Historical VaR]", f"{latest['historical_var']*100:.2f}%")
-                            full_prompt = full_prompt.replace("[Expected Shortfall]", f"{latest['expected_shortfall']*100:.2f}%")
-                            full_prompt = full_prompt.replace("[ES - VaR Spread]", f"{(latest['expected_shortfall'] - latest['historical_var'])*100:.2f}%")
+                                date_str = latest_date.strftime('%d/%m/%Y')
+                                full_prompt = prompt_template
+                                full_prompt = full_prompt.replace("[Nhập ngày]", date_str)
+                                full_prompt = full_prompt.replace("[Giá VNINDEX]", f"{latest['price']:,.2f}")
+                                full_prompt = full_prompt.replace("[σ 30 ngày]", f"{latest['stdev_30']*100:.2f}%")
+                                full_prompt = full_prompt.replace("[Parametric VaR]", f"{latest['parametric_var']*100:.2f}%")
+                                full_prompt = full_prompt.replace("[Historical VaR]", f"{latest['historical_var']*100:.2f}%")
+                                full_prompt = full_prompt.replace("[Expected Shortfall]", f"{latest['expected_shortfall']*100:.2f}%")
+                                full_prompt = full_prompt.replace("[ES - VaR Spread]", f"{(latest['expected_shortfall'] - latest['historical_var'])*100:.2f}%")
 
-                            parts = full_prompt.split("# INPUT DATA")
-                            system_prompt = parts[0].strip()
-                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+                                parts = full_prompt.split("# INPUT DATA")
+                                system_prompt = parts[0].strip()
+                                user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
-                            response = client.chat.completions.create(
-                                model=cfg["api_model"],
-                                messages=[
-                                    {"role": "system", "content": system_prompt},
-                                    {"role": "user", "content": user_prompt}
-                                ],
-                                temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
-                            )
-                            result_text = response.choices[0].message.content
+                                response = client.chat.completions.create(
+                                    model=cfg["api_model"],
+                                    messages=[
+                                        {"role": "system", "content": system_prompt},
+                                        {"role": "user", "content": user_prompt}
+                                    ],
+                                    temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
+                                )
+                                result_text = response.choices[0].message.content
 
-                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                            with open(ai_cache_file, "w", encoding="utf-8") as f:
-                                f.write(result_text)
+                                ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                                with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                    f.write(result_text)
 
-                            st.success("Hoàn thành phân tích!")
-                            with st.container(border=True):
-                                st.markdown(result_text)
+                                st.success("Hoàn thành phân tích!")
+                                with st.container(border=True):
+                                    st.markdown(result_text)
 
-                        except Exception as e:
-                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại!")
+                            except Exception as e:
+                                st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại!")
