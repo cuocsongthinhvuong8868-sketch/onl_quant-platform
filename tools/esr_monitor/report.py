@@ -7,7 +7,7 @@ def snapshot(df_close, _load_custom):
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_close, df_vn30,
         deposit_rate=0.06,
-        pillar_mode='downside',
+        pillar_mode='classic',
         pca_warmup=252,
         ema_span=20,
     )
