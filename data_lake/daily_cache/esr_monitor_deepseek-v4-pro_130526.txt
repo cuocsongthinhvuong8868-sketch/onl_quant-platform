@@ -1,0 +1,88 @@
+# BÁO CÁO QUẢN TRỊ RỦI RO (RISK MANAGEMENT REPORT)
+
+**Ngày:** 12/05/2026  
+**Trạng thái Hệ thống:** SAFE  
+**Chỉ số SSI:** 48.2%  
+**VN30:** 2053.97 (Trên MA125)
+
+---
+
+## 1. Systemic Fragility Assessment (Đánh giá Độ mong manh của Hệ thống)
+
+**Trạng thái hiện tại: An toàn có điều kiện (Conditional Safety)**
+
+SSI hiện tại ở mức 48.2%, nằm dưới ngưỡng cảnh báo 50%. Điều này cho thấy thị trường chưa bước vào giai đoạn rủi ro hệ thống cấp tính. Tuy nhiên, con số này đang tiến sát đường biên WARNING - một tín hiệu yêu cầu giám sát chặt chẽ.
+
+**Phân tích Divergence:**
+
+- **Giá VN30 (2053.97):** Đang ở vùng đỉnh lịch sử, nằm trên MA125 thể hiện xu hướng tăng trung hạn vững chắc.
+- **SSI (48.2%):** Chỉ số này cho thấy rủi ro đang tăng dần nhưng chưa vượt ngưỡng quan trọng. Không có phân kỳ nguy hiểm tại thời điểm hiện tại (giá tăng, SSI vẫn dưới 50%).
+
+**Kết luận:** Thị trường đang ở pha tích lũy rủi ro giai đoạn đầu (Early Warning Stage). Chưa có dấu hiệu Bull Trap ngay lập tức, nhưng biên độ an toàn (SSI cách ngưỡng WARNING chỉ 1.8%) đang thu hẹp nhanh.
+
+---
+
+## 2. Risk Decomposition (Bóc tách Nguồn gốc Rủi ro)
+
+**Cấu trúc rủi ro theo PCA Weights:**
+
+| Trụ cột | Trọng số | Bản chất |
+|---------|----------|----------|
+| S_LIQ (Thanh khoản) | 30% | Áp lực cạn kiệt thanh khoản |
+| S_LEV (Áp lực bán) | 28% | Nguồn cung chủ động gia tăng |
+| S_VAL (Định giá) | 20% | Rủi ro định giá quá đắt |
+
+**Chẩn đoán:** Rủi ro hiện tại mang bản chất **"Thanh khoản - Định giá kép"** (Liquidity-Valuation Hybrid).
+
+- **S_LIQ chiếm trọng số cao nhất (30%):** Thanh khoản đang cạn kiệt ở các mã VN30. Amihud Illiquidity Index tăng đồng nghĩa chi phí giao dịch đang đắt đỏ.
+- **S_LEV (28%):** Áp lực bán chủ động đang tăng, cho thấy dòng tiền thông minh (smart money) đang âm thầm phân phối.
+- **S_VAL (20%):** ERP (Equity Risk Premium) thu hẹp, định giá VN30 đang đắt so với trái phiếu.
+
+**Mô hình rủi ro:** Thị trường đang chịu sức ép kép: (1) Thanh khoản kém khiến mỗi lệnh bán lớn dễ gây giảm sâu hơn mức bình thường, và (2) Định giá cao hạn chế lực cầu mua vào.
+
+---
+
+## 3. Contagion & Tail Risk (Rủi ro Lây lan & Đuôi phân phối)
+
+**Xác suất sự kiện đuôi (Tail Risk):** **Thấp đến Trung bình** (20-25% trong 10 phiên tới)
+
+**Lý do:**
+- SSI dưới ngưỡng CRITICAL nên xác suất xảy ra crash ngay lập tức là thấp.
+- Tuy nhiên, tổ hợp rủi ro S_LIQ + S_LEV là bộ đôi nguy hiểm: Nếu một sự kiện bất ngờ xảy ra, thanh khoản kém sẽ khuếch đại biên độ giảm.
+
+**Kịch bản Drawdown nếu xảy ra sự cố:**
+- Với S_LIQ 30% và S_LEV 28%, biên độ rớt giá kỳ vọng trong kịch bản xấu: **3-5%** trong 1-2 phiên.
+- Margin call sẽ kích hoạt nếu VN30 mất mốc 1990 (dưới MA125) — hiện cách 63 điểm (~3%).
+
+**Kết luận:** Rủi ro thiên nga đen chưa hiện hữu, nhưng hạ tầng thị trường (thanh khoản) đang yếu dần. Một cú sốc nhỏ cũng có thể gây ra biến động lớn hơn bình thường.
+
+---
+
+## 4. Hedging & Portfolio Action (Chiến lược Phòng vệ & Hành động)
+
+### Mệnh lệnh cho danh mục:
+
+**1. Tỷ lệ Cash (Tiền mặt):**
+- **Khuyến nghị: 20-25% danh mục**
+- Lý do: SSI gần ngưỡng WARNING (48.2%), cần duy trì "đạn dược" để tận dụng cơ hội nếu thị trường điều chỉnh về vùng định giá hấp dẫn hơn.
+
+**2. Hành động Hedging:**
+- **Kích hoạt Short VN30F (Hợp đồng tương lai):** CÓ, với tỷ lệ Hedge 15-20% danh mục cơ sở.
+  - Chiến thuật: Short VN30F kỳ hạn gần (tháng 5 hoặc 6) để phòng vệ danh mục dài hạn.
+  - Không cần Long VN30F vì xu hướng chính vẫn tăng, chỉ Hedge phòng trường hợp xấu.
+- **Alternative Hedge:** Không khuyến nghị Put Option đơn thuần vì S_VOL chưa cao, phí Option đắt.
+
+**3. Cơ cấu danh mục:**
+- **Tăng tỷ trọng cổ phiếu Beta thấp:** VNM, GAS, MSN (lợi suất cổ tức >4%).
+- **Giảm tỷ trọng cổ phiếu đầu cơ/đòn bẩy cao:** HPG, FPT, VRE.
+- **Cắt margin** ở các mã có P/E > 20x và S_LIQ cao.
+
+**4. Ngưỡng cảnh báo hành động:**
+- **Nếu SSI vượt 55%:** Tăng Cash lên 30%, nâng Hedge lên 30%.
+- **Nếu SSI chạm 70% (WARNING):** Kích hoạt Hedge toàn bộ danh mục, Cash lên 50%.
+
+---
+
+**Tổng kết:** Thị trường an toàn nhưng đang rời xa vùng an toàn. Chiến lược tối ưu: **Phòng vệ chủ động, duy trì thanh khoản, tránh định giá quá đắt.**
+
+**Trạng thái hệ thống:** 🟢 SAFE (Cảnh báo tầm trung)
