@@ -129,77 +129,124 @@ def render():
     today_str = date.today().strftime('%d%m%y')
     ai_cache_file = DATA_LAKE / "daily_cache" / f"dispersion_{ai_provider}_{today_str}.txt"
     
-    if ai_cache_file.exists():
-        st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
-        with open(ai_cache_file, "r", encoding="utf-8") as f:
-            cached_result = f.read()
-        with st.container(border=True):
-            st.markdown(cached_result)
+    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
+    with tab_current:
+        if ai_cache_file.exists():
+            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+            with open(ai_cache_file, "r", encoding="utf-8") as f:
+                cached_result = f.read()
+            with st.container(border=True):
+                st.markdown(cached_result)
             
-        if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
-            os.remove(ai_cache_file)
-            st.rerun()
-    else:
-        btn_label = f"🐺 Chẩn đoán Cấu trúc & Đứt gãy ({AI_PROVIDER_MAP[ai_provider]['display']})"
-        if st.button(btn_label, type="primary", use_container_width=True):
-            if not api_key:
-                st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
-            else:
-                with st.spinner("AI đang phân tích cấu trúc rủi ro phân tán..."):
-                    try:
-                        from openai import OpenAI
-                        cfg = AI_PROVIDER_MAP[ai_provider]
-                        client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+            if st.button("🔄 Chạy lại phân tích AI", type="secondary"):
+                os.remove(ai_cache_file)
+                st.rerun()
+        else:
+            btn_label = f"🐺 Chẩn đoán Cấu trúc & Đứt gãy ({AI_PROVIDER_MAP[ai_provider]['display']})"
+            if st.button(btn_label, type="primary", use_container_width=True):
+                if not api_key:
+                    st.error("⚠️ Bạn chưa nhập API Key ở thanh menu bên trái.")
+                else:
+                    with st.spinner("AI đang phân tích cấu trúc rủi ro phân tán..."):
+                        try:
+                            from openai import OpenAI
+                            cfg = AI_PROVIDER_MAP[ai_provider]
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     
-                        with open(str(ROOT_DIR / "promt" / "dispersion promt.md"), "r", encoding="utf-8") as f:
-                            prompt_template = f.read()
+                            with open(str(ROOT_DIR / "promt" / "dispersion promt.md"), "r", encoding="utf-8") as f:
+                                prompt_template = f.read()
     
-                        date_str = metrics.index.max().strftime('%d/%m/%Y')
+                            date_str = metrics.index.max().strftime('%d/%m/%Y')
                         
-                        spread_val = latest.get("Spread", 0) * 100 * (252**0.5)
-                        spread_z = latest.get("Spread_Z", 0)
-                        dpi_val = latest.get("DPI", 0)
+                            spread_val = latest.get("Spread", 0) * 100 * (252**0.5)
+                            spread_z = latest.get("Spread_Z", 0)
+                            dpi_val = latest.get("DPI", 0)
                         
-                        corr_val = latest.get("Ledoit_Correlation", 0)
+                            corr_val = latest.get("Ledoit_Correlation", 0)
                         
-                        cs_skew = latest.get("CS_Skewness", "N/A")
-                        if isinstance(cs_skew, (int, float)) and not pd.isna(cs_skew): cs_skew = f"{cs_skew:+.2f}"
-                        cs_kurt = latest.get("CS_Kurtosis", "N/A")
-                        if isinstance(cs_kurt, (int, float)) and not pd.isna(cs_kurt): cs_kurt = f"{cs_kurt:.2f}"
+                            cs_skew = latest.get("CS_Skewness", "N/A")
+                            if isinstance(cs_skew, (int, float)) and not pd.isna(cs_skew): cs_skew = f"{cs_skew:+.2f}"
+                            cs_kurt = latest.get("CS_Kurtosis", "N/A")
+                            if isinstance(cs_kurt, (int, float)) and not pd.isna(cs_kurt): cs_kurt = f"{cs_kurt:.2f}"
     
-                        full_prompt = prompt_template.replace("{date_str}", date_str)\
-                                                     .replace("{spread_val}", f"{spread_val:.2f}")\
-                                                     .replace("{spread_z}", f"{spread_z:+.2f}")\
-                                                     .replace("{dpi_val}", f"{dpi_val:.1f}")\
-                                                     .replace("{corr_val}", f"{corr_val:.3f}")\
-                                                     .replace("{cs_skew}", cs_skew)\
-                                                     .replace("{cs_kurt}", cs_kurt)
+                            full_prompt = prompt_template.replace("{date_str}", date_str)\
+                                                         .replace("{spread_val}", f"{spread_val:.2f}")\
+                                                         .replace("{spread_z}", f"{spread_z:+.2f}")\
+                                                         .replace("{dpi_val}", f"{dpi_val:.1f}")\
+                                                         .replace("{corr_val}", f"{corr_val:.3f}")\
+                                                         .replace("{cs_skew}", cs_skew)\
+                                                         .replace("{cs_kurt}", cs_kurt)
 
-                        parts = full_prompt.split("# INPUT DATA")
-                        system_prompt = parts[0].strip()
-                        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+                            parts = full_prompt.split("# INPUT DATA")
+                            system_prompt = parts[0].strip()
+                            user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
-                        response = client.chat.completions.create(
-                            model=cfg["api_model"],
-                            messages=[
-                                {"role": "system", "content": system_prompt},
-                                {"role": "user", "content": user_prompt}
-                            ],
-                            temperature=AI_TEMPERATURE
-                        )
+                            response = client.chat.completions.create(
+                                model=cfg["api_model"],
+                                messages=[
+                                    {"role": "system", "content": system_prompt},
+                                    {"role": "user", "content": user_prompt}
+                                ],
+                                temperature=AI_TEMPERATURE
+                            )
     
-                        result_text = response.choices[0].message.content
+                            result_text = response.choices[0].message.content
                         
-                        # Lưu cache
-                        ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
-                        with open(ai_cache_file, "w", encoding="utf-8") as f:
-                            f.write(result_text)
+                            # Lưu cache
+                            ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                            with open(ai_cache_file, "w", encoding="utf-8") as f:
+                                f.write(result_text)
                             
     
-                        st.success("Hoàn thành phân tích!")
-                        with st.container(border=True):
-                            st.markdown(result_text)
+                            st.success("Hoàn thành phân tích!")
+                            with st.container(border=True):
+                                st.markdown(result_text)
     
+                        except Exception as e:
+                            st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+
+    with tab_history:
+        _all_caches = sorted(
+            list(DATA_LAKE.glob(f"daily_cache/dispersion_*.txt")),
+            key=lambda p: p.stat().st_mtime,
+            reverse=True,
+        )
+        _all_caches = _all_caches[:10]
+        if not _all_caches:
+            st.info("ℹ️ Chưa có dữ liệu phân tích lịch sử.")
+        else:
+            _options = {}
+            for _fp in _all_caches:
+                _fname = _fp.name
+                _parts = _fname.replace(".txt", "").split("_")
+                if len(_parts) >= 3:
+                    _date_str = _parts[-1]
+                    _provider_parts = _parts[1:-1]
+                    if "dispersion".count("_") > 0:
+                        prefix_parts_count = len("dispersion".split("_"))
+                        _provider_parts = _parts[prefix_parts_count:-1]
+                    _provider = "_".join(_provider_parts)
+                    if len(_date_str) == 6 and _date_str.isdigit():
+                        _date_display = f"{_date_str[:2]}/{_date_str[2:4]}/{_date_str[4:]}"
+                        _provider_display = AI_PROVIDER_MAP.get(_provider, {}).get("display", _provider)
+                        _label = f"{_date_display} — {_provider_display}"
+                        _options[_label] = _fp
+            
+            if _options:
+                _selected_label = st.selectbox(
+                    "📅 Chọn ngày và model:",
+                    options=list(_options.keys()),
+                    index=0,
+                    key="dispersion_history_selector"
+                )
+                _sel_path = _options[_selected_label]
+                with st.container(border=True):
+                    try:
+                        with open(_sel_path, "r", encoding="utf-8") as f:
+                            st.markdown(f.read())
                     except Exception as e:
-                        st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại cấu hình thư viện openai và API key!")
+                        st.error(f"Lỗi đọc file: {e}")
+            else:
+                st.info("ℹ️ Không thể đọc được danh sách lịch sử.")
+
 
