@@ -24,11 +24,8 @@ def _get_token() -> str:
         # Thử đọc từ streamlit secrets nếu có
         try:
             import streamlit as st
-            # Thử cả dict access và .get()
-            try:
-                token = st.secrets["GITHUB_TOKEN"]
-            except Exception:
-                token = st.secrets.get("GITHUB_TOKEN", "")
+            # Dùng .get() để tránh KeyError
+            token = st.secrets.get("GITHUB_TOKEN", "")
             if token:
                 os.environ["GITHUB_TOKEN"] = token
         except Exception:
