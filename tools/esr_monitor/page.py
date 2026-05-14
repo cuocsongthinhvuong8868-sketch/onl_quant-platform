@@ -68,7 +68,7 @@ def render():
     elif api_key_msg:
         st.sidebar.success(api_key_msg)
 
-        # ── Load data ──
+            # ── Load data ──
     try:
         df_close = load_close_prices()
         df_vn30 = load_custom("vn30_cache.csv")
@@ -142,7 +142,7 @@ def render():
         gc = "#c0392b" if gap >= 0 else "#27ae60"
         extra_parts.append(f"HMM thr: <b>{threshold:.3f}</b> | Gap: <span style='color:{gc}'><b>{gap:+.3f}</b></span>")
 
-    c1, c2, c3 = st.columns([1, 1, 2])
+        c1, c2, c3 = st.columns([1, 1, 2])
     with c1:
         st.markdown(
             f"<div style='padding:15px;border-radius:8px;background:{bg_color};"
@@ -173,6 +173,19 @@ def render():
                        title="Latest PCA Weights")
         fig_w.update_layout(height=200, margin=dict(l=0, r=0, t=30, b=0))
         st.plotly_chart(fig_w, use_container_width=True)
+        
+        # Giải thích các pillar
+        with st.expander("📖 Ý nghĩa các Pillar"):
+            st.markdown("""
+            | Pillar | Tên đầy đủ | Ý nghĩa |
+            |--------|-----------|---------|
+            | **S_VOL** | Realized Volatility | Biến động lịch sử 20 ngày của VN30 (cao = stress) |
+            | **S_PRES** | Selling Pressure | Tỷ lệ khối lượng giao dịch phiên giảm 5 ngày (cao = áp lực bán mạnh) |
+            | **S_COR** | Systemic Correlation | Tương quan hệ thống — PCA(1) giải thích % biến động của 30 mã VN30 (cao = đồng pha, nguy cơ crash) |
+            | **S_LIQ** | Illiquidity | Thiếu thanh khoản — Median Amihud 20 ngày (cao = kém thanh khoản) |
+            | **S_VAL** | Valuation Tension | Chênh lệch lợi nhuận VN30 1 năm so với lãi suất tiền gửi (thấp = định giá hấp dẫn; âm = thị trường giảm mạnh) |
+            """)
+            st.caption("📌 **SSI** = tổng hợp có trọng số PCA của 5 pillar trên. Trọng số thay đổi theo thời gian.")
 
     # ── Main chart ──
     st.subheader("📈 SSI vs VN30")
