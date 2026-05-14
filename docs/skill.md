@@ -155,7 +155,7 @@ Cấu trúc chuẩn:
 - **Entry:** `pages/tools_page_A/_1_Fed_Liquidity.py` (gọi `tools.fed_liquidity.page.render()`)
 - **Lưu ý:**
   - Tool dùng pattern app **đọc file** (data_lake) — KHÔNG gọi FRED API trực tiếp trong app
-  - Cần `fredapi` package (chưa thêm vào requirements.txt — bổ sung khi cần)
+  - Đã thêm `fredapi>=0.5.2` vào `requirements.txt`
   - Chưa tích hợp vào AI CIO Executive Summary (data weekly, frequency khác 9 tool kia)
 
 ---
@@ -915,7 +915,7 @@ Port tool Fed Liquidity từ `Desktop/9999/fed/` (file `fed.py` + `feddashborad.
 
 - **App đọc cache, không gọi FRED API trực tiếp** — đúng pattern data_lake
 - Updater là pipeline đầy đủ: pull → process → save, không tách stage để giảm I/O
-- `fredapi` package cần được cài đặt — chưa thêm vào `requirements.txt` (bổ sung khi deploy lên Streamlit Cloud)
+- `fredapi>=0.5.2` đã thêm vào `requirements.txt` (Streamlit Cloud + GitHub Actions tự cài)
 - AI prompt theo template "[Placeholder]" giống `var_cvar_vnindex_promt.md` để page.py replace dễ
 - Cache AI text: `daily_cache/fed_liquidity_{provider}_{ddmmyy}.txt` — đồng nhất với các tool khác
 - **Chưa tích hợp vào AI CIO Executive Summary** (weekly data, frequency khác 9 tool daily) — sẽ cân nhắc thêm sau nếu cần
