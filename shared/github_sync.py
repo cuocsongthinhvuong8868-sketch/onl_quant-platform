@@ -110,16 +110,6 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
     if not token:
         raise ValueError("GITHUB_TOKEN chưa được thiết lập. Vui lòng thêm vào Streamlit Secrets hoặc environment variable.")
 
-    # Test kết nối trước
-    conn = test_connection()
-    if not conn["ok"]:
-        raise RuntimeError(f"GitHub connection test failed: {conn['error']}")
-    if not conn.get("can_push"):
-        raise RuntimeError(
-            f"Token của user '{conn['user']}' không có quyền ghi (push) vào repo {conn['repo']}. "
-            "Vui lòng kiểm tra lại quyền của GitHub Token."
-        )
-
     url = f"{API_BASE}/contents/{repo_path}"
     headers = _build_headers(token)
 
@@ -156,21 +146,10 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
     data = resp.json()
     content = data.get("content", {})
     file_url = content.get("html_url", "")
-    download_url = content.get("download_url", "")
-
-    # Kiểm tra file thực sự có thể download được
-    if download_url:
-        check = requests.get(download_url, headers=headers, timeout=15)
-        if check.status_code != 200:
-            raise RuntimeError(
-                f"GitHub PUT returned success nhưng file không tải được ({check.status_code}). "
-                f"Có thể do cache CDN. URL: {file_url}"
-            )
 
     return {
         "ok": True,
         "file_url": file_url,
-        "download_url": download_url,
         "sha": content.get("sha", ""),
     }
 
