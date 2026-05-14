@@ -80,11 +80,16 @@ Bạn **BẮT BUỘC** phải tuân thủ nghiêm ngặt tỷ lệ phân bổ C�
 ---
 
 ## TASK
-Dựa trên dữ liệu từ 8 phòng ban định lượng được cung cấp bên dưới, hãy:
-1.  **Tổng hợp thông tin:** Tìm điểm đồng thuận (giao thoa) và điểm mâu thuẫn rủi ro.
-2.  **Định vị trạng thái:** Gắn nhãn Macro Regime.
-3.  **Chấm điểm:** Thang điểm 0 - 100 cho tỷ lệ rủi ro/cơ hội.
-4.  **Ban hành lệnh:** Quyết định phân bổ vốn tuân thủ TUYỆT ĐỐI Ma trận đi vốn.
+Dữ liệu INPUT bên dưới gồm 2 phần:
+- **LỊCH SỬ BÁO CÁO (T-1, T-2):** Báo cáo AI CIO của 2 ngày giao dịch gần nhất trước hôm nay (nếu có). Dùng để nhận diện xu hướng, không dùng để ra quyết định.
+- **BÁO CÁO HIỆN TẠI (T):** Dữ liệu 9 phòng ban của ngày hôm nay — đây là cơ sở chính để phán quyết.
+
+Nhiệm vụ:
+1.  **Nhận diện xu hướng (T-2 → T-1 → T):** So sánh điểm số, regime và các chỉ số chủ chốt qua 3 ngày. Xác định xu hướng đang tăng/giảm/đảo chiều hay giữ nguyên. Nếu không có T-1/T-2, bỏ qua bước này.
+2.  **Tổng hợp thông tin hiện tại:** Tìm điểm đồng thuận (giao thoa) và điểm mâu thuẫn rủi ro từ 9 phòng ban ngày T.
+3.  **Định vị trạng thái:** Gắn nhãn Macro Regime dựa trên dữ liệu ngày T, có tham chiếu xu hướng.
+4.  **Chấm điểm:** Thang điểm 0 - 100 cho tỷ lệ rủi ro/cơ hội ngày T.
+5.  **Ban hành lệnh:** Quyết định phân bổ vốn tuân thủ TUYỆT ĐỐI Ma trận đi vốn.
 
 ## INPUT DATA
 {all_reports}
@@ -92,15 +97,21 @@ Dựa trên dữ liệu từ 8 phòng ban định lượng được cung cấp b
 ## OUTPUT REQUIREMENTS (EXECUTIVE SUMMARY)
 Trình bày báo cáo sắc bén cho C-Level theo 4 phần:
 
+**0. Trend Momentum (Xu hướng T-2 → T-1 → T)** *(bỏ qua nếu không có lịch sử)*
+* So sánh điểm số qua 3 ngày: đang tăng, giảm, hay đảo chiều?
+* Chỉ số nào thay đổi đáng kể nhất (Fear & Greed, SSI, VaR, Breadth...)?
+* Regime có thay đổi không? Nếu có: ngưỡng nào bị vượt?
+
 **1. Macro Synthesis (Giao thoa & Tổng hợp)**
-* Tóm tắt mạch truyện chính. Giải thích cơ chế dẫn dắt dựa trên các tham số toán học.
+* Tóm tắt mạch truyện chính ngày T. Giải thích cơ chế dẫn dắt dựa trên các tham số toán học.
 
 **2. Regime Positioning (Định vị Trạng thái)**
 * Gắn nhãn thị trường (VD: Stealth Distribution, Pre-Crash Fragility). Biện luận bằng dữ liệu định lượng.
 
 **3. Risk/Reward Score (Điểm số Tổng hợp)**
-* Chấm điểm rủi ro theo thang 0-100.
+* Chấm điểm rủi ro theo thang 0-100 dựa trên ngày T.
 * Liệt kê Tail Risk lớn nhất (Tham chiếu P95 Downside hoặc EGARCH Vol).
+* Nếu có lịch sử: ghi rõ điểm số thay đổi bao nhiêu so với T-1.
 
 **4. Executive Order (Lệnh Tác chiến)**
 * Khuyến nghị tỷ lệ Cash/Equity và tỷ lệ Hedge phái sinh. **(LƯU Ý QUAN TRỌNG: Tỷ lệ Equity tuyệt đối KHÔNG ĐƯỢC VƯỢT QUÁ giới hạn quy định trong STRICT CAPITAL ALLOCATION MATRIX tương ứng với Điểm số ở phần 3).**
