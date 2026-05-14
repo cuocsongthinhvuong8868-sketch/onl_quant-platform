@@ -165,6 +165,9 @@ def render():
             with st.container(border=True):
                 st.markdown(cached_result)
 
+            from shared.github_sync import render_sync_button
+            render_sync_button(ai_cache_file, key_suffix="fed_liq")
+
             if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="fed_liq_rerun_ai"):
                 os.remove(ai_cache_file)
                 st.rerun()
