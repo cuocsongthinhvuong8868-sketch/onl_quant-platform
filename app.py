@@ -45,10 +45,7 @@ with col1:
         st.markdown(
             "- Lãi suất & Chính sách tiền tệ\n"
             "- Tỷ giá & Dự trữ ngoại hối\n"
-            "- Tăng trưởng GDP & CPI\n"
-            "- Kinh tế toàn cầu"
         )
-        st.markdown("🚧 **Đang phát triển**")
         if st.button("📈 Vào Macro Analysis", key="btn_macro", use_container_width=True):
 
             st.switch_page("pages/A_Macro_Analysis.py")
@@ -60,8 +57,6 @@ with col2:
         st.markdown(
             "- Báo cáo tài chính doanh nghiệp\n"
             "- Mô hình định giá DCF\n"
-            "- Phân tích kỹ thuật cá nhân\n"
-            "- Screening cổ phiếu"
         )
         st.markdown("🚧 **Đang phát triển**")
         if st.button("🔬 Vào Micro Analysis", key="btn_micro", use_container_width=True):
@@ -73,11 +68,8 @@ with col3:
         st.markdown("### 🧠 Tài chính Hành vi")
         st.markdown("**Behavioral Finance**")
         st.markdown(
-            "✅ **9 công cụ sẵn sàng:**\n"
             "- Fear & Greed\n"
             "- Market Breadth / Dispersion\n"
-            "- VaRES / Var-CVaR\n"
-            "- ESR Monitor\n"
             "- & nhiều hơn nữa..."
         )
         if st.button("🧠 Vào Behavioral Finance", key="btn_bf", use_container_width=True):
