@@ -165,26 +165,31 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
                             st.warning(f"⚠️ Không tìm thấy file cache nào cho {AI_PROVIDER_MAP[_sync_provider]['display']}.")
                         else:
                             _success = 0
-                            _fail = 0
+                            _fail_msgs = []
                             _progress = st.progress(0)
                             for i, _fp in enumerate(_sync_files):
                                 try:
-                                    _rel_path = str(_fp.relative_to(ROOT_DIR))
+                                    try:
+                                        _rel_path = str(_fp.relative_to(ROOT_DIR)).replace("\\", "/")
+                                    except ValueError:
+                                        _rel_path = f"data_lake/daily_cache/{_fp.name}"
                                     _content = _fp.read_bytes()
-                                    _result = upload_file(
+                                    upload_file(
                                         _rel_path,
                                         _content,
                                         f"Sync: {_fp.name}",
                                     )
                                     _success += 1
-                                except Exception:
-                                    _fail += 1
+                                except Exception as _fe:
+                                    _fail_msgs.append(f"`{_fp.name}`: {_fe}")
                                 _progress.progress((i + 1) / len(_sync_files))
-                            
-                            if _fail == 0:
+
+                            if not _fail_msgs:
                                 st.success(f"✅ Đã đồng bộ {_success} file lên GitHub thành công!")
                             else:
-                                st.warning(f"⚠️ Đã đồng bộ {_success}/{len(_sync_files)} file ({_fail} lỗi).")
+                                st.warning(f"⚠️ Đã đồng bộ {_success}/{len(_sync_files)} file. Lỗi:")
+                                for _em in _fail_msgs:
+                                    st.error(_em)
                     except Exception as _sync_err:
                         st.error(f"❌ Lỗi đồng bộ: {_sync_err}")
     except Exception as gh_debug_err:
