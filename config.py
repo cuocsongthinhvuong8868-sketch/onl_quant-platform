@@ -4,16 +4,18 @@ from dotenv import load_dotenv
 
 load_dotenv()
 
-ROOT_DIR     = Path(__file__).parent
-DATA_LAKE    = ROOT_DIR / "data_lake"
-MARKET_DATA  = DATA_LAKE / "market_data.csv"
-VNINDEX_DATA = DATA_LAKE / "vnindex_cache.csv"
-VN30_DATA    = DATA_LAKE / "vn30_cache.csv"
-TICKERS_FILE = ROOT_DIR / "tickers.csv"
+ROOT_DIR            = Path(__file__).parent
+DATA_LAKE           = ROOT_DIR / "data_lake"
+MARKET_DATA         = DATA_LAKE / "market_data.csv"
+VNINDEX_DATA        = DATA_LAKE / "vnindex_cache.csv"
+VN30_DATA           = DATA_LAKE / "vn30_cache.csv"
+FED_LIQUIDITY_DATA  = DATA_LAKE / "fed_liquidity_cache.csv"
+TICKERS_FILE        = ROOT_DIR / "tickers.csv"
 
 DATA_LAKE.mkdir(parents=True, exist_ok=True)
 
 VNSTOCK_API_KEY       = os.getenv("VNSTOCK_API_KEY", "")
+FRED_API_KEY          = os.getenv("FRED_API_KEY", "")
 DEFAULT_LOOKBACK_DAYS = 1095      # ~3 năm — dùng khi file chưa tồn tại
 DEFAULT_BACKFILL_DAYS = 2190      # ~6 năm — gợi ý cho --backfill
 DEFAULT_WINDOW        = 60

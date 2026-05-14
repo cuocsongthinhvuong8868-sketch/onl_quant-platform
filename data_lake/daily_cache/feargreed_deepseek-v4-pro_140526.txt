@@ -1,0 +1,53 @@
+# BÁO CÁO PHÂN TÍCH CHIẾN LƯỢC ĐỊNH LƯỢNG
+
+**Ngày: 14/05/2026**
+
+---
+
+## 1. MARKET REGIME (NHẬN DIỆN PHA THỊ TRƯỜNG)
+
+Risk Score ở mức 50.4/100, gần như bất động so với phiên trước (-0.1 điểm), xác nhận thị trường đang trong pha **TRUNG TÍNH - CHỌN CỔ PHIẾU (Neutral / Stock Picking)**. 
+
+Trạng thái tâm lý đám đông không nghiêng hẳn về sợ hãi hay tham lam. Dòng tiền không hình thành xu hướng hội tụ rõ rệt; thay vào đó, đang trong giai đoạn **phân bổ lại** giữa các nhóm ngành. Hành vi giao dịch mang tính cá biệt hóa, thiếu điểm kích hoạt đủ mạnh để phá vỡ biên độ hiện tại.
+
+---
+
+## 2. SYSTEMIC RISK ASSESSMENT (ĐÁNH GIÁ RỦI RO HỆ THỐNG)
+
+- **EGARCH Volatility (3.2%)** giảm -2.4%, cho thấy kỳ vọng biến động ngắn hạn thu hẹp, vùng giá đang giao dịch tương đối ổn định.
+- **Rolling Skewness (+0.26)** duy trì dương rõ rệt → phân phối lợi suất lệch phải, đuôi rủi ro **nghiêng về phía tăng**, không có nguy cơ suy thoái bất ngờ.
+
+**Kết luận:** Rủi ro hệ thống đang **thu hẹp** (b1). Thị trường không có dấu hiệu sắp sụp đổ hay đột biến giảm. Xác suất xảy ra sự kiện đuôi âm thấp.
+
+---
+
+## 3. CONTAGION & DISPERSION (HIỆU ỨNG LÂY LAN VÀ ĐỘ PHÂN HÓA)
+
+- **Upside Correlation (65.9%)** cao vượt trội so với **Downside Correlation (13.3%)**, tạo ra chênh lệch **+52.6 điểm phần trăm**.
+
+Điều này phản ánh:
+- Khi thị trường tăng: Hành vi bầy đàn mạnh → phe mua hoạt động đồng loạt, lan tỏa rộng khắp.
+- Khi thị trường giảm: Hầu như không có hiệu ứng lây lan → lực bán mang tính cá nhân, thiếu xác nhận hệ thống.
+
+**Kết luận:** Không có rủi ro lây lan giảm. Sự phân hóa giữa hai chiều correlation cho thấy thị trường có nền tảng nâng đỡ tích cực khi giá xuống, tạo điều kiện cho các nhịp phục hồi nhanh.
+
+---
+
+## 4. ACTIONABLE STRATEGY (CHIẾN LƯỢC HÀNH ĐỘNG)
+
+### Tỷ trọng Beta (Rủi ro thị trường):
+
+> **Đề xuất: Beta = 0.80 – 1.00 (Ưu tiên thị trường)**
+
+Với bối cảnh: (1) Volatility giảm liên tục, (2) Skewness dương hỗ trợ, (3) Downside Correlation thấp → rủi ro giảm sâu có kiểm soát. Mức Beta này tối ưu hóa capture lợi suất khi thị trường tăng nhờ Upside Correlation cao.
+
+### Chiến lược cụ thể:
+
+| Hành động | Mô tả |
+|-----------|-------|
+| **Giải ngân** | Tận dụng các nhịp điều chỉnh nhỏ trong ngày, tỷ trọng giải ngân tối đa 15-20% NAV mỗi đợt với kỳ vọng nắm giữ 3-5 phiên |
+| **Phòng thủ** | Không cần hedging toàn danh mục. Chỉ sử dụng trailing stop mềm (-3.5% từ đáy gần nhất) cho vị thế riêng lẻ để kiểm soát rủi ro phi hệ thống |
+| **Phân bổ** | Xoay trọng tâm vào cổ phiếu vốn hóa vừa và nhỏ (Midcap/Smallcap) có thanh khoản tốt vì đây là nhóm hưởng lợi từ dòng tiền phân bổ trong pha Stock Picking |
+| **Không khuyến nghị** | Mở vị thế đòn bẩy (margin), mua bán khống, hoặc giao dịch hợp đồng tương lai trong điều kiện biên độ hiện tại do thiếu xác nhận bứt phá |
+
+**Chiến thuật Exit:** Đánh giá lại tỷ trọng nếu Risk Score vượt ra khỏi biên độ 40–60 hoặc Downside Correlation đột ngột tăng vượt mốc 25%.
