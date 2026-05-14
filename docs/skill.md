@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-Phiên cập nhật: 2026-05-11  
+Phiên cập nhật: 2026-05-14
 Mục tiêu: Bảo toàn ngữ cảnh để resume công việc ngay khi upload lại file này.
 
 ---
@@ -28,9 +28,11 @@ Cấu trúc chuẩn:
 - `data_lake/`: hồ dữ liệu CSV dùng chung
 - `shared/data_loader.py`: loader chuẩn (đọc từ data_lake)
 - `pages/`
-  - `A_Macro_Analysis.py`: Nhánh Vĩ mô (🚧 đang phát triển)
+  - `A_Macro_Analysis.py`: Nhánh Vĩ mô — grid menu + gọi render() động (1 tool: Fed Liquidity)
   - `B_Micro_Analysis.py`: Nhánh Vi mô (🚧 đang phát triển)
   - `C_Behavioral_Finance.py`: Nhánh Tài chính Hành vi — **gộp 9 tool hiện tại** dạng grid menu + gọi render() động
+  - `tools_page_A/`: thư mục chứa entry tool nhánh A (ẩn khỏi sidebar)
+    - `_1_Fed_Liquidity.py`
   - `tools_page_C/`: thư mục chứa 9 entry tool (ẩn khỏi sidebar)
     - `_1_Fear_Greed.py` … `_9_Var_CVaR_VNINDEX.py`
 - `tools/<tool_name>/`
@@ -123,6 +125,39 @@ Cấu trúc chuẩn:
 - Tính: rolling σ30, Parametric VaR 95%, Historical VaR 95% (3 năm), ES 95%
 - Input: `vnindex_cache.csv`
 
+### 3.10 Fed Liquidity Monitor (Nhánh A — Macro)
+- Port từ: `Desktop/9999/fed/` (fed.py + feddashborad.py)
+- Chuẩn hóa vào: `tools/fed_liquidity/`
+- **Logic core:**
+  - Pull 3 series FRED: `WALCL` (Fed Balance Sheet), `WTREGEN` (Treasury General Account), `RRPONTSYD` (Overnight Reverse Repo)
+  - Chuẩn hoá: `RRPONTSYD × 1000` (đổi đơn vị → triệu USD)
+  - Resample `W-WED` (weekly Wednesday), ffill, dropna
+  - `Net_Liquidity = WALCL − WTREGEN − RRPONTSYD`
+  - `Impulse = Net_Liquidity.diff()` (delta tuần)
+  - `Impulse_EMA = Impulse.ewm(span=4)`
+  - `Z_Score = (Impulse − mean_52W) / std_52W`
+  - Signal:
+    - **ADD**: `Impulse_EMA > 0 AND Z_Score >= +1`
+    - **CUT**: `Impulse_EMA < 0 AND Z_Score <= -1`
+    - **HOLD**: else
+  - Filter từ `START_DATE = 2017-01-01`
+- **File cấu trúc:**
+  - `quant/metrics.py`: `fetch_fed_data()`, `process_liquidity_logic()`, `summarize_latest()`
+  - `ui/sidebar.py`: date picker + clear cache button
+  - `ui/charts.py`: `plot_net_liquidity()` (line + colored dots theo Signal), `plot_momentum()` (bar Impulse + line EMA), `plot_zscore()` (Z-Score với vùng ADD/CUT shading)
+  - `page.py`: `render()` — header metrics (4+3 cards), 2 charts chính + expander Z-Score + bảng dữ liệu, AI block 2 tabs (current/history)
+  - `report.py`: `snapshot()` đọc cache CSV cho discovery engine
+- **Inputs:** `data_lake/fed_liquidity_cache.csv` (do updater tạo)
+- **Updater:** `command/update_fed_liquidity.py` — gọi FRED API → process → save CSV
+  - Đọc `FRED_API_KEY` từ env / .env / config
+  - CLI: `python command/update_fed_liquidity.py [--api-key xxx] [--from-date YYYY-MM-DD]`
+- **Prompt AI:** `promt/fed_liquidity_promt.md`
+- **Entry:** `pages/tools_page_A/_1_Fed_Liquidity.py` (gọi `tools.fed_liquidity.page.render()`)
+- **Lưu ý:**
+  - Tool dùng pattern app **đọc file** (data_lake) — KHÔNG gọi FRED API trực tiếp trong app
+  - Đã thêm `fredapi>=0.5.2` vào `requirements.txt`
+  - Chưa tích hợp vào AI CIO Executive Summary (data weekly, frequency khác 9 tool kia)
+
 ---
 
 ## 4) Pages & Cấu trúc 3 nhánh
@@ -131,7 +166,8 @@ Cấu trúc chuẩn:
 
 ```
 app.py (Trang chủ)
-  ├── 📈 A_Macro_Analysis.py         — Nhánh Vĩ mô (🚧 đang phát triển)
+  ├── 📈 A_Macro_Analysis.py         — Nhánh Vĩ mô
+  │     └── 🏦 Fed Liquidity Monitor
   ├── 🔬 B_Micro_Analysis.py         — Nhánh Vi mô (🚧 đang phát triển)
   └── 🧠 C_Behavioral_Finance.py     — Nhánh Tài chính Hành vi
         ├── 🎯 Fear & Greed
@@ -195,6 +231,14 @@ Lưu ý:
 ## 5.4 Dividend
 - File: `data_lake/dividend_cache.csv`
 - Hiện tại dùng static CSV do API dividend chưa ổn định/không khả dụng trên môi trường hiện tại.
+
+## 5.5 Fed Liquidity (FRED)
+- File: `data_lake/fed_liquidity_cache.csv`
+- Script: `command/update_fed_liquidity.py`
+- Pull từ FRED API 3 series: `WALCL`, `WTREGEN`, `RRPONTSYD` → process toàn bộ pipeline → lưu CSV đã processed
+- Cấu hình API: `FRED_API_KEY` trong `.env` (hoặc env var, hoặc `--api-key` CLI)
+- Tần suất khuyến nghị: weekly (Fed release WALCL vào thứ 5)
+- Output columns: `DATE, WALCL, WTREGEN, RRPONTSYD, Net_Liquidity, Impulse, Impulse_EMA, Z_Score, Signal`
 
 ---
 
@@ -829,3 +873,49 @@ Prompt đã cập nhật (thêm `[PCA_EVR]`, `[Market State]`, `[Pillar Mode]`, 
 - Amihud chỉ mang tính tương đối, không phải absolute
 - Downside mode mặc định (chỉ tính vol/corr/liq trên phiên giảm) — được khuyến nghị
 - PCA warmup = 252 ngày ~ 1 năm dữ liệu trước khi có SSI đầu tiên
+
+---
+
+## 26) Phiên cập nhật 2026-05-14 — Fed Liquidity Monitor (Nhánh A — Macro)
+
+### 26.1 Mục tiêu
+
+Port tool Fed Liquidity từ `Desktop/9999/fed/` (file `fed.py` + `feddashborad.py`) vào platform mới theo skeleton chuẩn. Đây là tool đầu tiên của nhánh **A_Macro_Analysis**.
+
+### 26.2 File tạo mới
+
+| File | Nội dung |
+|------|----------|
+| `tools/fed_liquidity/__init__.py` | Empty |
+| `tools/fed_liquidity/quant/__init__.py` | Empty |
+| `tools/fed_liquidity/quant/metrics.py` | `fetch_fed_data(api_key)`, `process_liquidity_logic(df_raw)`, `summarize_latest(df)` + constants |
+| `tools/fed_liquidity/ui/__init__.py` | Empty |
+| `tools/fed_liquidity/ui/sidebar.py` | `render_sidebar()` — date picker + clear cache |
+| `tools/fed_liquidity/ui/charts.py` | `plot_net_liquidity()`, `plot_momentum()`, `plot_zscore()` (Plotly) |
+| `tools/fed_liquidity/page.py` | `render()` — header metrics + 3 chart + bảng + AI block |
+| `tools/fed_liquidity/report.py` | `snapshot()` đọc cache CSV |
+| `command/update_fed_liquidity.py` | Updater: pull FRED → process → save CSV |
+| `promt/fed_liquidity_promt.md` | AI prompt Global Macro Strategist |
+| `pages/tools_page_A/__init__.py` | Empty |
+| `pages/tools_page_A/_1_Fed_Liquidity.py` | Entry — gọi `tools.fed_liquidity.page.render()` |
+
+### 26.3 File sửa
+
+- `pages/A_Macro_Analysis.py`: Refactor từ placeholder → grid menu pattern (giống `C_Behavioral_Finance.py`)
+- `config.py`: Thêm `FED_LIQUIDITY_DATA = DATA_LAKE / "fed_liquidity_cache.csv"` và `FRED_API_KEY = os.getenv("FRED_API_KEY", "")`
+- `docs/skill.md`: Thêm section 3.10 + 5.5 + section 26 này
+
+### 26.4 Quy trình vận hành
+
+1. **Set FRED API key**: thêm `FRED_API_KEY=xxx` vào `.env` (hoặc `export FRED_API_KEY=xxx`)
+2. **Update cache**: `python command/update_fed_liquidity.py`
+3. **Mở app**: `streamlit run app.py` → trang `📈 Phân tích Vĩ mô` → 🏦 Fed Liquidity Monitor
+
+### 26.5 Lưu ý kỹ thuật
+
+- **App đọc cache, không gọi FRED API trực tiếp** — đúng pattern data_lake
+- Updater là pipeline đầy đủ: pull → process → save, không tách stage để giảm I/O
+- `fredapi>=0.5.2` đã thêm vào `requirements.txt` (Streamlit Cloud + GitHub Actions tự cài)
+- AI prompt theo template "[Placeholder]" giống `var_cvar_vnindex_promt.md` để page.py replace dễ
+- Cache AI text: `daily_cache/fed_liquidity_{provider}_{ddmmyy}.txt` — đồng nhất với các tool khác
+- **Chưa tích hợp vào AI CIO Executive Summary** (weekly data, frequency khác 9 tool daily) — sẽ cân nhắc thêm sau nếu cần

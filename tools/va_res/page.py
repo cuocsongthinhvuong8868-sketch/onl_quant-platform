@@ -268,6 +268,9 @@ def show():
                     with st.container(border=True):
                         st.markdown(cached_result)
 
+                    from shared.github_sync import render_sync_button
+                    render_sync_button(ai_cache_file, key_suffix="va_res")
+
                     if st.button("🔄 Chạy lại phân tích AI", type="secondary", key="va_res_rerun_ai"):
                         os.remove(ai_cache_file)
                         st.rerun()

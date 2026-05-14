@@ -8,6 +8,7 @@ Cần thiết lập:
 """
 import os
 import base64
+from pathlib import Path
 import requests
 
 OWNER = os.getenv("GITHUB_REPO_OWNER", "cuocsongthinhvuong8868-sketch")
@@ -172,3 +173,70 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
         "download_url": download_url,
         "sha": content.get("sha", ""),
     }
+
+
+def render_sync_button(cache_file, key_suffix: str = "") -> None:
+    """
+    Render nút Streamlit để đồng bộ 1 file cache AI cụ thể lên GitHub.
+    Gọi sau block hiển thị báo cáo AI trong page tool. Không hiện nếu file chưa tồn tại.
+
+    Parameters
+    ----------
+    cache_file : Path | str
+        Đường dẫn tuyệt đối tới file cache (.txt).
+    key_suffix : str
+        Suffix optional để Streamlit key unique khi cùng file gọi nhiều chỗ.
+    """
+    import streamlit as st
+
+    cache_path = Path(cache_file)
+    if not cache_path.exists():
+        return
+
+    _safe_stem = "".join(c if c.isalnum() else "_" for c in cache_path.stem)
+    btn_key = f"gh_sync_btn_{_safe_stem}_{key_suffix}"
+    status_key = f"gh_sync_status_{_safe_stem}_{key_suffix}"
+
+    clicked = st.button(
+        "📤 Đồng bộ báo cáo lên GitHub",
+        key=btn_key,
+        type="secondary",
+        help="Đẩy file cache báo cáo AI hiện tại lên repo GitHub (chỉ file này, không kèm file khác).",
+    )
+
+    if clicked:
+        try:
+            try:
+                from config import ROOT_DIR
+            except ImportError:
+                ROOT_DIR = Path(__file__).resolve().parent.parent
+            try:
+                rel_path = str(cache_path.relative_to(ROOT_DIR))
+            except ValueError:
+                rel_path = f"data_lake/daily_cache/{cache_path.name}"
+            rel_path = rel_path.replace("\\", "/")
+
+            content_bytes = cache_path.read_bytes()
+            with st.spinner(f"Đang đẩy {cache_path.name} lên GitHub..."):
+                result = upload_file(
+                    rel_path,
+                    content_bytes,
+                    f"Sync AI cache: {cache_path.name}",
+                )
+            st.session_state[status_key] = {
+                "ok": True,
+                "file_url": result.get("file_url", ""),
+                "name": cache_path.name,
+            }
+        except Exception as e:
+            st.session_state[status_key] = {"ok": False, "error": str(e)}
+
+    status = st.session_state.get(status_key)
+    if status:
+        if status.get("ok"):
+            msg = f"✅ Đã đồng bộ `{status['name']}`"
+            if status.get("file_url"):
+                msg += f" — [Xem trên GitHub]({status['file_url']})"
+            st.success(msg)
+        else:
+            st.error(f"❌ Lỗi đồng bộ: {status.get('error', 'unknown')}")
