@@ -1,0 +1,129 @@
+import pandas as pd
+import numpy as np
+import logging
+from pathlib import Path
+
+# Import quant engines
+from tools.fear_greed.quant.metrics import calculate_quant_metrics
+from tools.fear_greed.quant.scoring import calculate_risk_score
+from tools.esr_monitor.quant.metrics import run_esr_pipeline
+
+logger = logging.getLogger(__name__)
+
+def generate_composite_signal(df_prices: pd.DataFrame, df_vn30_idx: pd.DataFrame) -> pd.DataFrame:
+    """
+    Tầng 1: Tổng hợp các tín hiệu định lượng thành một Score duy nhất (0-100).
+    Logic được thiết kế để 'thích nghi' với độ dài dữ liệu (dùng tối đa data hiện có).
+    """
+    logger.info("Bắt đầu tính toán Composite Signal (Adaptive Mode)...")
+
+    # 1. Fear & Greed Score (0-100)
+    # Làm sạch df_prices để tránh Inf/NaN:
+    #  - giá 0 trong data_lake sẽ sinh inf khi pct_change (0 -> X) → PCA sklearn crash
+    #  - thay 0 + inf -> NaN, ffill/bfill, drop cột toàn NaN
+    df_prices_clean = (
+        df_prices.replace([np.inf, -np.inf, 0], np.nan)
+                 .ffill()
+                 .bfill()
+                 .dropna(axis=1, how="all")
+    )
+
+    fg_metrics = calculate_quant_metrics(df_prices_clean, window_size=60)
+    fg_scored = calculate_risk_score(fg_metrics)
+    fg_score = fg_scored["Risk_Score"]
+
+    # 2. Market Breadth (% mã > MA125) - Tự tính để có min_periods=1
+    prices = df_prices_clean.sort_index()
+    ma125 = prices.rolling(window=125, min_periods=1).mean()
+    breadth_series = (prices > ma125).sum(axis=1)
+    total_tickers = df_prices.shape[1]
+    breadth_score = (breadth_series / total_tickers) * 100
+
+    # 3. ESR SSI (Stress Index 0-1) + Market State (4-state regime cho trend overlay)
+    market_states = None
+    try:
+        # Làm sạch df_vn30_idx (cùng nguyên tắc: zero -> NaN trước ffill/bfill)
+        df_vn30_idx_clean = (
+            df_vn30_idx.replace([np.inf, -np.inf, 0], np.nan)
+                       .ffill()
+                       .bfill()
+        )
+
+        # Tăng warmup nhẹ lên 40 để PCA ổn định hơn
+        pillars, esr_res, market_states, _ = run_esr_pipeline(
+            df_prices_clean, df_vn30_idx_clean,
+            pca_warmup=40,
+            pillar_mode='downside'
+        )
+        ssi_greed_score = (1 - esr_res.ssi) * 100
+    except Exception as e:
+        logger.error(f"Lỗi tính ESR SSI: {e}")
+        ssi_greed_score = pd.Series(np.nan, index=fg_score.index)
+
+    # 4. VaR/CVaR Stress (Expected Shortfall) - Tự tính để linh hoạt window
+    try:
+        vni_prices = df_vn30_idx_clean.iloc[:, 0].sort_index()
+        # Tránh log(0)
+        vni_prices = vni_prices.replace(0, np.nan).ffill()
+        vni_ret = np.log(vni_prices / vni_prices.shift(1)).replace([np.inf, -np.inf], 0).fillna(0)
+        
+        # Tính Historical VaR 5% với window tối đa hiện có (min_periods=1)
+        hist_var = vni_ret.rolling(window=756, min_periods=20).quantile(0.05)
+        
+        # Tính Expected Shortfall (CVaR)
+        def calc_es(window_ret, var_val):
+            tail = window_ret[window_ret <= var_val]
+            return tail.mean() if len(tail) > 0 else var_val
+            
+        es_list = []
+        for i in range(len(vni_ret)):
+            if i < 20: 
+                es_list.append(np.nan)
+                continue
+            window_data = vni_ret.iloc[max(0, i-755):i+1]
+            es_val = calc_es(window_data, hist_var.iloc[i])
+            es_list.append(es_val)
+            
+        es_series = pd.Series(es_list, index=vni_ret.index)
+        # Chuẩn hóa qua Percentile Rank
+        var_stress_score = es_series.rolling(window=252, min_periods=1).rank(pct=True) * 100
+    except Exception as e:
+        logger.error(f"Lỗi tính VaR/CVaR: {e}")
+        var_stress_score = pd.Series(np.nan, index=fg_score.index)
+
+    # Kết hợp các signals
+    df_combined = pd.DataFrame({
+        "fear_greed": fg_score,
+        "breadth": breadth_score,
+        "ssi_greed": ssi_greed_score,
+        "var_stress": var_stress_score
+    }).ffill().dropna()
+
+    # Tính Composite Score (mean 4 signal). Bỏ EWM ở đây vì F&G đã smooth — tránh double-smoothing lag.
+    df_combined["composite_score"] = df_combined[
+        ["fear_greed", "breadth", "ssi_greed", "var_stress"]
+    ].mean(axis=1)
+
+    # Gắn Market_State (4-state) từ ESR pipeline để Tầng 2 dùng làm trend filter overlay.
+    if market_states is not None:
+        df_combined["market_state"] = (
+            market_states.reindex(df_combined.index).ffill()
+        )
+    else:
+        df_combined["market_state"] = np.nan
+
+    # Tín hiệu trend filter cứng: VNINDEX < MA200 → hard cap equity trong Tầng 2.
+    # Đặt min_periods=50 để có signal sớm trên data ngắn, không cần chờ đủ 200 phiên.
+    try:
+        vni_price = df_vn30_idx_clean.iloc[:, 0].sort_index()
+        vni_ma200 = vni_price.rolling(window=200, min_periods=50).mean()
+        below_ma200 = (vni_price < vni_ma200)
+        df_combined["below_ma200"] = (
+            below_ma200.reindex(df_combined.index).ffill().fillna(False).astype(bool)
+        )
+    except Exception as e:
+        logger.error(f"Lỗi tính MA200 trend filter: {e}")
+        df_combined["below_ma200"] = False
+
+    logger.info(f"Hoàn thành Composite Signal. Range: {df_combined.index.min()} -> {df_combined.index.max()}")
+    return df_combined

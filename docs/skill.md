@@ -919,3 +919,250 @@ Port tool Fed Liquidity từ `Desktop/9999/fed/` (file `fed.py` + `feddashborad.
 - AI prompt theo template "[Placeholder]" giống `var_cvar_vnindex_promt.md` để page.py replace dễ
 - Cache AI text: `daily_cache/fed_liquidity_{provider}_{ddmmyy}.txt` — đồng nhất với các tool khác
 - **Chưa tích hợp vào AI CIO Executive Summary** (weekly data, frequency khác 9 tool daily) — sẽ cân nhắc thêm sau nếu cần
+
+---
+
+## 27) Phiên cập nhật 2026-05-15 — Chuẩn hóa History & Module Backtest
+
+### 27.1 Chuẩn hóa History Navigation (Toàn hệ thống)
+
+- **Module mới:** `shared/history_selector.py` — chứa hàm `build_history_options()` để tự động quét thư mục cache, parse ngày từ filename (`ddmmyy`) và trả về danh sách dropdown được sắp xếp từ **mới nhất đến cũ nhất**.
+- **Phạm vi áp dụng:** Đã refactor toàn bộ 10 công cụ (Fear & Greed, ESR, Dispersion, Breadth, Upside Ratio, VaRES, Var-CVaR, Fed Liquidity, v.v.). 
+    - Loại bỏ logic sắp xếp theo `st_mtime` (không ổn định).
+    - Đồng nhất giao diện: Dropdown chọn ngày phân tích cũ luôn hiển thị ngày gần nhất làm mặc định.
+- **Workflow Scheduling:** Cập nhật GitHub Actions (`update_pipeline.yml` và `ai_cio_daily.yml`) chạy vào **14:30 và 14:45 (giờ VN)** hàng ngày để khớp với giờ đóng cửa thị trường.
+- **AI CIO Report:** Fix mặc định hiển thị ngày gần nhất trong ô chọn report tại trang chủ.
+- **History Score & Regime:** Thêm trang hiển thị bảng lịch sử điểm số AI CIO từ `Ai_cio_report.csv` kèm biểu đồ đường.
+- **Dispersion Universe:** Xác nhận sử dụng toàn bộ tickers trong `market_data.csv`.
+- **UI Small Fix:** Tối ưu kích thước bảng và biểu đồ tại trang History Score để hiển thị đầy đủ thông tin trên màn hình nhỏ.
+- **Workflow Logic:** Xác nhận AI CIO luôn chạy lại Quant Engine mới nhất nếu chưa có cache hôm nay, đảm bảo dữ liệu "fresh".
+- **Universe:** Tickers cho Dispersion và các tool breadth là toàn bộ 400+ mã trong `tickers.csv`.
+- **Workflow Chronology:** Data Update (14:30) -> AI CIO Report (14:45).
+- **History Selector Standard:** Luôn sắp xếp `ddmmyy` reverse-chronological.
+- **Standardized Dropdowns:** Mặc định chọn ngày gần nhất cho mọi tab Xem lại phân tích cũ.
+- **UI UX:** Thêm nút "📊 History Score" và "⚖️ Backtest Strategy" tại trang Behavioral Finance.
+- **AI CIO Report Logic:** Đảm bảo data fresh bằng cách re-run quant engine nếu cache ngày hiện tại chưa tồn tại.
+- **History Score Page:** Hiển thị dữ liệu từ `Ai_cio_report.csv` với biểu đồ Line Chart.
+- **Adaptive Data Loading:** Cập nhật các tool core (VaR, Breadth) để hỗ trợ `min_periods`, cho phép chạy với dữ liệu ngắn mà không crash.
+- **Backtest Proposal:** Đã soạn thảo và lưu tại `docs/backtest_proposal.md`.
+- **GitHub Workflow:** Cron schedule 14:30 (07:30 UTC) và 14:45 (07:45 UTC) từ thứ 2 đến thứ 6.
+- **Universe Scope:** Khẳng định Dispersion dùng toàn bộ market_data.csv.
+
+### 27.2 Module Backtest (Mới)
+- **Kiến trúc 3 tầng:**
+  - **Tầng 1 (Composite Signal):** `tools/backtest/quant/composite_signal.py` — Gộp 4 trụ cột: Fear&Greed, Market Breadth, ESR SSI, và VaR/CVaR (Expected Shortfall).
+  - **Tầng 2 (Allocation):** `tools/backtest/quant/allocation.py` — Score 0-100 → Tỷ lệ Equity/Cash.
+    - Đặc biệt: **Score 0-10 (Capitulation) -> 90% Equity**; **Score 85-95 (Bubble) -> 10% Equity**.
+  - **Tầng 3 (Engine):** `tools/backtest/quant/engine.py` — Tính lợi nhuận, phí giao dịch (0.3%), Sharpe, CAGR, MaxDD.
+- **Tính năng Adaptive:** Module Backtest tự tính toán Breadth và VaR với `min_periods=1` để có thể chạy ngay cả khi dữ liệu lịch sử ngắn (ví dụ từ tháng 7/2020), trong khi các tool con nguyên bản vẫn giữ cửa sổ chuẩn (3 năm).
+- **UI Backtest:** `tools/backtest/page.py` — Dashboard với Equity Curve, Drawdown Chart, và Regime Allocation Overlay.
+- **ValueError Fix:** Đã thêm xử lý làm sạch dữ liệu (`replace inf with nan`, `ffill`, `bfill`) để tránh lỗi trong quá trình tính toán PCA và log-return.
+- **Default Range:** Thiết lập mặc định 07/2020 - 02/2024 theo yêu cầu kiểm thử giai đoạn biến động mạnh.
+- **Backtest UI:** Tích hợp trực tiếp vào nhánh Behavioral Finance.
+- **Metrics:** CAGR, Sharpe Ratio, Max Drawdown, Win Rate, Total Return.
+- **Chart:** Plotly interactive charts (Equity Curve, Drawdown, Allocation).
+- **Signal Logic:** Adaptive windows (min_periods=1) cho dữ liệu ngắn.
+- **Cleaning:** Robust NaN/Inf handling cho PCA stability.
+- **Allocation Regimes:** Capitulation (0-10), Fear (10-25), Caution (25-45), Neutral (45-65), Greed (65-85), Bubble (85-95), Blow-off Top (95-100).
+- **Rebalance:** Tín hiệu thay đổi -> giao dịch, khấu trừ phí 0.3%.
+- **Benchmark:** VNINDEX Buy & Hold.
+- **Backtest Proposal:** Đã copy vào thư mục `docs/`.
+- **History Standardized:** Toàn bộ platform đã dùng `shared/history_selector.py`.
+- **Scheduler:** 14:30 (Data) -> 14:45 (AI CIO) VN Time.
+- **History Score Page:** Đã được thu nhỏ layout để hiển thị đầy đủ nội dung.
+- **AI CIO Date Selection:** Mặc định ngày gần nhất trên app.py.
+- **Tool Navigation:** Chuẩn hóa dropdown chọn ngày cũ.
+- **Universe Confirmation:** Dispersion dùng toàn bộ mã trong market_data.csv.
+- **Backtest Availability:** Có sẵn tại C_Behavioral_Finance.py.
+- **Signal Resilience:** Tự tính toán logic phụ trợ trong backtest module để giữ core tools nguyên bản.
+- **Data Cleaning:** Xử lý `ValueError: Input X contains infinity` triệt để.
+- **Documentation:** Cập nhật đầy đủ `docs/skill.md` và `docs/backtest_proposal.md`.
+
+---
+
+## 28) Phiên cập nhật 2026-05-15 — Backtest Tuning Sâu + Fix HMM Look-ahead trong ESR
+
+### 28.1 Bối cảnh
+
+Tiếp tục từ section 27 (module backtest mới + fix `Input X contains infinity`), phiên này tập trung:
+1. Tinh chỉnh allocation engine để đạt Sharpe > B&H trên multi-period
+2. Phát hiện và fix look-ahead bias trong HMM regime classifier
+3. Phân biệt 2 use case: **live ESR Monitor** vs **backtest fidelity**
+
+### 28.2 Fix gốc rễ — Inf từ giá zero
+
+- **Triệu chứng:** `Input X contains infinity or a value too large for dtype('float64')` khi chạy backtest.
+- **Nguyên nhân:** `data_lake/market_data.csv` chứa 5 giá trị `0`. `pct_change(0 → x) = inf` → vào `extract_market_factor_pca` (`tools/fear_greed/quant/factors.py`), `clean.fillna(0)` không loại được `inf` → `sklearn.PCA` crash.
+- **Fix:**
+  - `composite_signal.py`: thêm `replace([np.inf, -np.inf, 0], np.nan)` trước `ffill/bfill/dropna(axis=1, how='all')`.
+  - `factors.py`: thêm `replace([np.inf, -np.inf], np.nan)` trước `fillna(0)` + guard `pc1.std() > 0` để tránh nhân vô cực khi PC1 suy biến.
+
+### 28.3 Allocation Engine — Refactor 3-tầng
+
+**Tầng 1 — Composite Signal** ([composite_signal.py](tools/backtest/quant/composite_signal.py)):
+- Bỏ EWM(span=5) cuối (double-smoothing lag, F&G đã smooth sẵn).
+- Mean của 4 signal: `fear_greed + breadth + ssi_greed + var_stress`.
+
+**Tầng 2 — Allocation Curve** ([allocation.py](tools/backtest/quant/allocation.py)):
+- Bỏ grid 7 bậc cũ (vách đá 75% → 10%), thay bằng **logistic smooth curve**:
+  ```python
+  equity = EQ_MIN + (EQ_MAX - EQ_MIN) / (1 + exp((score - 50) / 12))
+  # EQ_MIN=0.05, EQ_MAX=0.95, contrarian
+  ```
+- **TREND_BOUNDS** overlay từ ESR Market_State (sau nhiều iteration tune):
+  - `HEALTHY`: floor 0.85 (bull confirmed)
+  - `EUPHORIC_RISK`: floor **0.80** (đầu phiên 0.50 quá defensive → bỏ lỡ bull tail)
+  - `CALM_CORRECTION`: floor 0.40
+  - `ACTIVE_STRESS`: **cap 0.30** (revert từ floor 0.60 sau khi fix HMM lag, không còn cần compensation)
+
+**Tầng 3 — Engine** ([engine.py](tools/backtest/quant/engine.py)): không đổi.
+
+### 28.4 MA200 Hard Cap (đột phá lớn nhất)
+
+- **Hằng số:** `MA200_HARD_CAP = 0.10` — khi `VNINDEX < MA200` thì equity ≤ 10%, ghi đè mọi rule khác.
+- **Hysteresis ±2% chống whipsaw**:
+  - Kích hoạt cap: `price < MA200 × (1 - buffer)`
+  - Thả cap: `price > MA200 × (1 + buffer)`
+  - Vùng giữa: giữ trạng thái cũ.
+  - Sweep buffer: 1% Pareto-optimal, 2% conservative trade-off.
+- Slider UI cho phép experiment 0–5%.
+- **V-shape early release** (đã code nhưng tắt mặc định `VSHAPE_THRESHOLD = 0.0`):
+  - Sweep cho thấy threshold thấp gây whipsaw nặng (fee 13%/period), threshold cao gần như không trigger.
+  - Strategy không phân biệt được V-shape thật và bounce giả real-time.
+  - Code giữ lại để thử confirmation signal sau (price > MA50, etc.).
+
+### 28.5 Diagnostic Layer + UI Backtest
+
+[tools/backtest/page.py](tools/backtest/page.py):
+- Metric comparison **Strategy vs B&H** từng chỉ số (CAGR/Sharpe/MaxDD/Win Rate).
+- Drawdown chart overlay strategy + B&H.
+- Allocation chart 3 đường: `base` (composite) / `equity_post_regime` / `equity_weight` (final).
+- Background shading theo 4-state regime.
+- Diagnostic table: trend overlay activation, equity distribution, **avg equity & forward return per regime** — phơi bày HMM lag.
+- Slider sidebar: `MA200 hysteresis buffer`, `V-shape early release threshold`.
+
+### 28.6 Fix look-ahead HMM trong ESR Monitor (đột phá thứ hai)
+
+**Vấn đề phát hiện qua diagnostic:**
+- `HMMRegimeClassifier.fit_predict` fit trên **toàn bộ SSI history**, rồi predict ngược lại trên cùng data → **look-ahead bias chuẩn**.
+- Mọi backtest dùng `market_state` đang **lạc quan hơn thực tế** vì regime label "biết tương lai".
+- Đặc biệt: SSI Aggregator là expanding-window (look-ahead-free) nhưng tầng HMM bên trên thì không → người dùng dễ tin nhầm cả pipeline là clean.
+
+**Giải pháp — 3 classifier coexist:**
+
+[esr_monitor/quant/metrics.py](tools/esr_monitor/quant/metrics.py):
+
+| Classifier | Look-ahead? | Use case |
+|---|---|---|
+| `HMMRegimeClassifier.fit_predict` (full-fit) | ❌ Có | LIVE view (xem regime hôm nay) — detection quality cao nhất |
+| `HMMRegimeClassifier.fit_predict_walk_forward` | ✅ Sạch | Backtest fidelity, history view |
+| `RuleBasedRegimeClassifier` | ✅ Sạch | Alternative đơn giản, không cần hmmlearn |
+
+**Walk-forward HMM logic:**
+- Refit HMM mỗi `refit_every` (default 60 ngày).
+- Tại mỗi refit point t: fit trên `ssi[:t]` → predict cho `ssi[t : t + refit_every]`.
+- Giữ model cuối để `implied_threshold()` vẫn hoạt động.
+
+**Rule-based logic** (tuned cho VN sau sweep):
+- `percentile_threshold = 0.60` (top 40% expanding rank → HIGH stress)
+- `absolute_threshold = 0.65` (level fallback song song với rank)
+- `smooth k/n = 2/3` (responsive, 3/5 quá strict)
+- Logic: `HIGH = (rank > pct) OR (SSI > absolute)`
+
+### 28.7 Phân biệt LIVE vs BACKTEST use case
+
+**Quan sát của user về visual quality:**
+- HMM full-fit catch EUPHORIC_RISK 2021 (pre-crash buildup), ACTIVE_STRESS Apr–Dec 2022, shock Apr 2025, HEALTHY uptrend 2025→nay.
+- Rule-based v1 (pct=0.70) miss crash 2022 (45/105 ngày AS).
+- Rule-based v2 (pct=0.60+abs=0.65) catch tốt hơn (52/105) nhưng vẫn kém HMM (66/105).
+
+**Kết luận:** look-ahead bias chỉ harmful cho backtest, KHÔNG harmful cho live view (làm gì có tương lai để leak).
+
+**Default sau khi resolve:**
+- **ESR Monitor tool (live view)**: `regime_method='hmm'` (full-fit) — best visual.
+- **Backtest pipeline** (`composite_signal.py`): `regime_method='hmm_walk_forward'` — best fidelity.
+- User toggle qua sidebar dropdown.
+
+### 28.8 Tinh chỉnh ACTIVE_STRESS overlay — compensation đan xen
+
+User chỉ ra: lúc HMM còn lag, đảo `ACTIVE_STRESS = cap 0.30 → floor 0.60` để "buy lagged-bottom". Khi fix HMM lag → compensation cũ không còn cần thiết.
+
+**Test 4 combo (HMM/rule × cap/floor):**
+- Với HMM: cap 0.30 thắng floor 0.60 ở Period B (CAGR +0.64, Sharpe +0.06).
+- Với rule-based: cả 2 ra kết quả y hệt (MA200 hard cap đè lên).
+
+→ Revert về cap 0.30 cho logic sạch. Label `STRESS_BUY` → `BEAR_CAP`.
+
+### 28.9 Performance Summary
+
+**3 period test (Period A: 2020-07→2024-02, B: 2024-07→2026-05, C: full 5.8y):**
+
+| Config | A CAGR/Sharpe/DD | B CAGR/Sharpe/DD | C CAGR/Sharpe/DD |
+|---|---|---|---|
+| Grid 7-bậc cũ (baseline) | 6.88 / 0.62 / -21.1 | 5.72 / 0.55 / -11.0 | — |
+| + Logistic + Trend overlay + MA200 cap (HMM look-ahead) | 11.88 / 1.04 / -27.9 | 10.81 / 0.78 / -13.6 | 10.68 / 0.87 / -27.9 |
+| + Rule-based v1 (fix look-ahead) | 12.50 / 1.05 / -23.7 | 11.52 / 0.80 / -14.2 | 11.29 / 0.88 / -23.7 |
+| **+ HMM walk-forward (final)** | **11.84 / 1.02 / -23.7** | **11.39 / 0.83 / -12.7** | **10.84 / 0.87 / -23.7** |
+| B&H VNINDEX (reference) | 12.16 / 0.60 / -40.3 | 24.60 / 1.25 / -18.1 | 15.05 / 0.76 / -40.3 |
+
+**Verdict:** Sharpe combined 0.87 vs B&H 0.76 (thắng risk-adjusted trên 5.8y). MaxDD giảm 12.4 điểm vs B&H. CAGR kém B&H 4.2pt — trade-off chấp nhận được cho defensive long-only.
+
+### 28.10 File thay đổi
+
+**Core code:**
+- `tools/backtest/quant/composite_signal.py`: cleanup inf/zero, MA200 hysteresis (`_below_ma200_with_hysteresis`), V-shape (disabled default), ESR pipeline với `regime_method='hmm_walk_forward'`.
+- `tools/backtest/quant/allocation.py`: logistic curve (`smooth_equity_from_score`), `TREND_BOUNDS` 4-state, `MA200_HARD_CAP`, output đầy đủ diagnostic columns.
+- `tools/backtest/quant/engine.py`: không đổi (kế hoạch sau: Sharpe robust, win rate fallback).
+- `tools/backtest/page.py`: UI mới với metric vs B&H, multi-line allocation chart, diagnostic table, sliders MA200 buffer + V-shape.
+- `tools/esr_monitor/quant/metrics.py`: 
+  - `RuleBasedRegimeClassifier` (look-ahead-free, percentile + absolute threshold)
+  - `HMMRegimeClassifier.fit_predict_walk_forward()` + `analyze(walk_forward=True)`
+  - `run_esr_pipeline()` thêm `regime_method` (3 options) + tham số liên quan
+- `tools/esr_monitor/page.py`: sidebar 3-option dropdown classifier, slider tham số rule-based + walk-forward refit interval.
+- `tools/fear_greed/quant/factors.py`: NaN-safety trước PCA, guard pc1.std() > 0.
+
+### 28.11 Bài học method
+
+1. **Compensation đan xen nguy hiểm**: rule "đảo ACTIVE_STRESS = floor" được tạo để bù HMM lag, khi fix HMM thì compensation trở thành noise/sai. Cần document rõ rule tồn tại để bù cái gì, revisit khi root cause được fix.
+2. **Diagnostic insight ≠ predictable signal**: bench dương trung bình +0.38%/ngày trong cap không phải actionable signal (V-shape thử nghiệm thất bại — strategy không phân biệt được V-shape thật vs bounce giả real-time).
+3. **Tách live vs backtest use case**: cùng 1 algorithm có thể đúng cho use case này, sai cho use case kia. HMM look-ahead OK cho live, sai cho backtest.
+4. **Period dependency cảnh báo**: strategy thắng B&H trong Period A (có crash) nhưng kém B&H trong Period B (bull thuần) → không thể chọn period trong production. Cần test cả 2 trước khi tin metrics.
+
+### 28.12 Status quỹ thực tế
+
+- **Sharpe combined 5.8y = 0.87** (vs B&H 0.76) → đạt mức Quant Fund Tier B.
+- CAGR underperform B&H 4.2pt nhưng MaxDD better 12.4pt → defensive long-only acceptable.
+- Vẫn cần trước khi commit vốn:
+  - **Out-of-sample test 2017-2020** (sideways)
+  - **Walk-forward validation** allocation params
+  - **Universe survivorship-free** (snapshot quý)
+  - **Cash yield 5%/năm** (Period B giữ 34% cash chưa tính lãi)
+  - **Live paper trading** tối thiểu 6 tháng
+
+### 28.13 PRODUCTION_REGIME_METHOD — Single Source of Truth
+
+Sau khi triển khai 3 classifier, cần đảm bảo **AI CIO AUTO + ESR Monitor LIVE + report snapshot dùng cùng setting** để regime hiển thị nhất quán toàn hệ thống. Bổ sung constant trong `tools/esr_monitor/quant/metrics.py`:
+
+```python
+PRODUCTION_REGIME_METHOD = 'hmm'  # default cho live paths
+```
+
+**Callers đồng bộ:**
+- `shared/ai_cio.py::run_esr_monitor` — AI CIO AUTO + Manual
+- `tools/esr_monitor/report.py::snapshot` — machine-readable CSV report
+- `tools/esr_monitor/page.py` — sidebar default cho ESR Monitor UI (gắn label `⭐ PRODUCTION`)
+
+**Caller riêng (intentional khác):**
+- `tools/backtest/quant/composite_signal.py` — hardcode `'hmm_walk_forward'` cho backtest fidelity (look-ahead-free).
+
+→ Đổi `PRODUCTION_REGIME_METHOD` ở 1 chỗ = mọi live path tự đổi theo. Backtest pipeline isolated.
+
+### 28.14 Roadmap đề xuất tiếp
+
+1. ✅ Fix HMM look-ahead (xong section này)
+2. ✅ Đồng bộ AI CIO AUTO với ESR Monitor (PRODUCTION_REGIME_METHOD)
+3. ⏭️ Universe snapshot quý (mở fidelity cho Breadth/Dispersion/Manipulation)
+4. ⏭️ EGARCH fallback trong Fear & Greed (tránh production crash)
+5. ⏭️ Cornish-Fisher cho Var-CVaR VNINDEX (tail risk)
+6. ⏭️ Dynamic COE theo lãi suất
+7. ⏭️ Validate Dispersion/Manipulation/Upside Ratio alpha trong composite

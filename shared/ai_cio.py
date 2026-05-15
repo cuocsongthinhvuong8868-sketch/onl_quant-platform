@@ -38,7 +38,9 @@ from tools.risk_adjusted_growth.quant.scoring import compute_scores
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
-from tools.esr_monitor.quant.metrics import run_esr_pipeline, VN30_TICKERS
+from tools.esr_monitor.quant.metrics import (
+    run_esr_pipeline, VN30_TICKERS, PRODUCTION_REGIME_METHOD,
+)
 # Import logic VaRES Engine
 from tools.va_res.report import snapshot as vares_snapshot
 # Import logic Var-CVaR VNINDEX
@@ -399,12 +401,16 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     if cached: return cached
     
     df_vn30 = load_custom("vn30_cache.csv")
+    # AI CIO AUTO/Manual: dùng PRODUCTION_REGIME_METHOD (single source of truth).
+    # AI CIO chỉ đọc regime của ngày hiện tại → look-ahead bias không leak.
+    # Đồng bộ với ESR Monitor LIVE default và report.py snapshot.
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_stocks, df_vn30,
         deposit_rate=0.06,
         pillar_mode='downside',
         pca_warmup=252,
         ema_span=20,
+        regime_method=PRODUCTION_REGIME_METHOD,
     )
 
     if pillars.empty or result.ssi.dropna().empty:

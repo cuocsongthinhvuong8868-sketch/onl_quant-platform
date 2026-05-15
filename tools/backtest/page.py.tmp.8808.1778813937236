@@ -1,0 +1,261 @@
+import streamlit as st
+import pandas as pd
+import numpy as np
+import plotly.graph_objects as go
+from datetime import date
+
+from shared.data_loader import load_close_prices, load_custom
+from tools.backtest.quant.composite_signal import generate_composite_signal
+from tools.backtest.quant.allocation import (
+    apply_allocation,
+    TREND_BOUNDS,
+    MA200_HARD_CAP,
+    EQ_MIN,
+    EQ_MAX,
+    CURVE_CENTER,
+    CURVE_SLOPE,
+)
+from tools.backtest.quant.engine import run_backtest, calculate_performance_metrics
+
+
+# Màu cho 4-state regime
+STATE_COLORS = {
+    "HEALTHY":         "rgba(46,204,113,0.18)",
+    "EUPHORIC_RISK":   "rgba(241,196,15,0.22)",
+    "CALM_CORRECTION": "rgba(52,152,219,0.18)",
+    "ACTIVE_STRESS":   "rgba(231,76,60,0.22)",
+}
+
+
+def _benchmark_metrics(cum_bench: pd.Series) -> dict:
+    """Tính CAGR/Sharpe/MaxDD cho benchmark trên cùng period."""
+    ret = cum_bench.pct_change().fillna(0)
+    n = len(cum_bench)
+    if n < 2:
+        return {"CAGR": 0, "Sharpe": 0, "Max Drawdown": 0}
+    years = n / 252
+    cagr = cum_bench.iloc[-1] ** (1 / years) - 1 if cum_bench.iloc[-1] > 0 else 0
+    vol = ret.std() * np.sqrt(252)
+    sharpe = cagr / vol if vol > 0 else 0
+    peak = cum_bench.cummax()
+    max_dd = ((cum_bench - peak) / peak).min()
+    return {"CAGR": cagr, "Sharpe": sharpe, "Max Drawdown": max_dd}
+
+
+def show():
+    st.title("⚖️ Quant Strategy Backtest")
+    st.caption(
+        "Composite Score (Fear&Greed, Breadth, SSI greed, VaR/ES) "
+        "→ Logistic equity curve + ESR Market_State trend overlay."
+    )
+
+    with st.sidebar:
+        st.header("⚙️ Cấu hình Backtest")
+        start_date = st.date_input("Ngày bắt đầu", date(2020, 7, 1))
+        end_date = st.date_input("Ngày kết thúc", date(2024, 2, 29))
+        fee = st.slider("Phí giao dịch (%)", 0.0, 1.0, 0.3, step=0.05) / 100
+
+        with st.expander("🎚️ Tham số allocation hiện tại", expanded=False):
+            st.markdown(
+                f"**Logistic curve**\n"
+                f"- floor / ceiling: `{EQ_MIN:.2f}` / `{EQ_MAX:.2f}`\n"
+                f"- center / slope: `{CURVE_CENTER}` / `{CURVE_SLOPE}`\n\n"
+                f"**Trend overlay (ESR 4-state)**"
+            )
+            for st_name, b in TREND_BOUNDS.items():
+                fl = f"floor={b['floor']:.2f}" if b['floor'] is not None else "floor=—"
+                cp = f"cap={b['cap']:.2f}" if b['cap'] is not None else "cap=—"
+                st.markdown(f"- `{st_name}`: {fl}, {cp}")
+            st.markdown(
+                f"\n**Hard guardrail**\n"
+                f"- VNINDEX < MA200 → equity ≤ `{MA200_HARD_CAP:.2f}` (ghi đè mọi rule)"
+            )
+
+    if not st.button("🚀 Chạy Backtest", type="primary", use_container_width=True):
+        return
+
+    try:
+        # 1. Load Data
+        with st.spinner("Đang tải dữ liệu..."):
+            df_prices = load_close_prices()
+            df_vni = load_custom("vnindex_cache.csv")
+            idx_col = "VNINDEX" if "VNINDEX" in df_vni.columns else df_vni.columns[0]
+            vnindex = df_vni[idx_col]
+            benchmark_ret = vnindex.pct_change()
+
+        # 2. Generate Signals
+        with st.spinner("Đang tính Composite Signals (Tầng 1)..."):
+            df_composite = generate_composite_signal(df_prices, df_vni)
+
+        # 3. Apply Allocation
+        with st.spinner("Áp dụng Allocation + Trend Overlay (Tầng 2)..."):
+            df_alloc = apply_allocation(df_composite)
+
+        # 4. Run Engine
+        with st.spinner("Đang chạy Backtest Engine (Tầng 3)..."):
+            full_results = run_backtest(df_alloc, benchmark_ret, transaction_fee=fee)
+            mask = (full_results.index.date >= start_date) & (full_results.index.date <= end_date)
+            results = full_results.loc[mask].copy()
+            if not results.empty:
+                results["cum_strategy"] = (1 + results["net_return"]).cumprod()
+                results["cum_benchmark"] = (1 + benchmark_ret.loc[results.index]).cumprod()
+            metrics = calculate_performance_metrics(results)
+            bench_metrics = _benchmark_metrics(results["cum_benchmark"])
+
+        if results.empty:
+            st.warning("Khoảng thời gian không có dữ liệu hợp lệ.")
+            return
+
+        st.divider()
+
+        # ── Metrics: Strategy vs Benchmark ─────────────────────
+        st.subheader("📊 Hiệu quả vs Benchmark (VNINDEX B&H)")
+        cs = st.columns(4)
+        cs[0].metric("CAGR",
+                     f"{metrics['CAGR']*100:.2f}%",
+                     f"{(metrics['CAGR']-bench_metrics['CAGR'])*100:+.2f}% vs B&H")
+        cs[1].metric("Sharpe",
+                     f"{metrics['Sharpe']:.2f}",
+                     f"{metrics['Sharpe']-bench_metrics['Sharpe']:+.2f} vs B&H")
+        cs[2].metric("Max Drawdown",
+                     f"{metrics['Max Drawdown']*100:.2f}%",
+                     f"{(metrics['Max Drawdown']-bench_metrics['Max Drawdown'])*100:+.2f}% vs B&H",
+                     delta_color="inverse")
+        cs[3].metric("Win Rate", f"{metrics['Win Rate']*100:.1f}%")
+
+        # ── Equity Curve ──────────────────────────────────────
+        st.subheader("📈 Equity Curve")
+        fig = go.Figure()
+        fig.add_trace(go.Scatter(x=results.index, y=results["cum_strategy"],
+                                 name="Strategy", line=dict(color="#2ecc71", width=3)))
+        fig.add_trace(go.Scatter(x=results.index, y=results["cum_benchmark"],
+                                 name="VNINDEX (B&H)", line=dict(color="#95a5a6", dash="dash")))
+        fig.update_layout(template="plotly_dark", hovermode="x unified",
+                          margin=dict(l=20, r=20, t=20, b=20), height=400)
+        st.plotly_chart(fig, use_container_width=True)
+
+        # ── Drawdown ──────────────────────────────────────────
+        st.subheader("📉 Drawdown")
+        fig_dd = go.Figure()
+        fig_dd.add_trace(go.Scatter(x=results.index, y=results["drawdown"],
+                                    fill="tozeroy", name="Strategy DD",
+                                    line=dict(color="#e74c3c")))
+        bench_peak = results["cum_benchmark"].cummax()
+        bench_dd = (results["cum_benchmark"] - bench_peak) / bench_peak
+        fig_dd.add_trace(go.Scatter(x=results.index, y=bench_dd,
+                                    name="B&H DD",
+                                    line=dict(color="#95a5a6", dash="dash")))
+        fig_dd.update_layout(template="plotly_dark",
+                             margin=dict(l=20, r=20, t=20, b=20), height=300)
+        st.plotly_chart(fig_dd, use_container_width=True)
+
+        # ── Allocation + Composite Score + Market State ───────
+        st.subheader("🛡️ Allocation & Regime")
+
+        fig_alloc = go.Figure()
+        # Background shading theo market_state
+        if "market_state" in results.columns:
+            state_series = results["market_state"].fillna("UNKNOWN")
+            change_pts = state_series.ne(state_series.shift()).cumsum()
+            for grp_id, grp in state_series.groupby(change_pts):
+                st_name = grp.iloc[0]
+                color = STATE_COLORS.get(st_name)
+                if color is None:
+                    continue
+                fig_alloc.add_vrect(x0=grp.index[0], x1=grp.index[-1],
+                                    fillcolor=color, line_width=0, layer="below")
+        # Vạch MA200 cap mức 0.10
+        fig_alloc.add_hline(y=MA200_HARD_CAP, line_dash="dot", line_color="#e74c3c",
+                            annotation_text=f"MA200 cap {MA200_HARD_CAP:.2f}",
+                            annotation_position="right")
+        # Equity weight line
+        fig_alloc.add_trace(go.Scatter(x=results.index, y=results["equity_weight"],
+                                       name="Equity (final)", line=dict(color="#3498db", width=2),
+                                       fill="tozeroy",
+                                       fillcolor="rgba(52,152,219,0.25)"))
+        if "equity_post_regime" in results.columns:
+            fig_alloc.add_trace(go.Scatter(x=results.index, y=results["equity_post_regime"],
+                                           name="Post regime (pre-MA200)",
+                                           line=dict(color="#f39c12", width=1, dash="dash")))
+        if "base_equity" in results.columns:
+            fig_alloc.add_trace(go.Scatter(x=results.index, y=results["base_equity"],
+                                           name="Base (composite only)",
+                                           line=dict(color="#bdc3c7", width=1, dash="dot")))
+        fig_alloc.update_layout(template="plotly_dark", height=350,
+                                margin=dict(l=20, r=20, t=20, b=20),
+                                yaxis=dict(title="Equity weight", range=[0, 1]))
+        st.plotly_chart(fig_alloc, use_container_width=True)
+
+        # Composite score chart
+        fig_score = go.Figure()
+        fig_score.add_trace(go.Scatter(x=results.index, y=results["composite_score"],
+                                       name="Composite Score",
+                                       line=dict(color="#9b59b6", width=2)))
+        fig_score.add_hline(y=CURVE_CENTER, line_dash="dash", line_color="#7f8c8d",
+                            annotation_text="Neutral 50")
+        fig_score.update_layout(template="plotly_dark", height=250,
+                                margin=dict(l=20, r=20, t=20, b=20),
+                                yaxis=dict(title="Composite (0-100)", range=[0, 100]))
+        st.plotly_chart(fig_score, use_container_width=True)
+
+        # ── Diagnostics ──────────────────────────────────────
+        st.subheader("🔬 Diagnostics — Component & Overlay")
+
+        # MA200 hard cap summary
+        n_total = len(results)
+        n_ma_cap = int(results.get("ma200_cap_active", pd.Series(False, index=results.index)).sum())
+        n_below_ma = int(results.get("below_ma200", pd.Series(False, index=results.index)).sum())
+        cs_ma = st.columns(3)
+        cs_ma[0].metric("Ngày VNINDEX < MA200",
+                        f"{n_below_ma}",
+                        f"{n_below_ma/n_total*100:.1f}% period")
+        cs_ma[1].metric("MA200 cap kích hoạt",
+                        f"{n_ma_cap}",
+                        f"{n_ma_cap/n_total*100:.1f}% period")
+        if n_ma_cap > 0:
+            ma_days = results[results["ma200_cap_active"]]
+            bench_avg_in_cap = ma_days["cum_benchmark"].pct_change().mean() * 100
+            cs_ma[2].metric("Bench avg ret/ngày (lúc cap)",
+                            f"{bench_avg_in_cap:+.3f}%",
+                            help="Nếu dương: cap đang đẩy ra khỏi uptick (MA200 chưa cross back kịp).")
+
+        d_cols = st.columns(2)
+        with d_cols[0]:
+            st.markdown("**Trend overlay activation**")
+            overlay_counts = results["trend_overlay"].value_counts()
+            df_ov = pd.DataFrame({
+                "Action": overlay_counts.index,
+                "Days": overlay_counts.values,
+                "% of period": (overlay_counts.values / n_total * 100).round(1),
+            })
+            st.dataframe(df_ov, hide_index=True, use_container_width=True)
+
+        with d_cols[1]:
+            st.markdown("**Equity weight distribution**")
+            eq_stats = results["equity_weight"].describe().round(3)
+            st.dataframe(eq_stats.rename("equity_weight").to_frame(),
+                         use_container_width=True)
+
+        # Average equity per market_state
+        if "market_state" in results.columns:
+            st.markdown("**Avg equity & forward return per regime**")
+            grp = results.groupby("market_state").agg(
+                days=("equity_weight", "size"),
+                avg_equity=("equity_weight", "mean"),
+                avg_daily_ret=("net_return", "mean"),
+                avg_bench_ret=("cum_benchmark", lambda x: x.pct_change().mean()),
+            ).round(4)
+            grp["days"] = grp["days"].astype(int)
+            st.dataframe(grp, use_container_width=True)
+
+        # ── Bảng chi tiết ─────────────────────────────────────
+        with st.expander("📋 Chi tiết 100 phiên gần nhất"):
+            show_cols = [c for c in [
+                "composite_score", "market_state", "regime", "trend_overlay",
+                "base_equity", "equity_weight", "net_return", "cum_strategy"
+            ] if c in results.columns]
+            st.dataframe(results[show_cols].tail(100), use_container_width=True)
+
+    except Exception as e:
+        st.error(f"Lỗi thực thi: {e}")
+        st.exception(e)

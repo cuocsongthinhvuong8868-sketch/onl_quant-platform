@@ -10,6 +10,7 @@ from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.api_key_helper import resolve_api_key
 from tools.esr_monitor.quant.metrics import (
     run_esr_pipeline, SSIResult, MARKET_STATES, VN30_TICKERS,
+    PRODUCTION_REGIME_METHOD,
 )
 from tools.esr_monitor.ui.charts import render_esr_chart, render_pillar_diagnostics
 try:
@@ -48,7 +49,42 @@ def render():
         help="downside: S_VOL/S_COR/S_LIQ chỉ tính trên phiên giảm. classic: đối xứng.",
     )
     trend_ma_window = st.sidebar.number_input("Trend MA (ngày)", value=200, min_value=50, max_value=500, step=10)
-    enable_hmm = st.sidebar.checkbox("HMM Regime Overlay", value=True)
+    enable_hmm = st.sidebar.checkbox("Regime Overlay", value=True,
+                                     help="Bật/tắt classifier regime (rule-based hoặc HMM).")
+
+    _classifier_options = ['hmm', 'hmm_walk_forward', 'rule_based']
+    _default_idx = (_classifier_options.index(PRODUCTION_REGIME_METHOD)
+                    if PRODUCTION_REGIME_METHOD in _classifier_options else 0)
+    regime_method = st.sidebar.selectbox(
+        "Regime Classifier",
+        options=_classifier_options,
+        index=_default_idx,
+        format_func=lambda x: {
+            'hmm': '🎯 HMM full-fit (LIVE — detection cao nhất) ⭐ PRODUCTION',
+            'hmm_walk_forward': '🧪 HMM walk-forward (look-ahead-free)',
+            'rule_based': '📏 Rule-based (percentile rank)',
+        }[x],
+        help=("HMM full-fit: fit toàn bộ series → có look-ahead bias nhưng OK cho live view "
+              "(xem regime hôm nay). Detection chất lượng cao nhất. "
+              "HMM walk-forward: refit mỗi 60 ngày, chỉ dùng data trước → look-ahead-free, "
+              "dùng cho backtest hoặc history view. "
+              "Rule-based: percentile rank + level fallback, không cần hmmlearn."),
+    )
+    regime_percentile = st.sidebar.slider(
+        "Stress percentile threshold", 0.50, 0.90, 0.60, step=0.05,
+        help="SSI percentile rank > X → HIGH stress (rule-based only).",
+        disabled=(regime_method in ('hmm', 'hmm_walk_forward')),
+    )
+    regime_abs_threshold = st.sidebar.slider(
+        "Absolute SSI threshold (level fallback)", 0.0, 1.0, 0.65, step=0.05,
+        help="HIGH stress nếu SSI > X tuyệt đối. Set 0 để tắt (rule-based only).",
+        disabled=(regime_method in ('hmm', 'hmm_walk_forward')),
+    )
+    regime_wf_refit = st.sidebar.slider(
+        "HMM walk-forward refit interval (ngày)", 20, 180, 60, step=10,
+        help="Số ngày giữa các lần refit HMM walk-forward (chỉ áp dụng cho hmm_walk_forward).",
+        disabled=(regime_method != 'hmm_walk_forward'),
+    )
 
     st.sidebar.divider()
     st.sidebar.header("🤖 AI Analysis")
@@ -85,6 +121,10 @@ def render():
         "ema_span": ema_span, "deposit_rate": deposit_rate,
         "pillar_mode": pillar_mode, "trend_ma_window": trend_ma_window,
         "enable_hmm": enable_hmm,
+        "regime_method": regime_method,
+        "regime_percentile": regime_percentile,
+        "regime_abs_threshold": regime_abs_threshold,
+        "regime_wf_refit": regime_wf_refit,
     }
     cached = load_daily_cache("esr_monitor", cache_key)
     if cached is not None:
@@ -96,12 +136,16 @@ def render():
     else:
         with st.spinner("🔄 Đang tính ESR 5-pillar SSI..."):
             try:
-                                pillars, result, market_states, threshold = run_esr_pipeline(
+                pillars, result, market_states, threshold = run_esr_pipeline(
                     df_close, df_vn30,
                     deposit_rate=deposit_rate,
                     pillar_mode=pillar_mode,
                     pca_warmup=pca_warmup,
                     ema_span=ema_span,
+                    regime_method=regime_method,
+                    regime_percentile=regime_percentile,
+                    regime_absolute_threshold=regime_abs_threshold,
+                    regime_wf_refit_every=regime_wf_refit,
                 )
             except Exception as e:
                 st.error(f"Lỗi ESR: {e}")

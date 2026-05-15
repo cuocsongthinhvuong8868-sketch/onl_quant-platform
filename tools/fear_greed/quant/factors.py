@@ -23,7 +23,11 @@ def extract_market_factor_pca(stocks_ret: pd.DataFrame) -> pd.Series:
     3. Căn chỉnh dấu PC1 theo chiều equal-weight return.
     4. Rescale về đơn vị equal-weight std để dễ diễn giải.
     """
-    clean = stocks_ret.dropna(axis=1, thresh=len(stocks_ret) // 2).fillna(0)
+    clean = (
+        stocks_ret.replace([np.inf, -np.inf], np.nan)
+                  .dropna(axis=1, thresh=len(stocks_ret) // 2)
+                  .fillna(0)
+    )
 
     pca = PCA(n_components=1)
     pc1 = pca.fit_transform(clean).flatten()
@@ -32,7 +36,9 @@ def extract_market_factor_pca(stocks_ret: pd.DataFrame) -> pd.Series:
     if np.corrcoef(pc1, ew)[0, 1] < 0:
         pc1 = -pc1
 
-    pc1 = pc1 * (ew.std() / pc1.std())
+    pc1_std = pc1.std()
+    if pc1_std > 0:
+        pc1 = pc1 * (ew.std() / pc1_std)
 
     logger.info("PCA Market Factor — PC1 giải thích: %.1f %%",
                 pca.explained_variance_ratio_[0] * 100)

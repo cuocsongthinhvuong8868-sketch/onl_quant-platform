@@ -97,9 +97,15 @@ if st.session_state.bf_selected_tool is None:
     with col_title:
         st.subheader("📋 Danh mục Công cụ")
     with col_history:
-        if st.button("📊 History Score & Regime", use_container_width=True, key="btn_history_score"):
-            st.session_state.bf_selected_tool = "history_score_regime"
-            st.rerun()
+        c1, c2 = st.columns(2)
+        with c1:
+            if st.button("📊 History Score", use_container_width=True, key="btn_history_score"):
+                st.session_state.bf_selected_tool = "history_score_regime"
+                st.rerun()
+        with c2:
+            if st.button("⚖️ Backtest Strategy", use_container_width=True, key="btn_backtest"):
+                st.session_state.bf_selected_tool = "backtest"
+                st.rerun()
     st.markdown("Chọn một công cụ bên dưới để bắt đầu phân tích:")
 
     # Chia thành các hàng, mỗi hàng 3 cột
@@ -135,6 +141,23 @@ else:
             render_history()
         except Exception as e:
             st.error(f"❌ Lỗi khi tải trang: {e}")
+            st.exception(e)
+        st.stop()
+
+    # ── Special: Backtest Strategy ──
+    if st.session_state.bf_selected_tool == "backtest":
+        col_back, col_title = st.columns([1, 6])
+        with col_back:
+            if st.button("🔙 Danh mục", use_container_width=True, key="btn_back_backtest"):
+                st.session_state.bf_selected_tool = None
+                st.rerun()
+        with col_title:
+            st.markdown("## ⚖️ Backtest Strategy")
+        try:
+            from tools.backtest.page import show as render_backtest
+            render_backtest()
+        except Exception as e:
+            st.error(f"❌ Lỗi khi tải trang Backtest: {e}")
             st.exception(e)
         st.stop()
 

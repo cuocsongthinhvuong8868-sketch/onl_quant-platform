@@ -1,0 +1,178 @@
+"""
+Tầng 2 — Allocation Strategy
+============================
+Ưu tiên 1: Logistic equity curve (mượt, monotonic, không vách đá).
+Ưu tiên 2: Trend filter overlay từ ESR Market_State (4-state regime).
+
+Triết lý:
+  - Composite_score thuần contrarian: score thấp = panic → tăng equity, score cao = greed → giảm equity.
+  - Curve logistic loại bỏ các "vách đá" 75→10 trong grid cũ, giảm churning fee.
+  - Trend overlay ngăn fight-trend: nếu thị trường rõ HEALTHY (bull confirmed) → ép sàn equity 80%;
+    nếu rõ ACTIVE_STRESS (bear confirmed) → ép trần equity 30%. Còn EUPHORIC_RISK / CALM_CORRECTION giữ nguyên
+    composite (vùng chuyển tiếp, contrarian phát huy).
+"""
+import logging
+
+import numpy as np
+import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+# ──────────────────────────────────────────────
+# Ưu tiên 1 — Smooth logistic equity curve
+# ──────────────────────────────────────────────
+EQ_MIN = 0.05   # equity floor: luôn giữ tối thiểu để không bị thiếu beta trong rare regime
+EQ_MAX = 0.95   # equity ceiling: luôn giữ tí cash để có dư địa rebalance
+CURVE_CENTER = 50.0
+CURVE_SLOPE = 12.0   # smaller → sharper. 12 ~ giảm 0.5 trên ~25 điểm score quanh center.
+
+
+def smooth_equity_from_score(score: float) -> float:
+    """
+    Logistic contrarian: score 0 → ~0.95 equity, score 50 → 0.50, score 100 → ~0.05.
+
+    f(s) = EQ_MIN + (EQ_MAX - EQ_MIN) / (1 + exp((s - center) / slope))
+    """
+    if pd.isna(score):
+        return np.nan
+    span = EQ_MAX - EQ_MIN
+    return EQ_MIN + span / (1.0 + np.exp((float(score) - CURVE_CENTER) / CURVE_SLOPE))
+
+
+def regime_label(score: float) -> str:
+    """Nhãn regime hiển thị cho UI — đơn thuần dán cho người đọc, không ảnh hưởng equity."""
+    if pd.isna(score):
+        return "Unknown"
+    if score <= 20:
+        return "Extreme Fear"
+    if score <= 40:
+        return "Fear"
+    if score <= 60:
+        return "Neutral"
+    if score <= 80:
+        return "Greed"
+    return "Extreme Greed"
+
+
+# ──────────────────────────────────────────────
+# Ưu tiên 2 — Trend overlay từ ESR Market_State
+# ──────────────────────────────────────────────
+# HEALTHY        : low stress + uptrend (bull confirmed)         → sàn equity 0.85 (ride the trend)
+# EUPHORIC_RISK  : high stress + uptrend (stretched bull)        → sàn equity 0.50, vẫn cho contrarian giảm nhưng không bail toàn bộ
+# CALM_CORRECTION: low stress + downtrend (orderly correction)   → sàn equity 0.40, để contrarian từ từ tích lũy
+# ACTIVE_STRESS  : high stress + downtrend (HMM lag — thường gần đáy)
+#                                                                → sàn equity 0.60 (contrarian buy-the-bottom).
+#                                                                  Diagnostic cho thấy bench thực tế DƯƠNG trong regime này.
+#                                                                  Bảo vệ thật sự được thực thi bằng MA200 hard cap bên dưới.
+#
+# Triết lý: trend overlay là "guardrails" — không phá vỡ contrarian, chỉ giới hạn biên độ
+#          để tránh fight-trend trong các regime đã xác nhận.
+TREND_BOUNDS = {
+    "HEALTHY":         {"floor": 0.85, "cap": None},
+    "EUPHORIC_RISK":   {"floor": 0.80, "cap": None},   # stretched bull vẫn là bull
+    "CALM_CORRECTION": {"floor": 0.40, "cap": None},
+    # ACTIVE_STRESS: cap 0.30 (defensive khi stress + downtrend).
+    # Lưu ý: từ ngày fix HMM look-ahead (rule_based default), gần như mọi ngày ACTIVE_STRESS
+    # cũng trùng với below_ma200 → MA200_HARD_CAP (0.10) đè lên rule này → overlay
+    # gần như inactive. Giữ cap 0.30 để symmetry và phòng khi user toggle về HMM legacy.
+    "ACTIVE_STRESS":   {"floor": None, "cap": 0.30},
+}
+
+# ──────────────────────────────────────────────
+# Hard guardrail — VNINDEX < MA200 → max equity
+# ──────────────────────────────────────────────
+# Ghi đè mọi rule khác. Đây là "circuit breaker" cuối cùng: khi trend đã thật sự gãy
+# (giá đóng cửa dưới MA200), không có rule contrarian nào được phép giữ equity cao.
+MA200_HARD_CAP = 0.10
+
+
+def apply_trend_overlay(base_equity: float, market_state) -> tuple:
+    """
+    Trả về (equity_after_overlay, overlay_action).
+    overlay_action ∈ {"BULL_FLOOR", "STRETCHED_FLOOR", "CORRECTION_FLOOR", "BEAR_CAP", "NONE"}.
+    """
+    if pd.isna(base_equity):
+        return base_equity, "NONE"
+    if isinstance(market_state, float) and np.isnan(market_state):
+        return base_equity, "NONE"
+
+    bounds = TREND_BOUNDS.get(market_state)
+    if bounds is None:
+        return base_equity, "NONE"
+
+    eq = base_equity
+    action = "NONE"
+    if bounds["floor"] is not None and eq < bounds["floor"]:
+        eq = bounds["floor"]
+        action = {
+            "HEALTHY":         "BULL_FLOOR",
+            "EUPHORIC_RISK":   "STRETCHED_FLOOR",
+            "CALM_CORRECTION": "CORRECTION_FLOOR",
+        }.get(market_state, "FLOOR")
+    if bounds["cap"] is not None and eq > bounds["cap"]:
+        eq = bounds["cap"]
+        action = "BEAR_CAP"
+    return eq, action
+
+
+# ──────────────────────────────────────────────
+# API chính
+# ──────────────────────────────────────────────
+def apply_allocation(df_composite: pd.DataFrame) -> pd.DataFrame:
+    """
+    Áp dụng allocation cho toàn bộ chuỗi composite score.
+
+    Pipeline: base (logistic) → ESR regime overlay → MA200 hard cap.
+
+    Input columns yêu cầu:
+      - composite_score : float 0-100
+      - market_state    : str (4-state) hoặc NaN (sẽ bỏ qua overlay)
+      - below_ma200     : bool, True khi VNINDEX < MA200 (hard cap circuit breaker)
+
+    Output thêm các cột:
+      - base_equity      : equity từ logistic curve (chưa overlay)
+      - equity_post_regime: equity sau ESR regime overlay (chưa cap MA200) — để debug
+      - equity_weight    : equity cuối cùng (sau MA200 cap)
+      - cash_weight      : 1 - equity_weight
+      - regime           : nhãn 5-bậc theo score (hiển thị)
+      - trend_overlay    : BULL_FLOOR / STRETCHED_FLOOR / CORRECTION_FLOOR / BEAR_CAP / NONE
+      - ma200_cap_active : True khi MA200 hard cap đè lên overlay
+    """
+    df = df_composite.copy()
+
+    if "market_state" not in df.columns:
+        df["market_state"] = np.nan
+    if "below_ma200" not in df.columns:
+        df["below_ma200"] = False
+
+    base_eq = df["composite_score"].apply(smooth_equity_from_score)
+
+    post_regime_eq = np.empty(len(df), dtype=float)
+    overlay_act = np.empty(len(df), dtype=object)
+    for i, (be, ms) in enumerate(zip(base_eq.values, df["market_state"].values)):
+        eq, act = apply_trend_overlay(be, ms)
+        post_regime_eq[i] = eq
+        overlay_act[i] = act
+
+    df["base_equity"] = base_eq.values
+    df["equity_post_regime"] = post_regime_eq
+    df["trend_overlay"] = overlay_act
+
+    # Hard MA200 cap — ghi đè mọi rule khác khi VNINDEX đã thật sự gãy trend.
+    final_eq = post_regime_eq.copy()
+    downtrend = df["below_ma200"].fillna(False).astype(bool).values
+    ma200_active = downtrend & (final_eq > MA200_HARD_CAP)
+    final_eq[ma200_active] = MA200_HARD_CAP
+
+    df["equity_weight"] = final_eq
+    df["cash_weight"] = 1.0 - df["equity_weight"]
+    df["regime"] = df["composite_score"].apply(regime_label)
+    df["ma200_cap_active"] = ma200_active
+
+    overlay_counts = df["trend_overlay"].value_counts().to_dict()
+    n_cap = int(ma200_active.sum())
+    logger.info(
+        "Allocation %d ngày — overlay=%s — MA200 hard cap đè %d ngày",
+        len(df), overlay_counts, n_cap,
+    )
+    return df

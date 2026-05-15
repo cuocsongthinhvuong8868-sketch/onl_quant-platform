@@ -1,0 +1,129 @@
+"""
+Tầng 2 — Allocation Strategy
+============================
+Ưu tiên 1: Logistic equity curve (mượt, monotonic, không vách đá).
+Ưu tiên 2: Trend filter overlay từ ESR Market_State (4-state regime).
+
+Triết lý:
+  - Composite_score thuần contrarian: score thấp = panic → tăng equity, score cao = greed → giảm equity.
+  - Curve logistic loại bỏ các "vách đá" 75→10 trong grid cũ, giảm churning fee.
+  - Trend overlay ngăn fight-trend: nếu thị trường rõ HEALTHY (bull confirmed) → ép sàn equity 80%;
+    nếu rõ ACTIVE_STRESS (bear confirmed) → ép trần equity 30%. Còn EUPHORIC_RISK / CALM_CORRECTION giữ nguyên
+    composite (vùng chuyển tiếp, contrarian phát huy).
+"""
+import logging
+
+import numpy as np
+import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+# ──────────────────────────────────────────────
+# Ưu tiên 1 — Smooth logistic equity curve
+# ──────────────────────────────────────────────
+EQ_MIN = 0.05   # equity floor: luôn giữ tối thiểu để không bị thiếu beta trong rare regime
+EQ_MAX = 0.95   # equity ceiling: luôn giữ tí cash để có dư địa rebalance
+CURVE_CENTER = 50.0
+CURVE_SLOPE = 12.0   # smaller → sharper. 12 ~ giảm 0.5 trên ~25 điểm score quanh center.
+
+
+def smooth_equity_from_score(score: float) -> float:
+    """
+    Logistic contrarian: score 0 → ~0.95 equity, score 50 → 0.50, score 100 → ~0.05.
+
+    f(s) = EQ_MIN + (EQ_MAX - EQ_MIN) / (1 + exp((s - center) / slope))
+    """
+    if pd.isna(score):
+        return np.nan
+    span = EQ_MAX - EQ_MIN
+    return EQ_MIN + span / (1.0 + np.exp((float(score) - CURVE_CENTER) / CURVE_SLOPE))
+
+
+def regime_label(score: float) -> str:
+    """Nhãn regime hiển thị cho UI — đơn thuần dán cho người đọc, không ảnh hưởng equity."""
+    if pd.isna(score):
+        return "Unknown"
+    if score <= 20:
+        return "Extreme Fear"
+    if score <= 40:
+        return "Fear"
+    if score <= 60:
+        return "Neutral"
+    if score <= 80:
+        return "Greed"
+    return "Extreme Greed"
+
+
+# ──────────────────────────────────────────────
+# Ưu tiên 2 — Trend overlay từ ESR Market_State
+# ──────────────────────────────────────────────
+# HEALTHY        : low stress + uptrend (bull confirmed)        → sàn equity 80%
+# ACTIVE_STRESS  : high stress + downtrend (bear confirmed)     → trần equity 30%
+# EUPHORIC_RISK  : high stress + uptrend (stretched, vulnerable)→ giữ contrarian (score cao -> bán bớt)
+# CALM_CORRECTION: low stress + downtrend (orderly reset)       → giữ contrarian (score thấp -> tăng dần)
+TREND_FLOOR_HEALTHY = 0.80
+TREND_CAP_STRESS = 0.30
+
+
+def apply_trend_overlay(base_equity: float, market_state) -> tuple:
+    """
+    Trả về (equity_after_overlay, overlay_action).
+    overlay_action ∈ {"BULL_FLOOR", "BEAR_CAP", "NONE"} để debug/diagnostic.
+    """
+    if pd.isna(base_equity):
+        return base_equity, "NONE"
+    if isinstance(market_state, float) and np.isnan(market_state):
+        return base_equity, "NONE"
+
+    if market_state == "HEALTHY" and base_equity < TREND_FLOOR_HEALTHY:
+        return TREND_FLOOR_HEALTHY, "BULL_FLOOR"
+    if market_state == "ACTIVE_STRESS" and base_equity > TREND_CAP_STRESS:
+        return TREND_CAP_STRESS, "BEAR_CAP"
+    return base_equity, "NONE"
+
+
+# ──────────────────────────────────────────────
+# API chính
+# ──────────────────────────────────────────────
+def apply_allocation(df_composite: pd.DataFrame) -> pd.DataFrame:
+    """
+    Áp dụng allocation cho toàn bộ chuỗi composite score.
+
+    Input columns yêu cầu:
+      - composite_score : float 0-100
+      - market_state    : str (4-state) hoặc NaN (sẽ bỏ qua overlay)
+
+    Output thêm các cột:
+      - base_equity      : equity từ logistic curve (chưa overlay)
+      - equity_weight    : equity sau khi áp trend overlay
+      - cash_weight      : 1 - equity_weight
+      - regime           : nhãn 5-bậc theo score (hiển thị)
+      - trend_overlay    : BULL_FLOOR / BEAR_CAP / NONE (diagnostic)
+    """
+    df = df_composite.copy()
+
+    if "market_state" not in df.columns:
+        df["market_state"] = np.nan
+
+    base_eq = df["composite_score"].apply(smooth_equity_from_score)
+
+    final_eq = np.empty(len(df), dtype=float)
+    overlay_act = np.empty(len(df), dtype=object)
+    for i, (be, ms) in enumerate(zip(base_eq.values, df["market_state"].values)):
+        eq, act = apply_trend_overlay(be, ms)
+        final_eq[i] = eq
+        overlay_act[i] = act
+
+    df["base_equity"] = base_eq.values
+    df["equity_weight"] = final_eq
+    df["cash_weight"] = 1.0 - df["equity_weight"]
+    df["regime"] = df["composite_score"].apply(regime_label)
+    df["trend_overlay"] = overlay_act
+
+    n_bull = int((df["trend_overlay"] == "BULL_FLOOR").sum())
+    n_bear = int((df["trend_overlay"] == "BEAR_CAP").sum())
+    logger.info(
+        "Allocation áp dụng: %d ngày — overlay BULL_FLOOR=%d, BEAR_CAP=%d, NONE=%d",
+        len(df), n_bull, n_bear, len(df) - n_bull - n_bear,
+    )
+    return df
