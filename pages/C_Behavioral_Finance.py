@@ -93,7 +93,13 @@ st.markdown("---")
 
 # ── Nếu chưa chọn tool → Hiển thị Grid danh mục ────────────────────
 if st.session_state.bf_selected_tool is None:
-    st.subheader("📋 Danh mục Công cụ")
+    col_title, col_history = st.columns([4, 2])
+    with col_title:
+        st.subheader("📋 Danh mục Công cụ")
+    with col_history:
+        if st.button("📊 History Score & Regime", use_container_width=True, key="btn_history_score"):
+            st.session_state.bf_selected_tool = "history_score_regime"
+            st.rerun()
     st.markdown("Chọn một công cụ bên dưới để bắt đầu phân tích:")
 
     # Chia thành các hàng, mỗi hàng 3 cột
@@ -115,6 +121,23 @@ if st.session_state.bf_selected_tool is None:
 
 # ── Đã chọn tool → Render tool tương ứng ───────────────────────────
 else:
+    # ── Special: History Score & Regime ──
+    if st.session_state.bf_selected_tool == "history_score_regime":
+        col_back, col_title = st.columns([1, 6])
+        with col_back:
+            if st.button("🔙 Danh mục", use_container_width=True, key="btn_back_history"):
+                st.session_state.bf_selected_tool = None
+                st.rerun()
+        with col_title:
+            st.markdown("## 📊 History Score & Regime")
+        try:
+            from pages.tools_page_C.history_score_regime import render as render_history
+            render_history()
+        except Exception as e:
+            st.error(f"❌ Lỗi khi tải trang: {e}")
+            st.exception(e)
+        st.stop()
+
     # Tìm tool trong danh sách
     current_tool = None
     for t in TOOLS:

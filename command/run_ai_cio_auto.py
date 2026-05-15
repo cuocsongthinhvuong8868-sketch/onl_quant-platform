@@ -19,6 +19,7 @@ Usage:
     python command/run_ai_cio_auto.py           # force mode (xoá cache cũ, gọi API mới)
     python command/run_ai_cio_auto.py --force   # giống default (luôn force)
 """
+import csv
 import os
 import re
 import sys
@@ -38,6 +39,8 @@ TODAY_STR = date.today().strftime('%d%m%y')
 CACHE_PATH = DATA_LAKE / "daily_cache" / f"executive_summary_{PROVIDER_KEY}_{TODAY_STR}.txt"
 REPORTS_DIR = ROOT / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
+
+CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 
 PDF_PATH = REPORTS_DIR / f"{TODAY_STR}_{PROVIDER_KEY.replace('-', '_')}_executive_summary.pdf"
 
@@ -138,6 +141,33 @@ def _parse_score_regime(report_text: str) -> tuple:
     return score_val, regime_val
 
 
+def _append_to_csv(score_val: str, regime_val: str):
+    """Ghi score & regime vào data_lake/Ai_cio_report.csv.
+    Nếu đã có dòng cùng ngày → ghi đè. Nếu chưa → append."""
+    today_ddmmyyyy = date.today().strftime('%d%m%Y')
+    header = ['ddmmyyyy', 'score', 'regime']
+    rows = []
+
+    # Đọc dữ liệu cũ (nếu file tồn tại)
+    if CSV_HISTORY_PATH.exists():
+        with open(CSV_HISTORY_PATH, 'r', encoding='utf-8', newline='') as f:
+            reader = csv.DictReader(f)
+            for row in reader:
+                if row.get('ddmmyyyy') != today_ddmmyyyy:
+                    rows.append(row)
+
+    # Thêm dòng hôm nay
+    rows.append({'ddmmyyyy': today_ddmmyyyy, 'score': score_val, 'regime': regime_val})
+
+    # Ghi lại toàn bộ
+    with open(CSV_HISTORY_PATH, 'w', encoding='utf-8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=header)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    print(f"[CSV] Appended to {CSV_HISTORY_PATH}: {today_ddmmyyyy}, {score_val}, {regime_val}")
+
+
 def _send_telegram(score_val: str, regime_val: str):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[WARN] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set. Skipping Telegram.")
@@ -202,7 +232,10 @@ if __name__ == "__main__":
     score_val, regime_val = _parse_score_regime(report_text)
     print(f"[PARSE] Score: {score_val} | Regime: {regime_val}")
 
-    # 4. Gửi Telegram
+    # 4. Ghi vào CSV lịch sử
+    _append_to_csv(score_val, regime_val)
+
+    # 5. Gửi Telegram
     _send_telegram(score_val, regime_val)
 
     print("[DONE]")
