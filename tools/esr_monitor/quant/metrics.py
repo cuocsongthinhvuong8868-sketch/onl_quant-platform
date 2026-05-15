@@ -40,6 +40,17 @@ VN30_TICKERS: Tuple[str, ...] = (
 )
 
 # ──────────────────────────────────────────────
+# PRODUCTION regime classifier — single source of truth
+# ──────────────────────────────────────────────
+# Mọi caller production (ESR Monitor LIVE view, AI CIO AUTO/Manual, report.py snapshot)
+# phải dùng cùng setting này để regime hiển thị nhất quán trên toàn hệ thống.
+# Đổi ở đây = toàn bộ production paths đổi theo.
+#
+# Backtest pipeline (composite_signal.py) dùng 'hmm_walk_forward' riêng để
+# look-ahead-free — đó là yêu cầu cho backtest fidelity, không apply cho live.
+PRODUCTION_REGIME_METHOD = 'hmm'
+
+# ──────────────────────────────────────────────
 # Pillar Engine
 # ──────────────────────────────────────────────
 class PillarEngine:
@@ -348,9 +359,89 @@ class HMMRegimeClassifier:
         between = [r for r in roots if lo <= r <= hi]
         return between[0] if between else (mu0 + mu1) / 2.0
 
-    def analyze(self, ssi: pd.Series):
-        """Convenience: fit + predict + compute threshold + stats."""
-        regime = self.fit_predict(ssi)
+    def fit_predict_walk_forward(self, ssi: pd.Series,
+                                 refit_every: int = 60,
+                                 min_train: int = 252) -> pd.Series:
+        """Look-ahead-free HMM via walk-forward refit.
+
+        Tại mỗi refit point t (cứ `refit_every` ngày), fit HMM trên ssi[:t] only,
+        rồi predict cho ssi[t : t + refit_every]. Lặp đến hết series.
+
+        Đảm bảo: tại mọi thời điểm dự đoán, HMM chỉ thấy dữ liệu trước đó → không leak.
+
+        Refit_every = 60 (~3 tháng giao dịch) là trade-off giữa:
+          - Càng nhỏ → ít stale, ít performance hit ở stage trained.
+          - Càng lớn → predict chunk dài hơn, vẫn dùng tham số cũ.
+
+        Lần fit cuối cùng sẽ giữ self.model + self.high_state để implied_threshold() vẫn dùng được.
+        """
+        try:
+            from hmmlearn.hmm import GaussianHMM
+        except ImportError:
+            logger.warning("hmmlearn unavailable. Skipping HMM walk-forward.")
+            return pd.Series(index=ssi.index, dtype=float)
+
+        clean = ssi.dropna()
+        n = len(clean)
+        if n < min_train + refit_every:
+            logger.warning(
+                "Too few SSI points (%d) for HMM walk-forward (min %d).",
+                n, min_train + refit_every,
+            )
+            return pd.Series(index=ssi.index, dtype=float)
+
+        regime_vals = np.full(n, np.nan)
+        n_refits = 0
+        end = min_train
+        while end < n:
+            train = clean.iloc[:end].values.reshape(-1, 1)
+            model = GaussianHMM(
+                n_components=self.n_states,
+                covariance_type='full',
+                random_state=self.random_state,
+                n_iter=self.n_iter,
+            )
+            try:
+                model.fit(train)
+            except Exception as exc:
+                logger.warning("HMM walk-forward refit failed at t=%d: %s", end, exc)
+                end += refit_every
+                continue
+            high_state = int(np.argmax(model.means_.flatten()))
+
+            chunk_end = min(end + refit_every, n)
+            chunk = clean.iloc[end:chunk_end].values.reshape(-1, 1)
+            if len(chunk) == 0:
+                break
+            states = model.predict(chunk)
+            regime_vals[end:chunk_end] = (states == high_state).astype(float)
+
+            # Lưu model cuối để implied_threshold() vẫn hoạt động
+            self.model = model
+            self.high_state = high_state
+            n_refits += 1
+            end = chunk_end
+
+        logger.info("HMM walk-forward: %d refits, predicted %d days", n_refits,
+                    int(np.sum(~np.isnan(regime_vals))))
+
+        out = pd.Series(index=ssi.index, dtype=float, name='Regime')
+        out.loc[clean.index] = regime_vals
+        return out
+
+    def analyze(self, ssi: pd.Series, walk_forward: bool = False,
+                refit_every: int = 60, min_train: int = 252):
+        """Convenience: fit + predict + compute threshold + stats.
+
+        Parameters
+        ----------
+        walk_forward : nếu True, dùng walk-forward refit (look-ahead-free).
+                       Mặc định False cho live use (full-fit, thiết kế hiển thị).
+        """
+        if walk_forward:
+            regime = self.fit_predict_walk_forward(ssi, refit_every, min_train)
+        else:
+            regime = self.fit_predict(ssi)
         threshold = self.implied_threshold()
         state_means = None
         state_stds = None
@@ -362,6 +453,130 @@ class HMMRegimeClassifier:
             sd_high = sigmas[np.argmax(mus)]
             state_means = (mu_low, mu_high)
             state_stds = (sd_low, sd_high)
+        return regime, threshold, state_means, state_stds
+
+
+# ──────────────────────────────────────────────
+# Rule-based Regime Classifier (look-ahead-free)
+# ──────────────────────────────────────────────
+class RuleBasedRegimeClassifier:
+    """Expanding-percentile regime classifier — look-ahead-free.
+
+    Khác với `HMMRegimeClassifier` (fit trên toàn bộ series → look-ahead bias):
+      - Tại mỗi thời điểm t, tính percentile rank của SSI[t] trong [0, t] (expanding).
+      - HIGH_STRESS = 1 nếu:
+          (rank > percentile_threshold)
+          OR (absolute_threshold > 0 AND SSI > absolute_threshold)
+        → kết hợp signal tương đối (rank) và signal tuyệt đối (level) để bắt cả:
+          * stress relative vs history (rank)
+          * absolute danger zone (level) — phòng trường hợp expanding window
+            có nhiều stress trước đó làm rank "loãng".
+      - Confirm bằng "k-of-n" rolling rule: ≥k ngày HIGH trong n ngày gần nhất.
+
+    Defaults (tuned cho VN data, optimized cho crash detection):
+      - percentile_threshold = 0.60 (top 40% nhạy hơn 30%)
+      - absolute_threshold = 0.65 (level fallback)
+      - smooth k/n = 2/3 (responsive hơn 3/5)
+
+    Output API tương thích `HMMRegimeClassifier.analyze()`:
+      → (regime_series, threshold, state_means, state_stds)
+    """
+
+    def __init__(
+        self,
+        percentile_threshold: float = 0.60,
+        absolute_threshold: float = 0.65,
+        smooth_window: int = 3,
+        smooth_k: int = 2,
+        min_periods: int = 252,
+    ):
+        self.percentile_threshold = percentile_threshold
+        self.absolute_threshold = absolute_threshold
+        self.smooth_window = smooth_window
+        self.smooth_k = smooth_k
+        self.min_periods = min_periods
+        # Diagnostic state
+        self.rank_series: Optional[pd.Series] = None
+        self.threshold_series: Optional[pd.Series] = None
+
+    def fit_predict(self, ssi: pd.Series) -> pd.Series:
+        """Tính regime series. min_periods đầu sẽ là NaN."""
+        ssi_clean = ssi.dropna()
+        n = len(ssi_clean)
+        if n < self.min_periods + self.smooth_window:
+            logger.warning(
+                "Too few SSI points (%d) for rule-based regime (min %d).",
+                n, self.min_periods + self.smooth_window,
+            )
+            return pd.Series(index=ssi.index, dtype=float, name="Regime")
+
+        # Expanding percentile rank — look-ahead-free
+        values = ssi_clean.values
+        ranks = np.full(n, np.nan)
+        thresholds = np.full(n, np.nan)
+        for i in range(self.min_periods - 1, n):
+            window = values[: i + 1]
+            # rank của giá trị hiện tại = % giá trị quá khứ ≤ giá trị hiện tại
+            ranks[i] = (window <= values[i]).sum() / (i + 1)
+            # threshold runtime = quantile(percentile_threshold) trên expanding window
+            thresholds[i] = np.quantile(window, self.percentile_threshold)
+
+        rank_s = pd.Series(ranks, index=ssi_clean.index, name="rank")
+        thr_s = pd.Series(thresholds, index=ssi_clean.index, name="threshold")
+        self.rank_series = rank_s
+        self.threshold_series = thr_s
+
+        # Raw signal: rank-based OR absolute-level fallback
+        raw_rank = rank_s > self.percentile_threshold
+        if self.absolute_threshold > 0:
+            raw_abs = ssi_clean > self.absolute_threshold
+            raw_high = (raw_rank | raw_abs).astype(int)
+        else:
+            raw_high = raw_rank.astype(int)
+        # Smoothing: k-of-n confirmation
+        smoothed_sum = raw_high.rolling(self.smooth_window,
+                                        min_periods=self.smooth_k).sum()
+        regime = (smoothed_sum >= self.smooth_k).astype(int)
+        # Mask NaN cho period chưa đủ warmup
+        regime = regime.astype(float)
+        regime[rank_s.isna()] = np.nan
+
+        # Reindex về ssi.index gốc (giữ NaN cho phần đầu)
+        out = pd.Series(index=ssi.index, dtype=float, name="Regime")
+        out.loc[regime.index] = regime.values
+        return out
+
+    def implied_threshold(self, ssi: Optional[pd.Series] = None) -> Optional[float]:
+        """SSI value tại percentile_threshold (latest expanding quantile).
+        Dùng cho hiển thị trên chart — đại diện boundary động."""
+        if self.threshold_series is not None and self.threshold_series.notna().any():
+            return float(self.threshold_series.dropna().iloc[-1])
+        if ssi is None:
+            return None
+        clean = ssi.dropna()
+        if clean.empty:
+            return None
+        return float(clean.quantile(self.percentile_threshold))
+
+    def analyze(self, ssi: pd.Series):
+        """API tương thích HMMRegimeClassifier.analyze()."""
+        regime = self.fit_predict(ssi)
+        threshold = self.implied_threshold(ssi)
+
+        # state_means / state_stds: thống kê SSI trong từng regime
+        ssi_aligned = ssi.reindex(regime.index)
+        mask_valid = regime.notna() & ssi_aligned.notna()
+        if mask_valid.sum() < 10:
+            return regime, threshold, None, None
+
+        ssi_low = ssi_aligned[mask_valid & (regime == 0)]
+        ssi_high = ssi_aligned[mask_valid & (regime == 1)]
+
+        if len(ssi_low) < 2 or len(ssi_high) < 2:
+            return regime, threshold, None, None
+
+        state_means = (float(ssi_low.mean()), float(ssi_high.mean()))
+        state_stds = (float(ssi_low.std()), float(ssi_high.std()))
         return regime, threshold, state_means, state_stds
 
 
@@ -434,6 +649,13 @@ def run_esr_pipeline(
     pillar_mode: str = 'downside',
     pca_warmup: int = 252,
     ema_span: int = 20,
+    regime_method: str = 'hmm',
+    regime_percentile: float = 0.60,
+    regime_absolute_threshold: float = 0.65,
+    regime_smooth_window: int = 3,
+    regime_smooth_k: int = 2,
+    regime_min_periods: int = 252,
+    regime_wf_refit_every: int = 60,
 ) -> Tuple[pd.DataFrame, SSIResult, Optional[pd.Series], Optional[float]]:
     """
     Full ESR pipeline from raw data.
@@ -441,12 +663,26 @@ def run_esr_pipeline(
     Dùng VN30 index làm index chính cho S_VOL, S_PRES, S_VAL, trend filter.
     Dùng VN30 constituent returns cho S_COR (systemic correlation).
 
+    Parameters
+    ----------
+    regime_method :
+      - 'hmm' (default)             : full-fit HMM. Có look-ahead bias nhưng OK cho live view
+                                       (xem regime hôm nay). Chất lượng detection cao nhất.
+      - 'hmm_walk_forward'          : HMM refit mỗi `regime_wf_refit_every` ngày, chỉ dùng
+                                       data trước thời điểm refit → look-ahead-free.
+                                       Dùng cho backtest fidelity hoặc history view.
+      - 'rule_based'                : Expanding-percentile rank + absolute level fallback.
+                                       Đơn giản, look-ahead-free, không cần hmmlearn.
+    regime_percentile, regime_absolute_threshold, regime_smooth_window,
+    regime_smooth_k, regime_min_periods : Tham số cho rule-based (bỏ qua khi method='hmm*').
+    regime_wf_refit_every : số ngày giữa các lần refit HMM walk-forward (default 60).
+
     Returns
     -------
     pillars : DataFrame (5 pillars + INDEX_Close + SSI + Market_State + HMM_Regime)
     result  : SSIResult
     market_states : Optional pd.Series (4-state classification)
-    threshold : Optional float (HMM decision boundary)
+    threshold : Optional float (HMM decision boundary hoặc expanding-quantile threshold)
     """
     # Filter VN30 tickers
     tickers = [t for t in VN30_TICKERS if t in df_close.columns]
@@ -493,9 +729,33 @@ def run_esr_pipeline(
     aggregator = SSIAggregator(pca_warmup=pca_warmup)
     result = aggregator.compute(pillars, ema_span=ema_span)
 
-    # HMM regime classifier
-    classifier = HMMRegimeClassifier()
-    regime_series, threshold, state_means, state_stds = classifier.analyze(result.ssi)
+    # Regime classifier — 3 options
+    if regime_method == 'hmm':
+        classifier = HMMRegimeClassifier()
+        regime_series, threshold, state_means, state_stds = classifier.analyze(
+            result.ssi, walk_forward=False,
+        )
+    elif regime_method == 'hmm_walk_forward':
+        classifier = HMMRegimeClassifier()
+        regime_series, threshold, state_means, state_stds = classifier.analyze(
+            result.ssi, walk_forward=True,
+            refit_every=regime_wf_refit_every,
+            min_train=regime_min_periods,
+        )
+    elif regime_method == 'rule_based':
+        classifier = RuleBasedRegimeClassifier(
+            percentile_threshold=regime_percentile,
+            absolute_threshold=regime_absolute_threshold,
+            smooth_window=regime_smooth_window,
+            smooth_k=regime_smooth_k,
+            min_periods=regime_min_periods,
+        )
+        regime_series, threshold, state_means, state_stds = classifier.analyze(result.ssi)
+    else:
+        raise ValueError(
+            f"Unknown regime_method={regime_method!r}. "
+            "Use 'hmm', 'hmm_walk_forward', or 'rule_based'."
+        )
 
     # 4-state market classification
     if regime_series is not None and not regime_series.dropna().empty:
