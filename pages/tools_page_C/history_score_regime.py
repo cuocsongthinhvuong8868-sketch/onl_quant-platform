@@ -64,7 +64,8 @@ def render():
 
     # ── Summary metrics ──
     latest = df.iloc[-1]
-    col1, col2, col3, col4 = st.columns(4)
+    regime_color = _regime_color(str(latest["regime"]))
+    col1, col2, col3, col4 = st.columns([1, 1, 2, 1])
     with col1:
         st.metric("📅 Ngày gần nhất", latest["date"].strftime("%d/%m/%Y"))
     with col2:
@@ -76,9 +77,14 @@ def render():
                 delta = f"{score_val - prev_score:+.0f}"
         st.metric("📈 Score", f"{score_val:.0f}/100" if pd.notna(score_val) else "N/A", delta=delta)
     with col3:
-        st.metric("🎯 Regime", latest["regime"])
+        st.markdown("🎯 **Regime**")
+        st.markdown(
+            f'<span style="font-size:1.15rem; font-weight:600; color:{regime_color};">'
+            f'{latest["regime"]}</span>',
+            unsafe_allow_html=True,
+        )
     with col4:
-        st.metric("📊 Số ngày ghi nhận", f"{len(df)}")
+        st.metric("📊 Số ngày", f"{len(df)}")
 
     st.markdown("---")
 
