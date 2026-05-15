@@ -223,38 +223,22 @@ def render():
                             st.error(f"Lỗi kết nối API: {e}. Vui lòng kiểm tra lại!")
 
     with tab_history:
-        _all_caches = sorted(
-            list(DATA_LAKE.glob("daily_cache/fed_liquidity_*.txt")),
-            key=lambda p: p.stat().st_mtime,
-            reverse=True,
-        )[:10]
-        if not _all_caches:
+        from shared.history_selector import build_history_options
+        _all_caches = list(DATA_LAKE.glob("daily_cache/fed_liquidity_*.txt"))
+        _options = build_history_options(_all_caches, "fed_liquidity", AI_PROVIDER_MAP)
+        if not _options:
             st.info("ℹ️ Chưa có dữ liệu phân tích lịch sử.")
         else:
-            _options = {}
-            for _fp in _all_caches:
-                _fname = _fp.name.replace(".txt", "")
-                _parts = _fname.split("_")
-                if len(_parts) >= 4:
-                    _date_str = _parts[-1]
-                    _provider = "_".join(_parts[2:-1])
-                    if len(_date_str) == 6 and _date_str.isdigit():
-                        _date_display = f"{_date_str[:2]}/{_date_str[2:4]}/{_date_str[4:]}"
-                        _provider_display = AI_PROVIDER_MAP.get(_provider, {}).get("display", _provider)
-                        _options[f"{_date_display} — {_provider_display}"] = _fp
-            if _options:
-                _selected_label = st.selectbox(
-                    "📅 Chọn ngày và model:",
-                    options=list(_options.keys()),
-                    index=0,
-                    key="fed_liq_history_selector",
-                )
-                _sel_path = _options[_selected_label]
-                with st.container(border=True):
-                    try:
-                        with open(_sel_path, "r", encoding="utf-8") as f:
-                            st.markdown(f.read())
-                    except Exception as e:
-                        st.error(f"Lỗi đọc file: {e}")
-            else:
-                st.info("ℹ️ Không thể đọc được danh sách lịch sử.")
+            _selected_label = st.selectbox(
+                "📅 Chọn ngày và model:",
+                options=list(_options.keys()),
+                index=0,
+                key="fed_liq_history_selector",
+            )
+            _sel_path = _options[_selected_label]
+            with st.container(border=True):
+                try:
+                    with open(_sel_path, "r", encoding="utf-8") as f:
+                        st.markdown(f.read())
+                except Exception as e:
+                    st.error(f"Lỗi đọc file: {e}")
