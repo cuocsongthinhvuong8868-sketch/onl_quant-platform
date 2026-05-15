@@ -273,9 +273,23 @@ with col1:
                     }
             
             if _cio_options:
+                # Sắp xếp theo ngày giảm dần (mới nhất lên đầu)
+                def _parse_date_key(label):
+                    try:
+                        ds = _cio_options[label]["date_str"]
+                        return datetime.strptime(ds, "%d%m%y")
+                    except Exception:
+                        return datetime.min
+                _sorted_keys = sorted(_cio_options.keys(), key=_parse_date_key, reverse=True)
+
+                # Reset session state nếu giá trị cũ không còn hợp lệ
+                _prev = st.session_state.get("cio_pdf_date_selector")
+                if _prev and _prev not in _sorted_keys:
+                    st.session_state.cio_pdf_date_selector = _sorted_keys[0]
+
                 _selected_label = st.selectbox(
                     "📅 Chọn ngày và model:",
-                    options=list(_cio_options.keys()),
+                    options=_sorted_keys,
                     index=0,
                     key="cio_pdf_date_selector",
                 )
