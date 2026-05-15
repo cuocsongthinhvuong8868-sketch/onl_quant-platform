@@ -1,5 +1,5 @@
 import os
-from datetime import date
+from datetime import date, timedelta
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
@@ -60,6 +60,32 @@ def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
+
+def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 2) -> str:
+    """Đọc tối đa n_past báo cáo executive_summary gần nhất (T-1, T-2...).
+    Quét lùi tối đa 7 ngày lịch để bỏ qua ngày nghỉ/không có cache.
+    Trả về chuỗi context sẵn sàng chèn vào prompt, rỗng nếu không tìm thấy."""
+    cache_dir = DATA_LAKE / "daily_cache"
+    found = []
+    for days_back in range(1, 8):
+        if len(found) >= n_past:
+            break
+        target_date = date.today() - timedelta(days=days_back)
+        date_str = target_date.strftime('%d%m%y')
+        path = cache_dir / f"executive_summary_{provider_key}_{date_str}.txt"
+        if path.exists():
+            with open(path, "r", encoding="utf-8") as f:
+                content = f.read().strip()
+            label = f"T-{len(found)+1} ({target_date.strftime('%d/%m/%Y')})"
+            found.append((label, content))
+
+    if not found:
+        return ""
+
+    blocks = []
+    for label, content in found:
+        blocks.append(f"=== BÁO CÁO {label} ===\n{content}")
+    return "\n\n".join(blocks)
 
 def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
     """Xoá toàn bộ cache AI text của 9 công cụ con + executive_summary cho provider_key cụ thể."""
@@ -523,9 +549,20 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
-    
+
+    historical_context = _read_recent_summaries(provider_key, n_past=2)
+    if historical_context:
+        historical_block = (
+            "=== LỊCH SỬ BÁO CÁO (T-1, T-2 — CHỈ ĐỂ PHÂN TÍCH XU HƯỚNG) ===\n"
+            + historical_context
+        )
+    else:
+        historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1/T-2 ==="
+
     all_reports = (
         f"=== {data_note} ===\n\n"
+        f"{historical_block}\n\n"
+        f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"
         f"=== 3. DISPERSION ===\n{r3}\n\n"
@@ -536,10 +573,10 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         f"=== 8. VARES ENGINE ===\n{r8}\n\n"
         f"=== 9. VAR-CVAR VNINDEX ===\n{r9}"
     )
-    
+
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:
         master_prompt = f.read()
-        
+
     master_full = master_prompt.replace("{all_reports}", all_reports)
     
     parts = master_full.split("# INPUT DATA")
