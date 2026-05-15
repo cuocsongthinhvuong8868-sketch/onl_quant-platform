@@ -1,0 +1,55 @@
+**Chẩn đoán Cấu trúc Thị trường | Macro Dispersion Lens v3.1**  
+*Ngày báo cáo: 15/05/2026*
+
+---
+
+### 1. Structural State & Persistence (Trạng thái Cấu trúc & Độ nén)
+
+**Hiện trạng tham số:**
+- **Spread_Z:** -0.06σ → Z-Score gần trung bình lịch sử, không thể hiện sự co giãn bất thường (neither stretched nor compressed).
+- **DPI:** 41.7% → Tỷ lệ số phiên có độ phân tán (CSSD - CSAD) > 0 duy trì ở mức dưới ngưỡng 50%, cho thấy độ bền của phân tán chỉ ở mức trung bình thấp.
+
+**Chẩn đoán:**  
+Thị trường đang vận hành trong trạng thái **cấu trúc bình thường (neutral regimes)**. Không có dấu hiệu của sự "kéo căng" hay "nén chặt" điển hình. Spread_Z âm nhẹ cho thấy độ phân tán đang thấp hơn kỳ vọng lịch sử, nhưng không đủ để gọi là sự đứt gãy. DPI chỉ 41.7% hàm ý rằng những phiên có phân tán cao (outliers trong cross-section) là rời rạc, không hình thành chuỗi bền vững. Do đó, đây là **trạng thái cục bộ nhất thời**, không phải một regime kéo dài.
+
+---
+
+### 2. Systemic vs. Idiosyncratic Regime (Hành vi Bầy đàn vs. Phân hóa)
+
+**Tham số:**  
+- **Avg Pairwise Corr:** 0.077 → Mức tương quan cặp trung bình rất thấp, gần như không có sự đồng pha giữa các mã.
+
+**Chẩn đoán:**  
+Với AvgCorr chỉ 0.077 (thấp hơn nhiều so với ngưỡng 0.3 thường thấy ở các thị trường bị chi phối bởi yếu tố vĩ mô), thị trường đang bị **dẫn dắt hoàn toàn bởi nhân tố đặc thù (idiosyncratic drivers)**.  
+Cấu trúc này phản ánh một môi trường nơi biến động giá từng cổ phiếu hầu như không có sự liên kết với nhau. Không có hiệu ứng bầy đàn (herding). Rủi ro hệ thống (systemic risk) đang ở mức thấp nhất trong lịch sử gần đây. Đây là điều kiện lý tưởng cho chiến lược stock-picking thuần túy, nếu không muốn nói là môi trường mà beta danh mục gần như vô dụng.
+
+---
+
+### 3. Tail-Risk Direction (Hướng của Đuôi rủi ro)
+
+**Tham số:**  
+- **CS Skewness:** N/A  
+- **CS Kurtosis:** N/A  
+
+**Chẩn đoán:**  
+Dữ liệu không có CS Skewness/Kurtosis, nhưng từ tổ hợp **DPI thấp (41.7%) + AvgCorr rất thấp (0.077)** có thể suy luận gián tiếp:  
+- Trong môi trường phi bầy đàn, các biến động cực đoan (outliers) nếu xảy ra sẽ mang tính **cá biệt** chứ không hệ thống.  
+- Mức Spread_Z gần 0 (−0.06σ) gợi ý rằng tail risk không tập trung ở bất kỳ hướng nào (không lệch âm, không lệch dương mạnh).  
+- **Kết luận:** Cấu trúc đuôi hiện tại là **phẳng (flat tail)**. Không có dấu hiệu của các cú sập tập thể (Skewness âm) hay hiệu ứng đầu cơ cực đoan tập trung (Skewness dương). Rủi ro là sự "bất ngờ" đến từ các mã riêng lẻ, không từ thị trường chung.
+
+---
+
+### 4. Historical Context & Regime Mapping (Khớp nối bối cảnh lịch sử)
+
+**Tọa độ trên 2D Map:**  
+- **DPI = 41.7%** (thấp)  
+- **AvgCorr = 0.077** (rất thấp)  
+
+**Khớp nối lịch sử:**  
+Vị trí này rơi vào khu vực **"Idiosyncratic Dispersion Regime"** trong không gian Regime Map. Đây là góc hoàn toàn đối lập với các giai đoạn đứt gãy thanh khoản (nơi DPI > 70% và Corr > 0.5).  
+Trong lịch sử Việt Nam, các điểm tương tự thường xuất hiện vào **giai đoạn tích lũy/pha tạp cuối chu kỳ** (late-cycle drift), khi thị trường mất hướng nhưng chưa sẵn sàng cho biến động lớn. Không mang hình bóng của bất kỳ cuộc khủng hoảng nào.
+
+**Rủi ro cấu trúc danh mục lớn nhất lúc này:**  
+- **Rủi ro tương quan giả (low-correlation trap):** Danh mục được xây dựng dựa trên tương quan thấp hiện tại có thể sẽ không thể bảo vệ nhà quản lý nếu AvgCorr đột ngột tăng vọt (do một cú sốc vĩ mô bất ngờ).  
+- **Khả năng phân hóa quá mức:** Với DPI thấp, nếu spread tăng đột biến, các vị thế idiosyncratic có thể đồng loạt bị "double-hit" vì không có yếu tố bảo hiểm từ beta hệ thống.  
+- **Khuyến nghị:** Các Portfolio Manager nên duy trì linh hoạt quy mô vị thế, tránh mở rộng rủi ro kỳ vọng vào sự phân hóa kéo dài mà thiếu hedge cho sự đảo chiều tương quan (correlation breakout).
