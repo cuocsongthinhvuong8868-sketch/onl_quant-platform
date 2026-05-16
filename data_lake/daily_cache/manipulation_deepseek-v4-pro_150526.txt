@@ -1,0 +1,57 @@
+# BÁO CÁO CHIẾN LƯỢC PHÁI SINH | Ngày 15/05/2026
+**Trạng thái:** COUPLING CỰC ĐỘ - Cảnh báo đỏ toàn hệ thống
+
+---
+
+## 1. Market Microstructure Assessment
+
+**Chẩn đoán cấu trúc chi phối:**
+Vingroup đang ở trạng thái **SIÊU DẪN DẮT** thị trường phái sinh. OLS Slope 0.42 ở Percentile 98.3% cho thấy mỗi 1% biến động của rổ VIN đang kéo VN30F1M dịch chuyển 0.42% - đây là mức độ nhạy cao nhất trong lịch sử quan sát.
+
+Correlation 0.72 ở mức 100th Percentile (tuyệt đối) khẳng định: **Không có sự phân hóa nào.** MMs đang sử dụng Vingroup như một cần cẩu điều khiển trực tiếp chỉ số phái sinh. Khi VIC/VHM/VRE quay, F1 quay theo một cách gần như đồng bộ.
+
+**Đánh giá bất thường:**
+Đây là cấu trúc **EXTREME** - vượt xa mọi ngưỡng chuẩn thống kê. Trong môi trường bình thường, hệ thống phân tán rủi ro qua nhiều nhóm ngành. Sự tập trung dẫn dắt vào 3 mã họ Vin ở mức hiện tại báo hiệu một trong hai kịch bản:
+1. **Market Making chiến lược:** MMs chủ động ép giá về vùng VIN để thanh lý vị thế đối ứng
+2. **Thiếu thanh khoản trầm trọng:** Các nhóm Bank/Chứng/Thép không đủ tải để khớp lệnh
+
+---
+
+## 2. Regime Interpretation
+
+**Giải mã Event Study:**
+Trạng thái COUPLING với ΔCorr = 0.80 và ΔSlope = 0.78 cho thấy quá trình phụ thuộc đang **TĂNG TỐC** chứ không dừng lại. Đây là tín hiệu:
+- Dòng tiền tổng thể đang **CO GIÃN THEO NHỊP VIN** - mọi quyết định mua/bán bluechip đều thông qua lăng kính VIC/VHM/VRE
+- Các quỹ ETF và khối ngoại có thể đang thực hiện **rebalancing danh mục** với bias mạnh về nhóm Vingroup
+
+**Cảnh báo Bẫy nhiễu:**
+Không có phân kỳ giữa Slope và Correlation (cả hai đều ở mức đỉnh), do đó **RỦI RO NHIỄU GIẢM THẤP**. Tuy nhiên, nguy cơ thực sự là:
+- **Bẫy thanh khoản:** Nếu VIN giảm sốc, F1 sẽ lao dốc parabola vì không có nhóm nào khác đỡ
+- **Hiệu ứng Contagion:** VRE yếu nhất trong 3 mã có thể gây ra đổ vỡ domino làm Slope tăng vọt lên >0.5
+
+---
+
+## 3. Trading Action Plan
+
+### **Chiến thuật ưu tiên:**
+**Intraday: Giao dịch theo hướng VIN - KHÔNG được đi ngược**
+- Long F1 khi VIC/VHM breakout khỏi vùng tích lũy 15 phút đầu giờ
+- Short F1 nếu VRE thủng hỗ trợ MA20 với volume >1.5x trung bình
+
+**Overnight: Tránh giữ vị thế qua đêm**
+- Risk/Reward không ủng hộ overnight do độ bất ổn ở mức extreme
+- Nếu bắt buộc giữ: Hedge bằng Short VN30F1 hợp đồng xa (F2) để giảm delta
+
+### **Rủi ro lớn nhất lúc này:**
+Rủi ro **CORRELATION BREAKDOWN** - nếu Correlation bất ngờ giảm do một tin tức vĩ mô (lãi suất/tỷ giá), Slope sẽ co giật mạnh, gây ra các nhịp giật 100-200 points không lường trước được.
+
+### **Leading Indicator cần quan sát:**
+1. **VRE** - Mã yếu nhất, cần coi như "canary in the coal mine"
+2. **Khối lượng khớp lệnh VIC** - Nếu volume >150% SMA20 đột biến kèm giá sideway, đó là tín hiệu MMs đang phân phối
+3. **Basis F1-F2** - Nếu basis nới rộng >15 points, xác nhận dòng tiền đang căng thẳng
+
+**Action trigger:**
+- Nếu Slope giảm <0.35 trong phiên: **Chuyển sang trạng thái WAIT** - đây là tín hiệu đầu tiên của Decoupling
+- Nếu Correlation thủng 0.65: **Đóng toàn bộ vị thế liên quan đến VIN** - cấu trúc thị trường đã thay đổi
+
+**Kết luận:** Thị trường đang ở trạng thái "một chiều hóa" cực đoan dưới sự dẫn dắt của Vingroup. Chiến thuật duy nhất là **bám đuôi trend VIN với stop loss chặt** - không chiến đấu với dòng tiền, cũng không FOMO mà không có kế hoạch thoát.
