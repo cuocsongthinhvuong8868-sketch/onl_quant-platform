@@ -154,17 +154,30 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
     }
 
 
-def render_sync_button(cache_file, key_suffix: str = "") -> None:
+def render_sync_button(
+    cache_file,
+    key_suffix: str = "",
+    label: str = "📤 Đồng bộ báo cáo lên GitHub",
+    help_text: str = "Đẩy file cache báo cáo AI hiện tại lên repo GitHub (chỉ file này, không kèm file khác).",
+    use_container_width: bool = False,
+) -> None:
     """
-    Render nút Streamlit để đồng bộ 1 file cache AI cụ thể lên GitHub.
-    Gọi sau block hiển thị báo cáo AI trong page tool. Không hiện nếu file chưa tồn tại.
+    Render nút Streamlit để đồng bộ 1 file cache cụ thể lên GitHub.
+    Gọi sau block hiển thị kết quả trong page tool. Không hiện nếu file chưa tồn tại.
 
     Parameters
     ----------
     cache_file : Path | str
-        Đường dẫn tuyệt đối tới file cache (.txt).
+        Đường dẫn tuyệt đối tới file cache (txt/pkl/csv... bất kỳ).
     key_suffix : str
         Suffix optional để Streamlit key unique khi cùng file gọi nhiều chỗ.
+    label : str
+        Text hiển thị trên nút. Default cho AI report, override khi dùng cho
+        cache model (.pkl) hoặc file khác.
+    help_text : str
+        Tooltip giải thích nút làm gì.
+    use_container_width : bool
+        Cho phép caller bố cục nút trong column với width đầy đủ.
     """
     import streamlit as st
 
@@ -177,10 +190,11 @@ def render_sync_button(cache_file, key_suffix: str = "") -> None:
     status_key = f"gh_sync_status_{_safe_stem}_{key_suffix}"
 
     clicked = st.button(
-        "📤 Đồng bộ báo cáo lên GitHub",
+        label,
         key=btn_key,
         type="secondary",
-        help="Đẩy file cache báo cáo AI hiện tại lên repo GitHub (chỉ file này, không kèm file khác).",
+        help=help_text,
+        use_container_width=use_container_width,
     )
 
     if clicked:

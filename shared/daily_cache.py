@@ -21,6 +21,20 @@ def _cache_file(namespace: str, payload_key: dict) -> Path:
     return CACHE_DIR / f"{namespace}_{_stable_hash(payload_key)}.pkl"
 
 
+def get_cache_path(namespace: str, payload_key: dict) -> Path:
+    """Public alias của `_cache_file` để các page truy vấn path mà không dùng underscore."""
+    return _cache_file(namespace, payload_key)
+
+
+def clear_daily_cache(namespace: str, payload_key: dict) -> bool:
+    """Xoá file cache cho 1 (namespace, payload_key). Trả True nếu thực sự xoá."""
+    p = _cache_file(namespace, payload_key)
+    if p.exists():
+        p.unlink()
+        return True
+    return False
+
+
 def load_daily_cache(namespace: str, payload_key: dict, data_date: str = None):
     p = _cache_file(namespace, payload_key)
     if not p.exists():
