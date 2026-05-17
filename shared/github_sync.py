@@ -143,14 +143,22 @@ def upload_file(repo_path: str, content_bytes: bytes, message: str) -> dict:
             err_body = resp.text
         raise RuntimeError(f"GitHub PUT failed ({resp.status_code}): {err_body}")
 
-    data = resp.json()
-    content = data.get("content", {})
-    file_url = content.get("html_url", "")
+    # Defensive parsing — GitHub API responses are stable nhưng đề phòng:
+    # rare 200 OK với empty body, hoặc response không có "content" key (chưa từng
+    # gặp nhưng KeyError sẽ crash app trong khi response thực sự đã thành công).
+    try:
+        data = resp.json() if resp.text else {}
+    except Exception:
+        data = {}
+    content = data.get("content") or {}
+    file_url = content.get("html_url", "") if isinstance(content, dict) else ""
+    sha_val = content.get("sha", "") if isinstance(content, dict) else ""
 
     return {
         "ok": True,
         "file_url": file_url,
-        "sha": content.get("sha", ""),
+        "sha": sha_val,
+        "status_code": resp.status_code,
     }
 
 
@@ -222,7 +230,14 @@ def render_sync_button(
                 "name": cache_path.name,
             }
         except Exception as e:
-            st.session_state[status_key] = {"ok": False, "error": str(e)}
+            # Capture full traceback để dễ debug — trước đây chỉ str(e) làm mất context
+            import traceback as _tb
+            st.session_state[status_key] = {
+                "ok": False,
+                "error": str(e),
+                "error_type": type(e).__name__,
+                "traceback": _tb.format_exc(),
+            }
 
     status = st.session_state.get(status_key)
     if status:
@@ -232,4 +247,11 @@ def render_sync_button(
                 msg += f" — [Xem trên GitHub]({status['file_url']})"
             st.success(msg)
         else:
-            st.error(f"❌ Lỗi đồng bộ: {status.get('error', 'unknown')}")
+            err_type = status.get("error_type", "Error")
+            err_msg = status.get("error", "unknown")
+            st.error(f"❌ Lỗi đồng bộ ({err_type}): {err_msg}")
+            # Show full traceback trong expander cho dev debug
+            tb = status.get("traceback")
+            if tb:
+                with st.expander("🔍 Chi tiết traceback (debug)"):
+                    st.code(tb, language="python")
