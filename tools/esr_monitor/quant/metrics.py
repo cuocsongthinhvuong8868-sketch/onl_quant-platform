@@ -729,6 +729,17 @@ def run_esr_pipeline(
     aggregator = SSIAggregator(pca_warmup=pca_warmup)
     result = aggregator.compute(pillars, ema_span=ema_span)
 
+    # Auto-fallback: nếu hmmlearn không cài → chuyển HMM* sang rule_based
+    if regime_method in ('hmm', 'hmm_walk_forward'):
+        try:
+            import hmmlearn  # noqa: F401
+        except ImportError:
+            logger.warning(
+                "hmmlearn không cài → fallback regime_method=%r sang 'rule_based'.",
+                regime_method,
+            )
+            regime_method = 'rule_based'
+
     # Regime classifier — 3 options
     if regime_method == 'hmm':
         classifier = HMMRegimeClassifier()
