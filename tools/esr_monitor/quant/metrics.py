@@ -92,17 +92,51 @@ class PillarEngine:
         return out
 
     @staticmethod
-    def s_liquidity(stocks_long: pd.DataFrame, window: int = 20) -> pd.Series:
+    def s_liquidity(stocks_long: pd.DataFrame, window: int = 20,
+                    long_window: int = 252) -> pd.Series:
         """
-        Cross-sectional MEDIAN Amihud illiquidity, rolling smoothed.
-        stocks_long must have columns: time, ticker, close, volume
+        VN30 Liquidity Stress = Volume Dry-Up.
+
+        Định nghĩa
+        ----------
+            S_LIQ = -log( MA_short(daily_total_dollar_vol) / MA_long(daily_total_dollar_vol) )
+
+        - Volume rút (short_avg < long_avg) → log < 0 → -log > 0 → STRESS cao.
+        - Volume bình thường so với lịch sử → S_LIQ ≈ 0.
+        - Volume bùng (capitulation/euphoria) → S_LIQ < 0 (negative stress).
+
+        Tại sao bỏ Amihud illiquidity (median |ret| / dollar_vol)?
+        ---------------------------------------------------------
+        Amihud được thiết kế cho small-cap / penny stock — đo price impact per
+        unit dollar traded. Trên VN30 bluechips, dollar volume luôn rất lớn
+        (hàng nghìn tỷ VND/ngày) nên Amihud trở thành noise: |ret| và volume
+        thường ↑ cùng lúc trong stress (panic selling) → triệt tiêu nhau.
+        Spearman corr(Amihud_VN30, S_VOL) ≈ 0 — không bắt được stress.
+
+        Trước đây pipeline dùng volume = 1e6 (giả) → Amihud = |ret|/close,
+        nên S_LIQ "đẹp mắt" vì đó thực ra là duplicate của volatility. Sau
+        khi inject volume thật, bản chất thực sự bộc lộ.
+
+        Volume Dry-Up tương ứng cảm nhận thị trường VN về "thanh khoản kém":
+        retail flight → khối lượng khô cạn so với norm lịch sử → bid-ask
+        widen → exit khó → stress thật sự.
+
+        Parameters
+        ----------
+        stocks_long : DataFrame [time, ticker, close, volume]
+        window : short MA cửa sổ (~20 phiên ≈ 1 tháng)
+        long_window : long MA cửa sổ làm baseline (~252 phiên ≈ 1 năm)
         """
         df = stocks_long.copy()
-        df['ret_abs'] = df.groupby('ticker')['close'].pct_change().abs()
-        dollar_vol = (df['close'] * df['volume']).replace(0, np.nan)
-        df['amihud'] = df['ret_abs'] / dollar_vol
-        daily = df.groupby('time')['amihud'].median()
-        return daily.rolling(window).mean()
+        df['dollar_vol'] = df['close'] * df['volume']
+        daily_dvol = df.groupby('time')['dollar_vol'].sum()
+        # Bỏ ngày volume = 0 (lễ / chưa giao dịch) để khỏi pull average xuống
+        daily_dvol = daily_dvol.replace(0, np.nan)
+        short_avg = daily_dvol.rolling(window, min_periods=max(window // 2, 5)).mean()
+        long_avg = daily_dvol.rolling(long_window, min_periods=long_window // 2).mean()
+        ratio = (short_avg / long_avg).replace([np.inf, -np.inf], np.nan)
+        # -log: dry-up (ratio<1) → positive stress
+        return -np.log(ratio.replace(0, np.nan))
 
     @staticmethod
     def s_valuation(idx_close: pd.Series, deposit_rate: float, window: int = 252) -> pd.Series:
@@ -148,20 +182,31 @@ class PillarEngine:
 
     @staticmethod
     def s_liquidity_down(stocks_long: pd.DataFrame, idx_returns: pd.Series,
-                         window: int = 20, min_down_days: int = 5) -> pd.Series:
-        """Cross-sectional median Amihud on DOWN-MARKET days only."""
+                         window: int = 20, long_window: int = 252,
+                         min_down_days: int = 5) -> pd.Series:
+        """Downside Volume Dry-Up: chỉ tính trên những phiên down market.
+
+        Volume khô cạn trên phiên giảm = "không ai chịu đỡ giá" = stress mạnh hơn
+        so với khô cạn chung. Áp dụng cùng -log(short/long) nhưng trên subset
+        down-day. Reindex về toàn bộ dates để giữ shape consistent với pillars.
+        """
         df = stocks_long.copy()
-        df['ret_abs'] = df.groupby('ticker')['close'].pct_change().abs()
-        dollar_vol = (df['close'] * df['volume']).replace(0, np.nan)
-        df['amihud'] = df['ret_abs'] / dollar_vol
-        idx_series = idx_returns.to_frame('idx_ret')
-        idx_series.index.name = 'time'
-        df = df.merge(idx_series, on='time', how='left')
-        df_down = df[df['idx_ret'] < 0].copy()
-        if len(df_down) < min_down_days:
-            return pd.Series(index=stocks_long['time'].unique(), dtype=float)
-        daily = df_down.groupby('time')['amihud'].median()
-        return daily.rolling(window).mean()
+        df['dollar_vol'] = df['close'] * df['volume']
+        # Tag down-day flag từ index return
+        idx_aligned = idx_returns.reindex(df['time'].unique())
+        down_dates = idx_aligned[idx_aligned < 0].index
+        df_down = df[df['time'].isin(down_dates)]
+        if df_down.shape[0] < min_down_days:
+            return pd.Series(index=pd.Index(stocks_long['time'].unique()).sort_values(), dtype=float)
+
+        daily_dvol_down = df_down.groupby('time')['dollar_vol'].sum().replace(0, np.nan)
+        short_avg = daily_dvol_down.rolling(window, min_periods=max(window // 2, 5)).mean()
+        long_avg = daily_dvol_down.rolling(long_window, min_periods=long_window // 2).mean()
+        ratio = (short_avg / long_avg).replace([np.inf, -np.inf], np.nan)
+        s = -np.log(ratio.replace(0, np.nan))
+        # Reindex về full date range để aggregator merge được
+        all_dates = pd.Index(sorted(stocks_long['time'].unique()))
+        return s.reindex(all_dates).ffill(limit=5)
 
     # ---- main compute ----
 
