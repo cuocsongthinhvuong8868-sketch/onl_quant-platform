@@ -17,6 +17,7 @@ import os
 import time
 import logging
 import argparse
+import numpy as np
 import pandas as pd
 from datetime import datetime, timedelta
 import sys
@@ -38,6 +39,7 @@ from config import (
     VNSTOCK_API_KEY,
     DATA_LAKE,
     MARKET_DATA,
+    MARKET_VOLUME,
     VNINDEX_DATA,
     VN30_DATA,
     TICKERS_FILE,
@@ -64,10 +66,13 @@ def load_tickers() -> list:
         return []
 
 
-def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Series | None:
+def fetch_history(symbol: str, start: str, end: str, source: str = "VCI") -> pd.DataFrame | None:
     """
-    Tải giá đóng cửa cho 1 mã.
+    Tải lịch sử OHLCV cho 1 mã, trả về DataFrame [close, volume] (index=date).
     Trả về None nếu không tải được — KHÔNG raise exception.
+
+    Volume = NaN nếu nguồn không cung cấp (vd. KBS cho index có thể thiếu);
+    caller phải xử lý NaN volume (vd. fill 0 hoặc skip).
     """
     try:
         from vnstock import Quote
@@ -78,19 +83,33 @@ def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Se
             logger.warning("%-6s — API trả về rỗng, bỏ qua.", symbol)
             return None
 
-        s = (
-            df[["time", "close"]]
-            .rename(columns={"close": symbol})
-            .set_index("time")
-        )
-        s.index = pd.to_datetime(s.index).normalize().tz_localize(None)
-        s = s[~s.index.duplicated(keep="last")]
-        logger.info("✓ %-8s [%s] — %d ngày", symbol, source, len(s))
-        return s[symbol]
+        keep_cols = ["time", "close"]
+        if "volume" in df.columns:
+            keep_cols.append("volume")
+
+        out = df[keep_cols].set_index("time")
+        out.index = pd.to_datetime(out.index).normalize().tz_localize(None)
+        out = out[~out.index.duplicated(keep="last")]
+
+        if "volume" not in out.columns:
+            out["volume"] = np.nan
+            logger.info("✓ %-8s [%s] — %d ngày (volume thiếu, fill NaN)", symbol, source, len(out))
+        else:
+            logger.info("✓ %-8s [%s] — %d ngày (close+vol)", symbol, source, len(out))
+        return out[["close", "volume"]]
 
     except Exception as e:
         logger.warning("✗ %-8s [%s] — %s — bỏ qua.", symbol, source, e)
         return None
+
+
+# Backwards-compat: code cũ vẫn import fetch_close
+def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Series | None:
+    """Wrapper giữ tương thích — trả về Series close only."""
+    df = fetch_history(symbol, start, end, source)
+    if df is None:
+        return None
+    return df["close"].rename(symbol)
 
 
 def _load_existing_market_data(path: Path) -> pd.DataFrame | None:
@@ -122,42 +141,47 @@ def _merge_and_save(df_new: pd.DataFrame, path: Path) -> pd.DataFrame:
     return df_merged
 
 
+def _fetch_index_with_fallback(symbol: str, start: str, end: str) -> pd.DataFrame | None:
+    """Fetch index (VNINDEX/VN30) với fallback VCI → KBS. Trả về DF [close, volume]."""
+    df = fetch_history(symbol, start, end, source="VCI")
+    if df is None:
+        logger.info("%s VCI thất bại, thử fallback KBS...", symbol)
+        df = fetch_history(symbol, start, end, source="KBS")
+    return df
+
+
 def update_vnindex(start: str, end: str) -> bool:
-    """
-    Tải và lưu dữ liệu VNINDEX vào data_lake/vnindex_cache.csv.
-    Trả về True nếu thành công.
-    Ưu tiên VCI, fallback KBS.
+    """Tải VNINDEX (close + volume) vào data_lake/vnindex_cache.csv.
+
+    Cột: VNINDEX, VNINDEX_volume.
+    close ffill (để skip ngày nghỉ); volume KHÔNG ffill (NaN giữ nguyên =
+    ngày không giao dịch → 0 sẽ làm méo Amihud).
     """
     logger.info("Đang tải VNINDEX...")
-    s = fetch_close("VNINDEX", start, end, source="VCI")
-    if s is None:
-        logger.info("VNINDEX VCI thất bại, thử fallback KBS...")
-        s = fetch_close("VNINDEX", start, end, source="KBS")
-    if s is None:
+    df = _fetch_index_with_fallback("VNINDEX", start, end)
+    if df is None:
         logger.warning("Không tải được VNINDEX, bỏ qua lưu file VNINDEX.")
         return False
 
-    df_new = s.to_frame(name="VNINDEX").sort_index().ffill()
+    df_new = df.rename(columns={"close": "VNINDEX", "volume": "VNINDEX_volume"}).sort_index()
+    df_new["VNINDEX"] = df_new["VNINDEX"].ffill()
     _merge_and_save(df_new, VNINDEX_DATA)
     return True
 
 
 def update_vn30(start: str, end: str) -> bool:
-    """
-    Tải và lưu dữ liệu VN30 index vào data_lake/vn30_cache.csv.
-    Trả về True nếu thành công.
-    Ưu tiên VCI, fallback KBS.
+    """Tải VN30 index (close + volume) vào data_lake/vn30_cache.csv.
+
+    Cột: VN30, VN30_volume. Volume cần thiết cho ESR Monitor S_PRES.
     """
     logger.info("Đang tải VN30...")
-    s = fetch_close("VN30", start, end, source="VCI")
-    if s is None:
-        logger.info("VN30 VCI thất bại, thử fallback KBS...")
-        s = fetch_close("VN30", start, end, source="KBS")
-    if s is None:
+    df = _fetch_index_with_fallback("VN30", start, end)
+    if df is None:
         logger.warning("Không tải được VN30, bỏ qua lưu file VN30.")
         return False
 
-    df_new = s.to_frame(name="VN30").sort_index().ffill()
+    df_new = df.rename(columns={"close": "VN30", "volume": "VN30_volume"}).sort_index()
+    df_new["VN30"] = df_new["VN30"].ffill()
     _merge_and_save(df_new, VN30_DATA)
     return True
 
@@ -207,33 +231,43 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
         logger.error("Không có ticker cổ phiếu hợp lệ sau khi loại VNINDEX.")
         return
 
-    series_list = []
+    close_list = []
+    volume_list = []
     failed = []
 
     for i, symbol in enumerate(stock_tickers, 1):
         logger.info("[%d/%d] Đang tải %s...", i, len(stock_tickers), symbol)
-        s = fetch_close(symbol, start, end, source="VCI")
-        if s is None:
+        df_hist = fetch_history(symbol, start, end, source="VCI")
+        if df_hist is None:
             logger.info("  %s VCI thất bại, thử fallback KBS...", symbol)
-            s = fetch_close(symbol, start, end, source="KBS")
-        if s is not None:
-            series_list.append(s)
+            df_hist = fetch_history(symbol, start, end, source="KBS")
+        if df_hist is not None:
+            close_list.append(df_hist["close"].rename(symbol))
+            volume_list.append(df_hist["volume"].rename(symbol))
         else:
             failed.append(symbol)
         time.sleep(1)  # rate limit
 
     logger.info("─" * 50)
-    logger.info("Thành công: %d / %d mã", len(series_list), len(stock_tickers))
+    logger.info("Thành công: %d / %d mã", len(close_list), len(stock_tickers))
 
     if failed:
         logger.warning("Bỏ qua %d mã: %s", len(failed), ", ".join(failed))
 
-    if len(series_list) < 2:
+    if len(close_list) < 2:
         logger.error("Chưa đủ dữ liệu (< 2 mã) — không lưu file.")
         return
 
-    df_new = pd.concat(series_list, axis=1).sort_index().ffill()
-    _merge_and_save(df_new, MARKET_DATA)
+    # close: ffill để skip cuối tuần / lễ
+    df_close = pd.concat(close_list, axis=1).sort_index().ffill()
+    _merge_and_save(df_close, MARKET_DATA)
+
+    # volume: KHÔNG ffill (volume = 0 hoặc NaN giữ ý nghĩa "không giao dịch")
+    df_volume = pd.concat(volume_list, axis=1).sort_index()
+    # Sanitize: thay <0 / inf bằng NaN; cho phép 0 thật
+    df_volume = df_volume.replace([np.inf, -np.inf], np.nan)
+    df_volume = df_volume.mask(df_volume < 0, np.nan)
+    _merge_and_save(df_volume, MARKET_VOLUME)
 
 
 if __name__ == "__main__":

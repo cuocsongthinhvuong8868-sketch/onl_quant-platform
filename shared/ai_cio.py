@@ -19,7 +19,7 @@ except ImportError:
             "base_url": "https://api.deepseek.com/v1",
         },
     }
-from shared.data_loader import load_close_prices, load_custom
+from shared.data_loader import load_close_prices, load_custom, load_volumes
 
 # Import logic Fear Greed
 from tools.fear_greed.quant.metrics import calculate_quant_metrics
@@ -401,11 +401,15 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     if cached: return cached
     
     df_vn30 = load_custom("vn30_cache.csv")
+    # Volume thật từ market_volume.csv (sau khi user chạy update_data.py phiên bản mới).
+    # Nếu file chưa tồn tại → load_volumes() trả None, pipeline tự fallback proxy + log warning.
+    df_volume = load_volumes()
     # AI CIO AUTO/Manual: dùng PRODUCTION_REGIME_METHOD (single source of truth).
     # AI CIO chỉ đọc regime của ngày hiện tại → look-ahead bias không leak.
     # Đồng bộ với ESR Monitor LIVE default và report.py snapshot.
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_stocks, df_vn30,
+        df_volume=df_volume,
         deposit_rate=0.06,
         pillar_mode='downside',
         pca_warmup=252,

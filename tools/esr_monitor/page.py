@@ -5,7 +5,7 @@ Full 5-pillar Systemic Stress Index (SSI) with HMM regime classifier,
 4-state market classification, and AI analysis.
 """
 import streamlit as st
-from shared.data_loader import load_close_prices, load_custom
+from shared.data_loader import load_close_prices, load_custom, load_volumes
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.api_key_helper import resolve_api_key
 from tools.esr_monitor.quant.metrics import (
@@ -111,11 +111,21 @@ def render():
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
+    # Volume thật cho S_LIQ (Amihud) — fallback proxy nếu file chưa có
+    df_volume = load_volumes()
+    has_index_volume = "VN30_volume" in df_vn30.columns
+    if df_volume is None or not has_index_volume:
+        st.caption(
+            "⚠️ Volume thật chưa đầy đủ — S_PRES/S_LIQ đang dùng proxy. "
+            "Chạy `python command/update_data.py --backfill 2190` để bổ sung."
+        )
     st.caption(f"📅 Dữ liệu cuối: {df_close.index.max().strftime('%d/%m/%Y')}")
     n_vn30 = sum(1 for t in VN30_TICKERS if t in df_close.columns)
     st.caption(f"📊 Số mã VN30: {n_vn30}/30")
 
     # ── Compute ESR ──
+    # Đưa "có volume thật hay không" vào cache key — vì cùng tham số mà đổi
+    # nguồn volume sẽ ra pillar khác → không thể chia sẻ cache.
     cache_key = {
         "ma_period": ma_period, "pca_warmup": pca_warmup,
         "ema_span": ema_span, "deposit_rate": deposit_rate,
@@ -125,6 +135,8 @@ def render():
         "regime_percentile": regime_percentile,
         "regime_abs_threshold": regime_abs_threshold,
         "regime_wf_refit": regime_wf_refit,
+        "real_vol": df_volume is not None,
+        "real_idx_vol": has_index_volume,
     }
     cached = load_daily_cache("esr_monitor", cache_key)
     if cached is not None:
@@ -138,6 +150,7 @@ def render():
             try:
                 pillars, result, market_states, threshold = run_esr_pipeline(
                     df_close, df_vn30,
+                    df_volume=df_volume,
                     deposit_rate=deposit_rate,
                     pillar_mode=pillar_mode,
                     pca_warmup=pca_warmup,

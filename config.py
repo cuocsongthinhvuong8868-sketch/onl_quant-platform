@@ -7,8 +7,9 @@ load_dotenv()
 ROOT_DIR            = Path(__file__).parent
 DATA_LAKE           = ROOT_DIR / "data_lake"
 MARKET_DATA         = DATA_LAKE / "market_data.csv"
+MARKET_VOLUME       = DATA_LAKE / "market_volume.csv"      # khớp shape MARKET_DATA, lưu volume
 VNINDEX_DATA        = DATA_LAKE / "vnindex_cache.csv"
-VN30_DATA           = DATA_LAKE / "vn30_cache.csv"
+VN30_DATA           = DATA_LAKE / "vn30_cache.csv"          # nay chứa cả VN30 + VN30_volume nếu có
 FED_LIQUIDITY_DATA  = DATA_LAKE / "fed_liquidity_cache.csv"
 TICKERS_FILE        = ROOT_DIR / "tickers.csv"
 
