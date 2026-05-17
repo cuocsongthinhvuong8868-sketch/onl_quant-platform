@@ -1,0 +1,31 @@
+## 1. Observations
+- VN30 Stress Index: 0.00% (ngưỡng cảnh báo: 40%)
+- Số mã thủng VaR 95%: 0/30
+- Complacency Index: 2.97% (ngưỡng nguy hiểm: 80%)
+- Số mã mispriced: 3
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở mức 0.00% cho thấy không có dấu hiệu lây lan thủng VaR trong rổ bluechip. Với 0/30 mã vi phạm, xác suất xảy ra sự kiện systemic do hiệu ứng domino từ các mã VN30 là gần bằng 0. Không có Top 3 crash để phân tích — thị trường hoàn toàn không có shock cục bộ nào đủ mạnh để lan rộng.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency Index ở mức 2.97% — rất thấp so với ngưỡng danger 80%. Điều này có nghĩa: thị trường **KHÔNG đang ở regime ngủ quên**. Tuy nhiên, điều này **KHÔNG đồng nghĩa thị trường ổn định hay không có áp lực bán**.  
+
+Với Stress Index = 0% và độ bao phủ mispriced chỉ 3 mã, tín hiệu Complacency thấp ở đây phù hợp với kịch bản thị trường đang vận hành với spread giãn rộng tự nhiên — không phải hoảng loạn hay uptrend mạnh. Không có dấu hiệu định giá sai rủi ro trên diện rộng.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có — không khuyến nghị thay đổi tỷ trọng dựa trên contagion.
+- **Top 3 Mispriced (Module C):** BID, VTO, VIC — spread bị nén cục bộ. Cảnh báo tiềm ẩn rủi ro điều chỉnh nếu thanh khoản đột ngột co hẹp. Theo dõi chặt khối lượng giao dịch và biến động giá trong 1–2 phiên tới.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 2.97,
+  "mispriced_count": 3,
+  "regime": "spread_normal",
+  "watchlist_short": ["BID", "VTO", "VIC"],
+  "confidence": "high"
+}
+```
