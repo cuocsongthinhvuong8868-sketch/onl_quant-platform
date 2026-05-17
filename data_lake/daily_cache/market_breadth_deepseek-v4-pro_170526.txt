@@ -1,0 +1,35 @@
+## 1. Observations
+- **MA20 (36.3%)**: Ở mức **thấp—oversold** (ngưỡng < 40%), cho thấy xung lực ngắn hạn rất yếu, gần chạm vùng quá bán (<20%).
+- **MA60 (35.5%)**: Ở mức **thấp**, dưới ngưỡng 50% trung bình, xác nhận xu hướng trung hạn chưa có dấu hiệu phục hồi rõ rệt.
+- **MA125 (30.7%)**: Ở mức **rất thấp**, gần chạm đáy, phản ánh chu kỳ kinh doanh nửa năm đang suy yếu mạnh.
+- **MA252 (36.3%)**: Ở mức **thấp**, dưới ngưỡng 40%, cho thấy thị trường đang ở trong một **Bear regime** dài hạn.
+
+## 2. Structural Health
+- **Alignment**: Cả 4 khung thời gian đều đồng loạt ở mức thấp (30-36%), không có divergence giữa MA20 và MA252 – cả hai đều yếu.
+- **Pattern khớp**: **Bear Confirmed** – MA20 < 30% (thực tế 36.3%, sát ngưỡng) và MA252 < 40%. Thị trường đang trong trạng thái yếu kém cơ cấu, không có tín hiệu đảo chiều.
+
+## 3. Money Flow Leadership
+- **Top volume MA20 (ngắn hạn)**: **Tài chính (TCB, STB, HDB)** và **Bất động sản (VRE, VHM, DXG, CII)** chiếm ưu thế, một số mã năng lượng (BSR, PVT). Đây là nhóm cyclical – không phải defensive.
+- **Top volume MA252 (dài hạn leader)**: Gần như **overlap hoàn toàn** với short-term: cùng nhóm Banks (MBB, STB, HDB, VPB), Real Estate (NVL, VRE, VHM) và Energy (BSR, PVT). Điều này cho thấy **dòng tiền lớn đang tập trung vào cùng nhóm, không có sự dịch chuyển rõ rệt.**
+- **Smart money**: Đang ưu tiên **cyclical (Bất động sản, Ngân hàng, Năng lượng)**, không phải defensive. Điều này bất thường trong Bear regime – có thể là dòng tiền đầu cơ ngắn hạn chứ không phải phòng thủ.
+
+## 4. Verdict
+- **Strategy: Defensive cash-up / WAIT FOR CONFIRMATION.** Mặc dù không có divergence giữa MA20 và MA252, nhưng MA20 đã tiến gần vùng oversold (<40%) trong khi MA252 vẫn <40%, không đủ mạnh để xác nhận bear trap. Rủi ro tiếp diễn giảm vẫn cao.
+- **Đòn bẩy: 0% margin.** Không đủ điều kiện để margin khi MA252 < 40% và không có tín hiệu đảo chiều.
+- **Hành động: Giữ tiền mặt. Chỉ tham gia T+ nếu MA20 bật lên > 50% kèm volume cải thiện.** Hiện tại, cấu trúc yếu và dòng tiền tập trung vào cyclical trong Bear regime là tín hiệu rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 36.3,
+  "ma60_pct": 35.5,
+  "ma125_pct": 30.7,
+  "ma252_pct": 36.3,
+  "regime": "bear_confirmed",
+  "leadership_sector": "cyclical",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
