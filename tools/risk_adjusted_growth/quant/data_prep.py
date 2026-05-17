@@ -1,4 +1,21 @@
+import logging
+
 import pandas as pd
+
+logger = logging.getLogger(__name__)
+
+# market_data.csv lưu giá theo nghìn VND (convention vnstock cho VN stocks):
+# VCB = 61.5 ↔ 61,500 VND. Còn BVPS trong bank_fundamentals.csv ở đơn vị VND
+# đầy đủ (VCB BVPS ~ 27,231). Để P/B đồng nhất đơn vị: price * 1000 / bvps.
+PRICE_THOUSANDS_TO_VND = 1000
+
+# Cap cash payout 50% để tránh outlier (special dividend) làm méo ROE retention.
+# Có thể nâng nếu khẩu vị ngân hàng có chính sách chia cao bền vững.
+CASH_PAYOUT_CAP = 0.5
+
+# Threshold cảnh báo BVPS rõ ràng sai unit. BVPS bank thấp nhất trong dataset
+# VN ~10k VND. Dưới mức này nghi đơn vị nghìn VND hoặc lỗi parse.
+BVPS_UNIT_SANITY_FLOOR = 1000
 
 
 def average_cash_payout(symbol: str, df_div: pd.DataFrame) -> float:
@@ -15,11 +32,12 @@ def average_cash_payout(symbol: str, df_div: pd.DataFrame) -> float:
     ).dropna()
     if s.empty:
         return 0.0
-    return min(float(s.mean()) / 100.0, 0.5)
+    return min(float(s.mean()) / 100.0, CASH_PAYOUT_CAP)
 
 
 def build_base_table(df_fund: pd.DataFrame, df_div: pd.DataFrame, price_row: pd.Series) -> pd.DataFrame:
     rows = []
+    suspect_unit_tickers = []
     for _, r in df_fund.iterrows():
         ticker = str(r["ticker"]).upper()
         roe_geomean = float(r["Geomean ROE"])
@@ -27,7 +45,10 @@ def build_base_table(df_fund: pd.DataFrame, df_div: pd.DataFrame, price_row: pd.
         bvps = float(r["BVPS"])
         price = float(price_row.get(ticker, 0.0)) if price_row is not None else 0.0
 
-        pb = (price * 1000 / bvps) if (bvps > 0 and price > 0) else 0.0
+        if 0 < bvps < BVPS_UNIT_SANITY_FLOOR:
+            suspect_unit_tickers.append((ticker, bvps))
+
+        pb = (price * PRICE_THOUSANDS_TO_VND / bvps) if (bvps > 0 and price > 0) else 0.0
         cash_payout = average_cash_payout(ticker, df_div)
 
         rows.append(
@@ -38,6 +59,14 @@ def build_base_table(df_fund: pd.DataFrame, df_div: pd.DataFrame, price_row: pd.
                 "Cash Payout Ratio": cash_payout,
                 "P/B Gốc": pb,
             }
+        )
+
+    if suspect_unit_tickers:
+        logger.warning(
+            "BVPS có vẻ sai unit (<%d VND) cho: %s. P/B sẽ bị inflate. "
+            "Kiểm tra lại file bank_fundamentals.csv — kỳ vọng BVPS theo VND đầy đủ.",
+            BVPS_UNIT_SANITY_FLOOR,
+            ", ".join(f"{t}={v}" for t, v in suspect_unit_tickers),
         )
 
     return pd.DataFrame(rows)

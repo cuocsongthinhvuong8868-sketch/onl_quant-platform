@@ -76,6 +76,7 @@ def _below_ma200_with_hysteresis(price: pd.Series, ma200: pd.Series,
     return pd.Series(out, index=price.index)
 
 def generate_composite_signal(df_prices: pd.DataFrame, df_vn30_idx: pd.DataFrame,
+                              df_volume: pd.DataFrame = None,
                               ma200_buffer: float = MA200_BUFFER,
                               vshape_threshold: float = VSHAPE_THRESHOLD,
                               vshape_lookback: int = VSHAPE_LOOKBACK) -> pd.DataFrame:
@@ -127,8 +128,10 @@ def generate_composite_signal(df_prices: pd.DataFrame, df_vn30_idx: pd.DataFrame
         # Tăng warmup nhẹ lên 40 để PCA ổn định hơn.
         # Dùng HMM walk-forward (look-ahead-free) — chất lượng HMM nhưng không leak data
         # tương lai vào regime classification (quan trọng cho backtest fidelity).
+        # df_volume optional: nếu có sẽ dùng cho Amihud, không thì pipeline fallback proxy.
         pillars, esr_res, market_states, _ = run_esr_pipeline(
             df_prices_clean, df_vn30_idx_clean,
+            df_volume=df_volume,
             pca_warmup=40,
             pillar_mode='downside',
             regime_method='hmm_walk_forward',

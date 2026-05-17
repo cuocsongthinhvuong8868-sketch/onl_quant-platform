@@ -1,4 +1,4 @@
-from shared.data_loader import load_custom
+from shared.data_loader import load_custom, load_volumes
 from tools.esr_monitor.quant.metrics import (
     run_esr_pipeline, VN30_TICKERS, PRODUCTION_REGIME_METHOD,
 )
@@ -6,10 +6,12 @@ from tools.esr_monitor.quant.metrics import (
 
 def snapshot(df_close, _load_custom):
     df_vn30 = load_custom("vn30_cache.csv")
+    df_volume = load_volumes()
     # Report snapshot CSV — dùng PRODUCTION_REGIME_METHOD (single source of truth).
     # Đồng bộ với ESR Monitor LIVE default và AI CIO AUTO.
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_close, df_vn30,
+        df_volume=df_volume,
         deposit_rate=0.06,
         pillar_mode='classic',
         pca_warmup=252,

@@ -1,5 +1,6 @@
 import pandas as pd
 import numpy as np
+from numba import njit
 from scipy.stats import norm
 
 # ── Constants ──
@@ -54,22 +55,39 @@ def calculate_var_cvar_metrics(vnindex_series: pd.Series) -> pd.DataFrame:
     return df[["price", "return", "stdev_30", "parametric_var", "historical_var", "expected_shortfall"]]
 
 
+@njit(fastmath=True, cache=True)
+def _rolling_es_kernel(returns: np.ndarray, var_arr: np.ndarray, window: int) -> np.ndarray:
+    """Numba kernel — O(N·W) loop nhưng compile sang native, nhanh ~50-200× pure-Python.
+
+    ES_i = mean({ r_j | r_j ≤ VaR_i, j ∈ [i-window+1, i] })
+    Fallback ES_i = VaR_i nếu tail rỗng (giữ semantic của bản pandas cũ).
+    """
+    n = returns.shape[0]
+    out = np.full(n, np.nan)
+    for i in range(window - 1, n):
+        var_thr = var_arr[i]
+        if np.isnan(var_thr):
+            continue
+        start = i - window + 1
+        s = 0.0
+        c = 0
+        for j in range(start, i + 1):
+            r = returns[j]
+            if not np.isnan(r) and r <= var_thr:
+                s += r
+                c += 1
+        out[i] = s / c if c > 0 else var_thr
+    return out
+
+
 def _rolling_expected_shortfall(returns: pd.Series, var_series: pd.Series, window: int = HIST_WINDOW) -> pd.Series:
     """
     Tính rolling Expected Shortfall: trung bình của các return nằm trong tail (≤ VaR).
     Với mỗi ngày i, ES_i = mean( { r_j | r_j ≤ VaR_i, j ∈ [i-window+1, i] } )
+
+    Wrap quanh numba kernel để giữ API pandas-style cho caller.
     """
-    es = pd.Series(index=returns.index, dtype=float)
-    for i in range(len(returns)):
-        if i < window - 1:
-            continue
-        window_returns = returns.iloc[i - window + 1 : i + 1]
-        var_threshold = var_series.iloc[i]
-        if pd.isna(var_threshold):
-            continue
-        tail = window_returns[window_returns <= var_threshold]
-        if len(tail) > 0:
-            es.iloc[i] = tail.mean()
-        else:
-            es.iloc[i] = var_threshold
-    return es
+    arr_ret = returns.to_numpy(dtype=np.float64, copy=False)
+    arr_var = var_series.reindex(returns.index).to_numpy(dtype=np.float64, copy=False)
+    es_arr = _rolling_es_kernel(arr_ret, arr_var, int(window))
+    return pd.Series(es_arr, index=returns.index)

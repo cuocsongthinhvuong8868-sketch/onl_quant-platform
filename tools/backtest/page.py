@@ -4,7 +4,7 @@ import numpy as np
 import plotly.graph_objects as go
 from datetime import date
 
-from shared.data_loader import load_close_prices, load_custom
+from shared.data_loader import load_close_prices, load_custom, load_volumes
 from tools.backtest.quant.composite_signal import (
     generate_composite_signal,
     MA200_BUFFER,
@@ -102,6 +102,18 @@ def show():
         with st.spinner("Đang tải dữ liệu..."):
             df_prices = load_close_prices()
             df_vni = load_custom("vnindex_cache.csv")
+            # Backtest dùng VNINDEX làm proxy thay vì VN30 (xem ESR pipeline) —
+            # vnindex_cache.csv giờ có VNINDEX_volume nhưng ESR đọc 'VN30_volume',
+            # nên ở đây load thêm vn30_cache.csv để pass volume index thật.
+            try:
+                df_vn30 = load_custom("vn30_cache.csv")
+                # Inject VN30_volume vào df_vni clone để ESR pipeline đọc được
+                if "VN30_volume" in df_vn30.columns:
+                    df_vni = df_vni.copy()
+                    df_vni["VN30_volume"] = df_vn30["VN30_volume"].reindex(df_vni.index)
+            except FileNotFoundError:
+                pass
+            df_volume = load_volumes()  # None nếu chưa update_data
             idx_col = "VNINDEX" if "VNINDEX" in df_vni.columns else df_vni.columns[0]
             vnindex = df_vni[idx_col]
             benchmark_ret = vnindex.pct_change()
@@ -110,6 +122,7 @@ def show():
         with st.spinner("Đang tính Composite Signals (Tầng 1)..."):
             df_composite = generate_composite_signal(
                 df_prices, df_vni,
+                df_volume=df_volume,
                 ma200_buffer=ma200_buffer_pct,
                 vshape_threshold=vshape_pct,
                 vshape_lookback=VSHAPE_LOOKBACK,

@@ -645,6 +645,7 @@ def classify_market_state(regime: pd.Series, idx_close: pd.Series,
 def run_esr_pipeline(
     df_close: pd.DataFrame,
     df_vn30: pd.DataFrame,
+    df_volume: Optional[pd.DataFrame] = None,
     deposit_rate: float = 0.06,
     pillar_mode: str = 'downside',
     pca_warmup: int = 252,
@@ -665,6 +666,13 @@ def run_esr_pipeline(
 
     Parameters
     ----------
+    df_volume : optional DataFrame
+        Volume per stock (cùng shape df_close: index=date, columns=tickers).
+        Nếu được cung cấp → S_LIQ dùng Amihud trên volume thật.
+        Nếu None → fallback proxy flat 1e6 với cảnh báo log (S_LIQ kém ý nghĩa).
+    df_vn30 : DataFrame
+        Phải có cột VN30 (close). Nếu có thêm cột 'VN30_volume' → S_PRES dùng
+        volume thật; không thì fallback proxy 1e9 với cảnh báo.
     regime_method :
       - 'hmm' (default)             : full-fit HMM. Có look-ahead bias nhưng OK cho live view
                                        (xem regime hôm nay). Chất lượng detection cao nhất.
@@ -692,24 +700,53 @@ def run_esr_pipeline(
     prices = df_close[tickers].sort_index().ffill()
     rets = prices.pct_change().dropna(how='all')
 
-    # VN30 index (load from vn30_cache.csv)
-    idx_col = 'VN30' if 'VN30' in df_vn30.columns else df_vn30.columns[0]
-    idx_df = df_vn30[[idx_col]].rename(columns={idx_col: 'close'}).sort_index().ffill()
+    # VN30 index — đọc close, và volume nếu file đã có
+    idx_close_col = 'VN30' if 'VN30' in df_vn30.columns else df_vn30.columns[0]
+    idx_df = df_vn30[[idx_close_col]].rename(columns={idx_close_col: 'close'}).sort_index()
+    idx_df['close'] = idx_df['close'].ffill()
 
-    # Volume proxy: use 1e9 flat (since we don't have real volume in data_lake)
-    vol_proxy = pd.Series(1e9, index=idx_df.index)
+    if 'VN30_volume' in df_vn30.columns:
+        idx_vol_series = df_vn30['VN30_volume'].reindex(idx_df.index)
+        # Volume = 0 ngày nghỉ là OK, nhưng NaN sẽ làm rolling sum sai → fill 0
+        idx_vol_series = idx_vol_series.fillna(0.0)
+        logger.info("ESR: dùng VN30_volume thật cho S_PRES.")
+    else:
+        logger.warning(
+            "ESR: thiếu VN30_volume → S_PRES dùng proxy flat 1e9 (selling pressure "
+            "mất ý nghĩa volume-weighted, chỉ còn đếm down-day). Chạy update_data.py "
+            "phiên bản mới để có volume thật."
+        )
+        idx_vol_series = pd.Series(1e9, index=idx_df.index)
 
     # Align index and stocks
     common = idx_df.index.intersection(rets.index)
     idx_close = idx_df.loc[common, 'close']
-    idx_volume = vol_proxy.loc[common]
+    idx_volume = idx_vol_series.loc[common]
     rets = rets.loc[common]
 
-    # Build stocks_long for Amihud
+    # Build stocks_long for Amihud — cần (close, volume) per ticker per day
     dates_long = np.repeat(rets.index.values, len(tickers))
     tickers_long = np.tile(tickers, len(rets))
     closes_long = prices.loc[rets.index, tickers].values.flatten()
-    volumes_long = np.ones(len(dates_long)) * 1e6
+
+    if df_volume is not None:
+        # Lấy volume cho đúng (date × ticker) — reindex để khớp shape
+        vol_panel = df_volume.reindex(index=rets.index, columns=tickers)
+        volumes_long = vol_panel.values.flatten().astype(np.float64)
+        # NaN volume → 0 (dollar_vol sẽ = 0 → Amihud = inf → caller đã .replace inf, nan)
+        volumes_long = np.where(np.isnan(volumes_long), 0.0, volumes_long)
+        n_valid = int((volumes_long > 0).sum())
+        logger.info(
+            "ESR: dùng volume thật cho S_LIQ — %d / %d cell có volume hợp lệ.",
+            n_valid, len(volumes_long),
+        )
+    else:
+        logger.warning(
+            "ESR: thiếu df_volume → S_LIQ dùng proxy flat 1e6 (Amihud illiquidity "
+            "biến thành |ret|/close, kém ý nghĩa). Pass df_volume = load_volumes() "
+            "để dùng dữ liệu thật."
+        )
+        volumes_long = np.ones(len(dates_long)) * 1e6
 
     stocks_long = pd.DataFrame({
         'time': dates_long,

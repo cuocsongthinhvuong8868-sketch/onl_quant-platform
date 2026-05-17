@@ -5,7 +5,7 @@ shared/data_loader.py
 import logging
 import pandas as pd
 from pathlib import Path
-from config import MARKET_DATA, DATA_LAKE
+from config import MARKET_DATA, MARKET_VOLUME, DATA_LAKE
 
 logger = logging.getLogger(__name__)
 
@@ -26,6 +26,27 @@ def load_close_prices() -> pd.DataFrame:
         )
     df = pd.read_csv(MARKET_DATA, index_col=0, parse_dates=True)
     logger.info("Đã tải market_data: %d ngày × %d mã", *df.shape)
+    return df
+
+
+def load_volumes() -> pd.DataFrame | None:
+    """Tải khối lượng từ data_lake/market_volume.csv.
+
+    Trả về None nếu file chưa tồn tại — caller (vd. ESR Monitor) phải fallback
+    sang volume proxy với cảnh báo. Sau khi user chạy lại update_data.py với
+    bản đã sửa A1, file sẽ có sẵn.
+
+    Columns trùng với load_close_prices() (cùng tickers). Volume có thể có NaN
+    cho ngày không giao dịch — caller xử lý NaN tuỳ ngữ cảnh.
+    """
+    if not MARKET_VOLUME.exists():
+        logger.warning(
+            "market_volume.csv chưa tồn tại. Chạy `python command/update_data.py "
+            "--backfill 2190` để fetch lại lịch sử có volume."
+        )
+        return None
+    df = pd.read_csv(MARKET_VOLUME, index_col=0, parse_dates=True)
+    logger.info("Đã tải market_volume: %d ngày × %d mã", *df.shape)
     return df
 
 
