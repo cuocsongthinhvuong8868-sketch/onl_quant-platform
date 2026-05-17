@@ -141,7 +141,14 @@ def render():
         "real_idx_vol": has_index_volume,
         "s_liq_method": "volume_dryup_v1",
     }
-    cached = load_daily_cache("esr_monitor", cache_key)
+    # Force-rerun flag: set bởi nút "🔄 Chạy lại Model" ở dưới — pop để chỉ có hiệu
+    # lực 1 lần (lần page render kế tiếp dùng cache như bình thường).
+    force_rerun_model = st.session_state.pop("esr_force_rerun_model", False)
+    if force_rerun_model:
+        if clear_daily_cache("esr_monitor", cache_key):
+            st.toast("🗑️ Đã xoá cache model — đang tính lại từ đầu.", icon="🗑️")
+
+    cached = None if force_rerun_model else load_daily_cache("esr_monitor", cache_key)
     if cached is not None:
         pillars = cached["pillars"]
         result = cached["result"]
@@ -171,6 +178,37 @@ def render():
             "market_states": market_states, "threshold": threshold,
         })
         st.caption("💾 Đã tạo cache mới (ESR Monitor).")
+
+    # ── Action buttons: Re-run model + GitHub sync ──
+    # Đặt ngay sau block compute để user nhìn được trạng thái cache (cache hit/miss)
+    # rồi quyết định tính lại + đẩy lên GitHub (cho Streamlit Cloud share cache).
+    _pkl_path = get_cache_path("esr_monitor", cache_key)
+    _btn_col1, _btn_col2 = st.columns(2)
+    with _btn_col1:
+        if st.button(
+            "🔄 Chạy lại Model (bỏ qua cache)",
+            key="esr_rerun_model_btn",
+            use_container_width=True,
+            type="secondary",
+            help=(
+                "Xoá cache pickle model hôm nay và tính lại pillars + SSI từ đầu. "
+                "Hữu ích khi data_lake vừa cập nhật hoặc bạn vừa đổi tham số."
+            ),
+        ):
+            st.session_state["esr_force_rerun_model"] = True
+            st.rerun()
+    with _btn_col2:
+        # Chỉ hiển thị nếu file cache đã tồn tại (sau compute thành công)
+        render_sync_button(
+            _pkl_path,
+            key_suffix="esr_model_pkl",
+            label="📤 Cập nhật cache Model lên GitHub",
+            help_text=(
+                "Đẩy file cache pickle ESR model (.pkl) lên repo GitHub. "
+                "Streamlit Cloud sẽ dùng kết quả này luôn sau khi sync — tránh tính lại 30s/lượt."
+            ),
+            use_container_width=True,
+        )
 
     # ── Header metrics ──
     last_ssi = result.ssi.dropna().iloc[-1]
