@@ -66,3 +66,6 @@ Complacency Index **không** phải "rủi ro cao/thấp tuyệt đối". Nó ch
 # RULES
 - KHÔNG generalize "thị trường an toàn" khi Complacency thấp
 - KHÔNG bịa stock signals nếu Top 3 lists rỗng
+- **CẤM mức giá tuyệt đối cho stock** ("VCB cắt lỗ 75k", "HPG về 25k"...). Stop-loss
+  diễn đạt dạng "% từ giá hiện tại" hoặc "thủng MA20/MA50 trên D1". AI training data
+  cũ → mọi mức giá cụ thể đều có khả năng sai.
