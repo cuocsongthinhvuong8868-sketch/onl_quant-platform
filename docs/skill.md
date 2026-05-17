@@ -273,19 +273,53 @@ RULES (anti-priming, uncertainty exits)
 **10. Aggressive mode** (`.claude/settings.local.json`):
 - `"defaultMode": "bypassPermissions"` cho repo này (project-scoped, không leak user-level)
 - Allowlist mở rộng: `python3 *`, `pip *`, `grep *`, `git *`, `streamlit *`, etc.
+- **Gate fix**: `bypassPermissions` cần `skipDangerousModePermissionPrompt: true` + `skipAutoPermissionPrompt: true` ở **ROOT level** (KHÔNG inside `permissions`) — thiếu gate này thì Claude silently fallback default mode mà không báo lỗi.
+
+**11. AI CIO history CSV — unified upsert** (`shared/ai_cio.py`):
+- Move `parse_score_regime` + `upsert_history_csv` từ `run_ai_cio_auto.py` → `shared/ai_cio.py`; `run_executive_summary(source="manual"|"auto")` TỰ ĐỘNG upsert CSV
+- **Same-day overwrite**: manual ghi đè auto cùng ngày (user trust > cron); T+1 thì append
+- CSV schema mở rộng `ddmmyyyy, score, regime, source, provider` (backwards-compat migrate row cũ)
+- History page: badge "🤖 Auto" / "👤 Manual" + provider, stats source distribution. 6/6 tests pass
+
+**12. Anti-hallucination price rules — 6 prompts**:
+- Vấn đề: AI ghi "VIC mất 45,000" trong khi VIC thực = 228k (training data cũ 2-3 năm)
+- Cấm mức giá tuyệt đối ở: `executive_summary`, `manipulation`, `ESR monitor`, `var_cvar_vnindex`, `va_res`, `risk_adjusted_growth`. Bắt buộc dùng % hoặc technical level (MA, support/resistance). 51/51 placeholders compat preserved
+
+**13. Real-time price injection** (manipulation prompt):
+- `run_manipulation` inject 4 placeholders mới `{vic_close}` `{vhm_close}` `{vre_close}` `{f1m_close}` từ `df_prices.iloc[-1]`
+- 2 formatters: `_fmt_stock_price` (×1000→VND) vs `_fmt_futures_index` (điểm, no scaling)
+- Verify (15/05/2026): VIC=228.00 (≈228,000 VND), VHM=158.00, VRE=34.00, F1M=2,053.90 điểm
+
+**14. Module resolution + Streamlit Cloud KeyError fix**:
+- Lỗi `KeyError: 'config'` / `'shared'` khi Cloud rebuild — nguyên nhân: 2 `config.py` (root + `command/`) + thiếu `__init__.py` ở `pages/`, `command/`, `pages/tools_page_C/`
+- Fix: xoá `command/config.py` (shim stale thiếu `MARKET_VOLUME`); tạo 3 `__init__.py` package markers; hardening `upload_file()` defensive JSON parse + `render_sync_button()` capture full traceback
+
+**15. Claude CLI + auto-context loading**:
+- Cài `@anthropic-ai/claude-code` v2.1.143 qua npm global (Node 22 sẵn qua nvm)
+- `CLAUDE.md` (89 dòng) auto-load khi `cd` vào project; `Run_Claude.command` Mac double-click launcher
+- Verify: `claude -p` từ project dir tự load context + apply bypass mode
 
 ---
 
 ## 10. Known Issues & Roadmap
 
 **Issues còn lại (từ Code Review §1 chưa fix):**
-- `shared/ai_cio.py` 594 dòng — God module, recommend refactor sang registry pattern
-- 61 instances `except Exception` rộng → mất stacktrace khi prod fail
+- `shared/ai_cio.py` 700+ dòng (đã grow sau session) — God module, recommend refactor sang registry pattern
+- 61 instances `except Exception` rộng → mất stacktrace khi prod fail (đã hardening `render_sync_button` để capture traceback)
 - Cache key dùng `date.today()` thay vì `df_stocks.index[-1]` → bug timezone Streamlit Cloud (UTC) vs VN (UTC+7)
 - Thư mục `promt/` (typo) — không rename vì hardcoded paths khắp ai_cio.py
-- Hardcoded `t0_dt = pd.to_datetime("2026-03-02")` trong manipulation
+- Hardcoded `t0_dt = pd.to_datetime("2026-03-02")` trong manipulation — fix thành rolling 60-phiên gần nhất
 - `_create_pdf` duplicate ở `app.py:193` và `command/run_ai_cio_auto.py:79`
 - Workflow `update_pipeline.yml` còn `MY_API_KEY` dead code + `git add .` risk
+- ✅ ~~Duplicate `command/config.py`~~ → FIXED 2026-05-17 (xoá shim + add `__init__.py`)
+- ✅ ~~`pages/tools_page_C/__init__.py` thiếu~~ → FIXED 2026-05-17
+
+**Anti-hallucination còn cải tiến được:**
+- Hiện chỉ manipulation prompt có inject giá real-time. Có thể mở rộng cho:
+  - `risk_adjusted_growth` (bank prices cho stop-loss recommendation)
+  - `va_res` (Top Crash list cần kèm giá hiện tại)
+  - `executive_summary` master (mọi stock pick phải có giá đối chiếu)
+- Pattern: pass `last_prices = df_stocks.iloc[-1]` qua kwargs → format helpers → prompt inject
 
 **Roadmap đề xuất (theo Tier A khả thi ngay):**
 1. ✅ EVT POT-GPD (xong session này)
@@ -322,9 +356,24 @@ RULES (anti-priming, uncertainty exits)
 - MaxDD: -23.7% (vs B&H -40.3%)
 - CAGR: 10.84% (vs B&H 15.05%) — defensive long-only trade-off
 
-**Verification status (sau session 2026-05-17):**
-- 12/12 file thay đổi compile sạch
+**Verification status (sau session 2026-05-17 full):**
+- Toàn bộ file thay đổi compile sạch (~25 files đụng tới)
 - EVT smoke test: 1.31s cho 2608 ngày (full pipeline classic+EVT)
 - Numba kernel parity với pandas cũ: 6.94e-18 max diff
-- 85/85 prompt placeholders match `ai_cio.py`
+- Prompt placeholders compat: 85/85 (initial v2) + 51/51 (sau anti-hallucination) → cùng `ai_cio.py` không vỡ
 - ESR pipeline both paths (real volume + fallback): SSI differ 0.4567 vs 0.4225 → confirm volume thật ảnh hưởng output
+- AI CIO CSV upsert: 6/6 tests pass (parse, same-day overwrite, T+1 append, invalid reject, backwards-compat migrate)
+- Real-time prices (15/05/2026): VIC=228k, VHM=158k, VRE=34k, VN30F1M=2053.9pt
+- Claude CLI 2.1.143 verified `claude -p` từ project dir auto-loads CLAUDE.md + bypass mode
+
+**Workflow new for session resume:**
+1. `cd ~/Documents/GitHub/onl_quant-platform` HOẶC double-click `Run_Claude.command`
+2. Claude CLI tự load `CLAUDE.md` (89 dòng context) + `.claude/settings.local.json` (bypass mode)
+3. Đọc `docs/skill.md` nếu cần ngữ cảnh sâu (session history compressed)
+4. Bypass mode active → Bash/Edit không hỏi xác nhận
+
+**Files mới của session này:**
+- `CLAUDE.md` (89 dòng) — auto-loaded context cho Claude CLI
+- `Run_Claude.command` (executable) — Mac launcher
+- `tools/var_cvar_vnindex/quant/evt.py` (220 dòng) — POT-GPD core
+- `command/__init__.py`, `pages/__init__.py`, `pages/tools_page_C/__init__.py` — package markers

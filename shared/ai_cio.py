@@ -258,7 +258,7 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
 def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
     cached = _read_cache("manipulation", provider_key)
     if cached: return cached
-    
+
     df_prices = prep_mani(df_stocks)
     weights_df, result_df = comp_mani(df_prices, window=60)
     t0_dt = pd.to_datetime("2026-03-02")
@@ -266,7 +266,7 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     if t0_dt.date() not in available_dates:
         t0_dt = pd.to_datetime(available_dates[-1])
     re_df = classify_regime(result_df, threshold=0.15, t0_dt=t0_dt)
-    
+
     date_str = result_df.index.max().strftime('%d/%m/%Y')
     latest = result_df.iloc[-1]
 
@@ -284,10 +284,31 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     d_slope = re_df["Delta_PR_Slope"].iloc[-1] if not re_df.empty else 0
 
     momentum_str = f"ΔCorr = {d_corr:.2f}, ΔSlope = {d_slope:.2f}"
-    
+
+    # ── Inject giá real-time VIC/VHM/VRE + VN30F1M để chống AI hallucinate
+    # mức giá cũ (vd. "VIC mất 45,000" trong khi VIC hiện ~200k). df_prices từ
+    # prep_mani() có sẵn 4 cột [VIC, VHM, VRE, VN30F1M].
+    # Cổ phiếu: market_data.csv lưu theo nghìn VND → *1000 ra VND đầy đủ.
+    # F1M: là futures index, đơn vị "điểm" (~VN30 index level) — KHÔNG nhân 1000.
+    def _fmt_stock_price(value: float) -> str:
+        if pd.isna(value) or value <= 0:
+            return "N/A"
+        return f"{value:.2f} (≈ {int(value * 1000):,} VND)"
+
+    def _fmt_futures_index(value: float) -> str:
+        if pd.isna(value) or value <= 0:
+            return "N/A"
+        return f"{value:,.2f} điểm (VN30 index level)"
+
+    last_prices = df_prices.iloc[-1]
+    vic_close = _fmt_stock_price(last_prices.get("VIC", float("nan")))
+    vhm_close = _fmt_stock_price(last_prices.get("VHM", float("nan")))
+    vre_close = _fmt_stock_price(last_prices.get("VRE", float("nan")))
+    f1m_close = _fmt_futures_index(last_prices.get("VN30F1M", float("nan")))
+
     with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
-        
+
     full_prompt = prompt_template.replace("{date_str}", date_str)\
                                  .replace("{slope_val}", f"{slope_val:.2f}")\
                                  .replace("{slope_pr}", f"{slope_pr:.1f}")\
@@ -297,7 +318,11 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
                                  .replace("{corr_status}", corr_status)\
                                  .replace("{t0_str}", t0_str)\
                                  .replace("{regime}", regime)\
-                                 .replace("{momentum_str}", momentum_str)
+                                 .replace("{momentum_str}", momentum_str)\
+                                 .replace("{vic_close}", vic_close)\
+                                 .replace("{vhm_close}", vhm_close)\
+                                 .replace("{vre_close}", vre_close)\
+                                 .replace("{f1m_close}", f1m_close)
 
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
