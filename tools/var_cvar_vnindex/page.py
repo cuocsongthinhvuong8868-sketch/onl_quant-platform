@@ -6,7 +6,7 @@ from datetime import date
 from shared.data_loader import load_custom
 from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
 from tools.var_cvar_vnindex.ui.sidebar import render_sidebar
-from tools.var_cvar_vnindex.ui.charts import plot_var_cvar
+from tools.var_cvar_vnindex.ui.charts import plot_var_cvar, plot_evt_tail_risk
 
 try:
     from config import AI_PROVIDER_MAP
@@ -60,34 +60,104 @@ def show():
     # ── Hiển thị ──
     if "var_cvar_metrics" in st.session_state:
         df_metrics = st.session_state.var_cvar_metrics
-        df_plot = df_metrics[df_metrics.index >= pd.to_datetime(plot_start_date)].dropna()
+        df_plot = df_metrics[df_metrics.index >= pd.to_datetime(plot_start_date)].dropna(
+            subset=["parametric_var", "historical_var", "expected_shortfall"]
+        )
 
         if not df_plot.empty:
-            fig = plot_var_cvar(df_plot)
-            st.plotly_chart(fig, use_container_width=True)
+            tab_classic, tab_evt = st.tabs([
+                "📊 VaR/CVaR Classic (95%)",
+                "🔥 EVT Tail Risk (POT-GPD, quantile cực đoan)",
+            ])
+            with tab_classic:
+                fig = plot_var_cvar(df_plot)
+                st.plotly_chart(fig, use_container_width=True)
+            with tab_evt:
+                if 'evt_var_99' in df_plot.columns and df_plot['evt_var_99'].notna().any():
+                    fig_evt = plot_evt_tail_risk(df_plot)
+                    st.plotly_chart(fig_evt, use_container_width=True)
+                    st.caption(
+                        "📌 **POT-GPD** (Peaks-Over-Threshold + Generalized Pareto Distribution): "
+                        "fit phân phối chỉ vào top 10% losses → extrapolate VaR/ES tới quantile 99%, 99.5%, 99.9% "
+                        "với độ tin cậy cao hơn Gaussian. ξ (xi) > 0.15 báo hiệu **heavy tail**; > 0.30 = **fat tail**."
+                    )
+                else:
+                    st.info("ℹ️ EVT cần ≥ 3 năm data (756 phiên). Quay lại sau khi backfill xong.")
         else:
             st.warning("Không có dữ liệu trong khoảng thờ gian đã chọn.")
 
         # Metrics T0
-        latest = df_metrics.dropna().iloc[-1]
-        latest_date = df_metrics.dropna().index[-1]
+        latest = df_metrics.dropna(subset=["historical_var"]).iloc[-1]
+        latest_date = df_metrics.dropna(subset=["historical_var"]).index[-1]
 
+        st.markdown("### 📈 Snapshot T0")
         col1, col2, col3, col4 = st.columns(4)
         with col1:
             st.metric("Giá VNINDEX", f"{latest['price']:,.2f}")
         with col2:
             st.metric("σ 30 ngày", f"{latest['stdev_30']*100:.2f}%")
         with col3:
-            st.metric("Parametric VaR 95%", f"{latest['parametric_var']*100:.2f}%")
+            st.metric("Parametric VaR 95%", f"{latest['parametric_var']*100:.2f}%",
+                      help="Gaussian: μ₃₀ + z₀.₀₅·σ₃₀. Đánh giá thấp tail risk khi có fat tail.")
         with col4:
-            st.metric("Historical VaR 95%", f"{latest['historical_var']*100:.2f}%")
+            st.metric("Historical VaR 95%", f"{latest['historical_var']*100:.2f}%",
+                      help="Rolling 5th percentile, 3-year window. Empirical.")
 
         col5, col6 = st.columns(2)
         with col5:
             st.metric("Expected Shortfall 95%", f"{latest['expected_shortfall']*100:.2f}%")
         with col6:
             es_exceed = latest['expected_shortfall'] - latest['historical_var']
-            st.metric("ES - VaR Spread", f"{es_exceed*100:.2f}%", delta="Tail risk" if es_exceed < 0 else "")
+            st.metric("ES - VaR Spread", f"{es_exceed*100:.2f}%",
+                      delta="Tail risk" if es_exceed < 0 else "")
+
+        # ── EVT metrics (nếu có) ──
+        has_evt = 'evt_var_99' in df_metrics.columns and pd.notna(latest.get('evt_var_99'))
+        if has_evt:
+            st.markdown("### 🔥 EVT — Tail Risk Extreme Quantiles")
+            ce1, ce2, ce3, ce4 = st.columns(4)
+            with ce1:
+                st.metric("EVT VaR 99%", f"{latest['evt_var_99']*100:.2f}%",
+                          help="POT-GPD extrapolation. Chính xác hơn Gaussian ở quantile cực đoan.")
+            with ce2:
+                st.metric("EVT VaR 99.5%", f"{latest['evt_var_995']*100:.2f}%",
+                          help="Sự kiện 1 năm xảy ra ~1 lần (1/200 phiên).")
+            with ce3:
+                st.metric("EVT ES 99%", f"{latest['evt_es_99']*100:.2f}%",
+                          help="Mức tổn thất trung bình kỳ vọng KHI vượt quá VaR 99%.")
+            with ce4:
+                es_var_99_spread = latest['evt_es_99'] - latest['evt_var_99']
+                st.metric("EVT ES-VaR Spread 99%", f"{es_var_99_spread*100:.2f}%",
+                          help="Spread càng âm = tail càng nặng.")
+
+            ce5, ce6, ce7, ce8 = st.columns(4)
+            with ce5:
+                xi_val = latest['evt_xi']
+                xi_label = "Light" if xi_val < 0.05 else ("Heavy" if xi_val < 0.30 else "Fat Tail ⚠️")
+                st.metric("ξ (GPD shape)", f"{xi_val:+.3f}",
+                          delta=xi_label,
+                          delta_color="off" if xi_val < 0.15 else "inverse",
+                          help="Tail index. ξ>0.15=heavy; ξ>0.30=fat (đuôi cực dày, rủi ro cực đoan).")
+            with ce6:
+                hill_val = latest['hill_index']
+                st.metric("Hill index", f"{hill_val:+.3f}",
+                          help="Hill (1975) tail estimator. Cross-check cho ξ; cùng dấu = robust signal.")
+            with ce7:
+                st.metric("Threshold u", f"{latest['evt_threshold']*100:.2f}%",
+                          help="Loss-scale threshold cho POT. Top 10% losses là exceedances.")
+            with ce8:
+                st.metric("# Exceedances", f"{int(latest['evt_n_exceed'])}",
+                          help="Số phiên loss vượt threshold trong window 3 năm.")
+
+            # Diagnostic so sánh Gaussian vs EVT
+            gauss_99 = latest['mean_30'] + (-2.3263) * latest['stdev_30']  # z_99
+            underestimate = (latest['evt_var_99'] - gauss_99) * 100
+            st.info(
+                f"💡 **Diagnostic:** Gaussian VaR 99% (μ₃₀ + z₀.₀₁·σ₃₀) ≈ {gauss_99*100:.2f}% — "
+                f"EVT cho {latest['evt_var_99']*100:.2f}%. Gaussian đang **{'underestimate' if underestimate < 0 else 'overestimate'} "
+                f"tail risk {abs(underestimate):.2f} điểm phần trăm**. ξ={xi_val:+.3f} → "
+                f"{'phân phối có đuôi dày, mô hình Gaussian không phù hợp.' if xi_val > 0.15 else 'phân phối khá gần Gaussian.'}"
+            )
 
         # ── AI Analysis ──
         st.divider()

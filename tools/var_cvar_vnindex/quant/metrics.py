@@ -3,31 +3,56 @@ import numpy as np
 from numba import njit
 from scipy.stats import norm
 
+from tools.var_cvar_vnindex.quant.evt import (
+    rolling_evt_metrics,
+    DEFAULT_REFIT_EVERY,
+    DEFAULT_THRESHOLD_PCT,
+)
+
 # ── Constants ──
 Z_95 = norm.ppf(0.05)          # ≈ -1.64485 for 95% confidence (left tail)
 HIST_WINDOW = 756               # ~3 years trading days
 STDDEV_WINDOW = 30
 
 
-def calculate_var_cvar_metrics(vnindex_series: pd.Series) -> pd.DataFrame:
+def calculate_var_cvar_metrics(
+    vnindex_series: pd.Series,
+    include_evt: bool = True,
+    evt_refit_every: int = DEFAULT_REFIT_EVERY,
+    evt_threshold_pct: float = DEFAULT_THRESHOLD_PCT,
+) -> pd.DataFrame:
     """
     Tính rolling risk metrics cho VNINDEX:
-      - log_return
-      - rolling_stdev_30
-      - parametric_var_95  (Gaussian VaR)
-      - historical_var_95  (rolling 5th percentile, 3-year window)
-      - expected_shortfall_95 (mean of tail ≤ historical_var_95)
+      Classic:
+        - log_return
+        - rolling_stdev_30
+        - parametric_var_95   (Gaussian VaR)
+        - historical_var_95   (rolling 5th percentile, 3-year window)
+        - expected_shortfall_95 (mean of tail ≤ historical_var_95)
+      EVT (Extreme Value Theory):
+        - evt_var_95 / evt_var_99 / evt_var_995  (POT-GPD extrapolated VaR)
+        - evt_es_95  / evt_es_99  / evt_es_995   (POT-GPD extrapolated ES)
+        - evt_xi     (GPD shape parameter — heavy tail indicator)
+        - evt_beta   (GPD scale parameter)
+        - evt_threshold      (loss-scale u, positive)
+        - evt_n_exceed       (số exceedances trong window)
+        - hill_index         (Hill tail index — cross-check cho ξ)
 
     Parameters
     ----------
     vnindex_series : pd.Series
         Giá đóng cửa VNINDEX, index=Date, values=float.
+    include_evt : bool
+        Có tính EVT-POT-GPD không (default True). Set False để skip nếu chỉ cần
+        classic metrics (vd. backtest tốc độ cao).
+    evt_refit_every : int
+        Số phiên giữa các lần refit GPD (default 21 ≈ 1 tháng).
+    evt_threshold_pct : float
+        Threshold percentile cho POT (default 0.10 = top 10% losses).
 
     Returns
     -------
-    pd.DataFrame
-        Columns: [price, return, stdev_30, parametric_var, historical_var, expected_shortfall]
-        Index: Date.
+    pd.DataFrame, index=Date.
     """
     df = pd.DataFrame({"price": vnindex_series.sort_index()})
     df["return"] = np.log(df["price"] / df["price"].shift(1))
@@ -49,10 +74,31 @@ def calculate_var_cvar_metrics(vnindex_series: pd.Series) -> pd.DataFrame:
     )
 
     # Expected Shortfall 95% = mean of returns in the 5% tail
-    # Tính bằng cách: với mỗi ngày, lấy mean của các return trong window ≤ historical_var tại ngày đó
-    df["expected_shortfall"] = _rolling_expected_shortfall(df["return"], df["historical_var"], window=HIST_WINDOW)
+    df["expected_shortfall"] = _rolling_expected_shortfall(
+        df["return"], df["historical_var"], window=HIST_WINDOW,
+    )
 
-    return df[["price", "return", "stdev_30", "parametric_var", "historical_var", "expected_shortfall"]]
+    classic_cols = [
+        "price", "return", "stdev_30",
+        "parametric_var", "historical_var", "expected_shortfall",
+    ]
+
+    if not include_evt:
+        return df[classic_cols]
+
+    # ── EVT-POT-GPD: extrapolate tail risk sang quantile cực đoan ──
+    # Tách module evt.py vì math độc lập + nặng (scipy MLE), tránh phình metrics.py
+    returns_clean = df["return"].dropna()
+    df_evt = rolling_evt_metrics(
+        returns_clean,
+        window=HIST_WINDOW,
+        refit_every=evt_refit_every,
+        threshold_pct=evt_threshold_pct,
+    )
+    # Align EVT về full index (NaN cho phần warmup)
+    df = df.join(df_evt, how="left")
+
+    return df[classic_cols + list(df_evt.columns)]
 
 
 @njit(fastmath=True, cache=True)

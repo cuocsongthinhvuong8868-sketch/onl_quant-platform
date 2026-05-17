@@ -508,12 +508,12 @@ def run_va_res(client, df_stocks, provider_key: str = "kimi-2.6", model: str = N
 def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
     cached = _read_cache("var_cvar_vnindex", provider_key)
     if cached: return cached
-    
+
     snap = var_cvar_snapshot(df_stocks)
-    
+
     with open(str(ROOT_DIR / "promt" / "var_cvar_vnindex_promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
-    
+
     full_prompt = prompt_template.replace("[Nhập ngày]", snap['date'])\
                                  .replace("[Giá VNINDEX]", f"{snap['vnindex_price']:,.2f}")\
                                  .replace("[σ 30 ngày]", f"{snap['stdev_30']*100:.2f}%")\
@@ -521,11 +521,31 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
                                  .replace("[Historical VaR]", f"{snap['historical_var']*100:.2f}%")\
                                  .replace("[Expected Shortfall]", f"{snap['expected_shortfall']*100:.2f}%")\
                                  .replace("[ES - VaR Spread]", f"{snap['es_var_spread']*100:.2f}%")
-    
+
+    # EVT placeholders — fallback "N/A" nếu data chưa đủ 3 năm
+    if snap.get("evt_available"):
+        xi_label = (
+            "fat tail (đuôi cực dày)" if snap['evt_xi'] > 0.30
+            else "heavy tail (đuôi nặng)" if snap['evt_xi'] > 0.15
+            else "near-Gaussian (đuôi nhẹ)"
+        )
+        full_prompt = full_prompt\
+            .replace("[EVT VaR 99%]", f"{snap['evt_var_99']*100:.2f}%")\
+            .replace("[EVT VaR 99.5%]", f"{snap['evt_var_995']*100:.2f}%")\
+            .replace("[EVT ES 99%]", f"{snap['evt_es_99']*100:.2f}%")\
+            .replace("[EVT Xi]", f"{snap['evt_xi']:+.3f} ({xi_label})")\
+            .replace("[Hill Index]", f"{snap['hill_index']:+.3f}")\
+            .replace("[EVT N Exceed]", str(snap['evt_n_exceed']))
+    else:
+        # Data < 756 ngày — bỏ EVT fields, AI prompt vẫn chạy với classic metrics
+        for placeholder in ["[EVT VaR 99%]", "[EVT VaR 99.5%]", "[EVT ES 99%]",
+                            "[EVT Xi]", "[Hill Index]", "[EVT N Exceed]"]:
+            full_prompt = full_prompt.replace(placeholder, "N/A (cần ≥ 756 phiên)")
+
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
-    
+
     res = call_ai(client, sys_p, usr_p, model=model)
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
