@@ -126,6 +126,7 @@ def render():
     # ── Compute ESR ──
     # Đưa "có volume thật hay không" vào cache key — vì cùng tham số mà đổi
     # nguồn volume sẽ ra pillar khác → không thể chia sẻ cache.
+    # s_liq_method bump khi đổi methodology S_LIQ → tự invalidate cache cũ.
     cache_key = {
         "ma_period": ma_period, "pca_warmup": pca_warmup,
         "ema_span": ema_span, "deposit_rate": deposit_rate,
@@ -137,6 +138,7 @@ def render():
         "regime_wf_refit": regime_wf_refit,
         "real_vol": df_volume is not None,
         "real_idx_vol": has_index_volume,
+        "s_liq_method": "volume_dryup_v1",
     }
     cached = load_daily_cache("esr_monitor", cache_key)
     if cached is not None:
