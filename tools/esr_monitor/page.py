@@ -45,7 +45,7 @@ def render():
     pillar_mode = st.sidebar.radio(
         "Pillar Mode",
         options=['downside', 'classic'],
-        index=0,
+        index=1,
         help="downside: S_VOL/S_COR/S_LIQ chỉ tính trên phiên giảm. classic: đối xứng.",
     )
     trend_ma_window = st.sidebar.number_input("Trend MA (ngày)", value=200, min_value=50, max_value=500, step=10)
@@ -186,7 +186,7 @@ def render():
         gc = "#c0392b" if gap >= 0 else "#27ae60"
         extra_parts.append(f"HMM thr: <b>{threshold:.3f}</b> | Gap: <span style='color:{gc}'><b>{gap:+.3f}</b></span>")
 
-        c1, c2, c3 = st.columns([1, 1, 2])
+    c1, c2, c3 = st.columns([1, 1, 2])
     with c1:
         st.markdown(
             f"<div style='padding:15px;border-radius:8px;background:{bg_color};"
