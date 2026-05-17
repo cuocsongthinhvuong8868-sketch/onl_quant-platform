@@ -1,0 +1,32 @@
+## 1. Observations
+- Risk Score 50.3 – nằm ở biên dưới của vùng NEUTRAL (40–60), giảm nhẹ -0.1 so với hôm trước.
+- EGARCH Vol 1.6% – giảm mạnh -0.8% trong một ngày, cho thấy biến động kỳ vọng hạ nhiệt rõ rệt.
+- Rolling Skewness +0.26 – dương nhẹ, phản ánh phân phối lợi nhuận lệch phải nhẹ.
+- Upside Correlation 65.3% cao gấp ~5.5 lần Downside Correlation 11.9%, cho thấy tài sản di chuyển đồng bộ khi tăng nhưng gần như độc lập khi giảm.
+
+## 2. Interpretation
+Thị trường đang trong pha phân hoá mạnh theo hướng “tăng theo nhóm, giảm riêng lẻ”. Dữ liệu hiện tại mô tả trạng thái xác suất cao là STOCK-PICKING NEUTRAL với tín hiệu lệch nhẹ về phía tích cực cận biên, chưa đủ để chuyển sang GREED.
+
+## 3. Cross-Check
+- Score (50.3) vs EGARCH Vol (1.6%, đang giảm): **Đồng bộ** — điểm trung bình-thấp đi kèm với vol giảm xác nhận thị trường không hoảng loạn, không tìm kiếm tail risk.
+- Skewness (+0.26) vs Correlation (upside rất cao, downside rất thấp): **Đồng bộ mạnh** — cùng mô tả một cấu trúc tăng có tổ chức, giảm phi hệ thống. Không có divergence đáng báo động.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.5–0.6** (trên thang 0–1.0).  
+Hành động: Duy trì danh mục cân bằng với định hướng stock-picking; không tăng beta đuổi theo up-corr cao vì risk score đang dừng ở 50.3, không phải 60+. Xác suất cao thị trường tiếp tục sideway/phân hoá trong ngắn hạn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "15/05/2026",
+  "regime": "NEUTRAL",
+  "score": 50.3,
+  "confidence": "high",
+  "beta_target": 0.55,
+  "key_signals": [
+    "Vol giảm mạnh -0.8% nhưng score vẫn trung tính, không đẩy sang GREED",
+    "Upside/downside correlation chênh lệch ~5.5x, cấu trúc phân hoá"
+  ]
+}
+```
