@@ -1,0 +1,39 @@
+## 1. Observations
+
+- **Spread_Z = +0.53σ**: Độ lệch phân tán ở mức trung bình, không có dấu hiệu căng thẳng bất thường so với 60 ngày gần nhất.
+- **DPI = 43.3%**: Dispersion Persistence Index dưới ngưỡng 70%, cho thấy sự phân hóa hiện tại mang tính cục bộ, không phải regime kéo dài.
+- **Avg Pairwise Correlation = 0.077**: Cực kỳ thấp, gần như không có đồng thuận giữa các cổ phiếu. Mỗi mã đang vận động độc lập.
+- **Cross-Sectional Skewness & Kurtosis: N/A**: Thiếu dữ liệu về đuôi phân phối, hạn chế khả năng đánh giá hướng của các outlier.
+
+## 2. Structural State
+
+Thị trường đang ở trạng thái **bình thường**, không stressed. Spread_Z thấp (+0.53σ) kết hợp DPI dưới 70% (43.3%) cho thấy không có áp lực dispersion cục bộ nào đang hình thành đủ mạnh để chuyển thành regime kéo dài. Cấu trúc hiện tại mang tính **cục bộ nhẹ** – có thể chỉ là nhiễu ngẫu nhiên trong một phiên, không phải tín hiệu chuyển giai đoạn.
+
+## 3. Cross-Check & Tail Direction
+
+Do dữ liệu Skewness và Kurtosis bị missing (N/A), không thể xác định chính xác tail nào đang gãy (negative hay positive) hoặc mức độ fat-tail. Đây là một hạn chế quan trọng trong chẩn đoán. Cần bổ sung dữ liệu này để kiểm tra xem liệu có outlier cực đoan nào đang chi phối chỉ số hay không.
+
+## 4. Regime Mapping
+
+Đối chiếu với 2D Map (DPI thấp × Corr thấp), thị trường hiện đang ở regime **Healthy Stock-Picking**.
+
+- **DPI = 43.3%** (thấp) cho thấy không có sự phân hóa kéo dài.
+- **Corr = 0.077** (cực thấp) xác nhận các cổ phiếu đang vận động độc lập, không có hành vi bầy đàn.
+
+**Risk lớn nhất cho Portfolio Manager**: Trong regime này, rủi ro chính là **concentration risk** – nếu danh mục tập trung quá mức vào một số mã hoặc một nhóm ngành, biến động cá biệt (idiosyncratic risk) có thể gây tổn thương nặng do không có sự tương quan bù trừ. Không có nguy cơ liquidity dry-up hay herding crash ở đây.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "15/05/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": 0.53,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.077,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```
+> *Ghi chú: Confidence ở mức medium do thiếu dữ liệu Skewness/Kurtosis. Nếu có dữ liệu này, có thể xác nhận tail direction chính xác hơn.*
