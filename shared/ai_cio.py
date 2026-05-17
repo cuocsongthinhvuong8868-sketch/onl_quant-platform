@@ -1,9 +1,114 @@
+import csv
 import os
+import re
 from datetime import date, timedelta
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
 from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
+
+# ── History CSV (Ai_cio_report.csv) ──
+# Schema mới: ddmmyyyy, score, regime, source, provider
+# Cũ chỉ có 3 cột — auto-migrate khi đọc.
+CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
+CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
+
+
+def parse_score_regime(report_text: str) -> tuple:
+    """Parse `final score & regime : <num> ; regime : <name>` từ dòng cuối report.
+
+    Fallback scan 5 dòng cuối nếu format dòng cuối không khớp.
+    Trả về (score_str, regime_str). Trả ("N/A", "N/A") nếu không tìm thấy.
+    """
+    if not report_text:
+        return "N/A", "N/A"
+
+    lines = report_text.strip().splitlines()
+    if not lines:
+        return "N/A", "N/A"
+
+    # 1. Strict match: dòng cuối format chính xác
+    final_line = lines[-1]
+    match = re.search(
+        r'final score\s*&\s*regime\s*[:=]\s*(\d+(?:\.\d+)?)\s*;\s*regime\s*[:=]\s*(.+)',
+        final_line,
+        re.IGNORECASE,
+    )
+    if match:
+        return match.group(1), match.group(2).strip()
+
+    # 2. Fallback: scan 5 dòng cuối
+    score_val, regime_val = "N/A", "N/A"
+    for line in lines[-5:]:
+        m = re.search(r'final score.*?[:=]\s*(\d+(?:\.\d+)?)', line, re.IGNORECASE)
+        if m:
+            score_val = m.group(1)
+        m2 = re.search(r'regime\s*[:=]\s*(.+)', line, re.IGNORECASE)
+        if m2:
+            regime_val = m2.group(1).strip()
+    return score_val, regime_val
+
+
+def upsert_history_csv(
+    score_val: str,
+    regime_val: str,
+    source: str = "manual",
+    provider: str = "",
+    target_date: date = None,
+) -> bool:
+    """Upsert (date, score, regime, source, provider) vào Ai_cio_report.csv.
+
+    Logic same-day:
+    - Nếu file đã có row cùng ngày → **ghi đè** (drop row cũ, thêm row mới)
+    - Nếu chưa → append vào cuối
+
+    `source` ∈ {"manual", "auto"} để track xuất xứ. Khi user chủ động chạy AI CIO
+    từ app, nó sẽ overwrite kết quả AUTO cùng ngày (semantic: user trust > cron).
+
+    Backwards-compat: nếu CSV cũ thiếu cột source/provider → fill empty string,
+    rewrite với header mới đầy đủ.
+
+    Trả True nếu ghi thành công, False nếu score/regime invalid.
+    """
+    if not score_val or score_val == "N/A":
+        return False
+
+    if target_date is None:
+        target_date = date.today()
+    target_ddmmyyyy = target_date.strftime('%d%m%Y')
+
+    rows = []
+    if CSV_HISTORY_PATH.exists():
+        try:
+            with open(CSV_HISTORY_PATH, 'r', encoding='utf-8', newline='') as f:
+                reader = csv.DictReader(f)
+                for row in reader:
+                    if row.get('ddmmyyyy') == target_ddmmyyyy:
+                        continue  # drop row cùng ngày → upsert
+                    # Backwards-compat: fill missing fields
+                    for field in CSV_HISTORY_HEADER:
+                        if field not in row:
+                            row[field] = ""
+                    rows.append(row)
+        except Exception as exc:
+            print(f"[CSV] Warning: đọc file cũ thất bại ({exc}), tạo mới.")
+            rows = []
+
+    rows.append({
+        'ddmmyyyy': target_ddmmyyyy,
+        'score': score_val,
+        'regime': regime_val,
+        'source': source,
+        'provider': provider,
+    })
+
+    CSV_HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
+    with open(CSV_HISTORY_PATH, 'w', encoding='utf-8', newline='') as f:
+        writer = csv.DictWriter(f, fieldnames=CSV_HISTORY_HEADER)
+        writer.writeheader()
+        writer.writerows(rows)
+
+    return True
 try:
     from config import AI_PROVIDER_MAP
 except ImportError:
@@ -550,7 +655,8 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
 
-def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False):
+def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
+                          source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
     model = cfg["api_model"]
@@ -615,5 +721,21 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
     _write_cache("executive_summary", final_res, provider_key)
-    
+
+    # ── Cập nhật history CSV (Ai_cio_report.csv) ──
+    # Same-day overwrite: source="manual" sẽ ghi đè kết quả "auto" cùng ngày,
+    # và ngược lại. Nếu sang ngày mới → append row mới. Semantic: kết quả mới
+    # nhất là source-of-truth cho history page.
+    try:
+        score_val, regime_val = parse_score_regime(final_res)
+        if score_val != "N/A":
+            ok = upsert_history_csv(score_val, regime_val,
+                                    source=source, provider=provider_key)
+            if ok:
+                print(f"[CSV] Upserted history: {score_val} | {regime_val} | source={source} | provider={provider_key}")
+        else:
+            print("[CSV] Warning: không parse được final score → skip CSV update.")
+    except Exception as exc:
+        print(f"[CSV] Warning: upsert history failed ({exc}). Report vẫn được trả về.")
+
     return final_res

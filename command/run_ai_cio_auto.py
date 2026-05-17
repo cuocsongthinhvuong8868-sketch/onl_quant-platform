@@ -31,7 +31,10 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
 from config import DATA_LAKE, ROOT_DIR
-from shared.ai_cio import run_executive_summary, _read_cache, _clear_all_tool_caches
+from shared.ai_cio import (
+    run_executive_summary, _read_cache, _clear_all_tool_caches,
+    parse_score_regime,   # re-export từ shared
+)
 
 # ── Config ──
 PROVIDER_KEY = "deepseek-v4-pro"
@@ -62,9 +65,13 @@ def _get_report_text() -> str:
         print("[ERROR] DEEPSEEK_API_KEY not set.")
         sys.exit(1)
 
-    print("[RUN] Generating AI CIO Executive Summary via DeepSeek (FORCE)...")
+    print("[RUN] Generating AI CIO Executive Summary via DeepSeek (FORCE, source=auto)...")
     try:
-        report_text = run_executive_summary(DEEPSEEK_KEY, provider_key=PROVIDER_KEY, force=True)
+        # source="auto": ghi vào CSV với marker để phân biệt với user manual run.
+        # Nếu user chạy manual sau đó cùng ngày → manual sẽ ghi đè (semantic: user trust > cron).
+        report_text = run_executive_summary(
+            DEEPSEEK_KEY, provider_key=PROVIDER_KEY, force=True, source="auto",
+        )
     except Exception as e:
         print(f"[ERROR] Failed to generate report: {e}")
         sys.exit(1)
@@ -116,56 +123,10 @@ def _create_pdf(text: str, path: str):
     pdf.output(path)
 
 
-def _parse_score_regime(report_text: str) -> tuple:
-    final_line = report_text.strip().splitlines()[-1]
-    score_val = "N/A"
-    regime_val = "N/A"
-
-    match = re.search(
-        r'final score & regime\s*[:=]\s*(\d+(?:\.\d+)?)\s*;\s*regime\s*[:=]\s*(.+)',
-        final_line,
-        re.IGNORECASE,
-    )
-    if match:
-        score_val = match.group(1)
-        regime_val = match.group(2).strip()
-    else:
-        for line in report_text.strip().splitlines()[-5:]:
-            m = re.search(r'final score.*?[:=]\s*(\d+(?:\.\d+)?)', line, re.IGNORECASE)
-            if m:
-                score_val = m.group(1)
-            m2 = re.search(r'regime\s*[:=]\s*(.+)', line, re.IGNORECASE)
-            if m2:
-                regime_val = m2.group(1).strip()
-
-    return score_val, regime_val
-
-
-def _append_to_csv(score_val: str, regime_val: str):
-    """Ghi score & regime vào data_lake/Ai_cio_report.csv.
-    Nếu đã có dòng cùng ngày → ghi đè. Nếu chưa → append."""
-    today_ddmmyyyy = date.today().strftime('%d%m%Y')
-    header = ['ddmmyyyy', 'score', 'regime']
-    rows = []
-
-    # Đọc dữ liệu cũ (nếu file tồn tại)
-    if CSV_HISTORY_PATH.exists():
-        with open(CSV_HISTORY_PATH, 'r', encoding='utf-8', newline='') as f:
-            reader = csv.DictReader(f)
-            for row in reader:
-                if row.get('ddmmyyyy') != today_ddmmyyyy:
-                    rows.append(row)
-
-    # Thêm dòng hôm nay
-    rows.append({'ddmmyyyy': today_ddmmyyyy, 'score': score_val, 'regime': regime_val})
-
-    # Ghi lại toàn bộ
-    with open(CSV_HISTORY_PATH, 'w', encoding='utf-8', newline='') as f:
-        writer = csv.DictWriter(f, fieldnames=header)
-        writer.writeheader()
-        writer.writerows(rows)
-
-    print(f"[CSV] Appended to {CSV_HISTORY_PATH}: {today_ddmmyyyy}, {score_val}, {regime_val}")
+# NOTE: _parse_score_regime + _append_to_csv đã move sang shared/ai_cio.py
+# (parse_score_regime + upsert_history_csv).
+# run_executive_summary() trong shared/ai_cio.py giờ TỰ ĐỘNG upsert CSV — auto
+# script không cần gọi nữa, chỉ pass source="auto" là đủ.
 
 
 def _send_telegram(score_val: str, regime_val: str):
@@ -228,12 +189,12 @@ if __name__ == "__main__":
         print(f"[ERROR] PDF creation failed: {e}")
         sys.exit(1)
 
-    # 3. Parse score & regime
-    score_val, regime_val = _parse_score_regime(report_text)
+    # 3. Parse score & regime (chỉ để show ở Telegram message — CSV đã upsert tự động)
+    score_val, regime_val = parse_score_regime(report_text)
     print(f"[PARSE] Score: {score_val} | Regime: {regime_val}")
 
-    # 4. Ghi vào CSV lịch sử
-    _append_to_csv(score_val, regime_val)
+    # 4. CSV history: KHÔNG cần gọi nữa — run_executive_summary() ở step 1 đã tự
+    #    upsert với source="auto". Tránh gọi 2 lần (idempotent nhưng redundant).
 
     # 5. Gửi Telegram
     _send_telegram(score_val, regime_val)

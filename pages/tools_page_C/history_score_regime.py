@@ -62,6 +62,13 @@ def render():
     df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
     df["score"] = pd.to_numeric(df["score"], errors="coerce")
 
+    # Backwards-compat: rows cũ thiếu cột source/provider → fill empty string
+    for col in ("source", "provider"):
+        if col not in df.columns:
+            df[col] = ""
+    df["source"] = df["source"].fillna("").astype(str)
+    df["provider"] = df["provider"].fillna("").astype(str)
+
     # ── Summary metrics ──
     latest = df.iloc[-1]
     regime_color = _regime_color(str(latest["regime"]))
@@ -182,9 +189,20 @@ def render():
     # ── Table ──
     st.subheader("📋 Bảng dữ liệu chi tiết")
 
-    display_df = df[["date", "score", "regime"]].copy()
+    # Render source thành emoji badge để dễ đọc
+    def _source_badge(s: str) -> str:
+        s = (s or "").lower()
+        if s == "auto":
+            return "🤖 Auto (cron)"
+        if s == "manual":
+            return "👤 Manual (user)"
+        return "—"  # rows cũ trước upgrade
+
+    display_df = df[["date", "score", "regime", "source", "provider"]].copy()
     display_df["date"] = display_df["date"].dt.strftime("%d/%m/%Y")
-    display_df.columns = ["Ngày", "Score", "Regime"]
+    display_df["source"] = display_df["source"].map(_source_badge)
+    display_df["provider"] = display_df["provider"].replace("", "—")
+    display_df.columns = ["Ngày", "Score", "Regime", "Nguồn", "Model"]
     # Reverse to show newest first
     display_df = display_df.iloc[::-1].reset_index(drop=True)
 
@@ -196,10 +214,16 @@ def render():
             "Ngày": st.column_config.TextColumn("📅 Ngày", width="small"),
             "Score": st.column_config.NumberColumn("📈 Score", format="%d", width="small"),
             "Regime": st.column_config.TextColumn("🎯 Regime", width="large"),
+            "Nguồn": st.column_config.TextColumn("🔧 Nguồn", width="small",
+                                                  help="Auto = cron GitHub Actions; Manual = user chạy từ app"),
+            "Model": st.column_config.TextColumn("🤖 Model", width="small"),
         },
     )
 
-    st.caption(f"Nguồn: `data_lake/Ai_cio_report.csv` • {len(df)} bản ghi")
+    # Stats về source distribution
+    src_counts = df["source"].replace("", "legacy").value_counts().to_dict()
+    src_summary = " • ".join(f"{k}: {v}" for k, v in src_counts.items())
+    st.caption(f"Nguồn: `data_lake/Ai_cio_report.csv` • {len(df)} bản ghi  ({src_summary})")
 
 
 if __name__ == "__main__":

@@ -122,3 +122,11 @@ final score & regime : 68 ; regime : UPTREND / EXPANSION
 - ❌ Pick từ Top Crash list của VaRES vào Core Holding
 - ❌ Bỏ qua tail-risk cap khi Score cao
 - ❌ Đưa final score & regime ở giữa report (PHẢI dòng cuối cùng)
+- ❌ **CẤM TUYỆT ĐỐI đưa mức giá tuyệt đối cho bất kỳ ticker nào.** Training data
+  của AI có thể từ 2-3 năm trước → giá đã thay đổi 2-10× (VD: VIC từ ~45k lên >200k,
+  VHM từ ~60k lên ~150k, HPG từ ~20k lên ~30k). Mọi đề xuất stop-loss / take-profit /
+  entry phải dùng **% từ giá hiện tại** HOẶC **technical level** (MA20/MA50/MA200,
+  support/resistance gần nhất, ATL N phiên) — KHÔNG đưa con số tuyệt đối kiểu
+  "VIC mất 45,000", "HPG về 28,000", "đảo Short F1 nếu VN-Index xuống 1200".
+  Nếu cần ngưỡng cụ thể → diễn đạt dạng "X% dưới giá đóng cửa hiện tại" hoặc
+  "thủng MA20 trên D1 chart".
