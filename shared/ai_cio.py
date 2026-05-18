@@ -261,10 +261,8 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
 
     df_prices = prep_mani(df_stocks)
     weights_df, result_df = comp_mani(df_prices, window=60)
-    t0_dt = pd.to_datetime("2026-03-02")
-    available_dates = result_df.index.date
-    if t0_dt.date() not in available_dates:
-        t0_dt = pd.to_datetime(available_dates[-1])
+    # Rolling 60-session event-study anchor — mirror UI default in tools/manipulation/page.py:71
+    t0_dt = pd.Timestamp(result_df.index[-60] if len(result_df) >= 60 else result_df.index[0])
     re_df = classify_regime(result_df, threshold=0.15, t0_dt=t0_dt)
 
     date_str = result_df.index.max().strftime('%d/%m/%Y')
