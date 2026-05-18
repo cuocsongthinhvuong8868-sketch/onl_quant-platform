@@ -77,7 +77,7 @@ Allow list bao gồm: `python3/python/pip/grep/find/ls/cat/git/streamlit *`. Byp
 
 1. **God module**: `shared/ai_cio.py` 600+ dòng — recommend refactor sang registry pattern
 2. **Cache key dùng `date.today()`**: timezone bug giữa Streamlit Cloud (UTC) và VN (UTC+7). Đổi sang `df_stocks.index[-1]`.
-3. **Hardcoded `t0_dt = pd.to_datetime("2026-03-02")`** trong manipulation: làm dynamic 60 phiên gần nhất.
+3. ✅ ~~**Hardcoded `t0_dt = pd.to_datetime("2026-03-02")`** trong manipulation: làm dynamic 60 phiên gần nhất.~~ → FIXED 2026-05-18 (`shared/ai_cio.py:264` dùng `result_df.index[-60]`, mirror UI default).
 4. **`_create_pdf` duplicate**: trong `app.py:193` và `command/run_ai_cio_auto.py:79` → extract `shared/pdf_export.py`.
 5. **Streamlit Cloud module resolution**: đã thêm `__init__.py` cho `command/`, `pages/`, `pages/tools_page_C/` (2026-05-17 fix).
 

@@ -308,7 +308,7 @@ RULES (anti-priming, uncertainty exits)
 - 61 instances `except Exception` rộng → mất stacktrace khi prod fail (đã hardening `render_sync_button` để capture traceback)
 - Cache key dùng `date.today()` thay vì `df_stocks.index[-1]` → bug timezone Streamlit Cloud (UTC) vs VN (UTC+7)
 - Thư mục `promt/` (typo) — không rename vì hardcoded paths khắp ai_cio.py
-- Hardcoded `t0_dt = pd.to_datetime("2026-03-02")` trong manipulation — fix thành rolling 60-phiên gần nhất
+- ✅ ~~Hardcoded `t0_dt = pd.to_datetime("2026-03-02")` trong manipulation — fix thành rolling 60-phiên gần nhất~~ → FIXED 2026-05-18 (`shared/ai_cio.py:264` dùng `result_df.index[-60]`, mirror UI default `tools/manipulation/page.py:71`)
 - `_create_pdf` duplicate ở `app.py:193` và `command/run_ai_cio_auto.py:79`
 - Workflow `update_pipeline.yml` còn `MY_API_KEY` dead code + `git add .` risk
 - ✅ ~~Duplicate `command/config.py`~~ → FIXED 2026-05-17 (xoá shim + add `__init__.py`)
