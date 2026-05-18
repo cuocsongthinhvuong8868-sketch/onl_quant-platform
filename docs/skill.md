@@ -323,7 +323,7 @@ RULES (anti-priming, uncertainty exits)
 
 **Roadmap đề xuất (theo Tier A khả thi ngay):**
 1. ✅ EVT POT-GPD (xong session này)
-2. ⏭️ Multi-factor Risk Model (Barra-lite): style factors Value/Size/Mom/Quality/LowVol + industry decomposition
+2. ⏭️ Multi-factor Risk Model (Barra-lite): style factors Value/Size/Mom/Quality/LowVol + industry decomposition — **build spec ở §12**
 3. ⏭️ MES / SRISK (NYU V-Lab pattern): systemic contribution từng VN30 mã
 4. ⏭️ Diebold-Yilmaz Spillover Index: VAR + FEVD network analysis
 5. ⏭️ DCC-GARCH: dynamic correlation matrix (thay Ledoit-Wolf static)
@@ -377,3 +377,95 @@ RULES (anti-priming, uncertainty exits)
 - `Run_Claude.command` (executable) — Mac launcher
 - `tools/var_cvar_vnindex/quant/evt.py` (220 dòng) — POT-GPD core
 - `command/__init__.py`, `pages/__init__.py`, `pages/tools_page_C/__init__.py` — package markers
+
+---
+
+## 12. Factor Risk Model — Build Spec (PROPOSED 2026-05-18)
+
+**Posture**: Barra-VN lite — Tier A roadmap #2. Đây là **missing primitive**: 9/10 tool hiện tại đo index/pillar aggregate, không có cách nào decompose stock return → factor exposure + alpha. Branch target: `B_Micro_Analysis` (đang trống).
+
+### 12.1. Factor design — 6 style + ~10 industry
+
+| Factor | Spec | Data | Status |
+|---|---|---|---|
+| **Momentum** | `log P_{t-21} − log P_{t-252}` (skip-1-month) | `market_data.csv` | ✅ HAVE |
+| **LowVol** | `−σ(log_ret)` 252d, hoặc EWMA λ=0.94 | `market_data.csv` | ✅ HAVE |
+| **Beta** | OLS vs VN-Index 252d, exp-decay weight half-life 63d (Barra USE4) | `market_data` + `vnindex_cache` | ✅ HAVE |
+| **Size** | `log(close × shares_out)` | + `shares_outstanding` quarterly snapshot | ❌ FETCH |
+| **Value** | z-score composite `B/P + E/P + S/P` | + BVPS / EPS_TTM / SPS_TTM quarterly | ❌ FETCH |
+| **Quality** | `z(ROE) − 0.5·z(D/E) + 0.5·z(GrossMargin)` | + ROE / D/E / GM quarterly | ❌ FETCH |
+| **Industry** | 10 ICB-L2 dummy | + ICB classification per mã | ❌ FETCH 1-time |
+
+### 12.2. Cross-sectional regression spec
+- **Monthly rebalance** WLS: weight = `√MCap` (Barra USE4 spec)
+- **Shrinkage**: shrink covariance to identity 10% (small universe ~250 + size–beta collinearity cao ở VN)
+- **Output**:
+  - Factor return time series `[6 style + 10 industry]`
+  - Per-stock exposure matrix `[N×16]` mỗi tháng
+  - Idiosyncratic alpha residual `ε_i,t`
+  - Factor t-stat (Fama-MacBeth standard error)
+
+### 12.3. vnstock data constraints (free tier, confirmed 2026-05-18)
+
+| Tier | Rate limit | BCTC history | Cost |
+|---|---|---|---|
+| **Guest** (no signup) | 20 req/min | **4 kỳ only** (1 năm quarterly) | Free + ads |
+| **Community** (free signup) | 60 req/min | **8 kỳ** (2 năm quarterly) | Free |
+| **Sponsor** | 60-100 req/min | Full (10+ năm) | Paid |
+
+**Source priority**: VCI (60/min, cần key) > KBS (20/min, cần key) > MSN (no key, KHÔNG có VN equity, chỉ forex/crypto).
+
+**Implication cho factor model**:
+- ✅ Phase 1 (3 factor không cần BCTC) — free Guest tier OK.
+- ⚠️ Phase 2 (Size/Value/Quality) — free Community = 8 quý = **2 năm history** → cross-sectional regression CHO HIỆN TẠI work fine; **backtest factor return 8 quý KHÔNG đủ power** cho Deflated SR + Fama-MacBeth t-stat valid.
+- ❌ Backtest serious (5+ năm) → **bắt buộc Sponsor paid tier**.
+
+### 12.4. Phase plan
+
+| Phase | Thời gian | Data tier | Output |
+|---|---|---|---|
+| **P1 MVP** | 1 tuần | Free Guest | 3 factor (Mom/LowVol/Beta), cross-sectional regression infra, UI + AI CIO snapshot. Đủ validate workflow. |
+| **P2 Full live** | +2-3 tuần | Free Community | + Size/Value/Quality + industry. Live signal OK; backtest weak (2 năm). |
+| **P3 Backtest valid** | +1 tuần | Sponsor paid | 5+ năm fundamental → Deflated SR, factor t-stat, Fama-MacBeth SE valid. |
+
+### 12.5. Critical caveats trước khi build
+
+1. **Price adjustment**: verify `market_data.csv` là **adjusted close** (split + cash dividend) hay raw. Check `command/update_data.py:Quote.history()` flag. Raw close → ex-date return jump phá Momentum + Beta signal.
+2. **Survivorship bias**: `tickers.csv` = **current** universe → factor backtest over-estimate (miss delisted HVN/FLC/ROS period). Cần point-in-time historical add/delist HSX cho backtest path.
+3. **Free float adjust**: state-owned (BID, VCB, GAS, BSR, ACV) có total MCap gấp 3-5× free float. Phase 3 mới handle; Phase 1-2 dùng total shares + note caveat.
+4. **Fundamental restatement** (VN habit: Q4 audit restate cả Q1-3): cần `as_of_date` field để point-in-time correct (avoid look-ahead trong backtest).
+5. **Risk-free rate**: VGB 1Y yield cho excess return. Tạm fix 4.5% nếu lười fetch — error nhỏ vì cross-sectional regression chủ yếu dùng excess return.
+
+### 12.6. File plan
+
+```
+tools/factor_risk_model/
+  quant/
+    factors.py        — compute_momentum / lowvol / beta / size / value / quality
+    regression.py     — cross_sectional_wls(), shrinkage, fama_macbeth_se()
+    metadata.py       — industry mapping helper
+  ui/charts.py        — factor return time series + exposure heatmap + decile spread
+  page.py             — render() + sidebar
+  report.py           — snapshot dict cho AI CIO
+command/
+  update_fundamentals.py    — fetch BVPS/EPS/SPS/ROE/DE quarterly via vnstock.Finance, Community tier
+  build_ticker_meta.py      — 1-time: shares_out + ICB-L2 per mã
+data_lake/
+  fundamentals_long.csv     — [ticker, quarter_end, bvps, eps_ttm, sps_ttm, roe, de, gm, as_of_date]
+  ticker_meta.csv           — [ticker, icb_l1, icb_l2, free_float_pct]
+  shares_outstanding.csv    — [ticker, date, shares_out]  (quarterly snapshot)
+promt/
+  factor_risk_promt.md      — v2 framework (PERSONA / Observations / Cross-Check / Verdict + JSON tail)
+```
+
+### 12.7. API budget (first backfill, ~250 mã)
+
+| Endpoint | Calls/cycle | Note |
+|---|---|---|
+| `Listing().industries_icb()` (1-time) | 1 | ICB classification full |
+| `Company(symbol).overview()` | 250 | shares_out + free_float |
+| `Finance(symbol).balance_sheet(period='quarter')` | 250 × 1 (free) → 250 × 5 (sponsor) | 8 vs 20+ quarters |
+| `Finance(symbol).income_statement(period='quarter')` | 250 | NI + revenue |
+| `Finance(symbol).ratio(period='quarter')` | 250 | ROE, D/E |
+
+**Throughput**: free Community 60 req/min → 1000 calls ≈ 17 phút. Sponsor 100 req/min → 10 phút. Cập nhật incremental sau quarter-end ~250 calls × 3 endpoint = 13 phút free tier.
