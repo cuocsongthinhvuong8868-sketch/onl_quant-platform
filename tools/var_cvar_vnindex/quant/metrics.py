@@ -79,7 +79,7 @@ def calculate_var_cvar_metrics(
     )
 
     classic_cols = [
-        "price", "return", "stdev_30",
+        "price", "return", "mean_30", "stdev_30",
         "parametric_var", "historical_var", "expected_shortfall",
     ]
 
