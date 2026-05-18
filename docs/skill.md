@@ -323,12 +323,19 @@ RULES (anti-priming, uncertainty exits)
 
 **Roadmap đề xuất (theo Tier A khả thi ngay):**
 1. ✅ EVT POT-GPD (xong session này)
-2. ⏭️ Multi-factor Risk Model (Barra-lite): style factors Value/Size/Mom/Quality/LowVol + industry decomposition — **build spec ở §12**
+2. 🚧 **CHƯA HOÀN THÀNH** — Multi-factor Risk Model (Barra-lite): style factors Value/Size/Mom/Quality/LowVol + industry decomposition. **Blocker**: vnstock free tier giới hạn BCTC 8 quý (~2 năm) → backtest weak; chờ Sponsor tier hoặc accept Phase 1 (3-factor không cần fundamental). **Build spec đầy đủ ở §12.**
 3. ⏭️ MES / SRISK (NYU V-Lab pattern): systemic contribution từng VN30 mã
 4. ⏭️ Diebold-Yilmaz Spillover Index: VAR + FEVD network analysis
 5. ⏭️ DCC-GARCH: dynamic correlation matrix (thay Ledoit-Wolf static)
 6. ⏭️ HRP (Hierarchical Risk Parity): thay logistic curve trong backtest allocation
 7. ⏭️ Deflated Sharpe / Probabilistic Sharpe — bảo vệ credibility backtest
+8. 🚧 **CHƯA HOÀN THÀNH** — Pairs Trading research lab (Engle-Granger + Johansen + OU half-life). Không plug AI CIO synthesis — đứng độc lập trên nhánh B_Micro_Analysis. **Build spec đầy đủ ở §13.**
+
+**⚠️ Pending Build Backlog (cần track riêng):**
+| # | Tool | Trạng thái | Blocker chính |
+|---|---|---|---|
+| §12 | Factor Risk Model (Barra-VN lite) | 🚧 PROPOSED, chưa code | vnstock free tier BCTC 8 quý → backtest 5+ năm cần Sponsor paid |
+| §13 | Pairs Trading research lab | 🚧 PROPOSED, chưa code | Execution gap (T+2, FOL, lot size) — 1-2 tuần MVP nếu prioritize |
 
 **Tier B (cần data extra):**
 - VPIN microstructure (cần intraday tick data)
@@ -469,3 +476,114 @@ promt/
 | `Finance(symbol).ratio(period='quarter')` | 250 | ROE, D/E |
 
 **Throughput**: free Community 60 req/min → 1000 calls ≈ 17 phút. Sponsor 100 req/min → 10 phút. Cập nhật incremental sau quarter-end ~250 calls × 3 endpoint = 13 phút free tier.
+
+---
+
+## 13. Pairs Trading Research Lab — Build Spec (PROPOSED 2026-05-18)
+
+**Posture**: Engle-Granger + Johansen + OU half-life filter cho mean-reversion pair trading trên cluster cointegrated VN. Tier A roadmap #8. Branch target: `B_Micro_Analysis` (đang trống). **KHÔNG plug vào AI CIO synthesis** — đứng độc lập như research dashboard.
+
+### 13.1. Tại sao VN là môi trường lý tưởng
+
+1. **Retail dominance ~75% volume** → emotion-driven decoupling lặp lại; mean-reversion edge tồn tại lâu vì ít smart money arb đi.
+2. **Forced flow events có lịch trước**: VN30 ETF rebalance quarterly, foreign ownership limit (FOL) cap, margin call cascade → spread compression/expansion calendar-tradable.
+3. **No real short ngoài VN30F1M futures** → ai cũng phải hedge qua basket → tạo basis spread.
+
+### 13.2. Cluster cointegrated thực tế
+
+| Cluster | Mã | Logic kinh tế | Test khuyến nghị |
+|---|---|---|---|
+| **Vingroup** | VIC, VHM, VRE | Same parent, FII flow shared | Johansen 3-way |
+| **Big-4 SOE bank** | VCB, CTG, BID, MBB | Regulated rate, deposit base, NIM cycle | Johansen 4-way |
+| **Steel** | HPG, HSG, NKG | Iron ore + rebar/galvanized cycle | Johansen 3-way |
+| **Securities** | SSI, HCM, VND, VCI | Brokerage commission cycle | EG pair-wise |
+| **Private bank** | VPB, STB, ACB, SHB | Retail loan book ⚠️ FOL risk | EG pair-wise (exclude FOL-near) |
+| **Oil & Gas** | GAS, PLX, BSR, PVS | Brent + USD/VND link | Johansen 4-way |
+| **Utility / Power** | REE, GEX, POW, HDG | Capacity factor, El Niño cycle | EG pair-wise |
+
+VIC/VHM/VRE và VCB/CTG/BID là 2 candidate mạnh nhất (verified trong literature VN — UEH papers).
+
+### 13.3. Spec kỹ thuật 4 stage
+
+**Stage 1 — Cointegration test**
+- Engle-Granger 2-step (pair): OLS `Y = α + β·X` → ADF residual, MacKinnon critical. Đủ cho 1300+ obs daily.
+- Johansen (triplet/cluster): `statsmodels.tsa.vector_ar.vecm.coint_johansen`, λ_max + trace stat.
+
+**Stage 2 — Spread dynamics filter**
+- OU half-life: fit AR(1) `Δspread_t = θ(μ − spread_{t-1}) + ε_t`; `half_life = ln(2)/θ`.
+- **Trade chỉ pair half-life 5-30 ngày** — <5 = noise (phí ăn hết); >30 = drift/regime change.
+- Backup filter: Hurst H < 0.5 confirm anti-persistent.
+
+**Stage 3 — Entry/exit rule**
+- Z-score 60d rolling
+- Entry: |z| > 2 (long low leg, short high leg)
+- Exit: z crosses 0 hoặc time-stop 2× half-life
+- Stop-loss: |z| > 3 → cointegration breakdown → exit + quarantine pair 60 ngày
+- Re-test cointegration mỗi 60 phiên; pair fail → kill position
+
+**Stage 4 — Position sizing**
+- Hedge ratio β từ EG step 1 hoặc Johansen β vector
+- Adjust lot size 100 → rounding error ~1-3% theoretical hedge
+- 50/50 long-short market-neutral hoặc beta-weighted vs VN-Index
+
+### 13.4. VN-specific gotchas (kill 70% paper backtest)
+
+| # | Gotcha | Tác động | Mitigation |
+|---|---|---|---|
+| 1 | **Margin call T+2 cascade** | Spread widen 4-5σ trước revert → forced close ở đáy | Capital cushion ≥ 2× initial margin, intraday MtM check |
+| 2 | **Foreign ownership limit (FOL)** | VPB/HDB/STB hit FOL → decoupling KHÔNG mean-revert | Exclude pair có 1 leg foreign room < 5% |
+| 3 | **Corporate action** | Split/divvy không adjust → fake spread jump | Verify `Quote.history(adjusted=True)` flag |
+| 4 | **Lot 100 + tick 50 VND** | Bid-ask eats ~10-20 bps/round-trip | Filter half-life ≥ 5 ngày |
+| 5 | **No real short** | Chỉ short qua VN30F1M basket | Mã ngoài VN30 chỉ long-only ratio |
+| 6 | **Lunch break gap 11:30-13:00** | Reopen ±2σ random walk | Time stop theo trading hour, không calendar |
+
+### 13.5. Tại sao tách khỏi AI CIO synthesis
+
+AI CIO pattern: 9 tool đo regime → 1 score 0-100 → 1 verdict allocation. Pairs signal:
+- Per-pair, per-day, discrete event (long VIC/short VHM, z=-2.3, half-life 12d)
+- KHÔNG aggregate được vào "regime"
+- Time-sensitive (14:45 cron publish → entry có thể đã gone)
+- Risk orthogonal với long-only equity allocation (market-neutral basket)
+
+→ Inject pairs signal vào executive summary master prompt sẽ pollute regime narrative. **Pattern đúng**: standalone research dashboard với live table sorted by |z|, backtest panel riêng, KHÔNG plug `shared/ai_cio.py`.
+
+### 13.6. File plan
+
+```
+tools/pairs_trading/
+  quant/
+    cointegration.py    — engle_granger(), johansen_test(), ou_half_life(), hurst()
+    signal.py           — z_score_60d(), entry_exit_rules(), stop_loss()
+    backtest.py         — basket_pnl(), transaction_cost_model(), margin_calc()
+    clusters.py         — PREDEFINED_CLUSTERS dict (VINGROUP, BIG4_BANK, STEEL, ...)
+  ui/
+    charts.py           — spread plot, z-score gauge, equity curve
+    sidebar.py          — cluster picker, |z| threshold tuner, half-life filter
+  page.py
+  # KHÔNG có report.py — không feed AI CIO
+pages/tools_page_B/
+  _N_Pairs_Trading.py   — entry, branch B_Micro_Analysis
+```
+
+**Dependency**: 0 mới. `market_data.csv` đã đủ 5+ năm. `statsmodels.tsa.vector_ar.vecm` đã có trong requirements.
+
+### 13.7. Honest evaluation
+
+| Dimension | Score | Reason |
+|---|---|---|
+| Signal-to-noise (VN) | 🟢 8/10 | Retail decoupling tạo edge bền |
+| Data availability | 🟢 10/10 | 0 fetch mới, market_data đủ — không có blocker như §12 |
+| Backtestability | 🟢 9/10 | 5+ năm history, survivorship VN30 thấp |
+| Execution gap (paper→live) | 🔴 5/10 | T+2, FOL, lot size → 3-4% theoretical edge ăn mất qua phí |
+| AI CIO synergy | 🔴 2/10 | Orthogonal, KHÔNG plug synthesis |
+| Audience fit | 🟡 6/10 | Chỉ user trade chủ động |
+| Effort | 🟡 1-2 tuần MVP | EG + Johansen + OU + dashboard. Live execution +1 tuần. |
+
+### 13.8. Phase plan
+
+| Phase | Thời gian | Output |
+|---|---|---|
+| **P1 Research-only** | 5-7 ngày | Live signal table + backtest panel, **không có live trade rule**. Demo + edge measurement. |
+| **P2 Live execution** | +1 tuần | Order ticket layer + margin calc + foreign room check + corp-action handler. Chỉ build sau khi P1 demo positive edge sau cost. |
+
+**Suggested order trong roadmap**: build SAU DCC-GARCH (Tier A #5) vì DCC dynamic correlation matrix dùng được chéo cho pairs filter — cointegration + dynamic corr combined mạnh hơn EG đơn.
