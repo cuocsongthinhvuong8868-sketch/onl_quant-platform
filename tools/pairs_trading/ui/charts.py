@@ -1,11 +1,13 @@
 """
 charts.py — Plotly charts cho Pairs Trading dashboard.
 
-4 chart functions:
+6 chart functions:
 - render_spread_chart        : 2-row spread + z-score with ±entry/±stop bands
 - render_cluster_heatmap     : NxN EG p-value heatmap (red <0.05 = cointegrated)
 - render_backtest_equity     : equity curve + drawdown
 - render_residual_diagnostics: residual time-series + ACF + ADF stat
+- render_pair_rho_chart      : DCC/EWMA time-series ρ_t với min threshold band
+- render_correlation_heatmap : NxN current correlation matrix (EWMA last-date)
 """
 from __future__ import annotations
 
@@ -177,6 +179,65 @@ def render_residual_diagnostics(resid: pd.Series, adf_stat: float, p_value: floa
         title=f"Residual diagnostics — ADF stat={adf_stat:.3f}, p-value={p_value:.4f}",
         height=500,
         showlegend=False,
+        margin=dict(l=10, r=10, t=70, b=10),
+    )
+    return fig
+
+
+def render_pair_rho_chart(
+    rho_series: pd.Series,
+    min_rho: float = 0.5,
+    method: str = "ewma",
+    title: str | None = None,
+) -> go.Figure:
+    """Time-series ρ_t cho 1 pair với min threshold band."""
+    if title is None:
+        title = f"Dynamic correlation ρ_t ({method.upper()})"
+    fig = go.Figure()
+    fig.add_trace(
+        go.Scatter(
+            x=rho_series.index, y=rho_series.values, mode="lines",
+            name="ρ_t", line=dict(color="#8E44AD", width=1.3),
+        )
+    )
+    fig.add_hline(
+        y=min_rho, line=dict(color="rgba(220,50,50,0.7)", dash="dash"),
+        annotation_text=f"min ρ = {min_rho:.2f}",
+        annotation_position="top right",
+    )
+    fig.add_hline(y=0, line=dict(color="rgba(120,120,120,0.4)", dash="dot"))
+    fig.update_layout(
+        title=title,
+        height=320,
+        showlegend=False,
+        margin=dict(l=10, r=10, t=60, b=10),
+        yaxis=dict(range=[-1.05, 1.05], title="ρ"),
+    )
+    return fig
+
+
+def render_correlation_heatmap(
+    corr_matrix: pd.DataFrame,
+    title: str = "Current correlation ρ (EWMA last-date)",
+) -> go.Figure:
+    """NxN correlation heatmap. Green = high positive, red = low/negative."""
+    z = corr_matrix.values.astype(float)
+    text = np.array([[f"{v:.2f}" for v in row] for row in z])
+    fig = go.Figure(
+        data=go.Heatmap(
+            z=z,
+            x=list(corr_matrix.columns),
+            y=list(corr_matrix.index),
+            colorscale="RdYlGn",
+            zmin=-1, zmax=1,
+            text=text,
+            texttemplate="%{text}",
+            colorbar=dict(title="ρ"),
+        )
+    )
+    fig.update_layout(
+        title=title,
+        height=450,
         margin=dict(l=10, r=10, t=70, b=10),
     )
     return fig
