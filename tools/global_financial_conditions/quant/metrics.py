@@ -6,7 +6,7 @@ Core logic cho Global Financial Conditions Monitor (GFCM).
   - VIX  (CBOE Volatility Index)            : FRED VIXCLS
   - MOVE (ICE BofAML US Bond Vol Estimate)  : Yahoo ^MOVE
   - HY OAS (ICE BofA US HY Index OAS)       : FRED BAMLH0A0HYM2
-  - CCC OAS (ICE BofA CCC & Lower HY OAS)   : FRED BAMLH0A3HYCM
+  - CCC OAS (ICE BofA CCC & Lower HY OAS)   : FRED BAMLH0A3HYC
   - Derived: Credit Quality Spread = CCC − HY
 
 Pipeline:
@@ -31,8 +31,8 @@ import pandas as pd
 # ── Constants ──
 FRED_SERIES = {
     "VIX": "VIXCLS",
-    "HY_OAS": "BAMLH0A0HYM2",
-    "CCC_OAS": "BAMLH0A3HYCM",
+    "HY_OAS": "BAMLH0A0HYM2",   # ICE BofA US HY Index OAS (broad)
+    "CCC_OAS": "BAMLH0A3HYC",   # ICE BofA CCC & Lower US HY Index OAS
 }
 YAHOO_MOVE_TICKER = "^MOVE"
 
@@ -68,7 +68,7 @@ OUTPUT_COLUMNS = [
 
 def fetch_fred_series(api_key: str, start_date: str = START_DATE) -> pd.DataFrame:
     """
-    Pull 3 FRED series: VIXCLS, BAMLH0A0HYM2, BAMLH0A3HYCM.
+    Pull 3 FRED series: VIXCLS, BAMLH0A0HYM2, BAMLH0A3HYC.
 
     Returns
     -------
