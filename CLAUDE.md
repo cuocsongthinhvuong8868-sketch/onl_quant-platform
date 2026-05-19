@@ -77,9 +77,18 @@ Allow list bao gồm: `python3/python/pip/grep/find/ls/cat/git/streamlit *`. Byp
 
 1. **God module**: `shared/ai_cio.py` 600+ dòng — recommend refactor sang registry pattern
 2. **Cache key dùng `date.today()`**: timezone bug giữa Streamlit Cloud (UTC) và VN (UTC+7). Đổi sang `df_stocks.index[-1]`.
-3. **Hardcoded `t0_dt = pd.to_datetime("2026-03-02")`** trong manipulation: làm dynamic 60 phiên gần nhất.
+3. ✅ ~~**Hardcoded `t0_dt = pd.to_datetime("2026-03-02")`** trong manipulation: làm dynamic 60 phiên gần nhất.~~ → FIXED 2026-05-18 (`shared/ai_cio.py:264` dùng `result_df.index[-60]`, mirror UI default).
 4. **`_create_pdf` duplicate**: trong `app.py:193` và `command/run_ai_cio_auto.py:79` → extract `shared/pdf_export.py`.
 5. **Streamlit Cloud module resolution**: đã thêm `__init__.py` cho `command/`, `pages/`, `pages/tools_page_C/` (2026-05-17 fix).
+
+## 🚧 Pending Build Backlog (chưa hoàn thành, đề xuất tools mới)
+
+| # | Tool | Trạng thái | Blocker / Next step |
+|---|---|---|---|
+| **§12** | **Factor Risk Model** (Barra-VN lite, 6 style + ~10 industry, cross-sectional WLS) | 🚧 PROPOSED 2026-05-18 — chưa code | vnstock free tier giới hạn BCTC 8 quý (~2 năm) → backtest 5+ năm cần Sponsor paid. Phase 1 (3 factor không cần BCTC) ship được ngay với free tier. |
+| **§13** | **Pairs Trading research lab** (Engle-Granger + Johansen + OU half-life, KHÔNG plug AI CIO) | 🚧 PROPOSED 2026-05-18 — chưa code | 0 data blocker. Execution gap T+2/FOL/lot-size lớn → P1 research-only 5-7 ngày trước khi build live execution layer. |
+
+**Quy tắc khi resume**: đọc `docs/skill.md` §12 (Factor Risk Model spec) và §13 (Pairs Trading spec) để pick up đầy đủ context trước khi code.
 
 ## When Working in This Project
 

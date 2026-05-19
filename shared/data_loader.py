@@ -58,3 +58,22 @@ def load_custom(filename: str) -> pd.DataFrame:
     df = pd.read_csv(path, index_col=0, parse_dates=True)
     logger.info("Đã tải %s: %d rows × %d cols", filename, *df.shape)
     return df
+
+
+def load_ticker_metadata() -> pd.DataFrame | None:
+    """Tải ticker_metadata.csv (ICB sector + exchange).
+
+    Cào bằng `python command/update_sector_data.py`. Index=Ticker,
+    cols=[industry_code, industry_name, exchange].
+
+    Trả về None nếu file chưa tồn tại — caller phải fallback gracefully.
+    """
+    path = DATA_LAKE / "ticker_metadata.csv"
+    if not path.exists():
+        logger.warning(
+            "ticker_metadata.csv chưa tồn tại. Chạy `python command/update_sector_data.py` để cào."
+        )
+        return None
+    df = pd.read_csv(path, index_col=0)
+    logger.info("Đã tải ticker_metadata: %d rows × %d cols", *df.shape)
+    return df
