@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-Updated: **2026-05-17**
+Updated: **2026-05-19**
 Mục đích: nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
@@ -587,3 +587,94 @@ pages/tools_page_B/
 | **P2 Live execution** | +1 tuần | Order ticket layer + margin calc + foreign room check + corp-action handler. Chỉ build sau khi P1 demo positive edge sau cost. |
 
 **Suggested order trong roadmap**: build SAU DCC-GARCH (Tier A #5) vì DCC dynamic correlation matrix dùng được chéo cho pairs filter — cointegration + dynamic corr combined mạnh hơn EG đơn.
+
+---
+
+## 14. Ship Log — Pairs Trading Lab + DCC-GARCH (2026-05-19)
+
+§13 và Tier A #5 (DCC-GARCH utility) đã **shipped** trên feature branch `claude/review-platform-docs-OiV1W`. Bài viết này log lại scope thực sự đã code so với plan §13.
+
+### 14.1. Branch / Commits
+
+| Commit | Subject |
+|---|---|
+| `dfb18ec` | docs: add Pairs Trading build spec (§13) + mark §12/§13 pending |
+| `32cbace` | **feat: build Pairs Trading Lab (§13) + DCC-GARCH utility + sector ingestion** |
+| `80fade5` | fix(app): update Micro Analysis landing card (remove 🚧 placeholder, point sang Pairs Trading) |
+
+PR #2 ở trạng thái **DRAFT** (chưa merge vào `main`). Streamlit Cloud deploy từ `main` → tool chưa xuất hiện production. User quyết định thời điểm convert ready / merge.
+
+### 14.2. Files actually created/modified
+
+**CREATE — Phase 0 (DCC-GARCH utility, no UI)**:
+- `shared/dcc_garch.py` (513 LOC) — public API: `fit_dcc()`, `dynamic_correlation_matrix(method='dcc'|'ewma'|'hybrid')`, `pair_correlation()`
+
+**CREATE — Phase 1 (Pairs Trading research)**:
+- `tools/pairs_trading/__init__.py`
+- `tools/pairs_trading/quant/cointegration.py` (214 LOC) — `engle_granger()`, `johansen_test()`, `ou_half_life()`, `ou_half_life_raw()`, `hurst()`, `pairwise_eg_matrix()`, re-export `adfuller` + `coint_johansen`
+- `tools/pairs_trading/quant/signal.py` (134 LOC) — `z_score_60d()`, `entry_exit_rules()` (FSM long/short/flat, time-stop 2× half-life), `quarantine_flag()`, `detect_breakout()`
+- `tools/pairs_trading/quant/backtest.py` (189 LOC) — `basket_pnl()`, `transaction_cost_model()`, `summary_stats()`, **+ Phase 2 add**: `generate_order_ticket()`, `order_ticket_to_json()`
+- `tools/pairs_trading/quant/clusters.py` (67 LOC) — 7 PREDEFINED_CLUSTERS + `get_cluster()`, `list_clusters()`, `validate_clusters_against_universe()`
+- `tools/pairs_trading/ui/charts.py` (182 LOC) — 4 Plotly functions
+- `tools/pairs_trading/ui/sidebar.py` (90 LOC)
+- `tools/pairs_trading/page.py` (545 LOC) — **5 tabs**: Cluster Scan / Pairwise Heatmap / Custom Pair / Aggregate Backtest / **Live Signals** (Phase 2 integrated)
+- `pages/tools_page_B/__init__.py` + `pages/tools_page_B/_1_Pairs_Trading.py`
+
+**CREATE — Data ingestion (out of original plan, added during build)**:
+- `command/update_sector_data.py` — fetch ICB sector từ `vnstock.Listing().symbols_by_industries()`
+- `data_lake/ticker_metadata.csv` — 245/253 ticker covered (8 ETF/index expected miss)
+- `shared/data_loader.py` (EDIT) — thêm `load_ticker_metadata()` helper
+
+**EDIT**:
+- `pages/B_Micro_Analysis.py` — placeholder → navigation hub mirror A_Macro pattern
+- `app.py` — landing card cho "Phân tích Vi mô" cập nhật ("🔁 Pairs Trading Research Lab / Cointegration + OU half-life + Z-score / 7 cluster VN + custom pair")
+- `requirements.txt` — `statsmodels>=0.14,<0.16`
+
+### 14.3. Deltas vs plan §13
+
+| Aspect | Plan §13 | Ship reality |
+|---|---|---|
+| Tab count | 4 (Cluster / Pairwise / Custom / Backtest) | **5** — gộp Phase 2 thành tab Live Signals riêng |
+| Pairs cluster Vingroup | "VIC/VHM/VRE expected cointegrated" | **VHM thuần real estate, VRE retail mall → Johansen FAIL ở 95%** (warning render in-page) |
+| MBB cluster | Move khỏi Big4_Bank | ✅ Done; Big4 còn 3-way (VCB/CTG/BID), Private_Bank 6-way (VPB/STB/ACB/SHB/MBB/HDB) |
+| Sector ingestion | KHÔNG có trong plan | **ADD** — discover trong build: cần ticker→sector map cho future cluster auto-discovery |
+| AI CIO plug | ❌ KHÔNG plug | ✅ honored — không có `report.py` trong `tools/pairs_trading/` |
+| FOL filter | SKIP (retail assume >5%) | ✅ honored — `st.info` banner "Verify manually before submitting" |
+| Corp-action handler | SKIP | ✅ honored — `st.warning` banner ở mở page |
+
+### 14.4. Real-data smoke test (commit `32cbace`)
+
+| Test | Expected | Actual |
+|---|---|---|
+| VIC/VHM Engle-Granger | p<0.05, half-life 10-20d | p=0.004, β=1.65 ✅ |
+| Vingroup Johansen (3-way) | n_coint ≥ 1 | n_coint=1 ✅ (nhưng VRE pair cô lập fails 95%) |
+| Private_Bank 6-way pairwise | mostly cointegrated | 13/15 pair p<0.05; ACB stand-out non-coint (retail profile) |
+| Big4_Bank Johansen (3-way) | n_coint ≥ 1 | ✅ Pass |
+
+### 14.5. Local AppTest smoke (post-ship, 2026-05-19)
+
+Test framework: `streamlit.testing.v1.AppTest.from_file(...).run()` (plain HTTP GET không trigger script execution — Streamlit chỉ chạy khi có WebSocket).
+
+| Page | Result |
+|---|---|
+| `app.py` landing | ✅ Title "📊 Quant Platform" render, micro-card text confirmed updated |
+| `pages/tools_page_B/_1_Pairs_Trading.py` | ✅ Title "🔁 Pairs Trading Research Lab" render; 2 design warning đúng ý đồ (corp-action + Vingroup risk) |
+| Quant imports | ✅ 4 module (cointegration, clusters, signal, backtest) all import OK |
+
+Non-blocking local-only noise:
+- `GITHUB_TOKEN chưa được thiết lập` — local secret missing, Cloud has it
+- `use_container_width deprecated` — Streamlit 1.x warning
+- `ModuleNotFoundError: fpdf` — local container missing pip install; requirements.txt đã có `fpdf2>=2.7.0` nên Cloud OK. Fix local: `pip install fpdf2` (installed 2.8.7).
+
+### 14.6. Open items sau ship
+
+1. **PR #2 vẫn DRAFT** — Cloud chưa thấy tool. User tự decide: (a) convert ready + merge thủ công, (b) Claude convert+merge khi được authorize, (c) repoint Cloud deploy về feature branch tạm thời.
+2. **DCC-GARCH chưa có parity test runtime** — code path tồn tại nhưng `dynamic_correlation_matrix(method="dcc")` chưa run trên full 50-ticker × 2500-obs trên CI. Plan §0 verification step #1-2 còn pending.
+3. **Pairs Trading chưa wire DCC filter** — `quant/cointegration.py` hiện chỉ EG + Johansen, chưa consume `shared.dcc_garch.pair_correlation()`. Phase 1 plan call out "DCC dynamic correlation cross-utility" — defer sau khi user xác nhận edge từ EG đơn.
+4. **Aggregate Backtest tab** — render OK headless nhưng chưa stress-test với cluster 6-way (Private_Bank → 15 pair × 2 năm). Có thể timeout trên Cloud (default 60s) — cần `@st.cache_data` hoặc background job.
+5. **Sector ingestion gap**: 8 ETF/index miss từ ICB → cluster auto-discovery (future feature) sẽ bypass ETF naturally.
+
+### 14.7. CLAUDE.md backlog update needed
+
+§13 trong CLAUDE.md hiện status `🚧 PROPOSED 2026-05-18 — chưa code`. Sau merge PR #2 nên đổi sang `✅ SHIPPED 2026-05-19 v1 (Pairs Trading Lab live, DCC utility shared, sector ingestion bonus)`. Giữ note về 5 open item ở §14.6 trên.
+
