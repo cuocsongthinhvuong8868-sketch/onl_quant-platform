@@ -77,6 +77,29 @@ def render_sidebar(available_tickers: list[str]) -> dict:
         ),
     )
 
+    st.sidebar.markdown("### Universe Scanner")
+    same_sector_only = st.sidebar.checkbox(
+        "Chỉ pair cùng industry",
+        value=True,
+        help=(
+            "Same `industry_code` từ ticker_metadata.csv. "
+            "Tăng signal-to-noise — economic linkage thật, không spurious correlation."
+        ),
+    )
+    cross_exchange = st.sidebar.checkbox(
+        "Cho phép cross-exchange (HOSE × UPCOM)",
+        value=False,
+        help="UPCOM thanh khoản thấp — default OFF để tránh execution risk.",
+    )
+    min_rho_screen = st.sidebar.slider(
+        "Scanner: min ρ_60d",
+        min_value=0.5, max_value=0.95, value=0.75, step=0.05,
+        help=(
+            "Pearson correlation trên 60 phiên gần nhất. "
+            "Lower = nhiều candidate hơn nhưng noise tăng. Default 0.75."
+        ),
+    )
+
     st.sidebar.markdown("### Backtest window")
     lookback_years = st.sidebar.slider(
         "Lookback (years)",
@@ -87,11 +110,31 @@ def render_sidebar(available_tickers: list[str]) -> dict:
     st.sidebar.markdown("---")
     st.sidebar.markdown("### Custom pair")
     eligible_tickers = sorted(set(available_tickers))
-    ct1 = st.sidebar.selectbox("Ticker 1 (Y / numerator)", options=eligible_tickers, index=0)
+
+    # Forward scanner-validated pair vào widget state TRƯỚC khi selectbox render.
+    # Pattern: scanner tab set scanner_target_t1/t2 + st.rerun() → sidebar consume.
+    if "scanner_target_t1" in st.session_state:
+        target = st.session_state.pop("scanner_target_t1")
+        if target in eligible_tickers:
+            st.session_state["pairs_custom_t1"] = target
+    if "scanner_target_t2" in st.session_state:
+        target = st.session_state.pop("scanner_target_t2")
+        if target in eligible_tickers:
+            st.session_state["pairs_custom_t2"] = target
+
+    ct1 = st.sidebar.selectbox(
+        "Ticker 1 (Y / numerator)",
+        options=eligible_tickers,
+        key="pairs_custom_t1",
+    )
+    remaining = [t for t in eligible_tickers if t != ct1]
+    # Clamp t2 nếu out-of-options (khi user đổi t1)
+    if st.session_state.get("pairs_custom_t2") not in remaining and remaining:
+        st.session_state["pairs_custom_t2"] = remaining[0]
     ct2 = st.sidebar.selectbox(
         "Ticker 2 (X / hedge)",
-        options=[t for t in eligible_tickers if t != ct1],
-        index=0,
+        options=remaining,
+        key="pairs_custom_t2",
     )
 
     st.sidebar.markdown("---")
@@ -120,4 +163,7 @@ def render_sidebar(available_tickers: list[str]) -> dict:
         "use_dcc_filter": bool(use_dcc_filter),
         "min_rho": float(min_rho),
         "dcc_method": str(dcc_method),
+        "same_sector_only": bool(same_sector_only),
+        "cross_exchange": bool(cross_exchange),
+        "min_rho_screen": float(min_rho_screen),
     }
