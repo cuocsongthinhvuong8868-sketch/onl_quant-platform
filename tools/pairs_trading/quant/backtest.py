@@ -132,6 +132,8 @@ def generate_order_ticket(
     margin_rate: float = DEFAULT_MARGIN_RATE,
     lot_size: int = DEFAULT_LOT_SIZE,
     stop_z: float = 3.0,
+    rho_at_entry: Optional[float] = None,
+    rho_method: Optional[str] = None,
 ) -> dict:
     """Generate JSON-serializable order ticket cho 1 pair entry.
 
@@ -162,7 +164,7 @@ def generate_order_ticket(
     margin_req = notional * margin_rate
     margin_cushion = margin_req * 2.0  # spec §13.4 #1: capital cushion ≥ 2× initial margin
 
-    return {
+    ticket: dict = {
         "timestamp": datetime.now().isoformat(timespec="seconds"),
         "pair": [t1, t2],
         "legs": [
@@ -182,6 +184,11 @@ def generate_order_ticket(
             "Cointegration re-test mỗi 60 phiên — kiểm tra last refit trước khi vào lệnh."
         ),
     }
+    if rho_at_entry is not None and np.isfinite(rho_at_entry):
+        ticket["rho_at_entry"] = float(rho_at_entry)
+        if rho_method is not None:
+            ticket["rho_method"] = str(rho_method)
+    return ticket
 
 
 def order_ticket_to_json(ticket: dict) -> str:
