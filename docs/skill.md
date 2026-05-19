@@ -1,17 +1,18 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-Updated: **2026-05-19**
-Mục đích: nén ngữ cảnh để resume công việc instant khi reopen.
+**Updated:** 2026-05-19 (GFCM ship)
+**Purpose:** nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
 
 ## 1. Mục tiêu & Posture
 
-Refactor 10+ tools quant rời rạc thành nền tảng Streamlit chuẩn hoá theo skeleton:
-- Tách rõ `quant` (business logic, không Streamlit) / `ui` (chart, sidebar) / `page` (render glue)
-- Data pipeline kiểu `data_lake/`: app **đọc** CSV; updater scripts **gọi** API
-- AI CIO synthesis: 9 tool quant → 1 executive summary qua Kimi/DeepSeek
+Streamlit-based quant platform cho thị trường VN, kiến trúc 3-tier:
+- `quant` (business logic, **không** Streamlit) / `ui` (chart, sidebar) / `page` (render glue)
+- Data pipeline `data_lake/`: app **đọc** CSV; updater scripts **gọi** API
+- AI CIO synthesis: 9 VN-equity tool → 1 executive summary qua Kimi/DeepSeek
 - Backtest pipeline isolated (look-ahead-free) khỏi live paths
+- Macro tools (Fed Liquidity, GFCM) **đứng riêng** — AI analysis trên page, KHÔNG inject executive summary
 
 ---
 
@@ -21,326 +22,247 @@ Refactor 10+ tools quant rời rạc thành nền tảng Streamlit chuẩn hoá 
 app.py                  — Home (3 nhánh, AI CIO panel, PDF export, GitHub sync)
 config.py               — paths + AI_PROVIDER_MAP (Kimi + DeepSeek)
 tickers.csv             — universe chính, single source of truth (~250 mã)
-data_lake/              — market_data, market_volume, vnindex/vn30 cache, bank_fundamentals, fed_liquidity_cache
+data_lake/              — market_data, market_volume, vnindex/vn30, fundamentals,
+                          fed_liquidity_cache, global_financial_conditions_cache,
+                          ticker_metadata, Ai_cio_report
 data_lake/daily_cache/  — pkl (compute) + txt (AI text reports)
 pages/
-  A_Macro_Analysis.py        — Fed Liquidity
-  B_Micro_Analysis.py        — 🚧 đang phát triển
+  A_Macro_Analysis.py        — Fed Liquidity, GFCM
+  B_Micro_Analysis.py        — Pairs Trading
   C_Behavioral_Finance.py    — 9 tools dạng grid menu
-  tools_page_C/...           — entry ẩn (gọi tools.<name>.page.render())
+  tools_page_{A,B,C}/…       — entry ẩn (gọi tools.<name>.page.render())
 tools/<tool>/
   quant/<metrics|engine|...>.py — business logic
   ui/<charts|sidebar>.py
-  page.py     — render/show entry
-  report.py   — snapshot dict cho AI CIO + machine report
+  page.py     — render entry
+  report.py   — snapshot dict (chỉ tool nào plug AI CIO mới có)
 shared/
-  data_loader.py    — load_close_prices, load_volumes, load_custom
-  daily_cache.py    — get_cache_path, clear_daily_cache, load/save_daily_cache (hash-based pkl)
-  ai_cio.py         — 9× run_<tool>() + run_executive_summary()
-  github_sync.py    — REST upload + render_sync_button(label, help_text, ...)
-  api_key_helper.py — 4-digit shortcut → Streamlit Secrets
-  history_selector.py — date+model picker cho AI text history
-  page_layout.py    — setup_page()
-promt/              — 11 prompt templates (Vietnamese, tên file có space)
+  data_loader.py      — load_close_prices, load_volumes, load_custom, load_ticker_metadata
+  daily_cache.py      — get_cache_path, clear_daily_cache, load/save_daily_cache (hash-based pkl)
+  ai_cio.py           — 9× run_<tool>() + run_executive_summary()
+  dcc_garch.py        — fit_dcc, dynamic_correlation_matrix, pair_correlation
+  github_sync.py      — REST upload + render_sync_button
+  api_key_helper.py   — 4-digit shortcut → Streamlit Secrets
+  history_selector.py — date+model picker
+  page_layout.py
+promt/              — 12 prompt templates (Vietnamese, tên file có space - typo intentional)
 command/
-  update_data.py             — fetch close+volume (vnstock), save market_data + market_volume
-  update_bank_fundamentals.py
-  update_fed_liquidity.py    — FRED API
-  run_ai_cio_auto.py         — cron GitHub Actions (3:00 AM VN)
+  update_data.py                          — vnstock close+volume
+  update_bank_fundamentals.py             — KBS fundamentals quarterly
+  update_fed_liquidity.py                 — FRED WALCL/TGA/RRP weekly
+  update_global_financial_conditions.py   — FRED VIX/HY/CCC + Yahoo MOVE daily
+  update_sector_data.py                   — ICB metadata
+  run_ai_cio_auto.py                      — cron GH Actions
   generate_report.py / generate_visual_report.py
 .github/workflows/
   update_pipeline.yml        — daily price update
-  ai_cio_daily.yml           — AI CIO cron
+  ai_cio_daily.yml           — AI CIO cron 14:45 VN
   fed_liquidity_weekly.yml
 ```
 
 ---
 
-## 3. 10 Tools — Snapshot
+## 3. 11 Tools Active — Snapshot
 
-| # | Tool | Module | Key logic | AI prompt |
-|---|---|---|---|---|
-| 1 | Fear & Greed | `fear_greed` | PCA market factor + **EGARCH→GARCH→EWMA fallback** + Kelly skewness | `fear greed promt.md` |
-| 2 | Upside/Downside Ratio | `upside_ratio` | Hybrid Logit-AR + Beta-AR Monte Carlo, 5000 sims | `upside ratio promt.md` |
-| 3 | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks), P/B unit constant `PRICE_THOUSANDS_TO_VND=1000` | `risk adjusted growth promt.md` |
-| 4 | Market Breadth | `market_breadth` | % stocks > MA20/60/125/252 | `Market Breadth promt.md` |
-| 5 | ESR Monitor | `esr_monitor` | 5-pillar SSI: S_VOL, S_PRES, S_COR, **S_LIQ=Volume Dry-Up**, S_VAL → PCA(1) rank → HMM regime → 4-state market | `ESR monitor promt.md` |
-| 6 | Dispersion | `dispersion` | CSAD/CSSD + DPI + Ledoit-Wolf rolling corr | `dispersion promt.md` |
-| 7 | Manipulation | `manipulation` | PCA composite VIC/VHM/VRE vs VN30F1M, percentile rank, 5-regime event study | `manipulation promt.md` |
-| 8 | VaRES | `va_res` | Cornish-Fisher VaR/ES, Module B (Contagion VN30) + Module C (Complacency self-baseline) | `va_res_promt.md` |
-| 9 | Var-CVaR VNINDEX | `var_cvar_vnindex` | Gaussian + Historical 95% + **EVT POT-GPD** (95/99/99.5) + Hill index, numba kernels | `var_cvar_vnindex_promt.md` |
-| 10 | Fed Liquidity (Macro) | `fed_liquidity` | WALCL − TGA − RRP, EMA(4), Z-score 52W → ADD/CUT/HOLD | `fed_liquidity_promt.md` |
+| # | Branch | Tool | Module | Key tech | AI integration |
+|---|---|---|---|---|---|
+| 1 | C | Fear & Greed | `fear_greed` | PCA + EGARCH→GARCH→EWMA fallback + Kelly skewness | Executive summary |
+| 2 | C | Upside Ratio | `upside_ratio` | Hybrid Logit-AR + Beta-AR Monte Carlo 5000 sims | Executive summary |
+| 3 | C | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks) | Executive summary |
+| 4 | C | Market Breadth | `market_breadth` | % stocks > MA20/60/125/252 | Executive summary |
+| 5 | C | **ESR Monitor** | `esr_monitor` | 5-pillar SSI (S_VOL/S_PRES/S_COR/**S_LIQ=Volume Dry-Up**/S_VAL) + HMM regime | Executive summary |
+| 6 | C | Dispersion | `dispersion` | CSAD/CSSD + DPI + Ledoit-Wolf | Executive summary |
+| 7 | C | Manipulation | `manipulation` | PCA composite VIC/VHM/VRE vs VN30F1M, percentile regime | Executive summary |
+| 8 | C | VaRES | `va_res` | Cornish-Fisher + Self-baseline Complacency | Executive summary |
+| 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | Executive summary |
+| 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | Standalone (AI tab trên page) |
+| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, **static PCA**, regime via PC1 percentile 3Y | Standalone (AI tab trên page) |
+| 12 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
 
-**PRODUCTION_REGIME_METHOD** (`tools/esr_monitor/quant/metrics.py:51`) = `'hmm'` cho live paths (ESR Monitor LIVE, AI CIO Manual/AUTO, report snapshot). Backtest dùng `'hmm_walk_forward'` riêng để look-ahead-free.
+`PRODUCTION_REGIME_METHOD` (`tools/esr_monitor/quant/metrics.py:51`) = `'hmm'` cho live paths. Backtest dùng `'hmm_walk_forward'` riêng.
 
 ---
 
 ## 4. Data Pipeline
 
-| File | Updater | Mode | Tần suất |
-|---|---|---|---|
-| `market_data.csv` (close) | `command/update_data.py` | Smart incremental (`combine_first`), backfill `--backfill 2190` | Daily 14:30 VN (GH Actions) |
-| `market_volume.csv` (volume) | Same | Same — KHÔNG ffill (NaN giữ ý nghĩa "không giao dịch") | Daily |
-| `vnindex_cache.csv` (close + VNINDEX_volume) | Same — `update_vnindex()` | Same | Daily |
-| `vn30_cache.csv` (close + VN30_volume) | Same — `update_vn30()` | Same | Daily |
-| `bank_fundamentals.csv` | `update_bank_fundamentals.py` | API KBS, fallback cache cũ | Quarterly |
-| `dividend_cache.csv` | static | — | Manual |
-| `fed_liquidity_cache.csv` | `update_fed_liquidity.py` (FRED API) | Weekly Wed | Weekly |
+| File | Updater | Tần suất |
+|---|---|---|
+| `market_data.csv` (close) | `update_data.py` smart-incremental | Daily 14:30 VN |
+| `market_volume.csv` | Same — KHÔNG ffill (NaN giữ nghĩa) | Daily |
+| `vnindex_cache.csv` / `vn30_cache.csv` | Same | Daily |
+| `bank_fundamentals.csv` | `update_bank_fundamentals.py` (KBS) | Quarterly |
+| `ticker_metadata.csv` | `update_sector_data.py` (vnstock Listing) | Quarterly |
+| `fed_liquidity_cache.csv` | `update_fed_liquidity.py` (FRED) | Weekly Wed |
+| `global_financial_conditions_cache.csv` | `update_global_financial_conditions.py` (FRED + Yahoo) | Daily |
 
-**Conventions:**
-- Universe = `tickers.csv` (single source of truth, ~250 mã). Tool subset phải lọc từ universe chung, không hardcode list riêng.
-- `data_lake/` đẩy lên GitHub để Streamlit Cloud chạy ngay (đã ignore `__pycache__`, `.env`, `.streamlit/secrets.toml`).
-- Sources: VCI ưu tiên → KBS fallback.
+**Conventions**:
+- Universe = `tickers.csv` (~250 mã). Tool subset lọc từ universe chung, KHÔNG hardcode list riêng.
+- `data_lake/` push lên GitHub để Streamlit Cloud chạy ngay.
+- Source priority: VCI > KBS fallback (for VN equity).
 
 ---
 
 ## 5. Cache & AI CIO
 
-**Compute cache (`.pkl`)** — `shared/daily_cache.py`:
+**Compute cache `.pkl`** — `shared/daily_cache.py`:
 - Hash-based: `data_lake/daily_cache/<tool>_<hash16>.pkl`
-- Key = dict(cấu hình + `s_liq_method`, `real_vol` flags để invalidate khi đổi methodology)
+- Key = dict(cấu hình + `s_<feature>_method: "vN"` flags)
 - API: `load_daily_cache`, `save_daily_cache`, `get_cache_path`, `clear_daily_cache`
 
-**AI text cache (`.txt`)** — `shared/ai_cio.py`:
-- Date+provider-based: `<tool>_<provider>_<ddmmyy>.txt`
-- Helpers: `_read_cache`, `_write_cache`, `_clear_all_tool_caches`, `_read_recent_summaries`
+**AI text cache `.txt`** — `shared/ai_cio.py`:
+- Date+provider: `<tool>_<provider>_<ddmmyy>.txt`
 
 **AI CIO pipeline** (`run_executive_summary`):
 1. `_clear_all_tool_caches(provider)` nếu `force=True`
-2. Chạy lần lượt 9 `run_<tool>()` — mỗi hàm load data, fill prompt, gọi OpenAI API, cache text
-3. `_read_recent_summaries(provider, n_past=2)` — đọc T-1, T-2 (lùi tối đa 7 ngày lịch)
-4. Aggregate vào master prompt + gọi 1 lần cuối → trả về executive summary
-5. Cron job: `command/run_ai_cio_auto.py` mỗi 14:45 VN (Mon-Fri), DeepSeek, parse `final score & regime` → push Telegram + commit cache lên GitHub
+2. Chạy 9 `run_<tool>()` lần lượt (cache hit nếu cùng ngày)
+3. `_read_recent_summaries(provider, n_past=2)` đọc T-1, T-2
+4. Aggregate vào master prompt → 1 lần OpenAI call cuối
+5. Auto upsert `Ai_cio_report.csv`: same-day overwrite (manual ghi đè auto), T+1 append
+6. Cron `run_ai_cio_auto.py` 14:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
 
-**Multi-provider** (`config.py:AI_PROVIDER_MAP`):
-- `kimi-2.6` → `https://api.moonshot.ai/v1` (temp 1.0)
-- `deepseek-v4-pro` → `https://api.deepseek.com/v1` (temp 0.5)
+**Multi-provider** (`config.AI_PROVIDER_MAP`): `kimi-2.6` (Moonshot, temp 1.0) / `deepseek-v4-pro` (temp 0.5)
 
-**API key shortcut** (`shared/api_key_helper.py`): user gõ 4 số → lookup `AI_KEY_<NNNN>` trong Streamlit Secrets.
+**API key shortcut** (`api_key_helper.py`): user gõ 4 số → lookup `AI_KEY_<NNNN>` trong Streamlit Secrets.
 
-**GitHub sync** (`shared/github_sync.py`): `render_sync_button(path, label, help_text, ...)` đẩy file qua REST API. Cần `GITHUB_TOKEN` trong env hoặc Streamlit Secrets.
+**GitHub sync** (`github_sync.py`): `render_sync_button(path, label, help_text, ...)` đẩy file qua REST. Cần `GITHUB_TOKEN`.
 
 ---
 
 ## 6. Conventions khi thêm tool mới
 
-1. Tạo `tools/<name>/{quant,ui}/__init__.py` + `quant/metrics.py` + `ui/charts.py` + `page.py`
+1. Tạo `tools/<name>/{quant,ui}/__init__.py` + `quant/metrics.py` + `ui/charts.py` + `ui/sidebar.py` + `page.py`
 2. Entry `pages/tools_page_<branch>/_N_<Name>.py` chỉ gọi `tools.<name>.page.render()`
 3. Đăng ký vào `pages/<X>_<Branch>.py:TOOLS` list (id, name, desc, page_module, render_func)
-4. Optional: `tools/<name>/report.py` với `snapshot(...)` → AI CIO + machine CSV report tự discovery
-5. Optional: `promt/<name>_promt.md` — theo framework prompt v2 (xem §8)
-6. Quant layer **không** import Streamlit; UI layer **không** chứa business logic
-7. Cache hash phải bao gồm `s_<feature>_method: "vN"` khi đổi methodology để auto-invalidate
+4. **Optional**: `tools/<name>/report.py` snapshot() — chỉ cần nếu plug AI CIO executive summary
+5. **Optional**: `promt/<name>_promt.md` — framework prompt v2 (§8)
+6. Quant layer **không** import Streamlit; UI **không** chứa business logic
+7. Errors trong quant → RAISE; UI catch + log
+8. Cache hash phải bao gồm `s_<feature>_method: "vN"` khi đổi methodology
+9. **Macro / cross-asset / non-VN-equity tool**: theo precedent `fed_liquidity`/`gfcm` — AI tab riêng trên page, KHÔNG inject executive summary aggregator (giữ scope sạch — executive summary là cho 9 VN-equity tools)
 
 ---
 
-## 7. Lệnh vận hành nhanh
+## 7. Commands
 
 ```bash
-# Chạy app
+# App
 streamlit run app.py
 
-# Update data daily (incremental, ~5 min cho 250 mã)
-python command/update_data.py
+# Data update
+python command/update_data.py                          # daily incremental ~5 min
+python command/update_data.py --backfill 2190          # 6 năm backfill
+python command/update_bank_fundamentals.py             # quarterly
+python command/update_fed_liquidity.py                 # weekly Wed (FRED)
+python command/update_global_financial_conditions.py   # daily (FRED+Yahoo)
+python command/update_sector_data.py                   # quarterly ICB
 
-# Backfill 6 năm (cần khi đổi schema, vd. thêm volume)
-python command/update_data.py --backfill 2190
-
-# Update fundamentals (quarterly)
-python command/update_bank_fundamentals.py
-
-# Update Fed liquidity (weekly Wed)
-python command/update_fed_liquidity.py
-
-# Generate AI CIO manual (forced refresh)
-python command/run_ai_cio_auto.py --force
+# AI CIO
+python command/run_ai_cio_auto.py --force              # manual refresh
 ```
 
 ---
 
-## 8. Prompt Framework v2 (2026-05-17)
-
-Mọi prompt trong `promt/` theo cùng cấu trúc:
+## 8. Prompt Framework v2
 
 ```
-PERSONA (1-2 dòng, no priming adjectives — KHÔNG "sắc bén/dứt khoát")
-INPUT (placeholders giữ y nguyên format cũ để ai_cio.py compat)
+PERSONA (1-2 dòng, no priming adjectives)
+INPUT (placeholders giữ format cũ — ai_cio.py .replace() literal)
 REFERENCE (thresholds + taxonomy)
-OUTPUT (Markdown, ~250-400 từ):
-  1. Observations (chỉ data, no interpretation)
+OUTPUT (Markdown, ~250-500 từ):
+  1. Observations (data only)
   2. Interpretation (data → regime, 1-2 câu)
-  3. Cross-Check (tìm divergence; "NO ACTIONABLE SIGNAL" nếu mâu thuẫn)
+  3. Cross-Check (divergence; "NO ACTIONABLE SIGNAL" nếu mâu thuẫn)
   4. Verdict (action HOẶC explicit no-action)
-  5. Structured Tail (JSON cho downstream parsing)
-RULES (anti-priming, uncertainty exits)
+  5. JSON tail cho downstream parsing
+RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 ```
 
-**Executive Summary master**:
-- Tail-risk OVERRIDE: ESR Critical (SSI>0.8) HOẶC EVT ξ>0.30 → cap equity ≤30% bất kể score
-- Confidence haircut: ≥3/9 tools confidence=low → giảm 1 bracket equity
-- Capital Allocation Matrix revised: KHÔNG còn cho Margin ở Score 80+ với vol thấp (bull top trap pattern)
-- Last line BẮT BUỘC format: `final score & regime : <0-100> ; regime : <label>`
+**Executive Summary master rules**:
+- Tail-risk OVERRIDE: ESR Critical (SSI>0.8) HOẶC EVT ξ>0.30 → cap equity ≤ 30%
+- Confidence haircut: ≥ 3/9 tools confidence=low → giảm 1 bracket equity
+- KHÔNG margin ở Score 80+ với vol thấp (bull top trap)
+- Last line BẮT BUỘC: `final score & regime : <0-100> ; regime : <label>`
 
-85/85 placeholders trong 11 prompts match với `ai_cio.py` — không cần đổi Python code.
+**Anti-hallucination prices**: cấm mức giá tuyệt đối VN stock ở 6 prompts. Manipulation prompt inject real-time `{vic_close}` `{vhm_close}` `{vre_close}` `{f1m_close}` từ `df_prices.iloc[-1]`.
 
 ---
 
 ## 9. Recent Sessions (compressed)
 
-### 2026-05-10 — Multi-Provider + GitHub Sync + Workflow
-- Thêm DeepSeek vào `AI_PROVIDER_MAP`; UI dropdown chọn provider trong AI CIO + 9 tool con
-- GitHub Sync button từ Streamlit Cloud (REST `contents` API, base64 encode)
-- `.github/workflows/ai_cio_daily.yml` cron 14:45 VN (07:45 UTC) Mon-Fri, push cache + PDF + send Telegram
-- Smart Incremental update_data: `combine_first()` thay vì `.loc[col]=` (silently drop)
+### Pre-2026-05 (highlights — full log archived)
+- **2026-05-10**: Multi-provider (Kimi + DeepSeek) + GitHub sync + GH Actions daily cron
+- **2026-05-11**: ESR 5-pillar SSI + HMM 4-state regime + API key shortcut
+- **2026-05-14**: Fed Liquidity tool (FRED) — nhánh A first
+- **2026-05-15**: Backtest engine + HMM walk-forward + history UX
 
-### 2026-05-11 — ESR 5-Pillar Full + API Shortcut
-- ESR Monitor refactor: từ 3-pillar proxy → 5-pillar SSI (S_VOL, S_PRES, S_COR, S_LIQ, S_VAL)
-- Expanding PCA(1) on rank-transformed pillars, sign-aligned with anchor S_VOL
-- HMM regime classifier + 4-state market (HEALTHY, EUPHORIC_RISK, CALM_CORRECTION, ACTIVE_STRESS)
-- API key shortcut: 4-digit → Streamlit Secrets `AI_KEY_NNNN`
+### 2026-05-17 — Code Review + EVT + Prompt v2
+- 14 quant modules audit; fix P/B unit ambiguity + ESR fake-volume + EGARCH fallback chain
+- **S_LIQ replaced**: Amihud → Volume Dry-Up (`-log(MA20/MA252 dollar vol)`) — Amihud không correlate stress trên VN30 bluechip
+- **EVT POT-GPD** (`tools/var_cvar_vnindex/quant/evt.py`, 220 LOC): refit mỗi 21 phiên, ξ=0.346 trên VN-Index 15/05/26 (fat tail)
+- **Prompt v2** redesign 11 files — 85/85 placeholders compat
+- **Anti-hallucination prices** rules — 6 prompts
+- **Module resolution** fix: xóa `command/config.py` shim + add `__init__.py` 3 packages
+- **Claude CLI** install + `CLAUDE.md` auto-load + `Run_Claude.command` Mac launcher
+- **Aggressive mode**: `.claude/settings.local.json` bypassPermissions với gate `skipDangerousModePermissionPrompt` ở root
 
-### 2026-05-14 — Fed Liquidity (Nhánh A Macro)
-- Port từ Desktop fed dashboard → `tools/fed_liquidity/`
-- FRED API pull WALCL/WTREGEN/RRPONTSYD, Net Liquidity = WALCL - TGA - RRP
-- Z-score 52W + Impulse EMA(4) → ADD/CUT/HOLD signal
-- Pattern app-đọc-cache: `update_fed_liquidity.py` updater, page không gọi FRED trực tiếp
+### 2026-05-18 — Pairs Trading Spec + Manipulation t0 fix
+- Build spec §13 (Pairs Trading) + §12 (Factor Risk Model) drafted
+- Fix manipulation hardcoded `t0_dt` → dynamic `result_df.index[-60]`
 
-### 2026-05-15 — Backtest Engine + HMM Walk-Forward + History UX
-- Backtest module: composite signal (F&G + Breadth + SSI greed + VaR/ES) → logistic equity curve + ESR 4-state overlay + MA200 hard cap
-- HMM look-ahead fix: thêm `fit_predict_walk_forward()` (refit mỗi 60d, look-ahead-free)
-- 3-period test: Sharpe combined 0.87 vs B&H 0.76 trên 5.8 năm, MaxDD better 12.4pt
-- PRODUCTION_REGIME_METHOD constant (`tools/esr_monitor/quant/metrics.py:51`) — single source of truth cho live paths
-- History UX: `shared/history_selector.py` chuẩn hoá date+model picker
+### 2026-05-19 — Pairs Trading SHIP + GFCM SHIP
 
-### 2026-05-17 — Code Review + EVT + Prompt v2 ⭐ CURRENT SESSION
+**Pairs Trading Lab (§13)** — shipped PR #2 (merged):
+- `tools/pairs_trading/` 7 files, ~1421 LOC
+- `quant/cointegration.py`: `engle_granger()`, `johansen_test()`, `ou_half_life()`, `hurst()`, `pairwise_eg_matrix()`
+- `quant/signal.py`: FSM long/short/flat, time-stop 2× half-life, quarantine on |z|>3
+- `quant/backtest.py`: basket_pnl, transaction cost model, summary stats, order ticket
+- `quant/clusters.py`: 7 PREDEFINED clusters (Vingroup, Big4_Bank, Steel, Securities, Private_Bank, Oil_Gas, Utility)
+- `page.py` 5 tabs: Cluster Scan / Pairwise Heatmap / Custom Pair / Aggregate Backtest / Live Signals
+- KHÔNG plug AI CIO (orthogonal signal — per-pair discrete, time-sensitive)
+- **Sector ingestion bonus**: `command/update_sector_data.py` + `data_lake/ticker_metadata.csv` (245/253 covered)
+- **DCC-GARCH utility** (`shared/dcc_garch.py`, 513 LOC) — placed shared, chưa wire vào pairs filter (defer cho V2)
+- Real-data smoke: VIC/VHM EG p=0.004, β=1.65; Big4_Bank Johansen pass; Vingroup 3-way 1 cointegration relation (VRE pair fails 95% → in-page warning)
 
-**1. Code Review toàn diện** (góc DS + SWE):
-- 14 quant modules audit + 6 shared/command modules
-- Phát hiện 2 critical bugs: ESR fake volume (S_PRES + S_LIQ = giả) + P/B unit ambiguity
-- 11 medium issues + 60+ broad `except Exception`, code duplication `_create_pdf` 2 chỗ
-
-**2. Fix A2 — P/B unit constant** (`tools/risk_adjusted_growth/quant/data_prep.py`):
-- Extract `PRICE_THOUSANDS_TO_VND=1000`, `CASH_PAYOUT_CAP=0.5`, `BVPS_UNIT_SANITY_FLOOR=1000`
-- Logger warning khi BVPS<1000 (nghi sai unit)
-
-**3. Fix A8 — Numba VaR ES** (`tools/var_cvar_vnindex/quant/metrics.py`):
-- `@njit(fastmath=True, cache=True)` kernel cho `_rolling_es_kernel`
-- Parity với pandas cũ: diff < 1e-17
-
-**4. Fix A5 — EGARCH fallback chain** (`tools/fear_greed/quant/volatility.py`):
-- EGARCH Skewed-T → GARCH(1,1) Gaussian → EWMA λ=0.94
-- Check `convergence_flag` thay try/except blind, log tier nào fire
-- AI CIO không còn crash khi EGARCH fail
-
-**5. Fix A1 — ESR Monitor real volume**:
-- `config.py`: thêm `MARKET_VOLUME` path
-- `command/update_data.py`: tách `fetch_history()` trả `[close, volume]`; fetch_close giữ backwards-compat
-- `shared/data_loader.py`: `load_volumes()` graceful (None nếu file thiếu)
-- `tools/esr_monitor/quant/metrics.py:run_esr_pipeline`: thêm `df_volume` param, detect `VN30_volume`, fallback có warning rõ
-- 5 callers updated: ai_cio, esr page, esr report, backtest page + composite_signal
-
-**6. S_LIQ regression discovery + fix** (sau khi user feedback):
-- Amihud illiquidity trên VN30 bluechip: Spearman với S_VOL = +0.008 (không correlate stress)
-- Hệ thống cũ "đẹp mắt" vì fake volume biến Amihud thành |ret|/close ≈ duplicate S_VOL (Spearman +0.49)
-- **REPLACE methodology**: S_LIQ = `-log(MA20(daily_dollar_vol) / MA252(daily_dollar_vol))` = Volume Dry-Up
-- Verified: S_LIQ percentile rank ngày 15/05 = 79% (khớp user intuition "thanh khoản kém"); SSI 63.4% downside mode, S_LIQ là driver chính weight 0.36
-- Bump `s_liq_method: "volume_dryup_v1"` vào cache key → auto-invalidate
-
-**7. EVT POT-GPD** (`tools/var_cvar_vnindex/quant/evt.py` — 220 dòng mới):
-- `pot_threshold`, `fit_gpd` (scipy MLE), `evt_var`, `evt_es`, `hill_estimator`, `rolling_evt_metrics`
-- Refit mỗi 21 phiên (~21× speedup, accuracy loss <1%)
-- 0.53s compute cho 2608 ngày
-- Snapshot 15/05/2026 VN-Index: ξ=0.346 (fat tail), Hill=0.471, EVT VaR 99%=-3.66% vs Gaussian -2.70% → Gaussian underestimate 1pp
-- UI: tab "🔥 EVT Tail Risk" với 2 subplot (VaR/ES + ξ/Hill), reference lines 0.15/0.30
-- 8 EVT metric cards + diagnostic banner so sánh Gaussian gap
-- `report.py` snapshot bổ sung 12 EVT fields; AI CIO + prompt template updated
-
-**8. ESR rerun + GitHub sync buttons** (`tools/esr_monitor/page.py`):
-- Session_state flag + `clear_daily_cache()` → "🔄 Chạy lại Model"
-- `render_sync_button(label="📤 Cập nhật cache Model lên GitHub", ...)` cho file .pkl
-- `shared/github_sync.py:render_sync_button` mở rộng nhận `label`, `help_text`, `use_container_width` (backwards-compat default)
-- `shared/daily_cache.py`: thêm `get_cache_path()` (public alias) + `clear_daily_cache()`
-- Fix `UnboundLocalError`: xoá inline import `from shared.github_sync import render_sync_button` ở line 319 (conflict với top-level import)
-
-**9. Prompts v2 redesign — 11 files**:
-- Framework: PERSONA + Observations → Interpretation → Cross-Check → Verdict + JSON tail
-- Bỏ math LaTeX redundant, fix stale refs (S_LEV→S_PRES, Amihud→Volume Dry-Up trong ESR)
-- Anti-priming: bỏ "sắc bén", "dứt khoát", "kỷ luật sắt đá"
-- "NO ACTIONABLE SIGNAL" valid khi data mâu thuẫn
-- Executive Summary master: tail-risk override + confidence haircut + KHÔNG cho margin Score>80 vol thấp
-- 85/85 placeholders match `ai_cio.py`
-
-**10. Aggressive mode** (`.claude/settings.local.json`):
-- `"defaultMode": "bypassPermissions"` cho repo này (project-scoped, không leak user-level)
-- Allowlist mở rộng: `python3 *`, `pip *`, `grep *`, `git *`, `streamlit *`, etc.
-- **Gate fix**: `bypassPermissions` cần `skipDangerousModePermissionPrompt: true` + `skipAutoPermissionPrompt: true` ở **ROOT level** (KHÔNG inside `permissions`) — thiếu gate này thì Claude silently fallback default mode mà không báo lỗi.
-
-**11. AI CIO history CSV — unified upsert** (`shared/ai_cio.py`):
-- Move `parse_score_regime` + `upsert_history_csv` từ `run_ai_cio_auto.py` → `shared/ai_cio.py`; `run_executive_summary(source="manual"|"auto")` TỰ ĐỘNG upsert CSV
-- **Same-day overwrite**: manual ghi đè auto cùng ngày (user trust > cron); T+1 thì append
-- CSV schema mở rộng `ddmmyyyy, score, regime, source, provider` (backwards-compat migrate row cũ)
-- History page: badge "🤖 Auto" / "👤 Manual" + provider, stats source distribution. 6/6 tests pass
-
-**12. Anti-hallucination price rules — 6 prompts**:
-- Vấn đề: AI ghi "VIC mất 45,000" trong khi VIC thực = 228k (training data cũ 2-3 năm)
-- Cấm mức giá tuyệt đối ở: `executive_summary`, `manipulation`, `ESR monitor`, `var_cvar_vnindex`, `va_res`, `risk_adjusted_growth`. Bắt buộc dùng % hoặc technical level (MA, support/resistance). 51/51 placeholders compat preserved
-
-**13. Real-time price injection** (manipulation prompt):
-- `run_manipulation` inject 4 placeholders mới `{vic_close}` `{vhm_close}` `{vre_close}` `{f1m_close}` từ `df_prices.iloc[-1]`
-- 2 formatters: `_fmt_stock_price` (×1000→VND) vs `_fmt_futures_index` (điểm, no scaling)
-- Verify (15/05/2026): VIC=228.00 (≈228,000 VND), VHM=158.00, VRE=34.00, F1M=2,053.90 điểm
-
-**14. Module resolution + Streamlit Cloud KeyError fix**:
-- Lỗi `KeyError: 'config'` / `'shared'` khi Cloud rebuild — nguyên nhân: 2 `config.py` (root + `command/`) + thiếu `__init__.py` ở `pages/`, `command/`, `pages/tools_page_C/`
-- Fix: xoá `command/config.py` (shim stale thiếu `MARKET_VOLUME`); tạo 3 `__init__.py` package markers; hardening `upload_file()` defensive JSON parse + `render_sync_button()` capture full traceback
-
-**15. Claude CLI + auto-context loading**:
-- Cài `@anthropic-ai/claude-code` v2.1.143 qua npm global (Node 22 sẵn qua nvm)
-- `CLAUDE.md` (89 dòng) auto-load khi `cd` vào project; `Run_Claude.command` Mac double-click launcher
-- Verify: `claude -p` từ project dir tự load context + apply bypass mode
+**Global Financial Conditions Monitor (GFCM)** — shipped PR #6 (merged):
+- `tools/global_financial_conditions/` 9 files, ~1399 LOC
+- 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYCM`) + derived Credit Quality Spread (CCC − HY)
+- **Static PCA** trên rolling z-score 756d: PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
+- Regime via PC1 rolling percentile 3Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
+- Driver flag: EQUITY_DRIVEN / RATES_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / BROAD_STRESS (≥3/4 ≥80pct) / NO_STRESS
+- 2-tab page: **📊 Level** (4-panel raw + mean overlay) / **🧠 Analytics** (PC1+regime band, percentile small multiples, PC2-vs-PC1 scatter, CQS chart, AI section)
+- Sidebar: slider "Lùi bao nhiêu năm?" (1-22, default 3) — chỉ filter display, PCA fit + percentile vẫn dùng full history
+- Standalone AI tab (giống fed_liquidity pattern), KHÔNG inject executive summary
+- History từ 2003 (limit của MOVE Yahoo coverage)
+- Smoke test: PCA loadings + explained variance valid, regime distribution reasonable
+- Requirements: thêm `yfinance>=0.2.40`
 
 ---
 
 ## 10. Known Issues & Roadmap
 
-**Issues còn lại (từ Code Review §1 chưa fix):**
-- `shared/ai_cio.py` 700+ dòng (đã grow sau session) — God module, recommend refactor sang registry pattern
-- 61 instances `except Exception` rộng → mất stacktrace khi prod fail (đã hardening `render_sync_button` để capture traceback)
-- Cache key dùng `date.today()` thay vì `df_stocks.index[-1]` → bug timezone Streamlit Cloud (UTC) vs VN (UTC+7)
-- Thư mục `promt/` (typo) — không rename vì hardcoded paths khắp ai_cio.py
-- ✅ ~~Hardcoded `t0_dt = pd.to_datetime("2026-03-02")` trong manipulation — fix thành rolling 60-phiên gần nhất~~ → FIXED 2026-05-18 (`shared/ai_cio.py:264` dùng `result_df.index[-60]`, mirror UI default `tools/manipulation/page.py:71`)
-- `_create_pdf` duplicate ở `app.py:193` và `command/run_ai_cio_auto.py:79`
-- Workflow `update_pipeline.yml` còn `MY_API_KEY` dead code + `git add .` risk
-- ✅ ~~Duplicate `command/config.py`~~ → FIXED 2026-05-17 (xoá shim + add `__init__.py`)
-- ✅ ~~`pages/tools_page_C/__init__.py` thiếu~~ → FIXED 2026-05-17
+**Open issues (đang track):**
+- `shared/ai_cio.py` 700+ dòng — God module, recommend refactor sang registry pattern (thêm tool mới hay phải edit list `tool_names` trong `_clear_all_tool_caches`)
+- 61 instances `except Exception` rộng — mất stacktrace prod fail
+- Cache key dùng `date.today()` — timezone bug Streamlit Cloud (UTC) vs VN (UTC+7) → đổi sang `df_stocks.index[-1]`
+- `_create_pdf` duplicate ở `app.py:193` và `command/run_ai_cio_auto.py:79` → extract `shared/pdf_export.py`
+- DCC-GARCH chưa có parity test runtime trên full 50-ticker × 2500-obs
+- Pairs Trading chưa wire DCC filter (defer V2)
+- Pairs Aggregate Backtest tab chưa stress-test cluster 6-way → có thể timeout Cloud
+- `promt/` typo — không rename vì hardcoded paths khắp `ai_cio.py`
 
-**Anti-hallucination còn cải tiến được:**
-- Hiện chỉ manipulation prompt có inject giá real-time. Có thể mở rộng cho:
-  - `risk_adjusted_growth` (bank prices cho stop-loss recommendation)
-  - `va_res` (Top Crash list cần kèm giá hiện tại)
-  - `executive_summary` master (mọi stock pick phải có giá đối chiếu)
-- Pattern: pass `last_prices = df_stocks.iloc[-1]` qua kwargs → format helpers → prompt inject
-
-**Roadmap đề xuất (theo Tier A khả thi ngay):**
-1. ✅ EVT POT-GPD (xong session này)
-2. 🚧 **CHƯA HOÀN THÀNH** — Multi-factor Risk Model (Barra-lite): style factors Value/Size/Mom/Quality/LowVol + industry decomposition. **Blocker**: vnstock free tier giới hạn BCTC 8 quý (~2 năm) → backtest weak; chờ Sponsor tier hoặc accept Phase 1 (3-factor không cần fundamental). **Build spec đầy đủ ở §12.**
-3. ⏭️ MES / SRISK (NYU V-Lab pattern): systemic contribution từng VN30 mã
-4. ⏭️ Diebold-Yilmaz Spillover Index: VAR + FEVD network analysis
-5. ⏭️ DCC-GARCH: dynamic correlation matrix (thay Ledoit-Wolf static)
-6. ⏭️ HRP (Hierarchical Risk Parity): thay logistic curve trong backtest allocation
-7. ⏭️ Deflated Sharpe / Probabilistic Sharpe — bảo vệ credibility backtest
-8. 🚧 **CHƯA HOÀN THÀNH** — Pairs Trading research lab (Engle-Granger + Johansen + OU half-life). Không plug AI CIO synthesis — đứng độc lập trên nhánh B_Micro_Analysis. **Build spec đầy đủ ở §13.**
-
-**⚠️ Pending Build Backlog (cần track riêng):**
-| # | Tool | Trạng thái | Blocker chính |
+**Roadmap còn lại:**
+| # | Item | Status | Blocker |
 |---|---|---|---|
-| §12 | Factor Risk Model (Barra-VN lite) | 🚧 PROPOSED, chưa code | vnstock free tier BCTC 8 quý → backtest 5+ năm cần Sponsor paid |
-| §13 | Pairs Trading research lab | 🚧 PROPOSED, chưa code | Execution gap (T+2, FOL, lot size) — 1-2 tuần MVP nếu prioritize |
+| §12 | **Factor Risk Model** (Barra-VN lite, 6 style + ~10 industry, cross-sectional WLS) | 🚧 PROPOSED, chưa code | vnstock free Community = 8 quý BCTC → backtest 5+ năm cần Sponsor paid. P1 (3-factor không cần BCTC) ship được ngay |
+| #3 | MES / SRISK (NYU V-Lab) | 📋 idea | — |
+| #4 | Diebold-Yilmaz Spillover (VAR + FEVD) | 📋 idea | — |
+| #6 | HRP (Hierarchical Risk Parity) thay logistic backtest curve | 📋 idea | — |
+| #7 | Deflated Sharpe / PSR | 📋 idea | — |
 
 **Tier B (cần data extra):**
-- VPIN microstructure (cần intraday tick data)
-- News sentiment NLP (PhoBERT + scrape VnExpress/CafeF)
-- Foreign flow analytics (cần API HSC/SSI/FireAnt)
+- VPIN microstructure (intraday tick)
+- News sentiment NLP (PhoBERT + scrape)
+- Foreign flow analytics (HSC/SSI API)
 - VN30F1M positioning + Open Interest
 
 ---
@@ -350,331 +272,33 @@ RULES (anti-priming, uncertainty exits)
 **Production constants:**
 - `tools/esr_monitor/quant/metrics.py:51` → `PRODUCTION_REGIME_METHOD = 'hmm'`
 - `tools/risk_adjusted_growth/quant/data_prep.py` → `PRICE_THOUSANDS_TO_VND = 1000`
-- `tools/var_cvar_vnindex/quant/evt.py` → `DEFAULT_REFIT_EVERY = 21`, `DEFAULT_THRESHOLD_PCT = 0.10`
+- `tools/var_cvar_vnindex/quant/evt.py` → `DEFAULT_REFIT_EVERY = 21`
 - `tools/fear_greed/quant/volatility.py` → `EWMA_LAMBDA = 0.94` (fallback)
+- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 756`, `PCT_STRESS = 0.80`, `START_DATE = "2003-01-01"`
 
 **Universe & data:**
-- ~250 tickers trong `tickers.csv`, VN30 hardcoded `VN30_TICKERS` (30 mã) trong `tools/esr_monitor/quant/metrics.py:36`
-- VNINDEX → riêng `vnindex_cache.csv`; VN30 → `vn30_cache.csv`
-- VN30F1M futures → trong `market_data.csv` (dùng cho Manipulation tool)
+- ~250 tickers `tickers.csv`; VN30 hardcoded `VN30_TICKERS` (30 mã) trong `tools/esr_monitor/quant/metrics.py:36`
+- VN30F1M futures trong `market_data.csv` (Manipulation tool)
 
-**Performance benchmarks (5.8y):**
-- Backtest Sharpe: 0.87 (vs B&H 0.76)
-- MaxDD: -23.7% (vs B&H -40.3%)
-- CAGR: 10.84% (vs B&H 15.05%) — defensive long-only trade-off
+**Performance benchmarks (5.8y backtest):**
+- Sharpe combined 0.87 (vs B&H 0.76), MaxDD -23.7% (vs B&H -40.3%), CAGR 10.84% (defensive long-only)
 
-**Verification status (sau session 2026-05-17 full):**
-- Toàn bộ file thay đổi compile sạch (~25 files đụng tới)
-- EVT smoke test: 1.31s cho 2608 ngày (full pipeline classic+EVT)
-- Numba kernel parity với pandas cũ: 6.94e-18 max diff
-- Prompt placeholders compat: 85/85 (initial v2) + 51/51 (sau anti-hallucination) → cùng `ai_cio.py` không vỡ
-- ESR pipeline both paths (real volume + fallback): SSI differ 0.4567 vs 0.4225 → confirm volume thật ảnh hưởng output
-- AI CIO CSV upsert: 6/6 tests pass (parse, same-day overwrite, T+1 append, invalid reject, backwards-compat migrate)
-- Real-time prices (15/05/2026): VIC=228k, VHM=158k, VRE=34k, VN30F1M=2053.9pt
-- Claude CLI 2.1.143 verified `claude -p` từ project dir auto-loads CLAUDE.md + bypass mode
-
-**Workflow new for session resume:**
+**Workflow resume:**
 1. `cd ~/Documents/GitHub/onl_quant-platform` HOẶC double-click `Run_Claude.command`
-2. Claude CLI tự load `CLAUDE.md` (89 dòng context) + `.claude/settings.local.json` (bypass mode)
-3. Đọc `docs/skill.md` nếu cần ngữ cảnh sâu (session history compressed)
+2. Claude CLI tự load `CLAUDE.md` + `.claude/settings.local.json` (bypass mode)
+3. Đọc `docs/skill.md` (file này) nếu cần ngữ cảnh sâu
 4. Bypass mode active → Bash/Edit không hỏi xác nhận
 
-**Files mới của session này:**
-- `CLAUDE.md` (89 dòng) — auto-loaded context cho Claude CLI
-- `Run_Claude.command` (executable) — Mac launcher
-- `tools/var_cvar_vnindex/quant/evt.py` (220 dòng) — POT-GPD core
-- `command/__init__.py`, `pages/__init__.py`, `pages/tools_page_C/__init__.py` — package markers
-
----
-
-## 12. Factor Risk Model — Build Spec (PROPOSED 2026-05-18)
-
-**Posture**: Barra-VN lite — Tier A roadmap #2. Đây là **missing primitive**: 9/10 tool hiện tại đo index/pillar aggregate, không có cách nào decompose stock return → factor exposure + alpha. Branch target: `B_Micro_Analysis` (đang trống).
-
-### 12.1. Factor design — 6 style + ~10 industry
-
-| Factor | Spec | Data | Status |
-|---|---|---|---|
-| **Momentum** | `log P_{t-21} − log P_{t-252}` (skip-1-month) | `market_data.csv` | ✅ HAVE |
-| **LowVol** | `−σ(log_ret)` 252d, hoặc EWMA λ=0.94 | `market_data.csv` | ✅ HAVE |
-| **Beta** | OLS vs VN-Index 252d, exp-decay weight half-life 63d (Barra USE4) | `market_data` + `vnindex_cache` | ✅ HAVE |
-| **Size** | `log(close × shares_out)` | + `shares_outstanding` quarterly snapshot | ❌ FETCH |
-| **Value** | z-score composite `B/P + E/P + S/P` | + BVPS / EPS_TTM / SPS_TTM quarterly | ❌ FETCH |
-| **Quality** | `z(ROE) − 0.5·z(D/E) + 0.5·z(GrossMargin)` | + ROE / D/E / GM quarterly | ❌ FETCH |
-| **Industry** | 10 ICB-L2 dummy | + ICB classification per mã | ❌ FETCH 1-time |
-
-### 12.2. Cross-sectional regression spec
-- **Monthly rebalance** WLS: weight = `√MCap` (Barra USE4 spec)
-- **Shrinkage**: shrink covariance to identity 10% (small universe ~250 + size–beta collinearity cao ở VN)
-- **Output**:
-  - Factor return time series `[6 style + 10 industry]`
-  - Per-stock exposure matrix `[N×16]` mỗi tháng
-  - Idiosyncratic alpha residual `ε_i,t`
-  - Factor t-stat (Fama-MacBeth standard error)
-
-### 12.3. vnstock data constraints (free tier, confirmed 2026-05-18)
-
-| Tier | Rate limit | BCTC history | Cost |
-|---|---|---|---|
-| **Guest** (no signup) | 20 req/min | **4 kỳ only** (1 năm quarterly) | Free + ads |
-| **Community** (free signup) | 60 req/min | **8 kỳ** (2 năm quarterly) | Free |
-| **Sponsor** | 60-100 req/min | Full (10+ năm) | Paid |
-
-**Source priority**: VCI (60/min, cần key) > KBS (20/min, cần key) > MSN (no key, KHÔNG có VN equity, chỉ forex/crypto).
-
-**Implication cho factor model**:
-- ✅ Phase 1 (3 factor không cần BCTC) — free Guest tier OK.
-- ⚠️ Phase 2 (Size/Value/Quality) — free Community = 8 quý = **2 năm history** → cross-sectional regression CHO HIỆN TẠI work fine; **backtest factor return 8 quý KHÔNG đủ power** cho Deflated SR + Fama-MacBeth t-stat valid.
-- ❌ Backtest serious (5+ năm) → **bắt buộc Sponsor paid tier**.
-
-### 12.4. Phase plan
-
-| Phase | Thời gian | Data tier | Output |
-|---|---|---|---|
-| **P1 MVP** | 1 tuần | Free Guest | 3 factor (Mom/LowVol/Beta), cross-sectional regression infra, UI + AI CIO snapshot. Đủ validate workflow. |
-| **P2 Full live** | +2-3 tuần | Free Community | + Size/Value/Quality + industry. Live signal OK; backtest weak (2 năm). |
-| **P3 Backtest valid** | +1 tuần | Sponsor paid | 5+ năm fundamental → Deflated SR, factor t-stat, Fama-MacBeth SE valid. |
-
-### 12.5. Critical caveats trước khi build
-
-1. **Price adjustment**: verify `market_data.csv` là **adjusted close** (split + cash dividend) hay raw. Check `command/update_data.py:Quote.history()` flag. Raw close → ex-date return jump phá Momentum + Beta signal.
-2. **Survivorship bias**: `tickers.csv` = **current** universe → factor backtest over-estimate (miss delisted HVN/FLC/ROS period). Cần point-in-time historical add/delist HSX cho backtest path.
-3. **Free float adjust**: state-owned (BID, VCB, GAS, BSR, ACV) có total MCap gấp 3-5× free float. Phase 3 mới handle; Phase 1-2 dùng total shares + note caveat.
-4. **Fundamental restatement** (VN habit: Q4 audit restate cả Q1-3): cần `as_of_date` field để point-in-time correct (avoid look-ahead trong backtest).
-5. **Risk-free rate**: VGB 1Y yield cho excess return. Tạm fix 4.5% nếu lười fetch — error nhỏ vì cross-sectional regression chủ yếu dùng excess return.
-
-### 12.6. File plan
-
-```
-tools/factor_risk_model/
-  quant/
-    factors.py        — compute_momentum / lowvol / beta / size / value / quality
-    regression.py     — cross_sectional_wls(), shrinkage, fama_macbeth_se()
-    metadata.py       — industry mapping helper
-  ui/charts.py        — factor return time series + exposure heatmap + decile spread
-  page.py             — render() + sidebar
-  report.py           — snapshot dict cho AI CIO
-command/
-  update_fundamentals.py    — fetch BVPS/EPS/SPS/ROE/DE quarterly via vnstock.Finance, Community tier
-  build_ticker_meta.py      — 1-time: shares_out + ICB-L2 per mã
-data_lake/
-  fundamentals_long.csv     — [ticker, quarter_end, bvps, eps_ttm, sps_ttm, roe, de, gm, as_of_date]
-  ticker_meta.csv           — [ticker, icb_l1, icb_l2, free_float_pct]
-  shares_outstanding.csv    — [ticker, date, shares_out]  (quarterly snapshot)
-promt/
-  factor_risk_promt.md      — v2 framework (PERSONA / Observations / Cross-Check / Verdict + JSON tail)
-```
-
-### 12.7. API budget (first backfill, ~250 mã)
-
-| Endpoint | Calls/cycle | Note |
-|---|---|---|
-| `Listing().industries_icb()` (1-time) | 1 | ICB classification full |
-| `Company(symbol).overview()` | 250 | shares_out + free_float |
-| `Finance(symbol).balance_sheet(period='quarter')` | 250 × 1 (free) → 250 × 5 (sponsor) | 8 vs 20+ quarters |
-| `Finance(symbol).income_statement(period='quarter')` | 250 | NI + revenue |
-| `Finance(symbol).ratio(period='quarter')` | 250 | ROE, D/E |
-
-**Throughput**: free Community 60 req/min → 1000 calls ≈ 17 phút. Sponsor 100 req/min → 10 phút. Cập nhật incremental sau quarter-end ~250 calls × 3 endpoint = 13 phút free tier.
-
----
-
-## 13. Pairs Trading Research Lab — Build Spec (PROPOSED 2026-05-18)
-
-**Posture**: Engle-Granger + Johansen + OU half-life filter cho mean-reversion pair trading trên cluster cointegrated VN. Tier A roadmap #8. Branch target: `B_Micro_Analysis` (đang trống). **KHÔNG plug vào AI CIO synthesis** — đứng độc lập như research dashboard.
-
-### 13.1. Tại sao VN là môi trường lý tưởng
-
-1. **Retail dominance ~75% volume** → emotion-driven decoupling lặp lại; mean-reversion edge tồn tại lâu vì ít smart money arb đi.
-2. **Forced flow events có lịch trước**: VN30 ETF rebalance quarterly, foreign ownership limit (FOL) cap, margin call cascade → spread compression/expansion calendar-tradable.
-3. **No real short ngoài VN30F1M futures** → ai cũng phải hedge qua basket → tạo basis spread.
-
-### 13.2. Cluster cointegrated thực tế
-
-| Cluster | Mã | Logic kinh tế | Test khuyến nghị |
-|---|---|---|---|
-| **Vingroup** | VIC, VHM, VRE | Same parent, FII flow shared | Johansen 3-way |
-| **Big-4 SOE bank** | VCB, CTG, BID, MBB | Regulated rate, deposit base, NIM cycle | Johansen 4-way |
-| **Steel** | HPG, HSG, NKG | Iron ore + rebar/galvanized cycle | Johansen 3-way |
-| **Securities** | SSI, HCM, VND, VCI | Brokerage commission cycle | EG pair-wise |
-| **Private bank** | VPB, STB, ACB, SHB | Retail loan book ⚠️ FOL risk | EG pair-wise (exclude FOL-near) |
-| **Oil & Gas** | GAS, PLX, BSR, PVS | Brent + USD/VND link | Johansen 4-way |
-| **Utility / Power** | REE, GEX, POW, HDG | Capacity factor, El Niño cycle | EG pair-wise |
-
-VIC/VHM/VRE và VCB/CTG/BID là 2 candidate mạnh nhất (verified trong literature VN — UEH papers).
-
-### 13.3. Spec kỹ thuật 4 stage
-
-**Stage 1 — Cointegration test**
-- Engle-Granger 2-step (pair): OLS `Y = α + β·X` → ADF residual, MacKinnon critical. Đủ cho 1300+ obs daily.
-- Johansen (triplet/cluster): `statsmodels.tsa.vector_ar.vecm.coint_johansen`, λ_max + trace stat.
-
-**Stage 2 — Spread dynamics filter**
-- OU half-life: fit AR(1) `Δspread_t = θ(μ − spread_{t-1}) + ε_t`; `half_life = ln(2)/θ`.
-- **Trade chỉ pair half-life 5-30 ngày** — <5 = noise (phí ăn hết); >30 = drift/regime change.
-- Backup filter: Hurst H < 0.5 confirm anti-persistent.
-
-**Stage 3 — Entry/exit rule**
-- Z-score 60d rolling
-- Entry: |z| > 2 (long low leg, short high leg)
-- Exit: z crosses 0 hoặc time-stop 2× half-life
-- Stop-loss: |z| > 3 → cointegration breakdown → exit + quarantine pair 60 ngày
-- Re-test cointegration mỗi 60 phiên; pair fail → kill position
-
-**Stage 4 — Position sizing**
-- Hedge ratio β từ EG step 1 hoặc Johansen β vector
-- Adjust lot size 100 → rounding error ~1-3% theoretical hedge
-- 50/50 long-short market-neutral hoặc beta-weighted vs VN-Index
-
-### 13.4. VN-specific gotchas (kill 70% paper backtest)
-
-| # | Gotcha | Tác động | Mitigation |
-|---|---|---|---|
-| 1 | **Margin call T+2 cascade** | Spread widen 4-5σ trước revert → forced close ở đáy | Capital cushion ≥ 2× initial margin, intraday MtM check |
-| 2 | **Foreign ownership limit (FOL)** | VPB/HDB/STB hit FOL → decoupling KHÔNG mean-revert | Exclude pair có 1 leg foreign room < 5% |
-| 3 | **Corporate action** | Split/divvy không adjust → fake spread jump | Verify `Quote.history(adjusted=True)` flag |
-| 4 | **Lot 100 + tick 50 VND** | Bid-ask eats ~10-20 bps/round-trip | Filter half-life ≥ 5 ngày |
-| 5 | **No real short** | Chỉ short qua VN30F1M basket | Mã ngoài VN30 chỉ long-only ratio |
-| 6 | **Lunch break gap 11:30-13:00** | Reopen ±2σ random walk | Time stop theo trading hour, không calendar |
-
-### 13.5. Tại sao tách khỏi AI CIO synthesis
-
-AI CIO pattern: 9 tool đo regime → 1 score 0-100 → 1 verdict allocation. Pairs signal:
-- Per-pair, per-day, discrete event (long VIC/short VHM, z=-2.3, half-life 12d)
-- KHÔNG aggregate được vào "regime"
-- Time-sensitive (14:45 cron publish → entry có thể đã gone)
-- Risk orthogonal với long-only equity allocation (market-neutral basket)
-
-→ Inject pairs signal vào executive summary master prompt sẽ pollute regime narrative. **Pattern đúng**: standalone research dashboard với live table sorted by |z|, backtest panel riêng, KHÔNG plug `shared/ai_cio.py`.
-
-### 13.6. File plan
-
-```
-tools/pairs_trading/
-  quant/
-    cointegration.py    — engle_granger(), johansen_test(), ou_half_life(), hurst()
-    signal.py           — z_score_60d(), entry_exit_rules(), stop_loss()
-    backtest.py         — basket_pnl(), transaction_cost_model(), margin_calc()
-    clusters.py         — PREDEFINED_CLUSTERS dict (VINGROUP, BIG4_BANK, STEEL, ...)
-  ui/
-    charts.py           — spread plot, z-score gauge, equity curve
-    sidebar.py          — cluster picker, |z| threshold tuner, half-life filter
-  page.py
-  # KHÔNG có report.py — không feed AI CIO
-pages/tools_page_B/
-  _N_Pairs_Trading.py   — entry, branch B_Micro_Analysis
-```
-
-**Dependency**: 0 mới. `market_data.csv` đã đủ 5+ năm. `statsmodels.tsa.vector_ar.vecm` đã có trong requirements.
-
-### 13.7. Honest evaluation
-
-| Dimension | Score | Reason |
-|---|---|---|
-| Signal-to-noise (VN) | 🟢 8/10 | Retail decoupling tạo edge bền |
-| Data availability | 🟢 10/10 | 0 fetch mới, market_data đủ — không có blocker như §12 |
-| Backtestability | 🟢 9/10 | 5+ năm history, survivorship VN30 thấp |
-| Execution gap (paper→live) | 🔴 5/10 | T+2, FOL, lot size → 3-4% theoretical edge ăn mất qua phí |
-| AI CIO synergy | 🔴 2/10 | Orthogonal, KHÔNG plug synthesis |
-| Audience fit | 🟡 6/10 | Chỉ user trade chủ động |
-| Effort | 🟡 1-2 tuần MVP | EG + Johansen + OU + dashboard. Live execution +1 tuần. |
-
-### 13.8. Phase plan
-
-| Phase | Thời gian | Output |
-|---|---|---|
-| **P1 Research-only** | 5-7 ngày | Live signal table + backtest panel, **không có live trade rule**. Demo + edge measurement. |
-| **P2 Live execution** | +1 tuần | Order ticket layer + margin calc + foreign room check + corp-action handler. Chỉ build sau khi P1 demo positive edge sau cost. |
-
-**Suggested order trong roadmap**: build SAU DCC-GARCH (Tier A #5) vì DCC dynamic correlation matrix dùng được chéo cho pairs filter — cointegration + dynamic corr combined mạnh hơn EG đơn.
-
----
-
-## 14. Ship Log — Pairs Trading Lab + DCC-GARCH (2026-05-19)
-
-§13 và Tier A #5 (DCC-GARCH utility) đã **shipped** trên feature branch `claude/review-platform-docs-OiV1W`. Bài viết này log lại scope thực sự đã code so với plan §13.
-
-### 14.1. Branch / Commits
-
-| Commit | Subject |
-|---|---|
-| `dfb18ec` | docs: add Pairs Trading build spec (§13) + mark §12/§13 pending |
-| `32cbace` | **feat: build Pairs Trading Lab (§13) + DCC-GARCH utility + sector ingestion** |
-| `80fade5` | fix(app): update Micro Analysis landing card (remove 🚧 placeholder, point sang Pairs Trading) |
-
-PR #2 ở trạng thái **DRAFT** (chưa merge vào `main`). Streamlit Cloud deploy từ `main` → tool chưa xuất hiện production. User quyết định thời điểm convert ready / merge.
-
-### 14.2. Files actually created/modified
-
-**CREATE — Phase 0 (DCC-GARCH utility, no UI)**:
-- `shared/dcc_garch.py` (513 LOC) — public API: `fit_dcc()`, `dynamic_correlation_matrix(method='dcc'|'ewma'|'hybrid')`, `pair_correlation()`
-
-**CREATE — Phase 1 (Pairs Trading research)**:
-- `tools/pairs_trading/__init__.py`
-- `tools/pairs_trading/quant/cointegration.py` (214 LOC) — `engle_granger()`, `johansen_test()`, `ou_half_life()`, `ou_half_life_raw()`, `hurst()`, `pairwise_eg_matrix()`, re-export `adfuller` + `coint_johansen`
-- `tools/pairs_trading/quant/signal.py` (134 LOC) — `z_score_60d()`, `entry_exit_rules()` (FSM long/short/flat, time-stop 2× half-life), `quarantine_flag()`, `detect_breakout()`
-- `tools/pairs_trading/quant/backtest.py` (189 LOC) — `basket_pnl()`, `transaction_cost_model()`, `summary_stats()`, **+ Phase 2 add**: `generate_order_ticket()`, `order_ticket_to_json()`
-- `tools/pairs_trading/quant/clusters.py` (67 LOC) — 7 PREDEFINED_CLUSTERS + `get_cluster()`, `list_clusters()`, `validate_clusters_against_universe()`
-- `tools/pairs_trading/ui/charts.py` (182 LOC) — 4 Plotly functions
-- `tools/pairs_trading/ui/sidebar.py` (90 LOC)
-- `tools/pairs_trading/page.py` (545 LOC) — **5 tabs**: Cluster Scan / Pairwise Heatmap / Custom Pair / Aggregate Backtest / **Live Signals** (Phase 2 integrated)
-- `pages/tools_page_B/__init__.py` + `pages/tools_page_B/_1_Pairs_Trading.py`
-
-**CREATE — Data ingestion (out of original plan, added during build)**:
-- `command/update_sector_data.py` — fetch ICB sector từ `vnstock.Listing().symbols_by_industries()`
-- `data_lake/ticker_metadata.csv` — 245/253 ticker covered (8 ETF/index expected miss)
-- `shared/data_loader.py` (EDIT) — thêm `load_ticker_metadata()` helper
-
-**EDIT**:
-- `pages/B_Micro_Analysis.py` — placeholder → navigation hub mirror A_Macro pattern
-- `app.py` — landing card cho "Phân tích Vi mô" cập nhật ("🔁 Pairs Trading Research Lab / Cointegration + OU half-life + Z-score / 7 cluster VN + custom pair")
-- `requirements.txt` — `statsmodels>=0.14,<0.16`
-
-### 14.3. Deltas vs plan §13
-
-| Aspect | Plan §13 | Ship reality |
-|---|---|---|
-| Tab count | 4 (Cluster / Pairwise / Custom / Backtest) | **5** — gộp Phase 2 thành tab Live Signals riêng |
-| Pairs cluster Vingroup | "VIC/VHM/VRE expected cointegrated" | **VHM thuần real estate, VRE retail mall → Johansen FAIL ở 95%** (warning render in-page) |
-| MBB cluster | Move khỏi Big4_Bank | ✅ Done; Big4 còn 3-way (VCB/CTG/BID), Private_Bank 6-way (VPB/STB/ACB/SHB/MBB/HDB) |
-| Sector ingestion | KHÔNG có trong plan | **ADD** — discover trong build: cần ticker→sector map cho future cluster auto-discovery |
-| AI CIO plug | ❌ KHÔNG plug | ✅ honored — không có `report.py` trong `tools/pairs_trading/` |
-| FOL filter | SKIP (retail assume >5%) | ✅ honored — `st.info` banner "Verify manually before submitting" |
-| Corp-action handler | SKIP | ✅ honored — `st.warning` banner ở mở page |
-
-### 14.4. Real-data smoke test (commit `32cbace`)
-
-| Test | Expected | Actual |
-|---|---|---|
-| VIC/VHM Engle-Granger | p<0.05, half-life 10-20d | p=0.004, β=1.65 ✅ |
-| Vingroup Johansen (3-way) | n_coint ≥ 1 | n_coint=1 ✅ (nhưng VRE pair cô lập fails 95%) |
-| Private_Bank 6-way pairwise | mostly cointegrated | 13/15 pair p<0.05; ACB stand-out non-coint (retail profile) |
-| Big4_Bank Johansen (3-way) | n_coint ≥ 1 | ✅ Pass |
-
-### 14.5. Local AppTest smoke (post-ship, 2026-05-19)
-
-Test framework: `streamlit.testing.v1.AppTest.from_file(...).run()` (plain HTTP GET không trigger script execution — Streamlit chỉ chạy khi có WebSocket).
-
-| Page | Result |
-|---|---|
-| `app.py` landing | ✅ Title "📊 Quant Platform" render, micro-card text confirmed updated |
-| `pages/tools_page_B/_1_Pairs_Trading.py` | ✅ Title "🔁 Pairs Trading Research Lab" render; 2 design warning đúng ý đồ (corp-action + Vingroup risk) |
-| Quant imports | ✅ 4 module (cointegration, clusters, signal, backtest) all import OK |
-
-Non-blocking local-only noise:
-- `GITHUB_TOKEN chưa được thiết lập` — local secret missing, Cloud has it
-- `use_container_width deprecated` — Streamlit 1.x warning
-- `ModuleNotFoundError: fpdf` — local container missing pip install; requirements.txt đã có `fpdf2>=2.7.0` nên Cloud OK. Fix local: `pip install fpdf2` (installed 2.8.7).
-
-### 14.6. Open items sau ship
-
-1. **PR #2 vẫn DRAFT** — Cloud chưa thấy tool. User tự decide: (a) convert ready + merge thủ công, (b) Claude convert+merge khi được authorize, (c) repoint Cloud deploy về feature branch tạm thời.
-2. **DCC-GARCH chưa có parity test runtime** — code path tồn tại nhưng `dynamic_correlation_matrix(method="dcc")` chưa run trên full 50-ticker × 2500-obs trên CI. Plan §0 verification step #1-2 còn pending.
-3. **Pairs Trading chưa wire DCC filter** — `quant/cointegration.py` hiện chỉ EG + Johansen, chưa consume `shared.dcc_garch.pair_correlation()`. Phase 1 plan call out "DCC dynamic correlation cross-utility" — defer sau khi user xác nhận edge từ EG đơn.
-4. **Aggregate Backtest tab** — render OK headless nhưng chưa stress-test với cluster 6-way (Private_Bank → 15 pair × 2 năm). Có thể timeout trên Cloud (default 60s) — cần `@st.cache_data` hoặc background job.
-5. **Sector ingestion gap**: 8 ETF/index miss từ ICB → cluster auto-discovery (future feature) sẽ bypass ETF naturally.
-
-### 14.7. CLAUDE.md backlog update needed
-
-§13 trong CLAUDE.md hiện status `🚧 PROPOSED 2026-05-18 — chưa code`. Sau merge PR #2 nên đổi sang `✅ SHIPPED 2026-05-19 v1 (Pairs Trading Lab live, DCC utility shared, sector ingestion bonus)`. Giữ note về 5 open item ở §14.6 trên.
-
+**Verification helpers:**
+- Compile check: `python3 -m py_compile <file>`
+- Prompt placeholder compat: grep `\[.*\]` trong prompt vs `.replace("...")` trong `ai_cio.py` / page.py
+- Numba kernel parity: pandas equivalent diff < 1e-15 (xem `_rolling_es_kernel` pattern)
+
+**Anti-pattern reminders (đã học):**
+- ❌ KHÔNG cho Margin khi Score>80 vol thấp (bull top trap)
+- ❌ KHÔNG đưa mức giá tuyệt đối VN stock trong AI report (training data cũ 2-3 năm)
+- ❌ KHÔNG dùng Amihud illiquidity cho VN30 bluechip (không correlate stress) — dùng Volume Dry-Up
+- ❌ KHÔNG `except Exception` rộng (silently swallow) — quant phải raise; UI mới catch
+- ❌ KHÔNG hardcode list trong `_clear_all_tool_caches` — thêm tool mới sẽ quên
+- ❌ KHÔNG tạo `command/config.py` shim — Python module collision với root
+- ❌ KHÔNG inject macro/cross-asset tool vào executive summary aggregator (dilute scope) — theo pattern fed_liquidity / GFCM
