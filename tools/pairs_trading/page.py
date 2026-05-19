@@ -518,6 +518,26 @@ def render() -> None:
         "Research dashboard — KHÔNG plug AI CIO synthesis (spec §13.5)."
     )
 
+    # ── Handbook download (manual usage guide) ──
+    from pathlib import Path as _Path
+    _hb = _Path(__file__).resolve().parents[2] / "docs" / "pairs_trading_handbook.md"
+    if _hb.exists():
+        _c1, _c2 = st.columns([3, 1])
+        with _c1:
+            st.caption(
+                "📖 **Manual Handbook** — hướng dẫn setup, đọc hiểu 5 tab, "
+                "decision framework thủ công + cạm bẫy (Vingroup risk, FOL, T+2)."
+            )
+        with _c2:
+            st.download_button(
+                label="⬇️ Tải Handbook (.md)",
+                data=_hb.read_bytes(),
+                file_name="pairs_trading_handbook.md",
+                mime="text/markdown",
+                use_container_width=True,
+                key="pairs_trading_handbook_dl",
+            )
+
     prices = load_close_prices()
     params = render_sidebar(list(prices.columns))
 
