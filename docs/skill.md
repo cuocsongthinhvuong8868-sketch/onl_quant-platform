@@ -225,7 +225,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 
 **Global Financial Conditions Monitor (GFCM)** — shipped PR #6 (merged):
 - `tools/global_financial_conditions/` 9 files, ~1399 LOC
-- 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYCM`) + derived Credit Quality Spread (CCC − HY)
+- 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYC`) + derived Credit Quality Spread (CCC − HY)
 - **Static PCA** trên rolling z-score 756d: PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
 - Regime via PC1 rolling percentile 3Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
 - Driver flag: EQUITY_DRIVEN / RATES_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / BROAD_STRESS (≥3/4 ≥80pct) / NO_STRESS
