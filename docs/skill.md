@@ -226,8 +226,8 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 **Global Financial Conditions Monitor (GFCM)** — shipped PR #6 (merged):
 - `tools/global_financial_conditions/` 9 files, ~1399 LOC
 - 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYC`) + derived Credit Quality Spread (CCC − HY)
-- **Static PCA** trên rolling z-score 756d: PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
-- Regime via PC1 rolling percentile 3Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
+- **Static PCA** trên rolling z-score 252d (1Y — FRED ICE BofA chỉ cấp ~3Y history): PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
+- Regime via PC1 rolling percentile 1Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
 - Driver flag: EQUITY_DRIVEN / RATES_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / BROAD_STRESS (≥3/4 ≥80pct) / NO_STRESS
 - 2-tab page: **📊 Level** (4-panel raw + mean overlay) / **🧠 Analytics** (PC1+regime band, percentile small multiples, PC2-vs-PC1 scatter, CQS chart, AI section)
 - Sidebar: slider "Lùi bao nhiêu năm?" (1-22, default 3) — chỉ filter display, PCA fit + percentile vẫn dùng full history
@@ -274,7 +274,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - `tools/risk_adjusted_growth/quant/data_prep.py` → `PRICE_THOUSANDS_TO_VND = 1000`
 - `tools/var_cvar_vnindex/quant/evt.py` → `DEFAULT_REFIT_EVERY = 21`
 - `tools/fear_greed/quant/volatility.py` → `EWMA_LAMBDA = 0.94` (fallback)
-- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 756`, `PCT_STRESS = 0.80`, `START_DATE = "2003-01-01"`
+- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 252` (1Y — FRED ICE BofA truncate), `PCT_STRESS = 0.80`, `START_DATE = "2003-01-01"`
 
 **Universe & data:**
 - ~250 tickers `tickers.csv`; VN30 hardcoded `VN30_TICKERS` (30 mã) trong `tools/esr_monitor/quant/metrics.py:36`
