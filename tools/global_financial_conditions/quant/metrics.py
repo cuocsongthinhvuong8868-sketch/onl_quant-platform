@@ -12,10 +12,10 @@ Core logic cho Global Financial Conditions Monitor (GFCM).
 Pipeline:
   1. fetch_raw_data(fred_api_key) -> DataFrame [VIX, MOVE, HY_OAS, CCC_OAS]
   2. process_gfcm_logic(df_raw) -> DataFrame với:
-       * Per-series rolling z-score & percentile rank 756d (3Y)
+       * Per-series rolling z-score & percentile rank 252d (1Y)
        * Credit Quality Spread (CCC − HY) + percentile
        * Static PCA (PC1 = stress, PC2 = divergence)
-       * PC1 rolling percentile 3Y
+       * PC1 rolling percentile 1Y
        * Regime classification (STRESS / ELEVATED / CALM)
        * Driver flag (EQUITY / RATES / HY_CREDIT / CCC_CREDIT / BROAD_STRESS / NO_STRESS)
 
@@ -37,7 +37,8 @@ FRED_SERIES = {
 YAHOO_MOVE_TICKER = "^MOVE"
 
 START_DATE = "2003-01-01"       # MOVE Yahoo coverage starts ~2003
-ROLLING_WINDOW = 756            # 3 năm trading days
+ROLLING_WINDOW = 252            # 1 năm trading days — FRED ICE BofA chỉ cấp ~3 năm history
+                                # (ICE pull license 2021); 252d cho phép ~280 valid regime points.
 
 PCT_STRESS = 0.80               # PC1_pct ≥ 0.80 → STRESS
 PCT_ELEVATED = 0.50             # 0.50 ≤ PC1_pct < 0.80 → ELEVATED, dưới = CALM
@@ -50,9 +51,9 @@ OUTPUT_COLUMNS = [
     "VIX", "MOVE", "HY_OAS", "CCC_OAS",
     # Derived
     "Credit_Quality_Spread",            # CCC_OAS − HY_OAS
-    # Z-scores rolling 3Y
+    # Z-scores rolling 1Y
     "VIX_z", "MOVE_z", "HY_z", "CCC_z",
-    # Percentile rank rolling 3Y
+    # Percentile rank rolling 1Y
     "VIX_pct", "MOVE_pct", "HY_pct", "CCC_pct",
     "CQS_pct",
     # PCA outputs

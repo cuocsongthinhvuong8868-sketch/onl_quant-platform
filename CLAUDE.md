@@ -36,7 +36,7 @@ promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere
 | 8 | C | VaRES | `va_res` | Cornish-Fisher + Self-baseline Complacency | exec-sum |
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | exec-sum |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | standalone |
-| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY/CCC OAS, static PCA, PC1_pct 3Y → STRESS/ELEVATED/CALM | standalone |
+| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY/CCC OAS, static PCA, PC1_pct 1Y → STRESS/ELEVATED/CALM (FRED ICE BofA truncate ~3Y) | standalone |
 | 12 | B | **Pairs Trading** | `pairs_trading` | EG + Johansen + OU half-life + Z-score 60d, 7 PREDEFINED clusters | none (orthogonal) |
 
 **AI integration patterns**:
@@ -113,7 +113,7 @@ Allowlist: `python3 *`, `python *`, `pip *`, `grep *`, `find *`, `ls *`, `cat *`
 | §6 | HRP thay logistic backtest curve | 📋 idea | — |
 | §7 | Deflated Sharpe / PSR | 📋 idea | — |
 | ✅ §13 | Pairs Trading Lab | **SHIPPED 2026-05-19** (PR #2 merged) | Live signals + 5 tabs + 7 clusters; DCC filter defer V2 |
-| ✅ §14 | GFCM (Global Financial Conditions) | **SHIPPED 2026-05-19** (PR #6 merged) | VIX + MOVE + HY/CCC OAS, static PCA, regime via PC1_pct 3Y |
+| ✅ §14 | GFCM (Global Financial Conditions) | **SHIPPED 2026-05-19** (PR #6 merged) | VIX + MOVE + HY/CCC OAS, static PCA, regime via PC1_pct 1Y (ICE BofA truncate constraint) |
 
 **Quy tắc khi resume**: đọc `docs/skill.md` (~300 dòng, compressed history) để pick up đầy đủ context trước khi code.
 

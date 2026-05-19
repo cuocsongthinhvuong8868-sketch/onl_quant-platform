@@ -153,16 +153,16 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
 
 def plot_percentile_grid(df: pd.DataFrame) -> go.Figure:
     """
-    4-panel small multiples: percentile rank 3Y của VIX/MOVE/HY/CCC.
+    4-panel small multiples: percentile rank 1Y của VIX/MOVE/HY/CCC.
     Shading vùng 80% (HIGH).
     """
     fig = make_subplots(
         rows=2, cols=2,
         subplot_titles=(
-            "VIX Percentile Rank (3Y)",
-            "MOVE Percentile Rank (3Y)",
-            "HY OAS Percentile Rank (3Y)",
-            "CCC OAS Percentile Rank (3Y)",
+            "VIX Percentile Rank (1Y)",
+            "MOVE Percentile Rank (1Y)",
+            "HY OAS Percentile Rank (1Y)",
+            "CCC OAS Percentile Rank (1Y)",
         ),
         horizontal_spacing=0.10,
         vertical_spacing=0.15,
@@ -299,7 +299,7 @@ def plot_credit_quality_spread(df: pd.DataFrame) -> go.Figure:
         latest_pct = df_valid["CQS_pct"].dropna().iloc[-1]
         fig.add_annotation(
             x=df_valid.index[-1], y=df_valid["Credit_Quality_Spread"].iloc[-1],
-            text=f"PR 3Y: {latest_pct*100:.0f}%",
+            text=f"PR 1Y: {latest_pct*100:.0f}%",
             showarrow=True, arrowhead=2, arrowcolor="#be123c",
             font=dict(color="#be123c", size=11),
             bgcolor="white", bordercolor="#be123c", borderwidth=1,
