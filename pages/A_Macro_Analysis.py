@@ -20,6 +20,13 @@ TOOLS = [
         "page_module": "tools.fed_liquidity.page",
         "render_func": "render",
     },
+    {
+        "id": "global_financial_conditions",
+        "name": "🌐 Global Financial Conditions",
+        "desc": "VIX + MOVE + HY OAS + CCC OAS · Static PCA composite · Regime via PC1 percentile rank 3Y (STRESS/ELEVATED/CALM)",
+        "page_module": "tools.global_financial_conditions.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
