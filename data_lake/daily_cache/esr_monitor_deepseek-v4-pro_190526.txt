@@ -1,33 +1,30 @@
 ## 1. Observations
-- SSI ở mức 62.4%, ngưỡng WARNING, chưa chạm CRITICAL nhưng đã vượt xa vùng SAFE.
-- Market state (4-state) là HEALTHY, dù HMM decision threshold (0.535) cho thấy mô hình có độ tin cậy vừa phải.
-- Top pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%) – Pillar Mode là downside (chỉ tính phiên giảm).
-- PCA Concentration (EVR PC1) ở 38.5%, thấp hơn mức cảnh báo herding cực đoan (thường >45%), nhưng vẫn đáng chú ý.
+- SSI tại 62.8% – nằm trong vùng WARNING (tích lũy rủi ro ngầm)
+- Market State (HMM × trend filter): HEALTHY – giá vẫn trong uptrend, trên MA125
+- Top 3 Pillar: S_LIQ (36%) > S_VAL (32%) > S_COR (17%)
+- PCA Concentration (EVR PC1) ở mức 38.5% – chưa quá đậm đặc nhưng đang tăng dần
 
-## 2. Risk Decomposition
-- **S_LIQ dẫn dắt (36%)**: Volume dry-up so với 1Y norm – thanh khoản khô cạn là tín hiệu classic của giai đoạn tích lũy rủi ro. Thị trường tăng nhưng khối lượng giao dịch suy yếu, báo hiệu dòng tiền đuối sức.
-- **S_VAL (32%)**: Valuation tension cao – lợi suất 252d vượt xa lãi suất tiền gửi, phản ánh định giá đã kéo căng. Đây thường là tiền đề cho điều chỉnh nếu dòng tiền rút.
-- **S_COR (17%)**: Systemic correlation ở mức vừa phải, chưa tạo herding cực đoan. Tuy nhiên, kết hợp S_LIQ + S_VAL cao tạo nên cấu trúc bull-trap điển hình: giá đỉnh, thanh khoản khô, định giá quá mức.
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ (36%)** là driver số một, cho thấy thanh khoản đang khô cạn so với chuẩn 1 năm. Volume dry-up trong bối cảnh giá tăng là tín hiệu cảnh báo điển hình của bull-trap: người mua không đủ lực đẩy giá bền vững. **S_VAL (32%)** đứng thứ hai phản ánh valuation tension – lợi nhuận 252 ngày đang bị bào mòn bởi chi phí cơ hội (lãi suất huy động). Khi cả hai cùng cao, thị trường đang ở pha "leo núi kiệt sức": giá chạm kháng cự tâm lý nhưng dòng tiền thực sự không theo. **S_COR (17%)** góp thêm yếu tố herding – các mã di chuyển cùng chiều khiến hệ thống dễ tổn thương với một cú xả đồng loạt.
 
 ## 3. Cross-Check
-- **Divergence mạnh**: VN30 ở đỉnh cao (trên MA125) trong khi SSI đã vào WARNING. Đây là divergence cổ điển giữa price action (lạc quan) và systemic stress (cảnh báo rủi ro). Bull-trap risk được xác nhận.
-- **HMM vs SSI lệch pha**: HMM báo HEALTHY (low stress + uptrend) nhưng SSI thực tế ở WARNING. Nguyên nhân: HMM chỉ nhìn trend ngắn (price action) mà chưa catch được tín hiệu volume dry-up và valuation tension từ pillar. Flag lệch pha: cần ưu tiên SSI hơn HMM.
+VN30 đang ở đỉnh mới (trên MA125) trong khi SSI leo lên vùng WARNING – đây là divergence âm tính điển hình. Giá kể chuyện lạc quan, nhưng cấu trúc rủi ro nội tại lại đang nén lại. HMM regime (HEALTHY) khớp với trend filter (uptrend), **nhưng lệch hoàn toàn với SSI level** (WARNING). Pillar Mode là "downside" càng củng cố thêm cảnh báo: SSI cao hơn vì volume khô + thanh khoản yếu chứ không phải vì biến động tăng. PCA Concentration (38.5%) chưa kích hoạt cảnh báo đỏ, nhưng nếu vượt 45% sẽ báo hiệu systemic correlation đang nguy hiểm.
 
 ## 4. Verdict
-- **Cash weight đề xuất**: 55-65% (cao hơn mức trung bình, do bull-trap risk hiện hữu).
-- **Hedge action**: Giảm beta danh mục (reduce beta), kết hợp short VN30F1M nhẹ (5-10% NAV) hoặc mua put nếu chi phí thấp. Không khuyến nghị mua thêm cổ phiếu ở vùng giá hiện tại.
-- **Lưu ý**: Pillar drivers (S_LIQ, S_VAL, S_COR) đồng thuận về tín hiệu cảnh báo, không mâu thuẫn. Đây là tín hiệu hành động rõ ràng, không phải "NO ACTIONABLE SIGNAL".
+Thị trường đang mang tính chất bull-trap tiềm năng: giá tăng nhưng quality of uptrend kém (volume cạn, định giá căng). Với CRO view (bearish-on-stress), không thể khuyến nghị margin tại đây.  
+**Cash weight đề xuất: 55-60%** – giảm beta, đặc biệt ở các mã bluechip đã tăng mạnh.  
+**Hedge action: Mua put VN30F1M** – strike cách giá hiện tại -3% đến -5%, chi phí thấp nhưng đủ để bảo vệ phần P&L còn lại.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "esr_monitor",
-  "ssi_pct": 62.4,
+  "ssi_pct": 62.8,
   "regime": "WARNING",
   "market_state": "HEALTHY",
   "top_driver": "S_LIQ",
-  "cash_target_pct": 60,
-  "hedge_action": "reduce_beta",
+  "cash_target_pct": 55,
+  "hedge_action": "buy_puts",
   "confidence": "medium"
 }
 ```

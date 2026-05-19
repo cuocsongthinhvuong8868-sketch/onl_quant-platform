@@ -1,32 +1,33 @@
 ## 1. Observations
-- **MA20 (1 tháng)**: 39.8% — mức thấp, gần vùng oversold (< 20%) nhưng chưa chạm. Thể hiện xung lực ngắn hạn yếu.
-- **MA60 (1 quý)**: 37.8% — mức thấp trung bình, chưa xác nhận điều chỉnh kết thúc.
-- **MA125 (nửa năm)**: 29.9% — mức rất thấp, cho thấy chu kỳ kinh doanh nửa năm suy yếu.
-- **MA252 (1 năm)**: 34.7% — mức thấp, dưới ngưỡng 40% cho thấy downtrend dài hạn còn áp đảo.
+- **MA20 (32.7%)**: Ở vùng thấp, gần ngưỡng oversold (<35%). Thể hiện xung lực ngắn hạn rất yếu.
+- **MA60 (33.1%)**: Ở vùng thấp, cho thấy đà trung hạn suy yếu, chưa có dấu hiệu kết thúc điều chỉnh.
+- **MA125 (27.9%)**: Ở vùng rất thấp (<30%), phản ánh sức mạnh chu kỳ nửa năm kém.
+- **MA252 (33.5%)**: Ở vùng thấp (<40%), báo hiệu xu hướng dài hạn đang trong pha suy yếu (Bearish regime).
 
 ## 2. Structural Health
-Cả 4 đường MA đều dưới 40%, tạo thành cấu trúc **suy yếu đồng thuận** — tất cả các khung thời gian đều cho tín hiệu downtrend. Không có divergence giữa MA20 và MA252 (cả hai đều thấp). Pattern hiện tại là **Bear Confirmed** theo chuẩn (MA20 < 30% AND MA252 < 40%), mặc dù MA20 chưa thực sự dưới 30% nhưng đã rất gần.
+- **Alignment**: Cả 4 khung thời gian đều thấp và gần như đồng thuận ở mức <35%. Đây là trạng thái yếu đồng bộ.
+- **Pattern Match**: KHỚP với **Bear Confirmed** – MA20 < 30% (gần sát) và MA252 < 40%. Không có divergence rõ rệt giữa MA20 và MA252 vì cả hai đều yếu. Thị trường đang trong xu hướng suy yếu cơ cấu, chưa phải là tín hiệu rũ bỏ hay bẫy tăng.
 
 ## 3. Money Flow Leadership
-- **Ngắn hạn (MA20)**: Real Estate + Energy + Brokers chiếm lĩnh: BSR, VRE, PVT, VHM, DXG, cùng SSI. Ngân hàng (STB, HDB) có mặt nhưng không áp đảo.
-- **Dài hạn (MA252)**: Overlap rõ với ngắn hạn: BSR, VRE, PVT, VHM, STB, HDB đều xuất hiện. NVL, HPG, MBB, VPB là điểm khác biệt dài hạn.
-- **Thông điệp dòng tiền**: Smart money vẫn tập trung vào một nhóm Cyclical chọn lọc (Energy, Real Estate), kết hợp một số Banks nội địa. Không có dấu hiệu dịch chuyển sang Defensive (Utilities/Consumer). Đây là tín hiệu dòng tiền kỳ vọng hồi phục nhưng chưa đủ rộng.
+- **Top MA20 (Ngắn hạn)**: Nổi bật là nhóm **Real Estate** (VRE, VHM, DXG, NVL) và **Energy/Commodities** (BSR, PVT). Banks (STB, VCB, HCM) xuất hiện nhưng xếp cuối.
+- **Top MA252 (Dài hạn)**: **Overlap rất cao** với MA20: BSR, VRE, PVT, VHM, STB. Điều này cho thấy dòng tiền lớn vẫn tập trung vào một nhóm mã trụ (Bất động sản + Năng lượng), không có sự lan tỏa rộng.
+- **Smart money**: Đang ưu tiên **Cyclical/Defensive Hybrid** (Bất động sản - nhạy chu kỳ nhưng có tính trú ẩn tương đối) và **Energy**. Không thấy dấu hiệu chuyển sang Banks (Defensive) hay Brokers (Aggressive) một cách rõ rệt.
 
 ## 4. Verdict
-- **Strategy**: Defensive cash-up. Tránh trend-following vì thị trường đang trong downtrend xác nhận. Không khuyến nghị mua đuổi.
-- **Đòn bẩy**: 0% margin. Vi phạm triết lý nếu dùng margin khi MA252 < 40%.
-- **Divergence check**: MA20 (39.8%) và MA252 (34.7%) đồng thuận thấp — không có divergence → không cần "WAIT FOR CONFIRMATION". Thị trường đã xác nhận suy yếu ở mọi khung thời gian.
+- **Strategy**: **DEFENSIVE CASH-UP**. Hoàn toàn không phải thời điểm cho Trend-following hay Mean-reversion T+.
+- **Đòn bẩy**: **0% margin**. Tuyệt đối không dùng margin khi rổ MA252 dưới 40%.
+- **Nhận định**: Cấu trúc thị trường yếu toàn diện. Breadth đồng thuận thấp trên mọi chu kỳ. Dòng tiền chỉ co cụm tại một vài mã trụ, không đủ sức kéo thị trường. Ưu tiên hàng đầu là bảo toàn vốn, chờ tín hiệu MA60 hoặc MA252 cải thiện rõ rệt.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "market_breadth",
-  "ma20_pct": 39.8,
-  "ma60_pct": 37.8,
-  "ma125_pct": 29.9,
-  "ma252_pct": 34.7,
+  "ma20_pct": 32.7,
+  "ma60_pct": 33.1,
+  "ma125_pct": 27.9,
+  "ma252_pct": 33.5,
   "regime": "bear_confirmed",
-  "leadership_sector": "cyclical",
+  "leadership_sector": "mixed",
   "strategy": "defensive",
   "margin_pct": 0,
   "confidence": "high"
