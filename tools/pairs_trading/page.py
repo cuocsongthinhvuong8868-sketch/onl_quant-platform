@@ -1,12 +1,13 @@
 """
 page.py — Pairs Trading Streamlit page.
 
-5 tabs:
+6 tabs:
   1. Cluster Scan         — Johansen + half-life + dominant spread
-  2. Pairwise Heatmap     — NxN EG p-value matrix
-  3. Custom Pair          — Full EG + OU + Hurst + z-score + 2yr backtest
-  4. Backtest aggregate   — All cointegrated pair trong cluster
-  5. Live Signals (P2)    — Current cointegrated pair với |z|, order ticket gen
+  2. Pairwise Heatmap     — NxN EG p-value matrix + current ρ heatmap
+  3. Universe Scanner     — 4-stage funnel (sector → ρ → EG → half-life) → top candidate
+  4. Custom Pair          — Full EG + OU + Hurst + z-score + DCC + 2yr backtest
+  5. Backtest aggregate   — All cointegrated pair trong cluster
+  6. Live Signals (P2)    — Current cointegrated pair với |z|, order ticket gen
 
 KHÔNG plug AI CIO (spec §13.5).
 """
@@ -51,6 +52,7 @@ from tools.pairs_trading.quant.dcc_filter import (
     pair_rho_series,
     passes_rho_filter,
 )
+from tools.pairs_trading.quant.scanner import run_universe_scan
 from tools.pairs_trading.ui.sidebar import render_sidebar
 from tools.pairs_trading.ui.charts import (
     render_spread_chart,
@@ -609,6 +611,142 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
 
 
 # ─────────────────────────────────────────────────
+# Tab: Universe Scanner (sector → ρ → EG → half-life funnel)
+# ─────────────────────────────────────────────────
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _run_universe_scan_cached(
+    prices_hash: int,
+    prices: pd.DataFrame,
+    same_sector_only: bool,
+    cross_exchange: bool,
+    min_rho_screen: float,
+    hl_min: int,
+    hl_max: int,
+) -> pd.DataFrame:
+    """Cache key = (prices last-date hash + 5 filter params). TTL 1h."""
+    return run_universe_scan(prices, {
+        "same_sector_only": same_sector_only,
+        "cross_exchange": cross_exchange,
+        "min_rho_screen": min_rho_screen,
+        "hl_min": hl_min,
+        "hl_max": hl_max,
+    })
+
+
+def _tab_universe_scanner(prices: pd.DataFrame, params: dict) -> None:
+    st.markdown("### 🔬 Universe Scanner")
+    st.caption(
+        f"Funnel 4-stage: **same-sector** → **ρ_60d ≥ {params['min_rho_screen']:.2f}** → "
+        f"**EG p<0.05** → **half-life ∈ [{params['hl_min']}, {params['hl_max']}]**. "
+        "Surface candidate từ ~245 mã universe, sau đó bạn validate sâu ở tab Custom Pair."
+    )
+
+    col_a, col_b, col_c = st.columns([1, 1, 3])
+    with col_a:
+        run = st.button("🔍 Run Scanner", type="primary", use_container_width=True)
+    with col_b:
+        clear = st.button(
+            "🗑️ Clear",
+            use_container_width=True,
+            disabled="scanner_result" not in st.session_state,
+        )
+    with col_c:
+        st.caption("Compute ~10-30s, cached 1h. Re-run khi đổi filter trong sidebar.")
+
+    if clear:
+        st.session_state.pop("scanner_result", None)
+        st.session_state.pop("scanner_last_validated", None)
+        st.rerun()
+
+    if run:
+        with st.spinner("Scanning ~245 mã universe (sector → ρ → EG → half-life)..."):
+            try:
+                prices_key = hash((str(prices.index[-1]), prices.shape))
+                result = _run_universe_scan_cached(
+                    prices_key, prices,
+                    same_sector_only=params["same_sector_only"],
+                    cross_exchange=params["cross_exchange"],
+                    min_rho_screen=params["min_rho_screen"],
+                    hl_min=params["hl_min"],
+                    hl_max=params["hl_max"],
+                )
+                st.session_state["scanner_result"] = result
+            except Exception as exc:
+                st.error(f"Scanner fail: {exc}")
+                logger.exception("Universe scan fail")
+                return
+
+    if "scanner_result" not in st.session_state:
+        st.info(
+            "👆 Click **'🔍 Run Scanner'** để bắt đầu funnel. "
+            "Workflow: scanner surface ~5-20 candidate → click **'Pre-fill Custom Pair'** → "
+            "switch sang tab **🎯 Custom Pair** để validate sâu (EG + OU + Hurst + DCC + backtest)."
+        )
+        return
+
+    df = st.session_state["scanner_result"]
+
+    if df.empty:
+        st.warning(
+            f"Không tìm thấy pair nào qualify với current params "
+            f"(ρ_60d ≥ {params['min_rho_screen']:.2f}, "
+            f"half-life ∈ [{params['hl_min']}, {params['hl_max']}]). "
+            "Thử relax threshold trong sidebar và Run Scanner lại."
+        )
+        return
+
+    st.success(
+        f"✅ Surfaced **{len(df)}** candidate pair. "
+        "Sorted by composite score = (1-p) × ρ × half_life_proximity_to_15. "
+        "High score = strong cointegration + co-moving + reasonable mean-revert horizon."
+    )
+
+    # Display ranked table
+    try:
+        styled = (
+            df.style
+            .format({
+                "ρ_60d": "{:.3f}",
+                "p_value": "{:.4f}",
+                "half_life": "{:.1f}",
+                "beta": "{:.4f}",
+                "score": "{:.4f}",
+            })
+            .background_gradient(subset=["score"], cmap="YlGn")
+        )
+        st.dataframe(styled, use_container_width=True, hide_index=True)
+    except Exception:
+        st.dataframe(df, use_container_width=True, hide_index=True)
+
+    # Validate workflow
+    st.markdown("---")
+    st.markdown("#### 🎯 Validate candidate trong Custom Pair tab")
+    col_pick, col_btn = st.columns([3, 1])
+    with col_pick:
+        selected = st.selectbox(
+            "Chọn pair",
+            options=df["pair"].tolist(),
+            key="scanner_selected_pair",
+            label_visibility="collapsed",
+        )
+    with col_btn:
+        if st.button("→ Pre-fill", type="primary", use_container_width=True):
+            t1, t2 = selected.split("/")
+            st.session_state["scanner_target_t1"] = t1
+            st.session_state["scanner_target_t2"] = t2
+            st.session_state["scanner_last_validated"] = f"{t1}/{t2}"
+            st.rerun()
+
+    if "scanner_last_validated" in st.session_state:
+        st.info(
+            f"📌 **{st.session_state['scanner_last_validated']}** đã pre-fill vào sidebar 'Custom pair'. "
+            "Switch sang tab **🎯 Custom Pair** để validate sâu."
+        )
+
+
+# ─────────────────────────────────────────────────
 # Main render
 # ─────────────────────────────────────────────────
 
@@ -648,9 +786,10 @@ def render() -> None:
 
     _show_global_warnings()
 
-    tab1, tab2, tab3, tab4, tab5 = st.tabs([
+    tab1, tab2, tab_scan, tab3, tab4, tab5 = st.tabs([
         "🔍 Cluster Scan",
         "🗺️ Pairwise Heatmap",
+        "🔬 Universe Scanner",
         "🎯 Custom Pair",
         "📈 Aggregate Backtest",
         "🚦 Live Signals",
@@ -659,6 +798,8 @@ def render() -> None:
         _tab_cluster_scan(prices_window, params)
     with tab2:
         _tab_pairwise(prices_window, params)
+    with tab_scan:
+        _tab_universe_scanner(prices, params)
     with tab3:
         _tab_custom_pair(prices_window, params)
     with tab4:
