@@ -32,6 +32,25 @@ st.markdown(
     "Nếu Người Dùng Muốn Sử Dụng AI Đọc Kết Quả, Vui Lòng Tích Hợp API của Mô Hình Kimmi AI Hoặc Deepseek AI."
 )
 
+# ── Manual Handbook download ──
+_handbook_path = Path(__file__).parent / "docs" / "manual_handbook.md"
+if _handbook_path.exists():
+    _col_hb1, _col_hb2 = st.columns([3, 1])
+    with _col_hb1:
+        st.caption(
+            "📖 **Manual Handbook** — hướng dẫn setup + đọc hiểu kết quả thủ công "
+            "11 tool (trước khi tích hợp AI CIO). Bao gồm framework kết hợp signal 3-layer."
+        )
+    with _col_hb2:
+        with open(_handbook_path, "rb") as _f:
+            st.download_button(
+                label="⬇️ Tải Handbook (.md)",
+                data=_f.read(),
+                file_name="quant_platform_handbook.md",
+                mime="text/markdown",
+                use_container_width=True,
+            )
+
 # ── Navigation Cards ──
 st.markdown("## 🚀 Chọn Nhánh Phân Tích")
 st.markdown("---")
