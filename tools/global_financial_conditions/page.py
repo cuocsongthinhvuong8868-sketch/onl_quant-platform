@@ -61,7 +61,7 @@ def render():
     st.title("🌐 Global Financial Conditions Monitor")
     st.caption(
         "Equity vol (VIX) + Rates vol (MOVE) + Credit (HY OAS, CCC OAS) · "
-        "Static PCA composite · Regime via PC1 percentile rank 3Y"
+        "Static PCA composite · Regime via PC1 percentile rank 1Y"
     )
 
     plot_start_date = render_sidebar()
@@ -180,13 +180,13 @@ def render():
         with col1:
             st.metric("PC1 percentile", f"{summary['pc1_pct']*100:.0f}%")
         with col2:
-            st.metric("VIX pct (3Y)", f"{summary['vix_pct']*100:.0f}%")
+            st.metric("VIX pct (1Y)", f"{summary['vix_pct']*100:.0f}%")
         with col3:
-            st.metric("MOVE pct (3Y)", f"{summary['move_pct']*100:.0f}%")
+            st.metric("MOVE pct (1Y)", f"{summary['move_pct']*100:.0f}%")
         with col4:
-            st.metric("HY pct (3Y)", f"{summary['hy_pct']*100:.0f}%")
+            st.metric("HY pct (1Y)", f"{summary['hy_pct']*100:.0f}%")
         with col5:
-            st.metric("CCC pct (3Y)", f"{summary['ccc_pct']*100:.0f}%")
+            st.metric("CCC pct (1Y)", f"{summary['ccc_pct']*100:.0f}%")
 
         st.plotly_chart(plot_pc1_with_regime(df_plot), use_container_width=True)
         st.plotly_chart(plot_percentile_grid(df_plot), use_container_width=True)
