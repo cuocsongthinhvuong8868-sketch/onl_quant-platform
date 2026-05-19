@@ -55,10 +55,10 @@ with col2:
         st.markdown("### 🔬 Phân tích Vi mô")
         st.markdown("**Micro Analysis**")
         st.markdown(
-            "- Báo cáo tài chính doanh nghiệp\n"
-            "- Mô hình định giá DCF\n"
+            "- 🔁 Pairs Trading Research Lab\n"
+            "- Cointegration + OU half-life + Z-score\n"
+            "- 7 cluster VN + custom pair\n"
         )
-        st.markdown("🚧 **Đang phát triển**")
         if st.button("🔬 Vào Micro Analysis", key="btn_micro", use_container_width=True):
 
             st.switch_page("pages/B_Micro_Analysis.py")
