@@ -3,7 +3,7 @@ command/update_global_financial_conditions.py
 Updater Global Financial Conditions Monitor (GFCM).
 
 Luồng:
-  1. Pull VIX + HY_OAS + CCC_OAS từ FRED (VIXCLS / BAMLH0A0HYM2 / BAMLH0A3HYCM)
+  1. Pull VIX + HY_OAS + CCC_OAS từ FRED (VIXCLS / BAMLH0A0HYM2 / BAMLH0A3HYC)
   2. Pull MOVE từ Yahoo Finance (^MOVE) qua yfinance
   3. Compute rolling z-score + percentile rank 756d, static PCA, regime + driver
   4. Lưu vào data_lake/global_financial_conditions_cache.csv
