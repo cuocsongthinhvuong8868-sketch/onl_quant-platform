@@ -45,12 +45,20 @@ from tools.pairs_trading.quant.backtest import (
     generate_order_ticket,
     order_ticket_to_json,
 )
+from tools.pairs_trading.quant.dcc_filter import (
+    cluster_rho_matrix,
+    pair_rho_now,
+    pair_rho_series,
+    passes_rho_filter,
+)
 from tools.pairs_trading.ui.sidebar import render_sidebar
 from tools.pairs_trading.ui.charts import (
     render_spread_chart,
     render_cluster_heatmap,
     render_backtest_equity,
     render_residual_diagnostics,
+    render_pair_rho_chart,
+    render_correlation_heatmap,
 )
 
 logger = logging.getLogger(__name__)
@@ -209,18 +217,43 @@ def _tab_pairwise(prices: pd.DataFrame, params: dict) -> None:
         M = pairwise_eg_matrix(sub, tickers)
     st.plotly_chart(render_cluster_heatmap(M, threshold=0.05), use_container_width=True)
 
-    # Sort cointegrated pairs by p-value
+    # DCC current correlation heatmap (cheap EWMA path, luôn show side-by-side)
+    rho_matrix = cluster_rho_matrix(sub, tickers)
+    if not rho_matrix.empty:
+        st.markdown("#### Current dynamic correlation (EWMA λ=0.94)")
+        st.caption(
+            "Pair có ρ cao + p-value EG thấp = ứng viên tốt nhất (cointegrated + co-moving). "
+            "Pair ρ thấp dù EG pass = stale relationship, regime đã đổi."
+        )
+        st.plotly_chart(render_correlation_heatmap(rho_matrix), use_container_width=True)
+
+    # Sort cointegrated pairs by p-value, thêm ρ column
     rows = []
     for i, t1 in enumerate(tickers):
         for j, t2 in enumerate(tickers):
             if i < j:
                 p = M.iloc[i, j]
                 if pd.notna(p):
-                    rows.append({"Pair": f"{t1}/{t2}", "p_value": p, "Cointegrated": p < 0.05})
+                    rho_val = (
+                        float(rho_matrix.loc[t1, t2])
+                        if not rho_matrix.empty
+                        and t1 in rho_matrix.index
+                        and t2 in rho_matrix.columns
+                        else np.nan
+                    )
+                    rows.append({
+                        "Pair": f"{t1}/{t2}",
+                        "p_value": p,
+                        "ρ_now": rho_val,
+                        "Cointegrated": p < 0.05,
+                    })
     if rows:
         df = pd.DataFrame(rows).sort_values("p_value")
-        st.markdown("#### Ranked pairs (low p = strong cointegration)")
-        st.dataframe(df, use_container_width=True, hide_index=True)
+        st.markdown("#### Ranked pairs (low p = strong cointegration, high ρ = co-moving)")
+        st.dataframe(
+            df.style.format({"p_value": "{:.4f}", "ρ_now": "{:.3f}"}),
+            use_container_width=True, hide_index=True,
+        )
 
 
 # ─────────────────────────────────────────────────
@@ -259,8 +292,12 @@ def _tab_custom_pair(prices: pd.DataFrame, params: dict) -> None:
         half_life=hl_raw,
     )
 
-    # Metrics row
-    c1, c2, c3, c4, c5 = st.columns(5)
+    # Compute current ρ (EWMA path always — cheap)
+    dcc_method = params.get("dcc_method", "ewma")
+    rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
+
+    # Metrics row (6 columns now, thêm ρ_now)
+    c1, c2, c3, c4, c5, c6 = st.columns(6)
     c1.metric("β (hedge ratio)", f"{eg['beta']:.4f}")
     c2.metric("ADF p-value", f"{eg['p_value']:.4f}",
               delta="cointegrated" if eg["is_cointegrated"] else "NOT cointegrated",
@@ -269,6 +306,16 @@ def _tab_custom_pair(prices: pd.DataFrame, params: dict) -> None:
     c4.metric("Hurst", f"{h:.3f}", delta="mean-revert" if h < 0.5 else "drift",
               delta_color="normal" if h < 0.5 else "inverse")
     c5.metric("Z latest", f"{z_series.dropna().iloc[-1]:.2f}" if z_series.notna().any() else "—")
+    if np.isfinite(rho_now):
+        passes = passes_rho_filter(rho_now, params.get("min_rho", 0.5))
+        c6.metric(
+            f"ρ_now ({dcc_method.upper()})",
+            f"{rho_now:.3f}",
+            delta="≥ min ρ" if passes else "< min ρ (decoupling)",
+            delta_color="normal" if passes else "inverse",
+        )
+    else:
+        c6.metric(f"ρ_now ({dcc_method.upper()})", "NaN")
 
     # Spread chart
     st.plotly_chart(
@@ -279,6 +326,19 @@ def _tab_custom_pair(prices: pd.DataFrame, params: dict) -> None:
         ),
         use_container_width=True,
     )
+
+    # ρ_t time-series chart
+    rho_ts = pair_rho_series(sub, t1, t2, method=dcc_method)
+    if not rho_ts.dropna().empty:
+        st.plotly_chart(
+            render_pair_rho_chart(
+                rho_ts.dropna(),
+                min_rho=params.get("min_rho", 0.5),
+                method=dcc_method,
+                title=f"{t1}/{t2} dynamic correlation",
+            ),
+            use_container_width=True,
+        )
 
     # Diagnostic chart
     with st.expander("📊 Residual diagnostics (ADF + ACF)"):
@@ -338,8 +398,13 @@ def _tab_aggregate_backtest(prices: pd.DataFrame, params: dict) -> None:
         st.warning("Backtest window <120 obs, skip")
         return
 
+    use_dcc = params.get("use_dcc_filter", False)
+    min_rho = params.get("min_rho", 0.5)
+    dcc_method = params.get("dcc_method", "ewma")
+
     rows = []
     equity_curves = {}
+    skipped_rho = 0
     for i, t1 in enumerate(tickers):
         for j, t2 in enumerate(tickers):
             if i >= j:
@@ -350,6 +415,10 @@ def _tab_aggregate_backtest(prices: pd.DataFrame, params: dict) -> None:
                     continue
                 hl = ou_half_life_raw(eg["resid"])
                 if not np.isfinite(hl) or not (params["hl_min"] <= hl <= params["hl_max"]):
+                    continue
+                rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
+                if use_dcc and not passes_rho_filter(rho_now, min_rho):
+                    skipped_rho += 1
                     continue
                 z = z_score_60d(eg["resid"])
                 sig = entry_exit_rules(
@@ -362,6 +431,7 @@ def _tab_aggregate_backtest(prices: pd.DataFrame, params: dict) -> None:
                     "Pair": f"{t1}/{t2}",
                     "β": round(eg["beta"], 4),
                     "p_value": round(eg["p_value"], 4),
+                    "ρ_now": round(rho_now, 3) if np.isfinite(rho_now) else float("nan"),
                     "half_life": round(hl, 1),
                     "total_ret": stats["total_return"],
                     "sharpe": round(stats["sharpe"], 2),
@@ -372,10 +442,17 @@ def _tab_aggregate_backtest(prices: pd.DataFrame, params: dict) -> None:
             except Exception as exc:
                 logger.warning("Aggregate backtest fail %s/%s: %s", t1, t2, exc)
 
+    if use_dcc and skipped_rho:
+        st.caption(f"ℹ️ DCC filter active — skipped {skipped_rho} pair với ρ_now < {min_rho:.2f}")
+
     if not rows:
+        filter_desc = (
+            f"cointegrated + half-life ∈ [{params['hl_min']}, {params['hl_max']}]"
+            + (f" + ρ ≥ {min_rho:.2f}" if use_dcc else "")
+        )
         st.info(
-            f"Không có pair nào pass filter (cointegrated + half-life ∈ [{params['hl_min']}, {params['hl_max']}]). "
-            "Thử relax half-life range trong sidebar."
+            f"Không có pair nào pass filter ({filter_desc}). "
+            "Thử relax filter trong sidebar."
         )
         return
 
@@ -428,6 +505,10 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
         st.error("Insufficient data")
         return
 
+    use_dcc = params.get("use_dcc_filter", False)
+    min_rho = params.get("min_rho", 0.5)
+    dcc_method = params.get("dcc_method", "ewma")
+
     rows = []
     for i, t1 in enumerate(tickers):
         for j, t2 in enumerate(tickers):
@@ -446,8 +527,11 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
                 z_last = float(z.iloc[-1])
                 quarantine = quarantine_flag(z, stop=params["z_stop"], days=60)
                 in_quarantine = quarantine is not None and quarantine > pd.Timestamp(datetime.now())
+                rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
+                rho_pass = passes_rho_filter(rho_now, min_rho)
+                # ρ filter là HARD GATE cho action: nếu use_dcc=True và ρ<min → FLAT
                 action = "FLAT"
-                if not in_quarantine:
+                if not in_quarantine and (not use_dcc or rho_pass):
                     if z_last < -params["z_entry"]:
                         action = f"LONG SPREAD (long {t1}, short {t2})"
                     elif z_last > params["z_entry"]:
@@ -456,9 +540,11 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
                     "Pair": f"{t1}/{t2}",
                     "β": round(eg["beta"], 4),
                     "z_now": round(z_last, 2),
+                    "ρ_now": round(rho_now, 3) if np.isfinite(rho_now) else float("nan"),
                     "half_life": round(hl, 1),
                     "action": action,
                     "quarantine_until": quarantine.strftime("%Y-%m-%d") if in_quarantine else "—",
+                    "_rho_pass": rho_pass,
                 })
             except Exception as exc:
                 logger.warning("Live signal fail %s/%s: %s", t1, t2, exc)
@@ -468,14 +554,28 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
         return
 
     df = pd.DataFrame(rows).sort_values("z_now", key=lambda s: s.abs(), ascending=False)
-    st.dataframe(df, use_container_width=True, hide_index=True)
+    if use_dcc:
+        st.caption(
+            f"ℹ️ DCC filter active: pair với ρ_now < {min_rho:.2f} ({dcc_method.upper()}) "
+            f"force action = FLAT bất kể z."
+        )
+    # Drop internal flag column trước khi hiển thị
+    st.dataframe(df.drop(columns=["_rho_pass"]), use_container_width=True, hide_index=True)
 
-    # Order ticket generator
+    # Order ticket generator — actionable phải pass cả quarantine VÀ ρ filter (nếu enabled)
     st.markdown("---")
     st.markdown("#### Generate Order Ticket")
-    actionable = [r for r in rows if r["action"] != "FLAT" and r["quarantine_until"] == "—"]
+    actionable = [
+        r for r in rows
+        if r["action"] != "FLAT" and r["quarantine_until"] == "—"
+        and (not use_dcc or r["_rho_pass"])
+    ]
     if not actionable:
-        st.info("Không có pair nào actionable hiện tại (z chưa breach entry hoặc đang quarantine)")
+        msg = "Không có pair nào actionable hiện tại (z chưa breach entry hoặc đang quarantine"
+        if use_dcc:
+            msg += f" hoặc ρ_now < {min_rho:.2f}"
+        msg += ")"
+        st.info(msg)
         return
 
     selected_pair = st.selectbox(
@@ -495,6 +595,8 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
             z_at_entry=chosen_row["z_now"],
             half_life=chosen_row["half_life"],
             stop_z=params["z_stop"],
+            rho_at_entry=chosen_row.get("ρ_now"),
+            rho_method=dcc_method,
         )
         ticket_json = order_ticket_to_json(ticket)
         st.code(ticket_json, language="json")

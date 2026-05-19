@@ -47,6 +47,36 @@ def render_sidebar(available_tickers: list[str]) -> dict:
         help="Spec §13.3: chỉ trade pair half-life 5-30d",
     )
 
+    st.sidebar.markdown("### DCC correlation filter")
+    use_dcc_filter = st.sidebar.checkbox(
+        "Enable DCC ρ filter",
+        value=False,
+        help=(
+            "Lọc pair theo dynamic correlation tại last date. "
+            "Pair với ρ < threshold = decoupling regime → skip entry. "
+            "OFF mặc định vì compute thêm ~5-15s cho Aggregate/Live tab."
+        ),
+    )
+    min_rho = st.sidebar.slider(
+        "Min current ρ",
+        min_value=-0.5, max_value=0.95, value=0.5, step=0.05,
+        disabled=not use_dcc_filter,
+        help=(
+            "ρ_t < threshold → pair decoupling, skip. "
+            "0.5 = moderately correlated. Mặc định 0.5 (literature)."
+        ),
+    )
+    dcc_method = st.sidebar.selectbox(
+        "ρ method",
+        options=["ewma", "dcc"],
+        index=0,
+        disabled=not use_dcc_filter,
+        help=(
+            "ewma: RiskMetrics λ=0.94, O(T) per pair, recommended. "
+            "dcc: bivariate DCC(1,1) MLE per pair, ~5-30s/pair, dùng cho audit."
+        ),
+    )
+
     st.sidebar.markdown("### Backtest window")
     lookback_years = st.sidebar.slider(
         "Lookback (years)",
@@ -87,4 +117,7 @@ def render_sidebar(available_tickers: list[str]) -> dict:
         "custom_t2": ct2,
         "tc_bps": float(tc_bps),
         "capital": int(capital),
+        "use_dcc_filter": bool(use_dcc_filter),
+        "min_rho": float(min_rho),
+        "dcc_method": str(dcc_method),
     }
