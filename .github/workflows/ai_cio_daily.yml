@@ -70,8 +70,23 @@ jobs:
           git add data_lake/daily_cache/ reports/
           if git diff --cached --quiet; then
             echo "No changes to commit."
-          else
-            git commit -m "Auto: AI CIO report $(date +'%d%m%y')"
-            git push
+            exit 0
           fi
+          git commit -m "Auto: AI CIO report $(date +'%d%m%y')"
+          # Retry push với pull --rebase để xử lý race condition
+          # (khi workflow khác push song song trong lúc job này chạy)
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "✅ Push thành công (attempt $attempt)"
+              exit 0
+            fi
+            echo "⚠️  Push bị reject (attempt $attempt/5) — pulling với rebase..."
+            git pull --rebase --autostash origin main || {
+              echo "❌ Rebase fail, abort và retry"
+              git rebase --abort || true
+            }
+            sleep $((attempt * 3))
+          done
+          echo "❌ Push fail sau 5 lần thử"
+          exit 1
 
