@@ -92,6 +92,13 @@ def fetch_fred_series(api_key: str, start_date: str = START_DATE) -> pd.DataFram
         except Exception as e:
             raise RuntimeError(f"Lỗi khi gọi FRED API ({code}): {e}") from e
         s.index = pd.to_datetime(s.index)
+        n_valid = int(s.dropna().shape[0])
+        if n_valid == 0:
+            raise RuntimeError(
+                f"FRED series '{code}' (mapped to {col}) trả về 0 quan sát kể từ "
+                f"{start_date}. Series có thể đã bị ICE BofA pull khỏi FRED (2021) "
+                f"hoặc ID đã đổi. Verify tại https://fred.stlouisfed.org/series/{code}"
+            )
         cols[col] = s
 
     df = pd.DataFrame(cols).sort_index()
