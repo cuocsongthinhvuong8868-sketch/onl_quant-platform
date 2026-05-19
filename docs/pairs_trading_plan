@@ -1,0 +1,307 @@
+# Plan: Pairs Trading Research Lab (§13) + DCC-GARCH Utility (Tier A #5)
+
+## Context
+
+User là retail trader AUM nhỏ, muốn build công cụ phát hiện và monitor pair-trading opportunities trên VN30/cluster cointegrated theo spec §13 trong `docs/skill.md:482-589`. Spec đã có sẵn, branch `B_Micro_Analysis` đang trống (placeholder).
+
+User quyết định build theo thứ tự:
+1. **shared/dcc_garch.py** (Tier A #5 — dynamic correlation utility module, không có UI standalone)
+2. **tools/pairs_trading/** với scope đầy đủ: 7 cluster predefined + custom pair UI + **cả P1 (research) lẫn P2 (live execution)**
+
+Decisions cụ thể:
+- ✅ FOL filter SKIP (retail AUM nhỏ, default assume foreign_room >5%)
+- ✅ Corp-action skip pipeline build (accept unadjusted prices, warn user)
+- ✅ DCC-GARCH = shared utility (không UI), dispersion + pairs_trading reuse chéo
+- ⚠️ **DCC full 250 ticker không khả thi** (>30min/refit, numerically unstable do sparse 2015-2018) → đề xuất hybrid: DCC top-50 liquid + EWMA λ=0.94 fallback cho ~200 còn lại
+- ✅ Custom pair: full EG + OU + Z-score + mini backtest 2 năm
+- ❌ KHÔNG plug AI CIO (spec explicit — pairs signal orthogonal với regime synthesis)
+
+Intended outcome: 1 dashboard độc lập trên nhánh B_Micro_Analysis để (P1) đo edge cointegration, (P2) generate order ticket JSON khi |z|>2.
+
+## Realistic effort: 15-21 ngày calendar
+
+---
+
+## Phase 0 — shared/dcc_garch.py utility (5-7 ngày)
+
+### Single file: `/home/user/onl_quant-platform/shared/dcc_garch.py`
+~350-450 LOC. Mirror consolidated style của `tools/fear_greed/quant/volatility.py:1-180`.
+
+### Public API
+```python
+def fit_dcc(returns: pd.DataFrame, alpha_init=0.05, beta_init=0.92) -> dict
+    # {"Q_bar", "alpha", "beta", "std_resid" pd.DataFrame, "uni_garch" dict, "tickers", "converged"}
+
+def dynamic_correlation_matrix(returns: pd.DataFrame, method="hybrid", top_n_dcc=50) -> pd.DataFrame
+    # NxN correlation tại last date. method ∈ {"dcc", "ewma", "hybrid"}
+
+def pair_correlation(returns: pd.DataFrame, t1: str, t2: str, method="hybrid") -> pd.Series
+    # Time-series rho_t cho 1 pair (pairs_trading sẽ consume cho filter)
+
+def _ewma_correlation(returns: pd.DataFrame, lambda_=0.94) -> np.ndarray
+def _select_liquid_universe(returns: pd.DataFrame, top_n=50) -> list[str]
+    # Rank theo trailing 60d mean dollar-volume từ load_volumes()
+```
+
+### DCC(1,1) algorithm (Engle 2002)
+**Step 1 — univariate per ticker**:
+- Reuse pattern từ `tools/fear_greed/quant/volatility.py:32-84` (fit_egarch 3-tier fallback)
+- ⚠️ `fit_egarch()` hiện trả annualized vol — DCC cần raw `conditional_volatility` (KHÔNG annualize) để compute std residuals. Viết wrapper `_fit_univariate_for_dcc(series)` trong `dcc_garch.py` (copy logic, không refactor fear_greed để tránh break dependent tools)
+- Output: `std_resid = (y - mean) / cond_vol`
+
+**Step 2 — DCC MLE**:
+- Q_t recursion: `Q_t = (1-α-β)·Q̄ + α·ε_{t-1}ε_{t-1}' + β·Q_{t-1}`
+- R_t = `diag(Q_t)^{-1/2} · Q_t · diag(Q_t)^{-1/2}`
+- Constraints: `α>0, β>0, α+β<0.999`
+- Optimizer: `scipy.optimize.minimize(method="L-BFGS-B", bounds=[(1e-4, 0.3), (0.5, 0.999)])`
+- N>30: dùng composite likelihood (Engle-Sheppard pairwise) để giảm cost
+- Reject convergence nếu `result.success == False` hoặc `α+β > 0.9995` → downgrade EWMA fallback + log warning
+
+### Hybrid tier logic
+1. `volumes = load_volumes()` từ `shared/data_loader.py:32`. Nếu None → DCC trên 30 VN30 ticker (hardcoded fallback list)
+2. Trailing 60d mean dollar-volume → top 50 ticker với <5% NaN trong returns window
+3. DCC fit trên 50-ticker block
+4. EWMA λ=0.94 cho ~200 còn lại (correlation across block + within tail tickers)
+5. Assembly block-diagonal NxN matrix; expose `method` flag trong cache key cho user override
+
+### Cache pattern
+Reuse `shared/daily_cache.py:38-65` (`load_daily_cache`/`save_daily_cache` đã có pickle support).
+- Namespace: `"dcc_garch"`
+- Payload key: `{"dcc_method": "v1", "tickers_hash": sha1(sorted(tickers)), "top_n_dcc": 50, "lookback_years": 5}`
+- `data_date` argument = `df.index[-1].isoformat()` (KHÔNG dùng `date.today()` để tránh timezone bug — đã note trong CLAUDE.md issue #2)
+
+### Parity test
+Compare last-date matrix của `dynamic_correlation_matrix(method="dcc")` vs `LedoitWolf().fit(X).covariance_` (pattern từ `tools/dispersion/quant/metrics.py:45-87`).
+- Stable period (Q3 2024): Frobenius distance < 0.3 expected
+- Stress period (Q1 2020): distance > 0.5 expected (đó là raison d'être của DCC)
+
+### Files changed
+| File | Action |
+|---|---|
+| `shared/dcc_garch.py` | CREATE |
+| `requirements.txt` | ADD `statsmodels>=0.14,<0.16` (cũng dùng cho §13 Johansen) |
+
+---
+
+## Phase 1 — tools/pairs_trading/ Research dashboard (5-7 ngày)
+
+### Directory scaffold
+```
+tools/pairs_trading/
+  __init__.py
+  quant/
+    __init__.py
+    cointegration.py
+    signal.py
+    backtest.py
+    clusters.py
+  ui/
+    __init__.py
+    charts.py
+    sidebar.py
+  page.py
+  # NO report.py (KHÔNG plug AI CIO)
+pages/tools_page_B/
+  __init__.py
+  _1_Pairs_Trading.py
+```
+Style: function-based (như `tools/dispersion/`), KHÔNG dùng Engine class.
+
+### `quant/cointegration.py`
+```python
+def engle_granger(p1: pd.Series, p2: pd.Series) -> dict
+    # OLS log(p1) ~ const + β·log(p2); ADF residual (statsmodels.tsa.stattools.adfuller, regression="nc")
+    # {"beta", "alpha", "adf_stat", "p_value", "is_cointegrated": p<0.05, "resid"}
+
+def johansen_test(prices: pd.DataFrame, det_order=0, k_ar_diff=1) -> dict
+    # statsmodels.tsa.vector_ar.vecm.coint_johansen
+    # {"trace_stat", "trace_crit_95", "n_coint_vectors", "eig_vectors"}
+
+def ou_half_life(spread: pd.Series) -> float
+    # Δspread_t = θ(μ − spread_{t-1}) → half_life = ln(2)/θ
+    # Return NaN nếu θ<=0 hoặc hl outside [5, 30]
+
+def hurst(spread: pd.Series, max_lag=20) -> float
+    # R/S; H<0.5 confirm mean-reverting
+```
+**NaN handling**: `prices.dropna(thresh=0.95*len(prices))` restrict tới 2018-01-01+ (early sparse data sẽ break Johansen).
+
+### `quant/signal.py`
+```python
+def z_score_60d(spread: pd.Series, window=60) -> pd.Series
+def entry_exit_rules(z, entry=2.0, exit_band=0.0, stop=3.0, half_life=None) -> pd.DataFrame
+    # Columns: position (+1/0/-1), entry_date, exit_date, exit_reason
+    # Time-stop: force exit after 2*half_life bars
+def quarantine_flag(z_history: pd.Series, stop=3.0, days=60) -> pd.Timestamp | None
+```
+
+### `quant/backtest.py`
+```python
+def basket_pnl(prices, weights, signals, tc_bps=15.0) -> pd.DataFrame
+    # equity_curve, gross_ret, net_ret, turnover, hit_rate, sharpe
+def transaction_cost_model(turnover, bps_round_trip=15.0) -> pd.Series
+    # Default 15 bps = 0.15% broker fee + 0.1% sell tax (VN)
+```
+
+### `quant/clusters.py`
+```python
+PREDEFINED_CLUSTERS = {
+    "Vingroup":      ["VIC","VHM","VRE"],
+    "Big4_Bank":     ["VCB","CTG","BID"],                       # SOE only (3-way Johansen)
+    "Steel":         ["HPG","HSG","NKG"],
+    "Securities":    ["SSI","HCM","VND","VCI"],
+    "Private_Bank":  ["VPB","STB","ACB","SHB","MBB","HDB"],     # MBB+HDB là private/commercial bank (6-way)
+    "Oil_Gas":       ["GAS","PLX","BSR","PVS"],
+    "Utility":       ["REE","GEX","POW","HDG"],
+}
+```
+**User override**: MBB là Quân Đội Bank (private/commercial bank, không phải SOE) → move khỏi Big4_Bank. Add HDB (HD Bank) vào Private_Bank cluster. Big4 giờ là 3-way Johansen (VCB/CTG/BID), Private_Bank là 6-way với commercial bank profile thống nhất hơn.
+At import: assert `set(all_tickers) ⊆ load_close_prices().columns`, warn-on-miss (BSR/PVS có thể UPCOM thiếu).
+
+### `ui/sidebar.py`
+Return dict: `{cluster, custom_pair, z_entry, z_stop, hl_min, hl_max, lookback_years, tc_bps, refit_dcc}`. Pattern từ `tools/dispersion/ui/sidebar.py`.
+
+### `ui/charts.py` — 4 functions
+- `render_spread_chart(spread, z_score, entries)` — 2-row Plotly (spread + z ±2/±3 bands)
+- `render_cluster_heatmap(pvalue_matrix)` — NxN EG p-value heatmap
+- `render_backtest_equity(equity, drawdown)`
+- `render_residual_diagnostics(resid)` — ADF readout + ACF
+
+### `page.py` — 4 tabs
+```python
+tab1, tab2, tab3, tab4 = st.tabs(["Cluster Scan", "Pairwise Heatmap", "Custom Pair", "Backtest"])
+```
+- **Tab 1**: Johansen trên cluster đã chọn → `n_coint_vectors`, eigenvector weights, dominant spread + half-life
+- **Tab 2**: NxN EG p-value heatmap (red < 0.05 = cointegrated)
+- **Tab 3**: 2 `st.selectbox` từ `tickers.csv` → full pipeline (EG + OU + Hurst + z-score + 2-yr backtest)
+- **Tab 4**: Aggregated backtest tất cả cointegrated pair pass filter
+
+Cache: `@st.cache_data(ttl=86400)` wrap quant compute, key = `(cluster_name, params_hash, df.index[-1])`.
+
+### `pages/tools_page_B/_1_Pairs_Trading.py`
+3 lines: `from tools.pairs_trading.page import render; render()`. Pattern từ `pages/tools_page_A/_1_Fed_Liquidity.py`.
+
+### `pages/B_Micro_Analysis.py`
+Update từ placeholder (line 1-30) → navigation hub mirror `pages/A_Macro_Analysis.py` pattern (link list tới `tools_page_B/` entries).
+
+### Files changed Phase 1
+| File | Action |
+|---|---|
+| `tools/pairs_trading/{quant,ui,page.py + __init__}.py` (10 files) | CREATE |
+| `pages/tools_page_B/{__init__,_1_Pairs_Trading}.py` | CREATE |
+| `pages/B_Micro_Analysis.py` | EDIT (placeholder → hub) |
+
+---
+
+## Phase 2 — Live execution layer (5-7 ngày)
+
+KHÔNG tạo file mới — extend existing modules trong `tools/pairs_trading/`.
+
+### `quant/backtest.py` (additions)
+```python
+def generate_order_ticket(signal: dict, prices: pd.Series, capital: float,
+                          margin_rate: float = 0.5, lot_size: int = 100) -> dict
+    # JSON-serializable, quantities rounded to multiples of 100
+```
+
+### `quant/signal.py` (additions)
+```python
+# quarantine_flag() đã có ở P1, expose state vào page
+```
+
+### `page.py` — new "Live Signals" tab
+- Table: cointegrated pair × current z × action recommendation
+- "Generate Order Ticket" button → JSON download
+- Banner: "Last cointegration refit: <date>. <n> days ago. [Refit Now]" (re-test khi n≥60)
+- Lunch break warning: nếu `datetime.now(ICT).time() ∈ [11:30, 13:00]` → `st.warning("VN lunch break — orders queue until 13:00")`
+- FOL info banner: `st.info("Assuming foreign_room > 5% for all tickers. Verify manually before submitting.")`
+
+### Order ticket schema
+```json
+{
+  "timestamp": "2026-05-19T09:15:00",
+  "pair": ["VCB", "CTG"],
+  "legs": [
+    {"ticker": "VCB", "side": "SELL", "quantity": 300, "limit_price": 92500},
+    {"ticker": "CTG", "side": "BUY", "quantity": 1100, "limit_price": 34200}
+  ],
+  "hedge_ratio": 0.27,
+  "z_at_entry": 2.14,
+  "expected_half_life_days": 12,
+  "stop_z": 3.0,
+  "margin_required": 18500000,
+  "notes": "Lunch break 11:30-13:00 ICT — do not auto-execute"
+}
+```
+
+### Files changed Phase 2
+| File | Action |
+|---|---|
+| `tools/pairs_trading/quant/backtest.py` | EDIT (add `generate_order_ticket`) |
+| `tools/pairs_trading/page.py` | EDIT (add Live Signals tab + warning banners) |
+
+---
+
+## Critical files for implementation
+
+**CREATE:**
+- `/home/user/onl_quant-platform/shared/dcc_garch.py` (Phase 0)
+- `/home/user/onl_quant-platform/tools/pairs_trading/__init__.py`
+- `/home/user/onl_quant-platform/tools/pairs_trading/quant/{cointegration,signal,backtest,clusters,__init__}.py`
+- `/home/user/onl_quant-platform/tools/pairs_trading/ui/{charts,sidebar,__init__}.py`
+- `/home/user/onl_quant-platform/tools/pairs_trading/page.py`
+- `/home/user/onl_quant-platform/pages/tools_page_B/{__init__,_1_Pairs_Trading}.py`
+
+**EDIT:**
+- `/home/user/onl_quant-platform/requirements.txt` — add `statsmodels>=0.14,<0.16`
+- `/home/user/onl_quant-platform/pages/B_Micro_Analysis.py` — replace placeholder với hub
+
+**REFERENCE (reuse pattern, do NOT modify):**
+- `/home/user/onl_quant-platform/tools/fear_greed/quant/volatility.py:32-84` — GARCH 3-tier fallback pattern cho DCC univariate
+- `/home/user/onl_quant-platform/tools/dispersion/quant/metrics.py:45-87` — Ledoit-Wolf cho parity test
+- `/home/user/onl_quant-platform/shared/daily_cache.py:38-65` — `load_daily_cache`/`save_daily_cache` (pickle đã có sẵn)
+- `/home/user/onl_quant-platform/shared/data_loader.py:13-50` — `load_close_prices()`, `load_volumes()`
+- `/home/user/onl_quant-platform/tools/dispersion/page.py` — Streamlit cache + manual CSV pattern
+- `/home/user/onl_quant-platform/pages/tools_page_A/_1_Fed_Liquidity.py` — page entry pattern
+
+---
+
+## Verification (end-to-end test plan)
+
+### Phase 0 — DCC-GARCH
+1. **Smoke test**: `python3 -c "from shared.dcc_garch import fit_dcc; ..."` trên 50 ticker × 2500 obs → assert `converged == True`, `α+β < 0.99`, runtime < 10 min
+2. **Parity vs Ledoit-Wolf**: load Q3 2024 returns → `dynamic_correlation_matrix(method="dcc")` vs `LedoitWolf().fit().covariance_` → Frobenius distance < 0.3
+3. **Stress divergence**: same trên Q1 2020 → distance > 0.5 (chứng minh DCC catch regime change)
+4. **EWMA fallback**: simulate non-convergence (perfectly random) → assert downgrade EWMA + log warning
+5. **Cache roundtrip**: `save_daily_cache(...) → load_daily_cache(...)` returns identical dict
+
+### Phase 1 — Pairs Trading research
+1. **VIC/VHM Engle-Granger** smoke: expect `p_value < 0.05`, half-life 10-20 ngày (literature reference)
+2. **Big4_Bank Johansen**: expect `n_coint_vectors >= 1`
+3. **Custom pair UI**: chọn random pair non-cointegrated (e.g. VIC/HPG) → expect `is_cointegrated == False`
+4. **Backtest 2 năm VIC/VHM**: equity curve render, Sharpe > 0.5 sau cost 15bps (acceptable threshold cho retail)
+5. **UI render**: `streamlit run app.py` → navigate B_Micro_Analysis → 4 tabs hiện ra, không exception trong console
+
+### Phase 2 — Live execution
+1. **Order ticket JSON schema**: valid JSON, quantities là multiples of 100, hedge_ratio match β từ EG
+2. **Quarantine activation**: simulate |z|>3 history → `quarantine_flag()` returns Timestamp 60 ngày trong future
+3. **Lunch break banner**: mock `datetime.now()` = 12:00 ICT → `st.warning` xuất hiện
+4. **Refit banner**: simulate last_refit = 65 ngày trước → red banner + button
+
+### Final integration
+- `streamlit run app.py` không exception
+- `python3 -m py_compile` tất cả file mới
+- `git diff` → no unintended changes ở các tool khác
+- Commit message style theo recent log: short subject + body explain "why"
+
+---
+
+## Risks / open items
+
+1. **DCC runtime 50 ticker ~5-10 min**: nếu CPU yếu, drop xuống 30 (VN30). Button-gated refit.
+2. **statsmodels API**: pin `>=0.14,<0.16` vì `coint_johansen` signature stable trong range này
+3. **NaN density pre-2018**: restrict `prices.dropna(thresh=0.95*len)` after 2018-01-01 cho Johansen
+4. **Corp-action bias** (user accepted): add docstring warning ở `cointegration.py` — split/divvy unadjusted sẽ fake-break cointegration
+5. **UPCOM tickers** (BSR, PVS): graceful skip nếu missing từ `tickers.csv`
+6. **fit_egarch() refactor risk**: tránh modify fear_greed module — copy logic vào `dcc_garch.py` wrapper
+7. **Cache key timezone bug** (CLAUDE.md issue #2): dùng `df.index[-1]` thay vì `date.today()` ngay từ ngày 1 cho DCC + pairs cache
