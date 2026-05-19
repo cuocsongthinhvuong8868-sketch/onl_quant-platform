@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope**: 0.41, percentile 96.7th — mức cực cao, cho thấy mỗi 1% biến động của VIN composite kéo VN30F1M biến động rất mạnh.
+- **Correlation**: 0.72, percentile 96.7th — tương quan rất chặt, gần như khớp nhịp hoàn hảo giữa VIN và futures.
+- **Regime**: COUPLING (ΔCorr = +0.77, ΔSlope = +0.77) — cả hai delta đều vượt ngưỡng +0.15, xác nhận VIN đang dẫn dắt F1 một cách áp đảo.
+
+## 2. Microstructure Read
+Cả hai percentile đều trên 80th (96.7th), đây là trạng thái bất thường rất hiếm gặp. VIC (225.00), VHM (154.00), VRE (33.10) đang chi phối tuyệt đối VN30F1M (2,047.50). Khả năng can thiệp (manipulation) hoặc dòng tiền tổ chức đổ mạnh vào nhóm Vingroup là rất cao. Không có dấu hiệu của decoupling — thị trường vẫn đang “một chiều” theo VIN.
+
+## 3. Event Study Interpretation
+COUPLING ở mức cực đại cho thấy intraday các lệnh mua/bán VIC/VHM/VRE sẽ được futures phản ánh ngay lập tức. Overnight, nếu VIN composite đóng cửa mạnh, futures có gap sáng hôm sau theo cùng hướng. Vì regime không phải TÍN HIỆU GIẢ nên tín hiệu này có thể trade được.
+
+## 4. Verdict
+**Trade plan**: **Long F1** — với tín hiệu coupling mạnh và không có dấu hiệu đảo chiều, mua VN30F1M để bắt kịp đà của VIN.  
+**Leading indicator**: VIC (giá hiện tại 225.00) — nếu VIC giữ trên 218.25 (tương đương MA20 khoảng 3% dưới giá hiện tại), coupling sẽ duy trì.  
+**Stop-loss reference**: 2,027.00 điểm (dưới VN30F1M 1% từ 2,047.50).  
+**Take profit**: không đặt target cố định, thoát khi correlation hoặc slope percentile quay xuống dưới 80th.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "18/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 96.7,
+  "corr_percentile": 96.7,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```

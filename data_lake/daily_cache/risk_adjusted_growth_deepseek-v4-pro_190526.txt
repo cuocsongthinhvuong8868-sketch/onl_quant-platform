@@ -1,0 +1,38 @@
+## 1. Scenario Assessment
+
+Với K=1.0, CoE=14%, và stress test BVPS -5%/P/B -5%, đây là kịch bản **tiêu chuẩn – hơi nghiêng về thận trọng** cho ngân hàng Việt Nam. Mặt bằng ngành cho thấy sự phân hóa rõ rệt: Top 3 tạo Alpha dương thặng dư (từ +3.7% đến +4.4%), trong khi Bottom 3 đốt vốn sâu (từ -5.4% đến -12.6%). Điều này khẳng định **khả năng stock-picking quan trọng hơn sector play** – không phải mọi bank đều "đắt" hay "rẻ" đồng loạt.
+
+## 2. Top Alpha Decomposition
+
+- **HDB (Alpha 4.4%)**: Fortress thuần chủng. Với P/B 1.35 (hợp lý) kết hợp ROE bền vững + σ thấp, HDB hưởng lợi từ cả định giá và chất lượng lợi nhuận ổn định.
+- **SHB (Alpha 3.9%)**: Cheap Trap? Không, SHB thoát bẫy nhờ P/B 0.93 quá rẻ (dưới book value) kết hợp ROE đủ tốt để vượt CoE. Định giá là driver chính, nhưng chất lượng ROE vẫn khả quan.
+- **TPB (Alpha 3.7%)**: Fortress hoặc Growth Trap? Rủi ro σ(ROE) trung bình cao hơn HDB, nhưng P/B 0.93 rẻ giúp bù đắp. Nếu σ(ROE) kiểm soát tốt → Fortress; nếu biến động → Growth Trap. Cần phân tích thêm volatility cụ thể.
+
+**Phân loại: HDB → Fortress, SHB → Cheap-but-not-trap, TPB → Fortress tiềm năng.**
+
+## 3. Value Traps Warning
+
+- **EIB (Alpha -12.6%)**: Premium Burn điển hình. P/B 1.55 không đắt nhưng ROE quá thấp + σ(ROE) cao → Risk Penalty giết chết lợi nhuận thặng dư. **Tránh xa**.
+- **LPB (Alpha -8.0%)**: Premium Burn nặng. P/B 3.31 là cao nhất trong nhóm, trong khi ROE không tương xứng → đốt vốn nghiêm trọng. Bẫy tăng trưởng kỳ vọng.
+- **VPB (Alpha -5.4%)**: Cheap Trap? Không, P/B 1.21 chỉ rẻ vừa phải, nhưng ROE suy giảm + σ cao tạo Alpha âm sâu. Không phải bẫy giá mà là **risk hiện hữu từ chất lượng tài sản**.
+
+## 4. Portfolio Construction
+
+- **Core Holding (60-70% allocation bank)**: **HDB** (Fortress số 1) + **TPB** (nếu xác nhận low σ) → ưu tiên high-conviction.
+- **Tactical (20-30%)**: **SHB** (P/B rẻ + Alpha dương) – dành cho nhà đầu tư chấp nhận rủi ro định giá thấp.
+- **Cấm mua / underweight**: **EIB**, **LPB**, **VPB** – cả ba đều tạo Alpha âm sâu, không có lý do value nào bào chữa.
+
+**Lưu ý**: Không có trường hợp toàn ngành Alpha âm, do đó không cần "AVOID SECTOR".
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "TPB"],
+  "avoid_list": ["EIB", "LPB", "VPB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```

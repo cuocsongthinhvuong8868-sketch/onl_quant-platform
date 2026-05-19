@@ -1,0 +1,29 @@
+## 1. Observations
+- Risk Score 50.2 nằm giữa khoảng NEUTRAL (40-60), giảm nhẹ -0.1 so với phiên trước.
+- EGARCH Vol 0.8% ở mức thấp, giảm -0.8% so với phiên trước.
+- Rolling Skewness 0.04 gần trung tính, không nghiêng rõ về âm hay dương.
+- Downside Correlation 12.1% thấp (threshold <20%), Upside Correlation 63.5% cao (threshold >60%).
+
+## 2. Interpretation
+Dữ liệu chỉ ra pha thị trường phân hóa mạnh (stock-picking regime): vol thấp + skew trung tính cho thấy không có áp lực bán hệ thống, nhưng downside correlation thấp và upside correlation cao phản ánh dòng tiền tập trung vào nhóm cổ phiếu dẫn dắt, không lan tỏa đều.
+
+## 3. Cross-Check
+- **Score (50.2) vs EGARCH Vol (0.8% thấp)**: Consistent — điểm số NEUTRAL đi kèm với mức vol thấp, không có dấu hiệu panic hay euphoria.
+- **Skewness (0.04) vs Correlation (down 12.1% vs up 63.5%)**: Divergence nhẹ — skewness trung tính nhưng upside correlation cao bất thường, báo hiệu rủi ro đám đông đang dồn vào một số mã dẫn dắt, tiềm ẩn phân phối.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.4**
+- Tiếp tục giữ tỷ trọng thị trường thấp hơn baseline (0.6-0.7). Không có lý do để cut hoàn toàn vì vol thấp và skew trung tính, nhưng divergence giữa skewness và correlation là tín hiệu cảnh giác. Nên giảm nhẹ các vị thế có beta cao, ưu tiên stock-picking với yếu tố phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "18/05/2026",
+  "regime": "NEUTRAL",
+  "score": 50.2,
+  "confidence": "medium",
+  "beta_target": 0.4,
+  "key_signals": ["Vol thấp (0.8%) + Skew trung tính (0.04): không panic", "Divergence giữa Up-corr cao (63.5%) và Down-corr thấp (12.1%): rủi ro tập trung"]
+}
+```

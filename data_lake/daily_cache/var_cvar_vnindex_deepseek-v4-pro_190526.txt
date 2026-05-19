@@ -1,0 +1,41 @@
+## 1. Observations
+
+- **Historical VaR 95%:** -1.64%, sâu hơn parametric Gaussian (-1.43%) khoảng 21 bps — tín hiệu ban đầu về đuôi nặng hơn normal.
+- **EVT VaR 99%:** -3.66%, phản ánh tổn thất 1% cận biên gấp ~2.6 lần σ₃₀ hàng ngày.
+- **ξ (GPD shape):** +0.346 — vượt ngưỡng 0.30, xác nhận chế độ **fat tail**.
+- **Hill index:** +0.471, cùng dấu và lớn hơn ξ một chút, củng cố tín hiệu đuôi cực dày.
+
+## 2. Tail Thickness Diagnosis
+
+ξ = 0.346 thuộc bracket **fat tail** (>0.30). Hill = 0.471 cùng dấu dương, magnitude tương đương (chênh ~0.125), cho thấy tín hiệu robust, không nhạy threshold đáng kể. ES − VaR spread = -1.36%, lớn hơn σ₃₀ (1.12%) — xác nhận thực nghiệm: đuôi trái dày hơn đáng kể so với kỳ vọng Gaussian. Cả ba chỉ báo đồng thuận về chế độ fat tail.
+
+## 3. Gaussian Gap
+
+Gaussian VaR 99% = μ + z₀.₀₁·σ với giả định μ ≈ 0 (drift trung bình thấp), ta có: 0 − 2.33 × 1.12% = **-2.61%**.  
+EVT VaR 99% = **-3.66%**.  
+Gap = |(-3.66) − (-2.61)| = **1.05 pp** — vượt ngưỡng 1 pp. Gaussian model bị broken nghiêm trọng ở quantile 99%; sử dụng nó để phân bổ risk capital sẽ underestimate tổn thất cận biên ~40%.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30:
+- **Tránh** momentum strategies: đuôi dày dễ gây drawdown đột ngột 3-5% trong 1-2 phiên.
+- **Mua puts ITM**: bảo vệ trực tiếp vùng tổn thất -3% đến -5%, nơi EVT ES 99% (-6.11%) cho thấy kỳ vọng tổn thất vượt VaR một khoảng lớn.
+- **Short futures hedge** một phần danh mục (10-20% notional) để giảm tail risk tổng thể.
+- Giảm leverage 30-50% nếu đang dùng margin.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "18/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.05,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

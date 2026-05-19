@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu** hiện tại (12.75%) thấp hơn mu dài hạn (14.08%) một khoảng -1.33%, cho thấy cầu đang yếu hơn trung bình lịch sử.
+- **Lực cung** hiện tại (5.18%) thấp hơn rất nhiều so với mu dài hạn (13.62%) với delta -8.44%, áp lực bán đang cực kỳ thấp.
+- Cả hai chiều đều có Phi > +0.10: cầu (0.142 – momentum đà mua) và cung (0.258 – momentum đà bán), xác nhận cả hai đều đang trong regime momentum, không có dấu hiệu đảo chiều.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền**: Đây là **zombification** điển hình. Cả lực cầu (12.75%) và lực cung (5.18%) đều nén xuống dưới mu dài hạn tương ứng (14.08% và 13.62%). Thị trường đang trong trạng thái thanh khoản cạn, không có bên nào xung lực thực sự.
+- **Bên giữ momentum**: So sánh |Phi_cung| = 0.258 > |Phi_cầu| = 0.142, nghĩa là đà bán (dù đang yếu) có độ bền vững cao hơn đà mua. Rủi ro tiềm ẩn: cung có thể bùng nổ bất ngờ nếu có catalyst.
+
+## 3. Stress-Test Read
+- P95 Downside = 28.75%: Đây là biên độ panic kỳ vọng nếu thị trường gãy – tương đương mức sụt giảm rất sâu trong 19 phiên.
+- **Asymmetry**: P95 Downside (28.75%) > P95 Upside (25.56%), tail risk bên bán dày hơn bên mua. Xác suất xảy ra kịch bản cực đoan tiêu cực cao hơn kịch bản tích cực.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân**: 10%. Tuyệt đối không mua đuổi trong regime zombie này.
+- **Strategy: PHÒNG THỦ.** Không phải NO ACTIONABLE vì Phi > 0.10 cả hai chiều (có tín hiệu), nhưng đó là tín hiệu xấu: zombie + tail risk lệch âm.
+- **Khuyến nghị**: Giữ tiền mặt, chờ một trong hai tín hiệu: (1) cầu breakout khỏi mu lịch sử (accumulation) hoặc (2) cung giảm Phi xuống ngưỡng mean-reversion.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 28.75,
+  "p95_upside_pct": 25.56,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
