@@ -228,67 +228,32 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
         key="fexam_input_mode",
     )
 
-    with st.form("fexam_portfolio_form", clear_on_submit=False):
-        if input_mode == "📋 Paste text":
-            text = st.text_area(
-                "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%)",
-                value="",
-                height=220,
-                placeholder="VIC, 0.15\nVHM, 0.10\nFPT, 12%\nMWG, 0.10\n...",
-                key="fexam_text",
-            )
-            uploaded = None
-        else:
-            uploaded = st.file_uploader(
-                "CSV file (cột ticker + weight)",
-                type=["csv"],
-                key="fexam_csv",
-            )
-            text = ""
-
-        col_submit, col_clear = st.columns([3, 1])
-        with col_submit:
-            submitted = st.form_submit_button(
-                "📊 Phân tích Portfolio",
-                type="primary",
-                use_container_width=True,
-            )
-        with col_clear:
-            cleared = st.form_submit_button(
-                "🗑️ Xoá",
-                use_container_width=True,
-                help="Xoá portfolio đã submit, reset analysis",
-            )
-
-    if cleared:
-        st.session_state.pop("fexam_holdings", None)
-        st.rerun()
-
-    if submitted:
-        try:
-            if input_mode == "📋 Paste text":
-                if not text or not text.strip():
-                    st.warning("⚠️ Vui lòng nhập holdings trước khi submit.")
-                    return
-                parsed = parse_holdings_text(text)
-            else:
-                if uploaded is None:
-                    st.warning("⚠️ Vui lòng upload CSV file trước khi submit.")
-                    return
-                parsed = parse_holdings_csv(uploaded.read())
-
-            if not parsed:
-                st.warning("⚠️ Không parse được holding nào — kiểm tra lại format.")
+    holdings = {}
+    if input_mode == "📋 Paste text":
+        text = st.text_area(
+            "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%)",
+            value="",
+            height=200,
+            placeholder="VIC, 0.15\nVHM, 0.10\nFPT, 12%\n...",
+            key="fexam_text",
+        )
+        if text:
+            try:
+                holdings = parse_holdings_text(text)
+            except Exception as exc:
+                st.error(f"Lỗi parse text: {exc}")
                 return
-            st.session_state["fexam_holdings"] = parsed
-        except Exception as exc:
-            st.error(f"Lỗi parse input: {exc}")
-            return
-
-    holdings = st.session_state.get("fexam_holdings", {})
+    else:
+        uploaded = st.file_uploader("CSV file (cột ticker + weight)", type=["csv"], key="fexam_csv")
+        if uploaded is not None:
+            try:
+                holdings = parse_holdings_csv(uploaded.read())
+            except Exception as exc:
+                st.error(f"Lỗi parse CSV: {exc}")
+                return
 
     if not holdings:
-        st.info("👆 Nhập portfolio và bấm **📊 Phân tích Portfolio** để bắt đầu.")
+        st.info("👆 Nhập portfolio để bắt đầu phân tích.")
         return
 
     try:
