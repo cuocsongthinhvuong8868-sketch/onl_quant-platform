@@ -22,7 +22,7 @@ command/      — CLI scripts (update_data, update_fed_liquidity, update_global_
 promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere)
 ```
 
-## 12 Tools Active
+## 13 Tools Active
 
 | # | Branch | Tool | Module | Key tech | AI |
 |---|---|---|---|---|---|
@@ -38,6 +38,7 @@ promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | standalone |
 | 11 | A | **GFCM v2** | `global_financial_conditions` | **11 indicators** (Vol: VIX/MOVE/SKEW/OVX/VVIX · Credit: HY/CCC/IG/EM OAS · Macro: 2s10s/DXY), static PCA 6-core, **PC1 EMA(5) smoothed**, PC1_pct 1Y → STRESS/ELEVATED/CALM. Daily cron 22:00 UTC. Handbook `docs/GFCM-handbook.md` | standalone |
 | 12 | B | **Pairs Trading** | `pairs_trading` | EG + Johansen + OU half-life + Z-score 60d, 7 PREDEFINED clusters | none (orthogonal) |
+| 13 | B | **Factor Examination** | `factor_examination` | **10 cross-section factor** (Mom_12_1/Mom_6_1/ST_Reversal/LT_Reversal/LowVol/Beta_Low/IdioVol_Low/Liquidity/Size/Anti_Lottery) sector-neutral ICB, robust MAD z-score, equal-weight composite. 4 tabs: Universe Rank / Portfolio Exam / Ticker Profile / Forward IC backtest. **Portfolio examination, KHÔNG regime classifier** | standalone |
 
 **AI integration patterns**:
 - **exec-sum**: tool có `report.py snapshot()`, được aggregate vào `shared/ai_cio.py:run_executive_summary()` cho 1 master verdict
@@ -109,7 +110,7 @@ Allowlist: `python3 *`, `python *`, `pip *`, `grep *`, `find *`, `ls *`, `cat *`
 
 | # | Tool | Trạng thái | Blocker / Next step |
 |---|---|---|---|
-| **§12** | **Factor Risk Model** (Barra-VN lite, 6 style + ~10 industry, cross-sectional WLS) | 🚧 PROPOSED 2026-05-18 — chưa code | vnstock free Community = 8 quý BCTC (~2 năm) → backtest 5+ năm cần Sponsor paid. **P1 (3-factor: Mom/LowVol/Beta — không cần BCTC) ship được ngay** với free tier |
+| ✅ §12 | **Factor Examination** (reframe từ Factor Risk Model) | **SHIPPED 2026-05-20** | 10 factor price-based (Mom/Reversal/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery) sector-neutral ICB. Portfolio examination tool — không double count regime tool. P2 (BCTC factors) defer khi có Sponsor paid |
 | §3 | MES / SRISK (NYU V-Lab) | 📋 idea | — |
 | §4 | Diebold-Yilmaz Spillover (VAR + FEVD) | 📋 idea | — |
 | §6 | HRP thay logistic backtest curve | 📋 idea | — |

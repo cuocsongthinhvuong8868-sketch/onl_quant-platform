@@ -23,6 +23,17 @@ TOOLS = [
         "page_module": "tools.pairs_trading.page",
         "render_func": "render",
     },
+    {
+        "id": "factor_examination",
+        "name": "📐 Portfolio Factor Examination",
+        "desc": (
+            "Multi-factor cross-sectional scorer (10 factor price-based, sector-neutral ICB): "
+            "Mom/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery/Reversal. Portfolio examination — "
+            "xếp hạng tickers ổn hơn phần còn lại. KHÔNG phải regime classifier."
+        ),
+        "page_module": "tools.factor_examination.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
