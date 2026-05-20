@@ -154,6 +154,7 @@ def plot_level_macro(df: pd.DataFrame) -> go.Figure:
 def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
     """
     PC1 time series với regime color-band background (STRESS/ELEVATED/CALM).
+    Hai line: PC1 raw (mờ, gray) + PC1_smooth EMA(5) (đậm, dark) — regime tính trên smooth.
     """
     fig = go.Figure()
 
@@ -178,19 +179,33 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
             fillcolor=color, opacity=0.10, line_width=0, layer="below",
         )
 
+    # Raw PC1 — light gray, thin, mờ phía sau
     fig.add_trace(go.Scatter(
         x=df_valid.index, y=df_valid["PC1"],
         mode="lines",
-        name="PC1",
-        line=dict(color="#0f172a", width=2),
-        hovertemplate="<b>%{x|%d/%m/%Y}</b><br>PC1: %{y:+.2f}<br>%{customdata}<extra></extra>",
-        customdata=df_valid["Regime"],
+        name="PC1 raw",
+        line=dict(color="#94a3b8", width=1),
+        opacity=0.55,
+        hovertemplate="<b>%{x|%d/%m/%Y}</b><br>PC1 raw: %{y:+.2f}<extra></extra>",
+        showlegend=True,
     ))
+
+    # Smoothed PC1 — đậm, đường chính dùng regime
+    if "PC1_smooth" in df_valid.columns:
+        fig.add_trace(go.Scatter(
+            x=df_valid.index, y=df_valid["PC1_smooth"],
+            mode="lines",
+            name="PC1 EMA(5)",
+            line=dict(color="#0f172a", width=2.2),
+            hovertemplate="<b>%{x|%d/%m/%Y}</b><br>PC1 smooth: %{y:+.2f}<br>Regime: %{customdata}<extra></extra>",
+            customdata=df_valid["Regime"],
+            showlegend=True,
+        ))
 
     fig.add_hline(y=0, line_color="#94a3b8", line_dash="dash")
 
     fig.update_layout(
-        title="PC1 — Composite Financial Stress Index (6-series PCA · background = regime)",
+        title="PC1 — Composite Financial Stress Index (6-series PCA · EMA(5) smooth · background = regime)",
         template="plotly_white",
         hovermode="x unified",
         plot_bgcolor="white",
@@ -198,7 +213,8 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
         font=dict(color="black"),
         height=380,
         yaxis=dict(title="PC1 (sigma)"),
-        showlegend=False,
+        showlegend=True,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
     )
     fig.update_xaxes(gridcolor="LightGray")
     fig.update_yaxes(gridcolor="LightGray")
