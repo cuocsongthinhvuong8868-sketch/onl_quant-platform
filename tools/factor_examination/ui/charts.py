@@ -31,9 +31,9 @@ def render_factor_heatmap(z_table: pd.DataFrame, tickers: list[str], title: str)
     ))
     fig.update_layout(
         title=title,
-        height=max(350, 20 * len(tickers) + 100),
-        margin=dict(l=10, r=10, t=70, b=10),
-        xaxis=dict(side="top"),
+        height=max(380, 20 * len(tickers) + 140),
+        margin=dict(l=10, r=10, t=60, b=80),
+        xaxis=dict(side="bottom", tickangle=-30),
     )
     return fig
 
