@@ -60,11 +60,27 @@ def _load_gfcm() -> pd.DataFrame:
 
 
 def render():
-    st.title("🌐 Global Financial Conditions Monitor")
-    st.caption(
-        "11 indicators · Vol (VIX/MOVE/SKEW/OVX/VVIX) + Credit (HY/CCC/IG/EM OAS) + Macro (2s10s/DXY) · "
-        "Static PCA 6-core composite · Regime via PC1 percentile rank 1Y"
-    )
+    col_title, col_handbook = st.columns([5, 1])
+    with col_title:
+        st.title("🌐 Global Financial Conditions Monitor")
+        st.caption(
+            "11 indicators · Vol (VIX/MOVE/SKEW/OVX/VVIX) + Credit (HY/CCC/IG/EM OAS) + Macro (2s10s/DXY) · "
+            "Static PCA 6-core composite · Regime via PC1 percentile rank 1Y"
+        )
+    with col_handbook:
+        st.write("")  # spacer để align với title
+        handbook_path = ROOT_DIR / "docs" / "GFCM-handbook.md"
+        if handbook_path.exists():
+            with open(handbook_path, "r", encoding="utf-8") as _f:
+                _handbook_content = _f.read()
+            st.download_button(
+                label="📖 Tải Handbook",
+                data=_handbook_content,
+                file_name="GFCM-handbook.md",
+                mime="text/markdown",
+                use_container_width=True,
+                help="Tải handbook giải thích chi tiết tool GFCM (mục tiêu, 11 indicators, PCA, regime logic, cách đọc dashboard).",
+            )
 
     plot_start_date = render_sidebar()
 

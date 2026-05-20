@@ -2,7 +2,7 @@
 
 **Type:** Streamlit-based quantitative analysis platform cho thị trường VN.
 **Stack:** Python 3.10-3.11 (production), Streamlit, pandas, scipy, plotly, scikit-learn, arch (GARCH), hmmlearn, numba, polars, fpdf2, statsmodels, fredapi, yfinance, OpenAI SDK.
-**Last major update:** 2026-05-19 (GFCM + Pairs Trading shipped — xem `docs/skill.md` để biết full session log).
+**Last major update:** 2026-05-20 (GFCM v2: 11 indicators, EMA(5) smoothing, daily cron, handbook — xem `docs/skill.md` để biết full session log).
 
 ## Architecture (3-tier)
 
@@ -36,7 +36,7 @@ promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere
 | 8 | C | VaRES | `va_res` | Cornish-Fisher + Self-baseline Complacency | exec-sum |
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | exec-sum |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | standalone |
-| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY/CCC OAS, static PCA, PC1_pct 1Y → STRESS/ELEVATED/CALM (FRED ICE BofA truncate ~3Y) | standalone |
+| 11 | A | **GFCM v2** | `global_financial_conditions` | **11 indicators** (Vol: VIX/MOVE/SKEW/OVX/VVIX · Credit: HY/CCC/IG/EM OAS · Macro: 2s10s/DXY), static PCA 6-core, **PC1 EMA(5) smoothed**, PC1_pct 1Y → STRESS/ELEVATED/CALM. Daily cron 22:00 UTC. Handbook `docs/GFCM-handbook.md` | standalone |
 | 12 | B | **Pairs Trading** | `pairs_trading` | EG + Johansen + OU half-life + Z-score 60d, 7 PREDEFINED clusters | none (orthogonal) |
 
 **AI integration patterns**:
@@ -76,7 +76,9 @@ python command/update_data.py                          # daily price+volume ~5 m
 python command/update_data.py --backfill 2190          # 6 năm backfill
 python command/update_bank_fundamentals.py             # quarterly
 python command/update_fed_liquidity.py                 # weekly Wed (FRED WALCL/TGA/RRP)
-python command/update_global_financial_conditions.py   # daily (FRED VIX/HY/CCC + Yahoo MOVE)
+python command/update_global_financial_conditions.py   # daily (FRED VIX/HY/CCC/IG/EM/T10Y2Y + Yahoo MOVE/SKEW/OVX/VVIX/DXY)
+                                                       # → cron .github/workflows/gfcm_daily.yml chạy 22:00 UTC Mon-Fri
+python command/probe_fred_series.py                    # diagnostic: test FRED IDs còn live
 python command/update_sector_data.py                   # quarterly ICB metadata
 
 # AI CIO
@@ -113,7 +115,11 @@ Allowlist: `python3 *`, `python *`, `pip *`, `grep *`, `find *`, `ls *`, `cat *`
 | §6 | HRP thay logistic backtest curve | 📋 idea | — |
 | §7 | Deflated Sharpe / PSR | 📋 idea | — |
 | ✅ §13 | Pairs Trading Lab | **SHIPPED 2026-05-19** (PR #2 merged) | Live signals + 5 tabs + 7 clusters; DCC filter defer V2 |
-| ✅ §14 | GFCM (Global Financial Conditions) | **SHIPPED 2026-05-19** (PR #6 merged) | VIX + MOVE + HY/CCC OAS, static PCA, regime via PC1_pct 1Y (ICE BofA truncate constraint) |
+| ✅ §14 | GFCM v1 (4 indicators) | **SHIPPED 2026-05-19** (PR #6 merged) | VIX + MOVE + HY/CCC OAS, static PCA, regime via PC1_pct 1Y |
+| ✅ §15 | GFCM v2 (11 indicators) | **SHIPPED 2026-05-20** (PR #11) | + SKEW/OVX/VVIX (vol) + IG/EM OAS (credit) + 2s10s/DXY (macro). PCA 6-core (VIX/MOVE/SKEW/HY/CCC/IG). Driver mở rộng 4 → 6 flag + BROAD≥4/6 |
+| ✅ §16 | GFCM EMA(5) smoothing | **SHIPPED 2026-05-20** (PR #13 merged) | `PC1_smooth = PC1.ewm(span=5)` → giảm regime flicker; PC1_5d raw để detect acceleration |
+| ✅ §17 | GFCM cron daily | **SHIPPED 2026-05-20** (PR #12 merged) | `.github/workflows/gfcm_daily.yml` chạy 22:00 UTC Mon-Fri = 05:00 VN sáng Thứ 3-Thứ 7 |
+| ✅ §18 | GFCM handbook | **SHIPPED 2026-05-20** | `docs/GFCM-handbook.md` + nút "📖 Tải Handbook" trên page |
 
 **Quy tắc khi resume**: đọc `docs/skill.md` (~300 dòng, compressed history) để pick up đầy đủ context trước khi code.
 
