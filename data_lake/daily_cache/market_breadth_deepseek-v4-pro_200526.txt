@@ -1,0 +1,45 @@
+## 1. Observations
+
+- **MA20 (1 tháng):** 25.1% rổ → **Thấp** (gần ngưỡng oversold <20%)
+- **MA60 (1 quý):** 28.7% rổ → **Thấp** (dưới ngưỡng 30%, xác nhận điều chỉnh chưa kết thúc)
+- **MA125 (6 tháng):** 24.7% rổ → **Thấp** (sức mạnh chu kỳ kinh doanh nửa năm yếu)
+- **MA252 (1 năm):** 32.3% rổ → **Thấp** (secular trend suy yếu, dưới ngưỡng 40%)
+
+## 2. Structural Health
+
+Bốn đường MA hoàn toàn đồng thuận ở mức thấp (25% → 29% → 25% → 32%), không có divergence. Mô hình khớp với **Bear Confirmed** khi MA20 < 30% (25.1%) và MA252 < 40% (32.3%). Không có dấu hiệu bear trap (MA252 cũng dưới 50%). Thị trường đang trong trạng thái suy yếu cấu trúc toàn diện, không có tín hiệu phục hồi từ bất kỳ khung thời gian nào.
+
+## 3. Money Flow Leadership
+
+- **Top MA20 (ngắn hạn):** Áp đảo bởi **Energy** (BSR, PVT, POW) và **Banks** (STB, VCB, VPB, HDB) cùng **Real Estate** (VRE, VHM, NVL). Brokers chỉ xuất hiện VIX và HCM. Đây là mix defensive (Banks) + cyclical (Energy/Real Estate).
+  
+- **Top MA252 (dài hạn):** Overlap lớn với MA20: BSR, VRE, PVT, VHM, STB — cho thấy dòng tiền tập trung vào cùng nhóm Energy & Real Estate trong cả ngắn và dài hạn. Banks như MBB, HDB, VPB vẫn duy trì vị thế dài hạn.
+
+- **Smart money đang phân hóa**: ưu tiên **Energy & Real Estate** (aggressive, kỳ vọng hồi phục) song song với **Banks** (defensive). Thiếu vắng Steel/Brokers cho thấy tâm lý chưa chấp nhận rủi ro cao.
+
+## 4. Verdict
+
+**Strategy: Defensive cash-up.** 
+Breadth yếu đồng thuận trên cả 4 horizon + Bear Confirmed regime. Không có divergence giữa MA20 và MA252 → không cần "WAIT FOR CONFIRMATION". Dòng tiền dồn vào Energy/Real Estate chỉ là kỳ vọng cục bộ, thiếu nền tảng rộng.
+
+**Đòn bẩy đề xuất: 0% margin.** 
+MA252 chỉ 32.3% (dưới 70%), kết hợp breadth yếu đồng thuận → không đủ điều kiện sử dụng margin an toàn.
+
+**Chiến thuật**: Tập trung defensive cash (ưu tiên vốn ngắn hạn < 20% danh mục), chỉ giao dịch Mean-reversion T+ với các mã có volume mạnh nhưng đã giảm sâu (BSR, VRE). Tránh margin, tránh trend-following khi MA20 < 30%.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 25.1,
+  "ma60_pct": 28.7,
+  "ma125_pct": 24.7,
+  "ma252_pct": 32.3,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
