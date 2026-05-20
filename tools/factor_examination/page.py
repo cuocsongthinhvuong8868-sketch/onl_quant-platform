@@ -440,6 +440,73 @@ def _tab_ic_validation(
 
 
 # ── AI Section ──────────────────────────────────────────────
+def _build_ai_prompt(scored: dict, agg: dict, port_pct: float, params: dict) -> tuple[str, str]:
+    """Render system + user prompt từ template + data."""
+    prompt_path = ROOT_DIR / "promt" / "factor_examination_promt.md"
+    with open(prompt_path, "r", encoding="utf-8") as f:
+        tmpl = f.read()
+
+    today = datetime.now().strftime("%Y-%m-%d")
+    exp = agg["factor_exposure"]
+    holdings_tbl = agg["holdings_table"]
+    top5 = holdings_tbl.head(5)
+    bot5 = holdings_tbl.tail(5)
+
+    def _table_md(df, columns):
+        lines = ["| " + " | ".join(columns) + " |", "|" + "---|" * len(columns)]
+        for _, row in df.iterrows():
+            cells = []
+            for c in columns:
+                v = row.get(c, "—")
+                if isinstance(v, float):
+                    cells.append(f"{v:+.2f}" if abs(v) < 100 else f"{v:.0f}")
+                else:
+                    cells.append(str(v))
+            lines.append("| " + " | ".join(cells) + " |")
+        return "\n".join(lines)
+
+    top5_md = _table_md(top5, ["ticker", "weight", "composite_z", "rank_pct", "sector", "top_factor"])
+    bot5_md = _table_md(bot5, ["ticker", "weight", "composite_z", "rank_pct", "sector", "weak_factor"])
+    sec_breakdown = "\n".join(f"- {s}: {w:.1%}" for s, w in agg["sector_weights"].items())
+
+    if agg["concentration"].empty:
+        conc_md = "Không có factor nào vượt ±1σ — portfolio cân bằng."
+    else:
+        conc_md = "\n".join(f"- {f}: {v:+.2f}σ" for f, v in agg["concentration"].items())
+
+    full_prompt = (
+        tmpl
+        .replace("[Nhập ngày]", today)
+        .replace("[Universe_n]", str(len(scored["composite"].dropna())))
+        .replace("[Min_ADV]", f"{params['min_adv_billion']:.1f}")
+        .replace("[Sector_neutral_flag]", "True" if params["sector_neutral"] else "False")
+        .replace("[N_holdings]", str(len(holdings_tbl)))
+        .replace("[N_missing]", str(len(agg["missing"])))
+        .replace("[Missing_list]", ", ".join(agg["missing"]) if agg["missing"] else "—")
+        .replace("[Port_composite]", f"{agg['portfolio_composite']:+.2f}")
+        .replace("[Port_pct]", f"{port_pct:.0f}" if pd.notna(port_pct) else "—")
+        .replace("[Mom12_exp]", f"{exp.get('Mom_12_1', np.nan):+.2f}")
+        .replace("[Mom6_exp]", f"{exp.get('Mom_6_1', np.nan):+.2f}")
+        .replace("[STR_exp]", f"{exp.get('ST_Reversal', np.nan):+.2f}")
+        .replace("[LTR_exp]", f"{exp.get('LT_Reversal', np.nan):+.2f}")
+        .replace("[LV_exp]", f"{exp.get('LowVol', np.nan):+.2f}")
+        .replace("[BL_exp]", f"{exp.get('Beta_Low', np.nan):+.2f}")
+        .replace("[IV_exp]", f"{exp.get('IdioVol_Low', np.nan):+.2f}")
+        .replace("[LIQ_exp]", f"{exp.get('Liquidity', np.nan):+.2f}")
+        .replace("[SZ_exp]", f"{exp.get('Size', np.nan):+.2f}")
+        .replace("[AL_exp]", f"{exp.get('Anti_Lottery', np.nan):+.2f}")
+        .replace("[Sector_breakdown]", sec_breakdown)
+        .replace("[Top5_table]", top5_md)
+        .replace("[Bot5_table]", bot5_md)
+        .replace("[Concentration_list]", conc_md)
+    )
+
+    parts = full_prompt.split("# INPUT")
+    system_prompt = parts[0].strip()
+    user_prompt = "# INPUT" + parts[1].strip() if len(parts) > 1 else full_prompt
+    return system_prompt, user_prompt
+
+
 def _render_ai_section(scored: dict, agg: dict, port_pct: float, params: dict) -> None:
     st.markdown("### 🤖 AI Analysis (Portfolio Examination)")
 
@@ -447,99 +514,92 @@ def _render_ai_section(scored: dict, agg: dict, port_pct: float, params: dict) -
     ai_provider = params["ai_provider"]
     cfg = AI_PROVIDER_MAP[ai_provider]
 
-    if not api_key:
-        st.info("ℹ️ Nhập API Key ở sidebar để chạy AI analysis.")
-        return
+    today_str = datetime.now().strftime("%d%m%y")
+    ai_cache_file = (
+        DATA_LAKE / "daily_cache"
+        / f"factor_examination_{ai_provider}_{today_str}.txt"
+    )
 
-    btn_label = f"🐺 Phân tích Portfolio ({cfg['display']})"
-    if not st.button(btn_label, type="primary", key="fexam_run_ai"):
-        return
+    tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
 
-    with st.spinner("AI đang phân tích portfolio..."):
-        try:
-            prompt_path = ROOT_DIR / "promt" / "factor_examination_promt.md"
-            with open(prompt_path, "r", encoding="utf-8") as f:
-                tmpl = f.read()
-
-            # Build inputs
-            today = datetime.now().strftime("%Y-%m-%d")
-            exp = agg["factor_exposure"]
-            holdings_tbl = agg["holdings_table"]
-            top5 = holdings_tbl.head(5)
-            bot5 = holdings_tbl.tail(5)
-
-            def _table_md(df, columns):
-                lines = ["| " + " | ".join(columns) + " |", "|" + "---|" * len(columns)]
-                for _, row in df.iterrows():
-                    cells = []
-                    for c in columns:
-                        v = row.get(c, "—")
-                        if isinstance(v, float):
-                            cells.append(f"{v:+.2f}" if abs(v) < 100 else f"{v:.0f}")
-                        else:
-                            cells.append(str(v))
-                    lines.append("| " + " | ".join(cells) + " |")
-                return "\n".join(lines)
-
-            top5_md = _table_md(top5, ["ticker", "weight", "composite_z", "rank_pct", "sector", "top_factor"])
-            bot5_md = _table_md(bot5, ["ticker", "weight", "composite_z", "rank_pct", "sector", "weak_factor"])
-
-            sec_breakdown = "\n".join(
-                f"- {s}: {w:.1%}" for s, w in agg["sector_weights"].items()
-            )
-
-            if agg["concentration"].empty:
-                conc_md = "Không có factor nào vượt ±1σ — portfolio cân bằng."
-            else:
-                conc_md = "\n".join(
-                    f"- {f}: {v:+.2f}σ" for f, v in agg["concentration"].items()
-                )
-
-            full_prompt = (
-                tmpl
-                .replace("[Nhập ngày]", today)
-                .replace("[Universe_n]", str(len(scored["composite"].dropna())))
-                .replace("[Min_ADV]", f"{params['min_adv_billion']:.1f}")
-                .replace("[Sector_neutral_flag]", "True" if params["sector_neutral"] else "False")
-                .replace("[N_holdings]", str(len(holdings_tbl)))
-                .replace("[N_missing]", str(len(agg["missing"])))
-                .replace("[Missing_list]", ", ".join(agg["missing"]) if agg["missing"] else "—")
-                .replace("[Port_composite]", f"{agg['portfolio_composite']:+.2f}")
-                .replace("[Port_pct]", f"{port_pct:.0f}" if pd.notna(port_pct) else "—")
-                .replace("[Mom12_exp]", f"{exp.get('Mom_12_1', np.nan):+.2f}")
-                .replace("[Mom6_exp]", f"{exp.get('Mom_6_1', np.nan):+.2f}")
-                .replace("[STR_exp]", f"{exp.get('ST_Reversal', np.nan):+.2f}")
-                .replace("[LTR_exp]", f"{exp.get('LT_Reversal', np.nan):+.2f}")
-                .replace("[LV_exp]", f"{exp.get('LowVol', np.nan):+.2f}")
-                .replace("[BL_exp]", f"{exp.get('Beta_Low', np.nan):+.2f}")
-                .replace("[IV_exp]", f"{exp.get('IdioVol_Low', np.nan):+.2f}")
-                .replace("[LIQ_exp]", f"{exp.get('Liquidity', np.nan):+.2f}")
-                .replace("[SZ_exp]", f"{exp.get('Size', np.nan):+.2f}")
-                .replace("[AL_exp]", f"{exp.get('Anti_Lottery', np.nan):+.2f}")
-                .replace("[Sector_breakdown]", sec_breakdown)
-                .replace("[Top5_table]", top5_md)
-                .replace("[Bot5_table]", bot5_md)
-                .replace("[Concentration_list]", conc_md)
-            )
-
-            parts = full_prompt.split("# INPUT")
-            system_prompt = parts[0].strip()
-            user_prompt = "# INPUT" + parts[1].strip() if len(parts) > 1 else full_prompt
-
-            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
-            response = client.chat.completions.create(
-                model=cfg["api_model"],
-                messages=[
-                    {"role": "system", "content": system_prompt},
-                    {"role": "user", "content": user_prompt},
-                ],
-                temperature=cfg.get("temperature", AI_TEMPERATURE),
-            )
-            result_text = response.choices[0].message.content
+    with tab_current:
+        if ai_cache_file.exists():
+            st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
+            with open(ai_cache_file, "r", encoding="utf-8") as f:
+                cached_result = f.read()
             with st.container(border=True):
-                st.markdown(result_text)
-        except Exception as e:
-            st.error(f"Lỗi kết nối API: {e}")
+                st.markdown(cached_result)
+
+            from shared.github_sync import render_sync_button
+            render_sync_button(ai_cache_file, key_suffix="fexam")
+
+            st.info(
+                "ℹ️ **Lưu ý**: Cache file lưu phân tích **mới nhất** của ngày + provider này. "
+                "Nếu chạy portfolio khác (cùng ngày, cùng provider) sẽ overwrite — "
+                "đẩy lên GitHub trước khi rerun nếu muốn giữ lịch sử portfolio cũ.",
+                icon="ℹ️",
+            )
+
+            if st.button("🔄 Chạy lại phân tích AI (overwrite cache)",
+                         type="secondary", key="fexam_rerun_ai"):
+                os.remove(ai_cache_file)
+                st.rerun()
+        else:
+            if not api_key:
+                st.info("ℹ️ Nhập API Key ở sidebar để chạy AI analysis.")
+                return
+
+            btn_label = f"🐺 Phân tích Portfolio ({cfg['display']})"
+            if not st.button(btn_label, type="primary", key="fexam_run_ai"):
+                return
+
+            with st.spinner("AI đang phân tích portfolio..."):
+                try:
+                    system_prompt, user_prompt = _build_ai_prompt(scored, agg, port_pct, params)
+                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                    response = client.chat.completions.create(
+                        model=cfg["api_model"],
+                        messages=[
+                            {"role": "system", "content": system_prompt},
+                            {"role": "user", "content": user_prompt},
+                        ],
+                        temperature=cfg.get("temperature", AI_TEMPERATURE),
+                    )
+                    result_text = response.choices[0].message.content
+
+                    ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
+                    with open(ai_cache_file, "w", encoding="utf-8") as f:
+                        f.write(result_text)
+
+                    st.success("Hoàn thành phân tích! Refresh tab để hiện nút Sync GitHub.")
+                    with st.container(border=True):
+                        st.markdown(result_text)
+                    st.rerun()
+                except Exception as e:
+                    st.error(f"Lỗi kết nối API: {e}")
+
+    with tab_history:
+        from shared.history_selector import build_history_options
+        _all_caches = list(DATA_LAKE.glob("daily_cache/factor_examination_*.txt"))
+        _options = build_history_options(
+            _all_caches, "factor_examination", AI_PROVIDER_MAP
+        )
+        if not _options:
+            st.info("ℹ️ Chưa có dữ liệu phân tích lịch sử.")
+        else:
+            _selected_label = st.selectbox(
+                "📅 Chọn ngày và model:",
+                options=list(_options.keys()),
+                index=0,
+                key="fexam_history_selector",
+            )
+            _sel_path = _options[_selected_label]
+            with st.container(border=True):
+                try:
+                    with open(_sel_path, "r", encoding="utf-8") as f:
+                        st.markdown(f.read())
+                except Exception as e:
+                    st.error(f"Lỗi đọc file: {e}")
 
 
 # ── Main render ─────────────────────────────────────────────
