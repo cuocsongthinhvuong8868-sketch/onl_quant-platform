@@ -24,16 +24,21 @@ except ImportError:
 from fredapi import Fred
 
 CANDIDATES = [
-    # Confirmed working baselines
+    # Volatility / equity
     "VIXCLS",                # CBOE Volatility Index
-    "BAMLH0A0HYM2",          # Broad US HY OAS — chắc chắn còn live
-    # Sub-rating OAS (cái bị nghi pull 2021)
+    # US Credit — sub-rating OAS (đều cùng dòng ICE BofA, có thể truncate ~3Y)
+    "BAMLH0A0HYM2",          # Broad US HY OAS
     "BAMLH0A1HYBB",          # BB US HY OAS
     "BAMLH0A2HYB",           # B US HY OAS
     "BAMLH0A3HYC",           # CCC & Lower US HY OAS
+    "BAMLC0A0CM",            # IG US Corp OAS (NEW)
+    # EM Credit
+    "BAMLEMCBPIOAS",         # EM Corporate Plus OAS (NEW)
+    # Macro / yield curve
+    "T10Y2Y",                # 10Y − 2Y UST yield (NEW)
     # Effective Yield variants (đôi khi còn khi OAS bị pull)
-    "BAMLH0A0HYM2EY",        # Broad HY Effective Yield
-    "BAMLH0A3HYCEY",         # CCC Effective Yield
+    "BAMLH0A0HYM2EY",
+    "BAMLH0A3HYCEY",
 ]
 
 
