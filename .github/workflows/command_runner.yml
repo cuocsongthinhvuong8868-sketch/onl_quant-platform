@@ -1,0 +1,138 @@
+name: 🔧 Command Runner (on-demand)
+
+# Pattern: Claude trigger qua push commit vào .github/triggers/run-command.json
+# Hoặc user trigger thủ công qua GH UI (workflow_dispatch).
+
+on:
+  push:
+    paths:
+      - '.github/triggers/run-command.json'
+  workflow_dispatch:
+    inputs:
+      script_path:
+        description: 'Đường dẫn script (vd: command/update_data.py)'
+        required: true
+        type: string
+      args:
+        description: 'Extra CLI args (optional)'
+        required: false
+        default: ''
+        type: string
+      commit_outputs:
+        description: 'Commit data_lake/ + reports/ về repo sau khi chạy?'
+        required: false
+        default: true
+        type: boolean
+
+permissions:
+  contents: write
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    timeout-minutes: 60
+
+    env:
+      VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
+      FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      MOONSHOT_API_KEY: ${{ secrets.MOONSHOT_API_KEY }}
+      TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
+      TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
+
+    steps:
+      - name: 📥 Checkout
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: 📋 Resolve script + args (dispatch hay trigger file)
+        id: cfg
+        run: |
+          set -e
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            SCRIPT="${{ github.event.inputs.script_path }}"
+            ARGS="${{ github.event.inputs.args }}"
+            COMMIT="${{ github.event.inputs.commit_outputs }}"
+            SOURCE="workflow_dispatch"
+          else
+            TRIGGER_FILE=".github/triggers/run-command.json"
+            if [ ! -f "$TRIGGER_FILE" ]; then
+              echo "❌ Trigger file không tồn tại: $TRIGGER_FILE"
+              exit 1
+            fi
+            SCRIPT=$(jq -r '.script_path' "$TRIGGER_FILE")
+            ARGS=$(jq -r '.args // ""' "$TRIGGER_FILE")
+            COMMIT=$(jq -r '.commit_outputs // true' "$TRIGGER_FILE")
+            SOURCE="trigger_file"
+          fi
+          echo "Source: $SOURCE"
+          echo "Script: $SCRIPT"
+          echo "Args:   $ARGS"
+          echo "Commit: $COMMIT"
+          echo "script=$SCRIPT" >> $GITHUB_OUTPUT
+          echo "args=$ARGS" >> $GITHUB_OUTPUT
+          echo "commit=$COMMIT" >> $GITHUB_OUTPUT
+
+      - name: 🛡️ Validate script path (chỉ cho phép command/*.py)
+        run: |
+          SCRIPT="${{ steps.cfg.outputs.script }}"
+          case "$SCRIPT" in
+            command/*.py)
+              echo "✅ Allowed: $SCRIPT" ;;
+            *)
+              echo "❌ Reject: chỉ cho phép command/*.py (nhận: $SCRIPT)"
+              exit 1 ;;
+          esac
+          if [ ! -f "$SCRIPT" ]; then
+            echo "❌ File không tồn tại: $SCRIPT"
+            exit 1
+          fi
+
+      - name: 🐍 Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+          cache: 'pip'
+
+      - name: 📦 Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          pip install -r requirements.txt
+
+      - name: 🚀 Chạy script
+        run: |
+          echo "▶️  python ${{ steps.cfg.outputs.script }} ${{ steps.cfg.outputs.args }}"
+          python ${{ steps.cfg.outputs.script }} ${{ steps.cfg.outputs.args }}
+
+      - name: 📤 Commit outputs nếu thay đổi
+        if: steps.cfg.outputs.commit == 'true'
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          # Stage các thư mục output có thể đã thay đổi (silent nếu folder không tồn tại)
+          for dir in data_lake reports docs; do
+            [ -d "$dir" ] && git add "$dir" || true
+          done
+
+          if git diff --cached --quiet; then
+            echo "ℹ️  Không có thay đổi output để commit."
+            exit 0
+          fi
+
+          SCRIPT_NAME=$(basename "${{ steps.cfg.outputs.script }}" .py)
+          git commit -m "Command runner: $SCRIPT_NAME $(date -u +'%Y-%m-%d %H:%M UTC')"
+
+          # Retry push với rebase handle race với workflow khác
+          for attempt in 1 2 3 4 5; do
+            if git push origin HEAD:${{ github.ref_name }}; then
+              echo "✅ Push thành công (attempt $attempt)"
+              exit 0
+            fi
+            echo "⚠️  Push reject (attempt $attempt/5) — pull rebase..."
+            git pull --rebase --autostash origin ${{ github.ref_name }} || git rebase --abort || true
+            sleep $((attempt * 3))
+          done
+          echo "❌ Push fail sau 5 lần"
+          exit 1
