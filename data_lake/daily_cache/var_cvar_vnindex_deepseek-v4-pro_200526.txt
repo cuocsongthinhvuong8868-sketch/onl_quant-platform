@@ -1,0 +1,47 @@
+## 1. Observations
+
+- Historical VaR 95% ở -1.64% sâu hơn Gaussian Parametric VaR 95% (-1.41%), phản ánh sự lệch pha giữa phân phối thực nghiệm và giả định chuẩn.
+- EVT VaR 99% đạt -3.66%, cao hơn đáng kể so với VaR Gauss 95% thông thường.
+- ξ (GPD shape) = +0.346, vượt ngưỡng 0.30, cho thấy đuôi phân phối cực kỳ dày.
+- Hill index = +0.471, cùng dấu dương với ξ và có độ lớn tương đương, củng cố tín hiệu đuôi dày.
+
+## 2. Tail Thickness Diagnosis
+
+- ξ = +0.346 nằm trong bracket **FAT TAIL** (> 0.30). Điều này cho thấy các sự kiện giảm giá cực đoan xảy ra thường xuyên hơn nhiều so với phân phối chuẩn dự đoán.
+- Hill index (+0.471) và ξ (+0.346) cùng dấu dương và chênh lệch không quá lớn (≈0.13), đây là tín hiệu cross-check **robust**. Mức ngưỡng threshold trong POT/GPD được chọn hợp lý, tail shape không quá nhạy với threshold.
+- Spread ES - VaR = -1.36% (tính theo giá trị tuyệt đối) lớn hơn σ₃₀ (1.12%). Điều này xác nhận rằng phân phối có đuôi dày một cách rõ rệt: phần kỳ vọng thua lỗ ngoài VaR (CVaR) vượt xa VaR 95%, một đặc điểm điển hình của fat tail.
+
+## 3. Gaussian Gap
+
+- **Tính Gaussian VaR 99%**: Giả sử mean μ = 0 (trong ngắn hạn), σ₃₀ = 1.12% → Gaussian VaR 99% ≈ μ - 2.33·σ = -2.61%.
+- **So sánh với EVT VaR 99%**: -3.66%.
+- **Gap**: |-3.66%| - |-2.61%| = **1.05 percentage point (pp)**.
+
+Gap này vượt ngưỡng 1 pp → **Gaussian model bị broken**. Sử dụng mô hình phân phối chuẩn để tính risk capital allocation sẽ dẫn đến thiếu hụt vốn đáng kể trong các kịch bản cực đoan.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30 và Gaussian gap > 1 pp, trạng thái rủi ro là **FAT TAIL**. Các khuyến nghị nghiệp vụ:
+
+- **Avoid momentum strategies**: Các chiến lược xoay vòng theo xu hướng sẽ chịu tổn thất lớn khi đột ngột đảo chiều với biên độ extreme.
+- **Mua put options ITM (in-the-money)**: Khi đuôi dày, put OTM có thể bị định giá thấp; put ITM mang lại bảo vệ chắc chắn hơn với delta cao hơn.
+- **Short futures hedge**: Sử dụng hợp đồng tương lai để phòng hộ trực tiếp danh mục, giảm thiểu rủi ro giảm giá mạnh.
+
+Không khuyến nghị giảm leverage đơn thuần vì ξ > 0.30 hàm ý rủi ro là bất đối xứng và cần hedging chủ động.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "20/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.05,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```
