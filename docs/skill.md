@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-**Updated:** 2026-05-19 (GFCM ship)
+**Updated:** 2026-05-20 (GFCM v2 — 11 indicators, EMA(5), cron daily, handbook)
 **Purpose:** nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
@@ -223,7 +223,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - **DCC-GARCH utility** (`shared/dcc_garch.py`, 513 LOC) — placed shared, chưa wire vào pairs filter (defer cho V2)
 - Real-data smoke: VIC/VHM EG p=0.004, β=1.65; Big4_Bank Johansen pass; Vingroup 3-way 1 cointegration relation (VRE pair fails 95% → in-page warning)
 
-**Global Financial Conditions Monitor (GFCM)** — shipped PR #6 (merged):
+**Global Financial Conditions Monitor (GFCM) v1** — shipped PR #6 (merged):
 - `tools/global_financial_conditions/` 9 files, ~1399 LOC
 - 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYC`) + derived Credit Quality Spread (CCC − HY)
 - **Static PCA** trên rolling z-score 252d (1Y — FRED ICE BofA chỉ cấp ~3Y history): PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
@@ -235,6 +235,46 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - History từ 2003 (limit của MOVE Yahoo coverage)
 - Smoke test: PCA loadings + explained variance valid, regime distribution reasonable
 - Requirements: thêm `yfinance>=0.2.40`
+
+### 2026-05-20 — GFCM v2 (expand + smooth + auto + handbook)
+
+**Iter 1: Expand 4 → 11 indicators** (PR #11 merged):
+- + **Volatility (3 mới)**: SKEW (Yahoo `^SKEW`), OVX (`^OVX`), VVIX (`^VVIX`)
+- + **Credit (2 mới)**: IG OAS (FRED `BAMLC0A0CM`), EM OAS (`BAMLEMCBPIOAS`)
+- + **Macro overlay (2 mới)**: 2s10s curve (`T10Y2Y`), DXY (Yahoo `DX-Y.NYB`)
+- **PCA core 6 series**: VIX/MOVE/SKEW/HY/CCC/IG (3 vol + 3 credit, đối xứng)
+- **5 auxiliary** (OVX/VVIX/EM/2s10s/DXY): chỉ z + percentile, KHÔNG vào PCA để giữ PC1 sạch
+- Driver mở rộng 4 → 6 flag + thêm SKEW_DRIVEN / IG_CREDIT_DRIVEN; BROAD_STRESS ngưỡng 3 → 4 (vì có 6 series)
+- Tab 1 layout: 3 sub-grids (Vol 5-panel · Credit 4-panel · Macro 2-panel)
+- Tab 2 percentile grid: 4 → 6 panel cho PCA core
+- AI prompt rewrite: 8 sections, 36 placeholders, JSON tail thêm `vol_breadth` + `macro_overlay`
+- Cache CSV format: 19 cols → 41 cols (sau khi thêm PC1_smooth ở iter 2)
+
+**Iter 2: EMA(5) smooth PC1** (PR #13 merged):
+- Vấn đề: PC1 raw có high-freq noise → regime bands flickering trong vài ngày → false signal
+- Fix: `PC1_smooth = PC1.ewm(span=5, adjust=False).mean()` — half-life ~3 ngày, lag ~3 ngày
+- **PC1_pct + Regime dùng PC1_smooth**; PC1_5d change vẫn dùng raw để detect acceleration
+- Chart `plot_pc1_with_regime`: 2 line — raw mờ gray + EMA(5) đậm dark
+- AI prompt: `[PC1]` = smoothed, thêm `[PC1_raw]` để compare early warning
+- Pattern theo Goldman GSFCI / Chicago Fed NFCI
+
+**Iter 3: Daily cron auto-update** (PR #12 merged):
+- `.github/workflows/gfcm_daily.yml` — chạy 22:00 UTC Mon-Fri = 05:00 VN sáng Thứ 3-Thứ 7
+- Sau US market close + FRED OAS publish T+1
+- Reuse secret `FRED_API_KEY` (đã có từ fed_liquidity)
+- Retry-push 5 lần với `pull --rebase --autostash` handle race
+
+**Iter 4: Handbook + nút download UI**:
+- `docs/GFCM-handbook.md` (~300 dòng) — giải thích mục tiêu, 11 indicators, pipeline, PCA logic, **cách đọc Regime label** (percentile vs raw value), driver flag, VN spillover, limitations
+- Page header thêm column `📖 Tải Handbook` với `st.download_button` trả markdown file
+- Case study trong handbook: giải thích tại sao PC1=0.89σ có thể là ELEVATED nhưng PC1=0.82σ là STRESS (rolling 252d distribution shift, không phải bug)
+
+**FRED IDs đã probe (tất cả OK):** `VIXCLS`, `BAMLH0A0HYM2`, `BAMLH0A3HYC`, `BAMLC0A0CM`, `BAMLEMCBPIOAS`, `T10Y2Y` — diagnostic script `command/probe_fred_series.py` đã update.
+
+**Lesson học**:
+- **Hard threshold trên giá trị raw** (như y=0 trên chart PC1) gây hiểu nhầm thành regime threshold — chỉ là PCA long-term mean reference. Regime thực sự dựa trên rolling percentile rank.
+- **Cùng raw value có thể có regime khác nhau** vì rolling window 252d composition thay đổi. Feature, không bug.
+- **User instruction**: khi đưa option → CHỜ user chọn, không tự code phương án nào.
 
 ---
 
@@ -274,7 +314,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - `tools/risk_adjusted_growth/quant/data_prep.py` → `PRICE_THOUSANDS_TO_VND = 1000`
 - `tools/var_cvar_vnindex/quant/evt.py` → `DEFAULT_REFIT_EVERY = 21`
 - `tools/fear_greed/quant/volatility.py` → `EWMA_LAMBDA = 0.94` (fallback)
-- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 252` (1Y — FRED ICE BofA truncate), `PCT_STRESS = 0.80`, `START_DATE = "2003-01-01"`
+- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 252` (1Y — FRED ICE BofA truncate), `PC1_EMA_SPAN = 5` (smooth), `PCT_STRESS = 0.80`, `PCT_ELEVATED = 0.50`, `START_DATE = "2003-01-01"`, `PCA_COLUMNS` (6 core) vs `AUX_COLUMNS` (5)
 
 **Universe & data:**
 - ~250 tickers `tickers.csv`; VN30 hardcoded `VN30_TICKERS` (30 mã) trong `tools/esr_monitor/quant/metrics.py:36`
