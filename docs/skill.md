@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-**Updated:** 2026-05-20 (GFCM v2 — 11 indicators, EMA(5), cron daily, handbook)
+**Updated:** 2026-05-20 (GFCM v2 + Factor Examination ship)
 **Purpose:** nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
@@ -276,6 +276,43 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - **Cùng raw value có thể có regime khác nhau** vì rolling window 252d composition thay đổi. Feature, không bug.
 - **User instruction**: khi đưa option → CHỜ user chọn, không tự code phương án nào.
 
+### 2026-05-20 (later) — Factor Examination (§12 reframe)
+
+**Bối cảnh**: §12 Factor Risk Model spec từ 2026-05-18 chưa code. User thảo luận:
+- Phase 2 với 2Y BCTC: cycle bias / survivorship / thin panel / overfit → risk model "decoration", không production
+- P1 mở rộng 10 factor: hầu hết double-count với ESR (S_VOL/S_LIQ/S_COR), Market Breadth (Mom), Dispersion (IdioVol), GFCM (DXY/Oil/Fed beta) → không thêm insight
+- **Reframe**: dùng 10 factor liệt kê làm **portfolio examination** (bottom-up, per-ticker score) thay vì regime classifier (top-down). Đây là angle orthogonal — không tool nào trên platform đang trả lời "trong universe, ticker nào đứng tốt hơn phần còn lại trên multi-factor basis"
+
+**User design choices**:
+- Q1: **Equal-weight 10 factor** (đơn giản, không overfit IC)
+- Q2: **Sector-neutral ICB** (trừ sector mean trước composite, sector <5 mã gộp 'Other')
+- Q3: **Static weight** mọi regime — human-in-the-loop quyết định regime từ GFCM/ESR
+- Q4: **Toàn `tickers.csv` ~250 mã**, filter min ADV 1 tỷ VND
+
+**Implementation** (SHIPPED 2026-05-20, push thẳng main):
+- `tools/factor_examination/` 9 files, ~1300 LOC
+- `quant/factors.py`: 10 factor sign-oriented "higher=better"
+  - Mom_12_1 (skip 21d), Mom_6_1, ST_Reversal (-21d ret), LT_Reversal (5Y→3Y)
+  - LowVol (-σ 252d), Beta_Low (-β vs VNI 60d), IdioVol_Low (-resid σ)
+  - Liquidity (-Amihud 60d), Size (log median ADV20d)
+  - Anti_Lottery (composite -MAX21d -0.01·skew60d)
+- `quant/scoring.py`: **MAD-based robust z-score** (1.4826 scaling) + winsorize ±3σ, sector neutralize, equal-weight composite, percentile rank. Mã <5 factor valid → NaN.
+- `quant/portfolio.py`: parse text/CSV holdings, normalize weights, aggregate factor exposure + concentration check (|exp|>1σ) + sector breakdown + Euclidean peer search.
+- `quant/ic_validation.py`: rolling 21d snapshot IC backtest (horizons 21/63/126d) + decile spread cumulative.
+- `ui/charts.py`: heatmap top/bot 20, radar 10-chiều portfolio vs benchmark, holdings bar (color theo rank quartile), IC time series, decile cum.
+- `ui/sidebar.py`: sector-neutral toggle, min ADV filter, IC lookback, AI provider/key.
+- `page.py` 4 tabs: Universe Ranking / Portfolio Examination / Ticker Profile / Forward IC Validation.
+- AI integration: **standalone** (theo pattern fed_liquidity/GFCM), prompt `promt/factor_examination_promt.md` ~28 placeholders, KHÔNG inject `shared/ai_cio.py`.
+- Wired vào `pages/B_Micro_Analysis.py` (cùng nhánh Pairs Trading).
+
+**Bugs đã fix smoke test**:
+- VN price quote = **ngàn VND** không phải VND → universe filter `dollar_vol / 1e6` (không 1e9) để ra tỷ VND. Trước fix: universe = 1 mã. Sau: ~80-120 mã pass 1B filter.
+
+**Lessons học**:
+- Reframe "Factor Risk Model" → "Portfolio Factor Examination" để tránh double count với ESR/Dispersion/Market Breadth. Risk model truyền thống cần BCTC dài; portfolio examination chỉ cần price/volume.
+- Tool **không** có alpha tự thân — chỉ có alpha khi human đã đánh giá regime từ tool khác.
+- MAD-based z-score robust hơn mean/std cho factor có fat tail (vd Mom outlier, MAX lottery).
+
 ---
 
 ## 10. Known Issues & Roadmap
@@ -293,7 +330,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 **Roadmap còn lại:**
 | # | Item | Status | Blocker |
 |---|---|---|---|
-| §12 | **Factor Risk Model** (Barra-VN lite, 6 style + ~10 industry, cross-sectional WLS) | 🚧 PROPOSED, chưa code | vnstock free Community = 8 quý BCTC → backtest 5+ năm cần Sponsor paid. P1 (3-factor không cần BCTC) ship được ngay |
+| ✅ §12 | **Factor Examination** (10 factor price-based, portfolio examination) | **SHIPPED 2026-05-20** | P2 BCTC factors (Value/Quality/Growth) defer khi có vnstock Sponsor paid |
 | #3 | MES / SRISK (NYU V-Lab) | 📋 idea | — |
 | #4 | Diebold-Yilmaz Spillover (VAR + FEVD) | 📋 idea | — |
 | #6 | HRP (Hierarchical Risk Parity) thay logistic backtest curve | 📋 idea | — |
