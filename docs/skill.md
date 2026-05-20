@@ -56,7 +56,7 @@ command/
   generate_report.py / generate_visual_report.py
 .github/workflows/
   update_pipeline.yml        — daily price update
-  ai_cio_daily.yml           — AI CIO cron 14:45 VN
+  ai_cio_daily.yml           — AI CIO cron 15:45 VN
   fed_liquidity_weekly.yml
 ```
 
@@ -118,7 +118,7 @@ command/
 3. `_read_recent_summaries(provider, n_past=2)` đọc T-1, T-2
 4. Aggregate vào master prompt → 1 lần OpenAI call cuối
 5. Auto upsert `Ai_cio_report.csv`: same-day overwrite (manual ghi đè auto), T+1 append
-6. Cron `run_ai_cio_auto.py` 14:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
+6. Cron `run_ai_cio_auto.py` 15:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
 
 **Multi-provider** (`config.AI_PROVIDER_MAP`): `kimi-2.6` (Moonshot, temp 1.0) / `deepseek-v4-pro` (temp 0.5)
 
