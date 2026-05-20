@@ -529,6 +529,25 @@ def render() -> None:
         "Có alpha **chỉ khi human đánh giá regime từ tool khác** (GFCM/ESR) trước."
     )
 
+    # ── Handbook download ──
+    _hb = Path(__file__).resolve().parents[2] / "docs" / "factor_examination_handbook.md"
+    if _hb.exists():
+        _c1, _c2 = st.columns([3, 1])
+        with _c1:
+            st.caption(
+                "📖 **Handbook** — hướng dẫn 10 factor, pipeline, đọc 4 tab, workflow "
+                "human-in-the-loop, concentration alert reading, FAQ."
+            )
+        with _c2:
+            st.download_button(
+                label="⬇️ Tải Handbook (.md)",
+                data=_hb.read_bytes(),
+                file_name="factor_examination_handbook.md",
+                mime="text/markdown",
+                use_container_width=True,
+                key="fexam_handbook_dl",
+            )
+
     # Load data
     try:
         prices = load_close_prices()
