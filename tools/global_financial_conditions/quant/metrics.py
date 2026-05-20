@@ -73,6 +73,10 @@ PCT_STRESS = 0.80               # PC1_pct ≥ 0.80 → STRESS
 PCT_ELEVATED = 0.50             # 0.50 ≤ PC1_pct < 0.80 → ELEVATED, dưới = CALM
 PCT_DRIVER_HIGH = 0.80          # Driver flag threshold per-series
 
+# PC1 smoothing — EMA span=5 (half-life ~3 ngày, lag ~3 ngày).
+# Áp dụng để giảm regime flicker; raw PC1 vẫn được lưu để tính 5d change.
+PC1_EMA_SPAN = 5
+
 # Raw columns (theo thứ tự fetch + merge)
 RAW_COLUMNS = [
     # Volatility
@@ -114,7 +118,7 @@ OUTPUT_COLUMNS = (
     + _z_cols
     + _pct_cols
     + ["CQS_pct"]
-    + ["PC1", "PC2", "PC1_pct"]
+    + ["PC1", "PC1_smooth", "PC2", "PC1_pct"]
     + ["Regime", "Driver"]
 )
 
@@ -410,7 +414,10 @@ def process_gfcm_logic(
     df["PC1"] = df_pc["PC1"]
     df["PC2"] = df_pc["PC2"]
 
-    df["PC1_pct"] = _rolling_pct_rank(df["PC1"], window)
+    # EMA smoothing PC1 để giảm regime flicker (span=5, half-life ~3 ngày).
+    # Regime + PC1_pct dùng PC1_smooth; PC1 raw giữ nguyên cho 5d change.
+    df["PC1_smooth"] = df["PC1"].ewm(span=PC1_EMA_SPAN, adjust=False).mean()
+    df["PC1_pct"] = _rolling_pct_rank(df["PC1_smooth"], window)
 
     df["Regime"] = [_classify_regime(p) for p in df["PC1_pct"]]
     df["Driver"] = [
@@ -438,7 +445,7 @@ def summarize_latest(df_processed: pd.DataFrame) -> dict:
         "date": "",
         "credit_quality_spread": 0.0,
         "cqs_pct": 0.0,
-        "pc1": 0.0, "pc2": 0.0, "pc1_pct": 0.0,
+        "pc1": 0.0, "pc1_smooth": 0.0, "pc2": 0.0, "pc1_pct": 0.0,
         "regime": "N/A", "driver": "N/A",
         "pc1_5d_change": 0.0,
     })
@@ -464,6 +471,7 @@ def summarize_latest(df_processed: pd.DataFrame) -> dict:
         "credit_quality_spread": _f(latest["Credit_Quality_Spread"]),
         "cqs_pct": _f(latest["CQS_pct"]),
         "pc1": _f(latest["PC1"]),
+        "pc1_smooth": _f(latest["PC1_smooth"]),
         "pc2": _f(latest["PC2"]),
         "pc1_pct": _f(latest["PC1_pct"]),
         "regime": str(latest["Regime"]),

@@ -32,9 +32,14 @@ Bạn là Senior Global Macro & Cross-Asset Strategist. Chuyên phân tích Glob
 - Credit Quality Spread (CCC − HY): [CQS]% (percentile 1Y: [CQS_pct]%)
 
 ## PCA Composite (6-core: VIX/MOVE/SKEW/HY/CCC/IG)
-- PC1 (stress factor): [PC1]σ — percentile rank 1Y: [PC1_pct]%
-- PC1 5-day change: [PC1_5d]σ
+- PC1 (stress factor, EMA(5) smoothed): [PC1]σ — percentile rank 1Y: [PC1_pct]%
+- PC1 raw hôm nay (chưa smooth): [PC1_raw]σ
+- PC1 5-day change (raw): [PC1_5d]σ
 - PC2 (divergence factor): [PC2]σ
+
+> PC1 dùng để classify regime đã được smooth EMA(5) (~3-day half-life)
+> để giảm regime flicker. PC1_raw + PC1_5d giúp đánh giá momentum gần
+> nhất khi cần (raw cao đột biến + smooth chưa kịp adapt = early warning).
 
 ## Regime & Driver
 - Regime: [Regime]   (STRESS / ELEVATED / CALM)
