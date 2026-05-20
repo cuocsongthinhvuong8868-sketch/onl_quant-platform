@@ -1,0 +1,54 @@
+## 1. Cross-Asset Snapshot
+
+Thứ tự các chỉ báo theo percentile rank 1Y (giảm dần):
+
+1. **CCC OAS (Deep Junk)**: 87% — mức 9.42% đang tiến sát ngưỡng deep distress (>10%), thể hiện lo ngại mạnh về rủi ro vỡ nợ ở phân khúc junk thấp nhất.
+2. **MOVE (Bond Vol)**: 81% — 85.3 bps là mức cao trong 1Y, phản ánh bất ổn về lãi suất (Fed path, Treasury supply). Chưa chạm ngưỡng rates stress (>120 bps) nhưng đang ở vùng cảnh báo.
+3. **VIX (Equity Vol)**: 61% — 17.82 là mức trung bình-thấp, không có stress equity. VIX dưới 20 cho thấy thị trường chứng khoán Mỹ chưa hoảng loạn.
+4. **HY OAS (Broad HY)**: 28% — 2.83% rất thấp so với 1Y, dưới ngưỡng credit warning (>5%). Trái phiếu high yield nói chung vẫn được định giá tích cực.
+
+**Nhận xét chính**: Có sự phân hóa rõ rệt: CCC OAS và MOVE ở vùng percentile cao, trong khi VIX và HY OAS ở mức thấp. Điều này cho thấy stress không đồng đều giữa các asset class.
+
+## 2. PCA Composite Interpretation
+
+- **PC1 percentile 86%** (≥80%) xác nhận regime **STRESS**. Stress factor đang ở mức cao trong 1Y, phản ánh financial conditions đang thắt chặt đáng kể.
+- **Driver: CCC_CREDIT_DRIVEN** — nguồn gốc stress tập trung ở deep junk credit spread. Không phải equity vol (VIX thấp) hay rates vol (MOVE cao nhưng không phải yếu tố dẫn dắt chính).
+- **PC2 = +0.26σ** — divergence dương nhẹ. Với loadings mặc định (equity vol và rates vol thường có dấu ngược với credit spreads trong PC2), PC2 dương cho thấy stress đang **credit-driven** hơn là vol-driven. Cụ thể: credit spreads (CCC OAS) đang tăng mạnh trong khi VIX và MOVE không tăng tương ứng — đây là tín hiệu divergence đáng chú ý.
+
+## 3. Credit Cycle Read
+
+- **CQS (CCC − HY) = 6.59% — percentile 95%**: Mức chênh lệch này rất cao trong 1Y, cho thấy credit quality đang **deteriorate** mạnh. CQS widening nhanh hơn HY widening — tức là sự suy yếu tập trung ở phân khúc junk thấp nhất (CCC), không phải toàn bộ thị trường high yield.
+- **So sánh CCC_pct (87%) >> HY_pct (28%)**: Đây là cấu trúc **late-cycle** điển hình. Nhà đầu tư đang định giá rủi ro vỡ nợ cao ở deep junk nhưng vẫn chấp nhận rủi ro ở high yield trung bình. Điều này phản ánh kỳ vọng suy thoái có chọn lọc, không phải systemic.
+
+## 4. Momentum
+
+- **PC1 5-day change: +0.58σ** — stress đang **accelerate** rõ rệt trong 5 ngày qua. Mức tăng này đáng kể (gần 0.6σ), cho thấy áp lực thắt chặt FCI đang gia tăng nhanh.
+- **Divergence đáng chú ý**: VIX (61%) và HY OAS (28%) hoàn toàn bình lặng, trong khi CCC OAS (87%) và MOVE (81%) tăng mạnh. Đây là **early warning** cho thấy thị trường đang chuyển từ "risk-on" sang "risk-off" có chọn lọc: equity chưa phản ứng, nhưng credit thứ cấp và bond vol đã báo hiệu.
+
+## 5. Spillover to VN-Index (4-8 tuần)
+
+Với regime **STRESS** + driver **CCC_CREDIT_DRIVEN**:
+
+- **Bias: NEGATIVE** cho VN-Index trong 4-8 tuần tới.
+- **Cơ chế lan tỏa**:
+    1. CCC OAS cao → carry trade unwind → EM stress contagion → foreign outflow khỏi VN.
+    2. MOVE cao → DXY có thể tăng → EM FX pressure (VND) → chi phí hedging tăng → dòng vốn FDI/portfolio chậm lại.
+    3. CQS widening (late-cycle signal) → defensive positioning bias ở EM → giảm allocation vào VN equity.
+- **Lưu ý về lag**: Tác động thường trễ 4-8 tuần. Nếu stress hiện tại (19/5) tiếp tục, VN-Index có thể chịu áp lực từ giữa tháng 6 đến tháng 7.
+- **Tuy nhiên**, VIX thấp và HY OAS thấp cho thấy chưa có systemic risk-off toàn cầu. VN có thể chỉ bị ảnh hưởng nhẹ hơn so với các EM khác nếu stress không leo thang.
+
+## 6. KẾT LUẬN
+
+**Regime STRESS, driver CCC_CREDIT_DRIVEN** — stress tập trung ở deep junk credit, không phải equity hay broad credit. FCI đang thắt chặt nhanh (PC1 +0.58σ/5d) với cấu trúc late-cycle điển hình. Tác động tiêu cực có độ trễ đến VN-Index trong 4-8 tuần, nhưng mức độ phụ thuộc vào việc stress có lan sang HY OAS và VIX hay không. Outlook 2-4 tuần: **thận trọng, bias giảm cho EM equity**.
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 86,
+  "regime": "STRESS",
+  "driver": "CCC_CREDIT_DRIVEN",
+  "credit_cycle_signal": "deteriorating",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
