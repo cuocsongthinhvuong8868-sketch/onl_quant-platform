@@ -1,53 +1,54 @@
 ## 1. Cross-Asset Snapshot
 
-**Volatility Group:**
-- **OVX (82%) — HIGH**: 72.89 bps, vượt ngưỡng 50 bps, báo hiệu shock năng lượng/địa chính trị (Trung Đông, OPEC).
-- **MOVE (81%) — HIGH**: 85.3 bps, dù chưa tới 120+ nhưng đã ở vùng rates uncertainty rõ rệt (Fed path, Treasury supply).
-- **VIX (61%) — ELEVATED**: 17.82, dưới ngưỡng 30, nhưng percentile 61% cho thấy equity vol đang cao hơn trung bình 1 năm.
-- **VVIX (29%) — LOW**: 94.6, không cảnh báo derivatives stress sắp tới.
-- **SKEW (1%) — LOW**: 135.5, dưới 145, tail risk premium gần như không tồn tại.
+**Volatility:**
+- **OVX (82%) – HIGH:** 72.89 bps, vượt ngưỡng oil shock (>50). Tín hiệu căng thẳng năng lượng/địa chính trị rõ rệt.
+- **MOVE (81%) – HIGH:** 85.3 bps, ở mức rates uncertainty cao nhưng chưa tới ngưỡng stress cực đoan (>120).
+- **VIX (61%) – ELEVATED:** 17.82, dưới ngưỡng risk-off (>20) nhưng vẫn trên trung bình lịch sử.
+- **VVIX (29%) – LOW:** 94.6, derivatives market chưa căng thẳng.
+- **SKEW (1%) – LOW:** 135.5, tail risk premium gần như bằng 0. Thị trường không hedging left-tail risk.
 
-**Credit Group:**
-- **CCC OAS (87%) — HIGH**: 9.42%, gần ngưỡng 10% deep distress, default-cycle fear tập trung ở deep junk.
-- **HY OAS (28%) — LOW**: 2.83%, dưới 5% warning, broad credit risk premium thấp.
-- **IG OAS (10%) — LOW**: 0.75%, dưới 1.5%, flight-to-quality chưa xảy ra.
-- **EM OAS (4%) — LOW**: 1.44%, EM credit stress gần như không có.
+**Credit:**
+- **CCC OAS (87%) – HIGH:** 9.42%, gần ngưỡng deep distress (>10%). Default-cycle fear tập trung ở deep junk.
+- **HY OAS (28%) – LOW:** 2.83%, dưới ngưỡng warning (>5%). Broad credit risk premium vẫn thấp.
+- **IG OAS (10%) – LOW:** 0.75%, dưới ngưỡng quality flight (>1.5%). Flight-to-quality chưa xảy ra.
+- **EM OAS (4%) – LOW:** 1.44%, EM credit stress không đáng kể.
 
 **Macro Overlay:**
-- **DXY (81%) — HIGH**: 99.30, dù chưa tới 110 extreme, nhưng percentile cao báo hiệu USD strength đáng kể.
-- **2s10s (43%) — LOW**: +0.54%, đường cong dương nhưng chưa steep đáng kể.
+- **DXY (81%) – HIGH:** 99.30, USD strength rõ rệt nhưng chưa tới mức extreme (>110).
+- **2s10s (43%) – LOW:** +0.54%, đường cong dương trở lại, không còn inverted.
 
 ## 2. PCA Composite Interpretation
 
-PC1 percentile 83% (EMA(5) smoothed: +0.82σ) xác nhận **regime STRESS**. PC1 raw hôm nay +1.21σ (cao hơn smooth) và PC1 5-day change +0.48σ cho thấy stress đang tăng tốc, smooth chưa kịp phản ánh đầy đủ — đây là early warning. Driver được xác định là **CCC_CREDIT_DRIVEN** (CCC OAS percentile 87% cao nhất trong 6 core). Breadth của stress hẹp: chỉ 2/6 core (MOVE 81%, CCC 87%) ở ngưỡng HIGH, không đủ để gọi là BROAD_STRESS (cần ≥4/6). PC2 +0.65σ, với loadings cần đối chiếu, nhưng dựa trên cấu trúc dữ liệu, PC2 dương thường phản ánh credit-driven stress trội hơn vol-driven — phù hợp với driver CCC.
+PC1 percentile 83% (smooth) xác nhận **regime STRESS**. PC1 raw (+1.21σ) cao hơn smooth (+0.82σ) cho thấy stress đang tăng nhanh, smooth chưa kịp phản ánh hết. Driver được xác định là **CCC_CREDIT_DRIVEN** – stress tập trung ở deep junk, không lan rộng ra toàn bộ credit spectrum hay equity vol. PC2 (+0.65σ) dương, kết hợp với loadings (credit > vol), khẳng định stress là credit-driven, không phải vol-driven. Breadth của stress hẹp: chỉ 2/6 core (MOVE, CCC) ở HIGH, không đạt ngưỡng BROAD_STRESS (≥4/6).
 
 ## 3. Credit Cycle Read
 
-Credit Quality Spread (CCC − HY) ở percentile 95% (6.59%) — **credit quality đang deteriorate mạnh**, tập trung ở junk tier. So sánh: CCC_pct 87% >> HY_pct 28% >> IG_pct 10%. Cấu trúc này cho thấy stress còn **confined ở deep junk**, chưa lan sang HY hay IG. Đây là tín hiệu late-cycle điển hình: nhà đầu tư đang định giá rủi ro default cho các công ty yếu nhất, nhưng chưa hoảng loạn lan rộng. EM OAS percentile 4% (1.44%) là tín hiệu tích cực cho dòng vốn EM: chi phí bảo hiểm rủi ro tín dụng EM đang rất thấp, không có áp lực contagion từ US credit stress.
+**Credit Quality Spread (CCC − HY) ở percentile 95% – tín hiệu credit quality đang deteriorate mạnh.** CQS 6.59% phản ánh khoảng cách giữa deep junk và high yield đang nới rộng, điển hình của cuối chu kỳ tín dụng. So sánh chi tiết: CCC_pct 87% cao, HY_pct 28% thấp, IG_pct 10% rất thấp. Cấu trúc này cho thấy stress **confined ở junk tier** – chưa lan sang IG. Đây là tín hiệu cảnh báo sớm, chưa phải systemic. EM OAS ở percentile 4% cho thấy dòng vốn EM chưa bị ảnh hưởng, nhưng nếu CCC tiếp tục xấu đi, carry trade unwind sẽ lan sang EM trong 4-8 tuần tới.
 
 ## 4. Volatility Breadth
 
-**Divergent regime rõ rệt**: MOVE (81%) cao trong khi VIX (61%) chỉ elevated và SKEW (1%) cực thấp. Không có đồng thuận broad vol. Sự diverge này rất đáng chú ý: rates vol cao (MOVE) nhưng equity vol bình thường và tail risk premium gần như bằng 0 — thị trường đang lo ngại về lãi suất (Fed, Treasury supply) hơn là equity downside. OVX (82%) báo hiệu oil shock độc lập, không được capture trong PC1 (vì PC1 chỉ gồm 6 core không có OVX). VVIX (29%) thấp cho thấy derivatives market chưa kỳ vọng VIX spike — stress hiện tại chưa đủ để kích hoạt vol-of-vol.
+**Volatility breadth divergent rõ rệt:** MOVE (81%) và OVX (82%) cao, trong khi VIX (61%) ở mức trung bình và SKEW (1%) gần như bằng 0. Không có đồng thuận giữa 3 chỉ báo vol cốt lõi. Diverge này rất quan trọng: VIX thấp + SKEW thấp cho thấy equity market đang complacent, không phản ánh stress từ rates và oil. OVX cao (72.89) là cảnh báo oil shock độc lập, chưa được capture trong PC1 (vì PC1 chỉ gồm 6 core). VVIX thấp (29%) cho thấy derivatives market chưa kỳ vọng VIX spike, nhưng nếu OVX tiếp tục tăng, VVIX có thể tăng theo với độ trễ.
 
 ## 5. Macro Overlay
 
-2s10s +0.54% (percentile 43%) — đường cong đã thoát khỏi vùng inverted (âm) và đang ở giai đoạn **re-steepening nhẹ**. Điều này phù hợp với kịch bản recession đang xảy ra hoặc sắp tới (steepen từ âm). Tuy nhiên, mức steep chưa mạnh, cho thấy thị trường chưa fully price recession. DXY 99.30 (percentile 81%) — USD đang mạnh tương đối trong 1 năm, gây áp lực lên EM FX, bao gồm VND. DXY ở mức này chưa phải extreme (110+), nhưng với percentile cao, nó đang tạo headwind cho dòng vốn EM.
+2s10s +0.54% (percentile 43%) – đường cong đang trong giai đoạn **re-steepening từ âm sang dương**. Đây là tín hiệu kinh điển của recession đang xảy ra hoặc sắp xảy ra (theo lý thuyết đường cong lợi suất). DXY 99.30 (percentile 81%) – USD strength rõ rệt, đang tạo áp lực lên EM FX. Với VND, DXY ở mức này chưa gây khủng hoảng nhưng đủ để gây áp lực lên tỷ giá và dòng vốn FDI. Kết hợp 2s10s re-steepening + DXY cao = bộ đôi bất lợi cho EM equity.
 
 ## 6. Momentum
 
-PC1 5-day change +0.48σ — **stress đang accelerate**. PC1 raw (+1.21σ) cao hơn smooth (+0.82σ) càng xác nhận momentum tăng. Chỉ báo diverge đáng chú ý: VIX (61%) và SKEW (1%) thấp trong khi MOVE (81%) và CCC (87%) cao — thị trường đang bỏ qua equity vol nhưng lo ngại rates vol và credit deterioration ở junk tier. Đây là early warning cho thấy stress có thể lan rộng nếu MOVE tiếp tục tăng hoặc CCC vượt ngưỡng 10%.
+PC1 5-day change +0.48σ – stress đang **accelerate** rõ rệt. PC1 raw (+1.21σ) cao hơn smooth (+0.82σ) là early warning: stress đang tăng nhanh hơn mức smooth có thể phản ánh. Diverge đáng chú ý: VIX (61%) và SKEW (1%) thấp trong khi CCC OAS (87%) và OVX (82%) cao. Đây là cấu trúc diverge nguy hiểm: equity vol chưa phản ứng nhưng credit và oil vol đã cảnh báo. Nếu diverge này kéo dài, VIX sẽ catch-up với độ trễ 1-2 tuần.
 
 ## 7. Spillover to VN-Index (4-8 tuần)
 
-Với regime STRESS + driver CCC_CREDIT_DRIVEN:
-- **Tác động tiêu cực có độ trễ**: CCC OAS cao (default-cycle fear) → carry trade unwind → EM stress contagion → ảnh hưởng đến VN-Index sau 4-8 tuần.
-- DXY 81% percentile gây áp lực lên VND, có thể dẫn đến FDI outflow và foreign selling.
-- Tuy nhiên, tác động được giảm nhẹ bởi: (1) stress confined ở junk tier, chưa lan IG hay EM; (2) EM OAS thấp (4%) cho thấy dòng vốn EM chưa bị ảnh hưởng trực tiếp; (3) VIX chỉ elevated, không cao — equity risk-off toàn cầu chưa mạnh.
-- Bias tổng thể: **negative nhẹ, có độ trễ**. VN-Index có thể chịu áp lực từ foreign selling và risk premium điều chỉnh, nhưng mức độ nghiêm trọng thấp hơn so với kịch bản BROAD_STRESS.
+Với regime STRESS + driver CCC_CREDIT_DRIVEN + macro overlay (2s10s re-steepening + DXY cao), **bias cho VN equity là negative.** Cơ chế lan tỏa cụ thể:
+- CCC OAS cao → carry trade unwind → EM stress contagion, ảnh hưởng đến dòng vốn ngoại vào VN.
+- DXY cao → VND pressure, FDI outflow, headwind cho VN-Index.
+- 2s10s re-steepening → recession risk US → demand shock cho EM exports (VN là nền kinh tế xuất khẩu lớn).
+- OVX cao → oil shock → CPI VN tăng → SBV thắt chặt tiền tệ (VN là net importer dầu).
+- Tuy nhiên, VIX thấp và SKEW thấp cho thấy equity market chưa risk-off, có thể làm chậm tác động lên VN. Dự kiến tác động rõ rệt trong 4-8 tuần tới.
 
 ## 8. KẾT LUẬN
 
-Regime STRESS nhưng hẹp, dẫn dắt bởi CCC_CREDIT_DRIVEN với credit deterioration tập trung ở deep junk. Stress đang accelerate (PC1 5-day +0.48σ) với early warning từ MOVE và CCC. Outlook 2-4 tuần: stress có thể duy trì hoặc tăng nhẹ nếu MOVE và CCC tiếp tục leo thang, nhưng chưa đủ để kích hoạt systemic risk-off. VN-Index đối mặt headwind nhẹ có độ trễ.
+**Regime STRESS, driver CCC_CREDIT_DRIVEN, credit cycle deteriorating, vol breadth divergent, macro overlay bất lợi cho EM. Outlook 2-4 tuần: stress tiếp tục gia tăng, VN-Index đối mặt headwind từ credit stress và USD strength, nhưng tác động có độ trễ 4-8 tuần.**
 
 ```json
 {
@@ -57,8 +58,8 @@ Regime STRESS nhưng hẹp, dẫn dắt bởi CCC_CREDIT_DRIVEN với credit det
   "driver": "CCC_CREDIT_DRIVEN",
   "credit_cycle_signal": "deteriorating",
   "vol_breadth": "divergent",
-  "macro_overlay": "usd_strength",
+  "macro_overlay": "recession_risk",
   "spillover_vnindex": "negative",
-  "confidence": "medium"
+  "confidence": "high"
 }
 ```
