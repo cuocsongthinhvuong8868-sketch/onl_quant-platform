@@ -156,10 +156,32 @@ def _tab_universe(scored: dict, sector_map: pd.Series) -> None:
 
     st.markdown(f"**Universe size**: {len(valid)} mã (sau filter).")
 
+    strong = valid[valid >= 1.0]
+    weak = valid[valid <= -1.0]
+    neutral = valid[(valid > -0.5) & (valid < 0.5)]
+
     col_a, col_b, col_c = st.columns(3)
-    col_a.metric("Top 1 composite z", f"{valid.iloc[0]:+.2f}", help=f"{valid.index[0]}")
-    col_b.metric("Median composite z", f"{valid.median():+.2f}")
-    col_c.metric("Bottom 1 composite z", f"{valid.iloc[-1]:+.2f}", help=f"{valid.index[-1]}")
+    col_a.metric(
+        "🟢 Strong (≥ +1σ)",
+        f"{len(strong)} mã",
+        help=(
+            f"Top: {strong.index[0]} ({strong.iloc[0]:+.2f}σ)"
+            if not strong.empty else "Không có mã ≥ +1σ"
+        ),
+    )
+    col_b.metric(
+        "⚪ Neutral (|z| < 0.5σ)",
+        f"{len(neutral)} mã",
+        help=f"{len(neutral) / len(valid) * 100:.0f}% universe",
+    )
+    col_c.metric(
+        "🔴 Weak (≤ -1σ)",
+        f"{len(weak)} mã",
+        help=(
+            f"Bottom: {weak.index[-1]} ({weak.iloc[-1]:+.2f}σ)"
+            if not weak.empty else "Không có mã ≤ -1σ"
+        ),
+    )
 
     st.markdown("---")
     col_top, col_bot = st.columns(2)
