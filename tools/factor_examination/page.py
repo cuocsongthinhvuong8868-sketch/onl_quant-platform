@@ -230,10 +230,12 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
 
     holdings = {}
     if input_mode == "📋 Paste text":
-        default_example = "VIC, 0.15\nVHM, 0.10\nFPT, 0.12\nMWG, 0.10\nHPG, 0.08\nVCB, 0.10\nMBB, 0.10\nTCB, 0.10\nGAS, 0.08\nPNJ, 0.07"
         text = st.text_area(
             "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%)",
-            value=default_example, height=200, key="fexam_text",
+            value="",
+            height=200,
+            placeholder="VIC, 0.15\nVHM, 0.10\nFPT, 12%\n...",
+            key="fexam_text",
         )
         if text:
             try:
