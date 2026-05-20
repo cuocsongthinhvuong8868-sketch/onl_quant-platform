@@ -304,6 +304,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - `page.py` 4 tabs: Universe Ranking / Portfolio Examination / Ticker Profile / Forward IC Validation.
 - AI integration: **standalone** (theo pattern fed_liquidity/GFCM), prompt `promt/factor_examination_promt.md` ~28 placeholders, KHÔNG inject `shared/ai_cio.py`.
 - Wired vào `pages/B_Micro_Analysis.py` (cùng nhánh Pairs Trading).
+- **Handbook** `docs/factor_examination_handbook.md` (~360 dòng, 11 sections: mục tiêu / 10 factor / pipeline / 4 tab / workflow human-in-the-loop / concentration alerts / limitations / so sánh với 12 tool khác / operational / FAQ / version log) + nút "⬇️ Tải Handbook (.md)" trên page header (mirror pattern Pairs Trading/GFCM).
 
 **Bugs đã fix smoke test**:
 - VN price quote = **ngàn VND** không phải VND → universe filter `dollar_vol / 1e6` (không 1e9) để ra tỷ VND. Trước fix: universe = 1 mã. Sau: ~80-120 mã pass 1B filter.
