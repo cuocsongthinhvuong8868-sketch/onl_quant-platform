@@ -20,6 +20,9 @@ Trả lời 1 câu hỏi cụ thể: **"Trong universe VN ~250 mã, ticker nào 
 >
 > Factor Examination chỉ có alpha **sau khi bạn đã quyết regime** từ các tool kia. Tool này chỉ trình bày exposure, không khuyến nghị tilt direction.
 
+> 🚧 **Phase 1 ship — fundamental factors CHƯA CÓ.**
+> Bản v1.0 chỉ có 10 price/volume-based factor. **Value (P/E, P/B), Quality (ROE, debt), Growth (earnings growth) — chưa có** vì vnstock Community (free) chỉ cấp 8 quý BCTC ≈ 2Y, không đủ cho backtest 5+ năm. Đọc kỹ **§7 Phase 1 Gaps** trước khi đưa ra quyết định dựa trên tool — nhất là **gap #1-6** (value/quality/growth/size-thật/catalyst/FOL).
+
 ---
 
 ## 2. 10 Factor — Định nghĩa & Direction
@@ -253,37 +256,73 @@ Alert trigger khi `|factor_exposure| > 1σ`. Mỗi alert ý nghĩa:
 
 ---
 
-## 7. Limitations
+## 7. Phase 1 — Gaps hiện tại & Phase 2 Roadmap
 
-### a) Price-based only — không có fundamental
-- Không Value (P/E, P/B), Quality (ROE, debt), Growth (revenue growth)
-- Lý do: vnstock Community (free) chỉ 8 quý BCTC → 2Y sample bias quá nặng cho Value/Quality
-- Defer P2 khi có vnstock Sponsor paid
+> ⚠️ **Quan trọng**: Bản v1.0 (Phase 1) ship 10 factor **price/volume-based**. Toàn bộ chiều **fundamental** (BCTC) chưa có. Bạn cần đọc rõ phần này trước khi đưa ra quyết định dựa trên tool.
 
-### b) Static factor weight, không regime-conditional
-- Equal-weight 10 factor trong mọi regime
-- Lý do: human-in-the-loop pattern — bạn quyết định regime đã đủ, không cần tool auto-tilt
-- Trade-off: trong STRONG bull, LowVol và Beta_Low tilt sẽ persistently negative → biết trước
+### 7.1. Gaps Phase 1 — Chiều thông tin TOOL KHÔNG THẤY
 
-### c) IC backtest sample size hạn chế
-- Max 5Y lookback → ~60 snapshots
-- IC mean SE ≈ 0.13 — khó claim significant predictive power tin cậy
-- IC chủ yếu dùng để **sanity check** ("composite không anti-predict"), không phải để optimize weights
+| # | Gap | Hệ quả thực tế |
+|---|---|---|
+| 1 | **Value factor missing** (P/E, P/B, EV/EBITDA, FCF yield) | Không phân biệt được "mã rẻ" vs "mã đắt". 1 mã có composite +1.5σ nhưng P/B = 8x → tool không flag overvaluation. |
+| 2 | **Quality factor missing** (ROE, ROA, gross margin, accruals quality, debt/equity) | Không thấy được mã có hiệu quả vốn cao hay không. Bank với ROE 25% và Bank với ROE 8% có thể đứng cạnh nhau trong top decile nếu chỉ price-factor đẹp. |
+| 3 | **Growth factor missing** (revenue growth YoY, earnings growth, sustainable growth rate) | Không capture được câu chuyện tăng trưởng. Tool có thể rank cao 1 mã đã rơi vào trạng thái earnings decline kéo dài nếu price chưa phản ánh. |
+| 4 | **Size proxy ≠ market cap thật** | Hiện dùng `log(median ADV20d)` — đo **liquidity size**, không phải **market cap**. Mã turnover cao (vd retail darling) sẽ được đánh giá "large" dù market cap nhỏ. Cần shares outstanding × close để fix → vnstock Community chưa cấp lịch sử shares outstanding ổn định. |
+| 5 | **Catalyst events vô hình** | Earnings surprise, M&A, regulatory shift, management change, FOL change, capital raise — tool **không** thấy. Đây là chiều idiosyncratic mà fundamental research truyền thống xử lý, tool không thay thế. |
+| 6 | **Foreign ownership / FOL** không có | Không biết mã đã hết room nước ngoài hay chưa. Quan trọng với mã VN30 bị foreign cap (VCB, VNM, FPT, MWG, …). |
+| 7 | **Sentiment & news** không có | Không phản ánh analyst revision (target price up/down), news flow, social/forum sentiment. Tool chậm 1 nhịp khi có narrative shift. |
+| 8 | **Insider trading & block deal** không có | Không thấy mua/bán nội bộ, deal lớn — signal sớm về intent của insider. |
+| 9 | **Macro-beta riêng cho từng mã** không có | Không tính β của mỗi mã với DXY/Oil/Fed liquidity. Người dùng phải đọc GFCM macro level rồi suy diễn impact lên holding cụ thể. |
 
-### d) Universe filter ADV
-- Mặc định ≥ 1 tỷ VND/ngày median 20d → cover ~80-130 mã
-- Quá thấp → microcap noise; quá cao → universe nhỏ thiếu cross-section power
-- 1 tỷ VND ≈ 40k USD/day, hợp lý cho retail VN
+### 7.2. Hệ quả tổng hợp của các gap
 
-### e) Sector mapping ICB
-- 245/253 mã có ICB từ `data_lake/ticker_metadata.csv`
-- ETF/futures (FUEV*, E1VFVN30, VN30F1M) bị exclude
-- Sector <5 mã gộp 'Other' — Insurance / Tech / một số ngành nhỏ rơi vào 'Other'
+Tool Phase 1 trả lời được:
+- ✅ "Mã nào đang **đứng mạnh trên price + risk dimensions** so với sector peers"
+- ✅ "Portfolio đang **tilt phong cách** price-momentum / low-vol / liquidity / lottery-avoidance ra sao"
+- ✅ "Holdings đang **rank cao hay thấp** trong universe trên 10 factor"
 
-### f) Tool tự thân **không** sinh alpha
-- Composite không phải signal trading
-- Top decile cumulative không guarantee outperform
-- Output cần **bạn diễn giải kết hợp regime tool khác**
+Tool Phase 1 **KHÔNG** trả lời được:
+- ❌ "Mã này có **rẻ** không?" (cần P/E, P/B)
+- ❌ "Mã này có **quality cao** không?" (cần ROE, debt, margins)
+- ❌ "Mã này đang **tăng trưởng** không?" (cần earnings growth, revenue growth)
+- ❌ "Portfolio có **overvaluation risk** không?" (cần aggregate valuation)
+- ❌ "Mã rank cao **có catalyst** không?" (cần news, earnings, insider data)
+- ❌ "Mã này còn **room nước ngoài** không?" (cần FOL data)
+
+**Implication thực tế**: Tool Phase 1 chỉ là **1 lớp screening trên 1 chiều** (price/risk). Phải dùng kèm:
+- Fundamental research thủ công (đọc BCTC, ban lãnh đạo)
+- News flow tracking
+- FOL check trước khi submit order
+- Regime đọc từ GFCM/ESR
+
+### 7.3. Methodological limitations (đã chốt design choice)
+
+| # | Limitation | Trade-off |
+|---|---|---|
+| a | **Static factor weight, không regime-conditional** | Equal-weight 10 factor mọi regime. Lý do: human-in-the-loop quyết định regime, tool không auto-tilt. Trade-off: trong STRONG bull, LowVol/Beta_Low tilt sẽ persistently negative — biết trước, là feature không bug. |
+| b | **Equal-weight composite, không IC-weighted** | Lý do: IC-weighted in-sample dễ overfit cycle hiện tại. Trade-off: composite có thể không "optimal" cho 1 cycle, nhưng robust dài hạn. |
+| c | **IC backtest sample size hạn chế** | Max 5Y lookback → ~60 snapshots. IC mean SE ≈ 0.13 — khó claim significant predictive power. IC dùng làm **sanity check** (composite không anti-predict), không phải optimize weights. |
+| d | **Universe filter min ADV** | Mặc định ≥ 1 tỷ VND/ngày median 20d → cover ~80-130 mã. Microcap có thể bị loại, dù có alpha riêng. User có thể giảm threshold xuống 0.5 tỷ nếu muốn rộng hơn. |
+| e | **Sector mapping ICB không hoàn hảo** | 245/253 mã có ICB. Sector <5 mã gộp 'Other' — Insurance, một phần Tech rơi vào 'Other' → sector-neutralize trong 'Other' không "fair" như sector lớn. |
+| f | **Tool tự thân không sinh alpha** | Composite không phải signal trading. Top decile cumulative không guarantee outperform. Cần **kết hợp regime đọc từ tool khác** + fundamental research. |
+
+### 7.4. Phase 2 Roadmap — Khi có vnstock Sponsor paid
+
+Khi unlock được 5Y+ BCTC từ vnstock Sponsor (paid tier), Phase 2 sẽ thêm:
+
+| Factor mới | Data cần | Định nghĩa |
+|---|---|---|
+| **Value composite** | Quarterly BCTC 5Y | z(−log P/E) + z(−log P/B) + z(EV/EBITDA inverted) + z(FCF yield) |
+| **Quality composite** | Quarterly BCTC 5Y | z(ROE 4Q rolling) + z(−Debt/Equity) + z(Gross margin trend) + z(−accruals) |
+| **Growth composite** | Quarterly BCTC 5Y | z(Revenue growth YoY) + z(EPS growth YoY) + z(sustainable growth rate) |
+| **Size đúng** | Shares outstanding lịch sử | log(close × shares_outstanding) — replace ADV proxy |
+| **Earnings momentum** | EPS estimates revision | z(consensus EPS revision 3M) — cần Bloomberg/FactSet hoặc vnstock Sponsor analyst |
+
+**Composite expanded**: 10 → 14-15 factor, mỗi nhóm (price/value/quality/growth) có weight tương đương → mỗi nhóm 25% weight thay vì 1 nhóm price chiếm 100%.
+
+**Re-validation IC**: với 5Y BCTC, IC backtest có ~60 snapshots × 5 horizons = đủ sample đánh giá factor premium tin cậy hơn.
+
+**Sample size blocker hiện tại**: vnstock Community = 8 quý ≈ 2Y. Phase 2 với 2Y có **cycle bias / survivorship / overfit** nặng (xem session log skill.md 2026-05-20 cho phân tích chi tiết) → **không ship được P2 với free tier**.
 
 ---
 
@@ -359,8 +398,25 @@ Alert trigger khi `|factor_exposure| > 1σ`. Mỗi alert ý nghĩa:
 
 ## 11. Version log
 
-| Date | Version | Note |
+| Date | Version | Note | Coverage |
+|---|---|---|---|
+| 2026-05-20 | **v1.0 (Phase 1)** | Initial ship — 10 factor price/volume-based, equal-weight, sector-neutral ICB | Price + risk dimension only. **Không** Value/Quality/Growth/Size-thật/FOL/sentiment (xem §7) |
+| (future) | v1.1 | Polish: count buckets metric, handbook expanded gaps, IC chart per-factor (placeholder) | Phase 1 same coverage |
+| (future P2) | **v2.0 (Phase 2)** | Unlock khi có vnstock Sponsor paid: thêm Value composite + Quality composite + Growth composite + Size-thật + Earnings momentum. Composite 10 → 14-15 factor | Full price + fundamental + risk dimension |
+
+### Diff Phase 1 → Phase 2
+
+| Dimension | Phase 1 (now) | Phase 2 (future) |
 |---|---|---|
-| 2026-05-20 | v1.0 | Initial ship — 10 factor, equal-weight, sector-neutral ICB |
-| (future) | v1.1 | Có thể add: factor weight slider, custom factor add, time-series IC chart per factor |
-| (future P2) | v2.0 | Thêm Value/Quality/Growth khi có vnstock Sponsor paid (BCTC 5Y) |
+| Price momentum | ✅ Mom_12_1, Mom_6_1, ST_Reversal, LT_Reversal | ✅ same |
+| Risk / Volatility | ✅ LowVol, Beta_Low, IdioVol_Low | ✅ same |
+| Liquidity | ✅ Liquidity, Size (ADV proxy) | ✅ Liquidity + Size-thật (market cap = shares × price) |
+| Lottery / behavioral | ✅ Anti_Lottery | ✅ same |
+| **Value** | ❌ missing | ✅ P/E, P/B, EV/EBITDA, FCF yield composite |
+| **Quality** | ❌ missing | ✅ ROE, Debt/Equity, margins, accruals composite |
+| **Growth** | ❌ missing | ✅ Revenue growth, EPS growth, sustainable growth rate |
+| **Earnings momentum** | ❌ missing | ✅ Consensus EPS revision (cần data analyst) |
+| **FOL / foreign room** | ❌ missing | 🚧 Khả thi nếu vnstock Sponsor cấp daily FOL |
+| **Sentiment / news** | ❌ missing | 🚧 Cần NLP layer riêng (PhoBERT + scrape) — defer Tier B |
+| **Composite weight** | Equal 1/10 | Group-weighted (price 25% / value 25% / quality 25% / growth 25%) |
+| **IC backtest sample** | ~60 snapshots / 5Y | Same (chỉ giới hạn bởi price history, không phải BCTC) |
