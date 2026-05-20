@@ -125,8 +125,9 @@ def render():
     with col3:
         st.metric("Driver", summary["driver"])
     with col4:
-        st.metric("PC1 (σ)", f"{summary['pc1']:+.2f}",
-                  delta=f"5d: {summary['pc1_5d_change']:+.2f}")
+        st.metric("PC1 EMA(5) (σ)", f"{summary['pc1_smooth']:+.2f}",
+                  delta=f"5d raw: {summary['pc1_5d_change']:+.2f}",
+                  help=f"PC1 raw hôm nay: {summary['pc1']:+.2f}σ — đã smooth bằng EMA(5)")
 
     st.divider()
 
@@ -235,7 +236,7 @@ def render():
             st.plotly_chart(plot_credit_quality_spread(df_plot), use_container_width=True)
 
         with st.expander("📋 Bảng Analytics (50 dòng gần nhất)"):
-            cols_ana = ["PC1", "PC2", "PC1_pct",
+            cols_ana = ["PC1", "PC1_smooth", "PC2", "PC1_pct",
                         "VIX_pct", "MOVE_pct", "SKEW_pct",
                         "HY_pct", "CCC_pct", "IG_pct",
                         "OVX_pct", "VVIX_pct", "EM_pct",
@@ -243,7 +244,7 @@ def render():
                         "Regime", "Driver"]
             cols_avail = [c for c in cols_ana if c in df_all.columns]
             pct_fmt = {c: "{:.2%}" for c in cols_avail if c.endswith("_pct")}
-            pct_fmt.update({"PC1": "{:+.2f}", "PC2": "{:+.2f}"})
+            pct_fmt.update({"PC1": "{:+.2f}", "PC1_smooth": "{:+.2f}", "PC2": "{:+.2f}"})
             st.dataframe(
                 df_all[cols_avail].tail(50).style.format(pct_fmt, na_rep="—"),
                 use_container_width=True,
@@ -332,8 +333,10 @@ def render():
                                     .replace("[HY_z]", f"{summary['hy_z']:+.2f}")
                                     .replace("[CCC_z]", f"{summary['ccc_z']:+.2f}")
                                     .replace("[IG_z]", f"{summary['ig_z']:+.2f}")
-                                    # PCA + classification
-                                    .replace("[PC1]", f"{summary['pc1']:+.2f}")
+                                    # PCA + classification — PC1 đã smooth EMA(5), PC1_raw để
+                                    # AI thấy noise gốc nếu cần so sánh
+                                    .replace("[PC1]", f"{summary['pc1_smooth']:+.2f}")
+                                    .replace("[PC1_raw]", f"{summary['pc1']:+.2f}")
                                     .replace("[PC2]", f"{summary['pc2']:+.2f}")
                                     .replace("[PC1_pct]", f"{summary['pc1_pct']*100:.0f}")
                                     .replace("[PC1_5d]", f"{summary['pc1_5d_change']:+.2f}")
