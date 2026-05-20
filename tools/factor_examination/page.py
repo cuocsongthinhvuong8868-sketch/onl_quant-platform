@@ -231,7 +231,8 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
     holdings = {}
     if input_mode == "📋 Paste text":
         text = st.text_area(
-            "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%)",
+            "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%), "
+            "sau đó nhấn **Ctrl + Enter** để submit",
             value="",
             height=200,
             placeholder="VIC, 0.15\nVHM, 0.10\nFPT, 12%\n...",
