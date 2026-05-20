@@ -51,6 +51,40 @@ def parse_holdings_text(text: str) -> dict[str, float]:
     return holdings
 
 
+def parse_holdings_df(df: pd.DataFrame) -> dict[str, float]:
+    """Parse DataFrame từ st.data_editor (cột 'ticker' + 'weight').
+
+    Tolerant: skip row empty ticker hoặc weight <= 0. Tự detect %: nếu tổng weight
+    > 1.5 → coi như user nhập %, chia 100.
+    """
+    if df is None or df.empty:
+        return {}
+    if "ticker" not in df.columns or "weight" not in df.columns:
+        raise ValueError("DataFrame cần cột 'ticker' và 'weight'")
+
+    holdings = {}
+    for _, row in df.iterrows():
+        t_raw = row.get("ticker")
+        if t_raw is None or (isinstance(t_raw, float) and pd.isna(t_raw)):
+            continue
+        t = str(t_raw).strip().upper()
+        if not t or t == "NAN":
+            continue
+        try:
+            w = float(row.get("weight", 0))
+        except (TypeError, ValueError):
+            continue
+        if pd.isna(w) or w <= 0:
+            continue
+        holdings[t] = w
+
+    # Heuristic: nếu tổng > 1.5 thì user nhập % thay vì fraction
+    total = sum(holdings.values())
+    if total > 1.5:
+        holdings = {t: w / 100.0 for t, w in holdings.items()}
+    return holdings
+
+
 def parse_holdings_csv(file_bytes: bytes) -> dict[str, float]:
     """Parse uploaded CSV file (ticker, weight). Tolerant với header variations."""
     import io
