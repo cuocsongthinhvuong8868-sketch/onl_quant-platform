@@ -37,7 +37,6 @@ from tools.factor_examination.quant.scoring import build_score_table
 from tools.factor_examination.quant.portfolio import (
     parse_holdings_text,
     parse_holdings_csv,
-    parse_holdings_df,
     normalize_weights,
     aggregate_portfolio,
     find_peers,
@@ -224,46 +223,19 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
     st.markdown("### Nhập portfolio")
     input_mode = st.radio(
         "Cách nhập",
-        ["📋 Bảng (fill in)", "📁 Upload CSV"],
+        ["📋 Paste text", "📁 Upload CSV"],
         horizontal=True,
         key="fexam_input_mode",
     )
 
-    # Initial empty table — 10 rows, user thêm/bớt qua data_editor
-    empty_df = pd.DataFrame({
-        "ticker": [""] * 10,
-        "weight": [0.0] * 10,
-    })
-
     with st.form("fexam_portfolio_form", clear_on_submit=False):
-        if input_mode == "📋 Bảng (fill in)":
-            st.caption(
-                "Điền **ticker** + **weight** vào bảng. Weight là fraction (0.15) "
-                "hoặc % (15) — tool tự detect. Bấm `+` thêm dòng, double-click cell để sửa."
-            )
-            edited_df = st.data_editor(
-                empty_df,
-                num_rows="dynamic",
-                use_container_width=True,
-                hide_index=True,
-                column_config={
-                    "ticker": st.column_config.TextColumn(
-                        "Ticker",
-                        help="Mã CK (vd: VIC, VHM, FPT...)",
-                        max_chars=10,
-                        width="small",
-                    ),
-                    "weight": st.column_config.NumberColumn(
-                        "Weight",
-                        help="Tỷ trọng — fraction (0.15) hoặc % (15)",
-                        min_value=0.0,
-                        max_value=100.0,
-                        step=0.01,
-                        format="%.4f",
-                        width="medium",
-                    ),
-                },
-                key="fexam_table",
+        if input_mode == "📋 Paste text":
+            text = st.text_area(
+                "Format: `ticker, weight` mỗi dòng (weight có thể là fraction 0.15 hoặc % 15%)",
+                value="",
+                height=220,
+                placeholder="VIC, 0.15\nVHM, 0.10\nFPT, 12%\nMWG, 0.10\n...",
+                key="fexam_text",
             )
             uploaded = None
         else:
@@ -272,7 +244,7 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
                 type=["csv"],
                 key="fexam_csv",
             )
-            edited_df = None
+            text = ""
 
         col_submit, col_clear = st.columns([3, 1])
         with col_submit:
@@ -294,21 +266,20 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
 
     if submitted:
         try:
-            if input_mode == "📋 Bảng (fill in)":
-                parsed = parse_holdings_df(edited_df)
-                if not parsed:
-                    st.warning(
-                        "⚠️ Bảng rỗng hoặc tất cả weight = 0. Điền ticker + weight > 0 rồi submit."
-                    )
+            if input_mode == "📋 Paste text":
+                if not text or not text.strip():
+                    st.warning("⚠️ Vui lòng nhập holdings trước khi submit.")
                     return
+                parsed = parse_holdings_text(text)
             else:
                 if uploaded is None:
                     st.warning("⚠️ Vui lòng upload CSV file trước khi submit.")
                     return
                 parsed = parse_holdings_csv(uploaded.read())
-                if not parsed:
-                    st.warning("⚠️ Không parse được holding nào từ CSV — kiểm tra format.")
-                    return
+
+            if not parsed:
+                st.warning("⚠️ Không parse được holding nào — kiểm tra lại format.")
+                return
             st.session_state["fexam_holdings"] = parsed
         except Exception as exc:
             st.error(f"Lỗi parse input: {exc}")
@@ -317,7 +288,7 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
     holdings = st.session_state.get("fexam_holdings", {})
 
     if not holdings:
-        st.info("👆 Điền portfolio và bấm **📊 Phân tích Portfolio** để bắt đầu.")
+        st.info("👆 Nhập portfolio và bấm **📊 Phân tích Portfolio** để bắt đầu.")
         return
 
     try:
