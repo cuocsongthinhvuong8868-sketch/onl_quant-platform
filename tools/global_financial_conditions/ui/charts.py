@@ -1,6 +1,13 @@
 """
 tools/global_financial_conditions/ui/charts.py
 Plotly charts cho GFCM (Tab 1 = Level, Tab 2 = Analytics).
+
+11 indicators chia 3 nhóm:
+  Volatility (5):  VIX, MOVE, SKEW, OVX, VVIX
+  Credit     (4):  HY_OAS, CCC_OAS, IG_OAS, EM_OAS
+  Macro      (2):  T10Y2Y, DXY
+
+PCA core 6 series (panel percentile): VIX, MOVE, SKEW, HY, CCC, IG.
 """
 from __future__ import annotations
 
@@ -17,41 +24,47 @@ REGIME_COLOR = {
 }
 
 SERIES_COLOR = {
+    # Volatility
     "VIX": "#0284c7",
     "MOVE": "#7c3aed",
+    "SKEW": "#0ea5e9",
+    "OVX": "#65a30d",
+    "VVIX": "#0891b2",
+    # Credit
     "HY_OAS": "#f59e0b",
     "CCC_OAS": "#dc2626",
+    "IG_OAS": "#14b8a6",
+    "EM_OAS": "#a16207",
+    # Macro
+    "T10Y2Y": "#1e293b",
+    "DXY": "#475569",
 }
 
 
 # ────────────────────────────────────────────────────────────────────────────
-# Tab 1: Level
+# Tab 1: Level (3 sub-grids)
 # ────────────────────────────────────────────────────────────────────────────
 
-def plot_level_grid(df: pd.DataFrame) -> go.Figure:
+def _plot_grid(df: pd.DataFrame, specs: list[tuple], rows: int, cols: int,
+               height: int) -> go.Figure:
     """
-    4 sub-plots (2x2): VIX, MOVE, HY_OAS, CCC_OAS raw levels với mean line.
+    Generic helper: render N sub-plots theo specs.
+    specs = [(col_name, subplot_title, ylabel), ...] (order maps to row-major).
     """
+    subplot_titles = [s[1] for s in specs]
+    while len(subplot_titles) < rows * cols:
+        subplot_titles.append("")
+
     fig = make_subplots(
-        rows=2, cols=2,
-        subplot_titles=(
-            "VIX — CBOE Volatility Index",
-            "MOVE — Bond Vol (ICE BofAML)",
-            "HY OAS — US High Yield Spread",
-            "CCC OAS — Deep Junk Spread",
-        ),
-        horizontal_spacing=0.10,
-        vertical_spacing=0.15,
+        rows=rows, cols=cols,
+        subplot_titles=tuple(subplot_titles),
+        horizontal_spacing=0.08,
+        vertical_spacing=0.18,
     )
 
-    specs = [
-        ("VIX", 1, 1, "VIX (points)"),
-        ("MOVE", 1, 2, "MOVE (bps)"),
-        ("HY_OAS", 2, 1, "HY OAS (%)"),
-        ("CCC_OAS", 2, 2, "CCC OAS (%)"),
-    ]
-
-    for col, r, c, ylabel in specs:
+    for i, (col, _title, ylabel) in enumerate(specs):
+        r = i // cols + 1
+        c = i % cols + 1
         if col not in df.columns:
             continue
         series = df[col].dropna()
@@ -63,7 +76,7 @@ def plot_level_grid(df: pd.DataFrame) -> go.Figure:
                 x=series.index, y=series.values,
                 mode="lines",
                 name=col,
-                line=dict(color=SERIES_COLOR.get(col, "#0f172a"), width=1.6),
+                line=dict(color=SERIES_COLOR.get(col, "#0f172a"), width=1.5),
                 hovertemplate=f"<b>%{{x|%d/%m/%Y}}</b><br>{col}: %{{y:.2f}}<extra></extra>",
                 showlegend=False,
             ),
@@ -84,13 +97,54 @@ def plot_level_grid(df: pd.DataFrame) -> go.Figure:
 
     fig.update_layout(
         template="plotly_white",
-        height=620,
+        height=height,
         plot_bgcolor="white",
         paper_bgcolor="white",
         font=dict(color="black"),
         margin=dict(l=40, r=20, t=50, b=30),
     )
     return fig
+
+
+def plot_level_volatility(df: pd.DataFrame) -> go.Figure:
+    """
+    5 panel volatility: VIX, MOVE, SKEW, OVX, VVIX.
+    Layout 3x2 (slot cuối trống).
+    """
+    specs = [
+        ("VIX",  "VIX — CBOE Equity Vol", "VIX (points)"),
+        ("MOVE", "MOVE — US Bond Vol (ICE BofAML)", "MOVE (bps)"),
+        ("SKEW", "SKEW — CBOE Tail Risk Premium", "SKEW (index)"),
+        ("OVX",  "OVX — CBOE Oil ETF Vol", "OVX (%)"),
+        ("VVIX", "VVIX — Vol-of-Vol", "VVIX (index)"),
+    ]
+    return _plot_grid(df, specs, rows=3, cols=2, height=720)
+
+
+def plot_level_credit(df: pd.DataFrame) -> go.Figure:
+    """
+    4 panel credit: HY, CCC, IG, EM OAS.
+    Layout 2x2.
+    """
+    specs = [
+        ("HY_OAS",  "HY OAS — US High Yield Broad",   "HY OAS (%)"),
+        ("CCC_OAS", "CCC OAS — Deep Junk",             "CCC OAS (%)"),
+        ("IG_OAS",  "IG OAS — US Investment Grade",    "IG OAS (%)"),
+        ("EM_OAS",  "EM OAS — Emerging Market Corp",   "EM OAS (%)"),
+    ]
+    return _plot_grid(df, specs, rows=2, cols=2, height=560)
+
+
+def plot_level_macro(df: pd.DataFrame) -> go.Figure:
+    """
+    2 panel macro: 2s10s curve, DXY.
+    Layout 1x2.
+    """
+    specs = [
+        ("T10Y2Y", "2s10s Curve — 10Y minus 2Y Treasury", "Spread (%)"),
+        ("DXY",    "DXY — ICE US Dollar Index",            "DXY (index)"),
+    ]
+    return _plot_grid(df, specs, rows=1, cols=2, height=320)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -136,7 +190,7 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
     fig.add_hline(y=0, line_color="#94a3b8", line_dash="dash")
 
     fig.update_layout(
-        title="PC1 — Composite Financial Stress Index (background = regime)",
+        title="PC1 — Composite Financial Stress Index (6-series PCA · background = regime)",
         template="plotly_white",
         hovermode="x unified",
         plot_bgcolor="white",
@@ -153,29 +207,29 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
 
 def plot_percentile_grid(df: pd.DataFrame) -> go.Figure:
     """
-    4-panel small multiples: percentile rank 1Y của VIX/MOVE/HY/CCC.
-    Shading vùng 80% (HIGH).
+    6-panel small multiples: percentile rank 1Y của 6 PCA-core series
+    (VIX, MOVE, SKEW, HY, CCC, IG). Shading vùng 80% (HIGH).
+    Layout 3x2.
     """
+    specs = [
+        ("VIX_pct",  "VIX Percentile Rank (1Y)",  "VIX",  "VIX"),
+        ("MOVE_pct", "MOVE Percentile Rank (1Y)", "MOVE", "MOVE"),
+        ("SKEW_pct", "SKEW Percentile Rank (1Y)", "SKEW", "SKEW"),
+        ("HY_pct",   "HY OAS Percentile Rank (1Y)",  "HY",  "HY_OAS"),
+        ("CCC_pct",  "CCC OAS Percentile Rank (1Y)", "CCC", "CCC_OAS"),
+        ("IG_pct",   "IG OAS Percentile Rank (1Y)",  "IG",  "IG_OAS"),
+    ]
+
     fig = make_subplots(
-        rows=2, cols=2,
-        subplot_titles=(
-            "VIX Percentile Rank (1Y)",
-            "MOVE Percentile Rank (1Y)",
-            "HY OAS Percentile Rank (1Y)",
-            "CCC OAS Percentile Rank (1Y)",
-        ),
+        rows=3, cols=2,
+        subplot_titles=tuple(s[1] for s in specs),
         horizontal_spacing=0.10,
         vertical_spacing=0.15,
     )
 
-    specs = [
-        ("VIX_pct", 1, 1, "VIX"),
-        ("MOVE_pct", 1, 2, "MOVE"),
-        ("HY_pct", 2, 1, "HY"),
-        ("CCC_pct", 2, 2, "CCC"),
-    ]
-
-    for col, r, c, label in specs:
+    for i, (col, _title, label, color_key) in enumerate(specs):
+        r = i // 2 + 1
+        c = i % 2 + 1
         if col not in df.columns:
             continue
         series = df[col].dropna()
@@ -186,9 +240,7 @@ def plot_percentile_grid(df: pd.DataFrame) -> go.Figure:
             go.Scatter(
                 x=series.index, y=series.values,
                 mode="lines",
-                line=dict(color=SERIES_COLOR.get(label if label != "HY" else "HY_OAS",
-                                                "#0f172a") if label != "HY" else SERIES_COLOR["HY_OAS"],
-                          width=1.5),
+                line=dict(color=SERIES_COLOR.get(color_key, "#0f172a"), width=1.5),
                 showlegend=False,
                 hovertemplate=f"<b>%{{x|%d/%m/%Y}}</b><br>{label}_pct: %{{y:.2f}}<extra></extra>",
             ),
@@ -208,7 +260,7 @@ def plot_percentile_grid(df: pd.DataFrame) -> go.Figure:
 
     fig.update_layout(
         template="plotly_white",
-        height=620,
+        height=720,
         plot_bgcolor="white",
         paper_bgcolor="white",
         font=dict(color="black"),

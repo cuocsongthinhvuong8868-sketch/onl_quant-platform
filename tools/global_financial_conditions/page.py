@@ -19,7 +19,9 @@ from tools.global_financial_conditions.quant.metrics import (
 )
 from tools.global_financial_conditions.ui.sidebar import render_sidebar
 from tools.global_financial_conditions.ui.charts import (
-    plot_level_grid,
+    plot_level_volatility,
+    plot_level_credit,
+    plot_level_macro,
     plot_pc1_with_regime,
     plot_percentile_grid,
     plot_pc_scatter,
@@ -60,8 +62,8 @@ def _load_gfcm() -> pd.DataFrame:
 def render():
     st.title("🌐 Global Financial Conditions Monitor")
     st.caption(
-        "Equity vol (VIX) + Rates vol (MOVE) + Credit (HY OAS, CCC OAS) · "
-        "Static PCA composite · Regime via PC1 percentile rank 1Y"
+        "11 indicators · Vol (VIX/MOVE/SKEW/OVX/VVIX) + Credit (HY/CCC/IG/EM OAS) + Macro (2s10s/DXY) · "
+        "Static PCA 6-core composite · Regime via PC1 percentile rank 1Y"
     )
 
     plot_start_date = render_sidebar()
@@ -138,33 +140,60 @@ def render():
     tab_level, tab_analytics = st.tabs(["📊 Level", "🧠 Analytics (PR + PCA + AI)"])
 
     # ────────────────────────────────────────────────────────────────────
-    # Tab 1 — Level
+    # Tab 1 — Level (3 sub-grids: Vol / Credit / Macro)
     # ────────────────────────────────────────────────────────────────────
     with tab_level:
-        st.subheader("Giá trị tuyệt đối 4 chỉ số")
+        st.subheader("Giá trị tuyệt đối — 11 indicators")
         st.caption(
-            "Mức raw level — quan sát so với đường trung bình lịch sử (dotted line). "
-            "Để xem xếp hạng theo phân phối lịch sử, chuyển sang tab Analytics."
+            "Raw level so với mean lịch sử (dotted line). "
+            "Để xem xếp hạng theo phân phối, chuyển sang tab Analytics."
         )
 
-        col1, col2, col3, col4 = st.columns(4)
-        with col1:
-            st.metric("VIX", f"{summary['vix']:.2f}")
-        with col2:
-            st.metric("MOVE", f"{summary['move']:.1f}")
-        with col3:
-            st.metric("HY OAS", f"{summary['hy_oas']:.2f}%")
-        with col4:
-            st.metric("CCC OAS", f"{summary['ccc_oas']:.2f}%")
+        # Volatility metrics + chart
+        st.markdown("##### ⚡ Volatility (5)")
+        c1, c2, c3, c4, c5 = st.columns(5)
+        with c1: st.metric("VIX", f"{summary['vix']:.2f}")
+        with c2: st.metric("MOVE", f"{summary['move']:.1f}")
+        with c3: st.metric("SKEW", f"{summary['skew']:.1f}")
+        with c4: st.metric("OVX", f"{summary['ovx']:.2f}")
+        with c5: st.metric("VVIX", f"{summary['vvix']:.1f}")
+        st.plotly_chart(plot_level_volatility(df_plot), use_container_width=True)
 
-        st.plotly_chart(plot_level_grid(df_plot), use_container_width=True)
+        st.divider()
+
+        # Credit metrics + chart
+        st.markdown("##### 💳 Credit Spreads (4)")
+        c1, c2, c3, c4 = st.columns(4)
+        with c1: st.metric("HY OAS", f"{summary['hy_oas']:.2f}%")
+        with c2: st.metric("CCC OAS", f"{summary['ccc_oas']:.2f}%")
+        with c3: st.metric("IG OAS", f"{summary['ig_oas']:.2f}%")
+        with c4: st.metric("EM OAS", f"{summary['em_oas']:.2f}%")
+        st.plotly_chart(plot_level_credit(df_plot), use_container_width=True)
+
+        st.divider()
+
+        # Macro metrics + chart
+        st.markdown("##### 🌍 Macro Overlay (2)")
+        c1, c2 = st.columns(2)
+        with c1: st.metric("2s10s (%)", f"{summary['t10y2y']:+.2f}")
+        with c2: st.metric("DXY", f"{summary['dxy']:.2f}")
+        st.plotly_chart(plot_level_macro(df_plot), use_container_width=True)
 
         with st.expander("📋 Bảng giá trị (50 dòng gần nhất)"):
-            cols_raw = ["VIX", "MOVE", "HY_OAS", "CCC_OAS", "Credit_Quality_Spread"]
+            cols_raw = [
+                "VIX", "MOVE", "SKEW", "OVX", "VVIX",
+                "HY_OAS", "CCC_OAS", "IG_OAS", "EM_OAS",
+                "T10Y2Y", "DXY",
+                "Credit_Quality_Spread",
+            ]
+            cols_available = [c for c in cols_raw if c in df_all.columns]
             st.dataframe(
-                df_all[cols_raw].tail(50).style.format({
-                    "VIX": "{:.2f}", "MOVE": "{:.1f}",
+                df_all[cols_available].tail(50).style.format({
+                    "VIX": "{:.2f}", "MOVE": "{:.1f}", "SKEW": "{:.1f}",
+                    "OVX": "{:.2f}", "VVIX": "{:.1f}",
                     "HY_OAS": "{:.2f}%", "CCC_OAS": "{:.2f}%",
+                    "IG_OAS": "{:.2f}%", "EM_OAS": "{:.2f}%",
+                    "T10Y2Y": "{:+.2f}", "DXY": "{:.2f}",
                     "Credit_Quality_Spread": "{:.2f}%",
                 }),
                 use_container_width=True,
@@ -176,17 +205,25 @@ def render():
     with tab_analytics:
         st.subheader("Percentile Rank · PCA · Regime")
 
-        col1, col2, col3, col4, col5 = st.columns(5)
-        with col1:
-            st.metric("PC1 percentile", f"{summary['pc1_pct']*100:.0f}%")
-        with col2:
-            st.metric("VIX pct (1Y)", f"{summary['vix_pct']*100:.0f}%")
-        with col3:
-            st.metric("MOVE pct (1Y)", f"{summary['move_pct']*100:.0f}%")
-        with col4:
-            st.metric("HY pct (1Y)", f"{summary['hy_pct']*100:.0f}%")
-        with col5:
-            st.metric("CCC pct (1Y)", f"{summary['ccc_pct']*100:.0f}%")
+        # Row 1: PC1 + 6 PCA-core percentiles
+        st.markdown("**PCA core (6 series)**")
+        col1, col2, col3, col4, col5, col6, col7 = st.columns(7)
+        with col1: st.metric("PC1 pct", f"{summary['pc1_pct']*100:.0f}%")
+        with col2: st.metric("VIX pct", f"{summary['vix_pct']*100:.0f}%")
+        with col3: st.metric("MOVE pct", f"{summary['move_pct']*100:.0f}%")
+        with col4: st.metric("SKEW pct", f"{summary['skew_pct']*100:.0f}%")
+        with col5: st.metric("HY pct", f"{summary['hy_pct']*100:.0f}%")
+        with col6: st.metric("CCC pct", f"{summary['ccc_pct']*100:.0f}%")
+        with col7: st.metric("IG pct", f"{summary['ig_pct']*100:.0f}%")
+
+        # Row 2: 5 auxiliary
+        st.markdown("**Auxiliary (5 series — không vào PCA)**")
+        c1, c2, c3, c4, c5 = st.columns(5)
+        with c1: st.metric("OVX pct", f"{summary['ovx_pct']*100:.0f}%")
+        with c2: st.metric("VVIX pct", f"{summary['vvix_pct']*100:.0f}%")
+        with c3: st.metric("EM pct", f"{summary['em_pct']*100:.0f}%")
+        with c4: st.metric("2s10s pct", f"{summary['t10y2y_pct']*100:.0f}%")
+        with c5: st.metric("DXY pct", f"{summary['dxy_pct']*100:.0f}%")
 
         st.plotly_chart(plot_pc1_with_regime(df_plot), use_container_width=True)
         st.plotly_chart(plot_percentile_grid(df_plot), use_container_width=True)
@@ -199,15 +236,16 @@ def render():
 
         with st.expander("📋 Bảng Analytics (50 dòng gần nhất)"):
             cols_ana = ["PC1", "PC2", "PC1_pct",
-                        "VIX_pct", "MOVE_pct", "HY_pct", "CCC_pct", "CQS_pct",
+                        "VIX_pct", "MOVE_pct", "SKEW_pct",
+                        "HY_pct", "CCC_pct", "IG_pct",
+                        "OVX_pct", "VVIX_pct", "EM_pct",
+                        "T10Y2Y_pct", "DXY_pct", "CQS_pct",
                         "Regime", "Driver"]
+            cols_avail = [c for c in cols_ana if c in df_all.columns]
+            pct_fmt = {c: "{:.2%}" for c in cols_avail if c.endswith("_pct")}
+            pct_fmt.update({"PC1": "{:+.2f}", "PC2": "{:+.2f}"})
             st.dataframe(
-                df_all[cols_ana].tail(50).style.format({
-                    "PC1": "{:+.2f}", "PC2": "{:+.2f}",
-                    "PC1_pct": "{:.2%}", "VIX_pct": "{:.2%}",
-                    "MOVE_pct": "{:.2%}", "HY_pct": "{:.2%}",
-                    "CCC_pct": "{:.2%}", "CQS_pct": "{:.2%}",
-                }, na_rep="—"),
+                df_all[cols_avail].tail(50).style.format(pct_fmt, na_rep="—"),
                 use_container_width=True,
             )
 
@@ -259,20 +297,42 @@ def render():
                                 full_prompt = (
                                     prompt_template
                                     .replace("[Nhập ngày]", summary["date"])
+                                    # Volatility group
                                     .replace("[VIX]", f"{summary['vix']:.2f}")
                                     .replace("[MOVE]", f"{summary['move']:.1f}")
+                                    .replace("[SKEW]", f"{summary['skew']:.1f}")
+                                    .replace("[OVX]", f"{summary['ovx']:.2f}")
+                                    .replace("[VVIX]", f"{summary['vvix']:.1f}")
+                                    # Credit group
                                     .replace("[HY_OAS]", f"{summary['hy_oas']:.2f}")
                                     .replace("[CCC_OAS]", f"{summary['ccc_oas']:.2f}")
+                                    .replace("[IG_OAS]", f"{summary['ig_oas']:.2f}")
+                                    .replace("[EM_OAS]", f"{summary['em_oas']:.2f}")
                                     .replace("[CQS]", f"{summary['credit_quality_spread']:.2f}")
+                                    # Macro group
+                                    .replace("[T10Y2Y]", f"{summary['t10y2y']:+.2f}")
+                                    .replace("[DXY]", f"{summary['dxy']:.2f}")
+                                    # Percentile ranks 1Y (11 indicators)
                                     .replace("[VIX_pct]", f"{summary['vix_pct']*100:.0f}")
                                     .replace("[MOVE_pct]", f"{summary['move_pct']*100:.0f}")
+                                    .replace("[SKEW_pct]", f"{summary['skew_pct']*100:.0f}")
+                                    .replace("[OVX_pct]", f"{summary['ovx_pct']*100:.0f}")
+                                    .replace("[VVIX_pct]", f"{summary['vvix_pct']*100:.0f}")
                                     .replace("[HY_pct]", f"{summary['hy_pct']*100:.0f}")
                                     .replace("[CCC_pct]", f"{summary['ccc_pct']*100:.0f}")
+                                    .replace("[IG_pct]", f"{summary['ig_pct']*100:.0f}")
+                                    .replace("[EM_pct]", f"{summary['em_pct']*100:.0f}")
+                                    .replace("[T10Y2Y_pct]", f"{summary['t10y2y_pct']*100:.0f}")
+                                    .replace("[DXY_pct]", f"{summary['dxy_pct']*100:.0f}")
                                     .replace("[CQS_pct]", f"{summary['cqs_pct']*100:.0f}")
+                                    # Z-scores 1Y (chỉ inject 6 PCA cores cho prompt gọn)
                                     .replace("[VIX_z]", f"{summary['vix_z']:+.2f}")
                                     .replace("[MOVE_z]", f"{summary['move_z']:+.2f}")
+                                    .replace("[SKEW_z]", f"{summary['skew_z']:+.2f}")
                                     .replace("[HY_z]", f"{summary['hy_z']:+.2f}")
                                     .replace("[CCC_z]", f"{summary['ccc_z']:+.2f}")
+                                    .replace("[IG_z]", f"{summary['ig_z']:+.2f}")
+                                    # PCA + classification
                                     .replace("[PC1]", f"{summary['pc1']:+.2f}")
                                     .replace("[PC2]", f"{summary['pc2']:+.2f}")
                                     .replace("[PC1_pct]", f"{summary['pc1_pct']*100:.0f}")
