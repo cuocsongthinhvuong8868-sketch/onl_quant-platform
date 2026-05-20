@@ -254,6 +254,10 @@ def _tab_portfolio(scored: dict, params: dict) -> None:
 
     if not holdings:
         st.info("👆 Nhập portfolio để bắt đầu phân tích.")
+        # Vẫn render history selector ở dưới để user xem lại past analyses
+        # KHÔNG cần submit portfolio mới
+        st.markdown("---")
+        _render_ai_history_only()
         return
 
     try:
@@ -507,6 +511,36 @@ def _build_ai_prompt(scored: dict, agg: dict, port_pct: float, params: dict) -> 
     system_prompt = parts[0].strip()
     user_prompt = "# INPUT" + parts[1].strip() if len(parts) > 1 else full_prompt
     return system_prompt, user_prompt
+
+
+def _render_ai_history_only() -> None:
+    """Render chỉ history selector (không cần portfolio submitted).
+
+    Dùng cho trường hợp user vào tab Portfolio nhưng chưa nhập portfolio,
+    vẫn cho phép xem lại past AI analyses.
+    """
+    st.markdown("### 📅 Xem lại phân tích AI cũ")
+    from shared.history_selector import build_history_options
+    _all_caches = list(DATA_LAKE.glob("daily_cache/factor_examination_*.txt"))
+    _options = build_history_options(
+        _all_caches, "factor_examination", AI_PROVIDER_MAP
+    )
+    if not _options:
+        st.info("ℹ️ Chưa có dữ liệu phân tích lịch sử.")
+        return
+    _selected_label = st.selectbox(
+        "📅 Chọn ngày và model:",
+        options=list(_options.keys()),
+        index=0,
+        key="fexam_history_selector_only",
+    )
+    _sel_path = _options[_selected_label]
+    with st.container(border=True):
+        try:
+            with open(_sel_path, "r", encoding="utf-8") as f:
+                st.markdown(f.read())
+        except Exception as e:
+            st.error(f"Lỗi đọc file: {e}")
 
 
 def _render_ai_section(scored: dict, agg: dict, port_pct: float, params: dict) -> None:
