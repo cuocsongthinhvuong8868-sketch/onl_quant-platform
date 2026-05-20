@@ -1,0 +1,70 @@
+name: Global Financial Conditions Daily Update
+
+# GFCM kéo 11 indicators từ FRED (6) + Yahoo (5).
+# Chạy lúc 22:00 UTC Mon-Fri = 05:00 VN sáng Thứ 3-Thứ 7,
+# tức sau US market close (~21:00 UTC) để bắt được:
+#   - VIX/MOVE/SKEW/OVX/VVIX/DXY close cùng ngày
+#   - FRED ICE BofA OAS (HY/CCC/IG/EM) thường được publish T+1 sáng ET,
+#     22:00 UTC Mon-Fri đảm bảo OAS hôm trước đã có
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * 1-5'
+
+permissions:
+  contents: write
+
+jobs:
+  update-gfcm:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run update_global_financial_conditions.py
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python command/update_global_financial_conditions.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data_lake/global_financial_conditions_cache.csv
+
+          if git diff --cached --quiet; then
+            echo "ℹ️  No changes in global_financial_conditions_cache.csv. Skipping commit."
+            exit 0
+          fi
+
+          git commit -m "Auto-update global_financial_conditions_cache.csv [skip ci]"
+
+          # Retry push với pull --rebase để handle race condition với workflow song song
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "✅ Push thành công (attempt $attempt)"
+              exit 0
+            fi
+            echo "⚠️  Push bị reject (attempt $attempt/5) — pulling với rebase..."
+            git pull --rebase --autostash origin main || {
+              echo "❌ Rebase fail, abort"
+              git rebase --abort || true
+            }
+            sleep $((attempt * 3))
+          done
+          echo "❌ Push fail sau 5 lần thử"
+          exit 1
