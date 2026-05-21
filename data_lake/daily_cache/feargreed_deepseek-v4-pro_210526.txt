@@ -1,0 +1,32 @@
+## 1. Observations
+- **Risk Score:** 50.1/100, nằm trung tâm vùng Neutral (40-60), không thay đổi so với phiên trước (-0.0 điểm).
+- **EGARCH Vol:** 9.5% (chuẩn hóa), tăng mạnh +7.1% so với phiên trước, vượt mức vol thấp thường thấy trong pha Greed.
+- **Rolling Skewness:** -0.03, ở gần mức 0 nhưng nghiêng nhẹ về âm, không đủ sâu để xác nhận Fear.
+- **Upside Correlation:** 64.1% vượt trội so với Downside Correlation: 12.3%, cho thấy sự đồng thuận tăng mạnh rõ rệt hơn đồng thuận giảm.
+
+## 2. Interpretation
+Dữ liệu hiện tại mô tả một thị trường đang trong pha **Stock-Picking / Neutral**, nhưng ẩn chứa sự phân kỳ nội tại: điểm số Neutral kết hợp với vol tăng đột biến và skewness tiêu cực nhẹ, trong khi correlation nghiêng hẳn về phía tăng. Đây là cấu trúc dễ tạo ra các biến động cục bộ thay vì xu hướng đơn nhất.
+
+## 3. Cross-Check
+- **Score (Neutral) vs EGARCH Vol (tăng mạnh):** Không nhất quán. Score không phản ánh mức vol đang leo cao. → **Flag divergence nhẹ**: rủi ro tail đang gia tăng dù tâm lý chưa chuyển pha.
+- **Skewness (-0.03) vs Upside Corr (64.1%):** Skew âm nhẹ mâu thuẫn với đồng thuận tăng mạnh. Điều này cho thấy lực tăng thiếu bền vững, mang tính "kéo" hơn là "đẩy" nội tại. → **Flag phân kỳ cấu trúc vi mô.**
+
+## 4. Verdict
+**Beta target:** 0.5  
+Các tín hiệu mâu thuẫn (vol tăng — score trung tính; skew âm — correlation tăng) không cho phép hành động tấn công hay phòng thủ dứt khoát. Trên dữ liệu hiện tại, duy trì **exposure trung bình**, sẵn sàng giảm nếu vol tiếp tục leo mà skew đồng loạt âm sâu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "21/05/2026",
+  "regime": "NEUTRAL",
+  "score": 50.1,
+  "confidence": "low",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Score neutral nhưng EGARCH vol tăng mạnh +7.1%",
+    "Skewness âm nhẹ (-0.03) mâu thuẫn với Upside Correlation >64%"
+  ]
+}
+```
