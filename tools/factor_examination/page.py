@@ -23,6 +23,7 @@ import streamlit as st
 from openai import OpenAI
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
+from shared.cache_reset import reset_all_compute_caches
 from shared.data_loader import (
     load_close_prices,
     load_volumes,
@@ -689,6 +690,28 @@ def render() -> None:
     if metadata is None:
         st.warning("⚠️ ticker_metadata.csv chưa có — sector-neutral sẽ về 'Other' cho mọi mã. "
                    "Chạy `python command/update_sector_data.py` để có ICB.")
+
+    # ── Data freshness bar + reset button ──
+    _last_date = prices.index[-1].date()
+    _c1, _c2 = st.columns([3, 1])
+    with _c1:
+        st.info(f"📅 **Ngày dữ liệu cuối cùng**: `{_last_date.strftime('%Y-%m-%d')}` "
+                f"(market_data.csv, {len(prices)} phiên)")
+    with _c2:
+        if st.button(
+            "🔄 Xử lý lại toàn bộ công cụ",
+            key="fexam_reset_all",
+            help="Xoá compute cache (Streamlit @cache_data + daily_cache/*.pkl) "
+                 "của TẤT CẢ tool → buộc reload data CSV và tính toán lại từ đầu. "
+                 "KHÔNG xoá AI text cache (.txt).",
+            use_container_width=True,
+        ):
+            _res = reset_all_compute_caches()
+            st.toast(
+                f"✅ Đã xoá {_res['pkl_deleted']} pkl + Streamlit cache. Reload...",
+                icon="🔄",
+            )
+            st.rerun()
 
     # Align market to prices index
     market = vnindex.reindex(prices.index).ffill()
