@@ -1,0 +1,34 @@
+## 1. Observations
+- SSI ở mức 63.8% (WARNING zone) — cao hơn đáng kể so với ngưỡng 50%.
+- Market State: HEALTHY — nhưng HMM threshold là 0.535, thấp hơn mức SSI hiện tại.
+- Top drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
+- Chiều Pillar Mode: downside — chỉ tính phiên giảm.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (36%)** dẫn dắt: volume khô cạn so với chuẩn 1 năm. Đây là tín hiệu nguy hiểm khi giá vẫn ở vùng cao — thanh khoản yếu thường báo hiệu “đỉnh giả tạo”.
+- **S_VAL (32%)**: valuation tension gia tăng — lợi nhuận 252 ngày giảm trong khi lãi suất tiền gửi không đổi, khiến chênh lệch hẹp dần.
+- **S_COR (17%)**: PCA EVR PC1 = 38.5% — systemic correlation không quá cao nhưng đang tăng, cho thấy thị trường bắt đầu di chuyển đồng loạt.
+- **Tổ hợp S_LIQ + S_VAL + S_COR + mode downside**: tín hiệu quen thuộc của bull-trap — khối lượng khô cạn, định giá căng, and herding đang hình thành mà phe mua KHÔNG còn sức nâng đỡ thực sự.
+
+## 3. Cross-Check
+- **Price vs SSI divergence RÕ**: VN30 đang ở vùng cao (trên MA125) nhưng SSI đã vượt 60% (WARNING). Đây là divergence âm điển hình — giá tạo đỉnh mới trong khi rủi ro hệ thống leo dốc.
+- **HMM regime lệch với SSI**: HMM báo HEALTHY (low stress + uptrend) nhưng SSI đã ở WARNING. Nguyên nhân: HMM chậm hơn, chưa capture được stress đang tích lũy từ thanh khoản khô cạn và valuation tension. Đây là lệch pha đáng lo ngại.
+
+## 4. Verdict
+- **Cash weight đề xuất: 50-60%** — danh mục cần được bảo vệ vì SSI ở WARNING, dù HMM còn HEALTHY.
+- **Hedge action: Short VN30F1M 30% danh mục** — vì top driver S_LIQ + S_COR kết hợp mode downside tạo tín hiệu rủi ro medium, nhưng chưa đủ mạnh để mua put. Short futures để giảm beta ngay lập tức.
+- **Mâu thuẫn**: HMM HEALTHY vs SSI WARNING — tuy nhiên, theo stance bearish-on-stress, tôi ưu tiên SSI. Cần theo dõi thêm 2-3 phiên để xác nhận.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.8,
+  "regime": "WARNING",
+  "market_state": "HEALTHY",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 55,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

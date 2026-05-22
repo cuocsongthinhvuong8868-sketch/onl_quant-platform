@@ -1,0 +1,51 @@
+## 1. Scenario Assessment
+
+Kịch bản Tiêu chuẩn (K=1.0, CoE=14%) là baseline hợp lý cho ngành ngân hàng Việt Nam trong giai đoạn bình thường hóa lãi suất. **Mức độ khắc nghiệt là trung bình**, không quá nặng nhưng cũng không dễ dãi – đủ để sàng lọc những ngân hàng có nền tảng ROE yếu. Stress test BVPS giảm -5% và P/B penalty -5% tạo áp lực bổ sung, phù hợp để kiểm tra sức chịu đựng.
+
+Mặt bằng ngành: **chỉ có 3-4 mã vượt ngưỡng Alpha>0** (HDB, SHB, TPB và một số khác không trong danh sách), phần lớn đốt vốn. Đây là tín hiệu cho thấy phần lớn ngân hàng Việt Nam đang tạo ra lợi nhuận không đủ bù đắp chi phí vốn chủ sở hữu khi tính đến rủi ro biến động ROE.
+
+## 2. Top Alpha Decomposition
+
+**HDB (Alpha 5.6%, P/B 1.27) – Fortress điển hình:**
+- Driver chính: **ROE cao kết hợp P/B hợp lý + σ(ROE) thấp**. Nếu HDB có ROE geomean ~22% và σ(ROE) dưới 8%, Risk Penalty sẽ chỉ ~8%, để lại Disciplined Return ~19.6%, trừ CoE được Alpha +5.6%.
+- Phân loại: **Fortress** – chất lượng nền tảng, giá không quá đắt.
+
+**SHB (Alpha 4.2%, P/B 0.92) – Cheap-but-not-trap:**
+- Driver chính: **P/B rẻ nhất top (0.92 lần)**, kết hợp ROE trung bình (15-16%) và σ thấp, tạo Disciplined Return ~18.2%.
+- Phân loại: **Cheap-but-not-trap** – giá rẻ + ROE đủ bền, không phải bẫy.
+
+**TPB (Alpha 3.7%, P/B 0.94) – Tương tự SHB:**
+- P/B dưới 1 lần, ROE giảm từ đỉnh 20% xuống còn ~17% nhưng σ thấp. Driver: **P/B định giá thấp + retention cao** do payout thấp.
+- Phân loại: **Cheap-but-not-trap** (tiềm năng compounding nếu ROE hồi phục).
+
+## 3. Value Traps Warning
+
+**EIB (Alpha -12.5%, P/B 1.52) – Premium Burn rõ ràng:**
+- P/B 1.52 lần không quá cao, nhưng ROE chỉ ~9-10% + σ rất cao → Disciplined Return chỉ ~1.5-2%, sụt giảm nghiêm trọng bởi Risk Penalty. Đây là **bẫy tăng trưởng** – ROE không đủ bù đắp chi phí vốn.
+
+**LPB (Alpha -8.1%, P/B 3.37) – Premium Burn nặng:**
+- P/B 3.37 lần là đắt nhất nhóm, trong khi ROE ~18% và σ cao (~15-20%). Risk Penalty ăn mòn >30% so với P/B. **Không có chất lượng nền tảng để biện minh cho valuation cao**.
+
+**VCB (Alpha -7.4%, P/B 2.33) – Fortress-premium hybrid nhưng đang suy yếu:**
+- VCB từng là Fortress chuẩn (ROE cao, σ thấp), nhưng P/B vẫn ở 2.33 lần. Khi ROE giảm nhẹ (xuống 20-21%) trong khi P/B chưa điều chỉnh, Alpha chuyển âm mạnh. **Rủi ro mean-reversion** – giá chưa phản ánh hết suy giảm ROE.
+
+## 4. Portfolio Construction
+
+- **Core Holding (Fortress – 60%)**: **HDB** chiếm tỷ trọng chính do nền tảng ROE bền vững + định giá hợp lý.
+- **Tactical (Cheap-but-not-trap – 30%)**: **SHB + TPB** – P/B dưới 1 lần, có room tăng nếu ROE hồi phục.
+- **Underweight / Avoid (10%)**: **EIB, LPB, VCB**. LPB và VCB có rủi ro điều chỉnh giá do Alpha âm sâu; EIB có vấn đề cấu trúc ROE.
+
+**Cảnh báo đặc biệt**: VCB đang là "cổ phiếu thần tượng" – nhưng dưới góc nhìn quant, risk-adjusted alpha âm 7.4% là tín hiệu "đỏ". Nhà đầu tư nên xem xét cơ hội thay thế bằng HDB.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB"],
+  "avoid_list": ["EIB", "LPB", "VCB"],
+  "sector_view": "neutral",
+  "confidence": "high"
+}
+```
