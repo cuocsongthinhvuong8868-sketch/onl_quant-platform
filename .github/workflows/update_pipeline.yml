@@ -65,6 +65,10 @@ jobs:
         env:
           VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
         run: python command/update_bank_fundamentals.py
+
+      - name: Pre-warm Factor Examination pkl
+        run: python command/update_factor_examination.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"

@@ -23,6 +23,7 @@ import streamlit as st
 from openai import OpenAI
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
+from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.data_loader import (
     load_close_prices,
     load_volumes,
@@ -80,11 +81,17 @@ def _build_universe(
     return keep
 
 
-# ── Cached pipeline ─────────────────────────────────────────
-@st.cache_data(ttl=86400, show_spinner=False)
+# ── Disk-cached pipeline (pkl via shared/daily_cache.py, đồng bộ pattern
+#    với fear_greed / manipulation / esr_monitor — invalidate bởi data_date
+#    stored trong pkl, không phải Streamlit in-memory cache process-local).
+SCORE_NAMESPACE = "factor_examination"
+IC_NAMESPACE = "factor_examination_ic"
+METHOD_V = "v1"
+
+
 def _cached_score_table(
     prices_key: str,
-    universe_hash: str,
+    universe_hash: str,  # unused — giữ signature backwards-compat
     sector_neutral: bool,
     _prices: pd.DataFrame,
     _volumes: pd.DataFrame,
@@ -92,19 +99,27 @@ def _cached_score_table(
     _metadata: pd.DataFrame | None,
     universe: tuple[str, ...],
 ) -> dict:
-    """Cache key = (latest_date, universe_hash, sector_neutral, 'v1')."""
     universe_list = list(universe)
+    cache_key = {
+        "universe": universe_list,
+        "sector_neutral": sector_neutral,
+        "method_v": METHOD_V,
+    }
+    cached = load_daily_cache(SCORE_NAMESPACE, cache_key, data_date=prices_key)
+    if cached is not None:
+        return cached
+
     prices_u = _prices[universe_list]
     volumes_u = _volumes[universe_list]
     factors = compute_all_factors(prices_u, volumes_u, _market)
     scored = build_score_table(factors, _metadata, sector_neutral=sector_neutral)
+    save_daily_cache(SCORE_NAMESPACE, cache_key, scored, data_date=prices_key)
     return scored
 
 
-@st.cache_data(ttl=86400, show_spinner=False)
 def _cached_ic(
     prices_key: str,
-    universe_hash: str,
+    universe_hash: str,  # unused — giữ signature backwards-compat
     sector_neutral: bool,
     lookback_years: int,
     _prices: pd.DataFrame,
@@ -114,10 +129,22 @@ def _cached_ic(
     universe: tuple[str, ...],
 ) -> dict:
     universe_list = list(universe)
-    return run_ic_backtest(
+    cache_key = {
+        "universe": universe_list,
+        "sector_neutral": sector_neutral,
+        "lookback_years": lookback_years,
+        "method_v": METHOD_V,
+    }
+    cached = load_daily_cache(IC_NAMESPACE, cache_key, data_date=prices_key)
+    if cached is not None:
+        return cached
+
+    result = run_ic_backtest(
         _prices[universe_list], _volumes[universe_list], _market, _metadata,
         sector_neutral=sector_neutral, lookback_years=lookback_years,
     )
+    save_daily_cache(IC_NAMESPACE, cache_key, result, data_date=prices_key)
+    return result
 
 
 # ── Helpers ─────────────────────────────────────────────────
