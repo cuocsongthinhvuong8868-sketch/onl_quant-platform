@@ -35,6 +35,20 @@ def clear_daily_cache(namespace: str, payload_key: dict) -> bool:
     return False
 
 
+def peek_data_date(namespace: str, payload_key: dict) -> str | None:
+    """Đọc data_date trong pkl mà không load payload. None nếu pkl không tồn tại
+    hoặc file corrupt."""
+    p = _cache_file(namespace, payload_key)
+    if not p.exists():
+        return None
+    try:
+        with p.open("rb") as f:
+            obj = pickle.load(f)
+        return obj.get("data_date")
+    except Exception:
+        return None
+
+
 def load_daily_cache(namespace: str, payload_key: dict, data_date: str = None):
     p = _cache_file(namespace, payload_key)
     if not p.exists():

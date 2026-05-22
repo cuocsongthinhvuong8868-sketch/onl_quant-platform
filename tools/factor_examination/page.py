@@ -23,7 +23,7 @@ import streamlit as st
 from openai import OpenAI
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
-from shared.daily_cache import load_daily_cache, save_daily_cache
+from shared.daily_cache import load_daily_cache, peek_data_date, save_daily_cache
 from shared.data_loader import (
     load_close_prices,
     load_volumes,
@@ -717,11 +717,6 @@ def render() -> None:
         st.warning("⚠️ ticker_metadata.csv chưa có — sector-neutral sẽ về 'Other' cho mọi mã. "
                    "Chạy `python command/update_sector_data.py` để có ICB.")
 
-    # ── Data freshness bar ──
-    _last_date = prices.index[-1].date()
-    st.info(f"📅 **Ngày dữ liệu cuối cùng**: `{_last_date.strftime('%Y-%m-%d')}` "
-            f"(market_data.csv, {len(prices)} phiên)")
-
     # Align market to prices index
     market = vnindex.reindex(prices.index).ffill()
 
@@ -749,6 +744,16 @@ def render() -> None:
             st.error(f"Factor compute fail: {exc}")
             logger.exception("Factor compute fail")
             return
+
+    # ── Data freshness bar: ngày data_date trong pkl đang active ──
+    _pkl_key = {
+        "universe": list(universe),
+        "sector_neutral": params["sector_neutral"],
+        "method_v": METHOD_V,
+    }
+    _pkl_date = peek_data_date(SCORE_NAMESPACE, _pkl_key) or prices_key
+    st.info(f"📅 **Ngày dữ liệu cuối cùng**: `{_pkl_date}` "
+            f"(pkl cache, universe {len(universe)} mã)")
 
     tab1, tab2, tab3, tab4 = st.tabs([
         "🏆 Universe Ranking",
