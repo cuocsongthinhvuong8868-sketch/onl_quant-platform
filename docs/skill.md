@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-**Updated:** 2026-05-20 (GFCM v2 + Factor Examination ship)
+**Updated:** 2026-05-22 (Factor Exam → pkl cache + cron pre-warm + 4 cache patterns documented)
 **Purpose:** nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
@@ -313,6 +313,46 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - Reframe "Factor Risk Model" → "Portfolio Factor Examination" để tránh double count với ESR/Dispersion/Market Breadth. Risk model truyền thống cần BCTC dài; portfolio examination chỉ cần price/volume.
 - Tool **không** có alpha tự thân — chỉ có alpha khi human đã đánh giá regime từ tool khác.
 - MAD-based z-score robust hơn mean/std cho factor có fat tail (vd Mom outlier, MAX lottery).
+
+---
+
+### 2026-05-22 — Factor Exam stale cache + pkl conversion + 4 cache patterns
+
+**Bối cảnh resume**: User báo Factor Exam page hiện compute output stuck 20/05, dù các tool khác recompute hằng ngày. Diagnose → fix → ship qua 6 PR.
+
+**PR sequence**:
+| PR | Change | Outcome |
+|---|---|---|
+| #16 | Info bar 📅 Ngày data + nút "Xử lý lại toàn bộ công cụ" (clear `st.cache_data` + local pkl) | Merged. Workflow `command_runner.yml` accidentally re-fired trên branch push do paths filter chưa có `branches:` filter → hotfix kèm. |
+| #17 | Nút "Xử lý lại tính toán" (rename) + helper `trigger_remote_cache_reset()` qua GitHub REST API → fire workflow xóa pkl trên repo. `command/clear_daily_cache.py` + `command_runner.yml` `git add -A`. | Merged nhưng nút không hoạt động trên Cloud (lý do chưa rõ — token / multi-worker / Cloud caching layer). |
+| #18 | Bỏ chức năng "Xử lý lại tính toán" (theo user). Xóa cache_reset.py + clear_daily_cache.py. Giữ info bar 📅. Revert `command_runner.yml` `git add -A`. | Merged. |
+| #19 | **Hotfix critical**: commit `8ab88bd` (merge main vào branch qua GH web UI) xóa marker `<<<<<<< ======= >>>>>>>` nhưng giữ text `claude/review-platform-docs-OiV1W` + `main` ở module level page.py → bare `BinOp` + `Name` expression → NameError ngay khi import. Crash Factor Exam page. | Merged. |
+| #20 | **Root cause fix**: Factor Exam dùng `@st.cache_data` in-memory process-local, không invalidate đáng tin trên long-running Cloud worker. Chuyển sang pkl pattern (`shared/daily_cache.py`) y hệt 7 tool VN-equity khác. Cache key dict deterministic (`json.dumps` sort_keys + sha1 qua `_stable_hash`). Tạo `command/update_factor_examination.py` (compute-only, no AI, ~5s) + add step vào `update_pipeline.yml` 14:30 VN cron. Seed 2 pkl (sector_neutral True/False, data_date 2026-05-22). | Merged. |
+| #21 | Info bar 📅 đọc `data_date` từ pkl active (qua mới `peek_data_date()` trong daily_cache.py) thay vì `prices.index[-1].date()` của CSV — reflect đúng ngày compute thực, không phải CSV claim. | Merged. |
+
+**4 cache pattern trên platform (đã document cho user)**:
+
+1. **PKL + cron pre-warm** (8 tool):
+   - 7 VN-equity (fear_greed/manipulation/dispersion/upside_ratio/risk_adjusted_growth/market_breadth/esr_monitor): pkl qua `daily_cache.py` + AI .txt, cron `ai_cio_daily.yml` 15:45 VN
+   - **factor_examination** (sau PR #20): pkl qua `daily_cache.py`, cron `update_pipeline.yml` 14:30 VN, AI on-demand
+2. **No-cache on-demand** (2 tool): va_res, var_cvar_vnindex — compute lightweight render mỗi lần. AI .txt vẫn cron pre-warm.
+3. **CSV cache + standalone AI** (2 macro): fed_liquidity (`fed_liquidity_weekly.yml` Wed 05:00 VN), GFCM (`gfcm_daily.yml` Mon-Fri 05:00 VN)
+4. **Per-pair on-demand** (1 tool): pairs_trading — user pick cluster+pair, compute on click
+
+**Infrastructure**:
+- `.github/workflows/command_runner.yml`: trigger file `.github/triggers/run-command.json` push-based. Đã add `branches: [main]` filter (PR #16 hotfix) để không re-fire trên feature branch push.
+- Trigger update_data + update_bank_fundamentals via MCP trong session — fetch 2026-05-21 + 2026-05-22 (intraday).
+
+**Lessons học**:
+- `@st.cache_data` không reliable trên Cloud long-running worker. Pkl pattern via `daily_cache.py` (disk-based + data_date check) là gold standard cho VN-equity compute tool.
+- GH web UI conflict resolution có thể strip marker nhưng giữ text branch name → silent NameError nếu không double-check. Luôn `python -m py_compile` post-merge.
+- `python hash()` của tuple **không** deterministic qua process (PYTHONHASHSEED random) → KHÔNG dùng làm cache key cross-process. Pkl `_stable_hash` (json + sha1) là correct.
+- "Ngày dữ liệu" hiển thị nên reflect data thực backing compute (pkl `data_date`), không phải metadata file (CSV `index[-1]`) — user có thể detect inconsistency khi Cloud có drift.
+- Compute-only cron script (no AI) là pattern lightweight để pre-warm pkl mà không tốn API quota.
+
+**Production constants mới**:
+- `tools/factor_examination/page.py`: `SCORE_NAMESPACE = "factor_examination"`, `IC_NAMESPACE = "factor_examination_ic"`, `METHOD_V = "v1"`
+- `command/update_factor_examination.py`: `DEFAULT_MIN_ADV_BILLION = 1.0` (match sidebar default)
 
 ---
 
