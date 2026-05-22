@@ -112,10 +112,9 @@ jobs:
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
-          # Stage các thư mục output có thể đã thay đổi (silent nếu folder không tồn tại).
-          # Dùng -A để stage cả deletions (cần cho script clear_daily_cache.py).
+          # Stage các thư mục output có thể đã thay đổi (silent nếu folder không tồn tại)
           for dir in data_lake reports docs; do
-            [ -d "$dir" ] && git add -A "$dir" || true
+            [ -d "$dir" ] && git add "$dir" || true
           done
 
           if git diff --cached --quiet; then
