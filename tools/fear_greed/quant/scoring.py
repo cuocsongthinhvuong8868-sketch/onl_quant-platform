@@ -58,8 +58,8 @@ def calculate_risk_score(metrics_df: pd.DataFrame, rank_window: int = 252) -> pd
     df["Up_Corr_Norm"]   = _pct_rank(df["Upside_Corr"])
     df.bfill(inplace=True)
 
-    panic_pull = df["Vol_Norm"] * df["Down_Corr_Norm"] * df["Skewness"].clip(upper=0).abs()
-    fomo_push  = df["Vol_Norm"] * df["Up_Corr_Norm"]   * df["Skewness"].clip(lower=0)
+    panic_pull = (df["Vol_Norm"] * df["Down_Corr_Norm"] * df["Skewness"].clip(upper=0).abs()) ** (1/3)
+    fomo_push  = (df["Vol_Norm"] * df["Up_Corr_Norm"]   * df["Skewness"].clip(lower=0)) ** (1/3)
 
     df["Risk_Score"] = np.where(
         panic_pull > fomo_push,
