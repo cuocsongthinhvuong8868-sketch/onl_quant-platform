@@ -1,0 +1,29 @@
+## 1. Observations
+- Risk Score: 50.7/100 (giảm -1.6 so với phiên trước), nằm trong vùng trung tính (40-60).
+- EGARCH Vol: 4.0%, giảm -5.6%, đang ở mức thấp hơn so với khung tham chiếu FEAR.
+- Rolling Skewness: -0.02, rất gần 0 (không lệch), không đủ âm sâu để cảnh báo EXTREME FEAR.
+- Upside Correlation (64.3%) cao gấp ~5 lần Downside Correlation (12.7%), cho thấy dòng tiền đồng thuận mạnh khi tăng nhưng phân hoá khi giảm.
+
+## 2. Interpretation
+Dữ liệu hiện tại mô tả một pha thị trường **cấu trúc phân hoá rõ rệt**: xác suất cao đám đông vẫn giữ tâm lý tích cực (upside-corr cao) nhưng không còn hào hứng đẩy giá như giai đoạn GREED; đồng thời EGARCH Vol thấp và Skewness trung tính cho thấy rủi ro hệ thống đang kìm hãm các biến động bất ngờ. Vùng điểm số này là nơi các upstream/downstream tín hiệu mâu thuẫn thường xuất hiện.
+
+## 3. Cross-Check
+- **Score (50.7) vs EGARCH Vol (4.0%)**: Divergence trung bình — Score giảm nhẹ (-1.6) nhưng Vol giảm (-5.6%). Điều này cho thấy nỗi sợ đang giảm chậm hơn tốc độ nén volatility. **Flag nhẹ.**
+- **Skewness (-0.02) vs Correlation (Upside cao)**: Skewness trung tính kết hợp với upside-corr cao là bất thường nhẹ — thường skew dương mới đi kèm corr tăng mạnh. Tín hiệu này phản ánh sự đồng thuận thiếu xác nhận từ phân phối lợi nhuận.
+
+## 4. Verdict
+**NO ACTIONABLE SIGNAL: Scoring và VOL đều trung tính nhưng Skewness mâu thuẫn với Correlation; không đủ cơ sở xác suất cao để dịch chuyển beta.**  
+Duy trì beta mặc định 0.5 (nửa nạp). Nếu muốn active, ưu tiên danh mục Stock Picking — không mở rộng beta thêm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "22/05/2026",
+  "regime": "NEUTRAL",
+  "score": 50.7,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": ["Score trung tính 50.7, không đủ mạnh để chuyển pha", "Vol giảm nhưng Skewness trung tính không xác nhận hưng phấn", "Correlation bất đối xứng (up 64%, down 13%) thể hiện phân hoá mạnh"]
+}
+```

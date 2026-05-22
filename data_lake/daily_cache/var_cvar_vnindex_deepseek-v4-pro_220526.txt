@@ -1,0 +1,48 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.64% (3Y rolling), sát với Parametric Gaussian (-1.53%), cho thấy vùng trung bình vẫn ổn định.
+- **EVT VaR 99%**: -3.66% — mức lỗ kỳ vọng 1/100 ngày giao dịch gấp ~2.4 lần Gaussian 95%.
+- **ξ (GPD shape)**: +0.346 — vượt ngưỡng 0.30, xác nhận chế độ **fat tail**.
+- **Hill index**: +0.471 — cùng dấu dương và lớn hơn ξ, nhưng vẫn nằm cùng vùng fat tail.
+
+## 2. Tail Thickness Diagnosis
+
+ξ = +0.346 thuộc bracket **FAT TAIL** (> 0.30).  
+Hill = +0.471 cùng dấu và độ lớn tương đồng (cả hai > 0.30) → **cross-check robust**, không có dấu hiệu threshold sensitivity.  
+
+ES − VaR Spread = -1.36%, lớn hơn σ₃₀ (1.16%) → xác nhận thực nghiệm: đuôi phân phối dày hơn Gaussian. Cả ba tín hiệu (ξ, Hill, spread) đều đồng thuận.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** (μ=0, z=-2.33): -2.33 × 1.16% ≈ **-2.70%**.
+- **EVT VaR 99%**: -3.66%.
+- **Gaussian Gap**: |−3.66% − (−2.70%)| = **0.96 pp** → **gần chạm ngưỡng 1 pp**.
+
+Tuy gap chưa vượt 1 pp tuyệt đối, nhưng EVT ES 99% (-6.11%) gấp ~2.3 lần Gaussian VaR 99%, cho thấy mô hình Normal đang **underestimate rủi ro cực đoan một cách có hệ thống** ở đuôi xa. Không nên dùng Gaussian để tính risk capital cho VaR 99%+.
+
+## 4. Verdict — Hedging Implications
+
+ξ = 0.346 > 0.30 → **fat tail confirmed**.  
+Khuyến nghị hành động ngay:
+- Tránh chiến lược momentum (dễ bị gap down)。
+- Mua **put options ITM** (delta ~0.60-0.70) để bảo vệ danh mục khỏi sự kiện -3.5% đến -5%.
+- **Short futures hedge** tỷ lệ 15-25% NAV nếu đòn bẩy danh mục >1.5x.
+
+**Không dùng** σ-based position sizing (Kelly, fixed fraction) khi ξ > 0.30.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "22/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.96,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```
