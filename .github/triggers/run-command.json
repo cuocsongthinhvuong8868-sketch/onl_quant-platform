@@ -1,13 +1,13 @@
 {
-  "_comment": "File này được Claude update qua MCP để trigger command_runner.yml. Mỗi lần content thay đổi → push event → workflow fire. Bạn cũng có thể edit thủ công + commit để trigger.",
+  "_comment": "File này được Claude / Streamlit UI update qua REST API để trigger command_runner.yml. Mỗi lần content thay đổi → push event → workflow fire.",
   "_schema": {
     "script_path": "Đường dẫn từ root repo, chỉ cho phép command/*.py",
-    "args": "Extra args (optional, vd '--backfill 2190')",
-    "commit_outputs": "true → workflow commit data_lake/reports/docs back to repo; false → chạy nhưng không commit",
-    "triggered_at": "ISO timestamp — chỉ để force diff khi cùng script chạy lại"
+    "args": "Extra args (optional)",
+    "commit_outputs": "true → workflow commit data_lake/reports/docs về repo",
+    "triggered_at": "ISO timestamp — force diff khi cùng script chạy lại"
   },
-  "script_path": "command/update_bank_fundamentals.py",
+  "script_path": "command/clear_daily_cache.py",
   "args": "",
   "commit_outputs": true,
-  "triggered_at": "2026-05-22T04:12:00Z"
+  "triggered_at": "2026-05-22T04:52:39Z"
 }
