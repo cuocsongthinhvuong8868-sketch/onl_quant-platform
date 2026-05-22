@@ -110,7 +110,7 @@ Allowlist: `python3 *`, `python *`, `pip *`, `grep *`, `find *`, `ls *`, `cat *`
 
 | # | Tool | Trạng thái | Blocker / Next step |
 |---|---|---|---|
-| ✅ §12 | **Factor Examination** (reframe từ Factor Risk Model) | **SHIPPED 2026-05-20** | 10 factor price-based (Mom/Reversal/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery) sector-neutral ICB. Portfolio examination tool — không double count regime tool. Handbook `docs/factor_examination_handbook.md` + nút download UI. P2 (BCTC factors) defer khi có Sponsor paid |
+| ✅ §12 | **Factor Examination** (reframe từ Factor Risk Model) | **SHIPPED 2026-05-20 + 2026-05-22 pkl refactor** | 10 factor price-based (Mom/Reversal/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery) sector-neutral ICB. Portfolio examination tool — không double count regime tool. Handbook `docs/factor_examination_handbook.md` + nút download UI. **2026-05-22**: chuyển từ `@st.cache_data` sang pkl `daily_cache.py` pattern + cron pre-warm trong `update_pipeline.yml` 14:30 VN; info bar 📅 đọc data_date từ pkl active. P2 (BCTC factors) defer khi có Sponsor paid |
 | §3 | MES / SRISK (NYU V-Lab) | 📋 idea | — |
 | §4 | Diebold-Yilmaz Spillover (VAR + FEVD) | 📋 idea | — |
 | §6 | HRP thay logistic backtest curve | 📋 idea | — |
