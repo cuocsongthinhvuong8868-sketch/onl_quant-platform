@@ -23,6 +23,7 @@ import streamlit as st
 from openai import OpenAI
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
+from shared.cache_reset import reset_local_compute_caches, trigger_remote_cache_reset
 from shared.data_loader import (
     load_close_prices,
     load_volumes,
@@ -689,6 +690,37 @@ def render() -> None:
     if metadata is None:
         st.warning("⚠️ ticker_metadata.csv chưa có — sector-neutral sẽ về 'Other' cho mọi mã. "
                    "Chạy `python command/update_sector_data.py` để có ICB.")
+
+    # ── Data freshness bar + reset button ──
+    _last_date = prices.index[-1].date()
+    _c1, _c2 = st.columns([3, 1])
+    with _c1:
+        st.info(f"📅 **Ngày dữ liệu cuối cùng**: `{_last_date.strftime('%Y-%m-%d')}` "
+                f"(market_data.csv, {len(prices)} phiên)")
+    with _c2:
+        if st.button(
+            "🔄 Xử lý lại tính toán",
+            key="fexam_reset_all",
+            help="Bước 1: xoá local cache (st.cache_data + pkl). "
+                 "Bước 2: trigger GitHub Actions xóa pkl trên repo → Cloud rebuild. "
+                 "KHÔNG xoá .txt AI cache.",
+            use_container_width=True,
+        ):
+            _local = reset_local_compute_caches()
+            _remote = trigger_remote_cache_reset()
+            if _remote.get("ok"):
+                st.toast(
+                    f"✅ Local: xoá {_local['pkl_deleted']} pkl + Streamlit cache. "
+                    f"Remote: trigger fired — workflow đang xóa pkl trên repo (~1-2 phút).",
+                    icon="🔄",
+                )
+            else:
+                st.toast(
+                    f"⚠️ Local: xoá {_local['pkl_deleted']} pkl OK. "
+                    f"Remote skip: {_remote.get('error', 'unknown')}",
+                    icon="⚠️",
+                )
+            st.rerun()
 
     # Align market to prices index
     market = vnindex.reindex(prices.index).ffill()
