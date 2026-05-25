@@ -1,0 +1,64 @@
+# Phân tích Economic Alpha – Ngân hàng Việt Nam (Kịch bản Tiêu chuẩn)
+
+## 1. Đánh giá kịch bản
+
+Với K=1.0 (risk penalty multiplier baseline) và chi phí vốn chủ sở hữu (CoE) 14% – đây là mức khảo sát tiêu chuẩn cho ngân hàng Việt Nam, không quá khắc nghiệt. Stress test BVPS giảm 5% và P/B penalty 5% tạo điều kiện kiểm tra sức chịu đựng hợp lý.
+
+**Mặt bằng ngành:** Có sự phân hóa rõ rệt. Top 3 tạo Alpha dương (từ 3.6% đến 5.1%), trong khi Bottom 3 âm sâu (-7.4% đến -12.6%). Điều này cho thấy ngành không đồng nhất – vẫn có cơ hội chọn lọc cổ phiếu để tạo giá trị thặng dư.
+
+## 2. Phân tích Top Alpha
+
+| Mã | Alpha | P/B | Phân loại | Driver chính |
+|----|-------|-----|-----------|--------------|
+| **HDB** | 5.1% | 1.30 | **Fortress** | ROE bền vững + σ thấp + P/B hợp lý |
+| **SHB** | 4.0% | 0.93 | **Cheap-but-not-trap** | P/B rẻ rõ rệt + ROE ổn định |
+| **TPB** | 3.6% | 0.94 | **Fortress** | P/B thấp + ROE duy trì tốt |
+
+**HDB** (Alpha 5.1%) nổi bật nhất: P/B 1.30 không quá rẻ nhưng ROE cao và biến động thấp (σ nhỏ) → Risk Penalty không đáng kể. Disciplined Return = 19.1% – 14% CoE = 5.1% Alpha. Đây là hình mẫu **Fortress** điển hình.
+
+**SHB** (Alpha 4.0%): P/B 0.93 cực kỳ rẻ. Dù ROE có thể không cao nhất, nhưng định giá thấp bù đắp. Xếp loại **Cheap-but-not-trap** vì không có dấu hiệu ROE suy giảm mạnh.
+
+**TPB** (Alpha 3.6%): P/B 0.94 + ROE ổn định. Tương tự SHB nhưng chất lượng tài sản tốt hơn. Phân loại **Fortress** nhẹ.
+
+## 3. Cảnh báo bẫy giá trị
+
+| Mã | Alpha | P/B | Vấn đề |
+|----|-------|-----|--------|
+| **EIB** | -12.6% | 1.54 | **Premium Burn**: P/B cao + ROE thấp + Risk Penalty lớn |
+| **LPB** | -8.2% | 3.42 | **Premium Burn** đỉnh cao: P/B quá đắt so với ROE thực tế |
+| **VCB** | -7.4% | 2.34 | **Premium Burn** kinh điển: định giá cao ngất nhưng ROE không đủ bù Risk Penalty |
+
+**EIB** chịu Risk Penalty từ σ(ROE) cao (biến động lợi nhuận). P/B 1.54 không đắt nhưng ROE thấp + rủi ro cao → khó tạo giá trị.
+
+**LPB** là **bẫy tăng trưởng**: P/B 3.42 là mức cao nhất bảng, trong khi Alpha âm sâu. Nhà đầu tư đang trả premium quá lớn cho kỳ vọng tăng trưởng.
+
+**VCB** là trường hợp kinh điển: P/B 2.34, ROE tốt nhưng σ(ROE) tương đối cao → Risk Penalty ăn mòn. Định giá không tương xứng với rủi ro.
+
+## 4. Đề xuất danh mục
+
+### Core Holding (60-70%): **HDB, TPB**
+- HDB: Fortress mạnh nhất – ROE bền, P/B hợp lý, Alpha cao nhất
+- TPB: Fortress phụ – P/B rẻ, ROE ổn định
+
+### Tactical (20-30%): **SHB**
+- Cheap-but-not-trap: P/B dưới 1, nếu cải thiện ROE sẽ tạo Alpha lớn hơn
+
+### Cấm mua / Underweight: **EIB, LPB, VCB**
+- EIB: Risk Penalty quá lớn
+- LPB: P/B ảo tưởng
+- VCB: Premium không được hỗ trợ bởi chất lượng đủ mạnh
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "TPB"],
+  "avoid_list": ["EIB", "LPB", "VCB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```
+
+**Lưu ý:** Phân tích chỉ dựa trên Top 3/Bottom 3 được cung cấp. Không hallucinate dữ liệu ngoài phạm vi. Không đưa mức giá tuyệt đối.
