@@ -1,0 +1,36 @@
+## 1. Observations
+- Risk Score = 51.3/100 (NEUTRAL), tăng +0.6 so với phiên trước, nằm gần giữa khung 40-60.
+- EGARCH Vol = 2.8%, giảm -2.4%, thấp hơn mức trung bình lịch sử (~3.5-4.0%).
+- Rolling Skewness = 0.01, gần zero, không có độ lệch đuôi rõ rệt.
+- Downside Correlation = 13.5% (thấp), Upside Correlation = 64.5% (cao), chênh lệch ~51 điểm phần trăm.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang ở pha **NEUTRAL phân hóa mạnh** theo hướng nghiêng về Greed: vol giảm nhẹ, skewness trung tính, và đám đông đồng thuận tăng (up-corr cao, down-corr thấp). Không có dấu hiệu sợ hãi hệ thống cũng như kỳ vọng cực đoan.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: Score ở NEUTRAL (51.3) trong khi vol giảm mạnh (-2.4%). Đây là divergence nhẹ: vol thấp thường đi kèm Greed (score >60). Score chưa phản ánh hết mức giảm vol → có thể đang thiếu động lực tăng beta.
+- **Skewness vs Correlations**: Skewness trung tính (0.01) nhưng up-corr cao (64.5%) tạo tín hiệu mixed. Thị trường phân hóa, không đồng nhất như Greed thuần túy.
+
+**Kết luận Cross-Check**: Signals mâu thuẫn nhẹ — vol thấp + up-corr cao nghiêng Greed, nhưng skewness trung tính và score chưa xác nhận. Không đủ để chuyển trạng thái mạnh.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.50 (giảm nhẹ so với trung tính 0.6)
+- **Hành động**: Giảm 10% beta từ mức trung tính. Ưu tiên stock-picking với cổ phiếu có skewness dương và vol riêng thấp. Không mở thêm vị thế mới. Nếu Risk Score vượt 55+ kèm vol tiếp tục giảm, có thể tăng lên 0.65. Hiện tại giữ phòng thủ chờ tín hiệu rõ hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "25/05/2026",
+  "regime": "NEUTRAL",
+  "score": 51.3,
+  "confidence": "medium",
+  "beta_target": 0.50,
+  "key_signals": [
+    "Score 51.3 gần trung tâm khung NEUTRAL",
+    "EGARCH Vol giảm mạnh -2.4% còn 2.8% nhưng chưa phá ngưỡng Greed",
+    "Upside Correlation 64.5% vs Downside 13.5% phản ánh phân hóa mạnh nghiêng tăng",
+    "Skewness 0.01 trung tính không xác nhận xu hướng đuôi"
+  ]
+}
+```

@@ -1,0 +1,43 @@
+## 1. Observations
+
+- SSI ở mức 63.9% — nằm trong vùng **WARNING** (tích lũy rủi ro ngầm)
+- Market State là **EUPHORIC RISK** — giá trên MA125 + stress cao
+- Top 3 Pillar: **S_LIQ (36%) > S_VAL (32%) > S_COR (17%)**
+- Pillar Mode là **downside** — chỉ tính phiên giảm khi phân rã
+
+## 2. Risk Decomposition (Bóc tách)
+
+**S_LIQ (36%)** — volume dry-up đang là driver số một. Chỉ số volume khô cạn so với chuẩn 1 năm đang ở mức cao nhất trong các pillar, phản ánh thanh khoản suy yếu nghiêm trọng dù giá vẫn đang tăng. Đây là tín hiệu điển hình của **bull-trap**: giá leo lên đỉnh nhưng khối lượng giao dịch không xác nhận.
+
+**S_VAL (32%)** — valuation tension ở vị trí thứ hai. Lợi nhuận 252 ngày của VN30 đang cao hơn đáng kể so với lãi suất tiền gửi, cho thấy sự kéo căng về định giá.
+
+**S_COR (17%)** — systemic correlation đóng góp thêm. PCA EVR PC1 ở mức 38.5%, vừa phải nhưng đang gia tăng cùng với S_LIQ.
+
+**Bộ ba S_LIQ + S_VAL + S_COR với Pillar Mode = downside** tạo thành signature cổ điển của herding trong uptrend yếu: dòng tiền đổ vào ít dần, định giá quá cao, và các mã bắt đầu di chuyển đồng pha hơn ở những phiên giảm.
+
+## 3. Cross-Check
+
+**Price action vs SSI**: Giá VN30 đang ở gần đỉnh (trên MA125) trong khi SSI 63.9% đã vào WARNING. Đây là divergence rõ ràng — giá cao nhưng stress hệ thống đang leo thang. Bull-trap risk đáng kể.
+
+**HMM regime**: Market State EUPHORIC RISK khớp hoàn toàn với SSI level. Không có lệch pha.
+
+## 4. Verdict
+
+**Cash weight đề xuất**: 70% cash — giữ margin rất thấp, gần như không tiếp xúc.  
+**Hedge action**: **Short VN30F1M** — hợp đồng tương lai gần là công cụ phù hợp nhất để hedgedown rủi ro bull-trap. Không mua put vì premium sẽ đắt do S_VOL đang tăng.  
+**Pillar drivers đồng thuận cao** — hành động rõ ràng, không mâu thuẫn.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "short_futures",
+  "confidence": "high"
+}
+```

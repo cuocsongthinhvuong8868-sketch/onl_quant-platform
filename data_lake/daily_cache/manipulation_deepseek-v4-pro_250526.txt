@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope**: 0.43 — Percentile lịch sử **100.0th** (🔴 Cao kỷ lục). Mỗi 1% biến động của VIN composite đang kéo VN30F1M ~0.43%, sức nặng chưa từng thấy.
+- **Correlation**: 0.73 — Percentile lịch sử **100.0th** (🔴 Rất chặt). Nhóm VIC/VHM/VRE gần như là yếu tố duy nhất chi phối VN30F1M.
+- **Regime**: **COUPLING** (ΔCorr = 0.97, ΔSlope = 0.93) — cả hai delta đều > +0.15, xác nhận VIN composite đang dẫn dắt F1 mạnh mẽ.
+
+## 2. Microstructure Read
+Với cả slope và correlation đều ở percentile 100.0th, đây là trạng thái **bất thường cực đoan**, không phải giao dịch tự nhiên. Khả năng rất cao có sự **can thiệp chủ động** (market maker hoặc tổ chức lớn) đẩy nhóm VIC/VHM/VRE để giữ/bơm VN30F1M. VIC ở 218.8 và VHM 158.7 đóng vai trò "cán cân" — nếu hai mã này đứt nhịp, VN30F1M sẽ mất neo nhanh.
+
+## 3. Event Study Interpretation
+Trạng thái COUPLING thuần (cả ΔCorr và ΔSlope cao) cho thấy edge ngắn hạn theo VIN là hợp lý. Tuy nhiên, percentile cực hạn 100/100 báo động đây có thể là **đỉnh của sóng intervention** — giá các mã VIN đã quá đắt so với nội tại. Nếu thị trường bắt đầu nghi ngờ sức bền của dòng tiền đỡ, coupling sẽ đảo chiều rất nhanh.  **Không nên giữ vị thế qua đêm** nếu không có tin hỗ trợ rõ ràng.
+
+## 4. Verdict
+**Trade plan**: **Long F1** — mua theo đà, nhưng chỉ intraday. Entry quanh 2,022.4, target chốt lời nhanh +0.4% (~2,030). Dừng lỗ dưới 2,015 (-0.37%).
+
+- **Leading indicator**: Theo dõi sát **VIC** (218.8 là support động). Nếu VIC mất 215 (-1.7%), khả năng cao slope sẽ đứt — thoát ngay.
+- **Stop-loss**: Đặt stop-loss cho VIC tại 215.50 (giá hiện tại 218.80, trượt 1.5%). Dùng trailing stop 0.5% trên VN30F1M.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "25/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 100.0,
+  "corr_percentile": 100.0,
+  "trade_signal": "long_f1",
+  "confidence": "medium"
+}
+```
