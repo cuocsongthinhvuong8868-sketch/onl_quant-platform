@@ -1,0 +1,38 @@
+## 1. Observations
+- SSI ở mức 64.0% – vùng **WARNING** (tích lũy rủi ro ngầm)
+- Market State và HMM Regime đều **HEALTHY** (có thể có divergence)
+- Top 3 Pillar Weights: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- Pillar Mode: **downside** (chỉ sử dụng phiên giảm để tính toán)
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ (36%)** là driver chính. Chỉ số này đo **Volume Dry-Up** – mức độ khô cạn khối lượng giao dịch so với chuẩn 1 năm. Giá trị cao (36%) cho thấy thanh khoản đã suy giảm đáng kể, tín hiệu điển hình của giai đoạn tích lũy trước biến động lớn hoặc bull-trap.
+
+**S_VAL (32%)** phản ánh căng thẳng định giá: lợi nhuận 252 ngày của VN30 thấp hơn lãi suất huy động, khiến dòng tiền có động cơ rút khỏi thị trường cổ phiếu.
+
+**S_COR (17%)** ở mức vừa phải, PCA EVR PC1 = 38.4% cho thấy chưa có herding cực đoan, nhưng đang tăng dần.
+
+**Kết luận**: Bộ ba S_LIQ + S_VAL + S_COR tạo thành **bull-trap signature** điển hình: giá tăng trên nền thanh khoản cạn kiệt, định giá căng thẳng, và tương quan hệ thống đang hội tụ. Đây là cấu trúc rủi ro tích lũy trước một đợt phân phối.
+
+## 3. Cross-Check
+**Divergence rõ rệt**: SSI ở WARNING (64.0%) trong khi Market State vẫn HEALTHY. VN30 đóng cửa trên MA125 nhưng không có xác nhận thanh khoản – giá tăng nhưng dòng tiền yếu. Đây là tín hiệu bull-trap kinh điển: price action lạc quan trong khi hệ thống đo lường stress đã chuyển sang cảnh báo.
+
+HMM threshold 0.535 không đủ nhạy để bắt kịp với tốc độ suy giảm thanh khoản – một độ trễ cần được lưu ý.
+
+## 4. Verdict
+**Cash weight đề xuất**: 60% (chỉ giữ 40% danh mục)
+**Hedge action**: Giảm beta (chuyển từ cổ phiếu vốn hóa lớn sang defensive), short một phần VN30F1M với quy mô 15-20% danh mục
+**Lưu ý**: S_VAL đang gia tăng là yếu tố cơ bản – nếu deposit rate tiếp tục neo cao, áp lực dịch chuyển dòng tiền sẽ mạnh hơn. Pillar Mode downside càng củng cố tín hiệu rủi ro từ S_LIQ và S_VAL – đây là cấu trúc đồng thuận theo hướng bearish, cần hành động phòng vệ sớm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64,
+  "regime": "WARNING",
+  "market_state": "HEALTHY",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
