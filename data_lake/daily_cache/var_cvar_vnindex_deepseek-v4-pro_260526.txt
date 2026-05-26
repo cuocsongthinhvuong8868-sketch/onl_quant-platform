@@ -1,0 +1,38 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.64%, sâu hơn Parametric Gaussian VaR (-1.05%) khoảng 0.59pp, cho thấy phân phối thực nghiệm có đuôi nặng hơn normal.
+- **EVT VaR 99%**: -3.66%, tương ứng với sự kiện 1/100 ngày giao dịch (khoảng 1 lần/năm).
+- **ξ (GPD shape)**: +0.346, nằm trong bracket **FAT TAIL** (>0.30), báo hiệu rủi ro cực đoan đáng kể.
+- **Hill index**: +0.471, cùng dấu dương với ξ và có magnitude tương đương (0.346 vs 0.471), tạo cross-check robust.
+
+## 2. Tail Thickness Diagnosis
+
+ξ = +0.346 thuộc bracket **FAT TAIL**. Hill index (+0.471) confirm cùng hướng và magnitude không quá chênh lệch, cho thấy threshold selection ổn định, tín hiệu đuôi dày đáng tin cậy. ES − VaR spread = -1.36%, lớn hơn σ₃₀ (0.80%), khẳng định bằng chứng thực nghiệm: đuôi phân phối dày hơn đáng kể so với giả định Gaussian.
+
+## 3. Gaussian Gap
+
+Tính Gaussian VaR 99%: với μ xấp xỉ 0 (ngày) và σ = 0.80%, z₀.₀₁ = -2.33 → Gaussian VaR 99% ≈ -1.86%. So với EVT VaR 99% = **-3.66%**, gap = **1.80pp** (>1pp). Điều này chứng tỏ mô hình Gaussian underestimate rủi ro cực đoan một cách nghiêm trọng. **Không thể dùng Parametric Gaussian để phân bổ vốn rủi ro hay tính capital charge.**
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30 và gap > 1pp, khuyến nghị:
+- **Tránh chiến lược momentum**: đuôi dày làm tăng xác suất "gap down" bất ngờ, momentum dễ bị stop-out thảm họa.
+- **Mua puts ITM**: EVT ES 99% đạt -6.11% cho thấy mức độ thiệt hại kỳ vọng trong 1% xấu nhất rất sâu. Puts ITM (strike gần giá hiện tại) để bảo vệ danh mục hiệu quả hơn OTM do tail risk quá lớn.
+- **Short futures hedge**: khối lượng tương ứng với 30-50% danh mục, điều chỉnh theo vị thế hiện tại.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "26/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.80,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```
