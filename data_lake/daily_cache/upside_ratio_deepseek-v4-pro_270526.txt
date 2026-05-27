@@ -1,0 +1,34 @@
+## 1. Observations
+- **Lực cầu (Upside Breadth):** Hiện tại 4.78%, thấp hơn nhiều so với mu dài hạn 13.71% (delta -8.93%). Phi = +0.166 (> +0.10) → Momentum regime (đà mua yếu nhưng có xu hướng duy trì).
+- **Lực cung (Downside Breadth):** Hiện tại 1.99%, thấp hơn rất nhiều so với mu dài hạn 13.50% (delta -11.51%). Phi = +0.272 (> +0.10) → Momentum regime (đà bán cũng yếu nhưng đang có xu hướng duy trì trạng thái nén).
+- Cả hai chiều đều ở trạng thái nén mạnh so với trung bình dài hạn, nhưng đều mang động lượng dương (momentum) — tức trạng thái nén này có khả năng tiếp diễn ngắn hạn.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền hiện tại: ZOMBIFICATION** — Cả Upside và Downside Breadth đều nén cực mạnh dưới mu dài hạn (up 4.78% << 13.71%, down 1.99% << 13.50%). Đây là dấu hiệu thanh khoản cạn kiệt, thị trường không có biên độ dao động đáng kể, giống như "thây ma".
+- **Bên nào giữ momentum thực sự?** So sánh |Phi|: Lực cung (0.272) > Lực cầu (0.166). Điều này cho thấy đà bán (dù yếu về biên độ) đang có tính dai dẳng hơn đà mua. Do đó, dòng tiền hiện tại mang thiên hướng **supply-side momentum** — cung yếu nhưng có tổ chức hơn cầu.
+
+## 3. Stress-Test Read
+- **P95 Downside = 28.50%:** Nếu thị trường panic, kỳ vọng biên độ giảm mạnh nhất trong 19 phiên tới lên tới 28.50%. Đây là mức cực đoan, phản ánh rủi ro đuôi rất lớn khi thanh khoản đột ngột bùng nổ.
+- **Asymmetry:** P95 Downside (28.50%) > P95 Upside (24.75%). Tail risk bên bán dày hơn bên mua (~3.75 điểm chênh lệch). Điều này cho thấy phân phối lợi nhuận lệch trái — dù hiện tại đang nén, nhưng rủi ro giảm sâu luôn tiềm ẩn cao hơn.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 10%**
+- **Strategy: DEFENSIVE.** Không nên mua đuổi hay rình bắt đáy vì:
+  - Zombification regime không có tín hiệu rõ ràng về hướng breakout.
+  - Momentum bên bán (phi=0.272) dai hơn bên mua → nguy cơ break down nếu có biến.
+  - Tail risk lệch về phía giảm (P95 Down > P95 Up).
+- Chiến lược tối ưu: Nắm giữ tiền mặt chủ yếu, chỉ giải ngân tỷ trọng rất nhỏ nếu có cơ hội cực kỳ xác suất cao. KHÔNG hành động nếu không có breakout rõ ràng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 28.50,
+  "p95_upside_pct": 24.75,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
