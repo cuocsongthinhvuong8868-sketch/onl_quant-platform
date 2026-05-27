@@ -1,0 +1,52 @@
+## 1. Scenario Assessment
+
+Kịch bản Tiêu chuẩn (K=1.0, CoE=14%) là baseline phù hợp cho ngân hàng Việt Nam. Với stress test BVPS giảm -5% và P/B penalty -5%, đây là mức độ khắc nghiệt trung bình – không quá nặng nhưng đủ để lọc ra những ngân hàng thực sự tạo giá trị.
+
+Mặt bằng ngành: **có sự phân hóa mạnh**. HDB, SHB, TPB ghi nhận Alpha dương (3.3% – 5.0%) chứng tỏ vẫn tồn tại cơ hội tạo giá trị thặng dư. Tuy nhiên, EIB, LPB, VCB âm sâu (-7.5% đến -12.6%) kéo trung bình ngành xuống vùng tiêu cực. Đây là thị trường stock-picker: không phải lúc nào cũng mua bank.
+
+## 2. Top Alpha Decomposition
+
+| Mã | Alpha | P/B | Driver chính | Phân loại |
+|----|-------|-----|--------------|-----------|
+| **HDB** | 5.0% | 1.31 | P/B hợp lý + ROE bền vững, σ thấp → Risk Penalty nhỏ | **Fortress** |
+| **SHB** | 3.8% | 0.94 | P/B rẻ nhất top (0.94x) + ROE ổn định → định giá quá rẻ so với chất lượng | **Fortress (value play)** |
+| **TPB** | 3.3% | 0.96 | P/B thấp + Payout thấp → retention cao, compounding lợi thế | **Fortress (compounding)** |
+
+Cả ba đều thuộc nhóm **Fortress**: P/B thấp (0.94–1.31x), ROE ổn định không quá biến động, cho phép Disciplined Return vượt qua CoE 14%. SHB và TPB được hưởng lợi kép từ P/B rẻ và khả năng giữ lại lợi nhuận cao.
+
+## 3. Value Traps Warning
+
+| Mã | Alpha | P/B | Vấn đề cốt lõi |
+|----|-------|-----|----------------|
+| **EIB** | -12.6% | 1.55 | ROE thấp + biến động mạnh → Risk Penalty lớn phá hủy hoàn toàn return. P/B 1.55x không rẻ so với chất lượng. |
+| **LPB** | -8.3% | 3.42 | **Premium Burn điển hình**: P/B rất đắt (3.42x) trong khi ROE không đủ cao để bù đắp CoE. |
+| **VCB** | -7.5% | 2.36 | P/B 2.36x “đắt tương đối” + ROE giảm tốc. Danh tiếng không che được Risk Penalty. |
+
+EIB là **Cheap Trap + Risk Trap** (vừa yếu vừa rủi ro). LPB và VCB là **Premium Burn**: nhà đầu tư trả giá quá cao cho kỳ vọng tăng trưởng không hiện thực hóa.
+
+## 4. Portfolio Construction
+
+**Core Holding (60-70% bank allocation):**
+- **HDB** – Fortress hàng đầu: Alpha cao nhất, P/B 1.31x hợp lý. Đây là neo danh mục.
+- **SHB** – Fortress value: P/B dưới 1x với Alpha dương 3.8% là cơ hội hiếm.
+
+**Tactical (20-30%):**
+- **TPB** – Bổ sung compounding exposure. Có thể tăng tỷ trọng nếu P/B vẫn dưới 1.0x.
+
+**Cấm mua / underweight:**
+- **EIB, LPB, VCB** – Ba mã này phá hủy giá trị cổ đông rõ rệt. Không có lý do fundamental nào để nắm giữ.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "SHB"],
+  "avoid_list": ["EIB", "LPB", "VCB"],
+  "sector_view": "neutral",
+  "confidence": "high"
+}
+```
+
+> ⚠️ **Lưu ý**: Ngành vẫn có cơ hội (HDB, SHB, TPB) nhưng không phải toàn bộ. Chỉ chọn lọc những mã Alpha > 0 + P/B lành mạnh.
