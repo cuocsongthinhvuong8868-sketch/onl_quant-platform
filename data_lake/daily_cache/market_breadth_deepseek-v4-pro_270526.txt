@@ -1,32 +1,33 @@
 ## 1. Observations
-- **MA20 (ngắn hạn – 1 tháng):** 31.5% mã đóng cửa trên MA20 – mức **thấp**, chỉ nhỉnh hơn oversold (ngưỡng 20%) một chút, xác nhận quán tính yếu trong ngắn hạn.
-- **MA60 (trung hạn – 1 quý):** 34.7% mã trên MA60 – mức **thấp**, thị trường chưa xác nhận kết thúc điều chỉnh trung hạn.
-- **MA125 (trung-dài – ½ năm):** 27.9% mã trên MA125 – mức **rất thấp**, chu kỳ kinh doanh nửa năm đang suy yếu trên diện rộng.
-- **MA252 (dài hạn – 1 năm):** 31.9% mã trên MA252 – mức **thấp**, xác nhận thị trường đang trong vùng secular weakness (xu hướng dài hạn suy yếu).
+- **MA20 (33.9%)**: Mức thấp – dưới ngưỡng 40%, cho thấy xung lực ngắn hạn rất yếu, gần vùng oversold.
+- **MA60 (35.9%)**: Mức thấp – dưới 40%, xác nhận phe mua trung hạn chưa chiếm ưu thế.
+- **MA125 (26.7%)**: Mức rất thấp – gần đáy, phản ánh chu kỳ kinh doanh nửa năm đang suy yếu.
+- **MA252 (31.9%)**: Mức thấp – dưới 40%, cho thấy xu hướng dài hạn vẫn mang tính bearish.
 
 ## 2. Structural Health
-Cả 4 khung thời gian đều đồng loạt nằm trong vùng thấp (31.5% / 34.7% / 27.9% / 31.9%), không có divergence nào đáng kể. Pattern khớp với **Bear Confirmed** (MA20 < 40% AND MA252 < 40%). Không có tín hiệu trap hay đảo chiều tiềm năng. Cấu trúc đang cho thấy một thị trường yếu đồng thuận từ ngắn hạn đến dài hạn.
+Cả bốn khung thời gian đều dưới 40% – một sự đồng thuận hiếm hoi theo hướng tiêu cực. Không có divergence giữa MA20 và MA252; cả hai đều yếu. Pattern phù hợp nhất là **Bear Confirmed** (MA20 < 30%? – gần sát, và MA252 < 40%). Thị trường đang trong trạng thái suy yếu cơ cấu, không có tín hiệu đảo chiều rõ ràng từ breadth.
 
 ## 3. Money Flow Leadership
-- **Top volume MA20 (ngắn hạn):** Dòng tiền tập trung mạnh vào **Banks** (VPB, VCB, ACB, BID), **Brokers** (VIX, SSI), **Energy** (BSR, POW, PLX), và **Manufacturing** (FPT). Đây là các ngành cyclical và financials, phù hợp với môi trường lãi suất thấp và kỳ vọng phục hồi kinh tế.
-- **Top volume MA252 (dài hạn leader):** Overlap rõ với short-term ở **BSR, VPB, VCB**. Ngoài ra, NVL, VRE, VHM đại diện cho **Real Estate** – ngành đang tạo đáy dài hạn nhưng chưa có xác nhận.
-- **Smart money ưu tiên:** Tập trung vào **financials (Banks + Brokers)** và **Energy (dầu khí)** – một sự kết hợp giữa defensive (Banks) và cyclical (Energy/Brokers). Chưa có dấu hiệu chuyển hẳn sang defensive hay aggressive rõ rệt.
+- **Top volume MA20 (ngắn hạn)**: Hoàn toàn là nhóm Banks (SHB, TCB, EIB, VPB, VCB, ACB, BID) kèm một mã chứng khoán (SSI, VIX) và một mã năng lượng (POW). Dòng tiền ngắn hạn tập trung mạnh vào tài chính – mang tính defensive hơn là tăng trưởng.
+- **Top volume MA252 (dài hạn)**: Overlap rất lớn với ngắn hạn: NVL, VRE, VHM (bất động sản), BSR, PVT (dầu khí), MBB, STB, HDB, VPB, VCB (ngân hàng). Điều này cho thấy nhóm Banks và BĐS là nơi trú ẩn dài hạn duy nhất.
+- **Smart money đang ưu tiên**: Defensive (Banks) và một phần Cyclical (BĐS, Dầu khí) – nhưng ở mức cầm chừng, không có dấu hiệu mua đuổi.
 
 ## 4. Verdict
-- **Strategy: Defensive cash-up (tăng tỷ trọng tiền mặt).** Không khuyến nghị Trend-following vì động lực yếu, cũng không khuyến nghị Mean-reversion vì rủi ro bắt đáy trong xu hướng giảm dài hạn.
-- **Đòn bẩy: 0% margin.** MA252 chỉ 31.9% (< 70%) nên không đủ điều kiện để sử dụng margin dù MA20 không oversold sâu.
-- **Nhận định:** Thị trường đang trong pha Bear Confirmed đồng thuận. Không có tín hiệu divergence nên không cần "WAIT FOR CONFIRMATION". Hành động hợp lý nhất: duy trì tiền mặt cao, chỉ canh mua từng phần khi breadth cải thiện rõ rệt.
+Thị trường rơi vào Bear Confirmed với breadth đồng thuận yếu ở mọi horizon. Dòng tiền chỉ tập trung ở nhóm Banks và BĐS – vốn là các nhóm dẫn dắt nhưng đang ở trạng thái giằng co. Không có tín hiệu để mua đuổi hay bắt đáy.  
+- **Strategy**: Defensive cash-up – ưu tiên giữ tiền mặt, không mở vị thế mới.  
+- **Đòn bẩy**: 0% margin.  
+- Không mua trung hạn cho đến khi MA20 hoặc MA60 bật lên trên 50% để xác nhận tín hiệu hồi phục.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "market_breadth",
-  "ma20_pct": 31.5,
-  "ma60_pct": 34.7,
-  "ma125_pct": 27.9,
+  "ma20_pct": 33.9,
+  "ma60_pct": 35.9,
+  "ma125_pct": 26.7,
   "ma252_pct": 31.9,
   "regime": "bear_confirmed",
-  "leadership_sector": "financials",
+  "leadership_sector": "defensive",
   "strategy": "defensive",
   "margin_pct": 0,
   "confidence": "high"

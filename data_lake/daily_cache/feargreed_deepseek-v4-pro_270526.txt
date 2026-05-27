@@ -1,22 +1,21 @@
 ## 1. Observations
-- Risk Score ở mức **50.3/100**, nằm trong vùng NEUTRAL (40-60), giảm nhẹ -1.1 điểm so với phiên trước.
-- EGARCH Vol chuẩn hóa ở **1.6%**, tăng +0.4% so với phiên trước, vượt ngưỡng thấp (<1.2%) nhưng chưa chạm ngưỡng cao (>2.0%).
-- Rolling Skewness ở **-0.02**, rất gần 0 (giới hạn phân hoá), không âm sâu như tín hiệu FEAR (-0.3).
-- Upside Correlation (61.9%) cao gấp **4.5 lần** Downside Correlation (13.9%), cho thấy dòng tiền đồng thuận tăng mạnh hơn nhiều so với bán.
+- Risk Score = 51.7, nằm giữa ngưỡng NEUTRAL (40–60), biến động +0.2 so với phiên trước.
+- EGARCH Vol chuẩn hóa = 1.6%, tăng +0.4% so với phiên trước, vượt ngưỡng trung bình (~1.2%).
+- Rolling Skewness = 0.01, gần bằng 0, không nghiêng về âm hay dương rõ rệt.
+- Downside Correlation (norm) = 13.5%, thấp; Upside Correlation (norm) = 62.9%, cao hơn gấp ~4.7 lần.
 
 ## 2. Interpretation
-Dữ liệu hiện tại mô tả một thị trường **NEUTRAL – phân hoá có thiên hướng lệch lên**: điểm số trung tính, nhưng cấu trúc tương quan cho thấy phe long đang chiếm ưu thế tuyệt đối (Upside-corr 61.9% vs Downside-corr 13.9%), trong khi skewness gần zero và vol tăng nhẹ báo hiệu sự thận trọng xuất hiện.
+Dữ liệu hiện tại mô tả một pha thị trường **phân hóa mạnh**: risk score trung tính, nhưng biến động ngắn hạn đang gia tăng (EGARCH vol tăng) trong khi skewness bằng 0 — xác suất cao thị trường đang dao động sideway với biên độ rộng, chưa hình thành xu hướng một chiều.
 
 ## 3. Cross-Check
-- **Score (50.3) vs EGARCH Vol (1.6% +0.4%):** Có divergence nhẹ — điểm số giảm (thận trọng hơn) nhưng vol tăng — xác suất cao thị trường đang chuyển từ “bình tĩnh” sang “dao động quanh vùng cân bằng”.
-- **Skewness (-0.02) vs Upside-corr (61.9%):** Lệch nhẹ — skewness âm rất nhẹ (đuôi trái có dấu hiệu), trong khi upside-corr quá cao — tín hiệu thị trường phân hoá: phần lớn cổ phiếu tăng đều nhưng một số large-cap bắt đầu lộ áp lực.
-→ **Kết luận: Hơi mâu thuẫn, tín hiệu chưa đồng nhất.**
+- **Score vs EGARCH vol**: Score 51.7 (trung tính) nhưng EGARCH vol 1.6% (cao hơn baseline) — xuất hiện divergence nhẹ: vol tăng trong khi tâm lý chưa ngả hẳn về sợ hãi hay tham lam.
+- **Skewness vs Upside/Downside Corr**: Skewness ≈ 0 kết hợp với upside corr (62.9%) cao hơn downside corr (13.5%) — đây là cấu trúc thị trường hai mặt: khi tăng thì cổ phiếu kéo nhau mạnh, nhưng khi giảm thì phân tán.
+- **Kết luận cross-check**: Các tín hiệu mâu thuẫn nhẹ, không đủ mạnh để xác nhận một pha rủi ro hệ thống rõ ràng.
 
 ## 4. Verdict
-**Beta exposure đề xuất: 0.6**
-- Giữ beta trung bình (0.5-0.6) do trạng thái NEUTRAL nhưng upside-corr mạnh — xác suất cao hơn đà tăng vẫn còn, dù vol gia tăng.
-- **Hành động:** Có thể gia tăng vị thế ở nhóm cổ phiếu có tương quan thấp với Index để hưởng lợi từ phân hoá. KHÔNG mua đuổi nhóm đã tăng quá nóng (skewness âm cảnh báo rủi ro phân phối đỉnh).  
-- Nếu Risk Score giảm dưới 40 trong 1-2 phiên tới → giảm beta về 0.2-0.3.
+**NO ACTIONABLE SIGNAL**: Score trung tính, vol tăng nhưng skewness phẳng, và cấu trúc correlation hai mặt tạo ra tín hiệu mâu thuẫn. Trên dữ liệu hiện tại, chưa có cơ sở probabilistic để điều chỉnh beta mạnh. Giữ danh mục ở mức beta trung bình, ưu tiên stock-picking, không thêm vốn mới vào VN-Index.
+
+**Beta exposure đề xuất: 0.5**
 
 ## 5. Structured Tail
 ```json
@@ -24,9 +23,13 @@ Dữ liệu hiện tại mô tả một thị trường **NEUTRAL – phân hoá
   "tool": "fear_greed",
   "date": "27/05/2026",
   "regime": "NEUTRAL",
-  "score": 50.3,
-  "confidence": "low",
-  "beta_target": 0.6,
-  "key_signals": ["Score giảm nhẹ, trung tính", "EGARCH Vol tăng +0.4% báo hiệu dao động gia tăng", "Upside-corr (61.9%) vượt trội Downside-corr (13.9%), dòng tiền dài vẫn áp đảo", "Skewness gần 0 cho thấy phân hoá nhưng đuôi trái bắt đầu hình thành"]
+  "score": 51.7,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Score 51.7 trong vùng NEUTRAL nhưng EGARCH vol 1.6% trên baseline",
+    "Upside correlation (62.9%) vượt trội downside (13.5%) tạo cấu trúc hai mặt",
+    "Skewness ~0 cho thấy chưa hình thành đuôi phân phối rõ ràng"
+  ]
 }
 ```
