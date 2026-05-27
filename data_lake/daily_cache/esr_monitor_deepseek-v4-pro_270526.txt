@@ -1,0 +1,33 @@
+## 1. Observations
+- SSI ở mức 64.3%, nằm trong vùng WARNING (0.50–0.80) — stress ngầm đang tích lũy
+- Market State: HEALTHY — HMM nhận diện uptrend, nhưng SSI đã vượt ngưỡng
+- Top 3 pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%) — S_LIQ dẫn dắt
+- VN30 đóng cửa trên MA125, nhưng Pillar Mode là downside (chỉ tính phiên giảm)
+
+## 2. Risk Decomposition
+- **S_LIQ (36%)** là áp lực chính: volume khô cạn so với chuẩn 1 năm. Đây là tín hiệu thanh khoản suy yếu nghiêm trọng — thị trường không có lực mua đủ mạnh để duy trì đà tăng.
+- **S_VAL (32%)** phản ánh căng thẳng định giá: lợi nhuận 252 ngày đang bị bào mòn bởi lãi suất cao, tạo áp lực thoái lui.
+- **S_COR (17%)** tăng nhẹ cho thấy hệ thống đang đồng pha hơn — dấu hiệu herding tiềm ẩn. Kết hợp S_LIQ + S_COR tạo thành bull-trap signature: giá tăng trên thanh khoản cạn kiệt, dễ đảo chiều.
+
+## 3. Cross-Check
+- **Divergence rõ rệt**: VN30 vẫn ở vùng giá gần đỉnh (trên MA125), trong khi SSI đã chạm WARNING. Đây là cấu trúc bull-trap kinh điển: giá tạo đỉnh mới nhưng stress ngầm leo thang.
+- **HMM (HEALTHY) lệch với SSI**: HMM chỉ nhìn trend, không phát hiện stress nền. Đây là flag quan trọng — hệ thống đang bỏ qua tín hiệu thanh khoản suy yếu. Pillar Mode downside càng củng cố kịch bản bán thầm lặng.
+
+## 4. Verdict
+- **Cash weight đề xuất: 60%** — giảm mạnh tỷ trọng cổ phiếu để bảo toàn vốn giữa stress ngầm leo thang.
+- **Hedge action: Short VN30F1M** — phòng vệ trực tiếp cho danh mục hiện tại; xem xét mua put nếu SSI tiến gần 80%.
+- Các pillar drivers đồng thuận theo hướng stress (S_LIQ + S_VAL + S_COR đều tăng), không có mâu thuẫn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.3,
+  "regime": "WARNING",
+  "market_state": "HEALTHY",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "short_futures",
+  "confidence": "high"
+}
+```
