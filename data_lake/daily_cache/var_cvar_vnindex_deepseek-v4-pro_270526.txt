@@ -1,0 +1,45 @@
+## 1. Observations
+
+- **Historical VaR 95%** ở mức -1.64%, sâu hơn Parametric VaR (-1.08%) khoảng 0.56pp, xác nhận phân phối lợi suất có đuôi nặng hơn Gaussian.
+- **EVT VaR 99%** đạt -3.66%, tương ứng với biến cố 1/100 ngày giao dịch; EVT ES 99% sâu hơn nữa ở -6.11%.
+- **ξ (GPD shape)** = +0.346, nằm trong vùng **fat tail** (>0.30), báo hiệu rủi ro cực đoan vượt xa mô hình chuẩn.
+- **Hill index** = +0.471, cùng dấu và magnitude tương đương với ξ, củng cố độ tin cậy của tín hiệu đuôi dày.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346** thuộc bracket **fat tail** (rủi ro cực đoan), nơi Gaussian underestimate đáng kể và ES có thể không hội tụ khi ξ tiến gần 0.5.
+- **Hill index (+0.471)** confirm robust signal: cả hai ước lượng độc lập đều chỉ ra tail index ≈ 2–3, tương ứng đuôi phân phối có phương sai vô hạn hoặc rất lớn.
+- **ES − VaR spread = -1.36%** lớn hơn σ₃₀ (0.80%) một khoảng 0.56pp, empirically khẳng định fat tail: tổn thất trung bình vượt ngưỡng VaR sâu hơn mức kỳ vọng dưới phân phối chuẩn.
+
+## 3. Gaussian Gap
+
+- Gaussian VaR 99% ≈ μ − 2.33σ. Giả định μ ≈ 0 (kỳ vọng ngắn hạn trung tính), ta có: **−2.33 × 0.80% = −1.86%**.
+- **EVT VaR 99% = −3.66%**, sâu hơn Gaussian VaR 99% một khoảng **1.80 percentage point**.
+- **Gap > 1pp** → Gaussian model bị broken. Sử dụng Gaussian để phân bổ vốn rủi ro (risk capital) sẽ dẫn đến thiếu hụt nghiêm trọng trong điều kiện thị trường căng thẳng.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.346 > 0.30:
+
+- **Tránh chiến lược momentum**: đuôi dày làm tăng xác suất các cú sốc ngược chiều, dễ gây thua lỗ lớn khi đảo chiều.
+- **Mua puts ITM**: bảo vệ trực tiếp danh mục vì mức giảm -3.66% (VaR 99%) xuất hiện thường xuyên hơn so với mô hình chuẩn; puts ITM đảm bảo bồi thường ngay từ ngưỡng nhỏ.
+- **Short futures hedge**: sử dụng hợp đồng tương lai để giảm delta tổng thể, đặc biệt khi EVT ES 99% (−6.11%) phản ánh kịch bản đuôi cực đoan mà put spread có thể không đủ.
+
+Không khuyến nghị giảm leverage đơn thuần vì fat tail đòi hỏi hedging chủ động, không chỉ co hẹp quy mô.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "27/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.80,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```
