@@ -1,0 +1,32 @@
+## 1. Observations
+- Risk Score ở mức **50.3/100**, nằm trong vùng NEUTRAL (40-60), giảm nhẹ -1.1 điểm so với phiên trước.
+- EGARCH Vol chuẩn hóa ở **1.6%**, tăng +0.4% so với phiên trước, vượt ngưỡng thấp (<1.2%) nhưng chưa chạm ngưỡng cao (>2.0%).
+- Rolling Skewness ở **-0.02**, rất gần 0 (giới hạn phân hoá), không âm sâu như tín hiệu FEAR (-0.3).
+- Upside Correlation (61.9%) cao gấp **4.5 lần** Downside Correlation (13.9%), cho thấy dòng tiền đồng thuận tăng mạnh hơn nhiều so với bán.
+
+## 2. Interpretation
+Dữ liệu hiện tại mô tả một thị trường **NEUTRAL – phân hoá có thiên hướng lệch lên**: điểm số trung tính, nhưng cấu trúc tương quan cho thấy phe long đang chiếm ưu thế tuyệt đối (Upside-corr 61.9% vs Downside-corr 13.9%), trong khi skewness gần zero và vol tăng nhẹ báo hiệu sự thận trọng xuất hiện.
+
+## 3. Cross-Check
+- **Score (50.3) vs EGARCH Vol (1.6% +0.4%):** Có divergence nhẹ — điểm số giảm (thận trọng hơn) nhưng vol tăng — xác suất cao thị trường đang chuyển từ “bình tĩnh” sang “dao động quanh vùng cân bằng”.
+- **Skewness (-0.02) vs Upside-corr (61.9%):** Lệch nhẹ — skewness âm rất nhẹ (đuôi trái có dấu hiệu), trong khi upside-corr quá cao — tín hiệu thị trường phân hoá: phần lớn cổ phiếu tăng đều nhưng một số large-cap bắt đầu lộ áp lực.
+→ **Kết luận: Hơi mâu thuẫn, tín hiệu chưa đồng nhất.**
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.6**
+- Giữ beta trung bình (0.5-0.6) do trạng thái NEUTRAL nhưng upside-corr mạnh — xác suất cao hơn đà tăng vẫn còn, dù vol gia tăng.
+- **Hành động:** Có thể gia tăng vị thế ở nhóm cổ phiếu có tương quan thấp với Index để hưởng lợi từ phân hoá. KHÔNG mua đuổi nhóm đã tăng quá nóng (skewness âm cảnh báo rủi ro phân phối đỉnh).  
+- Nếu Risk Score giảm dưới 40 trong 1-2 phiên tới → giảm beta về 0.2-0.3.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "27/05/2026",
+  "regime": "NEUTRAL",
+  "score": 50.3,
+  "confidence": "low",
+  "beta_target": 0.6,
+  "key_signals": ["Score giảm nhẹ, trung tính", "EGARCH Vol tăng +0.4% báo hiệu dao động gia tăng", "Upside-corr (61.9%) vượt trội Downside-corr (13.9%), dòng tiền dài vẫn áp đảo", "Skewness gần 0 cho thấy phân hoá nhưng đuôi trái bắt đầu hình thành"]
+}
+```
