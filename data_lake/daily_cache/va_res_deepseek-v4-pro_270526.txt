@@ -1,0 +1,32 @@
+## 1. Observations
+- **VN30 Stress Index:** 0.00% (ngưỡng cảnh báo: 40%)
+- **Số mã thủng VaR 95%:** 0/30
+- **Complacency Index:** 7.92% (ngưỡng nguy hiểm: 80%)
+- **Số mã mispriced:** 8
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index ở mức 0.00%, dưới xa ngưỡng cảnh báo 40%. Điều này cho thấy **không có dấu hiệu lây lan real-time** giữa các mã VN30. Không có mã nào thủng VaR 95%, phản ánh trạng thái biến động nội tại của rổ VN30 đang nằm trong kỳ vọng thống kê.
+- Vì danh sách Top 3 breach rỗng, không có sự cố cá biệt nào để phân tích. Ở thời điểm hiện tại, không có cơ sở để kết luận về đầu sóng systemic.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- Complacency Index ở mức 7.92%, rất thấp so với ngưỡng nguy hiểm 80%. Chúng ta **chỉ có thể kết luận**: thị trường **KHÔNG ở regime ngủ quên**. Điều này KHÔNG đồng nghĩa thị trường ổn định.
+- Kết hợp với Stress Index thấp, regime hiện tại thiên về trạng thái spread giãn rộng (không bị nén), có thể đi kèm với biến động giá thực tế đang diễn ra (dù không lây lan trong VN30). Không có tín hiệu định giá sai rủi ro trên diện rộng từ Module C.
+- **CẤM:** Không được suy luận "thị trường bình thường" hay "không áp lực bán".
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Danh sách rỗng → không có khuyến nghị.
+- **Top 3 Mispriced (Module C) — SSB, HSG, BID:** Spread của các mã này đang bị nén chặt nhất thị trường. Đây là tín hiệu thanh khoản cục bộ hoặc khả năng định giá sai. **Khuyến nghị:** Đặt trailing stop-loss chặt hơn mức thông thường cho SSB, HSG, BID (ví dụ: cắt lỗ nếu giá đóng cửa thủng MA20 trên D1). Chưa đủ cơ sở để khuyến nghị bán khống.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 7.92,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["SSB", "HSG", "BID"],
+  "confidence": "high"
+}
+```
