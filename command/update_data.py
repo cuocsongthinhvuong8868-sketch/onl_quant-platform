@@ -235,12 +235,22 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
     volume_list = []
     failed = []
 
+    # Tính start date mặc định (lookback) cho các mã mới nếu đang ở chế độ incremental
+    full_lookback_start = (datetime.now() - timedelta(days=DEFAULT_LOOKBACK_DAYS)).strftime("%Y-%m-%d")
+
     for i, symbol in enumerate(stock_tickers, 1):
-        logger.info("[%d/%d] Đang tải %s...", i, len(stock_tickers), symbol)
-        df_hist = fetch_history(symbol, start, end, source="VCI")
+        # Xác định start date cho riêng mã này
+        if df_existing is not None and symbol in df_existing.columns:
+            symbol_start = start
+            logger.info("[%d/%d] Đang tải %s (incremental từ %s)...", i, len(stock_tickers), symbol, symbol_start)
+        else:
+            symbol_start = full_lookback_start
+            logger.info("[%d/%d] Đang tải %s (mã mới, tải đầy đủ từ %s)...", i, len(stock_tickers), symbol, symbol_start)
+
+        df_hist = fetch_history(symbol, symbol_start, end, source="VCI")
         if df_hist is None:
             logger.info("  %s VCI thất bại, thử fallback KBS...", symbol)
-            df_hist = fetch_history(symbol, start, end, source="KBS")
+            df_hist = fetch_history(symbol, symbol_start, end, source="KBS")
         if df_hist is not None:
             close_list.append(df_hist["close"].rename(symbol))
             volume_list.append(df_hist["volume"].rename(symbol))

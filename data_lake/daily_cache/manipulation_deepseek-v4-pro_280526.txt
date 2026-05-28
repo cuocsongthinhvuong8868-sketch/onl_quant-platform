@@ -1,0 +1,29 @@
+## 1. Observations
+- 📈 OLS Slope: 0.41 (Percentile: 86.7th — **rất cao**), thể hiện mối quan hệ giữa VIN composite và VN30F1M cực kỳ chặt chẽ, gần như VIN kéo F1 đi theo từng điểm.
+- 📊 Tương quan: 0.72 (Percentile: 88.3th — **rất cao**), xác nhận mức độ dính chặt bất thường so với lịch sử 3 tháng.
+- 🏷️ Trạng thái áp đảo từ Event Study: **COUPLING** (ΔCorr = +0.68, ΔSlope = +0.67), cả hai delta đều vượt ngưỡng +0.15 gấp 4-5 lần.
+
+## 2. Microstructure Read
+Cả hai percentile slope và corr đều > 80th → **tín hiệu coupling cực đoan, mang dấu hiệu can thiệp**. VIC/VHM/VRE đang là lực kéo chính của VN30F1M trong phiên này, không chỉ đơn thuần là dẫn dắt mà gần như là bộ đôi **áp đảo index**. Các cổ phiếu trụ khác (Bank, Chứng khoán) đang bị mờ nhạt — khả năng dòng tiền đã tập trung vào nhóm VIN để tạo hiệu ứng cho F1.
+
+## 3. Event Study Interpretation
+COUPLING ở dải cực trên (percentile ~87-88) có hai kịch bản:
+- **Intraday**: Nhóm VIN sẽ tiếp tục kéo F1 lên tới khi nào slope giảm hoặc có dấu hiệu bán chốt ở vùng kháng cự.
+- **Overnight**: **Không khuyến nghị giữ vị thế qua đêm** vì đây rất có thể là hành vi kéo khối lượng lớn trong phiên, rủi ro force sell đầu phiên hôm sau rất cao.
+
+## 4. Verdict
+- **Trade plan: Long F1** theo đà VIN trong phiên sáng/đầu phiên chiều. Không giữ qua đêm.
+- **Leading indicator**: Theo dõi **VIC** — nếu VIC thủng mốc **210.80** (> -1% so với giá hiện tại) thì tín hiệu đảo chiều. Sức mạnh của bộ ba chỉ có ý nghĩa khi VIC trên 210.00.
+- **Stop-loss tham khảo**: VN30F1M cắt **dưới 2,010 điểm** (~3% từ 2,023.70). Hoặc nếu VIC < 208.10 (~210.80 × (1 - 1.3%)).
+
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "medium"
+}
+```

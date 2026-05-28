@@ -1,0 +1,28 @@
+## 1. Observations
+- Risk Score 47.9 nằm giữa khoảng 40-60, sát ngưỡng NEUTRAL, giảm nhẹ -0.4 điểm so với phiên trước.
+- EGARCH Vol 2.8% cao hơn mức trung bình lịch sử (~2.0-2.2%), đồng thời tăng +0.8% trong một phiên — mức tăng vol đột biến.
+- Rolling Skewness -0.05 âm nhẹ, tiệm cận ngưỡng 0, chưa phải âm sâu (< -0.3).
+- Upside Correlation (26.4%) cao hơn Downside Correlation (15.9%) một cách rõ rệt, với chênh lệch +10.5%.
+
+## 2. Interpretation
+Cấu trúc điểm số NEUTRAL kết hợp với EGARCH vol tăng mạnh (+0.8%) và skewness âm nhẹ cho thấy thị trường đang chuyển pha từ trạng thái phân hóa bình thường sang giai đoạn biến động gia tăng có pha trộn tâm lý phòng thủ. Đây không phải tín hiệu bear mạnh, nhưng xác suất xu hướng sideway với biên độ rộng đang tăng lên, không phải bull trend đồng thuận.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: **Divergence**. Score NEUTRAL (47.9) nhưng vol tăng 0.8% trong phiên, vượt mức 2.5% — bất thường. Điểm tâm lý vẫn trung tính nhưng vol đã spike nhẹ, cho thấy ẩn áp lực giao dịch dưới bề mặt.
+- **Skewness vs Correlation**: **Divergence**. Skewness -0.05 (âm nhẹ, phòng thủ) nhưng Up-Corr (26.4%) lại cao hơn Down-Corr (15.9%). Nếu skew âm thực sự thì down-corr phải cao hơn. Sự lệch pha này làm giảm độ tin cậy của cả hai tín hiệu.
+
+## 4. Verdict
+**Beta exposure: 0.55** — giảm từ mức trung bình 0.7 xuống 0.55 do vol tăng bất thường + skew lệch pha. Hành động: giảm tỷ trọng nhóm VN30 beta cao, chuyển một phần sang cổ phiếu phòng thủ hoặc chờ đến khi vol giảm xuống dưới 2.3% để tái gia tăng exposure. Chưa đủ điều kiện hedge toàn bộ vì điểm số vẫn trong vùng trung tính và tương quan lợi suất chưa chuyển hoàn toàn sang chế độ phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "27/05/2026",
+  "regime": "NEUTRAL",
+  "score": 47.9,
+  "confidence": "medium",
+  "beta_target": 0.55,
+  "key_signals": ["SCORE_NEUTRAL_BUT_VOL_SPIKE_+0.8%", "SKEW_-0.05_VS_UP-CORR_DOMINANCE_DIVERGENCE"]
+}
+```

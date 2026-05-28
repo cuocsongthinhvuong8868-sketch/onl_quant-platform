@@ -1,0 +1,44 @@
+## 1. Observations
+
+- **Historical VaR 95% (3Y rolling):** -1.64%, phản ánh mức thua lỗ trung bình trong điều kiện thị trường "xấu" thông thường.
+- **EVT VaR 99%:** -3.66%, tương ứng sự kiện 1/100 phiên, vượt xa mức ước tính của phân phối chuẩn.
+- **ξ (GPD shape):** +0.346, nằm trong ngưỡng "fat tail". Đuôi phân phối cực dày.
+- **Hill index:** +0.471, cùng dấu với ξ nhưng lớn hơn đáng kể (0.471 vs 0.346), báo hiệu độ nhạy threshold và tính không ổn định của ước lượng cực đoan.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346** thuộc bracket **FAT TAIL** (> 0.30). Điều này có nghĩa là mô hình phân phối chuẩn (Gaussian) đang underestimate một cách nghiêm trọng rủi ro ở đuôi.
+- **Hill index (+0.471)** confirm hướng fat tail (cùng dấu, dương), nhưng độ lớn chênh lệch ~0.125 so với ξ. Khoảng cách này làm giảm độ tin cậy (confidence) của EVT, cho thấy kết quả nhạy với ngưỡng kích hoạt (threshold) 10%. EVT VaR 99% và ES 99% nên được xem là "ước lượng thận trọng" thay vì giá trị chính xác.
+- **ES − VaR Spread = 1.36%** (vượt xa σ₃₀ = 0.81%) → empirically confirm đuôi dày: khi thị trường vượt VaR 95%, mức lỗ trung bình (-3.00%) sâu hơn rất nhiều so với VaR (-1.64%), khớp với đặc tính fat tail.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** ước lượng: Giả sử μ ≈ 0 (mean daily), z₀.₀₁ = -2.33 → VaR = -2.33 × 0.81% = **-1.89%**.
+- **EVT VaR 99%** thực tế: **-3.66%**.
+- **Gaussian Gap** = | -3.66% - (-1.89%) | = **1.77 percentage points**.
+- Gap > 1 pp → Gaussian model **bị broken**. Không thể dùng Parametric VaR/Gaussian để tính risk capital cho danh mục có độ nhạy VNINDEX cao.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30 và Gaussian Gap > 1.5pp:
+
+- **Không sử dụng momentum strategies**: đuôi dày dễ gây gap loss trong 1-2 phiên, chiến lược trend-following sẽ bị stop-out nặng.
+- **Khuyến nghị hedge: mua puts ITM (strike gần spot)** + **short index futures tương ứng 20-30% NAV**. Puts OTM không đủ bảo vệ với mức ES 99% = -6.11%.
+- Tránh leverage > 1.5x vì xác suất sụt giảm 3%+ trong một phiên là cao hơn nhiều so với ước tính Gaussian.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "27/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.77,
+  "hedge_action": "buy_puts_itm_short_futures",
+  "confidence": "medium"
+}
+```
