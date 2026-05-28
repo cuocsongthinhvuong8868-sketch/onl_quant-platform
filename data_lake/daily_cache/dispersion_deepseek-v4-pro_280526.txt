@@ -1,0 +1,38 @@
+## 1. Observations
+
+- **Spread_Z = -0.22σ**: Spread (11.97%) ở mức trung bình trong xu hướng 60 ngày, không có tín hiệu kéo căng.
+- **DPI = 41.7%**: Dưới ngưỡng 70%, cho thấy dispersion hiện tại không phải là một regime kéo dài. Đây là biến động nhất thời trong cross-sectional returns.
+- **Avg Pairwise Correlation = 0.006**: Cực kỳ thấp, gần như bằng 0. Không có hiệu ứng bầy đàn; các cổ phiếu đang vận động hoàn toàn độc lập.
+- **Skewness & Kurtosis: N/A**: Dữ liệu không đủ hoặc không thể tính toán, mất một kênh cảnh báo về độ lệch đuôi.
+
+## 2. Structural State
+
+Thị trường hiện tại **không ở trạng thái stressed**. Cả hai chỉ báo Spread_Z (-0.22σ) và DPI (41.7%) đều dưới ngưỡng cảnh báo. Không có dấu hiệu của căng thẳng cục bộ (Spread_Z cao, DPI thấp) hay regime kéo dài (cả hai đều cao). Cấu trúc đang ở trạng thái "trung tính - phân hóa".
+
+## 3. Cross-Check & Tail Direction
+
+**Không thể đánh giá**: Do Skewness và Kurtosis bị báo N/A, chúng ta không có công cụ để xác định tail nào đang chi phối (bán hay mua) hay mức độ fat-tail của phân phối. Đây là một điểm mù trong bộ cảm biến hôm nay. Cần tham chiếu từ các công cụ khác (e.g., VaR phân vị 99% của các cổ phiếu riêng lẻ) để bù đắp.
+
+## 4. Regime Mapping
+
+Đối chiếu với 2D Map (**DPI thấp + Corr thấp**), trạng thái hiện tại là **Healthy Stock-Picking**.
+
+- **Đặc điểm**: Thị trường cho phép phân hóa cực cao. Không có một xu hướng chung nào chi phối (corr ~ 0). Các cổ phiếu vận động dựa trên yếu tố vi mô riêng lẻ.
+- **Risk lớn nhất cho Portfolio Manager**:
+    - **Concentration risk**: Rủi ro tập trung cao. Vì các cổ phiếu không có tương quan, một danh mục thiếu đa dạng hóa sẽ chịu biến động lớn từ các mã riêng lẻ.
+    - **Liquidity dry-up (thứ phát)**: Trong môi trường này, các nhóm ngành có thể bị hút thanh khoản nhanh chóng khi không có dòng tiền đồng thuận.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "27/05/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.22,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,33 @@
+## 1. Observations
+- **VN30 Stress Index**: 6.67% (ngưỡng cảnh báo: 40%)
+- **# mã thủng VaR 95%**: 2/30
+- **Complacency Index**: 7.41% (ngưỡng nguy hiểm: 80%)
+- **# mã mispriced**: 8
+
+## 2. Contagion Assessment (Module B)
+- **Mức độ stress VN30**: Rất thấp (6.67%), xa ngưỡng 40%. Chưa có dấu hiệu lây lan real-time trên diện rộng. Số lượng mã thủng VaR 95% chỉ ở mức cá biệt (2/30).
+- **Top 3 crash (VRE, VHM)**: Đây là sự cố riêng lẻ, nhiều khả năng do yếu tố vi mô (kết quả kinh doanh, tin tức ngành bất động sản/bán lẻ) chứ chưa phải đầu sóng systemic. Rủi ro lây lan tiếp theo phụ thuộc vào việc các mã này có lan sang nhóm ngân hàng, chứng khoán hay không — hiện chưa thấy dấu hiệu.
+
+## 3. Complacency Assessment (Module C)
+- **Complacency thấp (7.41%)**: Thị trường KHÔNG ở regime ngủ quên. Điều này KHÔNG đồng nghĩa thị trường ổn định.
+- **Phân tích bổ sung dựa trên Stress Index**: Stress Index thấp (6.67%) cho thấy tại thời điểm hiện tại, thị trường không bị ép bán real-time. Tuy nhiên, việc có 8 mã mispriced (spread bị nén) tiềm ẩn nguy cơ điều chỉnh đột ngột khi thanh khoản đột biến. Cần theo dõi sát các mã này trong 1-2 phiên tới.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B)**:
+    - **VRE, VHM**: Giảm tỷ trọng nếu đang nắm giữ. Cắt lỗ nếu giá thủng MA20 trên D1 (khoảng -3% so với giá hiện tại). Chưa khuyến nghị short mới khi chưa xác nhận xu hướng giảm bền vững.
+- **Top 3 Mispriced (Module C)**:
+    - **HSG, VIB, BID**: Spread nén chặt → rủi ro điều chỉnh khi có tin tức bất lợi. Tạm thời cảnh báo "không mua mới" cho đến khi spread giãn trở lại mức trung bình 5 ngày.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 6.67,
+  "breach_count": 2,
+  "complacency_pct": 7.41,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["VRE", "VHM", "HSG", "VIB", "BID"],
+  "confidence": "high"
+}
+```

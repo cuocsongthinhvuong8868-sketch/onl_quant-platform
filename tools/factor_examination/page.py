@@ -183,13 +183,13 @@ def _tab_universe(scored: dict, sector_map: pd.Series) -> None:
 
     st.markdown(f"**Universe size**: {len(valid)} mã (sau filter).")
 
-    strong = valid[valid >= 1.0]
+    strong = valid[valid >= 0.8]
     weak = valid[valid <= -1.0]
     neutral = valid[(valid > -0.5) & (valid < 0.5)]
 
     col_a, col_b, col_c = st.columns(3)
     col_a.metric(
-        "🟢 Strong (≥ +1σ)",
+        "🟢 Strong (≥ +0.8σ)",
         f"{len(strong)} mã",
         help=(
             f"Top: {strong.index[0]} ({strong.iloc[0]:+.2f}σ)"
