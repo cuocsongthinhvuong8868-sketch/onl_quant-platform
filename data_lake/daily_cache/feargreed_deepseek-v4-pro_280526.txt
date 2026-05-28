@@ -1,28 +1,35 @@
 ## 1. Observations
-- Risk Score 47.9 nằm giữa khoảng 40-60, sát ngưỡng NEUTRAL, giảm nhẹ -0.4 điểm so với phiên trước.
-- EGARCH Vol 2.8% cao hơn mức trung bình lịch sử (~2.0-2.2%), đồng thời tăng +0.8% trong một phiên — mức tăng vol đột biến.
-- Rolling Skewness -0.05 âm nhẹ, tiệm cận ngưỡng 0, chưa phải âm sâu (< -0.3).
-- Upside Correlation (26.4%) cao hơn Downside Correlation (15.9%) một cách rõ rệt, với chênh lệch +10.5%.
+- Risk Score 49.3/100 nằm trong ngưỡng NEUTRAL (40-60), delta +1.5 điểm so với phiên trước, cho thấy xu hướng tăng nhẹ.
+- EGARCH Vol 0.8% đang ở mức thấp, giảm -2.0% so với phiên trước, dưới ngưỡng báo động 1.5%.
+- Rolling Skewness +0.05 gần bằng 0, không cho thấy đuôi âm hay dương rõ rệt.
+- Downside Correlation 14.7% thấp hơn đáng kể so với Upside Correlation 26.6% (chênh lệch ~12pp), phản ánh phân hoá mạnh giữa pha tăng và pha giảm.
 
 ## 2. Interpretation
-Cấu trúc điểm số NEUTRAL kết hợp với EGARCH vol tăng mạnh (+0.8%) và skewness âm nhẹ cho thấy thị trường đang chuyển pha từ trạng thái phân hóa bình thường sang giai đoạn biến động gia tăng có pha trộn tâm lý phòng thủ. Đây không phải tín hiệu bear mạnh, nhưng xác suất xu hướng sideway với biên độ rộng đang tăng lên, không phải bull trend đồng thuận.
+Dữ liệu hiện tại xác suất cao đang mô tả một thị trường NEUTRAL với tính phân hoá cổ phiếu cao: vol thấp cho thấy không có căng thẳng hệ thống, skewness trung tính và sự lệch pha rõ rệt giữa upside/downside correlation xác nhận các nhóm ngành đang vận động độc lập, không có dòng tiền đồng thuận.
 
 ## 3. Cross-Check
-- **Score vs EGARCH Vol**: **Divergence**. Score NEUTRAL (47.9) nhưng vol tăng 0.8% trong phiên, vượt mức 2.5% — bất thường. Điểm tâm lý vẫn trung tính nhưng vol đã spike nhẹ, cho thấy ẩn áp lực giao dịch dưới bề mặt.
-- **Skewness vs Correlation**: **Divergence**. Skewness -0.05 (âm nhẹ, phòng thủ) nhưng Up-Corr (26.4%) lại cao hơn Down-Corr (15.9%). Nếu skew âm thực sự thì down-corr phải cao hơn. Sự lệch pha này làm giảm độ tin cậy của cả hai tín hiệu.
+- Score (49.3) vs EGARCH Vol (0.8%): consistent — cả hai đều phản ánh trạng thái NEUTRAL không căng thẳng.
+- Skewness (+0.05) vs Correlation (down 14.7% << up 26.6%): consistent nhẹ — skewness trung tính phù hợp với thị trường phân hoá, không có hiệu ứng đám đông trên cả hai phía.
+
+Tổng thể không phát hiện divergence đáng kể. Tín hiệu đồng nhất ở trạng thái NEUTRAL / STOCK PICKING.
 
 ## 4. Verdict
-**Beta exposure: 0.55** — giảm từ mức trung bình 0.7 xuống 0.55 do vol tăng bất thường + skew lệch pha. Hành động: giảm tỷ trọng nhóm VN30 beta cao, chuyển một phần sang cổ phiếu phòng thủ hoặc chờ đến khi vol giảm xuống dưới 2.3% để tái gia tăng exposure. Chưa đủ điều kiện hedge toàn bộ vì điểm số vẫn trong vùng trung tính và tương quan lợi suất chưa chuyển hoàn toàn sang chế độ phòng thủ.
+Beta exposure đề xuất: **0.6** (trung bình-cao).
+Hành động: Duy trì danh mục tập trung vào cổ phiếu riêng lẻ (stock-picking). Không cần phòng thủ toàn diện (vol thấp, skew trung tính) nhưng cũng không nên tăng đòn bẩy (vì chưa có tín hiệu đồng thuận). Xác suất cao VN-Index tiếp tục sideway phân hoá.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "fear_greed",
-  "date": "27/05/2026",
+  "date": "28/05/2026",
   "regime": "NEUTRAL",
-  "score": 47.9,
-  "confidence": "medium",
-  "beta_target": 0.55,
-  "key_signals": ["SCORE_NEUTRAL_BUT_VOL_SPIKE_+0.8%", "SKEW_-0.05_VS_UP-CORR_DOMINANCE_DIVERGENCE"]
+  "score": 49.3,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Vol EGARCH giảm 2% cho thấy không căng thẳng hệ thống",
+    "Chênh lệch Upside/Downside Correlation ~12pp xác nhận phân hoá mạnh",
+    "Skewness trung tính +0.05 không cho thấy rủi ro đuôi"
+  ]
 }
 ```

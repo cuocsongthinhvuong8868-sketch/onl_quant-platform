@@ -1,30 +1,30 @@
 ## 1. Observations
-- Lực cầu hiện tại (10.12%) thấp hơn mu dài hạn (14.47%) — cầu đang suy yếu.
-- Lực cung hiện tại (6.82%) thấp hơn mu dài hạn (14.13%) — cung cũng yếu hơn kỳ vọng.
-- Cả hai chiều đều thuộc Momentum regime (Phi_cầu = 0.177, Phi_cung = 0.221), cho thấy xu hướng hiện tại có khả năng tự duy trì.
+- **Lực cầu (Upside):** Hiện tại 5.88% thấp hơn nhiều so với Mu dài hạn 14.12% (delta -8.24%). Phi = +0.179 > +0.10 → **Momentum (đà mua)**.
+- **Lực cung (Downside):** Hiện tại 14.35% xấp xỉ Mu 14.23% (delta +0.12%). Phi = +0.217 > +0.10 → **Momentum (đà bán)**.
+- Cả hai chiều đều ở chế độ momentum, nhưng lực cầu đang bị nén mạnh dưới trung bình, trong khi lực cung ở mức trung bình lịch sử.
 
 ## 2. Supply-Demand Dynamics
-- **Trạng thái dòng tiền: Zombification (Up nén + Down nén)** — Cả hai chiều đều thấp hơn mu dài hạn, biên độ giao dịch hẹp, thanh khoản cạn kiệt. Không có dấu hiệu phân phối hay tích lũy rõ ràng.
-- **Momentum thực sự thuộc về bên cung (phi = 0.221 > 0.177)**. Dù cả hai đều mang tính đà, nhưng đà bán mạnh hơn và có độ bền cao hơn — áp lực giảm vẫn đang chiếm ưu thế ngay cả khi cung hiện tại thấp.
+- **Trạng thái dòng tiền:** **Phân phối (Distribution)** — Lực cầu nén dưới Mu (5.88% << 14.12%) kết hợp lực cung trung bình sát Mu → áp lực bán đang chiếm ưu thế, dòng tiền rút dần.
+- **Momentum thực sự:** Cả hai bên đều giữ momentum (Phi > +0.10), nhưng so sánh |Phi|: **Cung (0.217) mạnh hơn Cầu (0.179)**. Điều này xác nhận đà bán đang áp đảo đà mua, thị trường nghiêng về phía cung.
 
 ## 3. Stress-Test Read
-- **P95 Downside = 27.08%** — Nếu thị trường gãy, biên độ panic kỳ vọng tương đương một đợt sell-off mạnh, gấp ~4 lần cung hiện tại.
-- **Asymmetry nghiêng về bên bán**: P95_Downside (27.08%) cao hơn P95_Upside (24.20%). Tail risk bên cung dày hơn 2.88%, phản ánh rủi ro đuôi giảm điểm lớn hơn khả năng bùng nổ tăng. Trong môi trường zombification, đà bán mạnh hơn làm tăng xác suất kích hoạt panic.
+- **P95 Downside = 27.90%:** Trong 5% kịch bản xấu nhất, biên độ panic sell có thể lên gần 28% trong 19 phiên — rủi ro đuôi rất dày.
+- **Asymmetry:** P95 Upside = 23.96% < P95 Downside = 27.90% → **Tail risk bán dày hơn tail risk mua**. Xác suất panic sell cao hơn xác suất bùng nổ mua ở biên độ cực đoan.
 
 ## 4. Verdict
-- **Tỷ trọng giải ngân: 15%** — Chỉ giữ vị thế rất nhỏ, không aggressive.
-- **Strategy: Phòng thủ** — Không mua đuổi vì cả hai chiều đều momentum nhưng cung áp đảo. Rình bắt đáy cũng rủi ro cao do tail risk nghiêng về giảm. Chờ breakout khỏi vùng thanh khoản chết hoặc tín hiệu mean-reversion rõ ràng.
-- Cả hai Phi đều > 0.10, nên không rơi vào trường hợp NO ACTIONABLE.
+- **Tỷ trọng giải ngân:** 10% (rất thấp, chỉ dành cho vị thế phòng thủ).
+- **Strategy:** **Phòng thủ (Defensive)** — Không mua đuổi, không bắt đáy khi đà bán còn mạnh và tail risk nghiêng về downside.
+- **Confidence:** Medium — dữ liệu rõ xu hướng phân phối, nhưng cần thêm tín hiệu xác nhận từ khối lượng.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "upside_ratio",
-  "regime": "zombification",
+  "regime": "distribution",
   "momentum_winner": "supply",
-  "p95_downside_pct": 27.08,
-  "p95_upside_pct": 24.20,
-  "deployment_pct": 15,
+  "p95_downside_pct": 27.90,
+  "p95_upside_pct": 23.96,
+  "deployment_pct": 10,
   "strategy": "defensive",
   "confidence": "medium"
 }

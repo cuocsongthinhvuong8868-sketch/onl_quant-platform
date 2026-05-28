@@ -1,38 +1,33 @@
 ## 1. Observations
+- **SSI**: 64.4% – nằm trong vùng WARNING (50–80%)
+- **Market State**: HEALTHY (HMM + trend filter cho thấy uptrend)
+- **Top 3 Pillar Weights**: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- **PCA Concentration**: EVR PC1 = 38.4% – mức tương quan hệ thống trung bình-thấp
 
-- **SSI:** 64.2% — xác nhận vùng **WARNING**, tích lũy rủi ro dưới bề mặt xu hướng tăng
-- **Market State (HMM):** HEALTHY — thuật toán chưa ghi nhận breakdown trend
-- **3 Top Pillar Weights:** S_LIQ (36%) > S_VAL (32%) > S_COR (17%)
-- **Pillar Mode:** downside — chỉ áp dụng cho phiên giảm, giúp lọc nhiễu tăng giá
+## 2. Risk Decomposition
+**Pillar dẫn dắt**: S_LIQ (36%) – **Volume Dry-Up** cao, nghĩa là volume giao dịch tổng thể đang khô cạn so với chuẩn 1 năm. Đây là tín hiệu thiếu dòng tiền xác nhận cho đà tăng.
 
-## 2. Risk Decomposition (Bóc tách)
+S_VAL (32%) phản ánh valuation tension: VN30 đã tăng đáng kể so với lãi suất tiền gửi, margin an toàn thu hẹp.
 
-**S_LIQ (36%) — Volume Dry-Up vs 1Y norm** đang dẫn dắt: lượng giao dịch khô cạn rõ rệt so với chuẩn một năm. Đây là tín hiệu thanh khoản suy yếu, thường đi kèm giai đoạn tích lũy đỉnh hoặc hình thành bull-trap.
-
-**S_VAL (32%)** — tension định giá cao: lợi nhuận 252 ngày vượt xa lãi suất huy động, phản ánh kỳ vọng tăng trưởng đã được "priced in" đáng kể. Rủi ro điều chỉnh khi kỳ vọng không được hiện thực hóa.
-
-**S_COR (17%)** — PCA EVR 38.4%, tuy chưa vượt ngưỡng herding cảnh báo (>45%), nhưng kết hợp với S_LIQ và S_VAL tạo thành bộ ba: **thanh khoản khô + định giá căng + tương quan hệ thống gia tăng** — cấu trúc điển hình trước các đợt phân phối đỉnh.
+S_COR (17%) ở mức trung bình (EVR PC1 ~38%) cho thấy chưa có herding mạnh, nhưng khi volume dry-up + valuation căng kết hợp → cấu trúc bull-trap tiềm năng: giá vẫn đi lên nhưng thiếu volume xác nhận, dễ đảo chiều nếu có catalyst tiêu cực.
 
 ## 3. Cross-Check
+**Divergence giá – SSI**: Có sự phân kỳ đáng chú ý. VN30 đóng cửa ở mức cao, nằm trên MA125, nhưng SSI đã ở WARNING (64.4%). Đây là risk divergence cổ điển: giá tạo đỉnh mới trong khi stress ngầm leo thang.
 
-**Divergence giá–SSI:** VN30 đang giao dịch trên MA125, nhưng SSI ở mức **WARNING**. Đây là tín hiệu phân kỳ âm cổ điển: giá lập đỉnh mới trong khi stress hệ thống leo thang. Bull-trap risk đang hiện hữu.
-
-**HMM vs SSI:** Market State HEALTHY (0.535 threshold) mâu thuẫn với SSI 64.2% trong vùng WARNING. Sự lệch pha này thường xảy ra khi HMM chưa kịp cập nhật trend breakdown — một flag quan trọng: **mô hình xu hướng đang chậm hơn thực tế rủi ro cấu trúc.**
+**HMM vs SSI**: HMM ghi nhận HEALTHY (dựa trên trend filter), trong khi SSI đã trên threshold WARNING. Sự lệch pha này cần được coi là cảnh báo sớm: hệ thống HMM chưa kịp phản ánh stress tích lũy. KHÔNG được bỏ qua do confirmation bias từ price action.
 
 ## 4. Verdict
+**Cash weight đề xuất**: 40% – giảm từ mức full-invest do SSI đã chạm WARNING và top driver là volume dry-up.
 
-**Cash Target: 40%** — giảm tiếp xúc thị trường từ mức neutral, giữ nửa danh mục linh hoạt để ứng phó với kịch bản bull-trap.
+**Hedge action**: **Short VN30F1M** – mở vị thế hedge 20-30% danh mục tương ứng với tỷ lệ cash giảm. Volume dry-up + valuation căng khiến rủi ro điều chỉnh tăng, trong khi HMM chưa phản ánh kịp.
 
-**Hedge Action: Short VN30F1M (1/3 danh mục)** — phòng vệ trực tiếp trên index futures, kết hợp giảm beta các cổ phiếu có định giá cao nhất.
-
-**Lưu ý:** Top 3 drivers (S_LIQ, S_VAL, S_COR) cùng hướng → tín hiệu đủ mạnh để hành động. Không có mâu thuẫn nội tại giữa các pillar.
+**Lưu ý**: Pillar drivers không mâu thuẫn – cả S_LIQ, S_VAL, S_COR đều chỉ về một kịch bản giảm dần động lực tăng. Tín hiệu có thể hành động.
 
 ## 5. Structured Tail
-
 ```json
 {
   "tool": "esr_monitor",
-  "ssi_pct": 64.2,
+  "ssi_pct": 64.4,
   "regime": "WARNING",
   "market_state": "HEALTHY",
   "top_driver": "S_LIQ",
