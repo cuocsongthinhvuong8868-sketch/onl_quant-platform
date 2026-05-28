@@ -91,12 +91,35 @@ def st_reversal(prices: pd.DataFrame) -> pd.Series:
 
 
 def lt_reversal(prices: pd.DataFrame) -> pd.Series:
-    """LT reversal 5Y → 3Y window. Higher = lower distant return = better."""
-    if len(prices) < WINDOW_LT_REV_START + 1:
-        return pd.Series(np.nan, index=prices.columns)
-    p_5y = prices.iloc[-WINDOW_LT_REV_START - 1]
-    p_3y = prices.iloc[-WINDOW_LT_REV_END - 1]
-    return -(p_3y / p_5y - 1.0)
+    """LT reversal: negative return over a long-term window.
+    Default: 5Y to 3Y (1260d to 756d).
+    Fallback: 3Y to 1Y (756d to 252d) if 5Y is not available but 3Y is.
+    Fallback 2: 2Y to 1Y (504d to 252d) if 3Y is not available but 2Y is.
+    """
+    out = {}
+    for col in prices.columns:
+        series = prices[col].dropna()
+        n = len(series)
+        
+        # Try 5Y -> 3Y (1260 to 756)
+        if n >= 1261:
+            p_5y = series.iloc[-1261]
+            p_3y = series.iloc[-757]
+            val = -(p_3y / p_5y - 1.0)
+        # Try 3Y -> 1Y (756 to 252)
+        elif n >= 757:
+            p_3y = series.iloc[-757]
+            p_1y = series.iloc[-253]
+            val = -(p_1y / p_3y - 1.0)
+        # Try 2Y -> 1Y (504 to 252)
+        elif n >= 505:
+            p_2y = series.iloc[-505]
+            p_1y = series.iloc[-253]
+            val = -(p_1y / p_2y - 1.0)
+        else:
+            val = np.nan
+        out[col] = val
+    return pd.Series(out)
 
 
 def low_vol(prices: pd.DataFrame) -> pd.Series:
