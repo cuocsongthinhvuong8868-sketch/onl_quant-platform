@@ -23,10 +23,10 @@ if ! command -v "$PY_BIN" >/dev/null 2>&1; then
 fi
 
 if command -v streamlit >/dev/null 2>&1; then
-  streamlit run app.py
+  streamlit run app.py --server.port=8502
 else
   echo "[INFO] streamlit command not in PATH, trying: $PY_BIN -m streamlit"
-  "$PY_BIN" -m streamlit run app.py
+  "$PY_BIN" -m streamlit run app.py --server.port=8502
 fi
 
 status=$?

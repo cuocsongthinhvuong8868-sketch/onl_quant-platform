@@ -27,6 +27,13 @@ TOOLS = [
         "page_module": "tools.global_financial_conditions.page",
         "render_func": "render",
     },
+    {
+        "id": "vnibor",
+        "name": "🏦 VNIBOR Monitor",
+        "desc": "Lãi suất qua đêm và các kỳ hạn ngắn liên ngân hàng · Phân loại trạng thái thanh khoản (Regime Percentile 1Y) · Tác động tới VN-Index",
+        "page_module": "tools.vnibor.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────

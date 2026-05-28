@@ -7,7 +7,7 @@ echo Folder: %cd%
 echo ======================================
 
 echo.
-echo [1/2] Running python -m command.update_data ...
+echo [1/3] Running python -m command.update_data ...
 python -m command.update_data
 if errorlevel 1 (
   echo [ERROR] command.update_data failed.
@@ -15,10 +15,18 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/2] Running python -m command.update_bank_fundamentals ...
+echo [2/3] Running python -m command.update_bank_fundamentals ...
 python -m command.update_bank_fundamentals
 if errorlevel 1 (
   echo [ERROR] command.update_bank_fundamentals failed.
+  goto :end
+)
+
+echo.
+echo [3/3] Running python -m command.update_vnibor ...
+python -m command.update_vnibor
+if errorlevel 1 (
+  echo [ERROR] command.update_vnibor failed.
   goto :end
 )
 
