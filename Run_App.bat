@@ -9,10 +9,10 @@ echo Folder: %cd%
 echo ======================================
 
 echo.
-streamlit run app.py
+streamlit run app.py --server.port=8502
 if errorlevel 1 (
   echo.
-  echo [ERROR] Failed to run: streamlit run app.py
+  echo [ERROR] Failed to run: streamlit run app.py --server.port=8502
 )
 
 echo.

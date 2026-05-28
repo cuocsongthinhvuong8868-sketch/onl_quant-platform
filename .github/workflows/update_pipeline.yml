@@ -69,6 +69,9 @@ jobs:
       - name: Pre-warm Factor Examination pkl
         run: python command/update_factor_examination.py
 
+      - name: Run update_vnibor.py
+        run: python command/update_vnibor.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
