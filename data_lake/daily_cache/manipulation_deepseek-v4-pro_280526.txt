@@ -1,21 +1,20 @@
 ## 1. Observations
-- 📈 OLS Slope: 0.41 (Percentile: 86.7th — **rất cao**), thể hiện mối quan hệ giữa VIN composite và VN30F1M cực kỳ chặt chẽ, gần như VIN kéo F1 đi theo từng điểm.
-- 📊 Tương quan: 0.72 (Percentile: 88.3th — **rất cao**), xác nhận mức độ dính chặt bất thường so với lịch sử 3 tháng.
-- 🏷️ Trạng thái áp đảo từ Event Study: **COUPLING** (ΔCorr = +0.68, ΔSlope = +0.67), cả hai delta đều vượt ngưỡng +0.15 gấp 4-5 lần.
+- **OLS Slope**: 0.41 (Percentile 86.7th — 🔴 Cao). Mối quan hệ giữa VIN composite và VN30F1M đang ở vùng hiếm, slope dốc hơn 86.7% lịch sử.
+- **Correlation**: 0.72 (Percentile 88.3th — 🔴 Rất chặt). Tương quan gần như tuyệt đối, VIN composite và futures di chuyển cùng nhịp.
+- **Regime**: COUPLING (ΔCorr = +0.68 > +0.15, ΔSlope = +0.67 > +0.15). VIN đang dẫn dắt futures một cách áp đảo.
 
 ## 2. Microstructure Read
-Cả hai percentile slope và corr đều > 80th → **tín hiệu coupling cực đoan, mang dấu hiệu can thiệp**. VIC/VHM/VRE đang là lực kéo chính của VN30F1M trong phiên này, không chỉ đơn thuần là dẫn dắt mà gần như là bộ đôi **áp đảo index**. Các cổ phiếu trụ khác (Bank, Chứng khoán) đang bị mờ nhạt — khả năng dòng tiền đã tập trung vào nhóm VIN để tạo hiệu ứng cho F1.
+Cả hai percentile đều trên 80th (86.7 và 88.3) — đây là tín hiệu bất thường, có khả năng can thiệp từ market maker hoặc dòng tiền lớn đang đẩy VIN composite làm "kèo thơm" cho futures. VIC (210,800 VND) và VHM (157,700 VND) đang là trụ chính, VRE (32,250 VND) đóng vai trò phụ trợ. Không có dấu hiệu "thoát hàng" vì tương quan vẫn rất chặt.
 
 ## 3. Event Study Interpretation
-COUPLING ở dải cực trên (percentile ~87-88) có hai kịch bản:
-- **Intraday**: Nhóm VIN sẽ tiếp tục kéo F1 lên tới khi nào slope giảm hoặc có dấu hiệu bán chốt ở vùng kháng cự.
-- **Overnight**: **Không khuyến nghị giữ vị thế qua đêm** vì đây rất có thể là hành vi kéo khối lượng lớn trong phiên, rủi ro force sell đầu phiên hôm sau rất cao.
+COUPLING ở mức extreme này cho thấy intraday có edge rõ: nếu VIN tăng, futures sẽ tăng theo ngay. Tuy nhiên, với slope quá dốc và percentile cao, rủi ro "quay đầu" cũng lớn — không nên giữ overnight. Regime không phải TÍN HIỆU GIẢ, nên có thể trade.
 
 ## 4. Verdict
-- **Trade plan: Long F1** theo đà VIN trong phiên sáng/đầu phiên chiều. Không giữ qua đêm.
-- **Leading indicator**: Theo dõi **VIC** — nếu VIC thủng mốc **210.80** (> -1% so với giá hiện tại) thì tín hiệu đảo chiều. Sức mạnh của bộ ba chỉ có ý nghĩa khi VIC trên 210.00.
-- **Stop-loss tham khảo**: VN30F1M cắt **dưới 2,010 điểm** (~3% từ 2,023.70). Hoặc nếu VIC < 208.10 (~210.80 × (1 - 1.3%)).
+**Trade Plan**: **Long F1** — nhịp đầu phiên (nếu VIN giữ vững trên VIC 210.80 và VHM 157.70).  
+**Leading Indicator**: Theo dõi VIC — nếu break dưới 210.80 (210,800 VND) × (1 − 2%) ≈ 206,584 VND (tương đương ~206.58), tín hiệu suy yếu. Cũng watch nhóm Ngân hàng (VCB, BID) để kiểm tra dòng tiền lan tỏa.  
+**Stop-loss reference**: VIC stop-loss tại 206.58 (≈ 206,580 VND, dưới 2% giá hiện tại). Nếu VIC mất mốc này, vào short F1 ngay.
 
+## 5. Structured Tail
 ```json
 {
   "tool": "manipulation",
