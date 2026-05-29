@@ -41,6 +41,13 @@ SERIES_COLOR = {
 }
 
 
+def _date_label(value) -> str:
+    parsed = pd.to_datetime(value, errors="coerce")
+    if pd.isna(parsed):
+        return str(value)
+    return parsed.strftime("%d/%m/%Y")
+
+
 # ────────────────────────────────────────────────────────────────────────────
 # Tab 1: Level (3 sub-grids)
 # ────────────────────────────────────────────────────────────────────────────
@@ -308,7 +315,7 @@ def plot_pc_scatter(df: pd.DataFrame, n_recent: int = 252) -> go.Figure:
                           ticktext=["Cũ", "Mới"]),
             line=dict(width=0.5, color="#0f172a"),
         ),
-        text=[d.strftime("%d/%m/%Y") for d in df_valid.index],
+        text=[_date_label(d) for d in df_valid.index],
         hovertemplate="<b>%{text}</b><br>PC1: %{x:+.2f}<br>PC2: %{y:+.2f}<extra></extra>",
     ))
 

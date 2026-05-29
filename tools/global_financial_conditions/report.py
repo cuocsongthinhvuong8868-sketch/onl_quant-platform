@@ -2,11 +2,10 @@
 tools/global_financial_conditions/report.py
 Snapshot hook cho AI / report engine.
 """
-import pandas as pd
 
 from config import DATA_LAKE
 from tools.global_financial_conditions.quant.metrics import (
-    OUTPUT_COLUMNS,
+    load_cached_gfcm,
     summarize_latest,
 )
 
@@ -33,11 +32,7 @@ def snapshot(df_close=None, load_custom=None) -> dict:
         }
         return out
 
-    df = pd.read_csv(path, parse_dates=["DATE"]).set_index("DATE").sort_index()
-    numeric_cols = [c for c in OUTPUT_COLUMNS if c not in ("Regime", "Driver")]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
+    df = load_cached_gfcm(path)
 
     summary = summarize_latest(df)
     summary["status"] = "ok"
