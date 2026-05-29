@@ -1,0 +1,33 @@
+## 1. Observations
+- **Module B — Stress Index:** 3.33% (thấp hơn nhiều so với ngưỡng cảnh báo 40%)
+- **Module B — Breach Count:** 1/30 mã thủng VaR 95%
+- **Module C — Complacency Index:** 6.48% (thấp hơn nhiều so với ngưỡng nguy hiểm 80%)
+- **Module C — Mispriced Count:** 7 mã có spread bị nén bất thường
+
+## 2. Contagion Assessment (Module B)
+**VN30 Stress Index ở mức 3.33% — không có dấu hiệu lây lan hệ thống.** Chỉ 1/30 mã thủng VaR 95%, cho thấy sự cố mang tính cá biệt, chưa hình thành hiệu ứng domino trên rổ VN30. SSB là mã breach sâu nhất duy nhất được ghi nhận. Với ngưỡng alert 40%, stress hiện tại ở mức nền rất thấp, chưa kích hoạt bất kỳ cảnh báo nào về systemic risk real-time.
+
+→ **Kết luận:** Đây là sự cố cá biệt tại SSB, không phải đầu sóng lây lan. Chưa cần can thiệp khẩn cấp ở cấp độ danh mục VN30.
+
+## 3. Complacency Assessment (Module C)
+**Complacency Index ở mức 6.48% — rất thấp so với ngưỡng nguy hiểm 80%.**
+
+Theo đúng bản chất chỉ báo: thị trường **KHÔNG đang ở regime ngủ quên**. Điều này KHÔNG đồng nghĩa thị trường ổn định. Với Complacency thấp, spread đang giãn rộng — điều này tương thích với nhiều regime khác nhau: uptrend mạnh có biến động, hoặc áp lực bán gia tăng. Stress Index (3.33%) thấp, loại trừ kịch bản hoảng loạn đang diễn ra. Nhưng không loại trừ khả năng thị trường đang trong giai đoạn phân phối yếu với volume thấp.
+
+## 4. Stock-Level Risk Calls
+- **SSB (Breach sâu nhất):** Đã thủng VaR 95% — cảnh báo giảm tỷ trọng hoặc đặt stop-loss chặt dưới vùng hỗ trợ gần nhất. Nếu khối lượng giao dịch gia tăng trong các phiên tới, xem xét thoát vị thế toàn bộ.
+- **HSG, VRE, VTO (Mispriced — spread bị nén):** Spread hẹp bất thường so với volatility ngầm — cảnh báo rủi ro điều chỉnh đột ngột. Tránh mua mới, đặc biệt nếu các mã này không có tin hỗ trợ cơ bản rõ ràng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["SSB"],
+  "confidence": "high"
+}
+```
