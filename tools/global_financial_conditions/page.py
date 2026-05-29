@@ -14,7 +14,7 @@ import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
 from tools.global_financial_conditions.quant.metrics import (
-    OUTPUT_COLUMNS,
+    load_cached_gfcm,
     summarize_latest,
 )
 from tools.global_financial_conditions.ui.sidebar import render_sidebar
@@ -51,12 +51,7 @@ def _load_gfcm() -> pd.DataFrame:
             f"Không tìm thấy {path}.\n"
             "Vui lòng chạy: python command/update_global_financial_conditions.py"
         )
-    df = pd.read_csv(path, parse_dates=["DATE"]).set_index("DATE").sort_index()
-    numeric_cols = [c for c in OUTPUT_COLUMNS if c not in ("Regime", "Driver")]
-    for col in numeric_cols:
-        if col in df.columns:
-            df[col] = pd.to_numeric(df[col], errors="coerce")
-    return df
+    return load_cached_gfcm(path)
 
 
 def render():

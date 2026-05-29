@@ -123,6 +123,36 @@ OUTPUT_COLUMNS = (
 )
 
 
+def load_cached_gfcm(path) -> pd.DataFrame:
+    """
+    Read a saved GFCM cache and normalize DATE defensively.
+
+    CSV cache files can be edited or merged outside the updater. If conflict
+    markers or other invalid rows enter the file, pandas may leave DATE as
+    strings even with parse_dates, which later breaks .strftime() callers.
+    """
+    df = pd.read_csv(path)
+    if "DATE" not in df.columns:
+        raise ValueError(f"GFCM cache is missing required DATE column: {path}")
+
+    parsed_dates = pd.to_datetime(df["DATE"], errors="coerce")
+    df = df.loc[parsed_dates.notna()].copy()
+    df["DATE"] = parsed_dates.loc[parsed_dates.notna()]
+
+    df = (
+        df.sort_values("DATE", kind="mergesort")
+        .drop_duplicates(subset=["DATE"], keep="last")
+        .set_index("DATE")
+        .sort_index()
+    )
+
+    numeric_cols = [c for c in OUTPUT_COLUMNS if c not in ("Regime", "Driver")]
+    for col in numeric_cols:
+        if col in df.columns:
+            df[col] = pd.to_numeric(df[col], errors="coerce")
+    return df
+
+
 # ────────────────────────────────────────────────────────────────────────────
 # Fetchers
 # ────────────────────────────────────────────────────────────────────────────
@@ -466,8 +496,15 @@ def summarize_latest(df_processed: pd.DataFrame) -> dict:
     def _f(v: Optional[float]) -> float:
         return float(v) if pd.notna(v) else 0.0
 
+    latest_date = pd.to_datetime(df_clean.index[-1], errors="coerce")
+    latest_date_str = (
+        str(df_clean.index[-1])
+        if pd.isna(latest_date)
+        else latest_date.strftime("%Y-%m-%d")
+    )
+
     out = {
-        "date": df_clean.index[-1].strftime("%Y-%m-%d"),
+        "date": latest_date_str,
         "credit_quality_spread": _f(latest["Credit_Quality_Spread"]),
         "cqs_pct": _f(latest["CQS_pct"]),
         "pc1": _f(latest["PC1"]),
