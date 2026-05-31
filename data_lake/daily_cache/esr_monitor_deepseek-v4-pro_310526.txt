@@ -1,28 +1,27 @@
 ## 1. Observations
 
-- SSI đạt 64.6%, nằm trong vùng WARNING (0.50–0.80), chưa chạm CRITICAL nhưng đã vượt ngưỡng cảnh báo.
-- Market State: EUPHORIC RISK — giá nằm trên MA125 nhưng stress hệ thống cao.
-- Top 3 pillar weights: S_LIQ (36%), S_VAL (32%), S_COR (17%).
-- PCA Concentration (EVR PC1) ở 38.4%, thấp hơn ngưỡng herding điển hình (45%+), nhưng S_COR vẫn đứng thứ 3.
+- SSI ở mức 64.6% – nằm trong vùng WARNING (0.50-0.80), tích lũy rủi ro hệ thống ngầm.
+- Market State là EUPHORIC RISK: giá đang trong uptrend nhưng stress cao, cảnh báo bull trap.
+- Top 3 pillars: S_LIQ (36%) > S_VAL (32%) > S_COR (17%).
+- Pillar Mode: downside – các pillar chỉ được kích hoạt khi thị trường giảm điểm.
 
-## 2. Risk Decomposition
+## 2. Risk Decomposition (Bóc tách)
 
-- **S_LIQ dẫn dắt (36%)**: Volume khô cạn so với chuẩn 1 năm. Chỉ số −log(MA20/MA252) dương cao phản ánh thanh khoản suy giảm nghiêm trọng, dù giá vẫn tăng. Đây là tín hiệu cổ điển của bull-trap — thiếu volume xác nhận xu hướng.
-- **S_VAL (32%)**: Valuation tension cao — lợi nhuận 252 ngày vượt xa lãi suất tiền gửi, phản ánh định giá đang căng giãn. Thị trường đã tăng quá nhanh so với nền tảng cơ bản.
-- **S_COR (17%)**: Systemic correlation vẫn trong vùng cao (EVR 38.4%). Kết hợp S_LIQ, đây là signature của herding trong điều kiện volume cạn — nhà đầu tư nắm giữ đồng loạt nhưng không có dòng tiền mới xác nhận.
-
-**Kết luận bóc tách**: Cả ba pillar chính đều hội tụ về stress — thanh khoản khô, định giá căng, tương quan cao. Không có pillar nào mang tín hiệu tích cực.
+- **S_LIQ (36%)** dẫn dắt stress lần này. Volume dry-up so với chuẩn 1 năm đang ở mức đáng chú ý – thanh khoản khô cạn trong các phiên giảm cho thấy thiếu lực cầu bắt đáy, tín hiệu điển hình của bull trap sắp xả.
+- **S_VAL (32%)** đứng thứ hai: valuation tension cao – lợi suất 12 tháng của VN30 đang vượt deposit rate đáng kể, ngụ ý định giá đã căng.
+- **S_COR (17%)** với EVR PC1 = 38.4% cho thấy các mã trong rổ đang vận động đồng pha hơn bình thường, hiệu ứng herding rõ nét. Kết hợp cả ba: **volume khô + định giá cao + herding** chính là công thức bull trap.
 
 ## 3. Cross-Check
 
-- **Giá vs SSI divergence**: VN30 đang ở đỉnh cao (trên MA125) trong khi SSI chạm WARNING. Đây là divergence âm điển hình: giá tạo đỉnh mới nhưng stress hệ thống không giảm. Bull-trap risk được xác nhận bởi cả pillar decomposition và regime classification.
-- **HMM regime alignment**: EUPHORIC RISK khớp hoàn toàn với SSI WARNING + pillar cấu trúc. Không có lệch — toàn bộ hệ thống đang đồng thuận về trạng thái rủi ro cao.
+- **Divergence rõ rệt:** VN30 đóng cửa trên MA125, nằm trong uptrend – nhưng SSI đã chạm WARNING ở mức 64.6%. Giá đỉnh mới + stress leo thang = không xác nhận. Đây là divergence bearish cổ điển.
+- **HMM regime khớp với SSI:** Market state = EUPHORIC RISK, hoàn toàn nhất quán với SSI > 0.50. Không có lệch pha.
+- Pillar Mode = downside càng củng cố stress chỉ biểu hiện ở các phiên giảm – stress đang tích lũy chứ không bùng nổ đồng loạt.
 
 ## 4. Verdict
 
-- **Cash weight đề xuất**: 65% (nắm giữ tiền mặt), chỉ để 35% danh mục trong cổ phiếu có beta thấp.
-- **Hedge action**: Giảm beta (reduce beta) — bán các vị thế beta cao, chuyển sang cổ phiếu phòng thủ. Chưa khuyến nghị short futures hoặc mua put ở thời điểm này vì SSI chưa chạm CRITICAL.
-- Không có mâu thuẫn giữa các pillar — cả 3 driver đều chỉ về cùng một hướng: bull-trap đang hình thành. Tín hiệu rõ ràng, có thể hành động.
+→ **Cash weight đề xuất: 70%** – ưu tiên bảo vệ danh mục.  
+→ **Hedge action: Short VN30F1M** tỷ lệ 30% notional hoặc mua put ATM duration 1 tháng.  
+→ Lý do: Cả 3 top pillar đều đồng thuận báo hiệu bull trap. Không có mâu thuẫn nào giữa các driver để trì hoãn hành động.
 
 ## 5. Structured Tail
 
@@ -33,8 +32,8 @@
   "regime": "WARNING",
   "market_state": "EUPHORIC_RISK",
   "top_driver": "S_LIQ",
-  "cash_target_pct": 65,
-  "hedge_action": "reduce_beta",
-  "confidence": "medium"
+  "cash_target_pct": 70,
+  "hedge_action": "short_futures",
+  "confidence": "high"
 }
 ```

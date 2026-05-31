@@ -64,14 +64,13 @@ Phân loại 9 tools định lượng cổ phiếu VN theo bias:
 Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và consensus định lượng để phân loại và giải thích bằng data):
 - CRISIS / DISTRIBUTION / PRE-CRASH / NEUTRAL / STOCK-PICKING / UPTREND / EXPANSION / BULL CONFIRMED
 
-### Step 5 — Score (0-100) anchored
-- Bắt đầu từ midpoint (50)
-- Cộng/trừ theo 9 tool signals, weight by confidence:
-  - High-confidence bullish tool: +5 to +10
-  - High-confidence bearish tool: -5 to -10
-  - Low-confidence: ±2 max
-- Tác động vĩ mô (từ Step 0): Nếu vĩ mô stress/nghẽn nghiêm trọng, chủ động áp dụng mức chiết khấu bổ sung (-5 đến -10 điểm) để phản ánh rủi ro thanh khoản hệ thống.
-- Apply tail-risk haircut nếu cần (CAP score ≤ 50 khi ESR Critical)
+### Step 5 — Score (0-100) anchored & Split Score
+- Thay vì gom tất cả rủi ro vào một điểm số duy nhất quá sớm, bạn **BẮT BUỘC phải tách điểm số thành 3 phần (Sub-Scores) riêng biệt** để PM nắm bắt được rủi ro cụ thể đến từ nguồn nào.
+- **LƯU Ý CỰC KỲ QUAN TRỌNG VỀ TOÁN HỌC**: Mỗi điểm số thành phần (Macro Risk, Market Internal, Tail Risk) hoạt động trên một **thang điểm sức khỏe/cơ hội độc lập từ 0 đến 100** (với 0 là rủi ro cực đại/nguy hiểm nhất, 100 là an toàn tuyệt đối/cơ hội tốt nhất). Chúng **KHÔNG PHẢI là các tỷ trọng cấu thành để cộng lại bằng 100**.
+  * Ví dụ: Báo cáo có thể ghi `[Macro Risk: 55/100 | Market Internal: 20/100 | Tail Risk: 15/100]`.
+  * Ý nghĩa: Thanh khoản vĩ mô trung bình (55), nhưng nội tại thị trường rất yếu (20) và rủi ro đuôi đang cực kỳ căng thẳng/nguy hiểm (15).
+  * 0-20: Cực kỳ nguy hiểm (Extreme Stress) | 20-40: Nguy hiểm (High Risk) | 40-60: Trung tính (Neutral) | 60-80: Tích cực (Opportunistic) | 80-100: Cực kỳ tích cực (Excellent).
+- **Composite Score (Điểm số tổng hợp, 0-100)**: Điểm số sức khỏe chung của toàn hệ thống (cũng nằm trên thang điểm 0-100). Điểm này được tổng hợp từ 3 Sub-Scores trên (ví dụ: lấy trung bình có trọng số hoặc bị kéo xuống theo quy tắc nút thắt cổ chai bởi điểm số thấp nhất), chứ **không phải** là tổng cộng đại số của 3 Sub-Scores. Neo từ midpoint (50), điều chỉnh cộng/trừ dựa trên consensus và độ tin cậy của 9 công cụ con, kết hợp chiết khấu vĩ mô (Step 0) và áp dụng tail-risk haircut (CAP score ≤ 50 khi ESR Critical).
 
 ### Step 6 — Capital Allocation
 - Equity range theo Score
@@ -83,7 +82,9 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
 ## OUTPUT FORMAT (Markdown, 800-1100 từ)
 
 ### 📊 EXECUTIVE BOTTOM LINE (Tóm tắt nhanh)
-- **Điểm số vĩ mô (Score)**: X/100
+- **Ngày báo cáo (Date)**: DD/MM/YYYY (BẮT BUỘC: lấy trùng khớp với "Ngày xuất bản" được cung cấp ở phần đầu của INPUT DATA)
+- **Điểm số tổng hợp (Composite Score)**: X/100
+  * *Tách biệt 3 nguồn rủi ro*: [Macro Risk: A/100 | Market Internal: B/100 | Tail Risk: C/100]
 - **Trạng thái vĩ mô (Regime)**: [CRISIS / DISTRIBUTION / PRE-CRASH / NEUTRAL / STOCK-PICKING / UPTREND / EXPANSION / BULL CONFIRMED]
 - **Mức rủi ro đuôi (Tail Risk)**: [Manageable / Elevated / Extreme]
 - **Cảnh báo cực đoan (Extreme Drivers Warning)**: [Cảnh báo cụ thể về các nhân tố đạt mức cực đoan đang diễn ra hiện tại từ các báo cáo con, ví dụ: nợ xấu deep junk (CCC OAS), sốc giá dầu (OVX), sức mạnh USD (DXY), hay chỉ số stress SSI vượt ngưỡng].
@@ -106,9 +107,13 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
 ### 4. Macro Regime
 - Label + 2-3 câu justification (phải kết hợp chặt chẽ giữa Lớp vĩ mô và 9 công cụ định lượng)
 
-### 5. Risk/Reward Score
-- Score X/100 (Δ vs T-1 nếu có history)
-- Giải thích lực cản hoặc lực đẩy từ Vĩ mô ảnh hưởng thế nào đến Score.
+### 5. Risk/Reward Score & Sub-Score Details
+- **Composite Score**: X/100 (Δ vs T-1 nếu có history)
+- **Chi tiết 3 thành phần điểm số**:
+  * **Macro Risk Score**: A/100. Giải thích cụ thể áp lực/thuận lợi đến từ thanh khoản thượng nguồn (Fed, Global) và mức độ căng thẳng lan truyền qua hệ thống liên ngân hàng/tỷ giá (VNIBOR, LTMM).
+  * **Market Internal Score**: B/100. Phân tích nội tại về độ rộng phục hồi của cổ phiếu (>MA20/60/125/252), đà bứt phá của Upside Ratio hay áp lực phân tán của Dispersion.
+  * **Tail Risk Score**: C/100. Đánh giá độ nhạy cảm của các rủi ro đuôi cực đoan (ESR SSI, EVT tail-index ξ, VaRES complacency).
+- Giải thích lực cản hoặc lực đẩy từ Vĩ mô ảnh hưởng thế nào đến Score tổng.
 - Top tail risk trong 5-20 phiên tới
 
 ### 6. Executive Order
@@ -120,6 +125,15 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
 ### 7. Confidence Note
 - Final confidence: low / medium / high
 - Nếu low → ghi rõ lý do (X/9 tools data thiếu hoặc conflict)
+
+### 8. Model Humility Box ("Điều gì sẽ làm báo cáo này sai?")
+- Hãy chủ động tư duy Red-Teaming và đưa ra các **ngưỡng định lượng cụ thể (falsification thresholds)** của các công cụ con để làm bằng chứng phủ định (falsify) luận điểm đầu tư hiện tại của báo cáo này. Nếu các ngưỡng này bị vi phạm, luận điểm của báo cáo sẽ sai và lệnh phân bổ tài sản hiện tại sẽ phải lập tức chấm dứt/quay xe.
+- Ví dụ:
+  * VNIBOR giảm nhanh về mức bình thường dưới X%.
+  * Độ rộng thị trường phục hồi mạnh mẽ với tỷ lệ mã nằm trên MA20 vượt ngưỡng >45%.
+  * Chỉ số stress SSI của ESR quay đầu xuống dưới 55% (SSI < 0.55).
+  * Chỉ số đuôi béo EVT ξ giảm sâu dưới 0.25 (ξ < 0.25).
+  * Hệ số tương quan coupling của bộ ba VIC/VHM/VRE hạ xuống dưới phân vị 70th percentile.
 
 ---
 
