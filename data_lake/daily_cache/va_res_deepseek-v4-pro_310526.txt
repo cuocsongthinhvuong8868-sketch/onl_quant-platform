@@ -1,0 +1,34 @@
+## 1. Observations
+- VN30 Stress Index: 3.33% (ngưỡng cảnh báo 40%) — ở mức rất thấp, không có dấu hiệu lây lan.
+- Số mã thủng VaR 95%: 1/30 (SSB) — sự cố cá biệt, chưa mang tính hệ thống.
+- Complacency Index: 6.48% (ngưỡng nguy hiểm 80%) — ở vùng rất thấp.
+- Số mã mispriced (spread nén): 7 — chủ yếu tập trung ở nhóm cổ phiếu nhỏ/đầu cơ.
+
+## 2. Contagion Assessment (Module B)
+- **Mức stress VN30 (3.33%):** Không có áp lực lây lan real-time. Thị trường đang vận hành mà không có hiệu ứng domino từ các mã mất thanh khoản.
+- **Top 3 breach (SSB):** Đây là sự cố cá biệt, rất có thể do tin tức riêng của cổ phiếu này hoặc hành vi giao dịch bất thường. Không có dấu hiệu đầu sóng systemic.
+
+## 3. Complacency Assessment (Module C)
+- **Complacency Index 6.48% — THẤP:** Thị trường **KHÔNG** ở regime ngủ quên. Điều này **KHÔNG** đồng nghĩa thị trường ổn định. Với Stress Index ở mức thấp, khả năng thị trường đang ở pha **uptrend mạnh** (spread giãn rộng do khối lượng cao) hoặc **sideways biến động mạnh** (không có sự tích lũy nén chặt). Cả hai kịch bản này đều có Complacency thấp tự nhiên. **Không có dấu hiệu định giá sai rủi ro trên diện rộng** — thị trường đang "định giá đúng" trạng thái hiện tại.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B — SSB):**  
+  - **SSB:** Cần giảm tỷ trọng ngay. Nếu SSB tiếp tục thủng MA20 trên D1, khả năng giảm thêm 5-8% từ giá hiện tại. Chưa loại trừ khả năng lây lan nếu thanh khoản đột biến.
+
+- **Top 3 Mispriced (Module C — HSG, VRE, VTO):**  
+  - Các mã này có spread bị nén chặt, nhưng Complacency thấp + Stress Index thấp → **không có cảnh báo điều chỉnh ngắn hạn**.  
+  - Tuy nhiên, mức độ nén spread này ở nhóm đầu cơ HSG, VTO tiềm ẩn rủi ro giảm sâu nếu thị trường đảo chiền. Hiện tại chưa có tín hiệu hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["SSB"],
+  "confidence": "high"
+}
+```

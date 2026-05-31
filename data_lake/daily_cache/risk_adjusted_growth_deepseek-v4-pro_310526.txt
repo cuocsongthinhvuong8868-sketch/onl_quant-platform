@@ -1,0 +1,64 @@
+# Phân Tích Economic Alpha Ngân Hàng VN – Kịch Bản Tiêu Chuẩn
+
+## 1. Scenario Assessment
+
+Kịch bản hiện tại (K=1.0, CoE=14%, stress BVPS -5%, P/B penalty -5%) là **baseline vừa phải** cho VN banking sector – không quá khắc nghiệt. Tuy nhiên, mặt bằng chỉ có **3/6 mã được phân tích tạo Alpha dương**, phần còn lại âm sâu. Điều này phản ánh sự phân hóa mạnh: nhóm định giá rẻ + ROE ổn định vẫn "sống khỏe", trong khi nhóm premium và rủi ro cao đang đốt vốn cổ đông thực sự dưới góc nhìn risk-adjusted.
+
+**DATA QUALITY WARNING:** Không có dữ liệu đầy đủ các mã BID, CTG, MBB, ACB – chỉ phân tích 6 mã được cung cấp. Kết luận mang tính relative trong subset này.
+
+---
+
+## 2. Top Alpha Decomposition
+
+### HDB (Alpha 5.5%, P/B 1.28)
+**Driver chính:** P/B rẻ + ROE retention cao. P/B 1.28 là mức hợp lý cho chất lượng tài sản hiện tại. Với giả định payout thấp → GEOMEAN ROE*(1-payout)/P/B tạo đòn bẩy compounding. **Phân loại: Fortress profile** – định giá hấp dẫn, ROE lịch sử ổn định, risk penalty thấp.
+
+### SHB (Alpha 3.9%, P/B 0.93)
+**Driver chính:** P/B cực rẻ (<1). Đây là trường hợp điển hình của "deep value" – P/B discount phản ánh nỗi lo về nợ xấu, nhưng alpha vẫn dương nhờ vùng đệm lớn. **Phân loại: Cheap-but-not-trap** nếu ROE duy trì >13% qua chu kỳ.
+
+### TPB (Alpha 3.3%, P/B 0.96)
+**Driver chính:** P/B hợp lý + ROE tăng trưởng. Tương tự SHB nhưng biên lợi nhuận co giãn hơn. **Phân loại: Growth Trap tiềm ẩn** nếu σ(ROE) cao, nhưng hiện tại risk penalty chưa quá mức.
+
+---
+
+## 3. Value Traps Warning
+
+### EIB (Alpha -12.5%, P/B 1.53) – **Premium Burn thuần túy**
+P/B cao (1.53) trong khi ROE không tương xứng. Risk penalty + CoE = 14% vượt xa disciplined return. Đây là cổ phiếu tăng giá nhờ speculation, không phải value. **Cấm mua.**
+
+### LPB (Alpha -8.0%, P/B 3.29) – **Premium Burn + Growth Trap**
+P/B 3.29 là đắt nhất nhóm, nhưng ROE không đủ bù với volatility. P/B penalty -5% càng làm trầm trọng. Đây là "tăng trưởng trên lưng rủi ro".
+
+### VCB (Alpha -7.2%, P/B 2.28) – **Premium Burn (Blue chip premium)**
+P/B 2.28 tuy "rẻ so với quá khứ" (từng >3), nhưng CoE 14% và K=1.0 vẫn tạo alpha âm sâu. Chất lượng tài sản tốt không thể bù cho định giá quá cao so với disciplined return.
+
+---
+
+## 4. Portfolio Construction
+
+| Phân loại | Mã | Tỷ trọng đề xuất |
+|------------|-----|------------------|
+| **Core Holding (Fortress)** | HDB | 35% |
+| | SHB | 25% |
+| **Tactical** | TPB | 20% |
+| **Cấm mua / Underweight** | EIB, LPB, VCB | 0% (AVOID) |
+
+**Giải trình:** HDB (Fortress) chiếm tỷ trọng lớn nhất do alpha dương bền vững + định giá rẻ. SHB (deep value) bổ sung cho core. TPB chỉ tactical vì rủi ro growth. Ba mã âm alpha bị loại hoàn toàn.
+
+---
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "SHB"],
+  "tactical_holdings": ["TPB"],
+  "avoid_list": ["EIB", "LPB", "VCB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+**Kết luận:** Không "AVOID SECTOR" vì vẫn có 3 mã alpha dương, nhưng cần chọn lọc cực kỳ khắt khe. Tập trung vào HDB và SHB – hai mã có P/B hấp dẫn và alpha dương rõ ràng. EIB, LPB, VCB là "value traps" dưới góc nhìn risk-adjusted.

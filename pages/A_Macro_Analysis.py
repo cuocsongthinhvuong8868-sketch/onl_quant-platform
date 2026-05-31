@@ -34,6 +34,13 @@ TOOLS = [
         "page_module": "tools.vnibor.page",
         "render_func": "render",
     },
+    {
+        "id": "ltmm",
+        "name": "📊 Liquidity Transmission (LTMM)",
+        "desc": "Theo dõi kênh truyền dẫn thanh khoản hệ thống: Thượng nguồn (upstream), Lớp ma sát (friction), và Hạ nguồn (market liquidity)",
+        "page_module": "tools.ltmm.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────

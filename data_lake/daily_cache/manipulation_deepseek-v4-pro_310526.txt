@@ -1,0 +1,32 @@
+## 1. Observations
+- **OLS Slope (0.41 | 86.7th)** : Hệ số dốc cao trong lịch sử, cho thấy composite VIN đang khuếch đại mạnh biến động lên futures — mỗi 1% VIC/VHM/VRE kéo F1 ~0.41%
+- **Correlation (0.72 | 88.3th)** : Tương quan cực chặt, gần đỉnh lịch sử — VIN đang là động lực chính chi phối VN30F1M
+- **Regime: COUPLING** (ΔCorr=+0.68, ΔSlope=+0.67) — xác nhận VIN gần như hoàn toàn dẫn dắt F1
+
+## 2. Microstructure Read
+**VIC/VHM/VRE đang chi phối tuyệt đối** VN30F1M trong 1 tháng qua. Khi cả Slope lẫn Correlation đều vượt ngưỡng 80th, đây là dấu hiệu **bất thường về cấu trúc thị trường**: rất có thể có sự can thiệp của market maker hoặc dòng tiền định chế đẩy VIN để neo/fix chỉ số. VIC ở 211.3 (≈211,300 VND) đang là trụ chính — nếu VIC đột ngột xả, F1 sẽ giảm tương ứng với hệ số slope 0.41.
+
+## 3. Event Study Interpretation
+COUPLING duration kéo dài 2 tháng cho thấy **đây không phải noise tạm thời**. Với tín hiệu này:
+- **Intraday**: Edge rõ nhất là **track VIN → Long F1** khi VIC/VHM xanh. 
+- **Overnight**: Có thể hold nếu VIC close strong và không có tin quốc tế tiêu cực. Tuyệt đối không short F1 long VIN — trong trạng thái này VIN kéo chết all short.
+- **Rủi ro PNL**: 0.41 slope nghĩa là nếu VIC giảm 5% từ 211.3 → 200.7, VN30F1M sẽ điều chỉnh ~2.05% — stop-loss rất gần.
+
+## 4. Verdict
+**Trade plan: LONG F1** — tận dụng coupling momentum.   
+- **Entry**: Mở long khi VIC > 211.3 (≈211,300 VND) kèm khối lượng > 20% trung bình 20 phiên. Có thể mua spread "Long VN30F1M + Short VIC" nếu hệ số beta ~0.41.
+- **Leading indicator**: Nhóm VIC trên bảng điện tử (kèm VND). Theo dõi thêm VPB/TCB — nếu bank bật nhưng VIN đứng, coupling có thể yếu dần.
+- **Stop-loss**: Nếu vào long VIC tại 211.3, stop fixed 2% → 211.3 × 0.98 = **207.1 (≈207,100 VND)**. Trade F1: stop dưới hỗ trợ gần nhất (test MA20 — cần real-time data). Vì N/A F1 price, có thể ước: Entry F1 ±1% của VIC adjustment (≈ ±0.41% × 1% ≈ 0.41%).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```

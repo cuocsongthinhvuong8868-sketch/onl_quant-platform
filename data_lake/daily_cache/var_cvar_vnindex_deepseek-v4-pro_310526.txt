@@ -1,0 +1,46 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.64%, sâu hơn Parametric Gaussian VaR (-1.17%) khoảng 0.47pp, cho thấy phân phối lợi nhuận có đuôi nặng hơn so với giả định chuẩn.
+- **EVT VaR 99%**: -3.66%, tương ứng với sự kiện 1/100 ngày. Mức này sâu hơn đáng kể so với ước lượng Gaussian tại cùng quantile.
+- **ξ (GPD shape)**: +0.346, vượt ngưỡng 0.30, xác nhận chế độ **fat tail (đuôi rất dày)**.
+- **Hill index**: +0.471, cùng dấu dương với ξ và có độ lớn tương đương, củng cố tín hiệu đuôi dày.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346** thuộc bracket **FAT TAIL** (> 0.30). Điều này cho thấy xác suất xảy ra các biến động cực đoan cao hơn nhiều so với mô hình phân phối chuẩn.
+- **Hill cross-check**: ξ (0.346) và Hill (0.471) cùng dương và gần nhau về độ lớn → tín hiệu **robust signal**.
+- **ES − VaR Spread**: -1.36% (tức |ES − VaR| = 1.36%) so với σ₃₀ = 0.81% => Spread lớn hơn σ₃₀ (1.36% > 0.81%), **fat tail confirmed empirically**. Khoảng cách lớn giữa VaR và ES là dấu hiệu điển hình của đuôi cực dày.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** (μ − 2.33σ): Giả sử μ ≈ 0 (không đáng kể), ta có: 0 − 2.33 × 0.81% = **-1.89%**.
+- **EVT VaR 99%**: -3.66%.
+- **Gaussian Gap** = |−3.66%| − |−1.89%| = **1.77 percentage points**.
+- Gap > 1pp → Gaussian model **bị broken**, không thể dùng để phân bổ vốn rủi ro. Sử dụng Gaussian sẽ dẫn đến thiếu hụt vốn đáng kể khi xảy ra biến động cực đoan.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.346 > 0.30, chế độ đuôi cực dày đã được xác nhận. Các khuyến nghị:
+
+- **Avoid momentum strategies (tránh chiến lược đà tăng)**: Trong môi trường đuôi dày, các cú sốc âm thường diễn ra nhanh và bất ngờ, khiến momentum dễ bị thua lỗ lớn.
+- **Mua puts ITM (In-The-Money)**: Bảo vệ trực tiếp danh mục với các quyền chọn có strike gần giá hiện tại, đảm bảo bồi thường ngay khi thị trường giảm.
+- **Short futures hedge**: Sử dụng hợp đồng tương lai để phòng ngừa rủi ro hệ thống, đặc biệt khi hệ số ξ cao cho thấy khả năng xảy ra sự kiện đuôi là có thực.
+
+**Mức độ tin cậy**: Cao (ξ và Hill đồng thuận, ES-VaR spread xác nhận, đủ số liệu EVT).
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "29/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.77,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

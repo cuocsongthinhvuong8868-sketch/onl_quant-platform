@@ -1,0 +1,33 @@
+## 1. Observations
+- **MA20**: 29.2% — **Thấp** (gần vùng oversold <20%)
+- **MA60**: 34.6% — **Thấp** (dưới ngưỡng trung bình 50%)
+- **MA125**: 28.7% — **Thấp** (yếu kéo dài nửa năm)
+- **MA252**: 33.4% — **Thấp** (dưới ngưỡng bear regime 40%)
+
+## 2. Structural Health
+Bốn đường MA đều ở vùng thấp, **hoàn toàn đồng thuận yếu** — không có divergence giữa các khung thời gian. Tín hiệu khớp hoàn toàn với pattern **Bear Confirmed**: MA20 < 30% AND MA252 < 40%. Thị trường đang trong xu hướng suy yếu cơ cấu kéo dài, chưa có dấu hiệu tạo đáy.
+
+## 3. Money Flow Leadership
+- **Top volume MA20**: Gần như toàn bộ là nhóm **Banks** (ABB, ACB, BID) và **Financials/Services** (ABS, AFX, AMS, APS). Không có Real Estate, Steel hay Brokers — cho thấy dòng tiền ngắn hạn chỉ đổ vào nhóm trụ cột thanh khoản cao.
+- **Top volume MA252**: Overlap gần như hoàn toàn với MA20 — 9/10 mã giống hệt, thêm BCA, BFC. Điều này chứng tỏ **smart money đang tập trung tuyệt đối vào Banks/Financials**, không có sự lan tỏa.
+- **Xu hướng smart money**: Defensive rõ rệt — ưu tiên Banks (nhóm an toàn tương đối trong thị trường yếu), không hề aggressive.
+
+## 4. Verdict
+- **Strategy**: **Defensive cash-up** — tuyệt đối không mua đuổi, không long đầu cơ. Tỷ trọng cổ phiếu nên duy trì dưới 30% danh mục.  
+- **Đòn bẩy**: **0% margin** — MA252 chỉ 33.4% (dưới 70%) nên không đủ điều kiện dùng margin.  
+- Mặc dù MA20 gần oversold, nhưng MA252 yếu + đồng thuận giảm → không phải Bear Trap mà là Bear Confirmed thực sự. Chưa có tín hiệu đảo chiều. **KHÔNG bắt đáy T+.**
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 29.2,
+  "ma60_pct": 34.6,
+  "ma125_pct": 28.7,
+  "ma252_pct": 33.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

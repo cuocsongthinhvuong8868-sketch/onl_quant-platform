@@ -1,0 +1,40 @@
+## 1. Observations
+
+- SSI đạt 64.6%, nằm trong vùng WARNING (0.50–0.80), chưa chạm CRITICAL nhưng đã vượt ngưỡng cảnh báo.
+- Market State: EUPHORIC RISK — giá nằm trên MA125 nhưng stress hệ thống cao.
+- Top 3 pillar weights: S_LIQ (36%), S_VAL (32%), S_COR (17%).
+- PCA Concentration (EVR PC1) ở 38.4%, thấp hơn ngưỡng herding điển hình (45%+), nhưng S_COR vẫn đứng thứ 3.
+
+## 2. Risk Decomposition
+
+- **S_LIQ dẫn dắt (36%)**: Volume khô cạn so với chuẩn 1 năm. Chỉ số −log(MA20/MA252) dương cao phản ánh thanh khoản suy giảm nghiêm trọng, dù giá vẫn tăng. Đây là tín hiệu cổ điển của bull-trap — thiếu volume xác nhận xu hướng.
+- **S_VAL (32%)**: Valuation tension cao — lợi nhuận 252 ngày vượt xa lãi suất tiền gửi, phản ánh định giá đang căng giãn. Thị trường đã tăng quá nhanh so với nền tảng cơ bản.
+- **S_COR (17%)**: Systemic correlation vẫn trong vùng cao (EVR 38.4%). Kết hợp S_LIQ, đây là signature của herding trong điều kiện volume cạn — nhà đầu tư nắm giữ đồng loạt nhưng không có dòng tiền mới xác nhận.
+
+**Kết luận bóc tách**: Cả ba pillar chính đều hội tụ về stress — thanh khoản khô, định giá căng, tương quan cao. Không có pillar nào mang tín hiệu tích cực.
+
+## 3. Cross-Check
+
+- **Giá vs SSI divergence**: VN30 đang ở đỉnh cao (trên MA125) trong khi SSI chạm WARNING. Đây là divergence âm điển hình: giá tạo đỉnh mới nhưng stress hệ thống không giảm. Bull-trap risk được xác nhận bởi cả pillar decomposition và regime classification.
+- **HMM regime alignment**: EUPHORIC RISK khớp hoàn toàn với SSI WARNING + pillar cấu trúc. Không có lệch — toàn bộ hệ thống đang đồng thuận về trạng thái rủi ro cao.
+
+## 4. Verdict
+
+- **Cash weight đề xuất**: 65% (nắm giữ tiền mặt), chỉ để 35% danh mục trong cổ phiếu có beta thấp.
+- **Hedge action**: Giảm beta (reduce beta) — bán các vị thế beta cao, chuyển sang cổ phiếu phòng thủ. Chưa khuyến nghị short futures hoặc mua put ở thời điểm này vì SSI chưa chạm CRITICAL.
+- Không có mâu thuẫn giữa các pillar — cả 3 driver đều chỉ về cùng một hướng: bull-trap đang hình thành. Tín hiệu rõ ràng, có thể hành động.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.6,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 65,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
