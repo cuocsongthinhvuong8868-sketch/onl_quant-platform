@@ -2,6 +2,7 @@ import csv
 import os
 import re
 from datetime import date, timedelta
+from pathlib import Path
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
@@ -678,6 +679,113 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
 
+def _parse_date_from_filename(filename: str) -> date | None:
+    """
+    Trích xuất ngày từ tên file cache dạng ddmmyy hoặc ddmmyyyy ở cuối file.
+    Trả về đối tượng datetime.date hoặc None nếu không khớp.
+    """
+    # 1. Tìm ddmmyy (6 chữ số) ở cuối tên file trước phần mở rộng
+    # Ví dụ: fed_liquidity_kimi-2.6_280526.txt -> 280526
+    match_6 = re.search(r'_(\d{6})$', filename)
+    if match_6:
+        d = match_6.group(1)
+        try:
+            return date(2000 + int(d[4:]), int(d[2:4]), int(d[:2]))
+        except ValueError:
+            pass
+            
+    # 2. Tìm ddmmyyyy (8 chữ số) ở cuối tên file
+    # Ví dụ: 30052026
+    match_8 = re.search(r'(\d{8})$', filename)
+    if match_8:
+        d = match_8.group(1)
+        try:
+            return date(int(d[4:]), int(d[2:4]), int(d[:2]))
+        except ValueError:
+            pass
+            
+    # 3. Quét bất kỳ chuỗi 6 hoặc 8 chữ số nào trong tên file
+    match_any = re.findall(r'\d{6,8}', filename)
+    for d in match_any:
+        try:
+            if len(d) == 6:
+                return date(2000 + int(d[4:]), int(d[2:4]), int(d[:2]))
+            elif len(d) == 8:
+                return date(int(d[4:]), int(d[2:4]), int(d[:2]))
+        except ValueError:
+            continue
+            
+    return None
+
+
+def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """
+    Quét tìm báo cáo AI gần nhất cho một công cụ vĩ mô.
+    Trả về tuple: (ngày_báo_cáo, nội_dung_báo_cáo).
+    Nếu không có, trả về ("N/A", "*Chưa có báo cáo phân tích*").
+    """
+    import datetime as datetime_mod
+    cache_dir = DATA_LAKE / "daily_cache"
+    
+    if tool_id == "ltmm":
+        cache_dir = DATA_LAKE / "data_LTMM" / "AI_CIO_raw"
+        pattern = f"ltmm_analyst_{provider_key}_*.txt"
+        fallback_pattern = "ltmm_analyst_*.txt"
+    elif tool_id == "fed_liquidity":
+        pattern = f"fed_liquidity_{provider_key}_*.txt"
+        fallback_pattern = "fed_liquidity_*.txt"
+    elif tool_id == "global_financial_conditions":
+        pattern = f"global_financial_conditions_{provider_key}_*.txt"
+        fallback_pattern = "global_financial_conditions_*.txt"
+    elif tool_id == "vnibor":
+        pattern = f"vnibor_{provider_key}_*.txt"
+        fallback_pattern = "vnibor_*.txt"
+    else:
+        return "N/A", "*Không xác định được công cụ*"
+        
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    
+    files = list(cache_dir.glob(pattern))
+    
+    if not files and fallback_pattern:
+        files = list(cache_dir.glob(fallback_pattern))
+        
+    if not files and tool_id == "ltmm":
+        # Đối với LTMM quét thêm tất cả .txt/.md khác
+        files = list(cache_dir.glob("*.txt")) + list(cache_dir.glob("*.md"))
+        
+    if not files:
+        return "N/A", "*Chưa có báo cáo phân tích*"
+        
+    # Sắp xếp các file theo ngày thực tế được trích xuất (chronological order)
+    # Nếu không trích xuất được ngày, dùng mtime làm tiêu chuẩn phụ
+    def file_sort_key(p: Path):
+        file_date = _parse_date_from_filename(p.stem)
+        if file_date:
+            return (file_date, p.stat().st_mtime)
+        else:
+            return (date(1970, 1, 1), p.stat().st_mtime)
+            
+    files = sorted(files, key=file_sort_key, reverse=True)
+    latest_file = files[0]
+    
+    # Phân tích ngày từ tên file để hiển thị
+    date_str = "N/A"
+    parsed_date = _parse_date_from_filename(latest_file.stem)
+    if parsed_date:
+        date_str = parsed_date.strftime('%d/%m/%Y')
+    else:
+        mtime = datetime_mod.datetime.fromtimestamp(latest_file.stat().st_mtime)
+        date_str = mtime.strftime('%d/%m/%Y')
+            
+    try:
+        with open(latest_file, "r", encoding="utf-8") as f:
+            content = f.read().strip()
+        return date_str, content
+    except Exception as e:
+        return "N/A", f"Lỗi đọc file: {e}"
+
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
@@ -718,9 +826,24 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     else:
         historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1/T-2 ==="
 
+    # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
+    fed_date, fed_rep = _get_latest_report_for_macro("fed_liquidity", provider_key)
+    gfcm_date, gfcm_rep = _get_latest_report_for_macro("global_financial_conditions", provider_key)
+    vnibor_date, vnibor_rep = _get_latest_report_for_macro("vnibor", provider_key)
+    ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
+
+    macro_section = (
+        "=== BÁO CÁO PHÂN TÍCH VĨ MÔ GẦN NHẤT (MACRO LAYER) ===\n\n"
+        f"=== A. FED LIQUIDITY MONITOR (Ngày báo cáo: {fed_date}) ===\n{fed_rep}\n\n"
+        f"=== B. GLOBAL FINANCIAL CONDITIONS (Ngày báo cáo: {gfcm_date}) ===\n{gfcm_rep}\n\n"
+        f"=== C. VNIBOR MONITOR (Ngày báo cáo: {vnibor_date}) ===\n{vnibor_rep}\n\n"
+        f"=== D. LIQUIDITY TRANSMISSION - LTMM (Ngày báo cáo: {ltmm_date}) ===\n{ltmm_rep}\n\n"
+    )
+
     all_reports = (
         f"=== {data_note} ===\n\n"
         f"{historical_block}\n\n"
+        f"{macro_section}"
         f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"
