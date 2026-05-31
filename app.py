@@ -474,4 +474,24 @@ if st.session_state.show_cio_input:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")
 
 st.markdown("---")
+
+# ── About this platform (Download Methodology PDF) ──
+pdf_path = r"C:\Users\ADMIN\Downloads\Tóm tắt methodology của onl_quant-platform.pdf"
+if os.path.exists(pdf_path):
+    try:
+        with open(pdf_path, "rb") as f:
+            pdf_data = f.read()
+        st.download_button(
+            label="📖 About this platform (Tóm tắt Methodology)",
+            data=pdf_data,
+            file_name="Tóm tắt methodology của onl_quant-platform.pdf",
+            mime="application/pdf",
+            use_container_width=True,
+            type="secondary"
+        )
+    except Exception as e:
+        st.caption(f"📖 About this platform (Không thể đọc tệp PDF: {e})")
+else:
+    st.caption("📖 About this platform (Tệp tóm tắt methodology chưa sẵn sàng tại thư mục Downloads)")
+
 st.caption("© Quant Platform — 3 nhánh phân tích: Macro Analysis • Micro Analysis • Behavioral Finance")
