@@ -1,19 +1,19 @@
 ## 1. Observations
-- Risk Score đạt 51.3/100, tăng nhẹ +1.7 so với phiên trước, nằm trong vùng NEUTRAL (40-60).
-- EGARCH Vol chuẩn hóa ở mức 5.2%, tăng mạnh +4.0% phiên trước, vượt ngưỡng cảnh báo (>5%).
-- Rolling Skewness ở mức 0.06, gần trung tính, không cho thấy thiên lệch phân phối rõ rệt.
-- Upside Correlation (26.8%) cao gần gấp đôi Downside Correlation (14.7%), cho thấy biến động cùng chiều tăng mạnh hơn khi thị trường tăng.
+- Risk Score 51.3 nằm trong range 40-60, xác nhận trạng thái NEUTRAL.
+- EGARCH Vol 5.2% tăng mạnh +4.0% so với phiên trước, vượt ngưỡng biến động trung bình lịch sử (~3.5-4.0%).
+- Rolling Skewness 0.06 ở mức trung tính, gần zero, không cho thấy lệch phân phối rõ ràng.
+- Upside Correlation (26.8%) cao gần gấp đôi Downside Correlation (14.7%).
 
 ## 2. Interpretation
-Trên dữ liệu hiện tại, thị trường đang ở pha NEUTRAL với đặc trưng phân hóa mạnh. Điểm đáng chú ý là biến động đang gia tăng (vol spike) nhưng chưa kèm theo sợ hãi lan rộng (skewness gần trung tính, downside corr thấp).
+Dữ liệu hiện tại mô tả một thị trường đang trong pha phân hóa (NEUTRAL/STOCK PICKING) nhưng có dấu hiệu cảnh báo từ biến động gia tăng. Skewness trung tính và upside correlation vượt trội cho thấy dòng tiền vẫn còn chọn lọc, chưa phải là panic bán tháo.
 
 ## 3. Cross-Check
-- Score (51.3, NEUTRAL) vs EGARCH Vol (5.2%, cao): có divergence nhẹ — score ở vùng trung tính trong khi vol tăng mạnh. Điều này cho thấy thị trường đang trong giai đoạn chuyển tiếp, chưa xác nhận rõ xu hướng sợ hãi hay tham lam.
-- Skewness (0.06) vs Correlation (down 14.7% vs up 26.8%): consistent — skewness trung tính phù hợp với up-corr cao hơn, cho thấy dòng tiền vẫn ưu tiên vị thế long.
+- Score (51.3 - NEUTRAL) vs EGARCH Vol (5.2% - cao): **Divergence rõ ràng**. Score ở vùng an toàn trong khi vol tăng đột biến, báo hiệu rủi ro tail đang hình thành nhưng chưa phản ánh vào tâm lý đám đông.
+- Skewness (0.06) vs Correlation (up > down): **Consistent** — thị trường chưa nghiêng hẳn về phòng thủ, dòng tiền vẫn ưa thích upside.
 
 ## 4. Verdict
-- Beta exposure đề xuất: 0.4–0.6
-- Hành động: DUY TRÌ exposure trung tính, nhưng sẵn sàng giảm nếu vol tiếp tục mở rộng. Tận dụng vol spike để tái cấu trúc danh mục theo hướng stock-picking, ưu tiên cổ phiếu có downside correlation thấp.
+- **Beta exposure đề xuất: 0.3** (giảm từ mức trung bình 0.5)
+- Giảm tỷ trọng danh mục xuống mức phòng thủ nhẹ. Không mua thêm vị thế mới cho đến khi vol hạ nhiệt hoặc score điều chỉnh về vùng FEAR phản ánh đúng rủi ro hệ thống. Có thể hedge một phần thông qua put spread nếu cần thiết.
 
 ## 5. Structured Tail
 ```json
@@ -23,7 +23,11 @@ Trên dữ liệu hiện tại, thị trường đang ở pha NEUTRAL với đ�
   "regime": "NEUTRAL",
   "score": 51.3,
   "confidence": "medium",
-  "beta_target": 0.5,
-  "key_signals": ["Vol spike (5.2%) chưa kèm skew âm", "Upside corr (26.8%) > downside corr (14.7%)"]
+  "beta_target": 0.3,
+  "key_signals": [
+    "Score NEUTRAL nhưng EGARCH Vol tăng vọt tạo divergence",
+    "Upside correlation vượt trội downside, dòng tiền chưa đảo chiều",
+    "Skewness trung tính, chưa hình thành panic"
+  ]
 }
 ```
