@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu**: Hiện tại 10.59% thấp hơn mu dài hạn 13.88% (-3.29pp). Phi = +0.180 → Momentum mua đang suy yếu nhưng vẫn còn đà giảm tiếp.
+- **Lực cung**: Hiện tại 8.00% thấp hơn mu dài hạn 14.29% (-6.29pp). Phi = +0.215 → Momentum bán cũng đang suy yếu, nhưng đà giảm mạnh hơn cầu.
+- Cả hai chiều đều ở trạng thái **nén dưới kỳ vọng** (up << mu, down << mu). Phi cả hai > +0.10 → cả hai đều trong momentum regime riêng.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền: Zombification**. Cả lực cầu và lực cung đều thấp hơn mu dài hạn đáng kể (cầu thấp hơn 3.29pp, cung thấp hơn 6.29pp). Thị trường đang thiếu cả áp lực mua lẫn bán rõ rệt → thanh khoản cạn, biên độ hẹp.
+- **Momentum winner**: Bên **cung (supply)** giữ đà mạnh hơn (|Phi_dn| = 0.215 vs |Phi_up| = 0.180). Dù hiện tại lực cung thấp, nếu có catalyst tiêu cực, đà bán sẽ kích hoạt nhanh hơn đà mua.
+
+## 3. Stress-Test Read
+- **P95 Downside = 27.70%**: Trong kịch bản tail xấu nhất (tần suất 5%), biên độ giảm có thể lên tới gần 28%. Đây là mức độ panic kỳ vọng nếu thị trường gãy đột ngột.
+- **Asymmetry**: P95 Downside (27.70%) > P95 Upside (23.99%). Tail risk phía bán dày hơn 3.71pp. Rủi ro mất vốn trong kịch bản xấu lớn hơn lợi nhuận trong kịch bản tốt → bất lợi cho vị thế mua.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân**: 0% → Không tham gia thị trường. Rủi ro bất đối xứng nghiêng về phía cung, trong khi thanh khoản cạn không tạo cơ hội giao dịch đáng tin.
+- **Strategy**: PHÒNG THỦ (Defensive). Rình bắt đáy chưa phù hợp vì momentum bán vẫn mạnh hơn. Không mua đuổi vì thanh khoản thấp dễ bị kẹp.
+- **Cảnh báo**: Dù chưa random walk, nhưng zombie regime khiến các tín hiệu trở nên kém tin cậy. Chỉ hành động khi có breakout rõ ràng hoặc khối lượng giao dịch bùng nổ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.70,
+  "p95_upside_pct": 23.99,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
