@@ -8,7 +8,12 @@ import pandas as pd
 import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
-from tools.vnibor.quant.metrics import load_vnibor_data, process_vnibor_logic, summarize_latest
+from tools.vnibor.quant.metrics import (
+    load_vnibor_data,
+    process_vnibor_logic,
+    summarize_latest,
+    summarize_20d_trend,
+)
 from tools.vnibor.ui.sidebar import render_sidebar
 from tools.vnibor.ui.charts import plot_vnibor_rates, plot_vnibor_spreads, plot_vnibor_regime
 
@@ -81,6 +86,7 @@ def render():
 
     # ── Header metrics ──
     summary = summarize_latest(df_processed)
+    trend_20d = summarize_20d_trend(df_processed, lookback=20)
     
     reg_icon = REGIME_ICON.get(summary["regime"], "⚪")
     sig_icon = SIGNAL_ICON.get(summary["signal"], "⚪")
@@ -198,7 +204,21 @@ def render():
                                     .replace("[Spread_1W_ON]", f"{summary['spread_1w']:+.2f}") \
                                     .replace("[Spread_2W_ON]", f"{summary['spread_2w']:+.2f}") \
                                     .replace("[Regime]", summary["regime"]) \
-                                    .replace("[Signal]", summary["signal"])
+                                    .replace("[Signal]", summary["signal"]) \
+                                    .replace("[Trend_20D_Label]", trend_20d["trend_label"]) \
+                                    .replace("[ON_20D_Change]", trend_20d["on_20d_change"]) \
+                                    .replace("[ON_MA5_20D_Change]", trend_20d["on_ma5_20d_change"]) \
+                                    .replace("[ON_MA5_20D_Slope]", trend_20d["on_ma5_slope"]) \
+                                    .replace("[ON_20D_Avg]", trend_20d["on_20d_avg"]) \
+                                    .replace("[ON_20D_Min]", trend_20d["on_20d_min"]) \
+                                    .replace("[ON_20D_Max]", trend_20d["on_20d_max"]) \
+                                    .replace("[ON_20D_Up_Days]", trend_20d["up_days"]) \
+                                    .replace("[ON_20D_Down_Days]", trend_20d["down_days"]) \
+                                    .replace("[Inversion_20D_Count]", trend_20d["inversion_days"]) \
+                                    .replace("[Stress_Warning_20D_Count]", trend_20d["stress_warning_days"]) \
+                                    .replace("[Regime_20D_Counts]", trend_20d["regime_counts"]) \
+                                    .replace("[Signal_20D_Counts]", trend_20d["signal_counts"]) \
+                                    .replace("[Trend_20D_Table]", trend_20d["trend_table"])
 
                                 parts = full_prompt.split("# INPUT DATA")
                                 system_prompt = parts[0].strip()
