@@ -28,7 +28,6 @@ TOOLS = [
         "render_func": "render",
     },
     {
-<<<<<<< Updated upstream
         "id": "vnibor",
         "name": "🏦 VNIBOR Monitor",
         "desc": "Lãi suất qua đêm và các kỳ hạn ngắn liên ngân hàng · Phân loại trạng thái thanh khoản (Regime Percentile 1Y) · Tác động tới VN-Index",
@@ -40,12 +39,13 @@ TOOLS = [
         "name": "📊 Liquidity Transmission (LTMM)",
         "desc": "Theo dõi kênh truyền dẫn thanh khoản hệ thống: Thượng nguồn (upstream), Lớp ma sát (friction), và Hạ nguồn (market liquidity)",
         "page_module": "tools.ltmm.page",
-=======
+        "render_func": "render",
+    },
+    {
         "id": "vn100_earnings_health",
         "name": "🇻🇳 VN100 Earnings Health",
         "desc": "Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + CSAD blend + PCA validation",
         "page_module": "tools.vn100_earnings_health.page",
->>>>>>> Stashed changes
         "render_func": "render",
     },
 ]
