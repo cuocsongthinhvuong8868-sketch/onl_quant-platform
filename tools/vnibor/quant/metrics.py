@@ -137,3 +137,119 @@ def summarize_latest(df_processed: pd.DataFrame) -> dict:
         "regime": str(latest["Regime"]),
         "signal": str(latest["Signal"])
     }
+
+
+def summarize_20d_trend(df_processed: pd.DataFrame, lookback: int = 20) -> dict:
+    """Tóm tắt xu hướng VNIBOR trong 20 phiên gần nhất cho AI prompt."""
+    empty_result = {
+        "trend_label": "DATA INSUFFICIENT",
+        "on_20d_change": "N/A",
+        "on_ma5_20d_change": "N/A",
+        "on_ma5_slope": "N/A",
+        "on_20d_avg": "N/A",
+        "on_20d_min": "N/A",
+        "on_20d_max": "N/A",
+        "up_days": "N/A",
+        "down_days": "N/A",
+        "inversion_days": "N/A",
+        "stress_warning_days": "N/A",
+        "regime_counts": "N/A",
+        "signal_counts": "N/A",
+        "trend_table": "N/A",
+    }
+    if df_processed is None or df_processed.empty:
+        return empty_result
+
+    df = df_processed.tail(lookback).copy()
+    if len(df) < 5:
+        return empty_result
+
+    def fmt_num(value, digits: int = 2, signed: bool = False) -> str:
+        if value is None or pd.isna(value):
+            return "N/A"
+        sign = "+" if signed else ""
+        return f"{float(value):{sign}.{digits}f}"
+
+    on = df["Overnight_ON"].astype(float)
+    on_ma5 = df["ON_5D_Mean"].astype(float) if "ON_5D_Mean" in df.columns else on.rolling(5, min_periods=1).mean()
+    on_20d_change = float(on.iloc[-1] - on.iloc[0])
+    on_ma5_20d_change = float(on_ma5.iloc[-1] - on_ma5.iloc[0])
+
+    y = on_ma5.dropna().to_numpy()
+    if len(y) >= 2:
+        x = np.arange(len(y))
+        on_ma5_slope = float(np.polyfit(x, y, 1)[0])
+    else:
+        on_ma5_slope = np.nan
+
+    up_days = int((df["ON_Impulse"] > 0).sum()) if "ON_Impulse" in df.columns else 0
+    down_days = int((df["ON_Impulse"] < 0).sum()) if "ON_Impulse" in df.columns else 0
+    inversion_days = int((df["Spread_1W_ON"] < 0).sum()) if "Spread_1W_ON" in df.columns else 0
+    stress_warning_days = int(df["Signal"].isin(["STRESS", "WARNING"]).sum()) if "Signal" in df.columns else 0
+
+    if stress_warning_days >= max(5, lookback // 4) or inversion_days >= max(4, lookback // 5):
+        trend_label = "liquidity squeeze / stress building"
+    elif on_ma5_20d_change >= 0.75 or on_ma5_slope >= 0.05:
+        trend_label = "tightening trend"
+    elif on_ma5_20d_change <= -0.75 or on_ma5_slope <= -0.05:
+        trend_label = "easing trend"
+    elif abs(on_ma5_20d_change) < 0.25 and abs(on_ma5_slope) < 0.02:
+        trend_label = "sideways / stable liquidity"
+    else:
+        trend_label = "mixed / transition"
+
+    regime_counts = "N/A"
+    if "Regime" in df.columns:
+        regime_counts = ", ".join(f"{k}: {int(v)}" for k, v in df["Regime"].value_counts().items())
+
+    signal_counts = "N/A"
+    if "Signal" in df.columns:
+        signal_counts = ", ".join(f"{k}: {int(v)}" for k, v in df["Signal"].value_counts().items())
+
+    table_cols = [
+        "Overnight_ON",
+        "ON_5D_Mean",
+        "ON_Impulse",
+        "ON_ZScore",
+        "ON_Percentile",
+        "Spread_1W_ON",
+        "Spread_2W_ON",
+        "Regime",
+        "Signal",
+    ]
+    table_df = df[[c for c in table_cols if c in df.columns]].copy()
+    table_df.insert(0, "date", table_df.index.strftime("%Y-%m-%d"))
+
+    display_cols = {
+        "Overnight_ON": "ON",
+        "ON_5D_Mean": "ON_MA5",
+        "ON_Impulse": "Impulse",
+        "ON_ZScore": "Z",
+        "ON_Percentile": "Pct",
+        "Spread_1W_ON": "1W_ON",
+        "Spread_2W_ON": "2W_ON",
+    }
+    table_df = table_df.rename(columns=display_cols)
+
+    numeric_cols = [c for c in ["ON", "ON_MA5", "Impulse", "Z", "Pct", "1W_ON", "2W_ON"] if c in table_df.columns]
+    for col in numeric_cols:
+        table_df[col] = table_df[col].map(lambda x: fmt_num(x, digits=3 if col == "Pct" else 2, signed=col in ["Impulse", "Z", "1W_ON", "2W_ON"]))
+
+    trend_table = table_df.to_string(index=False)
+
+    return {
+        "trend_label": trend_label,
+        "on_20d_change": fmt_num(on_20d_change, signed=True),
+        "on_ma5_20d_change": fmt_num(on_ma5_20d_change, signed=True),
+        "on_ma5_slope": fmt_num(on_ma5_slope, digits=3, signed=True),
+        "on_20d_avg": fmt_num(on.mean()),
+        "on_20d_min": fmt_num(on.min()),
+        "on_20d_max": fmt_num(on.max()),
+        "up_days": str(up_days),
+        "down_days": str(down_days),
+        "inversion_days": str(inversion_days),
+        "stress_warning_days": str(stress_warning_days),
+        "regime_counts": regime_counts,
+        "signal_counts": signal_counts,
+        "trend_table": trend_table,
+    }
