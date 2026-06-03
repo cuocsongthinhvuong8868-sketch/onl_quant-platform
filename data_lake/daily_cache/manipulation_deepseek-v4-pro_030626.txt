@@ -1,18 +1,18 @@
 ## 1. Observations
-- **OLS Slope**: 0.41 (Percentile: 86.7th — 🔴 Rất cao) → VIC/VHM/VRE đang kéo VN30F1M cực mạnh, độ dốc regression gần đỉnh lịch sử.
-- **Correlation**: 0.72 (Percentile: 88.3th — 🔴 Rất chặt) → Mối quan hệ giữa 3 mã VIN và futures gần như tuyệt đối.
-- **Regime**: COUPLING (ΔCorr = 0.68, ΔSlope = 0.67) → Cả correlation lẫn slope cùng tăng đột biến, xác nhận trạng thái dẫn dắt mạnh.
+- **OLS Slope = 0.41** (Percentile 86.7 – 🔴 Rất cao): Mức độ dẫn dắt của nhóm VIC/VHM/VRE lên VN30F1M đang ở vùng extreme, phản ánh lực kéo rất mạnh từ cổ phiếu họ Vingroup lên hợp đồng tương lai.
+- **Correlation = 0.72** (Percentile 88.3 – 🔴 Rất chặt): Mối tương quan giữa composite Vingroup và F1 đang ở mức gần như hoàn hảo trong lịch sử gần đây.
+- **Regime hiện tại: COUPLING** (ΔCorr = +0.68, ΔSlope = +0.67) – cả hai delta đều vượt xa ngưỡng +0.15, xác nhận trạng thái bám đuôi mạnh.
 
 ## 2. Microstructure Read
-Cả 2 percentile đều vượt 80th (86.7% + 88.3%) — đây là bất thường cực đoan. Composite VIC/VHM/VRE đang chi phối tuyệt đối VN30F1M. Khả năng cao có sự can thiệp của market maker hoặc dòng tiền tổ chức đẩy VIN group (đặc biệt VIC đang ở 204.90) để kéo futures. VRE (31.00) tạo đáy ổn định, VHM (150.80) tương đối trung tính, nhưng VIC là trụ chính. Market đang "dính chặt" VIN — nếu VIC đảo chiều, futures sẽ drop ngay lập tức.
+Cả hai percentile đều trên 80 (>80th) – đây là tín hiệu bất thường, nghi ngờ có sự can thiệp chủ động (market making, margin call, hoặc dòng tiền lớn) vào nhóm VIC/VHM/VRE để kéo F1. Ở trạng thái này, Vingroup đang *chi phối hoàn toàn* diễn biến của VN30F1M trong phiên. Nếu không có can thiệp đảo chiều, bất kỳ biến động nào trên VIC/VHM/VRE sẽ ngay lập tức phản ánh lên F1.
 
 ## 3. Event Study Interpretation
-Trạng thái COUPLING ở mức cực đoan (cả Δ > 0.15 gấp 4-5 lần) có ý nghĩa rõ ràng cho intraday: **edge tracking thuần túy**. VN30F1M sẽ replicate mọi biến động của VIC trong phiên khớp lệnh. Overnight: Không nên giữ vị thế vì tin tức có thể làm trật coupling nhanh chóng. Signal rất mạnh cho scalping intraday — mua/bán theo nhịp VIC.
+Trạng thái COUPLING với slope rất dốc (0.41) cho thấy tỷ lệ đòn bẩy VIN dẫn dắt F1 đang ở mức cực đại. Vào intraday đây là cơ hội **long F1 khi VIC bật lên** (bám theo dịch chuyển ngay lập tức). Tuy nhiên, rủi ro qua đêm rất cao vì dễ xuất hiện lệnh bán tháo margin hoặc can thiệp trái chiều. Chỉ giữ vị thế qua đêm nếu có thông tin tích cực cụ thể từ Vingroup trước giờ đóng cửa.
 
 ## 4. Verdict
-- **Trade plan**: **Spread VIN-vs-Bank** (short VIC / long F1) để khai thác sự can thiệp quá mức. Hoặc **Long F1** nếu VIC duy trì momentum > 205.0.
-- **Leading indicator**: VIC giá khớp lệnh (theo dõi intraday breakout 205.5), khối lượng dư mua/bán sàn HOSE, và thanh khoản VHM/VRE.
-- **Stop-loss reference**: Dùng % từ entry: Long F1 theo VIC → nếu VIC đóng cửa dưới 204.90 × (1 − 2%) = 200.80, hoặc futures mất mốc kỹ thuật MA20 (không có số liệu futures, dùng slope fall < 0.30 làm cảnh báo thoát).
+- **Trade Plan:** **Long F1** trong phiên, bám spread VIC-F1. Không giữ qua đêm trừ khi có xác nhận tin tốt.
+- **Leading indicator:** VIC và VHM là hai mã dẫn dắt chính; nếu VIC tăng vượt 200.00 (≈ 200,000 VND) hoặc VHM phá 150.00 (≈ 150,000 VND) đều mở rộng cơ hội. Theo dõi thêm nhóm Bank (VPB, MBB, TCB) để phát hiện phân hóa – nếu Bank yếu, không nên quá kỳ vọng F1.
+- **Stop-loss reference:** Nếu vào Long F1, cắt lỗ khi VIC quay xuống dưới **197.60 × (1 − 1.5%) ≈ 194.70** (≈ 194,700 VND) – mức 1.5% tương ứng với một lần thất bại breakout. Nếu chờ tin, đặt stop dưới MA20 của VIC (giả sử ~196.00).
 
 ## 5. Structured Tail
 ```json

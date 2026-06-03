@@ -1,43 +1,29 @@
 ## 1. Observations
-
-- Risk Score: 52.9/100 (NEUTRAL zone, 40-60), phiên trước +0.5 điểm
-- EGARCH Vol (chuẩn hóa): 4.4%, thấp hơn ngưỡng FEAR (>6-8%), Δ: -1.6%
-- Rolling Skewness: +0.05 (xấp xỉ 0, không có đuôi âm sâu hay dương rõ rệt)
-- Downside Correlation: 14.7% vs. Upside Correlation: 24.8% — chênh lệch ~10.1 điểm phần trăm, thiên về upside
+- Risk Score ở 54.6, duy trì trong vùng NEUTRAL (40–60) dù tăng nhẹ +1.7 so với phiên trước.
+- EGARCH Volatility tăng mạnh +5.6% (lên 9.9%) — vượt xa mức trung bình lịch sử của vùng NEUTRAL.
+- Rolling Skewness dương +0.12 — phân phối lợi nhuận lệch phải nhẹ, không có dấu hiệu đuôi rủi ro lớn.
+- Upside Correlation (34.9%) cao hơn gấp 2.3 lần Downside Correlation (14.9%) — nhóm cổ phiếu tăng đồng pha hơn hẳn nhóm giảm.
 
 ## 2. Interpretation
-
-Dữ liệu hiện tại mô tả một thị trường đang ở pha cân bằng ngắn hạn: volatility trung bình-thấp, skewness trung tính, và tương quan biến động thiên về phía tăng (upside). Không có dấu hiệu của đám đông hoảng loạn (down-corr thấp, vol giảm) cũng như chưa đạt đến trạng thái hưng phấn (skew chưa dương mạnh). Đây là cấu trúc phù hợp cho chiến lược stock-picking, không phải directional bet.
+Dữ liệu hiện tại mô tả một thị trường phân hóa nhưng đang có dấu hiệu chuyển pha: điểm số tâm lý NEUTRAL nhưng cấu trúc rủi ro (vol tăng mạnh) và cấu trúc tương quan (up-corr cao) không đồng bộ — đây là tín hiệu của giai đoạn chuyển tiếp tiềm ẩn.
 
 ## 3. Cross-Check
-
-- **Score vs. EGARCH Vol:** Đồng thuận. Score NEUTRAL (52.9) với vol trung bình (4.4%) là consistent; không có divergence.
-- **Skewness (0.05) vs. Upside/Downside Correlation:** Hơi lệch nhẹ. Skewness ở mức trung tính (0.05), nhưng upside-corr (24.8%) cao hơn rõ rệt so với downside-corr (14.7%). Divergence này cho thấy tín hiệu "bề mặt trung tính nhưng bên trong thiên lệch tăng", cần theo dõi thêm chứ không hành động theo.
-
-**Tổng thể signals:** Consistent (không mâu thuẫn trực tiếp).
+- **Score vs EGARCH Vol:** Divergence rõ rệt. Score chỉ tăng nhẹ (+1.7) nhưng vol tăng vọt (+5.6%). Điều này cho thấy thị trường đang diễn biến phức tạp hơn những gì chỉ số tâm lý phản ánh — cần thận trọng.
+- **Skewness vs Correlation:** Skewness dương (0.12) nhưng up-corr (34.9%) rất cao so với down-corr — consistent với pha tăng nhưng tín hiệu vol tăng mâu thuẫn. Cấu trúc này dễ sụp đổ nếu vol tiếp tục leo thang.
 
 ## 4. Verdict
-
-**Beta exposure đề xuất:** 0.6 (trung bình, không full long)
-
-**Hành động:** Giữ danh mục ở trạng thái cân bằng, tích cực chọn cổ phiếu riêng lẻ. Không mở thêm directional short vì vol thấp và upside-corr đang chiếm ưu thế. Cơ cấu lại danh mục theo hướng: ưu tiên các cổ phiếu có độc lập với index thấp (beta thấp) và có catalyst riêng.
-
-**NO ACTIONABLE TRADING SIGNAL** — Các signals hiện tại không đủ mạnh để khuyến nghị mua/bán toàn bộ danh mục.
+**Beta exposure đề xuất:** 0.4 (giảm từ mức trung bình 0.5–0.6 về phòng thủ nhẹ)
+**Hành động:** Giảm tỷ trọng các cổ phiếu beta cao, ưu tiên danh mục phòng thủ. Không mua thêm vị thế mới. Chờ vol giảm trở lại (dưới 8%) trước khi gia tăng exposure.
 
 ## 5. Structured Tail
-
 ```json
 {
   "tool": "fear_greed",
-  "date": "02/06/2026",
+  "date": "03/06/2026",
   "regime": "NEUTRAL",
-  "score": 52.9,
-  "confidence": "high",
-  "beta_target": 0.6,
-  "key_signals": [
-    "Score 52.9 neutral zone, vol giảm 1.6%",
-    "Upside corr 24.8% cao hơn downside corr 14.7% 10 điểm",
-    "Skewness 0.05 trung tính, không panic"
-  ]
+  "score": 54.6,
+  "confidence": "low",
+  "beta_target": 0.4,
+  "key_signals": ["Vol tăng mạnh +5.6% nhưng Score chỉ +1.7", "Up-corr (34.9%) > Down-corr (14.9%)", "Skewness dương nhẹ +0.12"]
 }
 ```
