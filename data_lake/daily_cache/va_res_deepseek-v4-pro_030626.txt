@@ -1,0 +1,32 @@
+## 1. Observations
+- **VN30 Stress Index:** 3.33% (alert threshold: 40%) — không chạm ngưỡng cảnh báo.
+- **# mã thủng VaR 95%:** 1/30 — duy nhất HDB.
+- **Complacency Index:** 5.56% (danger threshold: 80%) — rất thấp.
+- **# mã mispriced:** 6 — VRE, VTO, VHM dẫn đầu về spread bị nén.
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index ở mức 3.33%, rất xa ngưỡng 40%. Điều này cho thấy không có hiệu ứng lây lan đáng kể giữa các mã VN30. Breach duy nhất là HDB với mức độ thủng sâu nhất, nhưng chưa tạo thành phản ứng dây chuyền.
+- **Top 3 crash (HDB):** là sự cố cá biệt, không phải đầu sóng systemic. Rủi ro lây nhiễm real-time ở mức thấp.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- Complacency Index ở mức 5.56% (rất thấp). Kết luận: **thị trường KHÔNG ở regime ngủ quên. Điều này KHÔNG đồng nghĩa thị trường ổn định.** Spread giãn rộng tự nhiên ở các phiên biến động mạnh (dù là uptrend hay hoảng loạn) khiến chỉ số này xuống thấp.
+- **Phân tích thêm dựa trên Stress Index:** Stress Index thấp (3.33%) kết hợp Complacency thấp (5.56%) cho thấy thị trường đang vận động có biên độ lớn nhưng chưa có dấu hiệu lây lan rủi ro. Đây có thể là giai đoạn tái phân bổ danh mục mạnh hoặc sideway biên độ rộng — không phải tín hiệu an toàn tuyệt đối.
+- **Cảnh báo:** 6 mã mispriced (spread bị nén) tồn tại ngay cả khi Complacency thấp: đây là các điểm biến dạng cục bộ cần theo dõi chứ không phải dấu hiệu thị trường đang yên tĩnh.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B) — HDB:** Giảm tỷ trọng ngay. Nếu giá thủng hỗ trợ MA20 ngày, mở vị thế short. Cắt lỗ nếu giá vượt MA50 ngày (+3-5% từ giá hiện tại).
+- **Top 3 Mispriced (Module C) — VRE, VTO, VHM:** Spread bị nén chặt bất thường, tiềm ẩn giãn spread đột ngột. Chưa khuyến nghị hành động ngay, nhưng cần theo dõi momentum breakout hoặc volume đột biến để quyết định đặt lệnh giới hạn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["HDB"],
+  "confidence": "high"
+}
+```
