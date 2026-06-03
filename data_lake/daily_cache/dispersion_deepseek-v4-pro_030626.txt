@@ -1,40 +1,37 @@
 ## 1. Observations
 
-- **Spread_Z: +0.74σ** — Độ lệch chuẩn hóa của spread ở mức dưới ngưỡng +1σ, không cho thấy sự căng thẳng bất thường so với đường trung bình 60 ngày.
-- **DPI: 41.7%** — Chỉ số bền vững phân tán ở mức trung bình, không đủ cao (>70%) để xác nhận một regime kéo dài.
-- **Avg Pairwise Correlation (Ledoit-Wolf): 0.006** — Tương quan cặp gần như bằng 0, phản ánh sự phân hóa cực mạnh giữa các cổ phiếu, không có hiệu ứng bầy đàn.
-- **Cross-Sectional Skewness/Kurtosis: N/A** — Thiếu dữ liệu để đánh giá hướng đuôi phân phối và mức độ xuất hiện các outlier.
+- **Spread_Z = -0.03σ**: Mức spread hiện tại hầu như ngang bằng với trung bình 60 ngày, không có dấu hiệu kéo căng cấu trúc.
+- **DPI = 41.7%**: Dưới ngưỡng 70%, cho thấy sự phân tán giá hiện tại có tính chất tạm thời, chưa hình thành regime kéo dài.
+- **Avg Pairwise Correlation (Ledoit-Wolf) = 0.005**: Cực kỳ thấp, gần như bằng 0 — các cổ phiếu đang vận động độc lập, không có hiệu ứng bầy đàn.
+- **Cross-Sectional Skewness & Kurtosis: N/A**: Không có dữ liệu để đánh giá hướng đuôi phân phối.
 
 ## 2. Structural State
 
-Thị trường đang ở trạng thái **bình thường đến trung tính**, không stressed. Spread_Z (+0.74σ) nằm dưới ngưỡng cảnh báo +1σ, và DPI ở mức 41.7% cho thấy mức độ phân tán chưa đủ mạnh để tạo thành một regime căng thẳng kéo dài. Stress, nếu có, chỉ là **cục bộ** (từng phiên riêng lẻ) và không có dấu hiệu chuyển thành regime bền vững.
+- **DPI (41.7%) + Spread_Z (-0.03σ)**: Cả hai chỉ số đều ở mức trung tính. DPI thấp cho thấy dispersion không có tính lan truyền; Spread_Z gần zero cho thấy cấu trúc đang cân bằng so với đường xu hướng 60 ngày. **Thị trường ở trạng thái bình thường, không stress.**
+- Không có dấu hiệu của stress cục bộ (Spread_Z thấp) hay stress regime kéo dài (DPI thấp).
 
 ## 3. Cross-Check & Tail Direction
 
-Không thể xác định hướng đuôi (tail direction) do thiếu dữ liệu Skewness và Kurtosis. Tuy nhiên, với Spread dương (15.76%), các outlier có xu hướng tác động mạnh theo chiều rộng (dispersion) hơn là chiều sâu (tail). Cần theo dõi Skew và Kurt trong phiên tiếp theo để xác định xem tail nào (sập hay đẩy) đang chi phối.
+- **Không thể xác định hướng tail** do dữ liệu Skewness và Kurtosis bị thiếu.
+- Giả định vắng mặt: Không có bằng chứng về outlier cực đoan (fat-tail) hay sự lệch phân phối rõ rệt. Cấu trúc phân phối lợi suất có thể coi là symmetric trong phiên này.
 
 ## 4. Regime Mapping
 
-Đối chiếu với 2D Regime Map (DPI × Corr):
-- **DPI thấp (41.7%) + Corr thấp (0.006)** → **Healthy Stock-Picking**
-
-Regime hiện tại là **Stock-Picking environment**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu riêng lẻ, khi không có xu hướng đồng thuận hay bầy đàn.
-
-**Risk lớn nhất cho Portfolio Manager:**
-- **Concentration risk**: Vì tương quan gần bằng 0, danh mục quá tập trung vào một số ít cổ phiếu có thể gặp rủi ro biến động riêng biệt. Cần đa dạng hóa mạnh mẽ hơn.
-- **Missing skew direction**: Khi không có dữ liệu skewness, PM dễ bị bất ngờ bởi các outlier cục bộ — một cổ phiếu có thể sập hoặc tăng đột biến mà không báo trước.
+- Đối chiếu 2D Map **(DPI thấp × Corr thấp)**: Thị trường đang ở ô **Healthy Stock-Picking**.
+- Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu dựa trên phân tích cơ bản, khi mà tương quan cổ phiếu gần như bằng 0, không có bầy đàn, và dispersion không mang tính tail-driven.
+- **Risk lớn nhất cho Portfolio Manager**: Rủi ro tập trung (concentration risk) — khi các danh mục được xây dựng dựa trên tín hiệu chọn cổ phiếu có thể phải đối mặt với biến động giá không đồng nhất nhưng vẫn có thể xảy ra sự đảo chiều đột ngột nếu tương quan bắt đầu tăng trở lại (regime shift sang Trending).
 
 ## 5. Structured Tail
 
 ```json
 {
   "tool": "dispersion",
-  "date": "02/06/2026",
+  "date": "03/06/2026",
   "regime": "STOCK_PICKING",
-  "spread_z": 0.74,
+  "spread_z": -0.03,
   "dpi_pct": 41.7,
-  "avg_corr": 0.006,
+  "avg_corr": 0.005,
   "tail_skew_direction": "symmetric",
-  "confidence": "medium"
+  "confidence": "high"
 }
 ```
