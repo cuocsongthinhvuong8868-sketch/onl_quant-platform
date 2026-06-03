@@ -1,0 +1,32 @@
+## 1. Observations
+- **MA20 (28.9%)**: Ở mức thấp — gần vùng oversold (<30%), cho thấy xung lực ngắn hạn rất yếu.
+- **MA60 (35.8%)**: Ở mức thấp trung bình — phần lớn mã đang giao dịch dưới đường trung bình quý.
+- **MA125 (28.2%)**: Ở mức thấp — chỉ ~¼ rổ duy trì được xu hướng bán niên.
+- **MA252 (32.0%)**: Ở mức thấp — dưới ngưỡng 40%, xác nhận thị trường đang trong pha suy yếu cấu trúc dài hạn.
+
+## 2. Structural Health
+Bốn đường MA đều dưới 36% và hội tụ ở vùng thấp (28-36%), tạo thành **sự đồng thuận giảm** rõ rệt. Pattern phù hợp nhất là **Bear Confirmed**: MA20 < 30% (28.9%) và MA252 < 40% (32.0%) — cả ngắn và dài hạn đều suy yếu. Không có dấu hiệu divergence nào đáng kể.
+
+## 3. Money Flow Leadership
+- **Top MA20 (ngắn hạn)**: ACB (Bank), ABB (Bank), ABS (Broker), BKG (Broker), BIC (Insurance) → **Tài chính (Banks + Brokers)** chiếm ưu thế tuyệt đối.
+- **Top MA252 (dài hạn)**: ACB, ABB, BIC, BFC (Phân bón) → Overlap rất cao với ngắn hạn (ACB, ABB, BIC, ADS). Dòng tiền dài hạn tập trung mạnh ở **Bank & Insurance** — thiên hướng **defensive** rõ rệt, không có dấu hiệu luân chuyển sang nhóm Cyclical (Steel, Brokers) hay Growth (Technology).
+
+## 4. Verdict
+- **Strategy**: **Defensive cash-up** — Breadth yếu đồng thuận, leadership chỉ gói gọn trong nhóm tài chính mang tính phòng thủ. Không có tín hiệu đảo chiều hay tạo đáy vững chắc.
+- **Đòn bẩy**: **0% margin** — MA252 < 40% và không có divergence để justify margin. Rủi ro hệ thống cao.
+- **Tín hiệu đặc biệt**: Không có divergence giữa MA20 và MA252 → không cần "WAIT FOR CONFIRMATION", trạng thái Bear Confirmed là rõ ràng.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 28.9,
+  "ma60_pct": 35.8,
+  "ma125_pct": 28.2,
+  "ma252_pct": 32.0,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

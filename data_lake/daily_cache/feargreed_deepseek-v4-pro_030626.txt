@@ -1,0 +1,43 @@
+## 1. Observations
+
+- Risk Score: 52.9/100 (NEUTRAL zone, 40-60), phiên trước +0.5 điểm
+- EGARCH Vol (chuẩn hóa): 4.4%, thấp hơn ngưỡng FEAR (>6-8%), Δ: -1.6%
+- Rolling Skewness: +0.05 (xấp xỉ 0, không có đuôi âm sâu hay dương rõ rệt)
+- Downside Correlation: 14.7% vs. Upside Correlation: 24.8% — chênh lệch ~10.1 điểm phần trăm, thiên về upside
+
+## 2. Interpretation
+
+Dữ liệu hiện tại mô tả một thị trường đang ở pha cân bằng ngắn hạn: volatility trung bình-thấp, skewness trung tính, và tương quan biến động thiên về phía tăng (upside). Không có dấu hiệu của đám đông hoảng loạn (down-corr thấp, vol giảm) cũng như chưa đạt đến trạng thái hưng phấn (skew chưa dương mạnh). Đây là cấu trúc phù hợp cho chiến lược stock-picking, không phải directional bet.
+
+## 3. Cross-Check
+
+- **Score vs. EGARCH Vol:** Đồng thuận. Score NEUTRAL (52.9) với vol trung bình (4.4%) là consistent; không có divergence.
+- **Skewness (0.05) vs. Upside/Downside Correlation:** Hơi lệch nhẹ. Skewness ở mức trung tính (0.05), nhưng upside-corr (24.8%) cao hơn rõ rệt so với downside-corr (14.7%). Divergence này cho thấy tín hiệu "bề mặt trung tính nhưng bên trong thiên lệch tăng", cần theo dõi thêm chứ không hành động theo.
+
+**Tổng thể signals:** Consistent (không mâu thuẫn trực tiếp).
+
+## 4. Verdict
+
+**Beta exposure đề xuất:** 0.6 (trung bình, không full long)
+
+**Hành động:** Giữ danh mục ở trạng thái cân bằng, tích cực chọn cổ phiếu riêng lẻ. Không mở thêm directional short vì vol thấp và upside-corr đang chiếm ưu thế. Cơ cấu lại danh mục theo hướng: ưu tiên các cổ phiếu có độc lập với index thấp (beta thấp) và có catalyst riêng.
+
+**NO ACTIONABLE TRADING SIGNAL** — Các signals hiện tại không đủ mạnh để khuyến nghị mua/bán toàn bộ danh mục.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "fear_greed",
+  "date": "02/06/2026",
+  "regime": "NEUTRAL",
+  "score": 52.9,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Score 52.9 neutral zone, vol giảm 1.6%",
+    "Upside corr 24.8% cao hơn downside corr 14.7% 10 điểm",
+    "Skewness 0.05 trung tính, không panic"
+  ]
+}
+```

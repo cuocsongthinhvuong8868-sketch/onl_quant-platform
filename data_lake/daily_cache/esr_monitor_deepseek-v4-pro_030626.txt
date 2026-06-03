@@ -1,0 +1,35 @@
+## 1. Observations
+- SSI ở mức 65.2%, nằm trong vùng WARNING (0.50–0.80), tích lũy rủi ro ngầm.
+- Market State: EUPHORIC_RISK – high stress + uptrend → cảnh báo bull trap.
+- Top driver: S_LIQ (36%) – volume dry-up so với 1Y norm; S_VAL (32%); S_COR (17%).
+- VN30 đóng cửa trên MA125, duy trì uptrend kỹ thuật.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (36%)** dẫn dắt: tín hiệu volume khô cạn nghiêm trọng so với chuẩn 1 năm. Khối lượng giao dịch suy giảm trong khi giá vẫn tăng → thanh khoản yếu, dễ bị thổi bay bởi bất kỳ cú sell-off nào.
+- **S_VAL (32%)**: valuation tension gia tăng. Lợi nhuận 252 ngày VN30 đang bị bào mòn bởi lãi suất huy động – định giá đang đắt dần.
+- **S_COR (17%)**: systemic correlation (EVR PC1 = 38.4%) – PCA concentration ở mức trung bình-cao, các mã vận động đồng pha → herding behavior tiềm ẩn.
+- **Tổ hợp S_LIQ + S_COR**: volume dry-up + đồng pha → signature bull trap cổ điển: giá tăng trên nền thanh khoản yếu, rủi ro đảo chiều khi lực mua cạn kiệt.
+
+## 3. Cross-Check
+- **SSI vs Price**: VN30 giữ uptrend + nằm trên MA125, nhưng SSI đã leo lên 65.2% (WARNING) → divergence rõ rệt. Giá tạo đỉnh mới cùng stress tích lũy là cấu trúc bull trap điển hình.
+- **HMM Regime**: EUPHORIC_RISK (high stress + uptrend) khớp hoàn toàn với SSI WARNING → không lệch tín hiệu.
+- **Pillar Mode downside**: bộ đo lường chỉ ghi nhận phiên giảm, càng củng cố rằng áp lực đang hình thành từ phía bán.
+
+## 4. Verdict
+- **Cash weight đề xuất: 50%** – danh mục cần được bảo vệ rõ rệt. Không khuyến nghị nắm giữ toàn bộ trong EUPHORIC_RISK.
+- **Hedge action**: Short VN30F1M 1:1 với phần equity còn lại. Hoặc mua put nếu ưa giới hạn rủi ro tuyệt đối. Giảm beta các mã mid-cap, ưu tiên blue-chip phòng thủ.
+- **Lưu ý**: Cả 3 pillar đều đồng thuận hướng stress (không mâu thuẫn) → tín hiệu đáng tin cậy, có thể hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.2,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 50,
+  "hedge_action": "short_futures",
+  "confidence": "high"
+}
+```

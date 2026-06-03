@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực Cầu** hiện tại 10.35% thấp hơn mu dài hạn 13.80% (-3.45pp), cho thấy bên mua đang yếu hơn trung bình lịch sử.
+- **Lực Cung** hiện tại 18.35% cao hơn mu dài hạn 14.37% (+3.98pp), phản ánh áp lực bán đang gia tăng đáng kể.
+- Cả hai chiều đều ở **Momentum regime** (Phi_Cầu = 0.181 > 0.10; Phi_Cung = 0.213 > 0.10), ngụ ý đà hiện tại có khả năng tiếp diễn.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền hiện tại: Phân phối (Distribution)** – Lực Cầu dưới mu và Lực Cung trên mu, khớp với định nghĩa "cùng chiều": bên mua suy yếu, bên bán mạnh lên, dòng tiền đang rút ra.
+- **Bên giữ momentum thực sự:** Cung (Supply) thắng thế với |Phi| = 0.213, cao hơn Cầu (|Phi| = 0.181). Đà bán có độ bền vững và khả năng lan rộng hơn đà mua.
+
+## 3. Stress-Test Read
+- **P95 Downside 27.42%** là mức panic sell kỳ vọng trong 19 phiên tới nếu đà bán tiếp tục khuếch đại – biên độ rủi ro rất lớn.
+- **Asymmetry:** P95 Downside (27.42%) > P95 Upside (23.75%), chênh lệch ~3.67pp. Đuôi rủi ro bên bán dày hơn đuôi tăng trưởng, cho thấy phân phối xác suất lệch âm – kịch bản xấu có khối lượng lớn hơn.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 10%** – hạn chế tối đa tiếp xúc thị trường trong bối cảnh phân phối.
+- **Strategy: Phòng thủ (Defensive)** – không mua đuổi, không bắt đáy. Chờ tín hiệu mean-reversion hoặc cầu hồi phục rõ ràng.
+- Ưu tiên danh mục phòng thủ (tiền mặt, trái phiếu ngắn hạn, cổ phiếu phòng thủ) do cả hai chiều đều trong momentum và nghiêng về bán.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.42,
+  "p95_upside_pct": 23.75,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
