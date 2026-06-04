@@ -1,0 +1,48 @@
+## 1. Observations
+
+- **Historical VaR 95% (3Y):** -1.64%, sâu hơn Parametric Gaussian VaR 95% (-1.31%) khoảng 0.33 điểm phần trăm, báo hiệu đuôi nặng hơn phân phối chuẩn ngay tại ngưỡng thông thường.
+- **EVT VaR 99%:** -3.66%, là mức tổn thất 1/100 ngày giao dịch (khoảng 1 lần mỗi 4 tháng).
+- **ξ (GPD shape):** +0.346, nằm trong vùng "fat tail" (ξ > 0.30), xác nhận đuôi phân phối cực kỳ dày.
+- **Hill index:** +0.471, cùng dấu dương và cùng magnitude với ξ (0.346 vs 0.471), cung cấp tín hiệu cross-check robust.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346 → Fat Tail (ξ > 0.30).** Đây là mức cảnh báo mà ở đó các mô hình phân phối chuẩn (Gaussian) underestimate rủi ro cực đoan một cách nghiêm trọng.
+- **Hill = 0.471** cùng dấu và magnitude tương đương với ξ (0.471 ≈ 1.36× ξ), cho thấy tín hiệu đuôi dày là nhất quán, không chỉ do độ nhạy ngưỡng (threshold sensitivity) của POT/GPD.
+- **ES − VaR Spread = 1.36%** vượt xa σ₃₀ = 0.79%. Quy tắc thực nghiệm xác nhận đuôi dày: spread lớn hơn 1σ chỉ ra sự hiện diện của các sự kiện cực đoan ngoài dự đoán của phân phối chuẩn.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99% (xấp xỉ μ − 2.33σ):** Với μ ≈ 0%, σ = 0.79% → -2.33 × 0.79% = **-1.84%**.
+- **EVT VaR 99%:** -3.66%.
+- **Gaussian Gap:** 3.66% − 1.84% = **1.82 điểm phần trăm (pp)** ≫ 1 pp.
+
+Kết luận: **Gaussian model bị broken với mức độ nghiêm trọng.** Dùng Gaussian VaR 99% để phân bổ vốn rủi ro (risk capital allocation) sẽ dẫn đến thiếu hụt vốn đáng kể khi sự kiện 1% xảy ra.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.346 > 0.30:
+
+1.  **Avoid momentum strategies** trong điều kiện thị trường hiện tại, vì đuôi dày làm tăng xác suất xảy ra các cú sốc ngược hướng mạnh (gap down, fat-tail reversals).
+2.  **Mua Puts ITM** để bảo vệ danh mục trực tiếp khỏi sự kiện EVT ES 99% (-6.11%). Puts OTM có thể không đủ coverage do mức độ nghiêm trọng của tail risk.
+3.  **Short futures hedge** cho các vị thế long lớn, hoặc sử dụng quyền chọn VN30F để hedge tổng thể.
+4.  **Giảm leverage** đáng kể (khuyến nghị 50-70%) vì ngay cả mức VaR 95% thông thường (-1.64%) cũng đã sâu hơn Gaussian.
+
+**Không khuyến nghị** σ-based position sizing (Kelly, Fixed Fraction) trong giai đoạn này; cần chuyển sang mô hình dựa trên EVT.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "04/06/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.82,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```
