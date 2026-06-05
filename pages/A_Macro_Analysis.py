@@ -41,6 +41,13 @@ TOOLS = [
         "page_module": "tools.ltmm.page",
         "render_func": "render",
     },
+    {
+        "id": "vn100_earnings_health",
+        "name": "🇻🇳 VN100 Earnings Health",
+        "desc": "Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + CSAD blend + PCA validation",
+        "page_module": "tools.vn100_earnings_health.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
@@ -73,7 +80,7 @@ if st.session_state.macro_selected_tool is None:
                     if st.button(
                         f"🔓 Mở {tool['name'].split('—')[0].strip()}",
                         key=f"btn_macro_{tool['id']}",
-                        use_container_width=True,
+                        width="stretch",
                     ):
                         st.session_state.macro_selected_tool = tool['id']
                         st.rerun()
@@ -105,7 +112,7 @@ else:
 
     col_back, col_title = st.columns([1, 6])
     with col_back:
-        if st.button("🔙 Danh mục", use_container_width=True):
+        if st.button("🔙 Danh mục", width="stretch"):
             st.session_state.macro_selected_tool = None
             st.rerun()
     with col_title:

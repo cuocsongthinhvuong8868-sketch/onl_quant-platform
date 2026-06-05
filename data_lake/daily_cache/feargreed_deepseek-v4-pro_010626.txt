@@ -1,0 +1,33 @@
+## 1. Observations
+- Risk Score ở 52.3 (NEUTRAL vùng 40-60), phiên trước +1.0 điểm
+- EGARCH Vol chuẩn hóa 6.0% (cao hơn ngưỡng GREED <4%), đang tăng +0.8%
+- Rolling Skewness +0.05 (gần trung tính, không âm sâu < -0.5)
+- Downside/Upside Correlation chênh lệch rõ: DC 14.9% thấp hơn UC 24.6% (gap ~10%)
+
+## 2. Interpretation
+Thị trường đang ở pha NEUTRAL có dấu hiệu phân hóa rõ: áp lực bán đồng loạt thấp nhưng vẫn có vùng pick selectively. Skewness dương nhẹ cho thấy tail rủi ro chưa dồn về phía dưới, nhưng vol đang tạo tín hiệu cảnh báo vì chạm ngưỡng 6% — mức đáng chú ý của chế độ stock-picking.
+
+## 3. Cross-Check
+- **Score (52.3) vs EGARCH Vol (6.0%):** Divergence nhẹ — Score tăng +1.0 nhưng vol tăng +0.8%. Ở chế độ NEUTRAL đây là tín hiệu không hoàn toàn nhất quán: nếu thị trường thực sự ổn định, vol đáng lẽ phải giảm hoặc đi ngang.
+- **Skewness (+0.05) vs Correlation gap (DC 14.9% < UC 24.6%):** Consistent — skew trung tính + up-corr cao hơn down-corr cho thấy chưa có panic, nhưng up-corr vẫn đang thấp hơn ngưỡng GREED (thường >35%), hàm ý không có momentum đủ mạnh.
+
+**Kết luận cross-check:** Có divergence nhẹ giữa Score tăng và Vol tăng, nhưng tổng thể consistent với NEUTRAL phân hóa.
+
+## 4. Verdict
+**Beta đề xuất: 0.6** (trên thang 0-1.0)
+- Không phòng thủ hoàn toàn vì skewness chưa âm sâu và down-corr thấp
+- Giữ beta trung bình do vol đang tạo tín hiệu cảnh báo
+- **Hành động:** Tập trung vào stock-picking với bias defensive sector; có thể long selective nhưng cần stop-loss chặt vì vol có thể tiếp tục tăng
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "01/06/2026",
+  "regime": "NEUTRAL",
+  "score": 52.3,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": ["Score 52.3 trong NEUTRAL zone", "EGARCH vol 6.0% đang tăng +0.8%", "Downside corr 14.9% thấp hơn nhiều so với upside corr 24.6%", "Skewness +0.05 trung tính"]
+}
+```

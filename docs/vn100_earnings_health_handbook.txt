@@ -1,0 +1,306 @@
+# VN100 Earnings Health Monitor Handbook
+
+Ngày cập nhật: 2026-06-03
+Mã hóa: UTF-8
+
+Tài liệu này tóm tắt methodology và cách đọc kết quả của VN100 Earnings Health Monitor.
+
+## 1. Mục đích
+
+VN100 Earnings Health Monitor đo sức khỏe lợi nhuận của nhóm VN100 dựa trên báo cáo tài chính quý.
+
+Framework trả lời các câu hỏi chính:
+
+- Lợi nhuận đang cải thiện hay suy yếu?
+- Sự cải thiện có diễn ra trên diện rộng hay chỉ tập trung ở một vài nhóm?
+- Lợi nhuận có ổn định hay biến động mạnh?
+- Cross-section có bị phân hóa hay không?
+- Chu kỳ hiện tại là chu kỳ chung của thị trường hay là cú sốc một ngành?
+
+Đây là fundamental monitor, không phải mô hình dự báo giá cổ phiếu.
+
+## 2. Nguyên tắc cốt lõi
+
+### Không dùng market cap
+
+Model không dùng giá cổ phiếu, vốn hóa, free-float hay outstanding shares trong score chính.
+
+Lý do: giá cổ phiếu biến động hằng ngày, trong khi báo cáo tài chính là dữ liệu theo quý. Dùng market cap sẽ trộn nhiễu thị trường vào tín hiệu kế toán.
+
+### Equal-weighted universe
+
+VN100 score đại diện cho sức khỏe trung bình của doanh nghiệp VN100, không phải riêng các công ty lớn nhất.
+
+### Geometric mean sau khi normalize
+
+Raw metric được xử lý theo pipeline:
+
+raw metric -> winsorize -> percentile health [0,1] -> clip [0.01,0.99] -> geometric mean -> score [-1,+1]
+
+Geometric mean phạt các component yếu mạnh hơn arithmetic mean. Vì vậy score tổng chỉ cao khi nhiều thành phần cùng tốt.
+
+## 3. Dữ liệu đầu vào
+
+Nguồn dữ liệu:
+
+- File JSON hoặc Excel báo cáo tài chính theo ticker.
+- Universe: config/vn100_universe.csv.
+- Sector: lấy từ vnstock và mapping về các nhóm methodology.
+
+Parser cần tìm được tối thiểu:
+
+- npat: lợi nhuận sau thuế.
+- equity: vốn chủ sở hữu.
+- period: quý.
+- ticker, sector, source_file.
+
+Nếu ticker không parse được, xem file:
+
+vn100_parse_log.csv
+
+File này chỉ hiện ticker failed và đường dẫn file cần sửa.
+
+## 4. Ticker-level metrics
+
+### NPAT TTM
+
+npat_ttm = tổng NPAT 4 quý gần nhất
+
+Dùng TTM để giảm nhiễu mùa vụ.
+
+### Equity lag 4Q
+
+equity_lag4 = equity của cùng kỳ năm trước
+
+Dùng equity lag 4Q để đo earnings improvement trên nền vốn đã có trước đó.
+
+### Momentum raw
+
+momentum_raw = delta_npat_ttm / equity_lag4
+
+Ý nghĩa: lợi nhuận TTM tăng hoặc giảm bao nhiêu so với vốn chủ sở hữu năm trước.
+
+### Profitability raw
+
+roe_ttm = npat_ttm / average_equity
+
+Ý nghĩa: mức sinh lời hiện tại của doanh nghiệp.
+
+### Stability raw
+
+stability_raw = rolling std(delta_earnings_to_equity, 12 quarters)
+
+Stability window đang dùng 12Q. Giá trị raw càng thấp thì lợi nhuận càng ổn định.
+
+## 5. Component scores
+
+Tất cả component score được map về thang:
+
+-1 = rất xấu
+ 0 = trung tính
++1 = rất tốt
+
+### Momentum Score
+
+Đo tốc độ cải thiện lợi nhuận của universe.
+
+Cách đọc nhanh:
+
+- > 0: earnings momentum đang cải thiện.
+- < 0: earnings momentum đang suy yếu.
+
+### Breadth Score
+
+Đo tỷ lệ ticker có momentum dương.
+
+breadth_raw = positive_ticker_count / valid_ticker_count
+
+Cách đọc nhanh:
+
+- Cao: nhiều doanh nghiệp cùng cải thiện.
+- Thấp: recovery hẹp hoặc suy yếu diện rộng.
+
+### Stability Score
+
+Đo tính ổn định của earnings improvement trong cửa sổ 12Q.
+
+Cách đọc nhanh:
+
+- Cao: chu kỳ lợi nhuận ổn định.
+- Thấp: lợi nhuận biến động, dễ nhiễu hoặc chưa bền.
+
+### Profitability Score
+
+Đo mức ROE TTM hiện tại sau khi normalize theo lịch sử/cross-section.
+
+Cách đọc nhanh:
+
+- Cao: nền lợi nhuận tốt.
+- Thấp: ROE yếu hoặc chưa phục hồi.
+
+### CSAD Quality Score
+
+CSAD đo độ phân tán cross-section của ticker health/momentum.
+
+csad_raw được giữ lại để diagnostic, nhưng score chính dùng smoothed quality:
+
+csad_quality = 0.65 * EMA_4Q(csad_quality_raw) + 0.35 * csad_quality_raw
+
+Lý do: raw CSAD rất nhạy với outlier, nên blend giúp giảm nhiễu nhưng vẫn không quá trễ.
+
+Cách đọc nhanh:
+
+- CSAD quality cao: tín hiệu đồng đều hơn, ít phân hóa.
+- CSAD quality thấp: fundamental bị phân hóa, có thể do một vài sector/ticker kéo.
+
+## 6. VN100 Composite Score
+
+VN100 score là weighted geometric mean của component scores sau khi map về [0,1].
+
+Weights hiện tại:
+
+- Momentum: 30%
+- Breadth: 25%
+- Profitability Quality: 20%
+- Stability: 15%
+- CSAD Quality: 10%
+
+Sau đó score được map về [-1,+1].
+
+## 7. Regime
+
+Regime dựa trên vn100_score:
+
+- score < -0.50: Earnings Stress
+- -0.50 đến -0.15: Weak
+- -0.15 đến +0.15: Neutral
+- +0.15 đến +0.50: Recovery
+- > +0.50: Expansion
+
+Cách đọc:
+
+- Earnings Stress: lợi nhuận suy yếu mạnh.
+- Weak: chu kỳ còn yếu.
+- Neutral: đang chuyển tiếp, chưa có tín hiệu rõ.
+- Recovery: earnings đang phục hồi.
+- Expansion: chu kỳ lợi nhuận mạnh và có chất lượng.
+
+## 8. Broadness label
+
+Broadness kết hợp breadth_raw và csad_percentile.
+
+- high breadth + low CSAD: broad-based expansion
+- high breadth + high CSAD: uneven recovery
+- low breadth + high CSAD: narrow leadership / one-sector shock
+- low breadth + low CSAD: broad-based weakness
+- otherwise: mixed / transition
+
+Lưu ý:
+
+- broad-based expansion: tín hiệu tốt hơn vì nhiều ticker cùng cải thiện và ít phân hóa.
+- uneven recovery: breadth tốt nhưng phân hóa cao, cần xem sector map.
+- narrow leadership / one-sector shock: có thể chỉ một nhóm kéo score.
+
+## 9. Sector Map
+
+Sector Map dùng để xem component nào đang kéo hoặc đè score.
+
+Cần đọc:
+
+- Sector composite score.
+- Sector momentum.
+- Sector breadth.
+- Sector stability.
+- Sector profitability.
+- Sector CSAD quality.
+
+Nếu VN100 score tốt nhưng chỉ 1-2 sector tốt, nên cẩn thận với kết luận broad recovery.
+
+## 10. PCA Validation
+
+PCA không được dùng để thay VN100 score chính.
+
+PCA là diagnostic để xem có common factor hay không:
+
+- pca_factor_score: common factor score thay thế/đối chiếu.
+- pc1_explained_variance: PC1 giải thích bao nhiêu biến động sector.
+- corr_ew_composite_pc1: PCA có đồng pha với equal-weight composite không.
+- dominant_sector_loadings: sector nào đóng góp lớn vào PC1.
+
+Cách đọc:
+
+- PC1 explained variance cao: có common cycle rõ.
+- PCA factor mạnh hơn VN100 score: tín hiệu common factor nhạy hơn, nhưng có thể bị chi phối bởi sector loading.
+- One-sector shock flag: cần xem sector map trước khi kết luận chu kỳ chung.
+
+## 11. Coverage
+
+Coverage có hai lớp:
+
+- Raw parse coverage: số ticker có data parse được.
+- Score coverage: số ticker đủ điều kiện tính score tại kỳ mới nhất.
+
+Ví dụ:
+
+parsed tickers = 100/100
+valid_ticker_count = 97
+coverage_ratio = 97%
+
+Điều này có nghĩa là dữ liệu đã có cho 100 ticker, nhưng kỳ mới nhất chỉ 97 ticker đủ trường để tính score.
+
+Nếu coverage thấp:
+
+- Kiểm tra vn100_parse_log.csv.
+- Kiểm tra data_quality_flag trong outputs/ticker_metrics.csv.
+- Không nên đọc regime quá mạnh nếu coverage dưới ngưỡng methodology.
+
+## 12. Cách đọc dashboard
+
+### Overview
+
+Đọc theo thứ tự:
+
+1. Coverage.
+2. VN100 Score.
+3. Regime.
+4. Broadness.
+5. Sector heatmap.
+
+### Component Trends
+
+Dùng để biết score tổng thay đổi do component nào:
+
+- Momentum tăng nhưng Profitability thấp: recovery mới bắt đầu.
+- Breadth cao nhưng Stability thấp: nhiều ticker cải thiện nhưng chưa bền.
+- Profitability cao nhưng Momentum thấp: nền lợi nhuận tốt nhưng đang chậm lại.
+
+### Breadth & CSAD
+
+Dùng để phân biệt recovery rộng hay hẹp:
+
+- Breadth cao + CSAD quality cao: tốt.
+- Breadth cao + CSAD quality thấp: recovery phân hóa.
+- Breadth thấp + CSAD quality thấp: rủi ro shock hẹp.
+
+### PCA Validation
+
+Dùng để kiểm tra chu kỳ chung:
+
+- PCA factor cùng chiều VN100 score: tín hiệu chung đang rõ.
+- PCA factor lệch mạnh với VN100 score: xem lại sector loadings.
+
+## 13. Lưu ý sử dụng
+
+Model này là monitor fundamental, không phải tín hiệu mua bán ngắn hạn.
+
+Không nên đọc một con số riêng lẻ. Nên đọc theo cụm:
+
+VN100 Score + Regime + Broadness + Component Trends + Sector Map + PCA
+
+Kết luận mạnh chỉ nên đưa ra khi:
+
+- Coverage cao.
+- Breadth ủng hộ.
+- CSAD không quá phân hóa.
+- Sector map không bị một ngành chi phối.
+- PCA không cảnh báo one-sector shock.

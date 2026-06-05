@@ -1,0 +1,47 @@
+# BÁO CÁO RỦI RO HỆ THỐNG VaRES
+**Ngày:** 02/06/2026
+
+---
+
+## 1. Observations
+- **VN30 Stress Index:** 3.33% (ngưỡng cảnh báo: 40%)
+- **Số mã thủng VaR 95%:** 1/30
+- **Complacency Index:** 5.56% (ngưỡng nguy hiểm: 80%)
+- **Số mã mispriced (spread nén):** 6
+
+---
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở mức rất thấp (3.33%), cho thấy chưa có dấu hiệu lây lan rủi ro real-time giữa các cổ phiếu vốn hóa lớn trong rổ VN30. Chỉ 1/30 mã (HDB) thủng VaR 95%, và đây là sự cố cá biệt, chưa phải đầu sóng của một sự kiện systemic. HDB có thể đang phản ứng với tin tức vi mô riêng lẻ hoặc áp lực bán kỹ thuật.
+
+---
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency Index ở mức rất thấp (5.56%), **hoàn toàn dưới mọi ngưỡng cảnh báo**. Điều này chỉ cho thấy thị trường **KHÔNG đang ở regime ngủ quên** — spread không bị nén chặt, cấu trúc bù rủi ro không bị bóp méo.
+
+**Tuyệt đối không suy ra thị trường đang ổn định.**
+
+Trái lại, với Stress Index cực thấp (3.33%) và Complacency cực thấp (5.56%), bức tranh khả năng cao là: thị trường đang trong một pha **uptrend mạnh hoặc biến động cao nhưng có tổ chức** — spread giãn rộng tự nhiên vì dòng tiền và thanh khoản cao, chứ không phải vì áp lực bán hoảng loạn. Cả hai Module đều không phát tín hiệu cảnh báo vào thời điểm hiện tại.
+
+---
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B) — HDB:** Khuyến nghị giảm tỷ trọng nếu mã tiếp tục thủng thêm MA20 trên D1 khoảng 3-5% từ giá hiện tại. Cá biệt, không cần hoảng loạn toàn bộ danh mục VN30.
+- **Top 3 Mispriced (Module C) — VRE, VTO, VHM:** Spread bị nén trên 6 mã nhưng ở mức nhẹ, chưa đủ để kích hoạt cảnh báo. Không hành động vội, nhưng cần theo dõi nếu số lượng mispriced tăng lên 15+ mã trong những phiên tới.
+
+---
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["HDB"],
+  "confidence": "high"
+}
+```

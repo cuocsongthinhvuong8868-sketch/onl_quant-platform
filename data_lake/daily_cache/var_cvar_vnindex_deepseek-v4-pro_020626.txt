@@ -1,0 +1,47 @@
+## 1. Observations
+
+- **Historical VaR 95% (3Y):** -1.64%, sâu hơn 0.33pp so với Parametric Gaussian VaR (-1.31%), cho thấy phân phối thực tế có đuôi nặng hơn so với giả định chuẩn.
+- **EVT VaR 99% (1/100):** -3.66%, tương ứng với mức thua lỗ trong một phiên gần gấp 4.6 lần độ lệch chuẩn 30 ngày (σ₃₀=0.80%).
+- **ξ (GPD shape):** +0.346 – nằm trong vùng **FAT TAIL** (>0.30), khẳng định đuôi phân phối cực dày.
+- **Hill index:** +0.471 – cùng dấu dương và có độ lớn tương đồng với ξ, cho thấy tín hiệu đuôi dày là ổn định, không phải artifact do ngưỡng chọn lọc.
+
+## 2. Tail Thickness Diagnosis
+
+- Giá trị ξ = +0.346 đưa VNINDEX vào bracket **FAT TAIL** (ξ > 0.30). Điều này đồng nghĩa với việc các sự kiện giảm >3σ xuất hiện thường xuyên hơn nhiều so với kỳ vọng phân phối chuẩn.
+- **Hill index +0.471 confirm robust signal:** cả hai ước lượng đều dương và gần nhau (ξ=0.346, Hill=0.471), làm tăng độ tin cậy của chẩn đoán đuôi dày.
+- **ES − VaR Spread = -1.36%** (so với σ₃₀=0.80%). Spread lớn hơn 1σ là bằng chứng thực nghiệm rõ ràng: phần đuôi thua lỗ không chỉ dày mà còn “nặng” – kỳ vọng thua lỗ vượt ngưỡng VaR sâu hơn nhiều so với mô hình chuẩn.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** (μ=0, z₀.₀₁=-2.33): μ + z·σ = 0 – 2.33×0.80% = **-1.86%**.
+- **EVT VaR 99%** = **-3.66%**.
+- **Gaussian Gap = EVT VaR – Gaussian VaR = -1.80pp** (gap tuyệt đối 1.80 percentage point > 1pp).
+
+Kết luận: Mô hình Gaussian đang underestimate rủi ro tới gần 2pp ở quantile 99%. Áp dụng Gaussian để phân bổ vốn rủi ro (risk capital allocation) sẽ dẫn đến thiếu hụt vốn đệm trầm trọng cho sự kiện 1/100.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = +0.346 > 0.30, tình trạng **FAT TAIL** yêu cầu hành động phòng hộ quyết liệt:
+
+- **Tránh các chiến lược momentum** – đuôi dày làm tăng xác suất “gap down” bất ngờ, momentum dễ bị stop-out với slippage lớn.
+- **Mua puts ITM (In-The-Money)** – mức bảo vệ cần ở gần giá hiện tại vì tail risk cao; OTM puts có thể không kịp “ăn” được kỳ vọng thua lỗ -6.11% (EVT ES 99%).
+- **Short futures hedge** cho danh mục lớn – sử dụng hợp đồng tương lai để giảm beta, đặc biệt khi ξ cho thấy rủi ro hệ thống ở cấp độ index.
+
+*Khuyến nghị giảm leverage ít nhất 50% so với mức thông thường, do ES (cực đoan) không có dấu hiệu hội tụ.*
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "02/06/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.80,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

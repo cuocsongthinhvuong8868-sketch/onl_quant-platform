@@ -786,6 +786,185 @@ def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -
         return "N/A", f"Lỗi đọc file: {e}"
 
 
+def _build_vnibor_structured_trend() -> tuple[str, str]:
+    """Build deterministic VNIBOR snapshot + 20-session trend for AI CIO macro layer."""
+    try:
+        from tools.vnibor.quant.metrics import (
+            load_vnibor_data,
+            process_vnibor_logic,
+            summarize_latest,
+            summarize_20d_trend,
+        )
+
+        df_processed = process_vnibor_logic(load_vnibor_data())
+        summary = summarize_latest(df_processed)
+        trend = summarize_20d_trend(df_processed, lookback=20)
+    except Exception as e:
+        return "N/A", f"DATA INSUFFICIENT: Không build được VNIBOR trend snapshot ({e})"
+
+    label = summary.get("date", "N/A")
+    snapshot = f"""
+=== VNIBOR STRUCTURED SNAPSHOT + 20D TREND ===
+Current snapshot:
+- Date: {summary.get('date', 'N/A')}
+- Overnight ON: {summary.get('overnight', 'N/A')}%
+- 1 Week: {summary.get('w1', 'N/A')}%
+- 2 Weeks: {summary.get('w2', 'N/A')}%
+- ON Impulse: {summary.get('impulse', 'N/A')}%
+- ON Z-Score: {summary.get('z_score', 'N/A')}
+- ON Percentile: {summary.get('percentile', 'N/A')}
+- Spread 1W-ON: {summary.get('spread_1w', 'N/A')}%
+- Spread 2W-ON: {summary.get('spread_2w', 'N/A')}%
+- Regime: {summary.get('regime', 'N/A')}
+- Signal: {summary.get('signal', 'N/A')}
+
+20-session trend:
+- Trend label: {trend.get('trend_label', 'N/A')}
+- ON 20D change: {trend.get('on_20d_change', 'N/A')}%
+- ON MA5 20D change: {trend.get('on_ma5_20d_change', 'N/A')}%
+- ON MA5 slope/session: {trend.get('on_ma5_slope', 'N/A')}%
+- ON 20D avg/min/max: {trend.get('on_20d_avg', 'N/A')}% / {trend.get('on_20d_min', 'N/A')}% / {trend.get('on_20d_max', 'N/A')}%
+- ON up/down days: {trend.get('up_days', 'N/A')} / {trend.get('down_days', 'N/A')}
+- Inverted 1W-ON days: {trend.get('inversion_days', 'N/A')}
+- STRESS/WARNING days: {trend.get('stress_warning_days', 'N/A')}
+- Regime counts: {trend.get('regime_counts', 'N/A')}
+- Signal counts: {trend.get('signal_counts', 'N/A')}
+- 20D table:
+{trend.get('trend_table', 'N/A')}
+""".strip()
+    return label, snapshot
+
+
+def _get_vnibor_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Combine structured VNIBOR trend with optional cached VNIBOR AI report."""
+    snapshot_date, snapshot = _build_vnibor_structured_trend()
+    ai_date, ai_report = _get_latest_report_for_macro("vnibor", provider_key)
+    if ai_report and not ai_report.startswith("*Chưa có"):
+        context = (
+            f"{snapshot}\n\n"
+            f"=== VNIBOR AI INTERPRETATION CACHE (Ngày báo cáo: {ai_date}) ===\n"
+            f"{ai_report}"
+        )
+    else:
+        context = (
+            f"{snapshot}\n\n"
+            "=== VNIBOR AI INTERPRETATION CACHE ===\n"
+            "*Chưa có cache AI riêng của VNIBOR; AI CIO phải tự diễn giải từ structured snapshot + 20D trend phía trên.*"
+        )
+    return snapshot_date, context
+
+
+def _get_latest_vn100_ai_report(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Return latest cached VN100 AI interpretation for this provider, with fallback to any provider."""
+    import datetime as datetime_mod
+
+    cache_dir = DATA_LAKE / "daily_cache"
+    cache_dir.mkdir(parents=True, exist_ok=True)
+    files = list(cache_dir.glob(f"vn100_earnings_health_{provider_key}_*.txt"))
+    if not files:
+        files = list(cache_dir.glob("vn100_earnings_health_*.txt"))
+    if not files:
+        return "N/A", ""
+
+    def file_sort_key(p: Path):
+        file_date = _parse_date_from_filename(p.stem)
+        if file_date:
+            return (file_date, p.stat().st_mtime)
+        return (date(1970, 1, 1), p.stat().st_mtime)
+
+    latest_file = sorted(files, key=file_sort_key, reverse=True)[0]
+    parsed_date = _parse_date_from_filename(latest_file.stem)
+    if parsed_date:
+        date_str = parsed_date.strftime("%d/%m/%Y")
+    else:
+        mtime = datetime_mod.datetime.fromtimestamp(latest_file.stat().st_mtime)
+        date_str = mtime.strftime("%d/%m/%Y")
+
+    try:
+        return date_str, latest_file.read_text(encoding="utf-8").strip()
+    except Exception as e:
+        return "N/A", f"Lỗi đọc file VN100 AI cache: {e}"
+
+
+def _build_vn100_structured_snapshot() -> tuple[str, str]:
+    """Build deterministic VN100 context so AI CIO can use the tool even without VN100 AI cache."""
+    try:
+        from tools.vn100_earnings_health.quant.loader import load_outputs, prepare_ai_payload
+
+        payload = prepare_ai_payload(load_outputs())
+    except Exception as e:
+        return "N/A", f"DATA INSUFFICIENT: Không build được VN100 Earnings Health snapshot ({e})"
+
+    label = f"{payload.get('period', 'N/A')} / {payload.get('period_end_date', 'N/A')}"
+    snapshot = f"""
+=== VN100 STRUCTURED SNAPSHOT ===
+- Period: {payload.get('period', 'N/A')}
+- Period end date: {payload.get('period_end_date', 'N/A')}
+- Parsed tickers: {payload.get('parsed_ticker_count', 'N/A')} / {payload.get('universe_ticker_count', 'N/A')}
+- Valid ticker count: {payload.get('valid_ticker_count', 'N/A')}
+- Coverage ratio: {payload.get('coverage_ratio', 'N/A')}
+- Failed parse tickers: {payload.get('failed_parse_tickers', 'N/A')}
+- Missing score tickers: {payload.get('missing_score_tickers', 'N/A')}
+
+VN100 Composite:
+- VN100 Score: {payload.get('vn100_score', 'N/A')}
+- Regime: {payload.get('regime', 'N/A')}
+- Broadness: {payload.get('broadness_label', 'N/A')}
+
+Component Scores:
+- Momentum: {payload.get('momentum_score', 'N/A')}
+- Breadth: {payload.get('breadth_score', 'N/A')}
+- Stability 12Q: {payload.get('stability_score', 'N/A')}
+- Profitability: {payload.get('profitability_score', 'N/A')}
+- CSAD Quality blended: {payload.get('csad_quality_score', 'N/A')}
+
+5-quarter context:
+- VN100 5Q trend table: {payload.get('vn100_5q_trend_table', 'N/A')}
+- Component 5Q trend table: {payload.get('component_5q_trend_table', 'N/A')}
+- Breadth/CSAD 5Q trend table: {payload.get('breadth_csad_5q_trend_table', 'N/A')}
+
+Trend summary:
+- VN100 Score 4Q change: {payload.get('vn100_score_4q_change', 'N/A')}
+- Momentum 4Q change: {payload.get('momentum_4q_change', 'N/A')}
+- Breadth 4Q change: {payload.get('breadth_4q_change', 'N/A')}
+- Stability 4Q change: {payload.get('stability_4q_change', 'N/A')}
+- Profitability 4Q change: {payload.get('profitability_4q_change', 'N/A')}
+- CSAD Quality 4Q change: {payload.get('csad_quality_4q_change', 'N/A')}
+
+Sector Map:
+- Top sectors by composite: {payload.get('top_sector_table', 'N/A')}
+- Bottom sectors by composite: {payload.get('bottom_sector_table', 'N/A')}
+
+PCA Validation:
+- PCA factor score: {payload.get('pca_factor_score', 'N/A')}
+- PC1 explained variance: {payload.get('pc1_explained_variance', 'N/A')}
+- Corr EW vs PC1: {payload.get('corr_ew_composite_pc1', 'N/A')}
+- Common factor label: {payload.get('common_factor_label', 'N/A')}
+- One-sector shock flag: {payload.get('one_factor_shock_flag', 'N/A')}
+- Dominant sector loadings: {payload.get('dominant_sector_loadings', 'N/A')}
+""".strip()
+    return label, snapshot
+
+
+def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Combine current structured VN100 data with optional cached AI interpretation."""
+    snapshot_label, snapshot = _build_vn100_structured_snapshot()
+    ai_date, ai_report = _get_latest_vn100_ai_report(provider_key)
+    if ai_report:
+        context = (
+            f"{snapshot}\n\n"
+            f"=== VN100 AI INTERPRETATION CACHE (Ngày báo cáo: {ai_date}) ===\n"
+            f"{ai_report}"
+        )
+    else:
+        context = (
+            f"{snapshot}\n\n"
+            "=== VN100 AI INTERPRETATION CACHE ===\n"
+            "*Chưa có cache AI riêng của VN100; AI CIO phải tự diễn giải từ structured snapshot phía trên.*"
+        )
+    return snapshot_label, context
+
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
@@ -829,8 +1008,9 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
     fed_date, fed_rep = _get_latest_report_for_macro("fed_liquidity", provider_key)
     gfcm_date, gfcm_rep = _get_latest_report_for_macro("global_financial_conditions", provider_key)
-    vnibor_date, vnibor_rep = _get_latest_report_for_macro("vnibor", provider_key)
+    vnibor_date, vnibor_rep = _get_vnibor_context(provider_key)
     ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
+    vn100_label, vn100_rep = _get_vn100_earnings_health_context(provider_key)
 
     macro_section = (
         "=== BÁO CÁO PHÂN TÍCH VĨ MÔ GẦN NHẤT (MACRO LAYER) ===\n\n"
@@ -840,10 +1020,16 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         f"=== D. LIQUIDITY TRANSMISSION - LTMM (Ngày báo cáo: {ltmm_date}) ===\n{ltmm_rep}\n\n"
     )
 
+    fundamental_section = (
+        "=== BÁO CÁO FUNDAMENTAL BOTTOM-UP - VN100 EARNINGS HEALTH ===\n\n"
+        f"=== VN100 EARNINGS HEALTH MONITOR (Kỳ dữ liệu: {vn100_label}) ===\n{vn100_rep}\n\n"
+    )
+
     all_reports = (
         f"=== {data_note} ===\n\n"
         f"{historical_block}\n\n"
         f"{macro_section}"
+        f"{fundamental_section}"
         f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"

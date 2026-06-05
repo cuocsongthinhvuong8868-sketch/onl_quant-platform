@@ -1,0 +1,34 @@
+## 1. Observations
+- **Stress Index (VN30):** 3.33% (ngưỡng cảnh báo: 40%) — rất thấp, không có áp lực lây lan đáng kể.
+- **Breached (VaR 95%):** 1/30 mã — GAS là mã duy nhất thủng VaR.
+- **Complacency Index (Toàn thị trường):** 6.48% (ngưỡng nguy hiểm: 80%) — rất thấp.
+- **Mispriced (Spread nén chặt):** 7 mã — chủ yếu tập trung ở nhóm HSG, VRE, VTO.
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index 3.33% nằm rất xa ngưỡng 40%. Điều này phản ánh **không có hiệu ứng lây lan real-time** giữa các mã VN30. Sự cố của GAS là cá biệt, chưa lan sang các mã cùng ngành hoặc cùng nhóm vốn hóa.
+- Top 1 breach (GAS) — mức độ sâu nặng: cần kiểm tra thêm thanh khoản và tin tức riêng (có thể do điều chỉnh giá hàng hóa hoặc kết quả kinh doanh). Hiện tại chưa có dấu hiệu đầu sóng systemic.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- **Complacency Index 6.48%** ở mức rất thấp. Kết luận: **thị trường KHÔNG ở regime ngủ quên. Điều này KHÔNG đồng nghĩa thị trường ổn định.**
+- Với Stress Index thấp (3.33%), tình huống hiện tại có thể là: thị trường đang trong uptrend mạnh (spread giãn rộng do khối lượng giao dịch lớn) hoặc giai đoạn hoảng loạn cục bộ đã qua. Cả hai đều có Complacency thấp nhưng bản chất hoàn toàn trái ngược. Cần bổ sung thêm dữ liệu xu hướng và biến động giá để phân biệt.
+- **Không có cảnh báo định giá sai trên diện rộng.** Rủi ro tiềm ẩn từ spread nén chỉ giới hạn ở 7 mã, không phải hệ thống.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):**
+    - **GAS:** Cảnh báo giảm tỷ trọng nếu giá thủng MA50 trên D1. Không thể loại trừ rủi ro giảm thêm 5-8% từ vùng hiện tại nếu không có tin tức hỗ trợ.
+- **Top 3 Mispriced (Module C):**
+    - **HSG, VRE, VTO:** Spread bị nén chặt nhất, tiềm ẩn khả năng điều chỉnh đột ngột khi thanh khoản phục hồi. Cảnh báo không nên mua đuổi giá chạm kháng cự gần đây; stop-loss dưới MA20 trên D1 cho vị thế hiện hữu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["GAS", "HSG", "VRE", "VTO"],
+  "confidence": "high"
+}
+```
