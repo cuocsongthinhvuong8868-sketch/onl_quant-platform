@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu (Upside Breadth):** Hiện tại 5.18% thấp hơn đáng kể so với mu dài hạn 13.58% (delta -8.40 ppts). Phi = +0.186 (> +0.10) → Momentum regime (đà yếu tiếp tục, không có dấu hiệu phục hồi).
+- **Lực cung (Downside Breadth):** Hiện tại 8.94% thấp hơn mu dài hạn 14.28% (delta -5.34 ppts). Phi = +0.212 (> +0.10) → Momentum regime (đà bán vẫn đang duy trì, chưa hạ nhiệt).
+- **Tương quan:** Cả hai chiều đều nén dưới mu dài hạn, không có chiều nào vượt trội rõ rệt so với baseline.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền:** **Zombification** – Cả lực cầu và lực cung đều bị nén dưới mu dài hạn, thị trường rơi vào trạng thái thanh khoản cạn kiệt, giao dịch ì ạch, không có xung lực rõ ràng từ bên nào.
+- **Momentum thực sự:** So sánh |Phi_up| = 0.186 vs |Phi_dn| = 0.212 → **Bên cung (supply) giữ momentum mạnh hơn** (0.212 > 0.186). Dù cả hai đều có đà, cung vẫn chiếm ưu thế, tiềm ẩn rủi ro bán tháo nếu có biến cố.
+
+## 3. Stress-Test Read
+- **P95 Downside = 26.97%:** Biên độ panic sell cực đoan, phản ánh tail risk lớn nếu thị trường mất kiểm soát, đặc biệt trong bối cảnh momentum cung đang chiếm ưu thế.
+- **Asymmetry:** P95 Upside (23.65%) < P95 Downside (26.97%) → **Tail risk bên bán dày hơn**, thị trường nghiêng về kịch bản xấu hơn là bùng nổ. Chênh lệch ~3.32 ppts cảnh báo rủi ro giảm sâu nặng hơn khả năng hồi phục mạnh.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 10-20%** (ưu tiên defensive, cash-heavy).
+- **Strategy: Phòng thủ (defensive)** – Momentum cung mạnh hơn + tail risk lệch về bán + trạng thái zombie → không nên mua đuổi hay bắt đáy sớm. Chờ tín hiệu mean-reversion (Phi âm) hoặc cầu đột biến.
+- **Cảnh báo:** Cả hai chiều đều có Phi > +0.10 → không phải regime nhiễu, nhưng cần ưu tiên bảo toàn vốn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.97,
+  "p95_upside_pct": 23.65,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

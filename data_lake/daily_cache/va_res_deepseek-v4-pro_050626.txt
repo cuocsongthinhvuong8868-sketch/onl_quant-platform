@@ -1,0 +1,31 @@
+## 1. Observations
+- **Stress Index (VN30):** 0.00% (ngưỡng báo động: 40%)
+- **Số mã thủng VaR 95%:** 0/30
+- **Complacency Index (Toàn thị trường):** 6.48% (ngưỡng nguy hiểm: 80%)
+- **Số mã mispriced:** 7
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở mức 0.00%, không có mã nào trong rổ thủng VaR 95%. Điều này cho thấy hiện tại chưa có dấu hiệu lây lan real-time giữa các bluechip. Top 3 breach sâu nhất không tồn tại, do đó các biến động giá cá thể (nếu có) vẫn nằm trong kỳ vọng rủi ro VaR. Rủi ro systemic chưa kích hoạt.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency Index ở mức rất thấp (6.48%), thấp hơn nhiều so với ngưỡng nguy hiểm 80%. **Kết luận duy nhất:** thị trường hiện tại **không ở regime ngủ quên**. 
+- **Lưu ý quan trọng:** điều này hoàn toàn **không đồng nghĩa thị trường đang bình thường hay ổn định**. Một thị trường đang hoảng loạn, lao dốc, hoặc thậm chí uptrend mạnh với spread biến động lớn đều có thể dẫn đến Complacency Index thấp.
+- **Kết hợp với Stress Index = 0%** (không có lây lan real-time), môi trường hiện tại đang có spread giãn rộng nhưng chưa kích hoạt dây chuyền thủng VaR. Cần theo dõi thêm các chỉ báo thanh khoản và động lượng để xác định bản chất chính xác.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có mã nào thủng VaR sâu, không có khuyến nghị giảm tỷ trọng cụ thể từ module này.
+- **Top 3 Mispriced (Module C):** OCB, VRE, VTO có spread bid-ask bị nén chặt nhất so với mô hình. Đây là tín hiệu cổ phiếu đang chịu áp lực định giá lệch. Cảnh báo tiềm ẩn: nếu thị trường đảo chiều, các mã này có thể điều chỉnh mạnh do bù spread. Cân nhắc giảm vị thế đối với OCB, VRE, VTO nếu giá thủng hỗ trợ kỹ thuật (MA20 trên D1) hoặc dừng lỗ ở mức -5% đến -7% từ giá hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.0,
+  "breach_count": 0,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VRE", "VTO"],
+  "confidence": "high"
+}
+```

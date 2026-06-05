@@ -1,0 +1,35 @@
+## 1. Observations
+- **MA20 (26.6%)**: Ở mức **thấp** (oversold zone, dưới ngưỡng 30%), phản ánh xung lực ngắn hạn cực yếu.
+- **MA60 (32.0%)**: Ở mức **thấp** (dưới 40%), xác nhận đà giảm trung hạn chưa kết thúc.
+- **MA125 (27.8%)**: Ở mức **thấp** (dưới 30%), cho thấy chu kỳ kinh doanh nửa năm suy yếu.
+- **MA252 (31.1%)**: Ở mức **thấp** (dưới 40%), xác nhận thị trường đang trong Bear regime dài hạn.
+
+## 2. Structural Health
+- **Alignment**: Cả 4 đường MA đều ở vùng thấp và giảm dần theo thời gian (MA20 < MA60 < MA125 ≈ MA252). Đây là cấu trúc **đồng thuận giảm** (bearish alignment) điển hình.
+- **Pattern**: Khớp với mô hình **Bear Confirmed** – MA20 < 30% và MA252 < 40%, phản ánh suy yếu cơ cấu kéo dài. Không có dấu hiệu divergence.
+
+## 3. Money Flow Leadership
+- **Top volume MA20**: Các mã Banking (ABB, ACB, BVB) và Chứng khoán (AAS, VFS) chiếm ưu thế, cùng với một số mã Bất động sản KCN (BCM) và Bảo hiểm (BIC). Đây là nhóm **Financials** đang chiếm sóng giao dịch ngắn hạn.
+- **Top volume MA252**: Overlap gần như hoàn toàn với MA20 (ABB, ACB, AFX, AMS, ASP, BIC). Điều này cho thấy dòng tiền dài hạn đang tập trung ở cùng nhóm cổ phiếu với ngắn hạn, không có sự phân hóa.
+- **Smart money**: Đang ưu tiên các mã **Defensive trong nhóm Financials** (Bank, Insurance) hơn là các nhóm Aggressive (Steel, Brokers). Đây là tín hiệu thận trọng.
+
+## 4. Verdict
+- **Strategy**: **Defensive cash-up** – ưu tiên bảo toàn vốn. Thị trường đang trong xu hướng giảm được xác nhận bởi cả 4 khung thời gian. Không nên trend-following long hay mean-reversion T+ khi chưa có tín hiệu tạo đáy.
+- **Đòn bẩy**: **0% margin** – tuyệt đối không sử dụng margin do Bear Confirmed regime.
+- **Divergence**: Không có divergence giữa MA20 và MA252, do đó không áp dụng "WAIT FOR CONFIRMATION". Tín hiệu đã rõ ràng: thị trường yếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 26.6,
+  "ma60_pct": 32.0,
+  "ma125_pct": 27.8,
+  "ma252_pct": 31.1,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
