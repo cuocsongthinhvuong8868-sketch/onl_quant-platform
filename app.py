@@ -446,7 +446,7 @@ if st.session_state.show_cio_input:
                             st.error(f"❌ Lỗi kết nối API: {_auth_e}")
                         st.stop()
                 
-                with st.spinner("AI CIO đang tổng hợp 9 báo cáo và đưa ra quyết định... (Quá trình có thể mất 1-2 phút)"):
+                with st.spinner("AI CIO đang tổng hợp macro, VN100 Earnings Health và 9 báo cáo định lượng... (Quá trình có thể mất 1-2 phút)"):
                     try:
                         from shared.ai_cio import run_executive_summary, _read_cache, _clear_all_tool_caches
                         import os as _os
@@ -454,7 +454,7 @@ if st.session_state.show_cio_input:
                         if refresh_btn:
                             # Xoá toàn bộ cache của 9 tool con + executive_summary trước khi chạy
                             _clear_all_tool_caches(cio_provider)
-                            st.info("🗑️ Đã xóa toàn bộ cache cũ của 9 công cụ con, đang tạo mới hoàn toàn từ đầu...")
+                            st.info("🗑️ Đã xóa cache cũ của 9 công cụ con và executive_summary, đang tạo mới từ đầu. VN100 sẽ được đọc từ snapshot output hiện tại.")
                         
                         cached_sum = _read_cache("executive_summary", cio_provider)
                         if cached_sum and not refresh_btn:

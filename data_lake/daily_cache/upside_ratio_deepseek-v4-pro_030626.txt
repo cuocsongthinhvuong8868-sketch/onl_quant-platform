@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu (Upside Breadth):** 11.29% thấp hơn Mu dài hạn (13.76%), delta = -2.47%. Phi = +0.181 → Momentum regime (đà mua đang suy yếu nhưng chưa đảo chiều).
+- **Lực cung (Downside Breadth):** 8.71% thấp hơn Mu dài hạn (14.33%), delta = -5.62%. Phi = +0.210 → Momentum regime (đà bán cũng suy yếu, áp lực giảm thấp hơn kỳ vọng).
+- **Cả hai chiều** đều ở dưới Mu dài hạn (cầu nén + cung nén) → tín hiệu zombification (thanh khoản cạn kiệt).
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền:** Zombification. Cả cầu và cung đều thấp hơn mức trung bình lịch sử, thị trường đang trong trạng thái chờ đợi, thanh khoản suy giảm. Không có áp lực mua/bán chủ động.
+- **Momentum winner:** Mặc dù cả hai đều có Phi > 0.10, độ lớn tương đương nhau (0.181 vs 0.210). Bên cung (đà bán) giữ momentum mạnh hơn một chút (|Phi_dn| = 0.210 > |Phi_up| = 0.181), nhưng sự chênh lệch không đủ lớn để kết luận chiều nào chiếm ưu thế → **trung tính**, momentums đang cân bằng trong vùng thấp.
+
+## 3. Stress-Test Read
+- **P95 Downside = 27.26%:** Nếu kịch bản panic xảy ra, mức giảm kỳ vọng ở đuôi 5% có thể lên tới 27.26% — biên độ rất lớn, phản ánh lớp băng mỏng bên dưới khi thanh khoản cạn.
+- **Asymmetry:** P95 Downside (27.26%) > P95 Upside (23.71%), chênh lệch 3.55%. Tail risk bên bán dày hơn bên mua. Mặc dù hiện tại cung/cầu đều thấp, rủi ro đuôi bất đối xứng nghiêng về phía giảm.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân:** 10-20% (rất thấp). Đây không phải thời điểm để vội vàng.
+- **Strategy:** Phòng thủ (Defensive). Zombification + tail risk nghiêng bán là môi trường không thuận lợi cho giải ngân mới. Cần chờ breakout rõ ràng ra khỏi vùng nén hiện tại.
+- **Lưu ý:** Không phải "NO ACTIONABLE" vì Phi > 0.10, nhưng action khuyến nghị là giảm thiểu rủi ro, không mua đuổi hay bắt đáy.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "neutral",
+  "p95_downside_pct": 27.26,
+  "p95_upside_pct": 23.71,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

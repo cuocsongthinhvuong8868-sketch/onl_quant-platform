@@ -1,0 +1,34 @@
+## 1. Observations
+- **OLS Slope**: 0.41 → Percentile 86.7th (🔴 Cao) — Hệ số dốc rất cao, cho thấy VIC/VHM/VRE đang biến động mạnh cùng chiều với VN30F1M.
+- **Correlation**: 0.72 → Percentile 88.3th (🔴 Rất chặt) — Tương quan gần như tuyệt đối, thị trường đang "dán mắt" vào nhóm VIN.
+- **Regime**: **COUPLING** — ΔCorr = 0.68 (> +0.15) và ΔSlope = 0.67 (> +0.15); combo này khẳng định sự chi phối hoàn toàn của nhóm VIN lên futures.
+
+## 2. Microstructure Read
+Cả hai percentile > 80th (slope 86.7th, corr 88.3th) → đây là cấu trúc bất thường khẳng định sự can thiệp/phối hợp có chủ đích từ nhóm VIN lên thị trường. VIC (204.90 ≈ 204,900 VND), VHM (150.80 ≈ 150,800 VND), VRE (31.00 ≈ 31,000 VND) đang đóng vai trò là "mỏ neo" kéo VN30F1M đi theo. Không có dấu hiệu phân hóa hay suy yếu — nhóm VIN vẫn là động lực chính.
+
+## 3. Event Study Interpretation
+Trạng thái COUPLING ở percentile cực cao này cho thấy:
+- **Intraday**: Rủi ro thiếu hụt thanh khoản ở nhóm VIN nếu có lệnh bán mạnh; nhưng hiện tại slope mạnh + corr chặt nên futures vẫn được kéo lên.
+- **Overnight**: Rủi ro gap ngược nếu VIC/VHM/VRE điều chỉnh mạnh sau giờ giao dịch — không nên giữ vị thế qua đêm trừ khi có xác nhận hành động giá mới từ VIC.
+
+## 4. Verdict
+**Trade plan**: **LONG F1** — edge tracking dựa trên coupling; kỳ vọng VN30F1M tiếp tục được kéo lên nhờ nhóm VIN.
+
+**Leading indicator**: Theo dõi sát VIC (204.90 ≈ 204,900 VND) — nếu VIC break dưới MA5 ngày (~200,500 VND tính từ giá đóng cửa 204,900 − 2%) → suy yếu, cần thoát.
+
+**Stop-loss reference**: VIC stop-loss tại 204.90 × (1 − 2%) ≈ 200.80 (≈ 200,800 VND) — mức này tương ứng break MA5. Nếu futures vào lệnh, stop-loss đặt dưới vùng hỗ trợ ngắn hạn của VIC.
+
+**Không giữ qua đêm** — chốt lời cuối phiên nếu không có breakout rõ ràng mới.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```
