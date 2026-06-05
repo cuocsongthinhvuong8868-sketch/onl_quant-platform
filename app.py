@@ -36,7 +36,7 @@ st.markdown(
 st.markdown("## 🚀 Chọn Nhánh Phân Tích")
 st.markdown("---")
 
-col1, col2, col3 = st.columns(3)
+col1, col2, col3, col4 = st.columns(4)
 
 with col1:
     with st.container(border=True, height=280):
@@ -74,6 +74,18 @@ with col3:
         )
         if st.button("🧠 Vào Behavioral Finance", key="btn_bf", use_container_width=True):
             st.switch_page("pages/C_Behavioral_Finance.py")
+
+with col4:
+    with st.container(border=True, height=280):
+        st.markdown("### Data Management")
+        st.markdown("**Model D - Data Health**")
+        st.markdown(
+            "- Raw and processed freshness\n"
+            "- Missing-date detection\n"
+            "- JSON / CSV health report"
+        )
+        if st.button("Open Data Health", key="btn_data_health", use_container_width=True):
+            st.switch_page("pages/D_Data_Health.py")
 
 st.markdown("---")
 

@@ -1,0 +1,273 @@
+data_lake: data_lake
+
+defaults:
+  warning_days: 2
+  critical_days: 7
+  frequency: daily
+  recursive: true
+  file_patterns:
+    - "*.csv"
+    - "*.parquet"
+    - "*.json"
+  date_columns:
+    - date
+    - DATE
+    - time
+    - period_end_date
+    - ddmmyyyy
+
+sources:
+  - name: bank_fundamentals
+    category: raw/fundamentals
+    path: data_lake/bank_fundamentals.csv
+    warning_days: 45
+    critical_days: 90
+    frequency: monthly
+
+  - name: market_data
+    category: raw/market
+    path: data_lake/market_data.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [time, date, DATE]
+
+  - name: market_volume
+    category: raw/market
+    path: data_lake/market_volume.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [time, date, DATE]
+
+  - name: vnindex_cache
+    category: raw/market
+    path: data_lake/vnindex_cache.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [time, date, DATE]
+
+  - name: vn30_cache
+    category: raw/market
+    path: data_lake/vn30_cache.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [time, date, DATE]
+
+  - name: vnibor
+    category: raw/macro
+    path: data_lake/LaiSuatLienNganHang_Wichart.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [date, DATE, time]
+
+  - name: fed_liquidity
+    category: raw/macro
+    path: data_lake/fed_liquidity_cache.csv
+    warning_days: 7
+    critical_days: 21
+    frequency: weekly
+    date_columns: [DATE, date, time]
+
+  - name: global_financial_conditions
+    category: raw/macro
+    path: data_lake/global_financial_conditions_cache.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [DATE, date, time]
+
+  - name: ltmm_raw
+    category: raw/macro
+    path: data_lake/data_LTMM/sourse_raw
+    warning_days: 3
+    critical_days: 10
+    frequency: daily
+    file_patterns: ["*.json"]
+
+  - name: manipulation_raw
+    category: raw/sentiment
+    path: data_lake/manipulation_raw_data.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: business_daily
+    date_columns: [date, DATE, time]
+
+  - name: vn100_ticker_metrics
+    category: processed/metrics
+    path: data_lake/vn100_earnings_health/outputs/ticker_metrics.csv
+    warning_days: 120
+    critical_days: 210
+    frequency: quarterly
+    date_columns: [period_end_date, date, DATE]
+
+  - name: vn100_composite
+    category: processed/metrics
+    path: data_lake/vn100_earnings_health/outputs/vn100_composite.csv
+    warning_days: 120
+    critical_days: 210
+    frequency: quarterly
+    date_columns: [period_end_date, date, DATE]
+
+  - name: ai_cio_score_history
+    category: processed/reports
+    path: data_lake/Ai_cio_report.csv
+    warning_days: 3
+    critical_days: 10
+    frequency: daily
+    date_columns: [ddmmyyyy, date, DATE]
+
+  - name: metrics_fed_liquidity
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: Fed Liquidity Monitor
+    depends_on: [fed_liquidity]
+    warning_days: 7
+    critical_days: 21
+
+  - name: metrics_global_financial_conditions
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: Global Financial Conditions
+    depends_on: [global_financial_conditions]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_vnibor
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: VNIBOR Monitor
+    depends_on: [vnibor]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_ltmm
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: Liquidity Transmission
+    depends_on: [ltmm_raw]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_vn100_earnings_health
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: VN100 Earnings Health
+    depends_on: [vn100_ticker_metrics, vn100_composite]
+    warning_days: 120
+    critical_days: 210
+
+  - name: metrics_pairs_trading
+    category: processed/tool_metrics/micro
+    type: tool_metrics
+    tool: Pairs Trading Research Lab
+    depends_on: [market_data]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_factor_examination
+    category: processed/tool_metrics/micro
+    type: tool_metrics
+    tool: Portfolio Factor Examination
+    depends_on: [market_data, market_volume, vnindex_cache]
+    cache_namespace: factor_examination
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_fear_greed
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Market Sentiment Fear & Greed
+    depends_on: [market_data]
+    cache_namespace: fear_greed
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_upside_ratio
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Upside/Downside Ratio
+    depends_on: [market_data, vnindex_cache]
+    cache_namespace: upside_ratio
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_risk_adjusted_growth
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Risk-Adjusted Growth
+    depends_on: [market_data, bank_fundamentals]
+    cache_namespace: risk_adjusted_growth
+    warning_days: 7
+    critical_days: 21
+
+  - name: metrics_market_breadth
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Market Breadth
+    depends_on: [market_data]
+    cache_namespace: market_breadth
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_esr_monitor
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: ESR Monitor
+    depends_on: [market_data, market_volume, vn30_cache]
+    cache_namespace: esr_monitor
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_dispersion
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Dispersion
+    depends_on: [market_data, vnindex_cache]
+    cache_namespace: dispersion_cache
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_va_res
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: VaRES Engine
+    depends_on: [market_data, vnindex_cache]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_manipulation
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Manipulation Detection
+    depends_on: [market_data, manipulation_raw]
+    cache_namespace: manipulation
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_var_cvar_vnindex
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Var-CVaR VNINDEX
+    depends_on: [vnindex_cache]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_backtest_strategy
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: Backtest Strategy
+    depends_on: [market_data, market_volume, vnindex_cache, vn30_cache]
+    warning_days: 3
+    critical_days: 10
+
+  - name: metrics_history_score_regime
+    category: processed/tool_metrics/behavioral
+    type: tool_metrics
+    tool: History Score & Regime
+    depends_on: [ai_cio_score_history]
+    warning_days: 3
+    critical_days: 10
