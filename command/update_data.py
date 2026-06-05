@@ -241,8 +241,29 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
     for i, symbol in enumerate(stock_tickers, 1):
         # Xác định start date cho riêng mã này
         if df_existing is not None and symbol in df_existing.columns:
-            symbol_start = start
-            logger.info("[%d/%d] Đang tải %s (incremental từ %s)...", i, len(stock_tickers), symbol, symbol_start)
+            last_valid = df_existing[symbol].dropna().index.max()
+            if pd.notna(last_valid):
+                # Use the symbol's own last valid date, not only the global file
+                # last_date. This backfills tail gaps such as stale VN30F1M while
+                # other columns already extend to newer sessions.
+                symbol_start = (last_valid - timedelta(days=3)).strftime("%Y-%m-%d")
+                logger.info(
+                    "[%d/%d] Đang tải %s (incremental từ %s, last_valid=%s)...",
+                    i,
+                    len(stock_tickers),
+                    symbol,
+                    symbol_start,
+                    last_valid.strftime("%Y-%m-%d"),
+                )
+            else:
+                symbol_start = full_lookback_start
+                logger.info(
+                    "[%d/%d] Đang tải %s (cột cũ nhưng toàn NaN, tải đầy đủ từ %s)...",
+                    i,
+                    len(stock_tickers),
+                    symbol,
+                    symbol_start,
+                )
         else:
             symbol_start = full_lookback_start
             logger.info("[%d/%d] Đang tải %s (mã mới, tải đầy đủ từ %s)...", i, len(stock_tickers), symbol, symbol_start)

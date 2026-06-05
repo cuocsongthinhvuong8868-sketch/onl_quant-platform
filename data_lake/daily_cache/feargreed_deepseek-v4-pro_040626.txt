@@ -1,0 +1,36 @@
+## 1. Observations
+- Risk Score 55.9/100: trong vùng NEUTRAL (40-60), tăng +1.2 so với phiên trước, tiến gần ngưỡng GREED (60+)
+- EGARCH Vol 8.3%: giảm -2.0% so với phiên trước, thấp hơn ngưỡng cảnh báo hệ thống (thường >12%)
+- Rolling Skewness +0.16: dương nhẹ, cho thấy đuôi phải dài hơn (lợi nhuận bất đối xứng về phía tăng)
+- Upside Correlation (35.1%) cao gấp 2.4 lần Downside Correlation (14.7%), phản ánh thị trường đồng pha mạnh khi tăng nhưng phân hóa khi giảm
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha **NEUTRAL nghiêng về GREED** — rủi ro hệ thống thấp (vol giảm, skew dương), dòng tiền có độ tin cậy tăng cao hơn giảm. Tuy nhiên Score chưa vượt ngưỡng 60 nên chưa xác nhận chuyển pha hoàn toàn.
+
+## 3. Cross-Check
+- **Score (55.9) vs EGARCH Vol (8.3% & giảm)**: Consistent — Score tăng nhẹ cùng vol giảm, phù hợp tâm lý tích cực hơn.
+- **Skewness (0.16) vs Upside/Downside Correlation (35.1%/14.7%)**: Consistent mạnh — cả hai đều phản ánh thị trường thiên bullish với phân hóa khi giảm, xác suất cao đây là môi trường stock-picking hiệu quả.
+
+**Kết luận cross-check**: Không phát hiện divergence đáng kể. Các tín hiệu đồng thuận ở trạng thái trung tính thiên tích cực.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.6 (trên thang 0-1.0)
+- **Hành động**: Tăng nhẹ tỷ trọng so với neutral, ưu tiên các cổ phiếu có correlation thấp với index để tận dụng môi trường phân hóa. Giữ một phần tiền mặt (~30%) đề phòng Score quay đầu xuống dưới 50.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "04/06/2026",
+  "regime": "NEUTRAL",
+  "score": 55.9,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Score tăng +1.2, tiến sát ngưỡng Greed 60",
+    "EGARCH Vol giảm xuống 8.3%, dưới ngưỡng rủi ro hệ thống",
+    "Upside/Downside correlation ratio = 2.4x, xác nhận môi trường stock-picking",
+    "Skewness dương +0.16, consistent với correlation phân hóa"
+  ]
+}
+```

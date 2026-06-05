@@ -28,6 +28,13 @@ TOOLS = [
         "render_func": "render",
     },
     {
+        "id": "humility_falsification",
+        "name": "🧭 Humility & Falsification Monitor",
+        "desc": "Đối chiếu điều kiện falsification trong AI CIO T-1 với dữ liệu T từ VNIBOR, Breadth, ESR, EVT, Coupling và Global Conditions",
+        "page_module": "tools.humility_falsification.page",
+        "render_func": "render",
+    },
+    {
         "id": "vnibor",
         "name": "🏦 VNIBOR Monitor",
         "desc": "Lãi suất qua đêm và các kỳ hạn ngắn liên ngân hàng · Phân loại trạng thái thanh khoản (Regime Percentile 1Y) · Tác động tới VN-Index",

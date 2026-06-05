@@ -1,0 +1,50 @@
+# Phân tích Economic Alpha Ngân hàng VN – Kịch bản Tiêu chuẩn
+
+## 1. Scenario Assessment
+
+Với K=1.0 (risk penalty multiplier tiêu chuẩn) + CoE 14% (baseline cho VN banking), bối cảnh hiện tại KHÔNG khắc nghiệt. Mặt bằng ngành phân hóa rõ: **tồn tại cả cơ hội lẫn bẫy giá trị**. Top 3 dẫn đầu ghi nhận Alpha dương, trong khi 3 mã đội sổ âm sâu, cho thấy thị trường đang định giá thiếu hiệu quả – cơ hội cho stock-picker.
+
+Kịch bản stress test BVPS -5% và P/B penalty -5% là mức hợp lý, không quá nặng. Toàn ngành tạo Alpha âm? Không – **tồn tại Alpha dương ở một số mã**, nhưng số lượng mã tạo giá trị thặng dư không chiếm đa số.
+
+## 2. Top Alpha Decomposition
+
+**HDB (Alpha 5.9%, P/B 1.26)** – **Fortress candidate**  
+P/B ~1.26 là vùng định giá hợp lý, không quá rẻ nhưng cũng không đắt. Driver chính: ROE bền vững + σ(ROE) thấp (HDB là một trong những ngân hàng có độ biến động ROE thấp nhất ngành). Payout thấp giúp retention cao, hỗ trợ compounding. Đây là mô hình Fortress điển hình.
+
+**SHB (Alpha 3.9%, P/B 0.93)** – **Cheap-but-not-trap**  
+P/B < 1 là yếu tố định giá hấp dẫn. Tuy nhiên cần thận trọng: nếu ROE không bền vững (do nợ xấu tiềm ẩn), SHB có thể chuyển thành Cheap Trap. Hiện tại, Alpha dương cho thấy thị trường chưa phản ánh hết giá trị nội tại.
+
+**CTG (Alpha 3.7%, P/B 1.02)** – **Fortress nhẹ**  
+P/B sát mệnh giá, kết hợp với quy mô lớn + ổn định giúp CTG tạo Alpha dương. Driver chính đến từ định giá rẻ hơn là tăng trưởng vượt trội.
+
+## 3. Value Traps Warning
+
+**EIB (Alpha -12.5%, P/B 1.51)** – **Premium Burn**  
+P/B 1.51 trong khi Alpha âm sâu → thị trường đang trả premium cho một cổ phiếu không tạo ra giá trị thặng dư. Nguyên nhân: Risk Penalty quá lớn (σ ROE cao) hoặc ROE thấp.
+
+**VCB (Alpha -7.3%, P/B 2.28)** – **Premium Burn điển hình**  
+P/B 2.28 là premium cao nhất ngành, nhưng Alpha âm -7.3% cho thấy quality premium đã bị định giá quá mức. Dù VCB có ROE tốt, nhưng định giá quá đắt khiến nó trở thành "Premium Burn".
+
+**LPB (Alpha -7.1%, P/B 2.94)** – **Growth Trap**  
+P/B 2.94 là cao nhất danh sách, đi kèm Alpha âm sâu. LPB có thể có ROE ấn tượng nhưng σ(ROE) cao, dẫn đến Risk Penalty lớn. Đây là Growth Trap điển hình: tăng trưởng nóng nhưng không bền vững.
+
+## 4. Portfolio Construction
+
+**Core Holding (60-70%)**: **HDB** – Fortress profile rõ ràng nhất. CTG có thể thêm vào nếu muốn tăng tính defensive.  
+**Tactical (20-30%)**: **SHB** – Cheap valuation, cần theo dõi chất lượng tài sản.  
+**Cấm mua / Underweight**: **EIB, VCB, LPB** – Cả ba đều có Alpha âm, không tạo giá trị cho cổ đông ở mức định giá hiện tại.  
+
+*Lưu ý: VCB có thể là defensive play ngắn hạn, nhưng theo khung Alpha dài hạn, tỷ trọng nên rất thấp.*
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB"],
+  "avoid_list": ["EIB", "VCB", "LPB"],
+  "sector_view": "bullish",
+  "confidence": "medium"
+}
+```

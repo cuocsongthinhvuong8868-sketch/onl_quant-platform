@@ -1,0 +1,30 @@
+## 1. Observations
+- VN30 Stress Index: 0.00% (ngưỡng cảnh báo 40%)
+- # mã thủng VaR 95%: 0/30
+- Complacency Index: 6.48% (ngưỡng nguy hiểm 80%)
+- # mã mispriced: 7 (OCB, VRE, VTO nén spread nhiều nhất)
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở 0.00% cho thấy không có mã nào trong rổ VN30 phá vỡ VaR 95% trong phiên này. Điều này phản ánh trạng thái **không có lây lan rủi ro real-time** giữa các bluechip. Không có Top 3 breach → không xuất hiện sự cố cá biệt, càng không có dấu hiệu đầu sóng systemic.
+
+## 3. Complacency Assessment (Module C)
+Complacency Index ở mức 6.48%, rất thấp so với ngưỡng 80%. Điều này chỉ kết luận duy nhất: **thị trường KHÔNG đang ở regime ngủ quên**. Không thể suy ra "thị trường ổn định" hay "không có áp lực bán". Trên thực tế, với Stress Index = 0%, thị trường đang ở trạng thái spread giãn rộng nhưng không đi kèm khủng hoảng: khả năng cao là một **phase điều chỉnh nhẹ hoặc tích lũy biên độ hẹp, thanh khoản thấp** hơn là uptrend mạnh hay sụp đổ. 7 mã mispriced (OCB, VRE, VTO) với spread nén cục bộ cần theo dõi thêm, nhưng chưa đủ để kích hoạt cảnh báo complacency toàn thị trường.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có — không cần hành động.
+- **Top 3 Mispriced (Module C):**
+  - OCB, VRE, VTO: spread bị nén chặt nhất. Khuyến nghị **theo dõi chặt khối lượng và biến động giá**; nếu có dấu hiệu đột biến thanh khoản kèm giảm giá > 2% so với giá đóng cửa gần nhất thì cân nhắc giảm tỷ trọng ngắn hạn. Chưa đủ cơ sở để kích hoạt stop-loss cứng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": [],
+  "confidence": "medium"
+}
+```
