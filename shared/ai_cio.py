@@ -151,6 +151,8 @@ from tools.esr_monitor.quant.metrics import (
 from tools.va_res.report import snapshot as vares_snapshot
 # Import logic Var-CVaR VNINDEX
 from tools.var_cvar_vnindex.report import snapshot as var_cvar_snapshot
+# Import Humility/Falsification audit context
+from tools.humility_falsification.page import get_humility_falsification_context
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
@@ -993,6 +995,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r7 = run_esr_monitor(client, df_stocks, provider_key, model)
     r8 = run_va_res(client, df_stocks, provider_key, model)
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
+    r10 = get_humility_falsification_context(provider_key, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
@@ -1030,6 +1033,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         f"{historical_block}\n\n"
         f"{macro_section}"
         f"{fundamental_section}"
+        f"=== HUMILITY & FALSIFICATION MONITOR (T vs PRIOR AI CIO THESIS) ===\n{r10}\n\n"
         f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"

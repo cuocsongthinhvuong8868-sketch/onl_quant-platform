@@ -563,7 +563,7 @@ class DataManager:
         files = [
             path
             for path in cache_dir.glob(f"{namespace}*")
-            if path.is_file() and path.suffix.lower() in {".pkl", ".csv"}
+            if path.is_file() and path.suffix.lower() in {".pkl", ".csv", ".json"}
         ]
         if not files:
             return {"file_count": 0}
@@ -599,6 +599,16 @@ class DataManager:
                 return latest_date(series.dropna().tolist())
             except Exception:
                 return None
+
+        if path.suffix.lower() == ".json":
+            try:
+                payload = json.loads(path.read_text(encoding="utf-8"))
+            except Exception:
+                return None
+            for key in ("data_date", "t_data_date", "latest_data_date", "generated_for"):
+                parsed = parse_date_value(payload.get(key))
+                if parsed is not None:
+                    return parsed
 
         return None
 

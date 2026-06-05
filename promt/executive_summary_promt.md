@@ -14,10 +14,11 @@ Bạn là Chief Investment Officer + Asset Allocation Strategist tại quỹ đ�
 ## INPUT DATA
 {all_reports}
 
-## INPUT CHỨA 4 PHẦN
+## INPUT CHỨA 5 PHẦN
 - **LỚP PHÂN TÍCH VĨ MÔ (MACRO LAYER)**: Báo cáo vĩ mô gần nhất từ Fed Liquidity Monitor, Global Financial Conditions, VNIBOR Monitor, và Liquidity Transmission (LTMM). Riêng VNIBOR có cả current snapshot và trend 20 phiên.
 - **LỊCH SỬ BÁO CÁO CIO (T-1, T-2)**: 2 báo cáo CIO gần nhất, dùng để xác định momentum xu hướng, KHÔNG ra quyết định trực tiếp.
 - **LỚP FUNDAMENTAL BOTTOM-UP (VN100 EARNINGS HEALTH)**: VN100 score, component scores, 5-quarter trend, sector leadership/drag, CSAD blend và PCA validation. Đây là monitor sức khỏe lợi nhuận, không dùng giá cổ phiếu/market cap/free-float.
+- **HUMILITY & FALSIFICATION MONITOR**: Audit định lượng xem các ngưỡng falsification từ AI CIO report gần nhất đã bị kích hoạt hay chưa. Nếu status là FALSIFIED hoặc WATCH, bắt buộc đưa vào Trend Momentum, Confidence Note và Executive Order.
 - **BÁO CÁO ĐỊNH LƯỢNG HIỆN TẠI (T)**: 9 reports từ Fear & Greed, Manipulation, Dispersion, Upside Ratio, Risk-Adjusted Growth, Market Breadth, ESR Monitor, VaRES, Var-CVaR VNINDEX.
 
 ## REFERENCE — CAPITAL ALLOCATION MATRIX (REVISED)
@@ -56,6 +57,12 @@ Tỷ lệ Equity exposure dựa trên Risk/Reward Score VÀ Tail Risk Filter:
 - Nếu KHÔNG có T-1/T-2 → ghi "NO HISTORICAL CONTEXT", skip step này
 - So sánh: Score Δ, SSI Δ, Regime change, key pillar drivers Δ
 - Xu hướng: improving / deteriorating / sideways / reversing
+
+### Step 1.5 — Humility & Falsification Audit
+- Đọc kỹ kết quả Humility & Falsification Monitor.
+- Nếu Thesis status = FALSIFIED: coi luận điểm AI CIO trước đó đã bị phủ định; không được giữ nguyên bias cũ nếu data hiện tại không còn ủng hộ.
+- Nếu Thesis status = WATCH: hạ confidence ít nhất một bậc nếu các rule bị kích hoạt liên quan trực tiếp tới allocation hiện tại.
+- Nếu Thesis status = INTACT: dùng như bằng chứng rằng luận điểm trước đó chưa bị falsify, nhưng vẫn phải đối chiếu với 9 tool hiện tại.
 
 ### Step 2 — Tool Consensus Map
 Phân loại 9 tools định lượng cổ phiếu VN theo bias, sau đó đối chiếu riêng với VN100 fundamental overlay:
@@ -116,6 +123,7 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
 
 ### 1. Trend Momentum (T-2 → T-1 → T)
 - (skip nếu không có historical context)
+- Tóm tắt ngắn kết quả Humility & Falsification Monitor: status, số rule bị kích hoạt, rule nào quan trọng nhất.
 
 ### 2. Tool Consensus
 - Bullish: ..., Bearish: ..., Neutral: ..., Conflicts: ...

@@ -2,7 +2,7 @@ from __future__ import annotations
 
 import json
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any, Callable
 
@@ -14,6 +14,7 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 
 
 REPORT_GLOB = "executive_summary_{provider}_*.txt"
+RESULT_CACHE_PREFIX = "humility_falsification"
 FALSIFICATION_CUTOFF = 3
 
 OPS: dict[str, Callable[[float, float], bool]] = {
@@ -81,6 +82,8 @@ def render() -> None:
         "So sanh cac dieu kien falsification trong AI CIO report ngay T-1 voi du lieu cap nhat ngay T."
     )
 
+    force_result = st.sidebar.button("Recompute result cache", width="stretch")
+
     if st.sidebar.button("Refresh cached metrics", width="stretch"):
         st.cache_data.clear()
         st.rerun()
@@ -110,15 +113,30 @@ def render() -> None:
         return
 
     _render_auto_report_note(report_path, target_report_date, report_match)
-    parsed = _load_report_rules(report_path)
 
-    rows = [_evaluate_rule(rule, current_metrics) for rule in parsed["rules"]]
-    result_df = pd.DataFrame(rows)
+    with st.spinner("Dang tai hoac tinh ket qua falsification..."):
+        payload = build_humility_falsification_payload(
+            provider_key=provider_key,
+            current_metrics=current_metrics,
+            force=force_result,
+        )
 
-    falsified = int(result_df["Falsified"].sum()) if not result_df.empty else 0
-    available = int(result_df["T actual"].notna().sum()) if not result_df.empty else 0
-    total = len(result_df)
-    status = _thesis_status(falsified)
+    if payload.get("error"):
+        st.error(str(payload["error"]))
+        _render_metric_quality(current_metrics, t_data_date)
+        return
+
+    if payload.get("cache_hit"):
+        st.success(f"Dung cache ket qua cung ngay: {payload.get('cache_path')}")
+    else:
+        st.success(f"Da tinh moi va luu cache ket qua: {payload.get('cache_path')}")
+
+    parsed = _cached_parsed_for_render(payload.get("parsed", {}))
+    result_df = pd.DataFrame(payload.get("rows", []))
+    falsified = int(payload.get("falsified", 0))
+    available = int(payload.get("available", 0))
+    total = int(payload.get("total", len(result_df)))
+    status = (str(payload.get("status_label", "N/A")), str(payload.get("status_help", "")))
 
     _render_summary(
         parsed,
@@ -131,8 +149,236 @@ def render() -> None:
         available,
     )
     _render_rule_table(result_df)
-    _render_metric_quality(current_metrics, t_data_date)
+    _render_metric_quality(payload.get("current_metrics", current_metrics), t_data_date)
     _render_source_context(parsed, report_path)
+
+
+def build_humility_falsification_payload(
+    provider_key: str = "deepseek-v4-pro",
+    current_metrics: dict[str, dict[str, Any]] | None = None,
+    force: bool = False,
+) -> dict[str, Any]:
+    """Build or load the same-day falsification result payload.
+
+    Cache identity is provider + T data date + exact T-1 report path/mtime. That
+    keeps the dashboard fast while still invalidating if the source AI CIO report
+    for the same date is regenerated.
+    """
+
+    t_data_date = _effective_t_data_date(current_metrics) if current_metrics is not None else _latest_close_data_date()
+    reports = _reports_by_provider().get(provider_key, [])
+
+    if t_data_date is not None and reports:
+        report_path, target_report_date, report_match = _auto_tminus_report(reports, t_data_date)
+        if report_path is not None and not force:
+            cache_path = _humility_cache_path(provider_key, t_data_date)
+            report_mtime = _path_mtime(report_path)
+            cached = _read_humility_cache(cache_path, provider_key, t_data_date, report_path, report_mtime)
+            if cached:
+                cached["cache_hit"] = True
+                cached["cache_path"] = str(cache_path)
+                return cached
+
+    current_metrics = current_metrics or _compute_current_metrics_uncached()
+    t_data_date = _effective_t_data_date(current_metrics)
+    if t_data_date is None:
+        return {
+            "error": "Khong xac dinh duoc ngay T tu du lieu hien tai cua cac cong cu.",
+            "current_metrics": current_metrics,
+        }
+
+    if not reports:
+        return {
+            "error": f"Chua tim thay AI CIO report cho provider {provider_key}.",
+            "provider_key": provider_key,
+            "t_data_date": t_data_date.isoformat(),
+            "current_metrics": current_metrics,
+        }
+
+    report_path, target_report_date, report_match = _auto_tminus_report(reports, t_data_date)
+    if report_path is None:
+        return {
+            "error": f"Khong tim thay AI CIO report cho T-1 = {target_report_date.isoformat()}.",
+            "provider_key": provider_key,
+            "t_data_date": t_data_date.isoformat(),
+            "target_report_date": target_report_date.isoformat(),
+            "report_match": report_match,
+            "current_metrics": current_metrics,
+        }
+
+    cache_path = _humility_cache_path(provider_key, t_data_date)
+    report_mtime = _path_mtime(report_path)
+
+    parsed = _load_report_rules(report_path)
+    rows = [_evaluate_rule(rule, current_metrics) for rule in parsed["rules"]]
+    result_df = pd.DataFrame(rows)
+    falsified = int(result_df["Falsified"].sum()) if not result_df.empty else 0
+    available = int(result_df["T actual"].notna().sum()) if not result_df.empty else 0
+    total = len(result_df)
+    status_label, status_help = _thesis_status(falsified)
+
+    payload = _json_ready(
+        {
+            "provider_key": provider_key,
+            "generated_at": datetime.now().isoformat(timespec="seconds"),
+            "t_data_date": t_data_date.isoformat(),
+            "target_report_date": target_report_date.isoformat(),
+            "report_match": report_match,
+            "report_path": str(report_path),
+            "report_mtime": report_mtime,
+            "parsed": _parsed_for_cache(parsed),
+            "rows": rows,
+            "current_metrics": current_metrics,
+            "status_label": status_label,
+            "status_help": status_help,
+            "falsified": falsified,
+            "available": available,
+            "total": total,
+        }
+    )
+    _write_humility_cache(cache_path, payload)
+    payload["cache_hit"] = False
+    payload["cache_path"] = str(cache_path)
+    return payload
+
+
+def get_humility_falsification_context(provider_key: str = "deepseek-v4-pro", force: bool = False) -> str:
+    """Return a compact markdown context block for AI CIO synthesis."""
+
+    payload = build_humility_falsification_payload(provider_key=provider_key, force=force)
+    return format_humility_payload_markdown(payload)
+
+
+def format_humility_payload_markdown(payload: dict[str, Any]) -> str:
+    if payload.get("error"):
+        return f"DATA INSUFFICIENT - Humility & Falsification Monitor: {payload['error']}"
+
+    lines = [
+        f"- Provider: {payload.get('provider_key', 'N/A')}",
+        f"- T data date: {payload.get('t_data_date', 'N/A')}",
+        f"- AI CIO report checked: {Path(str(payload.get('report_path', ''))).name}",
+        f"- Report match: {payload.get('report_match', 'N/A')}",
+        f"- Thesis status: {payload.get('status_label', 'N/A')}",
+        f"- Rules triggered: {payload.get('falsified', 0)}/{payload.get('total', 0)}",
+        f"- Available T metrics: {payload.get('available', 0)}/{payload.get('total', 0)}",
+        f"- Cache: {'HIT' if payload.get('cache_hit') else 'REFRESHED'} ({payload.get('cache_path', 'N/A')})",
+        "",
+        "| Model | Metric | Threshold | T-1 reported | T actual | Delta | Status | Data date |",
+        "|---|---|---:|---:|---:|---:|---|---|",
+    ]
+    for row in payload.get("rows", []):
+        lines.append(
+            "| {model} | {metric} | {threshold} | {tminus} | {actual} | {delta} | {status} | {date} |".format(
+                model=_md_cell(row.get("Model", "")),
+                metric=_md_cell(row.get("Metric", "")),
+                threshold=_md_cell(row.get("T-1 threshold", "")),
+                tminus=_md_cell(row.get("T-1 reported", "")),
+                actual=_md_cell(row.get("T actual display", "")),
+                delta=_md_cell(row.get("Delta display", "")),
+                status=_md_cell(row.get("Status", "")),
+                date=_md_cell(row.get("Data date", "")),
+            )
+        )
+
+    errors = [
+        f"- {key}: {value.get('error')}"
+        for key, value in payload.get("current_metrics", {}).items()
+        if value.get("error")
+    ]
+    if errors:
+        lines.extend(["", "Metric quality warnings:", *errors])
+    return "\n".join(lines)
+
+
+def _humility_cache_path(provider_key: str, t_data_date: date) -> Path:
+    date_key = t_data_date.strftime("%d%m%y")
+    return DATA_LAKE / "daily_cache" / f"{RESULT_CACHE_PREFIX}_{provider_key}_{date_key}.json"
+
+
+def _latest_close_data_date() -> date | None:
+    path = DATA_LAKE / "market_data.csv"
+    if not path.exists():
+        return None
+    try:
+        date_col = pd.read_csv(path, usecols=[0], parse_dates=[0]).iloc[:, 0]
+        return pd.Timestamp(date_col.dropna().iloc[-1]).date()
+    except Exception:
+        return None
+
+
+def _path_mtime(path: Path) -> str:
+    try:
+        return datetime.fromtimestamp(path.stat().st_mtime).isoformat(timespec="seconds")
+    except OSError:
+        return ""
+
+
+def _read_humility_cache(
+    cache_path: Path,
+    provider_key: str,
+    t_data_date: date,
+    report_path: Path,
+    report_mtime: str,
+) -> dict[str, Any] | None:
+    if not cache_path.exists():
+        return None
+    try:
+        payload = json.loads(cache_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+
+    if payload.get("provider_key") != provider_key:
+        return None
+    if payload.get("t_data_date") != t_data_date.isoformat():
+        return None
+    if payload.get("report_path") != str(report_path):
+        return None
+    if payload.get("report_mtime") != report_mtime:
+        return None
+    return payload
+
+
+def _write_humility_cache(cache_path: Path, payload: dict[str, Any]) -> None:
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(json.dumps(payload, ensure_ascii=False, indent=2), encoding="utf-8")
+
+
+def _parsed_for_cache(parsed: dict[str, Any]) -> dict[str, Any]:
+    cached = dict(parsed)
+    report_date = cached.get("report_date")
+    if isinstance(report_date, date):
+        cached["report_date"] = report_date.isoformat()
+    return _json_ready(cached)
+
+
+def _cached_parsed_for_render(parsed: dict[str, Any]) -> dict[str, Any]:
+    rendered = dict(parsed)
+    rendered["report_date"] = _payload_date(rendered.get("report_date"))
+    return rendered
+
+
+def _json_ready(value: Any) -> Any:
+    if isinstance(value, dict):
+        return {str(key): _json_ready(child) for key, child in value.items()}
+    if isinstance(value, list):
+        return [_json_ready(child) for child in value]
+    if isinstance(value, tuple):
+        return [_json_ready(child) for child in value]
+    if isinstance(value, (datetime, date)):
+        return value.isoformat()
+    if isinstance(value, pd.Timestamp):
+        return value.isoformat()
+    try:
+        if pd.isna(value) and not isinstance(value, (str, bytes)):
+            return None
+    except Exception:
+        pass
+    return value
+
+
+def _md_cell(value: Any) -> str:
+    text = "" if value is None else str(value)
+    return text.replace("|", "/").replace("\n", " ").strip()
 
 
 def _provider_selector(reports_by_provider: dict[str, list[Path]]) -> str:
@@ -340,8 +586,11 @@ def _extract_tminus_values(text: str) -> dict[str, float]:
     return values
 
 
-@st.cache_data(show_spinner=False, ttl=3600)
 def _compute_current_metrics() -> dict[str, dict[str, Any]]:
+    return _compute_current_metrics_uncached()
+
+
+def _compute_current_metrics_uncached() -> dict[str, dict[str, Any]]:
     metrics: dict[str, dict[str, Any]] = {}
 
     df_close: pd.DataFrame | None = None

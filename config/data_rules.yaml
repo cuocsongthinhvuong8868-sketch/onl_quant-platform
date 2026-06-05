@@ -160,6 +160,15 @@ sources:
     warning_days: 120
     critical_days: 210
 
+  - name: metrics_humility_falsification
+    category: processed/tool_metrics/macro
+    type: tool_metrics
+    tool: Humility & Falsification Monitor
+    depends_on: [market_data, vnibor, vnindex_cache, vn30_cache, global_financial_conditions, manipulation_raw]
+    cache_namespace: humility_falsification
+    warning_days: 3
+    critical_days: 10
+
   - name: metrics_pairs_trading
     category: processed/tool_metrics/micro
     type: tool_metrics
