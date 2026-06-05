@@ -251,9 +251,22 @@ with col1:
         st.markdown("### 📄 Xuất PDF Report AI CIO")
         
         # Quét tất cả cache executive_summary trong daily_cache, chỉ lấy 10 cache gần nhất
+        _all_cio_cache = list(DATA_LAKE.glob("daily_cache/executive_summary_*.txt"))
+        
+        # Sort by date extracted from filename (ddmmyy) instead of mtime
+        # to ensure correct chronological order regardless of file timestamps
+        def _extract_date_from_path(p):
+            try:
+                # Filename format: executive_summary_{provider}_{ddmmyy}.txt
+                fname = p.stem  # e.g., "executive_summary_deepseek-v4-pro_040626"
+                date_str = fname.split("_")[-1]  # e.g., "040626"
+                return datetime.strptime(date_str, "%d%m%y")
+            except Exception:
+                return datetime.min
+        
         _all_cio_cache = sorted(
-            list(DATA_LAKE.glob("daily_cache/executive_summary_*.txt")),
-            key=lambda p: p.stat().st_mtime,
+            _all_cio_cache,
+            key=_extract_date_from_path,
             reverse=True,
         )
         _all_cio_cache = _all_cio_cache[:10]  # 🔥 Chỉ lấy 10 ngày gần nhất
