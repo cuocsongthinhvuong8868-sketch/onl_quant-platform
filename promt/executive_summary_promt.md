@@ -153,6 +153,26 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
   * Chỉ số stress SSI của ESR quay đầu xuống dưới 55% (SSI < 0.55).
   * Chỉ số đuôi béo EVT ξ giảm sâu dưới 0.25 (ξ < 0.25).
   * Hệ số tương quan coupling của bộ ba VIC/VHM/VRE hạ xuống dưới phân vị 70th percentile.
+- Sau phần diễn giải của Model Humility Box, bắt buộc thêm một khối JSON hợp lệ để dashboard `Humility & Falsification Monitor` đọc máy được. Khối JSON phải nằm **trước** dòng final score mandatory và dùng schema sau:
+```json
+{
+  "report_date": "YYYY-MM-DD",
+  "composite_score": 0,
+  "regime": "regime label",
+  "falsification_rules": [
+    {
+      "model": "Tên công cụ",
+      "metric": "Tên metric",
+      "threshold_operator": "< | > | <= | >=",
+      "threshold_value": 0,
+      "current_value": 0,
+      "unit": "%",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    }
+  ]
+}
+```
+- `threshold_operator` chỉ được dùng một trong bốn giá trị `<`, `>`, `<=`, `>=`; điều kiện falsification được hiểu là `current_value threshold_operator threshold_value`. Không thêm comment trong JSON.
 
 ---
 

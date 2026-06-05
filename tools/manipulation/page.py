@@ -18,7 +18,7 @@ logging.basicConfig(
 
 from config import AI_PROVIDER_MAP
 from shared.data_loader import load_close_prices
-from shared.daily_cache import load_daily_cache, save_daily_cache
+from shared.daily_cache import clear_daily_cache, load_daily_cache, save_daily_cache
 from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
 from tools.manipulation.ui.sidebar import render_sidebar
 from tools.manipulation.ui.charts import render_core, render_event
@@ -42,23 +42,42 @@ def render():
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
-    st.caption(f"📅 Dữ liệu cuối cùng: {df_prices.index.max().strftime('%d/%m/%Y')}")
+    try:
+        df_prepared = prepare_data(df_prices)
+    except ValueError as e:
+        st.error(f"❌ Lỗi dữ liệu: {e}")
+        st.stop()
+
+    raw_data_date = df_prices.index.max().strftime("%Y-%m-%d")
+    effective_data_date = df_prepared.dropna().index.max().strftime("%Y-%m-%d")
+    st.caption(
+        f"📅 Dữ liệu cuối cùng: {pd.Timestamp(raw_data_date).strftime('%d/%m/%Y')} · "
+        f"Manipulation input valid tới: {pd.Timestamp(effective_data_date).strftime('%d/%m/%Y')}"
+    )
 
     key = {"window": window}
-    cached = load_daily_cache("manipulation", key)
+    cached = load_daily_cache("manipulation", key, data_date=effective_data_date)
+    if cached is not None:
+        cached_result_date = cached["result"].index.max().strftime("%Y-%m-%d")
+        if cached_result_date != effective_data_date:
+            clear_daily_cache("manipulation", key)
+            cached = None
+            st.warning(
+                f"Cache Manipulation stale ({cached_result_date}) so với input ({effective_data_date}); "
+                "đang tính lại."
+            )
     if cached is not None:
         weights = cached["weights"]
         result = cached["result"]
-        st.caption("⚡ Dùng cache cùng ngày (Manipulation).")
+        st.caption(f"⚡ Dùng cache cùng ngày (Manipulation, result tới {result.index[-1].strftime('%d/%m/%Y')}).")
     else:
         with st.spinner("Đang chạy PCA + Rolling Metrics..."):
             try:
-                df_prepared = prepare_data(df_prices)
                 weights, result = compute_metrics(df_prepared, window=window)
             except ValueError as e:
                 st.error(f"❌ Lỗi dữ liệu: {e}")
                 st.stop()
-        save_daily_cache("manipulation", key, {"weights": weights, "result": result})
+        save_daily_cache("manipulation", key, {"weights": weights, "result": result}, data_date=effective_data_date)
         st.caption("💾 Đã tạo cache ngày mới (Manipulation).")
 
     # ── Hiển thị Core Metrics ──
@@ -190,4 +209,3 @@ def render():
                         st.markdown(f.read())
                 except Exception as e:
                     st.error(f"Lỗi đọc file: {e}")
-
