@@ -1,8 +1,10 @@
 import csv
+import json
 import os
 import re
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Any
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
@@ -13,41 +15,145 @@ from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 # Cũ chỉ có 3 cột — auto-migrate khi đọc.
 CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
+HUMILITY_RULES_PREFIX = "ai_cio_humility_rules"
+TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
+TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
+HUMILITY_DEFAULT_RULES = [
+    {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5,
+        "unit": "sessions",
+        "description": "Liquidity pressure is no longer persistent if stressed funding sessions fall below 5 of the last 20 observations.",
+    },
+    {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45,
+        "unit": "%",
+        "description": "Internal participation materially improves when more than 45% of covered tickers trade above MA20.",
+    },
+    {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55,
+        "unit": "%",
+        "description": "Systemic stress cools if SSI drops below 55%.",
+    },
+    {
+        "model": "Tail Risk (EVT)",
+        "metric": "Tail Index (xi)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "unit": "",
+        "description": "Left-tail risk normalizes when the EVT tail index falls below 0.25.",
+    },
+    {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70,
+        "unit": "th pct",
+        "description": "Index coupling risk eases when the Vingroup slope percentile falls below the 70th percentile.",
+    },
+    {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80,
+        "unit": "th pct",
+        "description": "External credit-quality stress eases when CQS drops below the 80th percentile.",
+    },
+]
 
 
 def parse_score_regime(report_text: str) -> tuple:
-    """Parse `final score & regime : <num> ; regime : <name>` từ dòng cuối report.
-
-    Fallback scan 5 dòng cuối nếu format dòng cuối không khớp.
-    Trả về (score_str, regime_str). Trả ("N/A", "N/A") nếu không tìm thấy.
-    """
+    """Parse score/regime from an AI CIO report."""
     if not report_text:
         return "N/A", "N/A"
 
-    lines = report_text.strip().splitlines()
-    if not lines:
-        return "N/A", "N/A"
-
-    # 1. Strict match: dòng cuối format chính xác
-    final_line = lines[-1]
-    match = re.search(
-        r'final score\s*&\s*regime\s*[:=]\s*(\d+(?:\.\d+)?)\s*;\s*regime\s*[:=]\s*(.+)',
-        final_line,
+    strict = re.compile(
+        r"final\s+score\s*&\s*regime\s*[:=]\s*([-+]?\d+(?:\.\d+)?)"
+        r"\s*;\s*regime\s*[:=]\s*([^\n`]+)",
         re.IGNORECASE,
     )
-    if match:
-        return match.group(1), match.group(2).strip()
+    matches = list(strict.finditer(report_text))
+    if matches:
+        match = matches[-1]
+        return match.group(1), _clean_regime_value(match.group(2))
 
-    # 2. Fallback: scan 5 dòng cuối
+    lines = report_text.strip().splitlines()
     score_val, regime_val = "N/A", "N/A"
-    for line in lines[-5:]:
-        m = re.search(r'final score.*?[:=]\s*(\d+(?:\.\d+)?)', line, re.IGNORECASE)
-        if m:
-            score_val = m.group(1)
-        m2 = re.search(r'regime\s*[:=]\s*(.+)', line, re.IGNORECASE)
-        if m2:
-            regime_val = m2.group(1).strip()
+    tail = lines[-80:]
+    for i, line in enumerate(tail):
+        score_match = re.search(
+            r"final\s+score(?:\s*&\s*regime)?\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
+            line,
+            re.IGNORECASE,
+        )
+        if not score_match:
+            continue
+        score_val = score_match.group(1)
+
+        same_line = re.search(r";\s*regime\s*[:=]\s*([^\n`]+)", line, re.IGNORECASE)
+        if same_line:
+            regime_val = _clean_regime_value(same_line.group(1))
+            continue
+
+        for candidate in tail[i + 1 : i + 4]:
+            regime_match = re.search(r"^\s*(?:[-*]\s*)?regime\s*[:=]\s*([^\n`]+)", candidate, re.IGNORECASE)
+            if regime_match:
+                regime_val = _clean_regime_value(regime_match.group(1))
+                break
+
+    if score_val != "N/A" and regime_val != "N/A":
+        return score_val, regime_val
+
+    score_fallback = _parse_summary_score(report_text)
+    regime_fallback = _parse_summary_regime(report_text)
+    if score_fallback != "N/A":
+        score_val = score_fallback
+    if regime_fallback != "N/A":
+        regime_val = regime_fallback
     return score_val, regime_val
+
+
+def _clean_regime_value(value: str) -> str:
+    cleaned = re.sub(r"<[^>]+>", "", str(value))
+    cleaned = cleaned.replace("**", "").replace("`", "").strip()
+    split = re.split(r"\bregime\s*[:=]\s*", cleaned, flags=re.IGNORECASE)
+    if len(split) > 1:
+        cleaned = split[-1].strip()
+    return cleaned.strip(" .;:-")
+
+
+def _parse_summary_score(report_text: str) -> str:
+    patterns = [
+        r"Composite Score\)\*\*\s*:\s*([-+]?\d+(?:\.\d+)?)\s*/\s*100",
+        r"Composite Score\s*[:=]\s*([-+]?\d+(?:\.\d+)?)\s*/?\s*100?",
+        r"Điểm\s+số\s+tổng\s+hợp.*?([-+]?\d+(?:\.\d+)?)\s*/\s*100",
+    ]
+    for pattern in patterns:
+        matches = re.findall(pattern, report_text, flags=re.IGNORECASE)
+        if matches:
+            return str(matches[-1])
+    return "N/A"
+
+
+def _parse_summary_regime(report_text: str) -> str:
+    patterns = [
+        r"Regime\)\*\*\s*:\s*([^\n]+)",
+        r"Trạng\s+thái\s+vĩ\s+mô.*?\*\*\s*:\s*([^\n]+)",
+        r"Macro Regime\s*[:=]\s*([^\n]+)",
+    ]
+    for pattern in patterns:
+        matches = re.findall(pattern, report_text, flags=re.IGNORECASE)
+        if matches:
+            return _clean_regime_value(matches[-1])
+    return "N/A"
 
 
 def upsert_history_csv(
@@ -171,6 +277,328 @@ def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     with open(path, "w", encoding="utf-8") as f:
         f.write(content)
 
+
+def _get_humility_rules_path(provider_key: str, target_date: date | None = None) -> Path:
+    date_key = (target_date or date.today()).strftime("%d%m%y")
+    return DATA_LAKE / "daily_cache" / f"{HUMILITY_RULES_PREFIX}_{provider_key}_{date_key}.json"
+
+
+def get_telegram_summary_path(provider_key: str, target_date: date | None = None) -> Path:
+    date_key = (target_date or date.today()).strftime("%d%m%y")
+    return DATA_LAKE / "daily_cache" / f"{TELEGRAM_SUMMARY_PREFIX}_{provider_key}_{date_key}.txt"
+
+
+def summarize_executive_report_for_telegram(
+    api_key: str,
+    report_text: str,
+    provider_key: str = "deepseek-v4-pro",
+    report_date: date | None = None,
+    force: bool = False,
+) -> str:
+    """Create a short Telegram-ready AI CIO brief and cache it by report date."""
+
+    target_date = report_date or _parse_report_date_from_text(report_text) or date.today()
+    cache_path = get_telegram_summary_path(provider_key, target_date)
+    if cache_path.exists() and not force:
+        return cache_path.read_text(encoding="utf-8").strip()
+
+    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["deepseek-v4-pro"])
+    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    model = cfg["api_model"]
+    temperature = min(float(cfg.get("temperature", 0.5)), 0.3)
+    score_val, regime_val = parse_score_regime(report_text)
+
+    system_prompt = (
+        "You are a portfolio risk chief writing a concise Vietnamese Telegram brief. "
+        "Compress the AI CIO report into an action-oriented daily decision note. "
+        "Use only facts in the report. Do not add prices or new tickers. "
+        "Keep the output under 2300 Vietnamese characters. Plain text only; no Markdown tables, no JSON."
+    )
+    user_prompt = f"""
+REPORT DATE: {target_date.strftime('%d/%m/%Y')}
+PARSED SCORE: {score_val}
+PARSED REGIME: {regime_val}
+
+Write exactly this structure:
+AI CIO DAILY BRIEF - DD/MM/YYYY
+Score/Regime: <score>/100 - <regime>
+Allocation: Cash X% | Equity Y% | Hedge Z%
+Verdict: <1 compact sentence>
+Key drivers:
+- <driver 1 with number>
+- <driver 2 with number>
+- <driver 3 with number>
+Action:
+- <portfolio action 1>
+- <portfolio action 2>
+- <risk trigger to monitor>
+Humility check: <INTACT/WATCH/FALSIFIED if available, plus 1 sentence>
+
+Full AI CIO report:
+{report_text}
+""".strip()
+
+    summary = call_ai(client, system_prompt, user_prompt, model=model, temperature=temperature)
+    summary = _clean_telegram_summary(summary, target_date, score_val, regime_val)
+    cache_path.parent.mkdir(parents=True, exist_ok=True)
+    cache_path.write_text(summary, encoding="utf-8")
+    return summary
+
+
+def _clean_telegram_summary(summary: str, target_date: date, score_val: str, regime_val: str) -> str:
+    text = (summary or "").strip()
+    text = re.sub(r"^```(?:text|markdown)?\s*", "", text, flags=re.IGNORECASE)
+    text = re.sub(r"\s*```$", "", text)
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    if not text:
+        text = (
+            f"AI CIO DAILY BRIEF - {target_date.strftime('%d/%m/%Y')}\n"
+            f"Score/Regime: {score_val}/100 - {regime_val}\n"
+            "Verdict: Summary unavailable; read full AI CIO report."
+        )
+    if len(text) > TELEGRAM_SUMMARY_CHAR_LIMIT:
+        text = text[: TELEGRAM_SUMMARY_CHAR_LIMIT - 80].rstrip()
+        text += "\n\n[Trimmed for Telegram. Read full report for details.]"
+    return text
+
+
+def postprocess_executive_summary_report(report_text: str, provider_key: str) -> tuple[str, Path | None]:
+    """Strip the machine JSON block from the human report and save it as a sidecar file."""
+
+    payload, span = _extract_falsification_payload(report_text)
+    clean_text = report_text
+    if span is not None:
+        clean_text = f"{report_text[:span[0]].rstrip()}\n\n{report_text[span[1]:].lstrip()}".strip()
+    elif '"falsification_rules"' in report_text:
+        clean_text = _strip_incomplete_falsification_block(report_text)
+
+    if payload is None and '"falsification_rules"' in report_text:
+        payload = _fallback_humility_payload_from_markdown(clean_text)
+
+    sidecar_path = _write_humility_rules_payload(payload, provider_key) if payload else None
+
+    score_val, regime_val = parse_score_regime(clean_text)
+    if score_val == "N/A" and payload:
+        score_val = _payload_number_as_text(payload.get("composite_score"))
+    if regime_val == "N/A" and payload:
+        regime_val = _clean_regime_value(str(payload.get("regime", ""))) or "N/A"
+    if score_val == "N/A" or regime_val == "N/A":
+        fallback_score, fallback_regime = parse_score_regime(report_text)
+        if score_val == "N/A":
+            score_val = fallback_score
+        if regime_val == "N/A":
+            regime_val = fallback_regime
+
+    if score_val != "N/A" and regime_val != "N/A" and not _has_final_score_line(clean_text):
+        clean_text = clean_text.rstrip() + f"\n\nfinal score & regime : {score_val} ; regime : {regime_val}\n"
+
+    return clean_text, sidecar_path
+
+
+def _extract_falsification_payload(text: str) -> tuple[dict[str, Any] | None, tuple[int, int] | None]:
+    marker = '"falsification_rules"'
+    idx = text.find(marker)
+    if idx < 0:
+        return None, None
+
+    for start in reversed([match.start() for match in re.finditer(r"\{", text[:idx])]):
+        candidate = _balanced_json(text, start)
+        if not candidate:
+            continue
+        try:
+            payload = json.loads(candidate)
+        except json.JSONDecodeError:
+            continue
+        if not isinstance(payload, dict) or not isinstance(payload.get("falsification_rules"), list):
+            continue
+
+        end = start + len(candidate)
+        return payload, _expand_json_span(text, start, end)
+    return None, None
+
+
+def _balanced_json(text: str, start: int) -> str | None:
+    depth = 0
+    in_string = False
+    escaped = False
+    for pos in range(start, len(text)):
+        char = text[pos]
+        if in_string:
+            if escaped:
+                escaped = False
+            elif char == "\\":
+                escaped = True
+            elif char == '"':
+                in_string = False
+            continue
+        if char == '"':
+            in_string = True
+        elif char == "{":
+            depth += 1
+        elif char == "}":
+            depth -= 1
+            if depth == 0:
+                return text[start : pos + 1]
+    return None
+
+
+def _expand_json_span(text: str, start: int, end: int) -> tuple[int, int]:
+    marker_start = text.rfind("<!-- HUMILITY_JSON_START -->", 0, start)
+    marker_end = text.find("<!-- HUMILITY_JSON_END -->", end)
+    if marker_start >= 0 and marker_end >= 0:
+        return marker_start, marker_end + len("<!-- HUMILITY_JSON_END -->")
+
+    fence_start = text.rfind("```json", 0, start)
+    fence_end = text.find("```", end)
+    if fence_start >= 0 and fence_end >= 0:
+        return fence_start, fence_end + 3
+    return start, end
+
+
+def _strip_incomplete_falsification_block(text: str) -> str:
+    idx = text.find('"falsification_rules"')
+    if idx < 0:
+        return text
+    marker_start = text.rfind("<!-- HUMILITY_JSON_START -->", 0, idx)
+    fence_start = text.rfind("```json", 0, idx)
+    brace_start = text.rfind("{", 0, idx)
+    starts = [value for value in (marker_start, fence_start, brace_start) if value >= 0]
+    start = min(starts) if starts else idx
+    end_marker = text.find("<!-- HUMILITY_JSON_END -->", idx)
+    if end_marker >= 0:
+        end = end_marker + len("<!-- HUMILITY_JSON_END -->")
+    else:
+        fence_end = text.find("```", idx)
+        end = fence_end + 3 if fence_end >= 0 else len(text)
+    return text[:start].rstrip()
+
+
+def _fallback_humility_payload_from_markdown(text: str) -> dict[str, Any] | None:
+    score_val, regime_val = parse_score_regime(text)
+    report_date = _parse_report_date_from_text(text) or date.today()
+    values = _extract_humility_values_from_text(text)
+    rules = []
+    for key, default_rule in zip(
+        ("vnibor", "breadth", "ssi", "evt", "coupling", "gfc"),
+        HUMILITY_DEFAULT_RULES,
+    ):
+        rule = dict(default_rule)
+        rule["current_value"] = values.get(key)
+        rules.append(rule)
+
+    if score_val == "N/A" and regime_val == "N/A" and not any(value is not None for value in values.values()):
+        return None
+
+    return {
+        "report_date": report_date.isoformat(),
+        "composite_score": None if score_val == "N/A" else float(score_val),
+        "regime": None if regime_val == "N/A" else regime_val,
+        "falsification_rules": rules,
+        "source": "fallback_from_ai_cio_markdown",
+    }
+
+
+def _parse_report_date_from_text(text: str) -> date | None:
+    patterns = [
+        r"Ngày\s+báo\s+cáo.*?(\d{2}/\d{2}/\d{4})",
+        r"Date\)\*\*\s*:\s*(\d{2}/\d{2}/\d{4})",
+        r'"report_date"\s*:\s*"(\d{4}-\d{2}-\d{2})"',
+    ]
+    for pattern in patterns:
+        matches = re.findall(pattern, text, flags=re.IGNORECASE)
+        if not matches:
+            continue
+        try:
+            value = matches[-1]
+            if "/" in value:
+                return pd.to_datetime(value, format="%d/%m/%Y").date()
+            return pd.Timestamp(value).date()
+        except Exception:
+            continue
+    return None
+
+
+def _extract_humility_values_from_text(text: str) -> dict[str, float | None]:
+    patterns: dict[str, list[tuple[str, str]]] = {
+        "vnibor": [
+            (r"VNIBOR|STRESS", r"(\d+(?:\.\d+)?)\s*/\s*20\s*phiên\s+STRESS"),
+        ],
+        "breadth": [
+            (r"Breadth MA20|MA20", r"từ\s+(\d+(?:\.\d+)?)%"),
+            (r"Breadth MA20|MA20", r"MA20[^\n]*?(\d+(?:\.\d+)?)%"),
+        ],
+        "ssi": [
+            (r"\bSSI\b|ESR", r"từ\s+(\d+(?:\.\d+)?)%"),
+            (r"\bSSI\b|ESR", r"SSI\s+(\d+(?:\.\d+)?)%"),
+        ],
+        "evt": [
+            (r"EVT|Tail Index|ξ|xi", r"từ\s+(\d+(?:\.\d+)?)"),
+            (r"EVT|Tail Index|ξ|xi", r"(?:ξ|xi)\s*=\s*(\d+(?:\.\d+)?)"),
+        ],
+        "coupling": [
+            (r"Coupling|Vingroup|Slope", r"từ\s+(\d+(?:\.\d+)?)th"),
+        ],
+        "gfc": [
+            (r"Global Financial Conditions|CQS", r"từ\s+(\d+(?:\.\d+)?)th"),
+            (r"Global Financial Conditions|CQS", r"CQS\s+(\d+(?:\.\d+)?)th"),
+        ],
+    }
+    values: dict[str, float | None] = {key: None for key in patterns}
+    for line in text.splitlines():
+        for key, cases in patterns.items():
+            if values[key] is not None:
+                continue
+            for line_pattern, value_pattern in cases:
+                if not re.search(line_pattern, line, flags=re.IGNORECASE):
+                    continue
+                match = re.search(value_pattern, line, flags=re.IGNORECASE)
+                if match:
+                    values[key] = float(match.group(1))
+                    break
+    return values
+
+
+def _write_humility_rules_payload(payload: dict[str, Any], provider_key: str) -> Path:
+    report_date = _payload_date(payload.get("report_date")) or date.today()
+    sidecar_path = _get_humility_rules_path(provider_key, report_date)
+    normalized = dict(payload)
+    normalized["report_date"] = report_date.isoformat()
+    normalized["provider_key"] = provider_key
+    normalized["saved_at"] = date.today().isoformat()
+    normalized["source"] = "ai_cio_executive_summary"
+    sidecar_path.parent.mkdir(parents=True, exist_ok=True)
+    sidecar_path.write_text(json.dumps(normalized, ensure_ascii=False, indent=2), encoding="utf-8")
+    return sidecar_path
+
+
+def _payload_date(value: Any) -> date | None:
+    if value in (None, ""):
+        return None
+    try:
+        return pd.Timestamp(value).date()
+    except Exception:
+        return None
+
+
+def _payload_number_as_text(value: Any) -> str:
+    try:
+        number = float(value)
+    except (TypeError, ValueError):
+        return "N/A"
+    if pd.isna(number):
+        return "N/A"
+    return str(int(number)) if number.is_integer() else str(number)
+
+
+def _has_final_score_line(text: str) -> bool:
+    return bool(
+        re.search(
+            r"final\s+score\s*&\s*regime\s*[:=]\s*[-+]?\d+(?:\.\d+)?\s*;\s*regime\s*[:=]",
+            text,
+            flags=re.IGNORECASE,
+        )
+    )
+
 def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 2) -> str:
     """Đọc tối đa n_past báo cáo executive_summary gần nhất (T-1, T-2...).
     Quét lùi tối đa 7 ngày lịch để bỏ qua ngày nghỉ/không có cache.
@@ -202,13 +630,17 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
     tool_names = [
         "feargreed", "manipulation", "dispersion", "upside_ratio",
         "risk_adjusted_growth", "market_breadth", "esr_monitor",
-        "va_res", "var_cvar_vnindex", "executive_summary"
+        "va_res", "var_cvar_vnindex", "executive_summary", "telegram_summary"
     ]
     for tool in tool_names:
         path = _get_cache_path(tool, provider_key)
         if path.exists():
             path.unlink()
             print(f"[Cache Clear] Deleted: {path.name}")
+    sidecar_path = _get_humility_rules_path(provider_key)
+    if sidecar_path.exists():
+        sidecar_path.unlink()
+        print(f"[Cache Clear] Deleted: {sidecar_path.name}")
 
 def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
     response = client.chat.completions.create(
@@ -1055,7 +1487,10 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else master_full
     
-    final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
+    raw_final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
+    final_res, humility_rules_path = postprocess_executive_summary_report(raw_final_res, provider_key)
+    if humility_rules_path:
+        print(f"[Humility] Saved rules JSON: {humility_rules_path}")
     _write_cache("executive_summary", final_res, provider_key)
 
     # ── Cập nhật history CSV (Ai_cio_report.csv) ──

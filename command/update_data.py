@@ -227,6 +227,12 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
 
     # Dữ liệu cổ phiếu — loại VNINDEX và VN30 khỏi market_data (lưu riêng)
     stock_tickers = [t for t in tickers if t not in ("VNINDEX", "VN30")]
+    
+    # Đảm bảo VN30F1M luôn được tải cho công cụ Manipulation Detection
+    if "VN30F1M" not in stock_tickers:
+        stock_tickers.append("VN30F1M")
+        logger.info("Đã tự động thêm VN30F1M vào danh sách cập nhật.")
+
     if not stock_tickers:
         logger.error("Không có ticker cổ phiếu hợp lệ sau khi loại VNINDEX.")
         return

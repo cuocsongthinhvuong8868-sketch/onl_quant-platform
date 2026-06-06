@@ -15,6 +15,7 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 
 REPORT_GLOB = "executive_summary_{provider}_*.txt"
 RESULT_CACHE_PREFIX = "humility_falsification"
+RULES_SIDECAR_PREFIX = "ai_cio_humility_rules"
 FALSIFICATION_CUTOFF = 3
 
 OPS: dict[str, Callable[[float, float], bool]] = {
@@ -172,7 +173,7 @@ def build_humility_falsification_payload(
         report_path, target_report_date, report_match = _auto_tminus_report(reports, t_data_date)
         if report_path is not None and not force:
             cache_path = _humility_cache_path(provider_key, t_data_date)
-            report_mtime = _path_mtime(report_path)
+            report_mtime = _rule_source_mtime(report_path)
             cached = _read_humility_cache(cache_path, provider_key, t_data_date, report_path, report_mtime)
             if cached:
                 cached["cache_hit"] = True
@@ -207,7 +208,7 @@ def build_humility_falsification_payload(
         }
 
     cache_path = _humility_cache_path(provider_key, t_data_date)
-    report_mtime = _path_mtime(report_path)
+    report_mtime = _rule_source_mtime(report_path)
 
     parsed = _load_report_rules(report_path)
     rows = [_evaluate_rule(rule, current_metrics) for rule in parsed["rules"]]
@@ -311,6 +312,14 @@ def _path_mtime(path: Path) -> str:
         return datetime.fromtimestamp(path.stat().st_mtime).isoformat(timespec="seconds")
     except OSError:
         return ""
+
+
+def _rule_source_mtime(report_path: Path) -> str:
+    parts = [f"report:{_path_mtime(report_path)}"]
+    sidecar_path = _sidecar_path_for_report(report_path)
+    if sidecar_path and sidecar_path.exists():
+        parts.append(f"sidecar:{_path_mtime(sidecar_path)}")
+    return "|".join(parts)
 
 
 def _read_humility_cache(
@@ -451,6 +460,19 @@ def _render_auto_report_note(report_path: Path, target_report_date: date, report
 
 
 def _load_report_rules(path: Path) -> dict[str, Any]:
+    sidecar_payload = _load_sidecar_payload_for_report(path)
+    if sidecar_payload:
+        rules = _rules_from_payload(sidecar_payload)
+        if rules:
+            return {
+                "report_date": _payload_date(sidecar_payload.get("report_date")) or _date_from_report_path(path),
+                "composite_score": _as_float(sidecar_payload.get("composite_score")),
+                "regime": sidecar_payload.get("regime"),
+                "rules": rules,
+                "parse_mode": "sidecar JSON",
+                "raw_payload": sidecar_payload,
+            }
+
     text = path.read_text(encoding="utf-8", errors="ignore")
     payload = _extract_falsification_json(text)
     if payload:
@@ -474,6 +496,38 @@ def _load_report_rules(path: Path) -> dict[str, Any]:
         "parse_mode": "markdown fallback",
         "raw_payload": None,
     }
+
+
+def _load_sidecar_payload_for_report(report_path: Path) -> dict[str, Any] | None:
+    sidecar_path = _sidecar_path_for_report(report_path)
+    if not sidecar_path or not sidecar_path.exists():
+        return None
+    try:
+        payload = json.loads(sidecar_path.read_text(encoding="utf-8"))
+    except Exception:
+        return None
+    if isinstance(payload, dict) and isinstance(payload.get("falsification_rules"), list):
+        return payload
+    return None
+
+
+def _sidecar_path_for_report(report_path: Path) -> Path | None:
+    provider_key = _provider_from_report_path(report_path)
+    report_date = _date_from_report_path(report_path)
+    if not provider_key or report_date is None:
+        return None
+    date_key = report_date.strftime("%d%m%y")
+    return DATA_LAKE / "daily_cache" / f"{RULES_SIDECAR_PREFIX}_{provider_key}_{date_key}.json"
+
+
+def _provider_from_report_path(report_path: Path) -> str | None:
+    stem = report_path.stem
+    prefix = "executive_summary_"
+    if not stem.startswith(prefix):
+        return None
+    body = stem[len(prefix) :]
+    match = re.match(r"(.+)_(\d{6})$", body)
+    return match.group(1) if match else None
 
 
 def _extract_falsification_json(text: str) -> dict[str, Any] | None:
@@ -719,10 +773,10 @@ def _evaluate_rule(rule: dict[str, Any], current_metrics: dict[str, dict[str, An
     actual = _as_float(metric.get("value"))
     op = str(rule.get("threshold_operator", "")).strip()
     unit = str(rule.get("unit", "")).strip()
-    threshold = _normalize_percent_like(_as_float(rule.get("threshold_value")), unit)
+    threshold = _normalize_metric_value(_as_float(rule.get("threshold_value")), unit, key)
 
     falsified = bool(actual is not None and threshold is not None and op in OPS and OPS[op](actual, threshold))
-    tminus = _normalize_percent_like(_as_float(rule.get("current_value")), unit)
+    tminus = _normalize_metric_value(_as_float(rule.get("current_value")), unit, key)
     delta = actual - tminus if actual is not None and tminus is not None else None
 
     return {
@@ -977,6 +1031,14 @@ def _normalize_percent_like(value: float | None, unit: str) -> float | None:
     if is_percent_like and 0 <= abs(value) <= 1:
         return value * 100
     return value
+
+
+def _normalize_metric_value(value: float | None, unit: str, metric_key: str) -> float | None:
+    if value is None:
+        return None
+    if metric_key in {"breadth", "ssi", "coupling", "gfc"} and 0 <= abs(value) <= 1:
+        return value * 100
+    return _normalize_percent_like(value, unit)
 
 
 def _format_threshold(op: str, threshold: float | None, unit: str) -> str:

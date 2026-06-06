@@ -212,44 +212,4 @@ Luận điểm hiện tại (CRISIS/PRE-CRASH, Cash 97%) sẽ bị **falsify** n
 
 **Nếu 3/6 ngưỡng trên bị vi phạm đồng thời, luận điểm CRISIS sẽ sai và cần chuyển sang NEUTRAL/STOCK-PICKING với equity exposure 20-30%.**
 
-```json
-{
-  "report_date": "2026-06-05",
-  "composite_score": 11,
-  "regime": "CRISIS / PRE-CRASH",
-  "falsification_rules": [
-    {
-      "model": "VNIBOR",
-      "metric": "ON_MA5_20D_change",
-      "threshold_operator": "<",
-      "threshold_value": 0,
-      "current_value": 0.88,
-      "unit": "%",
-      "description": "VNIBOR 20 phiên chuyển từ tightening sang easing: ON MA5 20D change âm rõ rệt"
-    },
-    {
-      "model": "Market Breadth",
-      "metric": "MA20_pct",
-      "threshold_operator": ">",
-      "threshold_value": 45,
-      "current_value": 26.6,
-      "unit": "%",
-      "description": "Breadth MA20 phục hồi trên 45% - Bear Confirmed regime bị phá vỡ"
-    },
-    {
-      "model": "ESR Monitor",
-      "metric": "SSI",
-      "threshold_operator": "<",
-      "threshold_value": 0.55,
-      "current_value": 0.656,
-      "unit": "decimal",
-      "description": "SSI giảm xuống dưới 55% - WARNING gỡ bỏ"
-    },
-    {
-      "model": "Var-CVaR VNINDEX",
-      "metric": "xi",
-      "threshold_operator": "<",
-      "threshold_value": 0.25,
-      "current_value": 0.346,
-      "unit": "decimal",
-      "description": "EVT ξ giảm sâu dưới 0.25 - FAT TA
+final score & regime : 11 ; regime : CRISIS / PRE-CRASH

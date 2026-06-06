@@ -33,7 +33,7 @@ sys.path.insert(0, str(ROOT))
 from config import DATA_LAKE, ROOT_DIR
 from shared.ai_cio import (
     run_executive_summary, _read_cache, _clear_all_tool_caches,
-    parse_score_regime,   # re-export từ shared
+    parse_score_regime, summarize_executive_report_for_telegram,   # re-export từ shared
 )
 
 # ── Config ──
@@ -50,6 +50,7 @@ PDF_PATH = REPORTS_DIR / f"{TODAY_STR}_{PROVIDER_KEY.replace('-', '_')}_executiv
 DEEPSEEK_KEY = os.getenv("DEEPSEEK_API_KEY", "").strip()
 TELEGRAM_BOT_TOKEN = os.getenv("TELEGRAM_BOT_TOKEN", "").strip()
 TELEGRAM_CHAT_ID = os.getenv("TELEGRAM_CHAT_ID", "").strip()
+TELEGRAM_SEND_FULL_PDF = os.getenv("TELEGRAM_SEND_FULL_PDF", "0").strip().lower() in {"1", "true", "yes", "on"}
 
 FORCE = True  # luôn force — không dùng cache, gọi API mới mỗi lần
 
@@ -129,7 +130,7 @@ def _create_pdf(text: str, path: str):
 # script không cần gọi nữa, chỉ pass source="auto" là đủ.
 
 
-def _send_telegram(score_val: str, regime_val: str):
+def _send_telegram(score_val: str, regime_val: str, summary_text: str):
     if not TELEGRAM_BOT_TOKEN or not TELEGRAM_CHAT_ID:
         print("[WARN] TELEGRAM_BOT_TOKEN or TELEGRAM_CHAT_ID not set. Skipping Telegram.")
         return
@@ -137,25 +138,28 @@ def _send_telegram(score_val: str, regime_val: str):
     import requests
     bot_api = f"https://api.telegram.org/bot{TELEGRAM_BOT_TOKEN}"
 
-    msg_text = (
-        f"📊 <b>AI CIO Daily Report</b>\n"
-        f"📅 Ngày: {date.today().strftime('%d/%m/%Y')}\n"
-        f"🤖 Model: DeepSeek V4 Pro\n"
-        f"📈 final score & regime : {score_val}\n"
-        f"🎯 regime : {regime_val}"
+    msg_text = summary_text.strip() or (
+        f"AI CIO Daily Brief\n"
+        f"Date: {date.today().strftime('%d/%m/%Y')}\n"
+        f"Model: DeepSeek V4 Pro\n"
+        f"Score/Regime: {score_val}/100 - {regime_val}"
     )
 
-    print("[TG] Sending text message...")
+    print("[TG] Sending summary text message...")
     try:
         r = requests.post(
             f"{bot_api}/sendMessage",
-            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg_text, "parse_mode": "HTML"},
+            json={"chat_id": TELEGRAM_CHAT_ID, "text": msg_text},
             timeout=30,
         )
         r.raise_for_status()
-        print("[TG] Text sent.")
+        print("[TG] Summary text sent.")
     except Exception as e:
         print(f"[ERROR] Telegram text failed: {e}")
+
+    if not TELEGRAM_SEND_FULL_PDF:
+        print("[TG] Full PDF sending disabled. Set TELEGRAM_SEND_FULL_PDF=1 to attach it.")
+        return
 
     print("[TG] Sending PDF...")
     try:
@@ -193,10 +197,29 @@ if __name__ == "__main__":
     score_val, regime_val = parse_score_regime(report_text)
     print(f"[PARSE] Score: {score_val} | Regime: {regime_val}")
 
-    # 4. CSV history: KHÔNG cần gọi nữa — run_executive_summary() ở step 1 đã tự
+    # 4. Tạo Telegram summary ngắn bằng DeepSeek V4 Pro
+    print("[SUMMARY] Creating Telegram brief via DeepSeek V4 Pro...")
+    try:
+        summary_text = summarize_executive_report_for_telegram(
+            DEEPSEEK_KEY,
+            report_text,
+            provider_key=PROVIDER_KEY,
+            force=True,
+        )
+        print("[SUMMARY] Telegram brief ready.")
+    except Exception as e:
+        print(f"[WARN] Telegram summary failed, using fallback message: {e}")
+        summary_text = (
+            f"AI CIO Daily Brief\n"
+            f"Date: {date.today().strftime('%d/%m/%Y')}\n"
+            f"Model: DeepSeek V4 Pro\n"
+            f"Score/Regime: {score_val}/100 - {regime_val}"
+        )
+
+    # 5. CSV history: KHÔNG cần gọi nữa — run_executive_summary() ở step 1 đã tự
     #    upsert với source="auto". Tránh gọi 2 lần (idempotent nhưng redundant).
 
-    # 5. Gửi Telegram
-    _send_telegram(score_val, regime_val)
+    # 6. Gửi Telegram
+    _send_telegram(score_val, regime_val, summary_text)
 
     print("[DONE]")

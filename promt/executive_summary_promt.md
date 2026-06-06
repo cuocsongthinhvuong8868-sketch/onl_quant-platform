@@ -161,7 +161,8 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
   * Chỉ số stress SSI của ESR quay đầu xuống dưới 55% (SSI < 0.55).
   * Chỉ số đuôi béo EVT ξ giảm sâu dưới 0.25 (ξ < 0.25).
   * Hệ số tương quan coupling của bộ ba VIC/VHM/VRE hạ xuống dưới phân vị 70th percentile.
-- Sau phần diễn giải của Model Humility Box, bắt buộc thêm một khối JSON hợp lệ để dashboard `Humility & Falsification Monitor` đọc máy được. Khối JSON phải nằm **trước** dòng final score mandatory và dùng schema sau:
+- Sau phần diễn giải của Model Humility Box, bắt buộc thêm một khối JSON hợp lệ giữa marker `<!-- HUMILITY_JSON_START -->` và `<!-- HUMILITY_JSON_END -->`. Hệ thống sẽ tự tách khối này thành file JSON riêng cho `Humility & Falsification Monitor`, nên không xem đây là nội dung báo cáo hiển thị. Khối JSON phải nằm **trước** dòng final score mandatory và dùng schema sau:
+<!-- HUMILITY_JSON_START -->
 ```json
 {
   "report_date": "YYYY-MM-DD",
@@ -180,7 +181,16 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
   ]
 }
 ```
+<!-- HUMILITY_JSON_END -->
 - `threshold_operator` chỉ được dùng một trong bốn giá trị `<`, `>`, `<=`, `>=`; điều kiện falsification được hiểu là `current_value threshold_operator threshold_value`. Không thêm comment trong JSON.
+- `falsification_rules` phải gồm đúng 6 rule, dùng đúng tên `model` và `metric` dưới đây để dashboard map được sang dữ liệu hiện tại:
+  * `VNIBOR Monitor` / `STRESS/WARNING sessions (20D)` / operator `<` / threshold `5` / unit `sessions`.
+  * `Market Breadth` / `Breadth MA20` / operator `>` / threshold `45` / unit `%`.
+  * `ESR Monitor` / `Systemic Stress Index (SSI)` / operator `<` / threshold `55` / unit `%`.
+  * `Tail Risk (EVT)` / `Tail Index (xi)` / operator `<` / threshold `0.25` / unit ``.
+  * `Manipulation / Coupling` / `Vingroup Slope Percentile` / operator `<` / threshold `70` / unit `th pct`.
+  * `Global Financial Conditions` / `CQS Percentile` / operator `<` / threshold `80` / unit `th pct`.
+- `current_value` trong JSON là giá trị được báo cáo ở chính ngày report hiện tại, không phải giá trị tương lai. Nếu không có giá trị hiện tại cho một rule, để `current_value` là `null` thay vì bịa số.
 
 ---
 
