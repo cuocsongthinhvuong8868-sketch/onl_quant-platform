@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope**: 0.31 (Percentile 36.7th — 🟡 Trung bình, chưa có sức bật rõ ràng)
+- **Correlation**: 0.61 (Percentile 26.7th — 🟡 Lỏng, mối liên kết VIN–F1 đang yếu)
+- **Regime**: STATUS QUO (ΔCorr = +0.12, ΔSlope = +0.02 — cả hai đều dưới ngưỡng 0.15, không đủ xác nhận COUPLING)
+
+## 2. Microstructure Read
+Cả hai percentile của slope (36.7) và corr (26.7) đều trong vùng bình thường (20–80th), cho thấy VIC/VHM/VRE vẫn có tác động đến VN30F1M ở mức nền, nhưng không phải là lực dẫn dắt chủ đạo. Thị trường futures đang cân bằng, chưa có dấu hiệu VIN chốt lời mạnh hay can thiệp tạo coupling extreme.
+
+## 3. Event Study Interpretation
+STATUS QUO kết hợp với Δ đồng biến dương (+0.12, +0.02) hàm ý thị trường đang trong pha “chờ” – không có sự kiện đặc biệt từ VIN group, khối ngoại hay tin tức macro. Đây là trạng thái lý tưởng để đứng ngoài hoặc chỉ giao dịch theo kỹ thuật thuần túy. Không có tín hiệu nào buộc phải giữ vị thế qua đêm.
+
+## 4. Verdict
+- **Trade plan**: NO TRADE
+- Lý do: Chưa có regime rõ ràng, percentile trung bình, không có đủ edge để vào lệnh.
+- Leading indicator: Theo dõi ΔCorr và ΔSlope trong 2–3 phiên tới – nếu vượt +0.15 đồng thời thì chuyển sang LONG F1; nếu giảm xuống < 20th percentile (Decoupling) thì SHORT F1.
+- Stop-loss reference: Nếu vào lệnh sau khi breakout, đặt stop 2% dưới entry (ví dụ: VIC tại 207.00 × (1−2%) ≈ 202.86; VHM tại 152.00 × (1−2%) ≈ 148.96; VRE tại 31.20 × (1−2%) ≈ 30.58).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "04/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 36.7,
+  "corr_percentile": 26.7,
+  "trade_signal": "no_trade",
+  "confidence": "medium"
+}
+```

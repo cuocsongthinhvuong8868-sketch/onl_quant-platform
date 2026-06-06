@@ -1,0 +1,28 @@
+## 1. Observations
+- Risk Score: 55.7/100, giảm nhẹ -0.5, nằm trong vùng NEUTRAL (40-60).
+- EGARCH Vol: 5.2%, giảm -4.4% so với phiên trước, dưới ngưỡng báo động (>8%).
+- Rolling Skewness: 0.05, gần zero, cho thấy phân phối lợi nhuận không lệch đáng kể.
+- Upside Correlation (35.3%) cao gần gấp 3 lần Downside Correlation (12.7%), phản ánh tâm lý đồng thuận tăng mạnh hơn bán tháo.
+
+## 2. Interpretation
+Dữ liệu cho thấy thị trường đang ở pha NEUTRAL-STOCK PICKING với xung lực tăng đang chiếm ưu thế hơn rủi ro giảm. Volatility hạ nhiệt và tương quan đồng thuận tăng cao cho thấy môi trường thân thiện với các vị thế long có chọn lọc, dù điểm số tổng thể chưa đủ cao để chuyển sang GREED.
+
+## 3. Cross-Check
+- **Score vs Volatility**: Score 55.7 (trung bình) + Vol 5.2% (thấp) → **consistent**. Vol giảm + score trung bình = bình thường hóa sau biến động.
+- **Skewness vs Correlation**: Skewness 0.05 (trung tính) nhưng Up-corr (35.3%) > Down-corr (12.7%) → **divergence nhẹ**. Dòng tiền có xu hướng tập trung vào phe mua hơn là bảo vệ danh mục, dù phân phối lợi nhuận chưa lệch hẳn.
+
+## 4. Verdict
+**NO ACTIONABLE SIGNAL**: Cấu trúc tín hiệu hiện tại (NEUTRAL + Vol thấp + Skew gần zero) không đủ mạnh để điều chỉnh beta hệ thống. Khuyến nghị duy trì danh mục hiện tại, chờ thêm tín hiệu xác nhận từ khối lượng hoặc breakout để chuyển sang Greed.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "05/06/2026",
+  "regime": "NEUTRAL",
+  "score": 55.7,
+  "confidence": "low",
+  "beta_target": 0.6,
+  "key_signals": ["Vol hạ nhiệt còn 5.2%, tạo điều kiện stock-picking", "Upside-corr 35.3% gấp 3 lần down-corr, tâm lý long chiếm chủ đạo nhưng chưa cực đoan"]
+}
+```

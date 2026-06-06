@@ -1,0 +1,32 @@
+## 1. Observations
+- **Stress Index (VN30):** 0.00% (ngưỡng cảnh báo: 40%)
+- **Số mã thủng VaR 95%:** 0/30
+- **Complacency Index (Toàn thị trường):** 6.48% (ngưỡng nguy hiểm: 80%)
+- **Số mã mispriced:** 7
+
+## 2. Contagion Assessment (Module B)
+- **Mức độ stress VN30 ở 0%**, không có mã nào trong rổ VN30 vi phạm VaR 95%. Điều này cho thấy hoàn toàn không có hiệu ứng lây lan real-time giữa các bluechips. Rủi ro systemic trong Module B đang ở trạng thái tắt.
+- **Top 3 crash: Không có.** Không có sự kiện thủng VaR đáng kể nào, do đó không có dấu hiệu đầu sóng systemic từ nhóm vốn hóa lớn.
+
+## 3. Complacency Assessment (Module C)
+- Complacency Index đạt **6.48%**, rất thấp so với ngưỡng nguy hiểm 80%.
+- **Kết luận chuẩn xác:** Thị trường **KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định**. Chỉ số thấp cho thấy spread đang giãn rộng (không bị nén), phù hợp với một thị trường đang vận động có biên độ, nhưng cần kết hợp với Stress Index để xác định bản chất vận động (tăng mạnh/giảm mạnh hay đi ngang biên độ rộng).
+- **Vì Stress Index cũng ở mức 0%**, dữ liệu hiện tại cho thấy thị trường đang trong trạng thái **spread giãn rộng thuần túy (không do sợ hãi cũng không do tự mãn)**, có thể là một pha tích lũy hoặc phân phối có khối lượng/biên độ lớn, chứ không phải là "bình thường".
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có. Không có khuyến nghị bán/gia tăng tỷ trọng từ Module này.
+- **Top 3 Mispriced (Module C): OCB, VRE, VTO.** Những mã này có spread bị nén chặt nhất trong số 7 mã mispriced. Mặc dù Complacency toàn thị trường thấp, sự tồn tại của các mã cụ thể này cho thấy **vẫn có rủi ro định giá sai cục bộ**. Khuyến nghị: **Cảnh báo rủi ro ở các mã này — chúng có thể đang tạo đỉnh vùng giá hẹp (spread nén) hoặc đã giảm sâu và spread thu hẹp một cách giả tạo.** Cần theo dõi breakout (tăng mạnh) hoặc breakdown (giảm mạnh) để xác nhận hướng đi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VRE", "VTO"],
+  "confidence": "high"
+}
+```
