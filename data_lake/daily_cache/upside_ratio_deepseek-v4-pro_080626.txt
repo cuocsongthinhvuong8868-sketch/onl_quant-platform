@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu (Upside):** 7.29% hiện tại thấp hơn đáng kể so với mu dài hạn 13.56% (delta -6.27pp). Phi = +0.194 (>+0.10) → Momentum regime mua đang suy yếu nhưng vẫn giữ đà giảm.
+- **Lực cung (Downside):** 28.94% hiện tại cao gấp đôi mu dài hạn 14.34% (delta +14.60pp). Phi = +0.213 (>+0.10) → Momentum regime bán rất mạnh, đà bán đang chiếm ưu thế.
+- **Tương quan 2 chiều:** Cầu yếu hơn mu + Cung mạnh hơn mu → cùng chiều distribution (phân phối). Cả hai đều ở momentum regime, không có dấu hiệu đảo chiều.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền: PHÂN PHỐI (Distribution)** – Cầu nén dưới baseline trong khi cung giãn trên baseline, đúng pattern "up << mu AND down >> mu". Không phải zombification vì thanh khoản vẫn hiện hữu qua biên độ phiên cao.
+- **Momentum winner: SUPPLY (Bên bán)** – So sánh |Phi_dn| = 0.213 > |Phi_up| = 0.194 cho thấy đà bán mạnh hơn đà mua cả về cường độ lẫn tốc độ lan rộng. Bên mua không đủ lực để ngăn áp lực bán leo thang.
+
+## 3. Stress-Test Read
+- P95 Downside = 27.96%: một kịch bản panic sell với biên độ rất dày (~28% mã giảm sâu/phiên) nếu áp lực cung tiếp tục momentum. Đây là mức stress cực hạn, gần gấp 2 lần mu dài hạn.
+- **Asymmetry: LỆCH VỀ DOWNside** – P95 Dn (27.96%) > P95 Up (23.82%), tail risk bên bán dày hơn 4.14pp. Xác suất xảy ra panic sell cao hơn explosive buy, phản ánh rủi ro giảm trội hơn.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 0-10%** – Chỉ dành cho vị thế short-cover kỹ thuật, không mua ròng.
+- **Strategy: PHÒNG THỦ** – Không bắt đáy, không mua đuổi. Chờ lực cung hạ nhiệt (Phi_dn giảm về <+0.10) trước khi hành động.
+- **Lưu ý:** Cả hai chiều đều có momentum mạnh (>+0.10), nên đây không phải regime nhiễu. Tuy nhiên, tín hiệu phân phối rõ ràng yêu cầu đứng ngoài.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.96,
+  "p95_upside_pct": 23.82,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

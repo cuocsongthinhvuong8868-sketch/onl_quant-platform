@@ -1,0 +1,53 @@
+# Phân Tích Economic Alpha Ngân Hàng VN – Kịch Bản Tiêu Chuẩn (K=1.0, CoE=14%)
+
+## 1. Đánh Giá Kịch Bản
+
+Với K=1.0 và CoE=14%, đây là mức baseline hợp lý cho sector ngân hàng VN. Mặt bằng **3 ngân hàng hàng đầu có Alpha dương** (+4.0% đến +6.2%), chứng tỏ sector đang tạo **giá trị thặng dư trên vốn cổ đông**, nhưng chỉ xảy ra ở những bank định giá thấp. Trong khi đó, các bank top-down (VCB, LPB) đang đốt vốn với Alpha âm sâu (−7.1%). Stress test BVPS giảm −5%, P/B penalty −5% là điều kiện đủ khắc nghiệt để loại bỏ các định giá ảo.
+
+## 2. Phân Tách Top Alpha
+
+### 🥇 HDB (Alpha 6.2% – P/B 1.24)
+- **Driver chính:** P/B hợp lý (1.24) + ROE duy trì ổn định + σ(ROE) thấp (đặc thù HDB là một trong những bank có ROE ít biến động nhất)
+- **Animal profile:** **Fortress** – hội tụ đủ 3 yếu tố: ROE cao, rủi ro thấp, P/B rẻ. Đây là dạng compounding cổ điển.
+
+### 🥈 CTG (Alpha 4.1% – P/B 0.99)
+- **Driver chính:** P/B dưới 1 → chiết khấu giá trị sổ sách. ROE khoảng 16-18% + payout thấp → retention cao.
+- **Animal profile:** **Cheap-but-not-trap** – định giá rẻ nhưng ROE vẫn đủ tốt để tạo lợi thế vốn.
+
+### 🥉 SHB (Alpha 4.0% – P/B 0.93)
+- **Driver chính:** P/B thấp nhất top + ROE có sự hỗ trợ từ mảng bán lẻ và M&A. P/b rẻ bù đắp σ(ROE) trung bình.
+- **Animal profile:** **Borderline Fortress** – nếu duy trì được ROE ổn định, có thể chuyển thành Fortress.
+
+## 3. Cảnh Báo Bẫy Giá Trị
+
+### ⛔️ EIB (Alpha −12.3% – P/B 1.48)
+Bẫy giá trị rõ rệt: P/B 1.48 nhưng ROE thấp (~8-9%), không đủ bù chi phí vốn 14%. **Cheap Trap** – định giá không hề rẻ nếu tính trên cơ sở năng lực sinh lời.
+
+### ⛔️ VCB (Alpha −7.1% – P/B 2.25)
+**Premium Burn** điển hình: P/B đắt nhất sector (2.25×) nhưng ROE chỉ ~19-20% → không đủ bù chi phí vốn. Nhà đầu tư đang trả premium cho thương hiệu, không phải năng lực tạo vốn.
+
+### ⛔️ LPB (Alpha −7.1% – P/B 2.93)
+Tệ nhất: P/B gần 3× với ROE ~17% – risk penalty ăn mòn nặng. **Premium Burn** rõ nhất – không có yếu tố nào bảo vệ nhà đầu tư nếu tăng trưởng chậm lại.
+
+## 4. Xây Dựng Danh Mục
+
+| Loại | Tỷ Trọng | Tên |
+|------|----------|-----|
+| **Core Holding** (Fortress) | 65% | **HDB** – mô hình compounding với rủi ro thấp |
+| **Tactical** (Cheap value) | 25% | **CTG + SHB** – định giá dưới book, có dư địa |
+| **Cấm mua / Underweight** | 0% | **VCB, LPB, EIB** – cả ba đều có Alpha âm sâu |
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB"],
+  "avoid_list": ["VCB", "LPB", "EIB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```
+
+> **Kết luận:** Cơ hội tập trung ở HDB (Fortress) và các bank định giá rẻ (CTG, SHB). **Tránh xa VCB, LPB, EIB** – dù giá có thể tăng theo sóng ngành, đây không phải value mà là speculation.
