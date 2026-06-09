@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-09",
+  "composite_score": 11,
+  "regime": "CRISIS / PRE-CRASH",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 17,
+      "unit": "sessions",
+      "description": "VNIBOR 20 phiên chuyển từ tightening sang easing: số phiên STRESS giảm xuống dưới 5"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 24.2,
+      "unit": "%",
+      "description": "Breadth MA20 phục hồi trên 45% - Bear Confirmed regime bị phá vỡ"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.7,
+      "unit": "%",
+      "description": "SSI giảm xuống dưới 55% - WARNING gỡ bỏ"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "EVT xi giảm xuống dưới 0.25 - FAT TAIL chuyển thành HEAVY TAIL"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 33.3,
+      "unit": "th pct",
+      "description": "Vingroup Slope Percentile dưới 70th - rủi ro flash crash giảm"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.4,
+      "unit": "th pct",
+      "description": "CQS giảm xuống dưới 80th - credit stress deep junk hạ nhiệt"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-09",
+  "source": "ai_cio_executive_summary"
+}
