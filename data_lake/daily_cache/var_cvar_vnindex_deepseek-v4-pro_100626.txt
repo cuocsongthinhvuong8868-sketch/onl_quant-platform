@@ -1,0 +1,48 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.65% (3Y rolling, 5th percentile)
+- **EVT VaR 99%**: -3.69% (1/100-event theo mô hình POT/GPD)
+- **ξ (shape)**: +0.345 — thuộc vùng **fat tail** theo thang REFERENCE
+- **Hill index**: +0.447 — cùng dấu, magnitude lớn hơn ξ nhưng vẫn trong cùng vùng fat tail
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = +0.345** nằm trong bracket **> 0.30** → **FAT TAIL** (đuôi cực dày, rủi ro cực đoan hiện hữu)
+- **Hill = +0.447** cùng dấu dương và magnitude tương đương (cùng vùng fat tail) → **cross‑check robust**, không có dấu hiệu threshold sensitivity
+- **ES − VaR Spread = -1.37%**, lớn hơn nhiều so với σ₃₀ = 0.88% → spread vượt σ₃₀, xác nhận **fat tail** về mặt thực nghiệm
+
+Kết luận: tail regime là **fat**, không thể bỏ qua.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** = μ + z₀.₀₁·σ (giả định μ ≈ 0, z₀.₀₁ ≈ -2.33)  
+  = 0 – 2.33 × 0.88% ≈ **-2.05%**
+- **EVT VaR 99%** = **-3.69%**
+- **Gap** = |-3.69%| – |-2.05%| = **1.64 percentage points** → > 1 pp
+
+Gap > 1 pp chứng tỏ Gaussian model underestimate mức lỗ cực đoan một cách đáng kể. **Không thể dùng Gaussian để allocation risk capital.**
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = +0.345 > 0.30, hedge action phải mạnh:
+- **Tránh chiến lược momentum** (dễ bị wipeout bởi tail event)
+- **Mua puts ITM** (đuôi dày → OTM puts có thể chưa đủ cover mức ES 99% = -6.15%)
+- Kết hợp **short futures hedge** để giảm net exposure tổng thể
+- Giảm leverage 50%+ ngay lập tức; không giữ position size lớn khi cấu trúc thị trường cho thấy tail risk cực kỳ dày
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "10/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.64,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

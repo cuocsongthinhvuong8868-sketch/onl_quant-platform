@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope**: 0.32 (31.7th percentile — 🟡 Trung bình) — độ dốc ở vùng thấp lịch sử, không khuếch đại rõ.
+- **Correlation**: 0.66 (73.3rd percentile — 🟡 Lỏng) — tương quan khá chặt so với lịch sử, nhưng chưa phải extreme.
+- **Regime**: STATUS QUO (ΔCorr = +0.57, ΔSlope = -0.12) — dù correlation tăng mạnh nhưng slope giảm nhẹ = không đủ điều kiện vào COUPLING hay ANCHORING.
+
+## 2. Microstructure Read
+VIC/VHM/VRE vẫn giữ ảnh hưởng tích cực tới VN30F11M nhờ correlation ở mức lỏng 73.3rd percentile, tức VIN chiếm tỷ trọng trong diễn biến F1. Slope chỉ 31.7th percentile = lực kéo yếu: giá VIN tăng/giảm không đẩy F1 với tốc độ tương xứng. Cả 2 percentile đều nằm trong khoảng 20–80th → không bất thường can thiệp. Trạng thái STATUS QUO khẳng định market vẫn vận hành ổn định, VIN còn vai trò nhưng đã suy giảm dần.
+
+## 3. Event Study Interpretation
+STATUS QUO sau khi ΔCorr tăng +0.57 và ΔSlope giảm -0.12: có một luồng lực đẩy tương quan (có thể từ dòng tiền nội bộ VIN hoặc tin ngành) nhưng không đủ mạnh để cải thiện độ dốc. Intraday: khả năng F1 sideway giả tạo, không có edge rõ. Overnight: không nên giữ vị thế — signal không rõ để giữ qua đêm. Đây không phải NO TRADE tuyệt đối, nhưng cần chờ breakout thực sự.
+
+## 4. Verdict
+- **Trade plan**: NO TRADE (ưu thế). Nếu bắt buộc vào: **Short F1** nhẹ (vì slope yếu + corr tăng nhưng không kéo được F1 lên = áp lực bán ngầm), với mức chốt lời kỹ thuật tại 1,948.0 (dưới MA20).  
+- **Leading indicator**: Nhóm Bank (VCB, BID) hoặc Chứng (SSI) — hiện ảnh hưởng đang hấp thụ dòng tiền.  
+- **Stop-loss reference (Short F1)**:  
+  Entry tại 1,961.5. Nếu F1 vượt 1,986.0 (>1.25% từ entry) → cắt lỗ ngay. Nếu không vào lệnh: đứng ngoài.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "10/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 31.7,
+  "corr_percentile": 73.3,
+  "trade_signal": "no_trade",
+  "confidence": "medium"
+}
+```
