@@ -1,0 +1,33 @@
+## 1. Observations
+- **Risk Score = 47.3 / 100** (Δ -1.0): nằm sát biên trên vùng NEUTRAL (40-60), không vượt ngưỡng GREED (60+).
+- **EGARCH Vol = 18.7%** (Δ +4.4%): tăng đột biến, vượt xa khỏi vùng vol thấp điển hình của regime GREED; đang tiến gần mức đỉnh cục bộ.
+- **Rolling Skewness = -0.04**: gần 0, không âm sâu – chưa cho thấy đuôi trái mở rộng.
+- **Downside Corr (12.7%) vs Upside Corr (28.8%)**: chênh lệch +16.1%, thiên hướng đi cùng nhau khi tăng mạnh hơn khi giảm – tín hiệu phân hoá.
+
+## 2. Interpretation
+Score ở mức 47.3 cùng EGARCH Vol tăng +4.4% phản ánh **trạng thái trung tính nhưng đang chuyển dịch từ STOCK PICKING sang FEAR trên diện rộng**. Thị trường mất dần sự phân hoá ổn định, khối lượng biến động gia tăng, nhưng chưa kích hoạt tín hiệu hoảng loạn vì skew chưa âm sâu.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: **Divergence rõ ràng** – Score chỉ giảm nhẹ (-1.0) trong khi Vol tăng mạnh (+4.4%). Điều này báo hiệu thị trường đang bị đánh giá thấp mức độ rủi ro biến động. Cần cảnh giác.
+- **Skewness vs Correlation**: Consistent nhẹ – gần 0 cho thấy phân phối đối xứng, kết hợp Upside Corr cao hơn Downside Corr cho thấy dòng tiền vẫn chọn lọc. Chưa có panic.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.4** (giảm từ mức trung bình 0.6).
+Hành động: Thu hẹp danh mục về các cổ phiếu có thanh khoản dẫn dắt và nền tảng cơ bản ổn định. Cắt giảm vị thế đầu cơ beta cao do tín hiệu Vol tăng báo trước xác suất cao phe cung gia tăng. Chưa cần hedge toàn phần vì skew chưa âm sâu – chờ thêm xác nhận.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "11/06/2026",
+  "regime": "NEUTRAL",
+  "score": 47.3,
+  "confidence": "medium",
+  "beta_target": 0.4,
+  "key_signals": [
+    "Score 47.3 – NEUTRAL nhưng Vol EGARCH tăng +4.4% divergence",
+    "Skewness gần 0 (-0.04) – chưa panic",
+    "Upside Corr gấp 2.3x Downside Corr – phân hoá vẫn duy trì"
+  ]
+}
+```

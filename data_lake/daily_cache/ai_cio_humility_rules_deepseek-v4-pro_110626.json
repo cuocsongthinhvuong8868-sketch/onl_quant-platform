@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-11",
+  "composite_score": 11,
+  "regime": "CRISIS / PRE-CRASH",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 15,
+      "unit": "sessions",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 29.6,
+      "unit": "%",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.8,
+      "unit": "%",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 30.0,
+      "unit": "th pct",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 97.8,
+      "unit": "th pct",
+      "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-11",
+  "source": "ai_cio_executive_summary"
+}
