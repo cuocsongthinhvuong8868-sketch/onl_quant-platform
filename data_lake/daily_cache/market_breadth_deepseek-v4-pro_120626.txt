@@ -1,0 +1,36 @@
+## 1. Observations
+- **MA20 (1 tháng)**: 29.2% — **thấp**, gần ngưỡng oversold (< 30%), cho thấy xung lực ngắn hạn rất yếu.
+- **MA60 (1 quý)**: 28.7% — **thấp**, dưới ngưỡng trung bình, xác nhận đà điều chỉnh trung hạn chưa kết thúc.
+- **MA125 (6 tháng)**: 25.4% — **thấp**, phản ánh sức mạnh chu kỳ kinh doanh nửa năm đang suy giảm nghiêm trọng.
+- **MA252 (1 năm)**: 28.7% — **thấp**, dưới ngưỡng 30%, xác nhận thị trường đang trong bear regime dài hạn.
+
+## 2. Structural Health
+Cả 4 đường MA đều đồng thuận ở vùng **thấp dưới 30%**, không có divergence rõ rệt giữa ngắn và dài hạn. Toàn bộ cấu trúc Breadth đang suy yếu đồng bộ từ đầu cơ đến xu hướng dài hạn.
+
+Pattern phù hợp nhất: **Bear Confirmed** — MA20 < 30% AND MA252 < 40%. Đây là dấu hiệu của secular weakness: áp lực bán lan tỏa, không có lực đỡ từ tầng nào.
+
+## 3. Money Flow Leadership
+- **Top volume MA20**: Ngân hàng (ACB, BIC, BFC) và sản xuất (AAA, APF, APG) chiếm ưu thế — dòng tiền ngắn hạn tập trung vào nhóm defensive và hàng hóa cơ bản.
+- **Top volume MA252**: Gần như overlap hoàn toàn với MA20 (ABB, ACB, ADS, AFX, APF) — cho thấy các mã trụ vững dài hạn cũng là những mã đang thu hút dòng tiền ngắn hạn.
+- **Smart money**: Đang ưu tiên **defensive** — ngân hàng và sản xuất công nghiệp là nơi trú ẩn chính; không thấy sự xuất hiện của cổ phiếu đầu cơ mạnh như chứng khoán, thép hay bất động sản.
+
+## 4. Verdict
+- **Strategy**: Defensive cash-up — Tuyệt đối không mua đuổi, chỉ hold tiền mặt.
+- **Đòn bẩy**: **0% margin** — không margin dưới bất kỳ hình thức nào khi MA252 < 30% và bear confirmed.
+- Không có divergence rõ giữa MA20 và MA252 để đưa ra tín hiệu "WAIT FOR CONFIRMATION", mà đây là bear đồng thuận → ưu tiên bảo toàn vốn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 29.2,
+  "ma60_pct": 28.7,
+  "ma125_pct": 25.4,
+  "ma252_pct": 28.7,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

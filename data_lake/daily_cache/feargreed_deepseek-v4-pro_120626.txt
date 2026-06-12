@@ -1,0 +1,34 @@
+## 1. Observations
+- Risk Score 48.7/100 nằm trong vùng NEUTRAL (40-60) với biến động nhẹ +1.5 so với phiên trước.
+- EGARCH Vol 13.5% giảm mạnh -7.1% so với phiên trước, dưới ngưỡng cảnh báo (>20%).
+- Rolling Skewness = 0.00, trung tính tuyệt đối – không nghiêng về âm hay dương.
+- Downside Correlation 11.5% thấp hơn nhiều so với Upside Correlation 29.0% – chênh lệch +17.5%.
+
+## 2. Interpretation
+Dữ liệu hiện tại cho thấy thị trường đang ở pha phân hóa trung tính (Stock-Picking regime): không có panic bán (down-corr thấp) cũng chưa có euphoria mua (skew = 0). Biến động thu hẹp nhanh (-7.1%) xác nhận xác suất cao lực cung/cầu đang cân bằng ngắn hạn.
+
+## 3. Cross-Check
+- Score (48.7 – NEUTRAL) vs EGARCH Vol (13.5% – giảm mạnh): **Consistent** – điểm trung tính đi kèm vol hạ nhiệt.
+- Skewness (0.00) vs chênh lệch correlation (Up-Down = +17.5%): **Cảnh báo divergence nhẹ** – skew phẳng nhưng up-corr cao gấp 2.5 lần down-corr, cho thấy các cổ phiếu đang di chuyển đồng pha hơn khi tăng. Dấu hiệu này xác suất thấp dẫn đến crash nhưng cần monitor nếu skew dần dương.
+
+## 4. Verdict
+**Beta exposure: 0.55 – 0.65**
+- Giữ danh mục ở mức beta trung bình do chưa đủ tín hiệu chuyển pha rõ rệt.
+- Không hedge (down-corr thấp, không có tail risk).
+- **NO ACTIONABLE SIGNAL**: divergence giữa skew trung tính và up-correlation cao tạo tín hiệu mâu thuẫn nhẹ. Cần thêm 1-2 phiên để xác nhận hướng breakout.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "12/06/2026",
+  "regime": "NEUTRAL",
+  "score": 48.7,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Score ở vùng NEUTRAL kết hợp EGARCH Vol giảm mạnh -7.1%",
+    "Up-corr 29% cao gấp 2.5 lần down-corr 11.5% – dư địa tăng phân hóa không đồng pha"
+  ]
+}
+```

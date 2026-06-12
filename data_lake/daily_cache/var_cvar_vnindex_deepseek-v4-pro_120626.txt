@@ -1,0 +1,49 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.65%, sát với Parametric Gaussian (-1.47%), cho thấy tail 95% chưa lệch nhiều so với normal.
+- **EVT VaR 99%**: -3.69%, tương đương mất ~3.7% trong 1/100 ngày xấu nhất.
+- **ξ (GPD shape)**: +0.345, vượt ngưỡng 0.30 → **fat tail regime**.
+- **Hill index**: +0.447, cùng dấu và magnitude tương đương với ξ → cross-check robust.
+
+## 2. Tail Thickness Diagnosis
+
+ξ = 0.345 thuộc bracket **> 0.30 → FAT TAIL** (rủi ro cực đoan, ES có thể không hội tụ).
+
+Hill index (+0.447) confirm cùng hướng và magnitude gần ξ, không có threshold sensitivity đáng kể → signal robust.
+
+ES − VaR spread = -1.37%, lớn hơn σ₃₀ (0.83%). Điều này corroborate empirically rằng tail dày hơn nhiều so với Gaussian: khi thị trường vượt VaR 95%, mức lỗ trung bình kỳ vọng sâu hơn 1.37%, phản ánh fat tail rõ rệt.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** (μ + z·σ, với z = -2.33):  
+Giả sử μ ≈ 0 (trung bình daily ∼ 0, phù hợp với σ₃₀ = 0.83%), ta có:  
+Gaussian VaR 99% ≈ 0 − 2.33 × 0.83% = **-1.93%**.
+
+- **EVT VaR 99%** = **-3.69%**.
+
+Gap = |(-1.93%) − (-3.69%)| = **1.76 percentage point** > 1pp → **Gaussian model bị broken**.  
+Không thể dùng parametric Gaussian cho risk capital allocation, vì nó underestimate lỗ 1/100 ngày đến gần gấp đôi.
+
+## 4. Verdict — Hedging Implications
+
+ξ > 0.30 → **FAT TAIL regime**.  
+Khuyến nghị: **tránh momentum strategies** (dễ bị gap down đánh bay lợi nhuận). Sử dụng **puts ITM** (tail hedge chi phí cao hơn nhưng bảo vệ tốt hơn khi thị trường sập), kết hợp **short futures** để giảm net exposure tức thì. Tránh bán OTM puts vì có thể bị assignment ở deep money.
+
+Leverage giảm mạnh: không vượt quá 50% margin, sẵn sàng giảm thêm nếu σ₃₀ mở rộng >1.2%.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "12/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.76,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```
