@@ -104,6 +104,7 @@ def process_liquidity_logic(df_raw: pd.DataFrame, start_date: str = START_DATE) 
     df["RRPONTSYD"] = df["RRPONTSYD"] * RRP_MULTIPLIER
 
     df = df.resample(RESAMPLE_RULE).last().ffill().dropna()
+    df = df[df.index <= pd.Timestamp.today().normalize()]
 
     df["Net_Liquidity"] = df["WALCL"] - df["WTREGEN"] - df["RRPONTSYD"]
     df["Impulse"] = df["Net_Liquidity"].diff()

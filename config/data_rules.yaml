@@ -88,14 +88,6 @@ sources:
     frequency: daily
     file_patterns: ["*.json"]
 
-  - name: manipulation_raw
-    category: raw/sentiment
-    path: data_lake/manipulation_raw_data.csv
-    warning_days: 3
-    critical_days: 10
-    frequency: business_daily
-    date_columns: [date, DATE, time]
-
   - name: vn100_ticker_metrics
     category: processed/metrics
     path: data_lake/vn100_earnings_health/outputs/ticker_metrics.csv
@@ -164,7 +156,7 @@ sources:
     category: processed/tool_metrics/macro
     type: tool_metrics
     tool: Humility & Falsification Monitor
-    depends_on: [market_data, vnibor, vnindex_cache, vn30_cache, global_financial_conditions, manipulation_raw]
+    depends_on: [market_data, vnibor, vnindex_cache, vn30_cache, global_financial_conditions]
     cache_namespace: humility_falsification
     warning_days: 3
     critical_days: 10
@@ -252,7 +244,7 @@ sources:
     category: processed/tool_metrics/behavioral
     type: tool_metrics
     tool: Manipulation Detection
-    depends_on: [market_data, manipulation_raw]
+    depends_on: [market_data]
     cache_namespace: manipulation
     warning_days: 3
     critical_days: 10

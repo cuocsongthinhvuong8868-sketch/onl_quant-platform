@@ -98,15 +98,7 @@ DEFAULT_CONFIG: dict[str, Any] = {
             "frequency": "daily",
             "file_patterns": ["*.json"],
         },
-        {
-            "name": "manipulation_raw",
-            "category": "raw/sentiment",
-            "path": "data_lake/manipulation_raw_data.csv",
-            "warning_days": 3,
-            "critical_days": 10,
-            "frequency": "business_daily",
-            "date_columns": ["date", "DATE", "time"],
-        },
+
         {
             "name": "vn100_ticker_metrics",
             "category": "processed/metrics",

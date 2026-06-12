@@ -90,6 +90,13 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
   * 0-20: Cực kỳ nguy hiểm (Extreme Stress) | 20-40: Nguy hiểm (High Risk) | 40-60: Trung tính (Neutral) | 60-80: Tích cực (Opportunistic) | 80-100: Cực kỳ tích cực (Excellent).
 - **Composite Score (Điểm số tổng hợp, 0-100)**: Điểm số sức khỏe chung của toàn hệ thống (cũng nằm trên thang điểm 0-100). Điểm này được tổng hợp từ 3 Sub-Scores trên (ví dụ: lấy trung bình có trọng số hoặc bị kéo xuống theo quy tắc nút thắt cổ chai bởi điểm số thấp nhất), chứ **không phải** là tổng cộng đại số của 3 Sub-Scores. Neo từ midpoint (50), điều chỉnh cộng/trừ dựa trên consensus và độ tin cậy của 9 công cụ con, kết hợp chiết khấu vĩ mô (Step 0), lớp earnings bottom-up VN100 (Step 0.5), và áp dụng tail-risk haircut (CAP score ≤ 50 khi ESR Critical).
 
+### Step 5.5 — LLM Overlay (Chủ quan có kiểm soát)
+- Sau khi đã có Composite Score và 3 Sub-Scores từ hard metrics, phải thêm một lớp **LLM Overlay** riêng biệt để giải thích phần judgement của CIO.
+- LLM Overlay **không thay thế hard metrics** và không được dùng để phá hard constraints. Nó chỉ được phép điều chỉnh nhẹ score nếu có bằng chứng tổng hợp rõ ràng từ realtime/macro/market-sense nằm trong INPUT.
+- Nếu overlay không điều chỉnh score, phải nói rõ vì sao các thay đổi marginal chưa đủ mạnh để thay đổi regime/score.
+- Nếu overlay có điều chỉnh score, phải ghi rõ hướng điều chỉnh, số điểm điều chỉnh, và metric nào cho phép điều chỉnh đó.
+- Các hard constraints vẫn dominates overlay: EVT ξ > 0.30, VNIBOR STRESS/WARNING days > 5, Breadth MA20 < 45%, CQS percentile > 80th.
+
 ### Step 6 — Capital Allocation
 - Equity range theo Score
 - Apply tail-risk cap
@@ -142,6 +149,13 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
   * **Tail Risk Score**: C/100. Đánh giá độ nhạy cảm của các rủi ro đuôi cực đoan (ESR SSI, EVT tail-index ξ, VaRES complacency).
 - Giải thích lực cản hoặc lực đẩy từ Vĩ mô ảnh hưởng thế nào đến Score tổng.
 - Top tail risk trong 5-20 phiên tới
+
+### 5.5 LLM Overlay (Chủ quan có kiểm soát)
+- **Metric-implied score/regime**: điểm và regime suy ra từ hard metrics/sub-scores trước overlay.
+- **Overlay adjustment**: positive / negative / zero, kèm số điểm điều chỉnh nếu có.
+- **Final CIO score/regime after overlay**: điểm cuối cùng sau overlay.
+- **Lý do overlay**: giải thích rõ LLM có thêm judgement gì so với hard metrics. Nếu overlay = zero, phải nói rõ vì sao realtime/macro/market sense không đủ mạnh để thay đổi score.
+- **Ranh giới kỷ luật**: không được dùng overlay để phá hard constraints như EVT ξ > 0.30, VNIBOR STRESS/WARNING days > 5, Breadth MA20 < 45%, CQS percentile > 80th.
 
 ### 6. Executive Order
 - Cash %  /  Equity %  /  Hedge instrument

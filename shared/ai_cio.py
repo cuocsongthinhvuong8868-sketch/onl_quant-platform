@@ -312,6 +312,8 @@ def summarize_executive_report_for_telegram(
         "You are a portfolio risk chief writing a concise Vietnamese Telegram brief. "
         "Compress the AI CIO report into an action-oriented daily decision note. "
         "Use only facts in the report. Do not add prices or new tickers. "
+        "If the report contains section 5.5 LLM Overlay, explicitly summarize the "
+        "metric-implied score, overlay adjustment, and final CIO score in one line. "
         "Keep the output under 2300 Vietnamese characters. Plain text only; no Markdown tables, no JSON."
     )
     user_prompt = f"""
@@ -322,6 +324,7 @@ PARSED REGIME: {regime_val}
 Write exactly this structure:
 AI CIO DAILY BRIEF - DD/MM/YYYY
 Score/Regime: <score>/100 - <regime>
+Overlay: <metric-implied score/regime> | <overlay adjustment> | <final CIO score/regime>
 Allocation: Cash X% | Equity Y% | Hedge Z%
 Verdict: <1 compact sentence>
 Key drivers:
