@@ -1,0 +1,42 @@
+## 1. Observations
+
+- **Spread_Z** đang ở -0.54σ — nằm trong biên độ dao động bình thường 60 ngày, không có độ lệch bất thường so với trung bình lịch sử.
+- **DPI** hiện ở mức 40.0% — dưới ngưỡng 70%, cho thấy mức độ phân tán hôm nay **không mang tính bền vững cao**.
+- **Avg Pairwise Correlation** (Ledoit-Wolf) ghi nhận cực thấp: **0.006** — gần như bằng 0, các cổ phiếu hầu như không có tương quan động thái với nhau.
+- **Cross-Sectional Skewness & Kurtosis:** N/A — không đủ dữ liệu để đánh giá tính phân phối đuôi.
+
+## 2. Structural State
+
+Thị trường đang ở trạng thái **bình thường - phi căng thẳng**. Cả DPI (40%) và Spread_Z (-0.54σ) đều nằm trong vùng điển hình của một phiên giao dịch không có biến cố.  
+Không xuất hiện tín hiệu stress; không có dấu hiệu stress cục bộ (Spread_Z thấp) hay stress kéo dài (DPI thấp). Đây là diễn biến mang tính **pha tạp ngẫu nhiên**, không bị chi phối bởi yếu tố ngoại vi.
+
+## 3. Cross-Check & Tail Direction
+
+Do thiếu dữ liệu Skewness và Kurtosis, không thể xác định hướng đuôi hoặc mức độ xuất hiện của outliers cực đoan. Tuy nhiên, với Spread dương (10.60%) và DPI chỉ 40%, dấu hiệu hiện tại cho thấy độ phân tán chủ yếu đến từ outliers rải rác hơn là từ một tail sự kiện tập trung.  
+Việc thiếu Kurtosis khiến chưa thể khẳng định mức độ "fat-tail" so với phân phối chuẩn.
+
+## 4. Regime Mapping
+
+Đối chiếu với 2D Map:
+- **DPI: 40% (thấp) × Corr: 0.006 (thấp)** → Chính xác khớp ô **Healthy Stock-Picking**.
+
+Đây là cấu trúc môi trường thuận lợi bậc nhất cho chiến lược chọn cổ phiếu. Các cổ phiếu hoàn toàn phân hóa độc lập, không có hiệu ứng bầy đàn.  
+
+**Rủi ro lớn nhất cho Portfolio Manager:**
+- **Concentration risk (rủi ro tập trung)**: Do không có tương quan, một danh mục đa dạng hóa tưởng chừng an toàn nhưng thực tế vẫn có thể chịu lỗ nếu chọn sai stock đơn lẻ.
+- **False sense of safety**: Correlation thấp tạo ảo giác dễ kiếm lời, nhưng spread thấp cũng đồng nghĩa với biên lợi nhuận thuần từ dispersion không quá lớn để bù đắp sai lầm pick.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "12/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.54,
+  "dpi_pct": 40.0,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```

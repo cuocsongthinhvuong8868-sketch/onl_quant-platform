@@ -1,0 +1,39 @@
+## 1. Scenario Assessment
+
+Kịch bản **Tiêu chuẩn** (K=1.0, CoE=14%) là mức baseline phù hợp cho ngành ngân hàng Việt Nam trong giai đoạn ổn định. Mức căng thẳng tài sản BVPS giảm 5% và P/B phạt 5% tạo ra một lớp đệm thận trọng hợp lý. **Mặt bằng tạo ra tín hiệu phân hóa rõ rệt**: 3 ngân hàng đứng đầu tạo Alpha dương ròng, cho thấy vẫn có cơ hội tìm kiếm giá trị thặng dư trong ngành, nhưng phần lớn thị trường vẫn đang ở vùng neutral đến đốt vốn.
+
+## 2. Top Alpha Decomposition
+
+- **HDB (Alpha 6.1%, P/B 1.24) – Fortress Candidate**: Driver chính là sự kết hợp giữa **P/B hợp lý** (không rẻ cũng không đắt) và **chất lượng lợi nhuận cốt lõi** (ROE bền vững, σ thấp). HDB thuộc nhóm ngân hàng quản trị rủi ro tốt, lợi nhuận ổn định, có khả năng giữ vững ROE cao. **Phân loại: Fortress**.
+- **CTG (Alpha 4.1%, P/B 1.00) – Cheap-but-not-trap**: P/B = 1.00 là điểm thu hút chính. CTG có ROE ở mức trung bình khá nhưng σ(ROE) thấp, giúp giảm Risk Penalty. **Phân loại: Fortress tiềm năng** (nếu duy trì được chất lượng).
+- **SHB (Alpha 3.9%, P/B 0.93) – Deep Value Fortress**: P/B < 1 (0.93) là yếu tố giá rẻ mạnh. ROE (theo geomean) đủ cao để vượt qua CoE ngay cả khi trừ Risk Penalty. **Phân loại: Fortress (dòng tiền compounding)**.
+
+## 3. Value Traps Warning
+
+- **EIB (Alpha -12.3%, P/B 1.48) – Premium Burn Nhẹ + Risk Heavy**: P/B 1.48 không quá đắt nhưng ROE rất thấp và σ(ROE) cao → Risk Penalty lớn. Đây là **Cheap Trap biến tướng**: giá không rẻ, chất lượng kém.
+- **VCB (Alpha -7.2%, P/B 2.26) – Premium Burn Điển Hình**: P/B = 2.26 là mức premium quá cao so với ROE cốt lõi (dù ROE tuyệt đối có vẻ ổn). Risk Penalty không lớn nhưng vẫn đủ để kéo Alpha âm sâu.
+- **LPB (Alpha -6.9%, P/B 2.88) – Premium Burn**: P/B gần 3 là mức định giá quá lạc quan so với khả năng sinh lợi. Khi tăng trưởng tín dụng chậm lại, LPB sẽ rất dễ bị điều chỉnh.
+
+## 4. Portfolio Construction
+
+- **Core Holding (60-70%)**: **HDB** (Fortress), **CTG** (Fortress tiềm năng).
+- **Tactical (20-30%)**: **SHB** (rẻ + chất lượng ổn, nhưng cần theo dõi rủi ro thanh khoản ngắn hạn).
+- **Avoid List / Underweight**:
+  - **EIB** (Cấm mua: cấu trúc ROE yếu + rủi ro cao)
+  - **VCB** (Cấm mua: P/B quá đắt so với lợi nhuận cốt lõi)
+  - **LPB** (Cấm mua: Premium Burn)
+
+**Sector View**: **Bullish có chọn lọc** – chỉ 3 mã trong Top có Alpha (+) nhưng chúng đại diện cho ~30% vốn hóa toàn ngành. Tổng thể ngành vẫn có điểm sáng.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "CTG"],
+  "avoid_list": ["EIB", "VCB", "LPB"],
+  "sector_view": "bullish",
+  "confidence": "medium"
+}
+```
