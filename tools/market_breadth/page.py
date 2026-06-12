@@ -54,15 +54,21 @@ def render():
 
     df_volumes = _load_optional_volume_cache()
 
-    key = {"universe_cols": int(df_prices.shape[1])}
-    cached = load_daily_cache("market_breadth", key)
+    data_date = df_prices.index.max().strftime("%Y-%m-%d")
+    key = {"cache_version": 2, "universe_cols": int(df_prices.shape[1])}
+    cached = load_daily_cache("market_breadth", key, data_date=data_date)
     if cached is not None:
         breadth = cached["breadth"]
         masks = cached["masks"]
         st.caption("⚡ Dùng cache cùng ngày (Market Breadth).")
     else:
         breadth, masks = compute_breadth(df_prices)
-        save_daily_cache("market_breadth", key, {"breadth": breadth, "masks": masks})
+        save_daily_cache(
+            "market_breadth",
+            key,
+            {"breadth": breadth, "masks": masks},
+            data_date=data_date,
+        )
         st.caption("💾 Đã tạo cache ngày mới (Market Breadth).")
     if breadth.empty:
         st.warning("Không đủ dữ liệu để tính Market Breadth.")
@@ -225,5 +231,3 @@ def render():
                         st.markdown(f.read())
                 except Exception as e:
                     st.error(f"Lỗi đọc file: {e}")
-
-

@@ -15,11 +15,15 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/3] Running python -m command.update_bank_fundamentals ...
-python -m command.update_bank_fundamentals
-if errorlevel 1 (
-  echo [ERROR] command.update_bank_fundamentals failed.
-  goto :end
+echo [2/3] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ...
+if exist "%USERPROFILE%\Desktop\bctc-scrape\Statistics\json" if exist "%USERPROFILE%\Desktop\bctc-scrape\BCTC\json" (
+  python -m command.update_risk_adjusted_growth_statistics --source-dir "%USERPROFILE%\Desktop\bctc-scrape\Statistics\json" --financial-report-source-dir "%USERPROFILE%\Desktop\bctc-scrape\BCTC\json"
+  if errorlevel 1 (
+    echo [ERROR] command.update_risk_adjusted_growth_statistics failed.
+    goto :end
+  )
+) else (
+  echo [SKIP] Local scrape folders not found: %USERPROFILE%\Desktop\bctc-scrape\Statistics\json and %USERPROFILE%\Desktop\bctc-scrape\BCTC\json
 )
 
 echo.

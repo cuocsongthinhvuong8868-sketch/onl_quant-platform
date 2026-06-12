@@ -399,3 +399,106 @@ def plot_credit_quality_spread(df: pd.DataFrame) -> go.Figure:
     fig.update_xaxes(gridcolor="LightGray")
     fig.update_yaxes(gridcolor="LightGray")
     return fig
+
+
+def plot_margin_debt_m2_overlay(df: pd.DataFrame) -> go.Figure:
+    """
+    Monthly US margin debt / M2 overlay. This chart is not part of GFCM PCA.
+    """
+    fig = make_subplots(specs=[[{"secondary_y": True}]])
+    if df is None or df.empty:
+        fig.update_layout(title="US Margin Debt / M2 — chưa có dữ liệu")
+        return fig
+
+    work = df.copy()
+    if "date" in work.columns:
+        work["date"] = pd.to_datetime(work["date"], errors="coerce")
+        work = work.set_index("date")
+    work = work.sort_index()
+
+    if "margin_debt_pct_m2" not in work.columns:
+        fig.update_layout(title="US Margin Debt / M2 — thiếu cột margin_debt_pct_m2")
+        return fig
+
+    valid = work.dropna(subset=["margin_debt_pct_m2"])
+    if valid.empty:
+        fig.update_layout(title="US Margin Debt / M2 — chưa đủ dữ liệu")
+        return fig
+
+    fig.add_trace(
+        go.Scatter(
+            x=valid.index,
+            y=valid["margin_debt_pct_m2"],
+            mode="lines",
+            name="Margin debt / M2",
+            line=dict(color="#2563eb", width=2.1),
+            hovertemplate="<b>%{x|%m/%Y}</b><br>Margin/M2: %{y:.2f}%<extra></extra>",
+        ),
+        secondary_y=False,
+    )
+
+    if "margin_debt_pct_m2_percentile_10y" in valid.columns:
+        pct = valid["margin_debt_pct_m2_percentile_10y"].dropna()
+        if not pct.empty:
+            fig.add_trace(
+                go.Scatter(
+                    x=pct.index,
+                    y=pct.values,
+                    mode="lines",
+                    name="10Y percentile",
+                    line=dict(color="#f59e0b", width=1.7, dash="dot"),
+                    hovertemplate="<b>%{x|%m/%Y}</b><br>10Y percentile: %{y:.0f}<extra></extra>",
+                ),
+                secondary_y=True,
+            )
+            fig.add_hline(
+                y=85,
+                line_dash="dash",
+                line_color="#f59e0b",
+                opacity=0.55,
+                secondary_y=True,
+                annotation_text="85th pct",
+                annotation_position="top right",
+            )
+
+    mean_val = float(valid["margin_debt_pct_m2"].mean())
+    fig.add_hline(
+        y=mean_val,
+        line_dash="dot",
+        line_color="#64748b",
+        opacity=0.65,
+        secondary_y=False,
+        annotation_text=f"mean={mean_val:.2f}%",
+        annotation_position="bottom right",
+    )
+
+    latest = valid.iloc[-1]
+    latest_date = valid.index[-1]
+    regime = latest.get("signal_regime", "N/A")
+    fig.add_annotation(
+        x=latest_date,
+        y=float(latest["margin_debt_pct_m2"]),
+        text=f"{regime}",
+        showarrow=True,
+        arrowhead=2,
+        arrowcolor="#2563eb",
+        font=dict(color="#1d4ed8", size=11),
+        bgcolor="white",
+        bordercolor="#2563eb",
+        borderwidth=1,
+    )
+
+    fig.update_layout(
+        title="US Margin Debt / M2 — Speculative Leverage Overlay (monthly · not in PCA)",
+        template="plotly_white",
+        hovermode="x unified",
+        plot_bgcolor="white",
+        paper_bgcolor="white",
+        font=dict(color="black"),
+        height=380,
+        legend=dict(orientation="h", yanchor="bottom", y=1.02, xanchor="right", x=1),
+    )
+    fig.update_yaxes(title_text="Margin debt / M2 (%)", gridcolor="LightGray", secondary_y=False)
+    fig.update_yaxes(title_text="10Y percentile", range=[0, 100], gridcolor="LightGray", secondary_y=True)
+    fig.update_xaxes(gridcolor="LightGray")
+    return fig

@@ -11,6 +11,7 @@ import pandas as pd
 import plotly.graph_objects as go
 from plotly.subplots import make_subplots
 from config import DATA_LAKE
+from shared.page_layout import render_signal_card
 
 CSV_PATH = DATA_LAKE / "Ai_cio_report.csv"
 
@@ -32,6 +33,17 @@ def _regime_color(regime_str: str) -> str:
         if keyword.lower() in regime_lower:
             return color
     return "#3498db"  # default blue
+
+
+def _regime_tone(regime_str: str) -> str:
+    regime_lower = regime_str.lower()
+    if "pre-crash" in regime_lower:
+        return "danger"
+    if "rủi ro" in regime_lower:
+        return "warning"
+    if "tích lũy" in regime_lower or "tăng trưởng" in regime_lower:
+        return "positive"
+    return "neutral"
 
 
 def render():
@@ -71,7 +83,6 @@ def render():
 
     # ── Summary metrics ──
     latest = df.iloc[-1]
-    regime_color = _regime_color(str(latest["regime"]))
     col1, col2, col3, col4 = st.columns([1, 1, 2, 1])
     with col1:
         st.metric("📅 Ngày gần nhất", latest["date"].strftime("%d/%m/%Y"))
@@ -84,12 +95,7 @@ def render():
                 delta = f"{score_val - prev_score:+.0f}"
         st.metric("📈 Score", f"{score_val:.0f}/100" if pd.notna(score_val) else "N/A", delta=delta)
     with col3:
-        st.markdown("🎯 **Regime**")
-        st.markdown(
-            f'<span style="font-size:1.15rem; font-weight:600; color:{regime_color};">'
-            f'{latest["regime"]}</span>',
-            unsafe_allow_html=True,
-        )
+        render_signal_card("🎯 Regime", latest["regime"], tone=_regime_tone(str(latest["regime"])))
     with col4:
         st.metric("📊 Số ngày", f"{len(df)}")
 

@@ -17,12 +17,23 @@ defaults:
     - ddmmyyyy
 
 sources:
-  - name: bank_fundamentals
+  - name: risk_adjusted_growth_statistics
     category: raw/fundamentals
-    path: data_lake/bank_fundamentals.csv
+    path: data_lake/risk_adjusted_growth/statistics_json
     warning_days: 45
     critical_days: 90
     frequency: monthly
+    file_patterns: ["*_financial_statistics.json"]
+    date_columns: [timestamp, date, DATE]
+
+  - name: risk_adjusted_growth_financial_reports
+    category: raw/fundamentals
+    path: data_lake/risk_adjusted_growth/financial_report_json
+    warning_days: 45
+    critical_days: 90
+    frequency: monthly
+    file_patterns: ["*_financial_report.json"]
+    date_columns: [timestamp, date, DATE]
 
   - name: market_data
     category: raw/market
@@ -200,10 +211,10 @@ sources:
     category: processed/tool_metrics/behavioral
     type: tool_metrics
     tool: Risk-Adjusted Growth
-    depends_on: [market_data, bank_fundamentals]
+    depends_on: [market_data, risk_adjusted_growth_statistics, risk_adjusted_growth_financial_reports]
     cache_namespace: risk_adjusted_growth
-    warning_days: 7
-    critical_days: 21
+    warning_days: 45
+    critical_days: 90
 
   - name: metrics_market_breadth
     category: processed/tool_metrics/behavioral

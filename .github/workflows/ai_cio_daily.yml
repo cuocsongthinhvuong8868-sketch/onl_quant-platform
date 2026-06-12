@@ -58,7 +58,18 @@ jobs:
         run: |
           echo "Dữ liệu chưa cập nhật hôm nay. Đang chạy update_data.py..."
           python command/update_data.py
-          python command/update_bank_fundamentals.py
+
+      - name: ✅ Validate Risk-Adjusted Growth bank statistics feed
+        run: |
+          python - <<'PY'
+          from tools.risk_adjusted_growth.quant.data_prep import load_statistics_ratio_table
+          df = load_statistics_ratio_table()
+          print(f"Risk-Adjusted Growth bank feed rows: {len(df)}")
+          if len(df) < 10:
+              raise SystemExit("Risk-Adjusted Growth bank feed has too few rows")
+          if not df["Cash Payout Source"].astype(str).str.contains("cash_flow_dividends_paid_20q").all():
+              raise SystemExit("Risk-Adjusted Growth payout feed is not cash-flow based")
+          PY
 
       - name: 🤖 Chạy AI CIO (force — không dùng cache cũ của tool con)
         run: python command/run_ai_cio_auto.py --force

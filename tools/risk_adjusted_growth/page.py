@@ -1,9 +1,14 @@
 import streamlit as st
 
-from shared.data_loader import load_close_prices, load_custom
+from shared.data_loader import load_close_prices
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from tools.risk_adjusted_growth.ui.sidebar import render_sidebar
-from tools.risk_adjusted_growth.quant.data_prep import build_base_table
+from tools.risk_adjusted_growth.quant.data_prep import (
+    FINANCIAL_REPORT_JSON_DIR,
+    STATISTICS_JSON_DIR,
+    build_base_table_from_statistics,
+    risk_adjusted_growth_source_signature,
+)
 from tools.risk_adjusted_growth.quant.scoring import compute_scores
 from tools.risk_adjusted_growth.ui.charts import render_table, render_alpha_chart
 try:
@@ -24,52 +29,18 @@ except ImportError:
 
 
 @st.cache_data(show_spinner=False)
-def _load_base_data(df_close):
-    df_fund = load_custom("bank_fundamentals.csv")
-    try:
-        df_div = load_custom("dividend_cache.csv")
-    except FileNotFoundError:
-        df_div = None
-
-    # load_custom dùng index_col=0, nên dividend có thể bị đẩy mã cổ phiếu vào index.
-    if df_div is not None and not df_div.empty:
-        div_cols = {str(c) for c in df_div.columns}
-        has_symbol_col = ("Ma CP" in div_cols) or ("ticker" in div_cols)
-        if not has_symbol_col:
-            if df_div.index.name:
-                idx_name = str(df_div.index.name)
-                if idx_name.lower() == "ma cp":
-                    df_div = df_div.reset_index().rename(columns={idx_name: "Ma CP"})
-                elif idx_name.lower() == "ticker":
-                    df_div = df_div.reset_index().rename(columns={idx_name: "ticker"})
-                else:
-                    df_div = df_div.reset_index().rename(columns={"index": "ticker"})
-            else:
-                df_div = df_div.reset_index().rename(columns={"index": "ticker"})
-
-    # load_custom dùng index_col=0, nên CSV fundamentals có thể bị đẩy ticker vào index.
-    if "ticker" not in df_fund.columns:
-        if df_fund.index.name and str(df_fund.index.name).lower() == "ticker":
-            df_fund = df_fund.reset_index()
-        elif "Unnamed: 0" in df_fund.columns:
-            df_fund = df_fund.rename(columns={"Unnamed: 0": "ticker"})
-        else:
-            df_fund = df_fund.reset_index().rename(columns={"index": "ticker"})
-
-    if "ticker" not in df_fund.columns:
-        raise ValueError("bank_fundamentals.csv thiếu cột 'ticker'.")
-
-    if df_close.empty:
-        raise ValueError("market_data.csv rỗng, chưa có dữ liệu giá.")
-
-    latest_prices = df_close.ffill().iloc[-1]
-    return build_base_table(df_fund, df_div, latest_prices)
+def _load_base_data(source_signature: str, price_date: str, price_row: dict):
+    return build_base_table_from_statistics(
+        STATISTICS_JSON_DIR,
+        financial_report_dir=FINANCIAL_REPORT_JSON_DIR,
+        price_row=price_row,
+    )
 
 
 def render():
     st.title("Risk-Adjusted Growth Rate")
-    st.caption("Economic Alpha cho nhóm ngân hàng, tách quant/UI theo pipeline data_lake")
-    st.caption("Build: RAG fix v3 (PB unit-normalized + dividend index normalization)")
+    st.caption("Economic Alpha cho nhóm ngân hàng, feed từ MozyFin Statistics + BCTC JSON trong data_lake")
+    st.caption("Build: RAG JSON feed v2 (ROE/PB từ Statistics, payout từ Cash Flow Dividends paid)")
 
     params = render_sidebar()
     ai_provider = params["ai_provider"]
@@ -80,15 +51,34 @@ def render():
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
-    st.caption(f"📅 Dữ liệu cuối cùng: {df_close.index.max().strftime('%d/%m/%Y')}")
+    if df_close.empty:
+        st.error("market_data.csv rỗng, không thể tính P/B daily.")
+        st.stop()
 
     with st.spinner("Đang tải fundamentals + xây bảng cơ sở..."):
         try:
-            df_base = _load_base_data(df_close)
+            source_signature = risk_adjusted_growth_source_signature(
+                STATISTICS_JSON_DIR,
+                FINANCIAL_REPORT_JSON_DIR,
+            )
+            price_date = df_close.index.max().strftime("%Y-%m-%d")
+            price_row = df_close.ffill().iloc[-1].to_dict()
+            df_base = _load_base_data(source_signature, price_date, price_row)
         except (FileNotFoundError, ValueError) as e:
             st.error(str(e))
-            st.info("Chạy script `python3 update_bank_fundamentals.py` để tạo dữ liệu fundamentals trong data_lake.")
+            st.info(
+                "Chạy script:\n"
+                "```bash\n"
+                "python command/update_risk_adjusted_growth_statistics.py\n"
+                "```"
+            )
             st.stop()
+    data_date = f"{price_date}|{source_signature}"
+    source_date = source_signature.split(":", 1)[0]
+    st.caption(
+        f"📅 Giá daily: {price_date} · Nguồn RAG JSON: {source_date} · "
+        f"{len(df_base)} ngân hàng hợp lệ · {STATISTICS_JSON_DIR} + {FINANCIAL_REPORT_JSON_DIR}"
+    )
 
     st.write(
         f"**Viễn cảnh:** {params['selected_k'].split(' ')[0]} | "
@@ -97,14 +87,17 @@ def render():
     )
 
     key = {
-        "cache_version": 3,
+        "cache_version": 9,
+        "source": "statistics_json+financial_report_json",
+        "source_signature": source_signature,
+        "price_date": price_date,
         "k_value": params["k_value"],
         "coe_decimal": params["coe_decimal"],
         "bvps_change_pct": params["bvps_change_pct"],
         "pb_penalty_pct": params["pb_penalty_pct"],
     }
-    force_recompute = st.button("Force Recompute (bỏ cache hôm nay)")
-    cached = load_daily_cache("risk_adjusted_growth", key)
+    force_recompute = st.button("Force Recompute (bỏ cache feed hiện tại)")
+    cached = load_daily_cache("risk_adjusted_growth", key, data_date=data_date)
     if (cached is not None) and (not force_recompute):
         df_result = cached["df_result"]
         st.caption("⚡ Dùng cache cùng ngày (Risk-Adjusted Growth).")
@@ -116,7 +109,7 @@ def render():
             bvps_change_pct=params["bvps_change_pct"],
             pb_penalty_pct=params["pb_penalty_pct"],
         )
-        save_daily_cache("risk_adjusted_growth", key, {"df_result": df_result})
+        save_daily_cache("risk_adjusted_growth", key, {"df_result": df_result}, data_date=data_date)
         st.caption("💾 Đã tạo cache ngày mới (Risk-Adjusted Growth).")
 
     render_table(df_result)
@@ -162,11 +155,32 @@ def render():
                             with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()
 
+                            ticker_col = "Ticker" if "Ticker" in df_result.columns else "Ngân hàng"
                             top_alpha = df_result.nlargest(3, "Economic Alpha")
-                            top_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(top_alpha.to_dict('records'))])
+                            top_alpha_str = ", ".join([
+                                (
+                                    f"{i+1}. {row[ticker_col]} "
+                                    f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+                                    f"P/B {row['P/B Gốc']:.2f}, "
+                                    f"ROE {row['Geomean ROE']*100:.1f}%, "
+                                    f"σROE {row['Stdev ROE']*100:.1f}%, "
+                                    f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+                                )
+                                for i, row in enumerate(top_alpha.to_dict('records'))
+                            ])
 
                             bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
-                            bottom_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(bottom_alpha.to_dict('records'))])
+                            bottom_alpha_str = ", ".join([
+                                (
+                                    f"{i+1}. {row[ticker_col]} "
+                                    f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+                                    f"P/B {row['P/B Gốc']:.2f}, "
+                                    f"ROE {row['Geomean ROE']*100:.1f}%, "
+                                    f"σROE {row['Stdev ROE']*100:.1f}%, "
+                                    f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+                                )
+                                for i, row in enumerate(bottom_alpha.to_dict('records'))
+                            ])
 
                             full_prompt = prompt_template.replace("{k_scenario}", params['selected_k'].split(' ')[0])\
                                                          .replace("{k_value}", str(params['k_value']))\

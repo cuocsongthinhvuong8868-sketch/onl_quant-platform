@@ -9,6 +9,7 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 from shared.daily_cache import load_daily_cache, save_daily_cache, get_cache_path, clear_daily_cache
 from shared.api_key_helper import resolve_api_key
 from shared.github_sync import render_sync_button
+from shared.page_layout import render_signal_card, tone_for_signal
 from tools.esr_monitor.quant.metrics import (
     run_esr_pipeline, SSIResult, MARKET_STATES, VN30_TICKERS,
     PRODUCTION_REGIME_METHOD,
@@ -124,11 +125,14 @@ def render():
     n_vn30 = sum(1 for t in VN30_TICKERS if t in df_close.columns)
     st.caption(f"📊 Số mã VN30: {n_vn30}/30")
 
+    data_date = df_close.index.max().strftime("%Y-%m-%d")
+
     # ── Compute ESR ──
     # Đưa "có volume thật hay không" vào cache key — vì cùng tham số mà đổi
     # nguồn volume sẽ ra pillar khác → không thể chia sẻ cache.
     # s_liq_method bump khi đổi methodology S_LIQ → tự invalidate cache cũ.
     cache_key = {
+        "cache_version": 2,
         "ma_period": ma_period, "pca_warmup": pca_warmup,
         "ema_span": ema_span, "deposit_rate": deposit_rate,
         "pillar_mode": pillar_mode, "trend_ma_window": trend_ma_window,
@@ -148,7 +152,11 @@ def render():
         if clear_daily_cache("esr_monitor", cache_key):
             st.toast("🗑️ Đã xoá cache model — đang tính lại từ đầu.", icon="🗑️")
 
-    cached = None if force_rerun_model else load_daily_cache("esr_monitor", cache_key)
+    cached = (
+        None
+        if force_rerun_model
+        else load_daily_cache("esr_monitor", cache_key, data_date=data_date)
+    )
     if cached is not None:
         pillars = cached["pillars"]
         result = cached["result"]
@@ -176,7 +184,7 @@ def render():
         save_daily_cache("esr_monitor", cache_key, {
             "pillars": pillars, "result": result,
             "market_states": market_states, "threshold": threshold,
-        })
+        }, data_date=data_date)
         st.caption("💾 Đã tạo cache mới (ESR Monitor).")
 
     # ── Action buttons: Re-run model + GitHub sync ──
@@ -220,36 +228,30 @@ def render():
 
     if current_state_key is not None and current_state_key in MARKET_STATES:
         info = MARKET_STATES[current_state_key]
-        status, color, bg_color, emoji = info['label'], info['color'], info['bg'], info['emoji']
+        status, emoji = info['label'], info['emoji']
     elif hmm_ok:
         regime_s = pillars.get('HMM_Regime')
         in_stress = regime_s.dropna().iloc[-1] == 1 if regime_s is not None else False
         status = "HIGH STRESS" if in_stress else "LOW STRESS"
-        color = "red" if in_stress else "green"
-        bg_color = "#f8f9fa"
         emoji = "🔴" if in_stress else "🟢"
     else:
         status = "SAFE" if last_ssi < 0.5 else ("WARNING" if last_ssi < 0.8 else "CRITICAL")
-        color = {"SAFE": "green", "WARNING": "orange", "CRITICAL": "red"}[status]
-        bg_color = "#f8f9fa"
         emoji = ""
 
-    extra_parts = []
+    extra_parts = [f"SSI = {last_ssi:.1%}"]
     if hmm_ok and threshold is not None:
         gap = last_ssi - threshold
-        gc = "#c0392b" if gap >= 0 else "#27ae60"
-        extra_parts.append(f"HMM thr: <b>{threshold:.3f}</b> | Gap: <span style='color:{gc}'><b>{gap:+.3f}</b></span>")
+        extra_parts.append(f"HMM thr {threshold:.3f} | Gap {gap:+.3f}")
 
     c1, c2, c3 = st.columns([1, 1, 2])
     with c1:
-        st.markdown(
-            f"<div style='padding:15px;border-radius:8px;background:{bg_color};"
-            f"border-left:5px solid {color}'>"
-            f"<h4 style='margin:0'>Market Regime</h4>"
-            f"<h2 style='color:{color};margin:5px 0'>{emoji} {status}</h2>"
-            f"<p style='margin:0'>SSI = <b>{last_ssi:.1%}</b></p>"
-            f"{'<br>'.join(extra_parts)}</div>",
-            unsafe_allow_html=True,
+        render_signal_card(
+            "Market Regime",
+            status,
+            tone=tone_for_signal(status),
+            icon=emoji,
+            caption=" | ".join(extra_parts),
+            min_height=122,
         )
     with c2:
         st.metric("PCA Concentration", f"{last_evr:.1%}",
@@ -427,4 +429,3 @@ def render():
                         st.markdown(f.read())
                 except Exception as e:
                     st.error(f"Lỗi đọc file: {e}")
-

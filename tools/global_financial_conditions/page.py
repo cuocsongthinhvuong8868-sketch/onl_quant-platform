@@ -13,9 +13,15 @@ import pandas as pd
 import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+from shared.page_layout import render_signal_card, tone_for_signal
 from tools.global_financial_conditions.quant.metrics import (
     load_cached_gfcm,
     summarize_latest,
+)
+from tools.global_financial_conditions.quant.margin_m2 import (
+    MARGIN_M2_CACHE,
+    load_cached_margin_m2,
+    summarize_latest_margin_m2,
 )
 from tools.global_financial_conditions.ui.sidebar import render_sidebar
 from tools.global_financial_conditions.ui.charts import (
@@ -26,6 +32,7 @@ from tools.global_financial_conditions.ui.charts import (
     plot_percentile_grid,
     plot_pc_scatter,
     plot_credit_quality_spread,
+    plot_margin_debt_m2_overlay,
 )
 
 try:
@@ -52,6 +59,19 @@ def _load_gfcm() -> pd.DataFrame:
             "Vui lòng chạy: python command/update_global_financial_conditions.py"
         )
     return load_cached_gfcm(path)
+
+
+def _load_margin_m2_optional() -> pd.DataFrame:
+    """Đọc US Margin Debt/M2 overlay nếu cache đã có; không chặn GFCM nếu thiếu."""
+    if not MARGIN_M2_CACHE.exists():
+        return pd.DataFrame()
+    return load_cached_margin_m2(MARGIN_M2_CACHE)
+
+
+def _fmt_metric(value, suffix: str = "", decimals: int = 2) -> str:
+    if value is None or pd.isna(value):
+        return "N/A"
+    return f"{float(value):.{decimals}f}{suffix}"
 
 
 def render():
@@ -124,6 +144,11 @@ def render():
         return
 
     summary = summarize_latest(df_all)
+    try:
+        df_margin_m2_all = _load_margin_m2_optional()
+    except Exception as e:
+        df_margin_m2_all = pd.DataFrame()
+        st.sidebar.warning(f"Margin/M2 overlay lỗi cache: {e}")
     rg = summary["regime"]
     rg_icon = REGIME_ICON.get(rg, "⚪")
 
@@ -132,9 +157,9 @@ def render():
     with col1:
         st.metric("Cập nhật gần nhất", summary["date"])
     with col2:
-        st.metric(f"Regime {rg_icon}", rg)
+        render_signal_card("Regime", rg, tone=tone_for_signal(rg), icon=rg_icon)
     with col3:
-        st.metric("Driver", summary["driver"])
+        render_signal_card("Driver", summary["driver"], tone="info")
     with col4:
         st.metric("PC1 EMA(5) (σ)", f"{summary['pc1_smooth']:+.2f}",
                   delta=f"5d raw: {summary['pc1_5d_change']:+.2f}",
@@ -246,7 +271,70 @@ def render():
         with col_b:
             st.plotly_chart(plot_credit_quality_spread(df_plot), use_container_width=True)
 
-        with st.expander("📋 Bảng Analytics (50 dòng gần nhất)"):
+        st.divider()
+        st.markdown("##### 🧮 US Margin Debt / M2 (Overlay — không vào PCA)")
+        st.caption(
+            "FINRA margin debt là dữ liệu monthly/lagged, chỉ dùng như speculative leverage overlay; "
+            "không đi vào PC1, regime PCA hoặc hard rule của GFCM."
+        )
+        if df_margin_m2_all.empty:
+            st.info(
+                f"Chưa có cache riêng Margin/M2 tại `{MARGIN_M2_CACHE}`. Chạy:\n"
+                "```bash\n"
+                "python command/update_us_margin_m2.py\n"
+                "```"
+            )
+        else:
+            margin_summary = summarize_latest_margin_m2(df_margin_m2_all)
+            m1, m2, m3, m4, m5 = st.columns(5)
+            with m1:
+                st.metric("Latest month", margin_summary["date"])
+            with m2:
+                st.metric("Margin/M2", _fmt_metric(margin_summary["margin_debt_pct_m2"], "%"))
+            with m3:
+                st.metric("5Y z-score", _fmt_metric(margin_summary["margin_debt_pct_m2_zscore_5y"], "σ"))
+            with m4:
+                st.metric("10Y percentile", _fmt_metric(margin_summary["margin_debt_pct_m2_percentile_10y"], "th", 0))
+            with m5:
+                render_signal_card(
+                    "Regime",
+                    margin_summary["signal_regime"],
+                    tone=tone_for_signal(margin_summary["signal_regime"]),
+                    min_height=78,
+                )
+
+            df_margin_plot = df_margin_m2_all[
+                df_margin_m2_all.index >= pd.to_datetime(plot_start_date)
+            ].copy()
+            st.plotly_chart(plot_margin_debt_m2_overlay(df_margin_plot), use_container_width=True)
+
+            with st.expander("📋 Bảng US Margin Debt / M2 (50 tháng gần nhất)"):
+                margin_cols = [
+                    "margin_debt_million_usd",
+                    "m2_billion_usd",
+                    "margin_debt_pct_m2",
+                    "margin_debt_yoy_pct",
+                    "m2_yoy_pct",
+                    "margin_debt_pct_m2_zscore_5y",
+                    "margin_debt_pct_m2_percentile_10y",
+                    "signal_regime",
+                ]
+                margin_cols_avail = [c for c in margin_cols if c in df_margin_m2_all.columns]
+                margin_fmt = {
+                    "margin_debt_million_usd": "{:,.0f}",
+                    "m2_billion_usd": "{:,.0f}",
+                    "margin_debt_pct_m2": "{:.2f}",
+                    "margin_debt_yoy_pct": "{:.2f}",
+                    "m2_yoy_pct": "{:.2f}",
+                    "margin_debt_pct_m2_zscore_5y": "{:+.2f}",
+                    "margin_debt_pct_m2_percentile_10y": "{:.0f}",
+                }
+                st.dataframe(
+                    df_margin_m2_all[margin_cols_avail].tail(50).style.format(margin_fmt, na_rep="—"),
+                    use_container_width=True,
+                )
+
+        with st.expander("📋 Bảng Analytics GFCM/PCA core (50 dòng gần nhất)"):
             cols_ana = ["PC1", "PC1_smooth", "PC2", "PC1_pct",
                         "VIX_pct", "MOVE_pct", "SKEW_pct",
                         "HY_pct", "CCC_pct", "IG_pct",

@@ -48,7 +48,7 @@ shared/
 promt/              — 12 prompt templates (Vietnamese, tên file có space - typo intentional)
 command/
   update_data.py                          — vnstock close+volume
-  update_bank_fundamentals.py             — KBS fundamentals quarterly
+  update_risk_adjusted_growth_statistics.py — copy/sanitize bank Statistics + BCTC JSON for RAG
   update_fed_liquidity.py                 — FRED WALCL/TGA/RRP weekly
   update_global_financial_conditions.py   — FRED VIX/HY/CCC + Yahoo MOVE daily
   update_sector_data.py                   — ICB metadata
@@ -90,7 +90,8 @@ command/
 | `market_data.csv` (close) | `update_data.py` smart-incremental | Daily 14:30 VN |
 | `market_volume.csv` | Same — KHÔNG ffill (NaN giữ nghĩa) | Daily |
 | `vnindex_cache.csv` / `vn30_cache.csv` | Same | Daily |
-| `bank_fundamentals.csv` | `update_bank_fundamentals.py` (KBS) | Quarterly |
+| `risk_adjusted_growth/statistics_json/*.json` | `update_risk_adjusted_growth_statistics.py` (MozyFin Statistics scrape) | Monthly / on new scrape |
+| `risk_adjusted_growth/financial_report_json/*.json` | `update_risk_adjusted_growth_statistics.py` (MozyFin BCTC scrape) | Monthly / on new scrape |
 | `ticker_metadata.csv` | `update_sector_data.py` (vnstock Listing) | Quarterly |
 | `fed_liquidity_cache.csv` | `update_fed_liquidity.py` (FRED) | Weekly Wed |
 | `global_financial_conditions_cache.csv` | `update_global_financial_conditions.py` (FRED + Yahoo) | Daily |
@@ -151,7 +152,7 @@ streamlit run app.py
 # Data update
 python command/update_data.py                          # daily incremental ~5 min
 python command/update_data.py --backfill 2190          # 6 năm backfill
-python command/update_bank_fundamentals.py             # quarterly
+python command/update_risk_adjusted_growth_statistics.py # bank Statistics + BCTC JSON for RAG
 python command/update_fed_liquidity.py                 # weekly Wed (FRED)
 python command/update_global_financial_conditions.py   # daily (FRED+Yahoo)
 python command/update_sector_data.py                   # quarterly ICB
@@ -341,7 +342,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 
 **Infrastructure**:
 - `.github/workflows/command_runner.yml`: trigger file `.github/triggers/run-command.json` push-based. Đã add `branches: [main]` filter (PR #16 hotfix) để không re-fire trên feature branch push.
-- Trigger update_data + update_bank_fundamentals via MCP trong session — fetch 2026-05-21 + 2026-05-22 (intraday).
+- Trigger update_data + RAG statistics feed refresh via MCP trong session — fetch 2026-05-21 + 2026-05-22 (intraday).
 
 **Lessons học**:
 - `@st.cache_data` không reliable trên Cloud long-running worker. Pkl pattern via `daily_cache.py` (disk-based + data_date check) là gold standard cho VN-equity compute tool.

@@ -4,6 +4,7 @@ import streamlit as st
 
 from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
+from shared.page_layout import render_signal_card, tone_for_signal
 from tools.upside_ratio.quant.metrics import build_breadth_series, compute_actual_breadth
 from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
 from tools.upside_ratio.ui.sidebar import render_sidebar
@@ -128,9 +129,21 @@ def render():
     )
 
     a, b, c, d = st.columns(4)
-    a.metric("Core Momentum Cầu (φ)", f"{phi_up:.3f}", regime_up)
+    with a:
+        render_signal_card(
+            "Core Momentum Cầu (φ)",
+            f"{phi_up:.3f}",
+            tone=tone_for_signal(regime_up),
+            caption=regime_up,
+        )
     b.metric("Long-run Mean Cầu (μ)", f"{mu_up*100:.1f}%")
-    c.metric("Core Momentum Cung (φ)", f"{phi_dn:.3f}", regime_dn)
+    with c:
+        render_signal_card(
+            "Core Momentum Cung (φ)",
+            f"{phi_dn:.3f}",
+            tone=tone_for_signal(regime_dn),
+            caption=regime_dn,
+        )
     d.metric("Long-run Mean Cung (μ)", f"{mu_dn*100:.1f}%")
 
     # Header lịch sử

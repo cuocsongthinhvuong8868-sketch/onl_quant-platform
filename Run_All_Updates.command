@@ -33,14 +33,18 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "[2/3] Running python -m command.update_bank_fundamentals ..."
-"$PY_BIN" -m command.update_bank_fundamentals
-if [ $? -ne 0 ]; then
-  echo "[ERROR] command.update_bank_fundamentals failed."
-  echo
-  read -n 1 -s -r -p "Press any key to close..."
-  echo
-  exit 1
+echo "[2/3] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ..."
+if [ -d "/Users/macos/Desktop/bctc-scrape/Statistics/json" ] && [ -d "/Users/macos/Desktop/bctc-scrape/BCTC/json" ]; then
+  "$PY_BIN" -m command.update_risk_adjusted_growth_statistics
+  if [ $? -ne 0 ]; then
+    echo "[ERROR] command.update_risk_adjusted_growth_statistics failed."
+    echo
+    read -n 1 -s -r -p "Press any key to close..."
+    echo
+    exit 1
+  fi
+else
+  echo "[SKIP] Local scrape folders not found: /Users/macos/Desktop/bctc-scrape/Statistics/json and /Users/macos/Desktop/bctc-scrape/BCTC/json"
 fi
 
 echo

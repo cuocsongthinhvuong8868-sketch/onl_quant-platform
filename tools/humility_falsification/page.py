@@ -11,6 +11,7 @@ import streamlit as st
 
 from config import AI_PROVIDER_MAP, DATA_LAKE
 from shared.data_loader import load_close_prices, load_custom, load_volumes
+from shared.page_layout import render_signal_card, tone_for_signal
 
 
 REPORT_GLOB = "executive_summary_{provider}_*.txt"
@@ -830,7 +831,8 @@ def _render_summary(
     c1.metric("T data as of", t_data_date.isoformat())
     c2.metric("Auto T-1 report", report_date.isoformat() if isinstance(report_date, date) else report_path.name)
     c3.metric("Rules triggered", f"{falsified}/{total}")
-    c4.metric("Thesis status", status_label)
+    with c4:
+        render_signal_card("Thesis status", status_label, tone=tone_for_signal(status_label))
 
     if isinstance(report_date, date) and report_date != target_report_date:
         st.warning(

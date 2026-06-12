@@ -9,6 +9,7 @@ import pandas as pd
 import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+from shared.page_layout import render_signal_card, tone_for_signal
 from tools.fed_liquidity.quant.metrics import OUTPUT_COLUMNS, summarize_latest
 from tools.fed_liquidity.ui.sidebar import render_sidebar
 from tools.fed_liquidity.ui.charts import plot_net_liquidity, plot_momentum, plot_zscore
@@ -110,7 +111,7 @@ def render():
     with col3:
         st.metric("Z-Score (52W)", f"{summary['z_score']:+.2f}")
     with col4:
-        st.metric(f"Signal {sig_icon}", sig)
+        render_signal_card("Signal", sig, tone=tone_for_signal(sig), icon=sig_icon)
 
     col5, col6, col7 = st.columns(3)
     with col5:

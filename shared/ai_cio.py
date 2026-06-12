@@ -245,7 +245,7 @@ from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rol
 # Import logic Upside Ratio
 
 # Import logic Risk Adjusted Growth
-from tools.risk_adjusted_growth.quant.data_prep import build_base_table
+from tools.risk_adjusted_growth.quant.data_prep import build_base_table_from_statistics
 from tools.risk_adjusted_growth.quant.scoring import compute_scores
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
@@ -629,11 +629,13 @@ def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 2) -> s
     return "\n\n".join(blocks)
 
 def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
-    """Xoá toàn bộ cache AI text của 9 công cụ con + executive_summary cho provider_key cụ thể."""
+    """Xoá cache AI text của các công cụ con + executive_summary cho provider_key cụ thể."""
     tool_names = [
         "feargreed", "manipulation", "dispersion", "upside_ratio",
         "risk_adjusted_growth", "market_breadth", "esr_monitor",
-        "va_res", "var_cvar_vnindex", "executive_summary", "telegram_summary"
+        "va_res", "var_cvar_vnindex",
+        "fed_liquidity", "global_financial_conditions",
+        "executive_summary", "telegram_summary"
     ]
     for tool in tool_names:
         path = _get_cache_path(tool, provider_key)
@@ -861,38 +863,40 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
 def run_risk_adjusted(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
     cached = _read_cache("risk_adjusted_growth", provider_key)
     if cached: return cached
-    
-    # 1. Load & normalize fundamentals
-    df_fund = load_custom("bank_fundamentals.csv")
-    if "ticker" not in df_fund.columns:
-        if df_fund.index.name and str(df_fund.index.name).lower() == "ticker":
-            df_fund = df_fund.reset_index()
-        elif "Unnamed: 0" in df_fund.columns:
-            df_fund = df_fund.rename(columns={"Unnamed: 0": "ticker"})
-        else:
-            df_fund = df_fund.reset_index().rename(columns={"index": "ticker"})
-    
-    # 2. Load dividend (optional)
-    try:
-        df_div = load_custom("dividend_cache.csv")
-    except FileNotFoundError:
-        df_div = None
-    
-    # 3. Build base table (tính P/B, payout ratio)
+
     latest_prices = df_stocks.ffill().iloc[-1]
-    df_base = build_base_table(df_fund, df_div, latest_prices)
-    
-    # 4. Compute scores
+    df_base = build_base_table_from_statistics(price_row=latest_prices)
     df_result = compute_scores(df_base=df_base, k_value=1.0, coe_decimal=0.14, bvps_change_pct=-5.0, pb_penalty_pct=-5.0)
+    ticker_col = "Ticker" if "Ticker" in df_result.columns else "Ngân hàng"
     
     with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
 
     top_alpha = df_result.nlargest(3, "Economic Alpha")
-    top_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(top_alpha.to_dict('records'))])
+    top_alpha_str = ", ".join([
+        (
+            f"{i+1}. {row[ticker_col]} "
+            f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+            f"P/B {row['P/B Gốc']:.2f}, "
+            f"ROE {row['Geomean ROE']*100:.1f}%, "
+            f"σROE {row['Stdev ROE']*100:.1f}%, "
+            f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+        )
+        for i, row in enumerate(top_alpha.to_dict('records'))
+    ])
     
     bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
-    bottom_alpha_str = ", ".join([f"{i+1}. {row['Ngân hàng']} (Alpha {row['Economic Alpha']*100:.1f}%, P/B {row['P/B Gốc']:.2f})" for i, row in enumerate(bottom_alpha.to_dict('records'))])
+    bottom_alpha_str = ", ".join([
+        (
+            f"{i+1}. {row[ticker_col]} "
+            f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+            f"P/B {row['P/B Gốc']:.2f}, "
+            f"ROE {row['Geomean ROE']*100:.1f}%, "
+            f"σROE {row['Stdev ROE']*100:.1f}%, "
+            f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+        )
+        for i, row in enumerate(bottom_alpha.to_dict('records'))
+    ])
 
     full_prompt = prompt_template.replace("{k_scenario}", "Tiêu chuẩn")\
                                  .replace("{k_value}", "1.0")\
@@ -1223,6 +1227,213 @@ def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -
         return "N/A", f"Lỗi đọc file: {e}"
 
 
+def _get_fed_liquidity_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Read the latest Fed Liquidity child AI report."""
+    return _get_latest_report_for_macro("fed_liquidity", provider_key)
+
+
+def run_fed_liquidity_child_report(
+    client,
+    provider_key: str = "kimi-2.6",
+    model: str = None,
+    force: bool = False,
+) -> str:
+    """
+    Generate the Fed Liquidity child AI report from the latest data cache.
+
+    Auto AI CIO is designed to consume child-tool txt reports. This function
+    keeps that contract while ensuring the txt is regenerated from current data.
+    """
+    cached = None if force else _read_cache("fed_liquidity", provider_key)
+    if cached:
+        return cached
+
+    try:
+        from tools.fed_liquidity.quant.metrics import OUTPUT_COLUMNS, summarize_latest
+
+        path = DATA_LAKE / "fed_liquidity_cache.csv"
+        df_processed = pd.read_csv(path, parse_dates=["DATE"]).set_index("DATE").sort_index()
+        numeric_cols = [c for c in OUTPUT_COLUMNS if c != "Signal"]
+        for col in numeric_cols:
+            if col in df_processed.columns:
+                df_processed[col] = pd.to_numeric(df_processed[col], errors="coerce")
+        summary = summarize_latest(df_processed)
+    except Exception as e:
+        result = f"DATA INSUFFICIENT: Không generate được Fed Liquidity child report ({e})"
+        _write_cache("fed_liquidity", result, provider_key)
+        return result
+
+    prompt_path = ROOT_DIR / "promt" / "fed_liquidity_promt.md"
+    prompt_template = prompt_path.read_text(encoding="utf-8")
+    full_prompt = (
+        prompt_template
+        .replace("[Nhập ngày]", summary["date"])
+        .replace("[Net Liquidity]", f"{summary['net_liquidity']:,.0f}")
+        .replace("[WALCL]", f"{summary['walcl']:,.0f}")
+        .replace("[WTREGEN]", f"{summary['wtregen']:,.0f}")
+        .replace("[RRPONTSYD]", f"{summary['rrpontsyd']:,.0f}")
+        .replace("[Impulse]", f"{summary['impulse']:+,.0f}")
+        .replace("[Impulse_EMA]", f"{summary['impulse_ema']:+,.0f}")
+        .replace("[Z_Score]", f"{summary['z_score']:+.2f}")
+        .replace("[Signal]", summary["signal"])
+    )
+
+    parts = full_prompt.split("# INPUT DATA")
+    system_prompt = parts[0].strip()
+    user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
+    result = call_ai(
+        client,
+        system_prompt,
+        user_prompt,
+        model=model or cfg["api_model"],
+        temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    _write_cache("fed_liquidity", result, provider_key)
+    return result
+
+
+def run_global_financial_conditions_child_report(
+    client,
+    provider_key: str = "kimi-2.6",
+    model: str = None,
+    force: bool = False,
+) -> str:
+    """
+    Generate the Global FCI child AI report from the latest GFCM data cache.
+
+    This is the missing step that caused Auto AI CIO to read a stale
+    global_financial_conditions_*.txt even though the CSV cache was current.
+    """
+    cached = None if force else _read_cache("global_financial_conditions", provider_key)
+    if cached:
+        return cached
+
+    try:
+        from tools.global_financial_conditions.quant.metrics import (
+            load_cached_gfcm,
+            summarize_latest,
+        )
+
+        df_processed = load_cached_gfcm(DATA_LAKE / "global_financial_conditions_cache.csv")
+        summary = summarize_latest(df_processed)
+    except Exception as e:
+        result = f"DATA INSUFFICIENT: Không generate được Global FCI child report ({e})"
+        _write_cache("global_financial_conditions", result, provider_key)
+        return result
+
+    prompt_path = ROOT_DIR / "promt" / "global_financial_conditions_promt.md"
+    prompt_template = prompt_path.read_text(encoding="utf-8")
+    full_prompt = (
+        prompt_template
+        .replace("[Nhập ngày]", summary["date"])
+        .replace("[VIX]", f"{summary['vix']:.2f}")
+        .replace("[MOVE]", f"{summary['move']:.1f}")
+        .replace("[SKEW]", f"{summary['skew']:.1f}")
+        .replace("[OVX]", f"{summary['ovx']:.2f}")
+        .replace("[VVIX]", f"{summary['vvix']:.1f}")
+        .replace("[HY_OAS]", f"{summary['hy_oas']:.2f}")
+        .replace("[CCC_OAS]", f"{summary['ccc_oas']:.2f}")
+        .replace("[IG_OAS]", f"{summary['ig_oas']:.2f}")
+        .replace("[EM_OAS]", f"{summary['em_oas']:.2f}")
+        .replace("[CQS]", f"{summary['credit_quality_spread']:.2f}")
+        .replace("[T10Y2Y]", f"{summary['t10y2y']:+.2f}")
+        .replace("[DXY]", f"{summary['dxy']:.2f}")
+        .replace("[VIX_pct]", f"{summary['vix_pct']*100:.0f}")
+        .replace("[MOVE_pct]", f"{summary['move_pct']*100:.0f}")
+        .replace("[SKEW_pct]", f"{summary['skew_pct']*100:.0f}")
+        .replace("[OVX_pct]", f"{summary['ovx_pct']*100:.0f}")
+        .replace("[VVIX_pct]", f"{summary['vvix_pct']*100:.0f}")
+        .replace("[HY_pct]", f"{summary['hy_pct']*100:.0f}")
+        .replace("[CCC_pct]", f"{summary['ccc_pct']*100:.0f}")
+        .replace("[IG_pct]", f"{summary['ig_pct']*100:.0f}")
+        .replace("[EM_pct]", f"{summary['em_pct']*100:.0f}")
+        .replace("[T10Y2Y_pct]", f"{summary['t10y2y_pct']*100:.0f}")
+        .replace("[DXY_pct]", f"{summary['dxy_pct']*100:.0f}")
+        .replace("[CQS_pct]", f"{summary['cqs_pct']*100:.0f}")
+        .replace("[VIX_z]", f"{summary['vix_z']:+.2f}")
+        .replace("[MOVE_z]", f"{summary['move_z']:+.2f}")
+        .replace("[SKEW_z]", f"{summary['skew_z']:+.2f}")
+        .replace("[HY_z]", f"{summary['hy_z']:+.2f}")
+        .replace("[CCC_z]", f"{summary['ccc_z']:+.2f}")
+        .replace("[IG_z]", f"{summary['ig_z']:+.2f}")
+        .replace("[PC1]", f"{summary['pc1_smooth']:+.2f}")
+        .replace("[PC1_raw]", f"{summary['pc1']:+.2f}")
+        .replace("[PC2]", f"{summary['pc2']:+.2f}")
+        .replace("[PC1_pct]", f"{summary['pc1_pct']*100:.0f}")
+        .replace("[PC1_5d]", f"{summary['pc1_5d_change']:+.2f}")
+        .replace("[Regime]", summary["regime"])
+        .replace("[Driver]", summary["driver"])
+    )
+
+    parts = full_prompt.split("# INPUT DATA")
+    system_prompt = parts[0].strip()
+    user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
+    result = call_ai(
+        client,
+        system_prompt,
+        user_prompt,
+        model=model or cfg["api_model"],
+        temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    _write_cache("global_financial_conditions", result, provider_key)
+    return result
+
+
+def _get_gfcm_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Read the latest Global FCI child AI report."""
+    return _get_latest_report_for_macro("global_financial_conditions", provider_key)
+
+
+def _build_margin_m2_structured_snapshot() -> tuple[str, str]:
+    """Build monthly US margin debt / M2 overlay context for AI CIO."""
+    try:
+        from tools.global_financial_conditions.quant.margin_m2 import (
+            MARGIN_M2_CACHE,
+            load_cached_margin_m2,
+            summarize_latest_margin_m2,
+        )
+
+        df_margin_m2 = load_cached_margin_m2(MARGIN_M2_CACHE)
+        summary = summarize_latest_margin_m2(df_margin_m2)
+    except Exception as e:
+        return "N/A", (
+            "DATA INSUFFICIENT: Không build được US Margin Debt/M2 overlay "
+            f"({e}). Đây là overlay monthly, không ảnh hưởng PCA Global FCI."
+        )
+
+    label = summary.get("date", "N/A")
+
+    def fmt(key: str, suffix: str = "", decimals: int = 2) -> str:
+        value = summary.get(key)
+        if value is None or pd.isna(value):
+            return "N/A"
+        return f"{float(value):.{decimals}f}{suffix}"
+
+    snapshot = f"""
+=== US MARGIN DEBT / M2 STRUCTURED SNAPSHOT (OVERLAY ONLY) ===
+- Date: {summary.get('date', 'N/A')}
+- Margin debt: {fmt('margin_debt_million_usd', ' mn USD', 0)}
+- M2: {fmt('m2_billion_usd', ' bn USD', 0)}
+- Margin debt / M2: {fmt('margin_debt_pct_m2', '%')}
+- Margin debt YoY: {fmt('margin_debt_yoy_pct', '%')}
+- M2 YoY: {fmt('m2_yoy_pct', '%')}
+- Margin/M2 5Y z-score: {fmt('margin_debt_pct_m2_zscore_5y', 'σ')}
+- Margin/M2 10Y percentile: {fmt('margin_debt_pct_m2_percentile_10y', 'th', 0)}
+- Signal regime: {summary.get('signal_regime', 'N/A')}
+- FINRA source: {summary.get('finra_source_url', 'N/A')}
+- FRED series: {summary.get('fred_series_id', 'N/A')}
+- Cache updated at: {summary.get('last_updated_at', 'N/A')}
+
+Usage discipline:
+- Monthly/lagged speculative leverage overlay only.
+- Not included in Global FCI PCA, PC1, PC1 percentile, or GFCM hard regime.
+- Use it to interpret whether Global FCI stress is amplified by crowded leverage.
+""".strip()
+    return label, snapshot
+
+
 def _build_vnibor_structured_trend() -> tuple[str, str]:
     """Build deterministic VNIBOR snapshot + 20-session trend for AI CIO macro layer."""
     try:
@@ -1431,6 +1642,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r8 = run_va_res(client, df_stocks, provider_key, model)
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     r10 = get_humility_falsification_context(provider_key, force=force)
+    run_fed_liquidity_child_report(client, provider_key, model, force=force)
+    run_global_financial_conditions_child_report(client, provider_key, model, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
@@ -1444,8 +1657,9 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1/T-2 ==="
 
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
-    fed_date, fed_rep = _get_latest_report_for_macro("fed_liquidity", provider_key)
-    gfcm_date, gfcm_rep = _get_latest_report_for_macro("global_financial_conditions", provider_key)
+    fed_date, fed_rep = _get_fed_liquidity_context(provider_key)
+    gfcm_date, gfcm_rep = _get_gfcm_context(provider_key)
+    margin_m2_date, margin_m2_rep = _build_margin_m2_structured_snapshot()
     vnibor_date, vnibor_rep = _get_vnibor_context(provider_key)
     ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
     vn100_label, vn100_rep = _get_vn100_earnings_health_context(provider_key)
@@ -1454,6 +1668,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         "=== BÁO CÁO PHÂN TÍCH VĨ MÔ GẦN NHẤT (MACRO LAYER) ===\n\n"
         f"=== A. FED LIQUIDITY MONITOR (Ngày báo cáo: {fed_date}) ===\n{fed_rep}\n\n"
         f"=== B. GLOBAL FINANCIAL CONDITIONS (Ngày báo cáo: {gfcm_date}) ===\n{gfcm_rep}\n\n"
+        f"=== B2. US MARGIN DEBT / M2 OVERLAY (Kỳ dữ liệu: {margin_m2_date}) ===\n{margin_m2_rep}\n\n"
         f"=== C. VNIBOR MONITOR (Ngày báo cáo: {vnibor_date}) ===\n{vnibor_rep}\n\n"
         f"=== D. LIQUIDITY TRANSMISSION - LTMM (Ngày báo cáo: {ltmm_date}) ===\n{ltmm_rep}\n\n"
     )

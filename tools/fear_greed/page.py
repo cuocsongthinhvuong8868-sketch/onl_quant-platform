@@ -50,8 +50,9 @@ def render():
         st.stop()
     st.caption(f"📅 Dữ liệu cuối cùng: {df_stocks.index.max().strftime('%d/%m/%Y')}")
 
-    key = {"window_size": window_size}
-    cached = load_daily_cache("fear_greed", key)
+    data_date = df_stocks.index.max().strftime("%Y-%m-%d")
+    key = {"cache_version": 2, "window_size": window_size}
+    cached = load_daily_cache("fear_greed", key, data_date=data_date)
     if cached is not None:
         scored_df = cached["scored_df"]
         st.caption("⚡ Dùng cache cùng ngày (Fear & Greed).")
@@ -63,7 +64,7 @@ def render():
                 st.error(f"❌ Lỗi mô hình: {e}")
                 st.stop()
         scored_df = calculate_risk_score(metrics_df, rank_window=RANK_WINDOW)
-        save_daily_cache("fear_greed", key, {"scored_df": scored_df})
+        save_daily_cache("fear_greed", key, {"scored_df": scored_df}, data_date=data_date)
         st.caption("💾 Đã tạo cache ngày mới (Fear & Greed).")
     latest    = scored_df.iloc[-1]
     prev      = scored_df.iloc[-2]

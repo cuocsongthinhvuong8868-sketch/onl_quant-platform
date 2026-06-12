@@ -8,6 +8,7 @@ import pandas as pd
 import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+from shared.page_layout import render_signal_card, tone_for_signal
 from tools.vnibor.quant.metrics import (
     load_vnibor_data,
     process_vnibor_logic,
@@ -113,9 +114,9 @@ def render():
     with col6:
         st.metric("Percentile (252 ngày)", f"{summary['percentile']*100:.1f}%")
     with col7:
-        st.metric(f"Trạng thái {reg_icon}", summary["regime"])
+        render_signal_card("Trạng thái", summary["regime"], tone=tone_for_signal(summary["regime"]), icon=reg_icon)
     with col8:
-        st.metric(f"Tín hiệu {sig_icon}", summary["signal"])
+        render_signal_card("Tín hiệu", summary["signal"], tone=tone_for_signal(summary["signal"]), icon=sig_icon)
 
     # Row 3: Spreads (chênh lệch kỳ hạn)
     st.markdown("##### 📐 Chênh lệch kỳ hạn ngắn hạn (Term Spreads)")
@@ -126,9 +127,12 @@ def render():
         st.metric("Spread 2W - ON (%)", f"{summary['spread_2w']:+.2f}%")
     with col11:
         inverted_curve = "ĐẢO NGƯỢC (Rủi ro)" if summary['spread_1w'] < 0 else "Bình thường (Dốc lên)"
-        st.metric("Đường cong Lợi suất", inverted_curve, 
-                  delta="Cảnh báo thanh khoản!" if summary['spread_1w'] < 0 else None, 
-                  delta_color="inverse")
+        render_signal_card(
+            "Đường cong Lợi suất",
+            inverted_curve,
+            tone="danger" if summary["spread_1w"] < 0 else "positive",
+            caption="Cảnh báo thanh khoản!" if summary["spread_1w"] < 0 else None,
+        )
 
     st.divider()
 

@@ -75,7 +75,7 @@ streamlit run app.py
 # Data updates
 python command/update_data.py                          # daily price+volume ~5 min
 python command/update_data.py --backfill 2190          # 6 năm backfill
-python command/update_bank_fundamentals.py             # quarterly
+python command/update_risk_adjusted_growth_statistics.py # bank Statistics + BCTC JSON for RAG
 python command/update_fed_liquidity.py                 # weekly Wed (FRED WALCL/TGA/RRP)
 python command/update_global_financial_conditions.py   # daily (FRED VIX/HY/CCC/IG/EM/T10Y2Y + Yahoo MOVE/SKEW/OVX/VVIX/DXY)
                                                        # → cron .github/workflows/gfcm_daily.yml chạy 22:00 UTC Mon-Fri

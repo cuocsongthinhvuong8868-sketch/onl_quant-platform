@@ -106,7 +106,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 │   ├── update_global_financial_conditions.py
 │   ├── update_vnibor.py
 │   ├── update_sector_data.py
-│   ├── update_bank_fundamentals.py
+│   ├── update_risk_adjusted_growth_statistics.py
 │   ├── update_factor_examination.py
 │   ├── run_ai_cio_auto.py
 │   └── generate_report.py
@@ -124,7 +124,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 │   ├── vn30_cache.csv
 │   ├── fed_liquidity_cache.csv
 │   ├── global_financial_conditions_cache.csv
-│   ├── bank_fundamentals.csv
+│   ├── risk_adjusted_growth/
 │   ├── daily_cache/              # Cache AI reports
 │   └── vn100_earnings_health/
 ├── reports/                      # Báo cáo PDF xuất ra
@@ -187,7 +187,7 @@ python command/update_fed_liquidity.py
 python command/update_global_financial_conditions.py
 python command/update_vnibor.py
 python command/update_sector_data.py
-python command/update_bank_fundamentals.py
+python command/update_risk_adjusted_growth_statistics.py
 python command/update_factor_examination.py
 ```
 
@@ -266,7 +266,7 @@ Dữ liệu không tự động cập nhật trên Streamlit Cloud. Bạn có th
 | `update_global_financial_conditions.py` | Cập nhật VIX, MOVE, HY OAS, CCC OAS |
 | `update_vnibor.py` | Cập nhật lãi suất liên ngân hàng VNIBOR |
 | `update_sector_data.py` | Cập nhật dữ liệu sector |
-| `update_bank_fundamentals.py` | Cập nhật fundamentals ngân hàng |
+| `update_risk_adjusted_growth_statistics.py` | Copy/sanitize Statistics + BCTC JSON ngân hàng cho Risk-Adjusted Growth |
 | `update_factor_examination.py` | Cập nhật factor scores cho 400 tickers |
 | `run_ai_cio_auto.py` | Chạy tự động tạo AI CIO Executive Summary |
 

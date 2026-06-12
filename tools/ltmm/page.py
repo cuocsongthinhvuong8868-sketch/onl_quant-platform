@@ -86,11 +86,18 @@ def _inject_styles() -> None:
             color: #111827;
             font-weight: 760;
             letter-spacing: 0;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         .ltmm-card-caption {
             margin-top: 8px;
             color: #5b6470;
             font-size: 0.86rem;
+            line-height: 1.28;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         .ltmm-section {
             font-size: 1.05rem;
@@ -99,7 +106,7 @@ def _inject_styles() -> None:
             color: #1f2937;
         }
         .ltmm-pill {
-            display: inline-block;
+            display: inline-flex;
             padding: 3px 9px;
             border-radius: 999px;
             font-size: 0.78rem;
@@ -107,6 +114,10 @@ def _inject_styles() -> None:
             border: 1px solid #cbd5e1;
             color: #334155;
             background: #f8fafc;
+            max-width: 100%;
+            white-space: normal;
+            overflow-wrap: anywhere;
+            word-break: break-word;
         }
         .ltmm-pill.fire {
             color: #7f1d1d;

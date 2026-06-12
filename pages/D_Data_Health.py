@@ -10,7 +10,7 @@ import streamlit as st
 
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
-from shared.page_layout import setup_page
+from shared.page_layout import setup_page, signal_card_html, signal_pill_html
 from src.data_manager import DataManager
 
 
@@ -23,10 +23,10 @@ STATUS_LABELS = {
     "warning": "Warning",
     "critical": "Critical",
 }
-STATUS_COLORS = {
-    "healthy": "#15803d",
-    "warning": "#b45309",
-    "critical": "#b91c1c",
+STATUS_TONES = {
+    "healthy": "positive",
+    "warning": "warning",
+    "critical": "danger",
 }
 
 
@@ -43,12 +43,8 @@ def _load_timeline(as_of: str, days: int) -> list[dict]:
 
 
 def _status_badge(status: str) -> str:
-    color = STATUS_COLORS.get(status, "#334155")
     label = STATUS_LABELS.get(status, status.title())
-    return (
-        f"<span style='display:inline-block;padding:0.2rem 0.55rem;border-radius:6px;"
-        f"background:{color};color:white;font-weight:600;font-size:0.85rem'>{label}</span>"
-    )
+    return signal_pill_html(label, tone=STATUS_TONES.get(status, "neutral"))
 
 
 def _render_summary(report: dict) -> None:
@@ -66,15 +62,8 @@ def _render_summary(report: dict) -> None:
 
 
 def _render_card(title: str, value: str, status: str) -> None:
-    color = STATUS_COLORS.get(status, "#334155")
     st.markdown(
-        f"""
-        <div style="border:1px solid {color};border-left:6px solid {color};border-radius:8px;
-        padding:0.75rem 0.9rem;background:#ffffff;">
-            <div style="font-size:0.82rem;color:#475569;font-weight:600;">{title}</div>
-            <div style="font-size:1.35rem;color:{color};font-weight:750;line-height:1.4;">{value}</div>
-        </div>
-        """,
+        signal_card_html(title, value, tone=STATUS_TONES.get(status, "neutral"), min_height=86),
         unsafe_allow_html=True,
     )
 

@@ -61,10 +61,17 @@ jobs:
             python command/update_data.py
           fi
 
-      - name: Run update_bank_fundamentals.py
-        env:
-          VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
-        run: python command/update_bank_fundamentals.py
+      - name: Validate Risk-Adjusted Growth bank statistics feed
+        run: |
+          python - <<'PY'
+          from tools.risk_adjusted_growth.quant.data_prep import load_statistics_ratio_table
+          df = load_statistics_ratio_table()
+          print(f"Risk-Adjusted Growth bank feed rows: {len(df)}")
+          if len(df) < 10:
+              raise SystemExit("Risk-Adjusted Growth bank feed has too few rows")
+          if not df["Cash Payout Source"].astype(str).str.contains("cash_flow_dividends_paid_20q").all():
+              raise SystemExit("Risk-Adjusted Growth payout feed is not cash-flow based")
+          PY
 
       - name: Pre-warm Factor Examination pkl
         run: python command/update_factor_examination.py
@@ -100,4 +107,3 @@ jobs:
           done
           echo "❌ Push fail sau 5 lần thử"
           exit 1
-

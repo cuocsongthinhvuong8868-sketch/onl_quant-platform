@@ -1,0 +1,65 @@
+name: US Margin Debt M2 Weekly Update
+
+# FINRA margin debt is monthly and published with a lag. Run weekly so the
+# platform picks up the new monthly observation soon after FINRA releases it.
+on:
+  workflow_dispatch:
+  schedule:
+    - cron: '0 22 * * 5'
+
+permissions:
+  contents: write
+
+jobs:
+  update-us-margin-m2:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.10'
+
+      - name: Install dependencies
+        run: |
+          python -m pip install --upgrade pip
+          if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
+
+      - name: Run update_us_margin_m2.py
+        env:
+          FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
+        run: python command/update_us_margin_m2.py
+
+      - name: Commit and Push changes
+        run: |
+          git config --global user.name "github-actions[bot]"
+          git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
+
+          git add data_lake/us_margin_debt_m2_cache.csv
+
+          if git diff --cached --quiet; then
+            echo "No changes in us_margin_debt_m2_cache.csv. Skipping commit."
+            exit 0
+          fi
+
+          git commit -m "Auto-update us_margin_debt_m2_cache.csv [skip ci]"
+
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              echo "Push succeeded on attempt $attempt"
+              exit 0
+            fi
+            echo "Push rejected on attempt $attempt/5; pulling with rebase..."
+            git pull --rebase --autostash origin main || {
+              echo "Rebase failed; aborting"
+              git rebase --abort || true
+            }
+            sleep $((attempt * 3))
+          done
+          echo "Push failed after 5 attempts"
+          exit 1
