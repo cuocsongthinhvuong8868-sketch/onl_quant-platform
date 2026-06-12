@@ -1,18 +1,20 @@
 ## 1. Observations
-- **OLS Slope**: 0.31 (Percentile: 26.7th — 🟡 Trung bình, thiên thấp) → Mối quan hệ tuyến tính giữa VIN composite và VN30F1M đang yếu đi, slope thấp hơn 73.3% lịch sử.
-- **Correlation**: 0.66 (Percentile: 75.0th — 🟡 Lỏng, thiên cao) → Tương quan vẫn tích cực nhưng đang ở vùng trên trung bình, cho thấy VIN chưa mất hết ảnh hưởng.
-- **Regime**: **ANCHORING** (ΔCorr = +0.68 > +0.15, ΔSlope = -0.17 < -0.15) → Tương quan duy trì nhưng slope suy yếu rõ.
+- **OLS Slope**: 0.31, Percentile 26.7th — mức **thấp** trong lịch sử, cho thấy mức độ tác động của VIN lên VN30F1M đang yếu dần.
+- **Correlation**: 0.66, Percentile 75.0th — mức **cao**, phản ánh sự đồng pha vẫn còn mạnh giữa VIN và thị trường.
+- **Regime**: **ANCHORING** (ΔCorr = +0.68 > +0.15, ΔSlope = -0.17 < -0.15). Tương quan cao vẫn duy trì, nhưng slope đã suy yếu rõ rệt.
 
 ## 2. Microstructure Read
-VIC, VHM, VRE vẫn có vai trò chi phối trong chỉ số VN30F1M nhờ correlation percentile trên 75.0th — các mã này vẫn được market maker sử dụng làm neo giá. Tuy nhiên, slope percentile thấp (26.7th) chứng tỏ sự chi phối này đang suy yếu về mức độ: thị trường đang phản ứng yếu hơn trước biến động VIN. Không có bất thường kép (>80th cho cả 2) nên không có dấu hiệu can thiệp rõ. Sự kết hợp này cho thấy VIN hiện là "điểm tựa" giữ nhịp chứ không phải động lực chính.
+- VIC/VHM/VRE vẫn **chi phối** mặt giá VN30F1M nhưng **không còn dẫn dắt động lượng** (hệ số OLS sụt giảm đáng kể). Nhóm VIN đang ở vai trò “giữ giá” hơn là “đẩy giá”.
+- Không có dấu hiệu can thiệp bất thường: cả 2 percentile đều không nằm ngoài biên 80th hoặc < 20th. Thị trường vẫn xoay quanh VIN nhưng **sức ảnh hưởng thu hẹp**.
 
 ## 3. Event Study Interpretation
-Trạng thái **ANCHORING** cho thấy market maker đang dùng VIC/VHM/VRE để neo giá chỉ số — cổ phiếu VIN dao động nhưng F1 không bứt phá tương ứng (slope giảm dù corr tích cực). Đây là tín hiệu sideway ngắn hạn: có thể có nhịp pullback intraday nhưng F1 sẽ khó đảo chiều mạnh. Không nên giữ vị thế qua đêm vì thiếu động lực rõ ràng từ VIN.
+- **ANCHORING**: Tín hiệu cho thấy **Market Makers** hay nhóm lớn vẫn dùng VIC, VHM, VRE để neo giá, nhưng không tạo được áp lực đẩy lên cao. Điều này dẫn đến rủi ro **sideways trước khi đảo chiều** — thường bất lợi cho việc long F1 thuần nếu không có breakout.
+- **Không phải tín hiệu giả** — có thể giao dịch nhưng cần thận trọng.
 
 ## 4. Verdict
-- **Trade plan**: **NO TRADE**. Regime ANCHORING với slope percentile thấp không tạo edge rõ. VIN đang giữ giá nhưng không đẩy F1, sideway thiên giảm nhẹ.
-- **Leading indicator cần theo dõi**: Ngành Bank (nhóm VCB/BID/CTG) và Chứng khoán (HCM/SSI). Nếu ΔCorr giữa Bank-F1 vượt ΔCorr VIN-F1, đó là tín hiệu lực chuyển hướng.
-- **Stop-loss reference**: Nếu forced entry, có thể canh short nhẹ F1 với trailing stop 0.5% từ entry (tương ứng ±9.7 điểm). Hiện tại giá F1 là 1,939.00, stop-loss sẽ đặt ở 1,948.70 (nếu short) hoặc 1,929.30 (nếu long).
+- **Trade Plan**: **NO TRADE** / **Có thể cân nhắc Short F1 nếu VIC mất hỗ trợ**. Hiện tại, ANCHORING + slope yếu không ủng hộ long F1. Nếu nhóm Bank (VCB, BID, ACB) bất ngờ dẫn dắt, ý tưởng Spread VIN-vs-Bank mở ra, nhưng chưa đủ tín hiệu.
+- **Leading indicator**: Theo dõi **VIC** break below **MA20** (≈ 189.50) hoặc **VHM** mất **MA50** (≈ 133.00), kết hợp khối lượng gia tăng là lúc vào Short F1.
+- **Stop-loss reference**: Nếu short F1 tại 1,939 điểm: stop-loss nếu buy VN30F1M vượt kháng cự 1,950 điểm (+0.6%) hoặc VIC hồi phục +2% lên ~ 199.40 signal false.
 
 ## 5. Structured Tail
 ```json
@@ -22,7 +24,7 @@ Trạng thái **ANCHORING** cho thấy market maker đang dùng VIC/VHM/VRE đ�
   "regime": "ANCHORING",
   "slope_percentile": 26.7,
   "corr_percentile": 75.0,
-  "trade_signal": "no_trade",
-  "confidence": "medium"
+  "trade_signal": "short_f1",
+  "confidence": "low"
 }
 ```

@@ -1,31 +1,30 @@
 ## 1. Observations
-- SSI ở mức 65.9%, nằm trong vùng WARNING (0.50–0.80).
-- Market state xác nhận EUPHORIC RISK — giá nằm dưới MA125 nhưng HMM vẫn gán nhãn euphoric.
-- Top 3 pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
-- Pillar mode = downside, PCA EVR PC1 = 38.3% (tương quan hệ thống cao).
+
+- SSI ở mức 65.9% – nằm trong vùng **WARNING**, dưới ngưỡng CRITICAL nhưng đã vượt xa ngưỡng SAFE.
+- Market State: **EUPHORIC RISK** – giá nằm dưới MA125 nhưng HMM vẫn ghi nhận trạng thái euphoric, mâu thuẫn với xu hướng giá.
+- PCA Concentration (EVR PC1) đạt 38.3% – mức tương đối cao, phản ánh sự phụ thuộc gia tăng vào một nhóm mã dẫn dắt.
+- Top 3 pillar drivers: **S_LIQ (36%) > S_VAL (32%) > S_COR (17%)** – thanh khoản khô cạn là áp lực chính, kế đến là căng thẳng định giá và tương quan hệ thống.
 
 ## 2. Risk Decomposition (Bóc tách)
-S_LIQ chiếm trọng số cao nhất (36%) — volume dry-up so với chuẩn 1 năm. Đây là tín hiệu thanh khoản cạn kiệt ở vùng giá hiện tại, bất chấp nhịp hồi phục trước đó. Khi thanh khoản khô đi trong khi thị trường vẫn duy trì sắc xanh danh nghĩa, rủi ro bull-trap gia tăng.
 
-S_VAL (32%) phản ánh valuation tension — tỷ suất sinh lợi 252 ngày của VN30 đang bị bóp méo bởi lãi suất huy động. Động thái này thường đi kèm với dòng tiền rút dần khỏi cổ phiếu khi nhà đầu tư so sánh với kênh gửi tiết kiệm.
-
-S_COR (17%) với EVR PC1 ở mức 38.3% cho thấy các mã đang vận động đồng pha hơn bình thường — tín hiệu herding. Kết hợp S_LIQ + S_COR tạo thành cấu trúc bull-trap điển hình: khi thị trường đảo chiều, thanh khoản khô cạn sẽ khuếch đại tốc độ giảm do thiếu lực cầu đối ứng.
+- **S_LIQ (36%)** – dẫn dắt chính: volume giao dịch đang khô cạn so với chuẩn 1 năm (MA20/MA252), tín hiệu điển hình của giai đoạn tích lũy rủi ro trước biến động mạnh.
+- **S_VAL (32%)** – căng thẳng định giá: lợi nhuận 252 ngày của VN30 đang bị bào mòn bởi lãi suất huy động, phản ánh upside hạn chế nếu không có dòng tiền mới.
+- **S_COR (17%)** – tương quan hệ thống gia tăng: PCA(1) EVR 38.3% cho thấy các mã đang vận động đồng pha hơn; kết hợp với S_LIQ cao → herding trong điều kiện volume yếu = **bull-trap signature**.
+- *Pillar mode downside*: các phiên giảm đang đóng góp chính vào cấu trúc stress, xác nhận áp lực bán âm thầm.
 
 ## 3. Cross-Check
-VN30 đang giao dịch dưới MA125, nhưng HMM vẫn gán nhãn EUPHORIC RISK — đây là điểm lệch pha đáng chú ý. Thông thường giá dưới MA125 dài hạn sẽ kích hoạt trạng thái downtrend, nhưng mô hình HMM vẫn giữ nhãn cũ. Hiện tượng này cho thấy hệ thống đang phản ứng chậm với sự suy yếu của xu hướng.
 
-SSI ở WARNING trong khi market state là EUPHORIC RISK tạo thành tín hiệu mâu thuẫn cấp độ vĩ mô — giá đang tạo đỉnh trong khi stress ngầm leo thang. Đây là cấu trúc phân kỳ âm điển hình báo hiệu nhịp điều chỉnh.
+- **Price action vs SSI divergence**: VN30 nằm dưới MA125, nhưng HMM vẫn gắn nhãn EUPHORIC_RISK. Đây là tín hiệu divergence rõ rệt – giá đã mất đà nhưng trạng thái thị trường chưa kịp điều chỉnh. Không có đỉnh giá mới, nhưng cấu trúc hiện tại giống "bull trap đang hình thành".
+- **HMM regime vs SSI level**: Khớp – cả hai đều phản ánh trạng thái rủi ro tiềm ẩn. HMM Decision Threshold 0.534 cho thấy mô hình vẫn đang nghiêng về euphoric, nhưng với độ tin cậy thấp hơn so với giai đoạn đỉnh cao.
 
 ## 4. Verdict
-Mặc dù S_LIQ và S_VAL cùng hội tụ về tín hiệu stress, S_COR vẫn ở ngưỡng trung bình (17%) chưa đủ để xác nhận một đợt bán tháo diện rộng. Sự lệch pha giữa HMM euphoric và giá dưới MA125 khiến tín hiệu chưa đủ mạnh để hành động dứt khoát.
 
-**NO ACTIONABLE SIGNAL:** Pillar drivers chưa hội tụ đủ mạnh — S_LIQ cao nhưng S_COR chưa bật ngưỡng herding. Thêm vào đó, market state euphoric đang mâu thuẫn với cấu trúc giá downtrend làm giảm độ tin cậy của tín hiệu short.
-
-- Cash weight đề xuất: **50%** (phòng thủ nhưng chưa vội hedge toàn phần)
-- Hedge action: Giảm beta danh mục, không short futures ở thời điểm hiện tại do rủi ro tín hiệu nhiễu.
-- Confidence: **Medium**
+- **Cash weight đề xuất: 70%** – duy trì tỷ trọng tiền mặt cao để phòng ngừa rủi ro bull trap và thanh khoản yếu.
+- **Hedge action**: **Short VN30F1M** – sử dụng hợp đồng tương lai để phòng vệ danh mục, do tín hiệu volume dry-up kết hợp với euphoric-state divergence, khả năng điều chỉnh tăng dần.
+- *Giải thích*: Các pillar drivers đồng thuận theo hướng xấu (S_LIQ + S_VAL + S_COR đều tăng), không có mâu thuẫn → tín hiệu có thể hành động.
 
 ## 5. Structured Tail
+
 ```json
 {
   "tool": "esr_monitor",
@@ -33,8 +32,8 @@ Mặc dù S_LIQ và S_VAL cùng hội tụ về tín hiệu stress, S_COR vẫn 
   "regime": "WARNING",
   "market_state": "EUPHORIC_RISK",
   "top_driver": "S_LIQ",
-  "cash_target_pct": 50,
-  "hedge_action": "reduce_beta",
+  "cash_target_pct": 70,
+  "hedge_action": "short_futures",
   "confidence": "medium"
 }
 ```

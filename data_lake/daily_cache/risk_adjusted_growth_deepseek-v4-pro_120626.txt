@@ -1,29 +1,58 @@
 ## 1. Scenario Assessment
 
-Kịch bản **Tiêu chuẩn** (K=1.0, CoE=14%) là mức baseline phù hợp cho ngành ngân hàng Việt Nam trong giai đoạn ổn định. Mức căng thẳng tài sản BVPS giảm 5% và P/B phạt 5% tạo ra một lớp đệm thận trọng hợp lý. **Mặt bằng tạo ra tín hiệu phân hóa rõ rệt**: 3 ngân hàng đứng đầu tạo Alpha dương ròng, cho thấy vẫn có cơ hội tìm kiếm giá trị thặng dư trong ngành, nhưng phần lớn thị trường vẫn đang ở vùng neutral đến đốt vốn.
+Với **K=1.0 và CoE=14%**, đây là kịch bản baseline cho ngành ngân hàng Việt Nam, không quá khắc nghiệt cũng không dễ dàng. Stress test BVPS -5% và P/B penalty -5% tạo áp lực nhẹ nhưng hợp lý cho giai đoạn thị trường biến động. 
+
+**Mặt bằng ngành đang đốt vốn**: Chỉ duy nhất SHB có Alpha dương (+1.2%), trong khi các mã top tiếp theo đều âm. Điều này cho thấy phần lớn ngân hàng trong mẫu không tạo ra đủ Disciplined Return để bù đắp chi phí vốn chủ sở hữu 14%.
 
 ## 2. Top Alpha Decomposition
 
-- **HDB (Alpha 6.1%, P/B 1.24) – Fortress Candidate**: Driver chính là sự kết hợp giữa **P/B hợp lý** (không rẻ cũng không đắt) và **chất lượng lợi nhuận cốt lõi** (ROE bền vững, σ thấp). HDB thuộc nhóm ngân hàng quản trị rủi ro tốt, lợi nhuận ổn định, có khả năng giữ vững ROE cao. **Phân loại: Fortress**.
-- **CTG (Alpha 4.1%, P/B 1.00) – Cheap-but-not-trap**: P/B = 1.00 là điểm thu hút chính. CTG có ROE ở mức trung bình khá nhưng σ(ROE) thấp, giúp giảm Risk Penalty. **Phân loại: Fortress tiềm năng** (nếu duy trì được chất lượng).
-- **SHB (Alpha 3.9%, P/B 0.93) – Deep Value Fortress**: P/B < 1 (0.93) là yếu tố giá rẻ mạnh. ROE (theo geomean) đủ cao để vượt qua CoE ngay cả khi trừ Risk Penalty. **Phân loại: Fortress (dòng tiền compounding)**.
+**SHB (Alpha +1.2%)** – **Fortress hoàn chỉnh**:
+- ROE 17.5% cao, σROE 1.9% cực thấp → chất lượng lợi nhuận bền vững
+- P/B 0.94 dưới 1 → định giá quá rẻ so với giá trị sổ sách
+- Payout chỉ 8.6% → giữ lại gần như toàn bộ lợi nhuận để tái đầu tư
+- Driver chính: **cả 3 trụ cột** – định giá rẻ, chất lượng cao, compounding mạnh
+
+**SSB (Alpha -1.0%)** – **Cheap Trap đang chuyển hóa**:
+- P/B 1.02 gần bằng giá trị sổ sách, ROE 15.6% khá
+- σROE 2.2% thấp → risk penalty nhẹ
+- Payout 0% hỗ trợ compounding
+- Vấn đề: ROE chưa đủ cao để vượt CoE khi P/B ngang giá trị sổ sách → sát biên giới positive alpha, có thể cải thiện nếu ROE tăng thêm
+
+**MSB (Alpha -1.3%)** – **Tương tự SSB**:
+- ROE 16.7% cao hơn SSB nhưng σROE 2.5% cũng cao hơn
+- P/B 1.10 tạo áp lực định giá nhẹ
+- Thiếu cổ tức → hỗ trợ retention, nhưng vẫn chưa đủ
 
 ## 3. Value Traps Warning
 
-- **EIB (Alpha -12.3%, P/B 1.48) – Premium Burn Nhẹ + Risk Heavy**: P/B 1.48 không quá đắt nhưng ROE rất thấp và σ(ROE) cao → Risk Penalty lớn. Đây là **Cheap Trap biến tướng**: giá không rẻ, chất lượng kém.
-- **VCB (Alpha -7.2%, P/B 2.26) – Premium Burn Điển Hình**: P/B = 2.26 là mức premium quá cao so với ROE cốt lõi (dù ROE tuyệt đối có vẻ ổn). Risk Penalty không lớn nhưng vẫn đủ để kéo Alpha âm sâu.
-- **LPB (Alpha -6.9%, P/B 2.88) – Premium Burn**: P/B gần 3 là mức định giá quá lạc quan so với khả năng sinh lợi. Khi tăng trưởng tín dụng chậm lại, LPB sẽ rất dễ bị điều chỉnh.
+**LPB (Alpha -12.0%)** – **Premium Burn điển hình**:
+- ROE 21.1% rất cao nhưng σROE 3.8% → mức biến động lớn, dễ tổn thương
+- P/B 2.88 quá đắt → Disciplined Return bị bóp méo mạnh
+- Payout 21% làm giảm retention
+- Kết luận: **Bẫy tăng trưởng (Growth Trap)** – giá đã phản ánh quá nhiều kỳ vọng
+
+**EIB (Alpha -11.4%)** – **Cheap Trap + Premium Burn kết hợp**:
+- ROE chỉ 10% – thấp nhất bảng, không tạo đủ lợi nhuận
+- σROE 3.8% cao → risk penalty lớn
+- P/B 1.48 vẫn đắt so với ROE thấp
+- Payout 4.9% không giúp ích gì
+
+**VPB (Alpha -10.1%)** – **Growth Trap + biến động cực đại**:
+- ROE 14.1% ở mức trung bình, nhưng σROE 4.7% cao nhất mẫu → risk penalty -4.7% ngay lập tức
+- P/B 1.22 không rẻ
+- Payout 24.6% cao nhất trong top âm → retention thấp
+- Cả 3 yếu tố đều bất lợi
 
 ## 4. Portfolio Construction
 
-- **Core Holding (60-70%)**: **HDB** (Fortress), **CTG** (Fortress tiềm năng).
-- **Tactical (20-30%)**: **SHB** (rẻ + chất lượng ổn, nhưng cần theo dõi rủi ro thanh khoản ngắn hạn).
-- **Avoid List / Underweight**:
-  - **EIB** (Cấm mua: cấu trúc ROE yếu + rủi ro cao)
-  - **VCB** (Cấm mua: P/B quá đắt so với lợi nhuận cốt lõi)
-  - **LPB** (Cấm mua: Premium Burn)
+**Core Holding (60-70%)**: **SHB** – Fortress duy nhất, P/B dưới 1 với ROE bền vững, tiềm năng tái định giá mạnh khi thị trường nhận ra giá trị thực.
 
-**Sector View**: **Bullish có chọn lọc** – chỉ 3 mã trong Top có Alpha (+) nhưng chúng đại diện cho ~30% vốn hóa toàn ngành. Tổng thể ngành vẫn có điểm sáng.
+**Tactical (20-30%)**: **SSB, MSB** – Cheap-but-not-trap, đang sát biên giới positive alpha. Cần theo dõi ROE quý tới để xác nhận xu hướng.
+
+**Cấm mua / Underweight**:
+- **LPB, VPB, EIB** – cả 3 đều có Alpha âm sâu, dù lý do khác nhau. LPB và VPB là Growth Trap điển hình; EIB là Cheap Trap + Premium Burn.
+
+Sector view: **Neutral (thiên về stock-picking)** – có 1 positive alpha nhưng phần lớn đốt vốn. Chỉ nên tập trung vào SHB.
 
 ## 5. Structured Tail
 
@@ -31,9 +60,9 @@ Kịch bản **Tiêu chuẩn** (K=1.0, CoE=14%) là mức baseline phù hợp ch
 {
   "tool": "risk_adjusted_growth",
   "scenario": "Tiêu chuẩn",
-  "core_holdings": ["HDB", "CTG"],
-  "avoid_list": ["EIB", "VCB", "LPB"],
-  "sector_view": "bullish",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
   "confidence": "medium"
 }
 ```

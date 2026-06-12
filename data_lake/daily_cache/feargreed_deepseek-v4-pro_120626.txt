@@ -1,21 +1,19 @@
 ## 1. Observations
-- Risk Score 48.7/100 nằm trong vùng NEUTRAL (40-60) với biến động nhẹ +1.5 so với phiên trước.
-- EGARCH Vol 13.5% giảm mạnh -7.1% so với phiên trước, dưới ngưỡng cảnh báo (>20%).
-- Rolling Skewness = 0.00, trung tính tuyệt đối – không nghiêng về âm hay dương.
-- Downside Correlation 11.5% thấp hơn nhiều so với Upside Correlation 29.0% – chênh lệch +17.5%.
+- Risk Score 48.7 nằm trong ngưỡng NEUTRAL (40-60), tăng nhẹ +1.5 so với phiên trước.
+- EGARCH Vol 13.1% thấp hơn đáng kể mức trung bình lịch sử (~18-22%), giảm -6.0% so với phiên trước.
+- Rolling Skewness ở mức 0.00, hoàn toàn trung tính — không nghiêng về âm (sợ hãi) hay dương (tham lam).
+- Upside Correlation (29.0%) cao gấp ~2.5 lần Downside Correlation (11.5%), cho thấy khi thị trường tăng thì cổ phiếu đi cùng nhau nhiều hơn khi thị trường giảm.
 
 ## 2. Interpretation
-Dữ liệu hiện tại cho thấy thị trường đang ở pha phân hóa trung tính (Stock-Picking regime): không có panic bán (down-corr thấp) cũng chưa có euphoria mua (skew = 0). Biến động thu hẹp nhanh (-7.1%) xác nhận xác suất cao lực cung/cầu đang cân bằng ngắn hạn.
+Dữ liệu hiện tại mô tả một thị trường đang ở pha "phân hóa có kiểm soát" — biến động thấp, không có panic, nhưng dòng tiền vẫn có chọn lọc (upside-corr cao hơn downside-corr). Đây là cấu trúc điển hình của giai đoạn NEUTRAL/STOCK PICKING, với rủi ro hệ thống thấp nhưng động lực tăng đồng thuận chưa đủ mạnh.
 
 ## 3. Cross-Check
-- Score (48.7 – NEUTRAL) vs EGARCH Vol (13.5% – giảm mạnh): **Consistent** – điểm trung tính đi kèm vol hạ nhiệt.
-- Skewness (0.00) vs chênh lệch correlation (Up-Down = +17.5%): **Cảnh báo divergence nhẹ** – skew phẳng nhưng up-corr cao gấp 2.5 lần down-corr, cho thấy các cổ phiếu đang di chuyển đồng pha hơn khi tăng. Dấu hiệu này xác suất thấp dẫn đến crash nhưng cần monitor nếu skew dần dương.
+- **Score vs EGARCH Vol**: Score 48.7 (NEUTRAL) kết hợp Vol 13.1% (thấp) → CONSISTENT. Không có divergence.
+- **Skewness vs Correlation**: Skewness = 0.00 không cung cấp tín hiệu định hướng; Upside >> Downside correlation (29% vs 11.5%) cho thấy cấu trúc thị trường vẫn xác suất cao là tăng mang tính "kéo nhau" hơn là giảm mang tính lây lan → CONSISTENT với pha NEUTRAL nhưng nghiêng nhẹ về tích cực.
 
 ## 4. Verdict
-**Beta exposure: 0.55 – 0.65**
-- Giữ danh mục ở mức beta trung bình do chưa đủ tín hiệu chuyển pha rõ rệt.
-- Không hedge (down-corr thấp, không có tail risk).
-- **NO ACTIONABLE SIGNAL**: divergence giữa skew trung tính và up-correlation cao tạo tín hiệu mâu thuẫn nhẹ. Cần thêm 1-2 phiên để xác nhận hướng breakout.
+- **Beta đề xuất:** 0.7 — Trên dữ liệu hiện tại, xác suất cao VN-Index đang ở pha rủi ro thấp, không có lý do để giảm beta mạnh.
+- **Hành động cụ thể:** Duy trì danh mục với beta trên trung bình, ưu tiên các cổ phiếu có upside correlation với index (bluechips, VN30). Có thể tận dụng biến động thấp để tăng nhẹ tỷ trọng.
 
 ## 5. Structured Tail
 ```json
@@ -24,11 +22,12 @@ Dữ liệu hiện tại cho thấy thị trường đang ở pha phân hóa tru
   "date": "12/06/2026",
   "regime": "NEUTRAL",
   "score": 48.7,
-  "confidence": "medium",
-  "beta_target": 0.6,
+  "confidence": "high",
+  "beta_target": 0.7,
   "key_signals": [
-    "Score ở vùng NEUTRAL kết hợp EGARCH Vol giảm mạnh -7.1%",
-    "Up-corr 29% cao gấp 2.5 lần down-corr 11.5% – dư địa tăng phân hóa không đồng pha"
+    "Vol giảm mạnh xuống 13.1% cho thấy stress hệ thống thấp",
+    "Upside-corr gấp 2.5x downside-corr, xác suất cao sell-off không lây lan",
+    "Skewness trung tính không hỗ trợ cho kịch bản tail risk"
   ]
 }
 ```
