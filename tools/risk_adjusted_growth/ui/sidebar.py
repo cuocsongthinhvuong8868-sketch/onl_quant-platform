@@ -32,7 +32,7 @@ def render_sidebar() -> dict:
     with st.sidebar:
         st.header("Cài đặt Biến Số Căn Bản")
         selected_k = st.selectbox("Chọn Viễn cảnh (Hệ số K):", list(K_OPTIONS.keys()), index=3)
-        coe_input = st.number_input("Cost of Equity (COE) %:", min_value=1.0, max_value=30.0, value=14.0, step=0.5)
+        coe_input = st.number_input("Cost of Equity (COE) %:", min_value=1.0, max_value=30.0, value=13.0, step=0.5)
 
         st.markdown("---")
         st.header("Kiểm tra Kịch bản")
