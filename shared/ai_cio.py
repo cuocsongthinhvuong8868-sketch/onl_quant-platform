@@ -604,13 +604,13 @@ def _has_final_score_line(text: str) -> bool:
         )
     )
 
-def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 2) -> str:
-    """Đọc tối đa n_past báo cáo executive_summary gần nhất (T-1, T-2...).
-    Quét lùi tối đa 7 ngày lịch để bỏ qua ngày nghỉ/không có cache.
+def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> str:
+    """Đọc tối đa n_past báo cáo executive_summary gần nhất (T-1 đến T-5).
+    Quét lùi tối đa 15 ngày lịch để bỏ qua ngày nghỉ/không có cache.
     Trả về chuỗi context sẵn sàng chèn vào prompt, rỗng nếu không tìm thấy."""
     cache_dir = DATA_LAKE / "daily_cache"
     found = []
-    for days_back in range(1, 8):
+    for days_back in range(1, 16):
         if len(found) >= n_past:
             break
         target_date = date.today() - timedelta(days=days_back)
@@ -1638,14 +1638,14 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
-    historical_context = _read_recent_summaries(provider_key, n_past=2)
+    historical_context = _read_recent_summaries(provider_key, n_past=5)
     if historical_context:
         historical_block = (
-            "=== LỊCH SỬ BÁO CÁO (T-1, T-2 — CHỈ ĐỂ PHÂN TÍCH XU HƯỚNG) ===\n"
+            "=== LỊCH SỬ BÁO CÁO (T-1 ĐẾN T-5 — CHỈ ĐỂ PHÂN TÍCH XU HƯỚNG) ===\n"
             + historical_context
         )
     else:
-        historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1/T-2 ==="
+        historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1 đến T-5 ==="
 
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
     fed_date, fed_rep = _get_fed_liquidity_context(provider_key)

@@ -1,0 +1,36 @@
+## 1. Observations
+
+- **Risk Score**: 48.7/100, tăng +1.5 điểm so với phiên trước, duy trì trong vùng 40-60.
+- **EGARCH Vol**: 13.5%, giảm -7.1%, đang dưới ngưỡng biến động cao (>20%).
+- **Rolling Skewness**: 0.00, chính xác tại ngưỡng trung tính, không lệch âm hay dương rõ rệt.
+- **Upside Correlation (29.0%) cao gấp ~2.5 lần Downside Correlation (11.5%)**, phản ánh tương quan đồng biến mạnh hơn nhiều so với tương quan nghịch biến.
+
+## 2. Interpretation
+
+Dữ liệu hiện tại mô tả một thị trường trung tính có thiên hướng tích cực: biến động giảm, phân phối lợi nhuận đối xứng (skew = 0), nhưng tương quan đồng biến khi tăng điểm (upside corr) cao áp đảo so với tương quan nghịch biến khi giảm điểm (downside corr). Điều này cho thấy môi trường giao dịch phân hóa, phù hợp với trạng thái Stock Picking.
+
+## 3. Cross-Check
+
+- **Score (tăng nhẹ) vs EGARCH Vol (giảm mạnh)**: Hai tín hiệu di chuyển cùng hướng — score tăng khi vol giảm, consistent với khung tham chiếu (NEUTRAL nghiêng về GREED).
+- **Skewness (0.00) vs Correlations (Upside >> Downside)**: Skewness ở mức trung tính, nhưng chênh lệch lớn giữa upside và downside corr tạo ra divergence nhẹ. Mức độ phân hóa (upside corr cao) mạnh hơn so với kỳ vọng từ skew = 0 — nhưng không mâu thuẫn tuyệt đối.
+- **Kết luận**: Consistent tổng thể, không có mâu thuẫn nghiêm trọng, chỉ có tín hiệu yếu về lực kéo phân hóa mạnh hơn hành vi đám đông thuần túy.
+
+## 4. Verdict
+
+**Beta đề xuất: 0.6** trên danh mục VN-Index.
+
+Trên dữ liệu hiện tại, chưa có tín hiệu bất ổn hệ thống. Biến động thấp và skew trung tính cho phép giữ rủi ro danh mục trung bình-cao với khả năng giảm vol là tích cực. Tuy nhiên, downside corr vẫn tồn tại (11.5%) nên chưa đủ để chuyển sang tấn công toàn diện. Chủ động nâng tỷ trọng các vị thế riêng lẻ, duy trì đa dạng hóa, không mua ròng chỉ số.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "fear_greed",
+  "date": "12/06/2026",
+  "regime": "NEUTRAL",
+  "score": 48.7,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": ["EGARCH Vol giảm mạnh -7.1%, về 13.5%", "Upside Correlation 29.0% gấp 2.5 lần Downside 11.5%", "Skewness 0.00 - phân phối đối xứng"]
+}
+```

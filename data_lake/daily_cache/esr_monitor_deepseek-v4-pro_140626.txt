@@ -1,0 +1,37 @@
+# ESR Monitor — 12/06/2026
+
+## 1. Observations
+- **SSI** đạt 65.9%, nằm trong vùng **WARNING** (0.50–0.80), cho thấy hệ thống đang tích lũy rủi ro ngầm.
+- **Market State** là **EUPHORIC_RISK** — kết hợp high stress + xu hướng tăng trước đó, nhưng VN30 hiện đóng cửa dưới MA125.
+- **PCA Concentration (EVR PC1)** đạt 38.3%, tín hiệu hệ thống vẫn khá tập trung — không đa dạng hóa corona.
+- **Top 3 Pillar Drivers:** #1 S_LIQ (36%), #2 S_VAL (32%), #3 S_COR (17%). Pillar Mode đang là downside.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (36%)** dẫn dắt áp lực chính. Đây là tín hiệu **volume khô cạn so với 1Y norm** — thanh khoản tổng dollar volume suy yếu, giao dịch cầm chừng, không đủ động lực duy trì xu hướng.
+- **S_VAL (32%)** ở vị trí thứ hai: chênh lệch return 252d VN30 vs lãi suất tiền gửi đã bị kéo căng so với lịch sử. Dù VN30 đi ngang, định giá không thay đổi mạnh, nhưng áp lực valuation tension vẫn cao.
+- **S_COR (17%)** ở vị trí thứ ba: systemic correlation tăng nhẹ — khi liquidity khô + valuation tension kéo dài, herding có thể bùng phát nếu xuất hiện catalyst.
+- **Tổng thể:** Bộ ba **S_LIQ + S_VAL + S_COR** đang tạo signature của một bull-trap tiềm năng: volume nghèo nàn, định giá căng, nhưng thị trường vẫn cố neo ở vùng cao.
+
+## 3. Cross-Check
+- **VN30 price action vs SSI:** VN30 đã đóng cửa dưới MA125 sau một giai đoạn uptrend trước đó, trong khi SSI vẫn đứng ở WARNING. Đây là tín hiệu divergence tiêu cực: giá không còn khả năng xác nhận uptrend mới khi stress ngầm vẫn cao.
+- **HMM regime vs SSI level:** Khớp — cả SSI và HMM đều phản ánh high stress, không có lệch.
+- **HMM Decision Threshold (0.534)** cho thấy mô hình đang operational với mức ngưỡng thận trọng.
+
+## 4. Verdict
+- **Cash weight đề xuất:** 60% danh mục. Giữ tỷ trọng tiền mặt cao để bảo toàn vốn trong bối cảnh liquid dry-up + valuation tension.
+- **Hedge action:** **Short VN30F1M** — khối lượng nhẹ, phòng vệ cho phần equity còn lại. Nếu SSI vượt 80% CRITICAL, có thể chuyển sang mua put.
+- **Không có mâu thuẫn nội bộ pillar drivers:** cả ba đều đồng thuận về hướng stress — tín hiệu rõ ràng, không cần NO ACTIONABLE SIGNAL.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "short_futures",
+  "confidence": "high"
+}
+```

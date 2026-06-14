@@ -1,0 +1,44 @@
+## 1. Observations
+
+- **Historical VaR 95%** (3Y rolling): -1.65%, sát với Parametric Gaussian -1.47%, cho thấy ở ngưỡng 95% hai phân phối tương đồng.
+- **EVT VaR 99%**: -3.69%, tương ứng mức thua lỗ -3.7% trong phiên, tần suất 1 lần/100 phiên.
+- **ξ (GPD shape)**: +0.345, nằm trong bracket “fat tail” (ξ > 0.30).
+- **Hill index**: +0.447, cùng dấu và cùng magnitude cao với ξ → tín hiệu robust.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.345** thuộc bracket **FAT TAIL** (ξ > 0.30). Đây là cảnh báo rằng phần đuôi phân phối lợi suất dày hơn đáng kể so với phân phối chuẩn.
+- **Hill = 0.447** có cùng dấu dương và magnitude tương đương (0.345 vs 0.447) → cross‑check **confirm**, không có threshold sensitivity. Độ tin cậy của EVT cao.
+- **ES − VaR Spread = -1.37%** (tính từ -3.02% và -1.65%) lớn hơn σ₃₀ = 0.83% → **fat tail confirmed empirically**. Khoảng cách giữa tổn thất trung bình (CVaR) và VaR vượt quá 1 độ lệch chuẩn, phản ánh mức độ rủi ro cực đoan cao.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** = μ + z₀.₀₁·σ = 0% + (-2.33 × 0.83%) = **-1.93%**.
+- **EVT VaR 99%** = **-3.69%**.
+- **Gaussian gap** = |-3.69%| − |-1.93%| = **1.76 percentage points**.
+- Gap > 1pp → **Gaussian model bị broken**. Nếu dùng VaR Gaussian để phân bổ vốn rủi ro, bạn đang underestimate rủi ro thực tế gần gấp đôi ở ngưỡng 99%.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.345 > 0.30, tail regime là **fat tail**:
+
+- **Không dùng** momentum strategies (dễ bị gap down phá vỡ).
+- **Khuyến nghị mua puts ITM** (deep in‑the‑money) để bảo vệ danh mục trước các sự kiện -3.7% đến -6.2% mà EVT đã cảnh báo.
+- **Short futures hedge** (hoặc sử dụng VN30F1M) để giảm net delta exposure, đặc biệt trong giai đoạn σ₃₀ chưa phản ánh hết tail risk.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "12/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.76,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

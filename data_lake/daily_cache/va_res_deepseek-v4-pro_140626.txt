@@ -1,0 +1,32 @@
+## 1. Observations
+- **VN30 Stress Index:** 3.33% (ngưỡng cảnh báo 40%) — ở mức rất thấp, không có áp lực lây lan hệ thống.
+- **Số mã thủng VaR 95%:** 1/30 — chỉ duy nhất VHM ghi nhận breach, không có dấu hiệu lan rộng.
+- **Complacency Index:** 4.63% (ngưỡng nguy hiểm 80%) — ở mức rất thấp, thị trường không ở regime ngủ quên.
+- **Số mã mispriced:** 5 — spread bị nén ở một số mã, nhưng chưa mang tính hệ thống.
+
+## 2. Contagion Assessment (Module B)
+- **VN30 Stress Index** ở mức 3.33%, rất xa ngưỡng alert 40%. Không có tín hiệu lây lan rủi ro real-time trên nhóm vốn hóa lớn. Thị trường VN30 đang vận hành trong trạng thái ổn định về mặt thống kê rủi ro.
+- **Top 1 breach (VHM):** chỉ duy nhất VHM thủng VaR 95%. Đây là sự cố cá biệt, không phải đầu sóng systemic. Nguyên nhân có thể do tin tức riêng lẻ, batch margin call, hoặc điều chỉnh room. Không có tín hiệu lây lan sang các mã VN30 khác.
+
+## 3. Complacency Assessment (Module C)
+- Complacency Index ở mức **4.63%, rất thấp** — thị trường **KHÔNG ở regime ngủ quên**. Điều này KHÔNG đồng nghĩa thị trường ổn định hay không có áp lực bán. 
+- Kết hợp với Stress Index thấp (3.33%), có thể loại trừ kịch bản thị trường đang crash mạnh (vì crash sẽ đẩy Stress Index lên cao). Tuy nhiên, không loại trừ khả năng thị trường đang trong giai đoạn accumulation vùng thấp hoặc sideway đi ngang với spread giãn nhẹ.
+- **Không có cảnh báo định giá sai rủi ro diện rộng** từ phía complacency.
+
+## 4. Stock-Level Risk Calls
+- **VHM (Top breach):** chịu áp lực bán cá biệt. Cần theo dõi khối lượng breakout tiếp theo. Nếu khối lượng duy trì cao trên D1 trong 2–3 phiên tới và giá không hồi phục, cân nhắc giảm tỷ trọng. Stop-loss tại mức thủng MA20 trên D1.
+- **OCB, ACB (Top mispriced):** spread bị nén chặt, tiềm ẩn rủi ro breakout bất ngờ nếu thanh khoản đột biến. Cảnh báo không nên mua đuổi khi giá đang im ắng; nếu có tin bất lợi, spread sẽ giãn nhanh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["VHM"],
+  "confidence": "high"
+}
+```
