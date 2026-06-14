@@ -466,6 +466,7 @@ def _render_ai_cio() -> None:
         _selected_label = st.selectbox(
             "Chọn báo cáo AI CIO để đọc:",
             options=list(_options.keys()),
+            index=0,  # Luôn mặc định chọn báo cáo mới nhất
             key="cio_history_select",
         )
         selected_path = _options[_selected_label]
@@ -486,8 +487,18 @@ def render() -> None:
     SOURCE_DIR.mkdir(parents=True, exist_ok=True)
     json_files = list(SOURCE_DIR.glob("*.json"))
 
+    def _parse_file_date(path: Path) -> dt.date:
+        """Parse DDMMYYYY from filename; return date.min if unparseable."""
+        stem = path.stem
+        if len(stem) == 8 and stem.isdigit():
+            try:
+                return dt.datetime.strptime(stem, "%d%m%Y").date()
+            except ValueError:
+                pass
+        return dt.date.min
+
     json_options = {}
-    for path in sorted(json_files, key=lambda p: p.name, reverse=True):
+    for path in sorted(json_files, key=_parse_file_date, reverse=True):
         stem = path.stem
         if len(stem) == 8 and stem.isdigit():
             label = f"📅 {stem[:2]}/{stem[2:4]}/{stem[4:]}"
@@ -504,6 +515,7 @@ def render() -> None:
     selected_date_label = st.sidebar.selectbox(
         "Chọn ngày phân tích:",
         options=list(json_options.keys()),
+        index=0,  # Luôn mặc định chọn ngày gần nhất
         key="platform_date_select",
     )
     active_json_path = json_options[selected_date_label]
