@@ -1,0 +1,62 @@
+from tools.sentiment_factor_news.core.classifier import classify_and_tag_item
+from tools.sentiment_factor_news.core.normalizer import normalize_mozyfin, normalize_widata
+from tools.sentiment_factor_news.core.scorer import score_item
+from tools.sentiment_factor_news.report import snapshot
+
+
+def test_mozyfin_banking_news_scores_positive():
+    raw_item = {
+        "id": 1001,
+        "title": "Cổ phiếu VCB bùng nổ, lợi nhuận ngân hàng cải thiện vượt bậc",
+        "vi_summary": "Lợi nhuận ngân hàng tăng mạnh nhờ CASA cải thiện và tăng trưởng tín dụng tốt.",
+        "source": "Mozyfin News",
+        "published_date": "2026-06-14T03:00:00Z",
+        "url": "https://mozyfin.com/news/1001",
+        "sectors": ["banking-35"],
+        "key_topics": ["economic", "stock"],
+        "market_impact": "bullish",
+        "entities": ["VCB"],
+    }
+
+    normalized = normalize_mozyfin(raw_item)
+    classification = classify_and_tag_item(normalized)
+    scores = score_item(normalized, classification)
+
+    assert normalized["source_system"] == "mozyfin"
+    assert classification["macro_channel"] == "banking_system"
+    assert classification["sentiment_label"] == "positive"
+    assert scores["final_score"] > 0.0
+
+
+def test_widata_fx_pressure_scores_negative():
+    raw_item = {
+        "id": 2002,
+        "title": "Tỷ giá USD/VND tăng mạnh áp lực lớn",
+        "ai_translated_title": "Tỷ giá USD/VND tăng mạnh áp lực lớn",
+        "ai_summary": "Tỷ giá tăng vượt mốc do chỉ số DXY tăng cao làm đồng VND mất giá mạnh.",
+        "source": "WiData Signal",
+        "publish_date": "2026-06-14T03:00:00Z",
+        "url": "https://widata.vn/news/2002",
+        "category": "Vĩ mô",
+        "tag_level_0": "Tỷ giá",
+        "tag_level_1": "USD/VND",
+        "important_level": 2,
+    }
+
+    normalized = normalize_widata(raw_item)
+    classification = classify_and_tag_item(normalized)
+    scores = score_item(normalized, classification)
+
+    assert normalized["source_system"] == "widata"
+    assert classification["macro_channel"] == "fx_external"
+    assert classification["event_type"] == "vnd_depreciation"
+    assert scores["final_score"] < 0.0
+
+
+def test_snapshot_reads_copied_feed():
+    snap = snapshot(window="1d")
+
+    assert snap["status"] == "ok"
+    assert snap["window"] == "latest_1d"
+    assert snap["news_count"] > 0
+    assert "macro_composite" in snap

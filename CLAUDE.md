@@ -2,7 +2,7 @@
 
 **Type:** Streamlit-based quantitative analysis platform cho thị trường VN.
 **Stack:** Python 3.10-3.11 (production), Streamlit, pandas, scipy, plotly, scikit-learn, arch (GARCH), hmmlearn, numba, polars, fpdf2, statsmodels, fredapi, yfinance, OpenAI SDK.
-**Last major update:** 2026-05-20 (GFCM v2: 11 indicators, EMA(5) smoothing, daily cron, handbook — xem `docs/skill.md` để biết full session log).
+**Last major update:** 2026-06-14 (Bank Valuation native tool vào A Macro; Risk-Adjusted Growth chuyển sang B Micro; GFCM v2 context vẫn xem `docs/skill.md`).
 
 ## Architecture (3-tier)
 
@@ -14,21 +14,21 @@ shared/       — Cross-tool utilities (data_loader, ai_cio, daily_cache, dcc_ga
 tools/<name>/ — Per-tool: quant/ (logic) + ui/ (charts, sidebar) + page.py (Streamlit render)
                 + report.py (snapshot, optional — chỉ cần nếu plug AI CIO executive summary)
 pages/        — Streamlit MPA entries:
-                  A_Macro_Analysis    (Fed Liquidity, GFCM)
-                  B_Micro_Analysis    (Pairs Trading)
-                  C_Behavioral_Finance (9 VN-equity tools)
+                  A_Macro_Analysis    (standalone macro/regime tools, gồm Bank Valuation)
+                  B_Micro_Analysis    (Pairs Trading, Factor Examination, Risk-Adjusted Growth)
+                  C_Behavioral_Finance (8 sentiment/risk tools + history/backtest)
 command/      — CLI scripts (update_data, update_fed_liquidity, update_global_financial_conditions,
                 update_sector_data, run_ai_cio_auto, etc.)
 promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere)
 ```
 
-## 13 Tools Active
+## 14 Tools Active
 
 | # | Branch | Tool | Module | Key tech | AI |
 |---|---|---|---|---|---|
 | 1 | C | Fear & Greed | `fear_greed` | PCA + EGARCH→GARCH→EWMA fallback + Kelly skewness | exec-sum |
 | 2 | C | Upside Ratio | `upside_ratio` | Hybrid Logit-AR + Beta-AR MC | exec-sum |
-| 3 | C | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks) | exec-sum |
+| 3 | B | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks) | exec-sum |
 | 4 | C | Market Breadth | `market_breadth` | % stocks > MA20/60/125/252 | exec-sum |
 | 5 | C | **ESR Monitor** | `esr_monitor` | 5-pillar SSI (S_VOL/S_PRES/S_COR/**S_LIQ=Volume Dry-Up**/S_VAL) + HMM | exec-sum |
 | 6 | C | Dispersion | `dispersion` | CSAD/CSSD + DPI + Ledoit-Wolf | exec-sum |
@@ -37,8 +37,9 @@ promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | exec-sum |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | standalone |
 | 11 | A | **GFCM v2** | `global_financial_conditions` | **11 indicators** (Vol: VIX/MOVE/SKEW/OVX/VVIX · Credit: HY/CCC/IG/EM OAS · Macro: 2s10s/DXY), static PCA 6-core, **PC1 EMA(5) smoothed**, PC1_pct 1Y → STRESS/ELEVATED/CALM. Daily cron 22:00 UTC. Handbook `docs/GFCM-handbook.md` | standalone |
-| 12 | B | **Pairs Trading** | `pairs_trading` | EG + Johansen + OU half-life + Z-score 60d, 7 PREDEFINED clusters | none (orthogonal) |
-| 13 | B | **Factor Examination** | `factor_examination` | **10 cross-section factor** (Mom_12_1/Mom_6_1/ST_Reversal/LT_Reversal/LowVol/Beta_Low/IdioVol_Low/Liquidity/Size/Anti_Lottery) sector-neutral ICB, robust MAD z-score, equal-weight composite. 4 tabs: Universe Rank / Portfolio Exam / Ticker Profile / Forward IC backtest. Handbook `docs/factor_examination_handbook.md`. **Portfolio examination, KHÔNG regime classifier** | standalone |
+| 12 | A | **Bank Valuation** | `bank_valuation` | Bottom-up bank valuation + valuation breadth regime proxy | standalone |
+| 13 | B | **Pairs Trading** | `pairs_trading` | EG + Johansen + OU half-life + Z-score 60d, 7 PREDEFINED clusters | none (orthogonal) |
+| 14 | B | **Factor Examination** | `factor_examination` | **10 cross-section factor** (Mom_12_1/Mom_6_1/ST_Reversal/LT_Reversal/LowVol/Beta_Low/IdioVol_Low/Liquidity/Size/Anti_Lottery) sector-neutral ICB, robust MAD z-score, equal-weight composite. 4 tabs: Universe Rank / Portfolio Exam / Ticker Profile / Forward IC backtest. Handbook `docs/factor_examination_handbook.md`. **Portfolio examination, KHÔNG regime classifier** | standalone |
 
 **AI integration patterns**:
 - **exec-sum**: tool có `report.py snapshot()`, được aggregate vào `shared/ai_cio.py:run_executive_summary()` cho 1 master verdict
@@ -54,7 +55,7 @@ promt/        — 12 AI prompt templates (typo intentional, hardcoded everywhere
 - **PRODUCTION_REGIME_METHOD** ở [tools/esr_monitor/quant/metrics.py:51](tools/esr_monitor/quant/metrics.py:51) = `'hmm'` cho live paths; backtest dùng `'hmm_walk_forward'` riêng.
 - **Cache invalidation**: hash-based pkl cache key phải bao gồm `s_<feature>_method: "vN"` khi đổi methodology.
 - **AI CIO history CSV** (`data_lake/Ai_cio_report.csv`) tự upsert khi `run_executive_summary()` chạy. Same-day → overwrite; T+1 → append.
-- **Macro / cross-asset tool pattern**: theo precedent `fed_liquidity` / `global_financial_conditions` — AI tab riêng trên page với prompt template riêng, **không** inject `shared/ai_cio.py`. Executive summary scope = 9 VN-equity tools only.
+- **Macro / cross-asset tool pattern**: theo precedent `fed_liquidity` / `global_financial_conditions` / `bank_valuation` — AI tab riêng trên page nếu có, **không** inject `shared/ai_cio.py`. Executive summary scope = VN-equity tools only; branch placement is not the criterion.
 
 ## DON'Ts (Anti-patterns đã học)
 

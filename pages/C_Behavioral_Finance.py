@@ -1,6 +1,6 @@
 """
 pages/3_Behavioral_Finance.py — Nhánh Phân tích Tài chính Hành vi (Behavioral Finance).
-Gộp tất cả 9 công cụ hiện tại vào một giao diện thống nhất.
+Gộp các công cụ hành vi và rủi ro thị trường vào một giao diện thống nhất.
 """
 import sys
 from pathlib import Path
@@ -21,17 +21,17 @@ TOOLS = [
         "render_func": "render",
     },
     {
+        "id": "sentiment_factor_news",
+        "name": "📰 News Sentiment Factor",
+        "desc": "Rule-based macro/news sentiment feed từ Mozyfin và WiData: composite, regime, channel scores và headline drivers.",
+        "page_module": "tools.sentiment_factor_news.page",
+        "render_func": "render",
+    },
+    {
         "id": "upside_ratio",
         "name": "🧬 Upside/Downside Ratio",
         "desc": "Hybrid MC Bidirectional Breadth Model — Phân tích Cung-Cầu với Monte Carlo ensemble",
         "page_module": "tools.upside_ratio.page",
-        "render_func": "render",
-    },
-    {
-        "id": "risk_adjusted_growth",
-        "name": "📊 Risk-Adjusted Growth",
-        "desc": "Phân tích tăng trưởng điều chỉnh rủi ro — DCF, P/B, Cash Payout cho ngân hàng",
-        "page_module": "tools.risk_adjusted_growth.page",
         "render_func": "render",
     },
     {
@@ -123,7 +123,7 @@ if st.session_state.bf_selected_tool is None:
                         st.rerun()
 
     st.markdown("---")
-    st.caption("© Quant Platform — Behavioral Finance • 9 công cụ phân tích")
+    st.caption(f"© Quant Platform — Behavioral Finance • {len(TOOLS)} công cụ phân tích")
 
 # ── Đã chọn tool → Render tool tương ứng ───────────────────────────
 else:

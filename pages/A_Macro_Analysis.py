@@ -42,6 +42,13 @@ TOOLS = [
         "render_func": "render",
     },
     {
+        "id": "bank_valuation",
+        "name": "🏦 Bank Valuation",
+        "desc": "Định giá bottom-up nhóm ngân hàng: Adjusted Book Value, Sustainable ROE, Residual Income, stress fair P/B và regime từ valuation breadth.",
+        "page_module": "tools.bank_valuation.page",
+        "render_func": "render",
+    },
+    {
         "id": "ltmm",
         "name": "📊 Liquidity Transmission (LTMM)",
         "desc": "Theo dõi kênh truyền dẫn thanh khoản hệ thống: Thượng nguồn (upstream), Lớp ma sát (friction), và Hạ nguồn (market liquidity)",

@@ -12,9 +12,9 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 
 | Nhánh | Mô tả | Số công cụ |
 |-------|-------|------------|
-| 📈 **Macro Analysis** | Phân tích vĩ mô toàn cầu & Việt Nam | 5 tools |
-| 🔬 **Micro Analysis** | Phân tích vi mô, pairs trading, factor examination | 2 tools |
-| 🧠 **Behavioral Finance** | Tài chính hành vi, tâm lý thị trường, rủi ro hệ thống | 9+ tools |
+| 📈 **Macro Analysis** | Phân tích vĩ mô, thanh khoản và regime từ định giá ngân hàng | 7 tools |
+| 🔬 **Micro Analysis** | Phân tích vi mô, factor, pairs trading và tăng trưởng điều chỉnh rủi ro | 3 tools |
+| 🧠 **Behavioral Finance** | Tài chính hành vi, tâm lý thị trường, rủi ro hệ thống | 8 + 2 utility tools |
 
 ---
 
@@ -24,9 +24,11 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 |---|---------|-------|
 | 1 | **Fed Liquidity Monitor** | Net Liquidity (WALCL − TGA − RRP) + Impulse EMA + Z-Score 52W → Tín hiệu ADD/CUT/HOLD |
 | 2 | **Global Financial Conditions** | VIX + MOVE + HY OAS + CCC OAS · Static PCA composite · Regime via PC1 percentile rank 3Y |
-| 3 | **VNIBOR Monitor** | Lãi suất liên ngân hàng qua đêm và các kỳ hạn ngắn · Phân loại trạng thái thanh khoản |
-| 4 | **Liquidity Transmission (LTMM)** | Theo dõi kênh truyền dẫn thanh khoản: Thượng nguồn → Lớp ma sát → Hạ nguồn |
-| 5 | **VN100 Earnings Health** | Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + PCA validation |
+| 3 | **Humility & Falsification Monitor** | Đối chiếu điều kiện falsification của AI CIO T-1 với dữ liệu T |
+| 4 | **VNIBOR Monitor** | Lãi suất liên ngân hàng qua đêm và các kỳ hạn ngắn · Phân loại trạng thái thanh khoản |
+| 5 | **Bank Valuation** | Định giá bottom-up nhóm ngân hàng: Adjusted Book Value, Sustainable ROE, Residual Income, stress fair P/B và regime từ valuation breadth |
+| 6 | **Liquidity Transmission (LTMM)** | Theo dõi kênh truyền dẫn thanh khoản: Thượng nguồn → Lớp ma sát → Hạ nguồn |
+| 7 | **VN100 Earnings Health** | Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + PCA validation |
 
 ---
 
@@ -36,6 +38,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 |---|---------|-------|
 | 1 | **Pairs Trading Research Lab** | Cointegration (Engle-Granger + Johansen) + OU half-life + Z-score 60d trên 7 cluster VN |
 | 2 | **Portfolio Factor Examination** | Multi-factor cross-sectional scorer (10 factors): Mom/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery/Reversal |
+| 3 | **Risk-Adjusted Growth** | Phân tích tăng trưởng điều chỉnh rủi ro — Economic Alpha, P/B, ROE và Cash Payout cho nhóm ngân hàng |
 
 ---
 
@@ -45,15 +48,14 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 |---|---------|-------|
 | 1 | **Market Sentiment (Fear & Greed)** | PCA & EGARCH(1,1,1) Skewed-T, Kelly Skewness — Đo lường tâm lý thị trường |
 | 2 | **Upside/Downside Ratio** | Hybrid MC Bidirectional Breadth Model — Phân tích Cung-Cầu với Monte Carlo ensemble |
-| 3 | **Risk-Adjusted Growth** | Phân tích tăng trưởng điều chỉnh rủi ro — DCF, P/B, Cash Payout cho ngân hàng |
-| 4 | **Market Breadth** | Độ rộng thị trường — Số mã >MA20/60/125/252, Top 10 Volume Leaders |
-| 5 | **ESR Monitor** | Hệ thống Cảnh báo Rủi ro Hệ thống — PCA trên VN30, phát hiện SAFE/WARNING/CRITICAL |
-| 6 | **Dispersion** | Phân tích phân tán thị trường — Volatility skew, term structure |
-| 7 | **VaRES Engine** | 3 Module: A-Single Ticker, B-VN30 Stress, C-Market Complacency với Self-Baseline |
-| 8 | **Manipulation Detection** | Phát hiện dấu hiệu thao túng giá — Các metrics đặc biệt về hành vi giao dịch |
-| 9 | **Var-CVaR VNINDEX** | Value-at-Risk & Expected Shortfall cho VNINDEX — Rolling σ, Parametric & Historical VaR, ES |
-| 10 | **History Score & Regime** | Backtest scoring system cho các regime thị trường |
-| 11 | **Backtest Strategy** | Framework backtest chiến lược giao dịch |
+| 3 | **Market Breadth** | Độ rộng thị trường — Số mã >MA20/60/125/252, Top 10 Volume Leaders |
+| 4 | **ESR Monitor** | Hệ thống Cảnh báo Rủi ro Hệ thống — PCA trên VN30, phát hiện SAFE/WARNING/CRITICAL |
+| 5 | **Dispersion** | Phân tích phân tán thị trường — Volatility skew, term structure |
+| 6 | **VaRES Engine** | 3 Module: A-Single Ticker, B-VN30 Stress, C-Market Complacency với Self-Baseline |
+| 7 | **Manipulation Detection** | Phát hiện dấu hiệu thao túng giá — Các metrics đặc biệt về hành vi giao dịch |
+| 8 | **Var-CVaR VNINDEX** | Value-at-Risk & Expected Shortfall cho VNINDEX — Rolling σ, Parametric & Historical VaR, ES |
+| 9 | **History Score & Regime** | Backtest scoring system cho các regime thị trường |
+| 10 | **Backtest Strategy** | Framework backtest chiến lược giao dịch |
 
 ---
 
@@ -82,9 +84,10 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 │   ├── B_Micro_Analysis.py       # Micro Analysis hub
 │   ├── C_Behavioral_Finance.py   # Behavioral Finance hub
 │   └── tools_page_*/             # Sub-pages (history score, backtest)
-├── tools/                        # 19 tool modules
+├── tools/                        # Tool modules
 │   ├── fed_liquidity/
 │   ├── global_financial_conditions/
+│   ├── bank_valuation/
 │   ├── vnibor/
 │   ├── ltmm/
 │   ├── vn100_earnings_health/
@@ -107,6 +110,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 │   ├── update_vnibor.py
 │   ├── update_sector_data.py
 │   ├── update_risk_adjusted_growth_statistics.py
+│   ├── update_bank_valuation_data.py
 │   ├── update_factor_examination.py
 │   ├── run_ai_cio_auto.py
 │   └── generate_report.py
@@ -125,6 +129,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 │   ├── fed_liquidity_cache.csv
 │   ├── global_financial_conditions_cache.csv
 │   ├── risk_adjusted_growth/
+│   ├── bank_valuation/
 │   ├── daily_cache/              # Cache AI reports
 │   └── vn100_earnings_health/
 ├── reports/                      # Báo cáo PDF xuất ra
@@ -267,6 +272,7 @@ Dữ liệu không tự động cập nhật trên Streamlit Cloud. Bạn có th
 | `update_vnibor.py` | Cập nhật lãi suất liên ngân hàng VNIBOR |
 | `update_sector_data.py` | Cập nhật dữ liệu sector |
 | `update_risk_adjusted_growth_statistics.py` | Copy/sanitize Statistics + BCTC JSON ngân hàng cho Risk-Adjusted Growth |
+| `update_bank_valuation_data.py` | Copy raw BCTC JSON + manual CAR vào `data_lake/bank_valuation` cho Bank Valuation native tool |
 | `update_factor_examination.py` | Cập nhật factor scores cho 400 tickers |
 | `run_ai_cio_auto.py` | Chạy tự động tạo AI CIO Executive Summary |
 

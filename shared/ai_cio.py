@@ -244,9 +244,11 @@ from tools.manipulation.quant.engine import prepare_data as prep_mani, compute_m
 from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
 # Import logic Upside Ratio
 
-# Import logic Risk Adjusted Growth
-from tools.risk_adjusted_growth.quant.data_prep import build_base_table_from_statistics
-from tools.risk_adjusted_growth.quant.scoring import compute_scores
+# Import logic Bank Valuation
+from tools.bank_valuation.quant.engine.ai_analysis import build_bank_valuation_ai_prompt
+from tools.bank_valuation.quant.pipeline import run_bank_valuation_pipeline
+# Import logic Sentiment Factor From News
+from tools.sentiment_factor_news.report import build_sentiment_factor_news_ai_prompt
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
@@ -632,7 +634,7 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
     """Xoá cache AI text của các công cụ con + executive_summary cho provider_key cụ thể."""
     tool_names = [
         "feargreed", "manipulation", "dispersion", "upside_ratio",
-        "risk_adjusted_growth", "market_breadth", "esr_monitor",
+        "bank_valuation_ai", "sentiment_factor_news", "market_breadth", "esr_monitor",
         "va_res", "var_cvar_vnindex",
         "fed_liquidity", "global_financial_conditions",
         "executive_summary", "telegram_summary"
@@ -860,59 +862,47 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     _write_cache("upside_ratio", res, provider_key)
     return res
 
-def run_risk_adjusted(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
-    cached = _read_cache("risk_adjusted_growth", provider_key)
+def run_bank_valuation(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("bank_valuation_ai", provider_key)
     if cached: return cached
 
-    latest_prices = df_stocks.ffill().iloc[-1]
-    df_base = build_base_table_from_statistics(price_row=latest_prices)
-    df_result = compute_scores(df_base=df_base, k_value=1.0, coe_decimal=0.14, bvps_change_pct=-5.0, pb_penalty_pct=-5.0)
-    ticker_col = "Ticker" if "Ticker" in df_result.columns else "Ngân hàng"
-    
-    with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
-        prompt_template = f.read()
+    try:
+        volumes = load_volumes()
+        valuation_df, _ = run_bank_valuation_pipeline(close_prices=df_stocks, volumes=volumes)
+    except Exception as exc:
+        return f"DATA INSUFFICIENT - Bank Valuation feed unavailable: {exc}"
 
-    top_alpha = df_result.nlargest(3, "Economic Alpha")
-    top_alpha_str = ", ".join([
-        (
-            f"{i+1}. {row[ticker_col]} "
-            f"(Alpha {row['Economic Alpha']*100:.1f}%, "
-            f"P/B {row['P/B Gốc']:.2f}, "
-            f"ROE {row['Geomean ROE']*100:.1f}%, "
-            f"σROE {row['Stdev ROE']*100:.1f}%, "
-            f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
-        )
-        for i, row in enumerate(top_alpha.to_dict('records'))
-    ])
-    
-    bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
-    bottom_alpha_str = ", ".join([
-        (
-            f"{i+1}. {row[ticker_col]} "
-            f"(Alpha {row['Economic Alpha']*100:.1f}%, "
-            f"P/B {row['P/B Gốc']:.2f}, "
-            f"ROE {row['Geomean ROE']*100:.1f}%, "
-            f"σROE {row['Stdev ROE']*100:.1f}%, "
-            f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
-        )
-        for i, row in enumerate(bottom_alpha.to_dict('records'))
-    ])
+    focus_question = (
+        "Tóm tắt feed Bank Valuation cho AI CIO: valuation breadth regime của nhóm ngân hàng, "
+        "best/worst valuation gaps, fair/undervalued candidates, overvalued/value-trap risks, "
+        "market confirmation, data quality, và các cảnh báo cần dùng trong allocation."
+    )
+    sys_p, usr_p = build_bank_valuation_ai_prompt(
+        valuation_df,
+        ohlcv_source="quant_platform_market_data",
+        focus_question=focus_question,
+    )
 
-    full_prompt = prompt_template.replace("{k_scenario}", "Tiêu chuẩn")\
-                                 .replace("{k_value}", "1.0")\
-                                 .replace("{coe_input}", "14.0")\
-                                 .replace("{bvps_change_pct}", "-5.0")\
-                                 .replace("{pb_penalty_pct}", "-5.0")\
-                                 .replace("{top_alpha_str}", top_alpha_str)\
-                                 .replace("{bottom_alpha_str}", bottom_alpha_str)
-
-    parts = full_prompt.split("# INPUT DATA")
-    sys_p = parts[0].strip()
-    usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
-    
     res = call_ai(client, sys_p, usr_p, model=model)
-    _write_cache("risk_adjusted_growth", res, provider_key)
+    _write_cache("bank_valuation_ai", res, provider_key)
     return res
+
+
+def run_sentiment_factor_news(client, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("sentiment_factor_news", provider_key)
+    if cached: return cached
+
+    try:
+        sys_p, usr_p = build_sentiment_factor_news_ai_prompt()
+    except Exception as exc:
+        res = f"DATA INSUFFICIENT - Sentiment Factor From News feed unavailable: {exc}"
+        _write_cache("sentiment_factor_news", res, provider_key)
+        return res
+
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("sentiment_factor_news", res, provider_key)
+    return res
+
 
 def run_market_breadth(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
     cached = _read_cache("market_breadth", provider_key)
@@ -1620,7 +1610,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     model = cfg["api_model"]
     temperature = cfg.get("temperature", 1.0)
     
-    # Nếu force=True → xoá toàn bộ cache của 9 tool con và executive_summary
+    # Nếu force=True → xoá toàn bộ cache của 10 tool con và executive_summary
     # để buộc gọi lại API từ đầu
     if force:
         _clear_all_tool_caches(provider_key)
@@ -1636,12 +1626,13 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r2 = run_manipulation(client, df_stocks, provider_key, model)
     r3 = run_dispersion(client, df_stocks, provider_key, model)
     r4 = run_upside_ratio(client, df_stocks, provider_key, model)
-    r5 = run_risk_adjusted(client, df_stocks, provider_key, model)
+    r5 = run_bank_valuation(client, df_stocks, provider_key, model)
     r6 = run_market_breadth(client, df_stocks, provider_key, model)
     r7 = run_esr_monitor(client, df_stocks, provider_key, model)
     r8 = run_va_res(client, df_stocks, provider_key, model)
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
-    r10 = get_humility_falsification_context(provider_key, force=force)
+    r10 = run_sentiment_factor_news(client, provider_key, model)
+    humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)
     
@@ -1683,17 +1674,18 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         f"{historical_block}\n\n"
         f"{macro_section}"
         f"{fundamental_section}"
-        f"=== HUMILITY & FALSIFICATION MONITOR (T vs PRIOR AI CIO THESIS) ===\n{r10}\n\n"
+        f"=== HUMILITY & FALSIFICATION MONITOR (T vs PRIOR AI CIO THESIS) ===\n{humility_context}\n\n"
         f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
         f"=== 1. FEAR & GREED ===\n{r1}\n\n"
         f"=== 2. MANIPULATION ===\n{r2}\n\n"
         f"=== 3. DISPERSION ===\n{r3}\n\n"
         f"=== 4. UPSIDE RATIO ===\n{r4}\n\n"
-        f"=== 5. RISK ADJUSTED GROWTH ===\n{r5}\n\n"
+        f"=== 5. BANK VALUATION ===\n{r5}\n\n"
         f"=== 6. MARKET BREADTH ===\n{r6}\n\n"
         f"=== 7. ESR MONITOR ===\n{r7}\n\n"
         f"=== 8. VARES ENGINE ===\n{r8}\n\n"
-        f"=== 9. VAR-CVAR VNINDEX ===\n{r9}"
+        f"=== 9. VAR-CVAR VNINDEX ===\n{r9}\n\n"
+        f"=== 10. SENTIMENT FACTOR FROM NEWS ===\n{r10}"
     )
 
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:

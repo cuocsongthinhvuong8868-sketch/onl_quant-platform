@@ -1,6 +1,6 @@
 # Skill Log — Quant Platform (Continuity Context)
 
-**Updated:** 2026-05-22 (Factor Exam → pkl cache + cron pre-warm + 4 cache patterns documented)
+**Updated:** 2026-06-14 (Bank Valuation native tool vào A Macro; Risk-Adjusted Growth chuyển sang B Micro)
 **Purpose:** nén ngữ cảnh để resume công việc instant khi reopen.
 
 ---
@@ -12,7 +12,7 @@ Streamlit-based quant platform cho thị trường VN, kiến trúc 3-tier:
 - Data pipeline `data_lake/`: app **đọc** CSV; updater scripts **gọi** API
 - AI CIO synthesis: 9 VN-equity tool → 1 executive summary qua Kimi/DeepSeek
 - Backtest pipeline isolated (look-ahead-free) khỏi live paths
-- Macro tools (Fed Liquidity, GFCM) **đứng riêng** — AI analysis trên page, KHÔNG inject executive summary
+- Macro/regime tools (Fed Liquidity, GFCM, Bank Valuation) **đứng riêng** — AI analysis trên page nếu có, KHÔNG inject executive summary
 
 ---
 
@@ -27,9 +27,9 @@ data_lake/              — market_data, market_volume, vnindex/vn30, fundamenta
                           ticker_metadata, Ai_cio_report
 data_lake/daily_cache/  — pkl (compute) + txt (AI text reports)
 pages/
-  A_Macro_Analysis.py        — Fed Liquidity, GFCM
-  B_Micro_Analysis.py        — Pairs Trading
-  C_Behavioral_Finance.py    — 9 tools dạng grid menu
+  A_Macro_Analysis.py        — standalone macro/regime tools, gồm Bank Valuation
+  B_Micro_Analysis.py        — Pairs Trading, Factor Examination, Risk-Adjusted Growth
+  C_Behavioral_Finance.py    — behavioral/risk tools dạng grid menu
   tools_page_{A,B,C}/…       — entry ẩn (gọi tools.<name>.page.render())
 tools/<tool>/
   quant/<metrics|engine|...>.py — business logic
@@ -49,6 +49,7 @@ promt/              — 12 prompt templates (Vietnamese, tên file có space - t
 command/
   update_data.py                          — vnstock close+volume
   update_risk_adjusted_growth_statistics.py — copy/sanitize bank Statistics + BCTC JSON for RAG
+  update_bank_valuation_data.py           — copy raw BCTC JSON + manual CAR for Bank Valuation
   update_fed_liquidity.py                 — FRED WALCL/TGA/RRP weekly
   update_global_financial_conditions.py   — FRED VIX/HY/CCC + Yahoo MOVE daily
   update_sector_data.py                   — ICB metadata
@@ -62,13 +63,13 @@ command/
 
 ---
 
-## 3. 11 Tools Active — Snapshot
+## 3. 14 Tools Active — Snapshot
 
 | # | Branch | Tool | Module | Key tech | AI integration |
 |---|---|---|---|---|---|
 | 1 | C | Fear & Greed | `fear_greed` | PCA + EGARCH→GARCH→EWMA fallback + Kelly skewness | Executive summary |
 | 2 | C | Upside Ratio | `upside_ratio` | Hybrid Logit-AR + Beta-AR Monte Carlo 5000 sims | Executive summary |
-| 3 | C | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks) | Executive summary |
+| 3 | B | Risk-Adjusted Growth | `risk_adjusted_growth` | Disciplined Return + Economic Alpha (banks) | Executive summary |
 | 4 | C | Market Breadth | `market_breadth` | % stocks > MA20/60/125/252 | Executive summary |
 | 5 | C | **ESR Monitor** | `esr_monitor` | 5-pillar SSI (S_VOL/S_PRES/S_COR/**S_LIQ=Volume Dry-Up**/S_VAL) + HMM regime | Executive summary |
 | 6 | C | Dispersion | `dispersion` | CSAD/CSSD + DPI + Ledoit-Wolf | Executive summary |
@@ -77,7 +78,9 @@ command/
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | Executive summary |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | Standalone (AI tab trên page) |
 | 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, **static PCA**, regime via PC1 percentile 3Y | Standalone (AI tab trên page) |
-| 12 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
+| 12 | A | **Bank Valuation** | `bank_valuation` | Bottom-up bank valuation + valuation breadth regime proxy | Standalone |
+| 13 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
+| 14 | B | **Factor Examination** | `factor_examination` | 10 cross-section factor, sector-neutral ICB, portfolio examination | Standalone |
 
 `PRODUCTION_REGIME_METHOD` (`tools/esr_monitor/quant/metrics.py:51`) = `'hmm'` cho live paths. Backtest dùng `'hmm_walk_forward'` riêng.
 
@@ -92,6 +95,8 @@ command/
 | `vnindex_cache.csv` / `vn30_cache.csv` | Same | Daily |
 | `risk_adjusted_growth/statistics_json/*.json` | `update_risk_adjusted_growth_statistics.py` (MozyFin Statistics scrape) | Monthly / on new scrape |
 | `risk_adjusted_growth/financial_report_json/*.json` | `update_risk_adjusted_growth_statistics.py` (MozyFin BCTC scrape) | Monthly / on new scrape |
+| `bank_valuation/bctc_json/*.json` | `update_bank_valuation_data.py` (raw MozyFin BCTC scrape) | Monthly / on new scrape |
+| `bank_valuation/manual_car.csv` | `update_bank_valuation_data.py` | On new manual CAR override |
 | `ticker_metadata.csv` | `update_sector_data.py` (vnstock Listing) | Quarterly |
 | `fed_liquidity_cache.csv` | `update_fed_liquidity.py` (FRED) | Weekly Wed |
 | `global_financial_conditions_cache.csv` | `update_global_financial_conditions.py` (FRED + Yahoo) | Daily |
@@ -139,7 +144,7 @@ command/
 6. Quant layer **không** import Streamlit; UI **không** chứa business logic
 7. Errors trong quant → RAISE; UI catch + log
 8. Cache hash phải bao gồm `s_<feature>_method: "vN"` khi đổi methodology
-9. **Macro / cross-asset / non-VN-equity tool**: theo precedent `fed_liquidity`/`gfcm` — AI tab riêng trên page, KHÔNG inject executive summary aggregator (giữ scope sạch — executive summary là cho 9 VN-equity tools)
+9. **Macro / cross-asset / non-VN-equity regime tool**: theo precedent `fed_liquidity`/`gfcm`/`bank_valuation` — AI tab riêng trên page nếu có, KHÔNG inject executive summary aggregator (giữ scope sạch — executive summary là cho VN-equity tools)
 
 ---
 
@@ -153,6 +158,7 @@ streamlit run app.py
 python command/update_data.py                          # daily incremental ~5 min
 python command/update_data.py --backfill 2190          # 6 năm backfill
 python command/update_risk_adjusted_growth_statistics.py # bank Statistics + BCTC JSON for RAG
+python command/update_bank_valuation_data.py             # raw BCTC JSON + manual CAR for Bank Valuation
 python command/update_fed_liquidity.py                 # weekly Wed (FRED)
 python command/update_global_financial_conditions.py   # daily (FRED+Yahoo)
 python command/update_sector_data.py                   # quarterly ICB

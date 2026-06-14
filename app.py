@@ -43,8 +43,8 @@ with col1:
         st.markdown("### 📈 Phân tích Vĩ mô")
         st.markdown("**Macro Analysis**")
         st.markdown(
-            "- Lãi suất & Chính sách tiền tệ\n"
-            "- Tỷ giá & Dự trữ ngoại hối\n"
+            "- Thanh khoản, lãi suất & điều kiện tài chính\n"
+            "- Regime từ định giá ngân hàng\n"
         )
         if st.button("📈 Vào Macro Analysis", key="btn_macro", use_container_width=True):
 
@@ -55,9 +55,9 @@ with col2:
         st.markdown("### 🔬 Phân tích Vi mô")
         st.markdown("**Micro Analysis**")
         st.markdown(
-            "- 🔁 Pairs Trading Research Lab\n"
-            "- Cointegration + OU half-life + Z-score\n"
-            "- 7 cluster VN + custom pair\n"
+            "- Pairs Trading & Factor Examination\n"
+            "- Tăng trưởng điều chỉnh rủi ro ngành ngân hàng\n"
+            "- Quan hệ giá, yếu tố và định giá vi mô\n"
         )
         if st.button("🔬 Vào Micro Analysis", key="btn_micro", use_container_width=True):
 

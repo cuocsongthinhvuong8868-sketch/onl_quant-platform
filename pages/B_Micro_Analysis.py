@@ -34,6 +34,13 @@ TOOLS = [
         "page_module": "tools.factor_examination.page",
         "render_func": "render",
     },
+    {
+        "id": "risk_adjusted_growth",
+        "name": "📊 Risk-Adjusted Growth",
+        "desc": "Phân tích tăng trưởng điều chỉnh rủi ro — Economic Alpha, P/B, ROE và Cash Payout cho nhóm ngân hàng.",
+        "page_module": "tools.risk_adjusted_growth.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
@@ -43,9 +50,8 @@ if "micro_selected_tool" not in st.session_state:
 # ── Header ──────────────────────────────────────────────────────────
 st.title("🔬 Phân tích Vi mô (Micro Analysis)")
 st.markdown(
-    "Khoang tàu **Micro Analysis** tập trung phân tích quan hệ stat-arb và "
-    "pair trading trên cluster cointegrated VN — research dashboard độc lập, "
-    "KHÔNG plug AI CIO synthesis."
+    "Khoang tàu **Micro Analysis** tập trung phân tích cấu trúc từng mã/ngành, "
+    "factor cross-section và các bài toán stat-arb trên cổ phiếu Việt Nam."
 )
 
 st.markdown("---")
