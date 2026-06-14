@@ -1,21 +1,21 @@
 ## 1. Observations
-- **VN30 Stress Index:** 3.33% (ngưỡng cảnh báo 40%) — ở mức rất thấp, không có áp lực lây lan hệ thống.
-- **Số mã thủng VaR 95%:** 1/30 — chỉ duy nhất VHM ghi nhận breach, không có dấu hiệu lan rộng.
-- **Complacency Index:** 4.63% (ngưỡng nguy hiểm 80%) — ở mức rất thấp, thị trường không ở regime ngủ quên.
-- **Số mã mispriced:** 5 — spread bị nén ở một số mã, nhưng chưa mang tính hệ thống.
+- VN30 Stress Index: 3.33% (alert threshold: 40%)
+- # mã thủng VaR 95%: 1/30
+- Complacency Index: 4.63% (danger threshold: 80%)
+- # mã mispriced: 5
 
 ## 2. Contagion Assessment (Module B)
-- **VN30 Stress Index** ở mức 3.33%, rất xa ngưỡng alert 40%. Không có tín hiệu lây lan rủi ro real-time trên nhóm vốn hóa lớn. Thị trường VN30 đang vận hành trong trạng thái ổn định về mặt thống kê rủi ro.
-- **Top 1 breach (VHM):** chỉ duy nhất VHM thủng VaR 95%. Đây là sự cố cá biệt, không phải đầu sóng systemic. Nguyên nhân có thể do tin tức riêng lẻ, batch margin call, hoặc điều chỉnh room. Không có tín hiệu lây lan sang các mã VN30 khác.
+VN30 Stress Index ở mức 3.33%, rất xa ngưỡng cảnh báo 40%. Chỉ 1/30 mã thủng VaR 95% và duy nhất VHM là breach sâu nhất. Đây là sự cố cá biệt của mã đơn lẻ, không có dấu hiệu lây lan systemic. Stress trên VN30 đang ở mức nền, chưa hình thành cấu trúc contagion.
 
-## 3. Complacency Assessment (Module C)
-- Complacency Index ở mức **4.63%, rất thấp** — thị trường **KHÔNG ở regime ngủ quên**. Điều này KHÔNG đồng nghĩa thị trường ổn định hay không có áp lực bán. 
-- Kết hợp với Stress Index thấp (3.33%), có thể loại trừ kịch bản thị trường đang crash mạnh (vì crash sẽ đẩy Stress Index lên cao). Tuy nhiên, không loại trừ khả năng thị trường đang trong giai đoạn accumulation vùng thấp hoặc sideway đi ngang với spread giãn nhẹ.
-- **Không có cảnh báo định giá sai rủi ro diện rộng** từ phía complacency.
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency Index ở mức 4.63%, rất thấp, khẳng định thị trường KHÔNG đang ở regime ngủ quên. Điều này KHÔNG đồng nghĩa thị trường ổn định. Dựa trên Stress Index thấp, kết luận thị trường đang ở trạng thái bình thường hoặc giảm sốc — không có áp lực bán mạnh cũng không có sự tích lũy căng thẳng. Spread giãn rộng tự nhiên, không bị nén chặt.
 
 ## 4. Stock-Level Risk Calls
-- **VHM (Top breach):** chịu áp lực bán cá biệt. Cần theo dõi khối lượng breakout tiếp theo. Nếu khối lượng duy trì cao trên D1 trong 2–3 phiên tới và giá không hồi phục, cân nhắc giảm tỷ trọng. Stop-loss tại mức thủng MA20 trên D1.
-- **OCB, ACB (Top mispriced):** spread bị nén chặt, tiềm ẩn rủi ro breakout bất ngờ nếu thanh khoản đột biến. Cảnh báo không nên mua đuổi khi giá đang im ắng; nếu có tin bất lợi, spread sẽ giãn nhanh.
+**Top 3 Crash (Module B):**
+- **VHM**: giảm tỷ trọng nếu thủng MA20 trên khung D1, đặt stop-loss ≥ 5% từ giá hiện tại.
+
+**Top 3 Mispriced (Module C):**
+- **OCB, VHM, ACB**: spread bị nén nhẹ, cần theo dõi volume breakout. Nguy cơ định giá sai chưa đáng kể với 5 mã mispriced trên toàn thị trường.
 
 ## 5. Structured Tail
 ```json

@@ -130,6 +130,17 @@ if _available_cio:
 else:
     st.info("ℹ️ Chưa có report AI CIO hôm nay. Chạy '🔥 Executive Summary (AI CIO)' để tạo; hoặc chọn ngày gần nhất muốn xem ở mục '📄 Xuất PDF Report AI CIO'.")
 
+st.markdown("---")
+
+# ── History Score & Regime ──
+try:
+    from pages.tools_page_C.history_score_regime import render as render_history
+    render_history()
+except Exception as e:
+    st.error(f"❌ Lỗi tải Lịch sử Score & Regime: {e}")
+
+st.markdown("---")
+
 # ── Debug GitHub Sync ──
 with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
     try:

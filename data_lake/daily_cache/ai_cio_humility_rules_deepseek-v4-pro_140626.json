@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-14",
+  "composite_score": 11,
+  "regime": "CRISIS/PRE-CRASH",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 14,
+      "unit": "sessions",
+      "description": "Nếu số phiên STRESS/WARNING giảm xuống dưới 5, VNIBOR squeeze đã kết thúc"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 29.2,
+      "unit": "%",
+      "description": "Nếu Breadth MA20 vượt 45%, thị trường thoát Bear Confirmed"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.9,
+      "unit": "%",
+      "description": "Nếu SSI xuống dưới 55%, hệ thống thoát WARNING"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Nếu ξ xuống dưới 0.25, Fat Tail regime kết thúc"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 26.7,
+      "unit": "th pct",
+      "description": "Nếu Slope Percentile duy trì dưới 70th, Vingroup không còn rủi ro dẫn dắt F1"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.8,
+      "unit": "th pct",
+      "description": "Nếu CQS percentile xuống dưới 80th, credit stress toàn cầu hạ nhiệt"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-14",
+  "source": "ai_cio_executive_summary"
+}

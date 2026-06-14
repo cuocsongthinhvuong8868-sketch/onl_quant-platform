@@ -1,30 +1,38 @@
 ## 1. Observations
 
-- **Historical VaR 95%** (3Y rolling): -1.65%, sát với Parametric Gaussian -1.47%, cho thấy ở ngưỡng 95% hai phân phối tương đồng.
-- **EVT VaR 99%**: -3.69%, tương ứng mức thua lỗ -3.7% trong phiên, tần suất 1 lần/100 phiên.
-- **ξ (GPD shape)**: +0.345, nằm trong bracket “fat tail” (ξ > 0.30).
-- **Hill index**: +0.447, cùng dấu và cùng magnitude cao với ξ → tín hiệu robust.
+- **Historical VaR 95% (3Y rolling):** -1.65%, sâu hơn Parametric Gaussian VaR 95% (-1.47%) – dấu hiệu ban đầu cho thấy phân phối lợi nhuận lệch khỏi Gaussian.
+- **EVT VaR 99% (1/100-event):** -3.69%. Khoảng lỗ cực đoan trong 1% trường hợp xấu nhất ước tính gần gấp đôi lỗ kỳ vọng thông thường.
+- **ξ (GPD shape):** +0.345. Hệ số này vượt ngưỡng 0.30, phân loại là **"đuôi béo" (fat tail)**.
+- **Hill index:** +0.447. Cùng dấu dương với ξ, khẳng định sự tồn tại của đuôi phân phối nặng.
 
 ## 2. Tail Thickness Diagnosis
 
-- **ξ = 0.345** thuộc bracket **FAT TAIL** (ξ > 0.30). Đây là cảnh báo rằng phần đuôi phân phối lợi suất dày hơn đáng kể so với phân phối chuẩn.
-- **Hill = 0.447** có cùng dấu dương và magnitude tương đương (0.345 vs 0.447) → cross‑check **confirm**, không có threshold sensitivity. Độ tin cậy của EVT cao.
-- **ES − VaR Spread = -1.37%** (tính từ -3.02% và -1.65%) lớn hơn σ₃₀ = 0.83% → **fat tail confirmed empirically**. Khoảng cách giữa tổn thất trung bình (CVaR) và VaR vượt quá 1 độ lệch chuẩn, phản ánh mức độ rủi ro cực đoan cao.
+ξ = 0.345 thuộc bracket **FAT TAIL** (ξ > 0.30). Điều này có nghĩa các sự kiện lỗ cực đoan xảy ra với tần suất cao hơn nhiều so với dự báo từ mô hình phân phối chuẩn.
+
+Hill index = 0.447 cùng dấu và có độ lớn tương đương với ξ (+0.345). Sự đồng thuận này cho tín hiệu tail risk **rất mạnh và ổn định**, không bị nhiễu do lựa chọn threshold.
+
+ES - VaR spread = -1.37%, lớn hơn đáng kể so với σ₃₀ = 0.83%. Mức chênh lệch này xác nhận bằng chứng thực nghiệm về đuôi béo: tổn thất trung bình vượt ngưỡng VaR rất xa.
 
 ## 3. Gaussian Gap
 
-- **Gaussian VaR 99%** = μ + z₀.₀₁·σ = 0% + (-2.33 × 0.83%) = **-1.93%**.
-- **EVT VaR 99%** = **-3.69%**.
-- **Gaussian gap** = |-3.69%| − |-1.93%| = **1.76 percentage points**.
-- Gap > 1pp → **Gaussian model bị broken**. Nếu dùng VaR Gaussian để phân bổ vốn rủi ro, bạn đang underestimate rủi ro thực tế gần gấp đôi ở ngưỡng 99%.
+Tính toán Gaussian VaR 99%:
+- Giả định μ ≈ 0 (kỳ vọng lợi nhuận ngắn hạn không đáng kể so với độ lệch).
+- z₀.₀₁ ≈ -2.33.
+- Gaussian VaR 99% ≈ 0 + (-2.33 × 0.83%) = **-1.93%**.
+
+So sánh: EVT VaR 99% (-3.69%) vs. Gaussian VaR 99% (-1.93%).
+**Gaussian Gap = -3.69% - (-1.93%) = -1.76 điểm phần trăm.**
+
+Gap vượt xa ngưỡng 1pp, kết luận: **Mô hình Gaussian hoàn toàn bị "broken"** đối với rủi ro đuôi. Sử dụng nó để phân bổ vốn rủi ro (risk capital allocation) sẽ dẫn đến thiếu hụt nghiêm trọng vốn dự phòng cho các cú sốc 1%.
 
 ## 4. Verdict — Hedging Implications
 
-Với ξ = 0.345 > 0.30, tail regime là **fat tail**:
+ξ = 0.345 > 0.30, áp dụng khuyến nghị cho chế độ đuôi béo:
+- **Tránh các chiến lược momentum** vì dễ bị thổi bay trong các đợt giảm sâu.
+- **Mua quyền chọn bán (puts) ITM** để bảo vệ danh mục trước các đợt sụt giảm mạnh; puts ITM có delta cao và độ nhạy với biến động (vega) cao hơn, phù hợp với kịch bản VaR/ES cực đoan.
+- **Short futures hedge** là hành động phòng ngừa trực tiếp, cần thiết nếu có thể đánh đổi chi phí hedge để bảo vệ danh mục chính.
 
-- **Không dùng** momentum strategies (dễ bị gap down phá vỡ).
-- **Khuyến nghị mua puts ITM** (deep in‑the‑money) để bảo vệ danh mục trước các sự kiện -3.7% đến -6.2% mà EVT đã cảnh báo.
-- **Short futures hedge** (hoặc sử dụng VN30F1M) để giảm net delta exposure, đặc biệt trong giai đoạn σ₃₀ chưa phản ánh hết tail risk.
+**Mức độ tin cậy: Cao.** Cả ξ và Hill đều đồng thuận về đuôi béo; ES-VaR spread và Gaussian gap cung cấp xác nhận độc lập.
 
 ## 5. Structured Tail
 
@@ -38,7 +46,7 @@ Với ξ = 0.345 > 0.30, tail regime là **fat tail**:
   "hill": 0.447,
   "tail_regime": "fat",
   "gaussian_gap_pp": 1.76,
-  "hedge_action": "buy_puts_itm|short_futures",
+  "hedge_action": "buy_puts_itm",
   "confidence": "high"
 }
 ```

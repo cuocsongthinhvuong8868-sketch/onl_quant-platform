@@ -605,12 +605,12 @@ def _has_final_score_line(text: str) -> bool:
     )
 
 def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> str:
-    """Đọc tối đa n_past báo cáo executive_summary gần nhất (T-1 đến T-5).
-    Quét lùi tối đa 15 ngày lịch để bỏ qua ngày nghỉ/không có cache.
+    """Đọc tối đa n_past báo cáo executive_summary gần nhất.
+    Quét lùi tối đa 25 ngày lịch để bỏ qua ngày nghỉ/không có cache.
     Trả về chuỗi context sẵn sàng chèn vào prompt, rỗng nếu không tìm thấy."""
     cache_dir = DATA_LAKE / "daily_cache"
     found = []
-    for days_back in range(1, 16):
+    for days_back in range(1, 26):
         if len(found) >= n_past:
             break
         target_date = date.today() - timedelta(days=days_back)
@@ -630,6 +630,197 @@ def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> s
         blocks.append(f"=== BÁO CÁO {label} ===\n{content}")
     return "\n\n".join(blocks)
 
+def _build_comprehensive_metrics_table(df_stocks, provider_key: str = "kimi-2.6", n_past: int = 7) -> str:
+    """Xây dựng bảng số liệu chuỗi thời gian định lượng toàn diện cho n_past phiên gần nhất,
+    bao gồm đầu ra của tất cả các công cụ con định lượng."""
+    try:
+        # 1. Fear & Greed
+        fg_metrics = calculate_quant_metrics(df_stocks, window_size=60)
+        fg_scored = calculate_risk_score(fg_metrics)
+        
+        # 2. Manipulation
+        df_prices = prep_mani(df_stocks)
+        _, result_mani = comp_mani(df_prices, window=60)
+        
+        # 3. Dispersion
+        df_idx = load_custom("vnindex_cache.csv")
+        idx_col = "VNINDEX" if "VNINDEX" in df_idx.columns else df_idx.columns[0]
+        stock_returns, metrics_disp = calculate_dispersion_metrics(df_stocks, df_idx[idx_col], zscore_type="Rolling", zscore_window=60, dpi_window=60)
+        corr = fit_rolling_correlation(stock_returns, window=30, refit_every=5)
+        metrics_disp["Ledoit_Correlation"] = corr
+        metrics_disp = metrics_disp.dropna(subset=["DPI", "Ledoit_Correlation"])
+        
+        # 4. Market Breadth
+        breadth_df, _ = compute_breadth(df_stocks)
+        
+        # 5. ESR Monitor
+        df_vn30 = load_custom("vn30_cache.csv")
+        df_volume = load_volumes()
+        _, result_esr, market_states, _ = run_esr_pipeline(
+            df_stocks, df_vn30, df_volume=df_volume, deposit_rate=0.06,
+            pillar_mode='downside', pca_warmup=252, ema_span=20, regime_method=PRODUCTION_REGIME_METHOD
+        )
+        
+        # 6. VaRES & 7. Var-CVaR & RAG (Loop n_past lần vì các hàm này chỉ tính snapshot ngày hiện tại)
+        vares_history = []
+        var_cvar_history = []
+        rag_history = []
+        for i in range(n_past):
+            sub_df = df_stocks if i == 0 else df_stocks.iloc[:-i]
+            vares_history.append(vares_snapshot(sub_df))
+            var_cvar_history.append(var_cvar_snapshot(sub_df))
+            try:
+                from tools.risk_adjusted_growth.report import snapshot as rag_snapshot
+                rag_history.append(rag_snapshot(sub_df, load_custom))
+            except Exception:
+                rag_history.append({"top_bank": "N/A", "top_alpha": 0.0})
+        vares_history.reverse()
+        var_cvar_history.reverse()
+        rag_history.reverse()
+        
+        # 8. Fed Liquidity
+        fed_path = DATA_LAKE / "fed_liquidity_cache.csv"
+        df_fed = pd.read_csv(fed_path, parse_dates=["DATE"]).set_index("DATE").sort_index()
+        
+        # 9. Global FCI
+        gfcm_path = DATA_LAKE / "global_financial_conditions_cache.csv"
+        df_gfcm = pd.read_csv(gfcm_path, parse_dates=["DATE"]).set_index("DATE").sort_index()
+        
+        # 10. VNIBOR
+        from tools.vnibor.quant.metrics import load_vnibor_data, process_vnibor_logic
+        df_vnibor = process_vnibor_logic(load_vnibor_data())
+        
+    except Exception as e:
+        return f"*Không thể xây dựng bảng số liệu định lượng do thiếu dữ liệu hoặc lỗi tính toán: {e}*"
+
+    # Lấy danh sách các ngày thực tế của n_past phiên giao dịch gần nhất từ df_stocks
+    dates = df_stocks.index[-n_past:]
+    
+    lines = [
+        "=== BẢNG SỐ LIỆU CHUỖI THỜI GIAN ĐỊNH LƯỢNG TOÀN DIỆN (T-6 ĐẾN T) ===",
+        "| Phiên | F&G Score | Mani Corr/Slope | Disp DPI/Spread Z | Breadth MA20 | ESR SSI | VaRES Stress/Compl. | Var-CVaR ES/xi | Fed Net Liq/Impulse | Global FCI CQS/PC1 | VNIBOR ON/Regime | RAG Top (Alpha) |",
+        "|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|:---|"
+    ]
+    
+    for idx, dt in enumerate(dates):
+        days_back = n_past - 1 - idx
+        label_date = dt.strftime('%d/%m')
+        label = f"T-{days_back} ({label_date})" if days_back > 0 else f"T ({label_date})"
+        
+        try:
+            # 1. F&G
+            fg_row = fg_scored.loc[dt]
+            fg_val = f"{fg_row['Risk_Score']:.1f}"
+        except Exception: fg_val = "N/A"
+            
+        try:
+            # 2. Manipulation
+            mani_row = result_mani.loc[dt]
+            mani_val = f"{mani_row['Correlation']:.2f}/{mani_row['OLS_Slope']:.2f}"
+        except Exception: mani_val = "N/A"
+            
+        try:
+            # 3. Dispersion
+            disp_row = metrics_disp.loc[dt]
+            disp_val = f"{disp_row['DPI']:.1f}/{disp_row['Spread_Z']:+.2f}"
+        except Exception: disp_val = "N/A"
+            
+        try:
+            # 4. Market Breadth
+            breadth_row = breadth_df.loc[dt]
+            total_stocks = len(df_stocks.columns)
+            breadth_val = f"{(breadth_row['> MA20'] / total_stocks * 100.0):.1f}%"
+        except Exception: breadth_val = "N/A"
+            
+        try:
+            # 5. ESR
+            esr_row = result_esr.loc[dt]
+            esr_val = f"{(esr_row['ssi'] * 100.0):.1f}%"
+        except Exception: esr_val = "N/A"
+            
+        try:
+            # 6. VaRES
+            vares_row = vares_history[idx]
+            vares_val = f"{vares_row['stress_index']:.1f}%/{vares_row['complacency_index']:.1f}%"
+        except Exception: vares_val = "N/A"
+            
+        try:
+            # 7. Var-CVaR
+            var_row = var_cvar_history[idx]
+            var_val = f"{(var_row['expected_shortfall'] * 100.0):.1f}%/{var_row['evt_xi']:+.3f}"
+        except Exception: var_val = "N/A"
+            
+        try:
+            # 8. Fed Liquidity (tìm ngày gần nhất trong df_fed so với dt)
+            fed_idx_date = df_fed.index[df_fed.index <= dt][-1]
+            fed_row = df_fed.loc[fed_idx_date]
+            fed_val = f"{fed_row['Net Liquidity']/1e3:.1f}T/{fed_row['Impulse']/1e3:+.1f}T"
+        except Exception: fed_val = "N/A"
+            
+        try:
+            # 9. Global FCI (tìm ngày gần nhất trong df_gfcm so với dt)
+            gfcm_idx_date = df_gfcm.index[df_gfcm.index <= dt][-1]
+            gfcm_row = df_gfcm.loc[gfcm_idx_date]
+            gfcm_val = f"{gfcm_row['CQS']:.1f}th/{gfcm_row['PC1_smooth']:+.2f}"
+        except Exception: gfcm_val = "N/A"
+            
+        try:
+            # 10. VNIBOR (tìm ngày gần nhất trong df_vnibor so với dt)
+            vnibor_idx_date = df_vnibor.index[df_vnibor.index <= dt][-1]
+            vnibor_row = df_vnibor.loc[vnibor_idx_date]
+            vnibor_val = f"{vnibor_row['Overnight']:.2f}%/{vnibor_row['Regime']}"
+        except Exception: vnibor_val = "N/A"
+            
+        try:
+            rag_row = rag_history[idx]
+            top_bank = rag_row.get("top_bank", "N/A")
+            top_alpha = rag_row.get("top_alpha", 0.0)
+            if top_bank != "N/A":
+                rag_val = f"{top_bank} ({top_alpha*100:.1f}%)"
+            else:
+                rag_val = "N/A"
+        except Exception:
+            rag_val = "N/A"
+
+        lines.append(
+            f"| {label} | {fg_val} | {mani_val} | {disp_val} | {breadth_val} | {esr_val} | "
+            f"{vares_val} | {var_val} | {fed_val} | {gfcm_val} | {vnibor_val} | {rag_val} |"
+        )
+        
+    return "\n".join(lines)
+
+def run_historical_trend_analyst(client, provider_key: str = "kimi-2.6", model: str = None,
+                                 raw_history_text: str = "", force: bool = False) -> str:
+    """Tóm tắt lịch sử 7 phiên gần nhất thông qua Sub AI CIO."""
+    cached = None if force else _read_cache("historical_trend", provider_key)
+    if cached:
+        return cached
+
+    if not raw_history_text:
+        return "Không có dữ liệu lịch sử thô để tóm tắt xu hướng."
+
+    with open(str(ROOT_DIR / "promt" / "historical_trend_promt.md"), "r", encoding="utf-8") as f:
+        prompt_template = f.read()
+
+    # Load df_stocks để chạy các hàm định lượng chuỗi thời gian
+    df_stocks = load_close_prices()
+
+    # Tạo bảng số liệu chuỗi thời gian định lượng toàn diện cho tất cả các tools con
+    metrics_table = _build_comprehensive_metrics_table(df_stocks, provider_key=provider_key, n_past=7)
+    if not metrics_table:
+        metrics_table = "*Không có dữ liệu chuỗi thời gian định lượng toàn diện từ tools*"
+
+    full_prompt = prompt_template.replace("{historical_reports_raw}", raw_history_text)\
+                                 .replace("{historical_metrics_table}", metrics_table)
+
+    parts = full_prompt.split("# INPUT DATA")
+    sys_p = parts[0].strip()
+    usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+
+    res = call_ai(client, sys_p, usr_p, model=model)
+    _write_cache("historical_trend", res, provider_key)
+    return res
+
 def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
     """Xoá cache AI text của các công cụ con + executive_summary cho provider_key cụ thể."""
     tool_names = [
@@ -637,7 +828,7 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
         "bank_valuation_ai", "sentiment_factor_news", "market_breadth", "esr_monitor",
         "va_res", "var_cvar_vnindex",
         "fed_liquidity", "global_financial_conditions",
-        "executive_summary", "telegram_summary"
+        "executive_summary", "telegram_summary", "historical_trend"
     ]
     for tool in tool_names:
         path = _get_cache_path(tool, provider_key)
@@ -901,6 +1092,93 @@ def run_sentiment_factor_news(client, provider_key: str = "kimi-2.6", model: str
 
     res = call_ai(client, sys_p, usr_p, model=model)
     _write_cache("sentiment_factor_news", res, provider_key)
+    return res
+
+
+def run_risk_adjusted_growth(client, df_stocks, provider_key: str = "kimi-2.6", model: str = None):
+    cached = _read_cache("risk_adjusted_growth", provider_key)
+    if cached: return cached
+
+    try:
+        from tools.risk_adjusted_growth.quant.data_prep import (
+            build_base_table_from_statistics,
+            risk_adjusted_growth_source_signature,
+            STATISTICS_JSON_DIR,
+            FINANCIAL_REPORT_JSON_DIR
+        )
+        from tools.risk_adjusted_growth.quant.scoring import compute_scores
+
+        source_signature = risk_adjusted_growth_source_signature(
+            STATISTICS_JSON_DIR,
+            FINANCIAL_REPORT_JSON_DIR,
+        )
+        price_row = df_stocks.ffill().iloc[-1].to_dict()
+        df_base = build_base_table_from_statistics(
+            STATISTICS_JSON_DIR,
+            financial_report_dir=FINANCIAL_REPORT_JSON_DIR,
+            price_row=price_row,
+        )
+        df_result = compute_scores(
+            df_base=df_base,
+            k_value=1.0,
+            coe_decimal=0.14,
+            bvps_change_pct=0.0,
+            pb_penalty_pct=0.0,
+        )
+    except Exception as exc:
+        res = f"DATA INSUFFICIENT - Risk-Adjusted Growth feed unavailable: {exc}"
+        _write_cache("risk_adjusted_growth", res, provider_key)
+        return res
+
+    try:
+        with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
+            prompt_template = f.read()
+
+        ticker_col = "Ticker" if "Ticker" in df_result.columns else "Ngân hàng"
+        top_alpha = df_result.nlargest(3, "Economic Alpha")
+        top_alpha_str = ", ".join([
+            (
+                f"{i+1}. {row[ticker_col]} "
+                f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+                f"P/B {row['P/B Gốc']:.2f}, "
+                f"ROE {row['Geomean ROE']*100:.1f}%, "
+                f"σROE {row['Stdev ROE']*100:.1f}%, "
+                f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+            )
+            for i, row in enumerate(top_alpha.to_dict('records'))
+        ])
+
+        bottom_alpha = df_result.nsmallest(3, "Economic Alpha")
+        bottom_alpha_str = ", ".join([
+            (
+                f"{i+1}. {row[ticker_col]} "
+                f"(Alpha {row['Economic Alpha']*100:.1f}%, "
+                f"P/B {row['P/B Gốc']:.2f}, "
+                f"ROE {row['Geomean ROE']*100:.1f}%, "
+                f"σROE {row['Stdev ROE']*100:.1f}%, "
+                f"Payout {row['Cash Payout Ratio']*100:.1f}%)"
+            )
+            for i, row in enumerate(bottom_alpha.to_dict('records'))
+        ])
+
+        full_prompt = prompt_template.replace("{k_scenario}", "Trung lập")\
+                                     .replace("{k_value}", "1.0")\
+                                     .replace("{coe_input}", "14.0")\
+                                     .replace("{bvps_change_pct}", "0.0")\
+                                     .replace("{pb_penalty_pct}", "0.0")\
+                                     .replace("{top_alpha_str}", top_alpha_str)\
+                                     .replace("{bottom_alpha_str}", bottom_alpha_str)
+
+        parts = full_prompt.split("# INPUT DATA")
+        system_prompt = parts[0].strip()
+        user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    except Exception as exc:
+        res = f"DATA INSUFFICIENT - Error processing Risk-Adjusted Growth prompt: {exc}"
+        _write_cache("risk_adjusted_growth", res, provider_key)
+        return res
+
+    res = call_ai(client, system_prompt, user_prompt, model=model)
+    _write_cache("risk_adjusted_growth", res, provider_key)
     return res
 
 
@@ -1632,20 +1910,26 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r8 = run_va_res(client, df_stocks, provider_key, model)
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     r10 = run_sentiment_factor_news(client, provider_key, model)
+    r11 = run_risk_adjusted_growth(client, df_stocks, provider_key, model)
     humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
-    historical_context = _read_recent_summaries(provider_key, n_past=5)
+    historical_context = _read_recent_summaries(provider_key, n_past=7)
     if historical_context:
+        print(f"[Trend Analyst] Generating 7-day historical trend summary via Sub AI CIO...")
+        trend_summary = run_historical_trend_analyst(
+            client, provider_key=provider_key, model=model,
+            raw_history_text=historical_context, force=force
+        )
         historical_block = (
-            "=== LỊCH SỬ BÁO CÁO (T-1 ĐẾN T-5 — CHỈ ĐỂ PHÂN TÍCH XU HƯỚNG) ===\n"
-            + historical_context
+            "=== BẢN TÓM TẮT XU HƯỚNG LỊCH SỬ (T-1 ĐẾN T-7 — DO SUB AI CIO TÓM TẮT) ===\n"
+            + trend_summary
         )
     else:
-        historical_block = "=== LỊCH SỬ BÁO CÁO: Không có cache T-1 đến T-5 ==="
+        historical_block = "=== BẢN TÓM TẮT XU HƯỚNG LỊCH SỬ: Không có cache T-1 đến T-7 ==="
 
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
     fed_date, fed_rep = _get_fed_liquidity_context(provider_key)
@@ -1685,7 +1969,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         f"=== 7. ESR MONITOR ===\n{r7}\n\n"
         f"=== 8. VARES ENGINE ===\n{r8}\n\n"
         f"=== 9. VAR-CVAR VNINDEX ===\n{r9}\n\n"
-        f"=== 10. SENTIMENT FACTOR FROM NEWS ===\n{r10}"
+        f"=== 10. SENTIMENT FACTOR FROM NEWS ===\n{r10}\n\n"
+        f"=== 11. RISK-ADJUSTED GROWTH ===\n{r11}"
     )
 
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:

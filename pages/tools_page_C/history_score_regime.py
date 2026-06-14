@@ -17,31 +17,37 @@ CSV_PATH = DATA_LAKE / "Ai_cio_report.csv"
 
 # ── Regime → color mapping ──
 REGIME_COLORS = {
-    "Pre-Crash":    "#e74c3c",
-    "Rủi ro cao":  "#e67e22",
-    "Trung tính":  "#f1c40f",
-    "Sideway":     "#95a5a6",
-    "Tích lũy":    "#2ecc71",
-    "Tăng trưởng": "#27ae60",
+    "capitulation": "#c0392b",
+    "crisis":       "#e74c3c",
+    "panic":        "#e67e22",
+    "distribution": "#f1c40f",
+    "fear":         "#f39c12",
+    "neutral":      "#3498db",
+    "picking":      "#34495e",
+    "uptrend":      "#2ecc71",
+    "expansion":    "#27ae60",
+    "bull":         "#1abc9c",
+    "greed":        "#16a085",
+    "warning":      "#d35400",
 }
 
 
 def _regime_color(regime_str: str) -> str:
     """Trả về màu phù hợp nhất dựa trên keyword trong regime string."""
-    regime_lower = regime_str.lower()
+    regime_lower = str(regime_str).lower()
     for keyword, color in REGIME_COLORS.items():
-        if keyword.lower() in regime_lower:
+        if keyword in regime_lower:
             return color
     return "#3498db"  # default blue
 
 
 def _regime_tone(regime_str: str) -> str:
-    regime_lower = regime_str.lower()
-    if "pre-crash" in regime_lower:
+    regime_lower = str(regime_str).lower()
+    if "capitulation" in regime_lower or "crisis" in regime_lower or "panic" in regime_lower:
         return "danger"
-    if "rủi ro" in regime_lower:
+    if "fear" in regime_lower or "distribution" in regime_lower or "warning" in regime_lower:
         return "warning"
-    if "tích lũy" in regime_lower or "tăng trưởng" in regime_lower:
+    if "uptrend" in regime_lower or "expansion" in regime_lower or "bull" in regime_lower:
         return "positive"
     return "neutral"
 
@@ -115,7 +121,7 @@ def render():
             x=df["date"],
             y=df["score"],
             mode="lines+markers",
-            name="Score",
+            name="Score & Regime",
             line=dict(color="#3498db", width=3),
             marker=dict(
                 size=12,
@@ -123,9 +129,11 @@ def render():
                 line=dict(width=2, color="#ffffff"),
                 symbol="circle",
             ),
+            customdata=df["regime"],
             hovertemplate=(
                 "<b>%{x|%d/%m/%Y}</b><br>"
-                "Score: <b>%{y}</b><br>"
+                "Score: <b>%{y}/100</b><br>"
+                "Regime: <b>%{customdata}</b><br>"
                 "<extra></extra>"
             ),
         )
@@ -133,11 +141,14 @@ def render():
 
     # Regime zones background
     zone_bands = [
-        (0, 20,  "rgba(231, 76, 60, 0.08)",  "Extreme Fear"),
-        (20, 40, "rgba(230, 126, 34, 0.08)",  "Fear / Pre-Crash"),
-        (40, 60, "rgba(241, 196, 15, 0.08)",  "Neutral / Sideway"),
-        (60, 80, "rgba(46, 204, 113, 0.08)",  "Greed"),
-        (80, 100, "rgba(39, 174, 96, 0.08)",  "Extreme Greed"),
+        (0, 7,    "rgba(192, 57, 43, 0.10)",   "Capitulation (0-7)"),
+        (8, 14,   "rgba(231, 76, 60, 0.08)",   "Extreme Crisis (8-14)"),
+        (15, 29,  "rgba(230, 126, 34, 0.08)",  "Pre-Crash / Panic (15-29)"),
+        (30, 44,  "rgba(241, 196, 15, 0.08)",  "Fear / Distribution (30-44)"),
+        (45, 59,  "rgba(52, 152, 219, 0.08)",  "Neutral / Stock-Picking (45-59)"),
+        (60, 74,  "rgba(46, 204, 113, 0.08)",  "Uptrend / Expansion (60-74)"),
+        (75, 89,  "rgba(39, 174, 96, 0.08)",   "Bull Confirmed (75-89)"),
+        (90, 100, "rgba(26, 188, 156, 0.08)",  "Extreme Greed / Top Warning (90-100)"),
     ]
     for y0, y1, fill_color, label in zone_bands:
         fig.add_hrect(
@@ -151,22 +162,18 @@ def render():
         )
 
     # Threshold lines
-    for threshold, dash_style, color in [(20, "dot", "#e74c3c"), (40, "dash", "#e67e22"),
-                                          (60, "dash", "#2ecc71"), (80, "dot", "#27ae60")]:
+    thresholds = [
+        (7, "dot", "#c0392b"),
+        (14, "dash", "#e74c3c"),
+        (29, "dash", "#e67e22"),
+        (44, "dash", "#f1c40f"),
+        (59, "dash", "#3498db"),
+        (74, "dash", "#2ecc71"),
+        (89, "dot", "#27ae60"),
+    ]
+    for threshold, dash_style, color in thresholds:
         fig.add_hline(y=threshold, line_dash=dash_style, line_color=color,
                       line_width=1, opacity=0.4)
-
-    # Add regime annotations on each point
-    for _, row in df.iterrows():
-        if pd.notna(row["score"]):
-            fig.add_annotation(
-                x=row["date"],
-                y=row["score"],
-                text=str(row["regime"])[:20],
-                showarrow=False,
-                yshift=20,
-                font=dict(size=9, color=_regime_color(str(row["regime"]))),
-            )
 
     fig.update_layout(
         height=500,
@@ -193,38 +200,37 @@ def render():
     st.markdown("---")
 
     # ── Table ──
-    st.subheader("📋 Bảng dữ liệu chi tiết")
+    with st.expander("📋 Xem bảng dữ liệu chi tiết", expanded=False):
+        # Render source thành emoji badge để dễ đọc
+        def _source_badge(s: str) -> str:
+            s = (s or "").lower()
+            if s == "auto":
+                return "🤖 Auto (cron)"
+            if s == "manual":
+                return "👤 Manual (user)"
+            return "—"  # rows cũ trước upgrade
 
-    # Render source thành emoji badge để dễ đọc
-    def _source_badge(s: str) -> str:
-        s = (s or "").lower()
-        if s == "auto":
-            return "🤖 Auto (cron)"
-        if s == "manual":
-            return "👤 Manual (user)"
-        return "—"  # rows cũ trước upgrade
+        display_df = df[["date", "score", "regime", "source", "provider"]].copy()
+        display_df["date"] = display_df["date"].dt.strftime("%d/%m/%Y")
+        display_df["source"] = display_df["source"].map(_source_badge)
+        display_df["provider"] = display_df["provider"].replace("", "—")
+        display_df.columns = ["Ngày", "Score", "Regime", "Nguồn", "Model"]
+        # Reverse to show newest first
+        display_df = display_df.iloc[::-1].reset_index(drop=True)
 
-    display_df = df[["date", "score", "regime", "source", "provider"]].copy()
-    display_df["date"] = display_df["date"].dt.strftime("%d/%m/%Y")
-    display_df["source"] = display_df["source"].map(_source_badge)
-    display_df["provider"] = display_df["provider"].replace("", "—")
-    display_df.columns = ["Ngày", "Score", "Regime", "Nguồn", "Model"]
-    # Reverse to show newest first
-    display_df = display_df.iloc[::-1].reset_index(drop=True)
-
-    st.dataframe(
-        display_df,
-        use_container_width=True,
-        hide_index=True,
-        column_config={
-            "Ngày": st.column_config.TextColumn("📅 Ngày", width="small"),
-            "Score": st.column_config.NumberColumn("📈 Score", format="%d", width="small"),
-            "Regime": st.column_config.TextColumn("🎯 Regime", width="large"),
-            "Nguồn": st.column_config.TextColumn("🔧 Nguồn", width="small",
-                                                  help="Auto = cron GitHub Actions; Manual = user chạy từ app"),
-            "Model": st.column_config.TextColumn("🤖 Model", width="small"),
-        },
-    )
+        st.dataframe(
+            display_df,
+            use_container_width=True,
+            hide_index=True,
+            column_config={
+                "Ngày": st.column_config.TextColumn("📅 Ngày", width="small"),
+                "Score": st.column_config.NumberColumn("📈 Score", format="%d", width="small"),
+                "Regime": st.column_config.TextColumn("🎯 Regime", width="large"),
+                "Nguồn": st.column_config.TextColumn("🔧 Nguồn", width="small",
+                                                      help="Auto = cron GitHub Actions; Manual = user chạy từ app"),
+                "Model": st.column_config.TextColumn("🤖 Model", width="small"),
+            },
+        )
 
     # Stats về source distribution
     src_counts = df["source"].replace("", "legacy").value_counts().to_dict()

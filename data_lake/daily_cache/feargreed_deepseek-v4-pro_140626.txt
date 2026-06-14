@@ -1,28 +1,22 @@
 ## 1. Observations
-
-- **Risk Score**: 48.7/100, tăng +1.5 điểm so với phiên trước, duy trì trong vùng 40-60.
-- **EGARCH Vol**: 13.5%, giảm -7.1%, đang dưới ngưỡng biến động cao (>20%).
-- **Rolling Skewness**: 0.00, chính xác tại ngưỡng trung tính, không lệch âm hay dương rõ rệt.
-- **Upside Correlation (29.0%) cao gấp ~2.5 lần Downside Correlation (11.5%)**, phản ánh tương quan đồng biến mạnh hơn nhiều so với tương quan nghịch biến.
+- **Risk Score**: 48.7/100 — nằm trong vùng NEUTRAL (40-60), tăng nhẹ +1.5 so với phiên trước.
+- **EGARCH Vol**: 13.5% — dưới ngưỡng alert thông thường (>20%), giảm -7.1% phiên này.
+- **Rolling Skewness**: 0.00 — ngưỡng zero, không nghiêng âm (fear) cũng không dương (greed).
+- **Correlation asymmetry**: Upside (29.0%) cao gấp ~2.5 lần Downside (11.5%) — độ phân hoá về tương quan theo chiều mạnh.
 
 ## 2. Interpretation
-
-Dữ liệu hiện tại mô tả một thị trường trung tính có thiên hướng tích cực: biến động giảm, phân phối lợi nhuận đối xứng (skew = 0), nhưng tương quan đồng biến khi tăng điểm (upside corr) cao áp đảo so với tương quan nghịch biến khi giảm điểm (downside corr). Điều này cho thấy môi trường giao dịch phân hóa, phù hợp với trạng thái Stock Picking.
+Dữ liệu hiện tại phản ánh pha thị trường **cân bằng với thiên hướng phân hoá nhẹ**: vol trung bình thấp, skew trung tính, nhưng upside correlation cao hơn đáng kể so với downside. Điều này cho thấy các cổ phiếu có xu hướng tăng cùng nhau khi thị trường tăng, nhưng rủi ro giảm có tính chọn lọc (stock-picking regime), chưa phải là rủi ro hệ thống đồng loạt.
 
 ## 3. Cross-Check
-
-- **Score (tăng nhẹ) vs EGARCH Vol (giảm mạnh)**: Hai tín hiệu di chuyển cùng hướng — score tăng khi vol giảm, consistent với khung tham chiếu (NEUTRAL nghiêng về GREED).
-- **Skewness (0.00) vs Correlations (Upside >> Downside)**: Skewness ở mức trung tính, nhưng chênh lệch lớn giữa upside và downside corr tạo ra divergence nhẹ. Mức độ phân hóa (upside corr cao) mạnh hơn so với kỳ vọng từ skew = 0 — nhưng không mâu thuẫn tuyệt đối.
-- **Kết luận**: Consistent tổng thể, không có mâu thuẫn nghiêm trọng, chỉ có tín hiệu yếu về lực kéo phân hóa mạnh hơn hành vi đám đông thuần túy.
+- **Score (48.7) vs EGARCH Vol (13.5% giảm 7.1%)**: **Đồng thuận** — Score ở NEUTRAL kết hợp vol hạ thấp cho thấy không có panic hay bất ổn cục bộ.
+- **Skewness (0.00) vs Upside/Downside Corr**: **Divergence nhẹ** — Skewness trung tính thường xuất hiện ở thị trường sideway, nhưng upside corr vượt trội (29% vs 11.5%) báo hiệu dòng tiền có xu hướng tập trung vào một nhóm cổ phiếu hơn là toàn bộ thị trường. Không mâu thuẫn, nhưng cảnh báo thiếu động lực tăng rộng khắp.
 
 ## 4. Verdict
+**Beta đề xuất: 0.60** — trung bình (trên nửa danh mục), không full long.
 
-**Beta đề xuất: 0.6** trên danh mục VN-Index.
-
-Trên dữ liệu hiện tại, chưa có tín hiệu bất ổn hệ thống. Biến động thấp và skew trung tính cho phép giữ rủi ro danh mục trung bình-cao với khả năng giảm vol là tích cực. Tuy nhiên, downside corr vẫn tồn tại (11.5%) nên chưa đủ để chuyển sang tấn công toàn diện. Chủ động nâng tỷ trọng các vị thế riêng lẻ, duy trì đa dạng hóa, không mua ròng chỉ số.
+Hành động: Duy trì vị thế stock-picking với tỷ trọng beta vừa phải. Tăng beta nếu EGARCH vol tiếp tục giảm dưới 12% và skew chuyển dương. Cắt giảm nếu downside corr vượt ngưỡng 20%.
 
 ## 5. Structured Tail
-
 ```json
 {
   "tool": "fear_greed",
@@ -30,7 +24,11 @@ Trên dữ liệu hiện tại, chưa có tín hiệu bất ổn hệ thống. B
   "regime": "NEUTRAL",
   "score": 48.7,
   "confidence": "high",
-  "beta_target": 0.6,
-  "key_signals": ["EGARCH Vol giảm mạnh -7.1%, về 13.5%", "Upside Correlation 29.0% gấp 2.5 lần Downside 11.5%", "Skewness 0.00 - phân phối đối xứng"]
+  "beta_target": 0.60,
+  "key_signals": [
+    "Vol giảm -7.1% về 13.5% — không có stress hệ thống",
+    "Skewness = 0.00 — phân phối lợi nhuận đối xứng",
+    "Upside/ Downside corr chênh lệch ~2.5 lần — phân hoá mạnh"
+  ]
 }
 ```

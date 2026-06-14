@@ -1,18 +1,20 @@
 ## 1. Observations
-- **OLS Slope**: 0.31 (26.7th percentile) — 🟡 Trung bình thấp, cho thấy mức độ dẫn dắt của VIN lên VN30F1M ở mức yếu, không đủ mạnh để đẩy giá.
-- **Correlation**: 0.66 (75.0th percentile) — 🟡 Cao, biểu thị mối tương quan giữa VIN và futures vẫn khá chặt, nhưng đã có dấu hiệu “lỏng” dần.
-- **Regime**: ANCHORING (ΔCorr = +0.68, ΔSlope = -0.17) — tương quan tăng nhưng slope giảm, phù hợp với định nghĩa: MM dùng VIN giữ giá nhưng không tạo được đà tăng.
+- **OLS Slope: 0.31 (26.7th percentile — 🟡 Trung bình)** → Độ dốc thấp, VIN group không còn đủ sức đẩy futures lên mạnh như lịch sử gần đây.
+- **Correlation: 0.66 (75.0th percentile — 🟡 Lỏng)** → Tương quan vẫn ở nửa trên phân phối, chứng tỏ VIC/VHM/VRE vẫn có ảnh hưởng đến VN30F1M, dù không cực đoan.
+- **Regime xác nhận: ANCHORING** (ΔCorr = +0.68 > +0.15, ΔSlope = -0.17 < -0.15) → Tương quan duy trì nhưng độ dốc suy yếu.
 
 ## 2. Microstructure Read
-VIC/VHM/VRE đang đóng vai trò “cọc neo” cho VN30F1M nhưng không còn sức bật. VIC 195.50 giữ giá nhờ lực đỡ của MM, VHM 138.70 đi ngang, VRE 28.60 yếu. Cả 2 percentile (slope 26.7, corr 75.0) nằm trong khoảng bình thường (<80th), nên chưa có dấu hiệu can thiệp bất thường. Tuy nhiên corr 75.0 vẫn cao, cho thấy thị trường vẫn chưa rời VIN hoàn toàn đủ để chuyển sang nhóm khác.
+- VIC/VHM/VRE vẫn là nhóm chi phối chính lên VN30F1M nhưng ở chế độ “giữ giá” hơn là “đẩy giá”. VIC đóng cửa 195,500 VND, VHM 138,700 VND, VRE 28,600 VND — cả ba đều neo index nhưng không tạo được động lực mua chủ động.
+- Không có dấu hiệu can thiệp bất thường: cả hai percentile (slope 26.7, corr 75.0) đều trong khoảng bình thường (20-80th), không đạt ngưỡng extreme để nghi ngờ MM can thiệp trực tiếp.
 
 ## 3. Event Study Interpretation
-Trạng thái ANCHORING có nghĩa: trong intraday, MM sẽ cố gắng giữ VIC/VHM/VRE ổn định (không sập) để tạo cảm giác futures an toàn, nhưng không đẩy giá lên được vì slope yếu. Overnight: rủi ro nếu có tin xấu thì “neo” này có thể gãy đột ngột, vì không có lực mua thực. Do regime đang là ANCHORING (không phải TÍN HIỆU GIẢ), vẫn có thể trade, nhưng cẩn trọng.
+- **ANCHORING** cảnh báo rằng market maker (hoặc khối nội) đang dùng VIC để neo VN30 ở mức giá không đổ vỡ, nhưng không đủ sức đẩy futures lên cao hơn. Đây là tín hiệu “chờ” hơn là “hành động” — thường đi kèm với khối lượng thấp và spread rộng.
+- Không phải TÍN HIỆU GIẢ nên có thể cân nhắc giao dịch, nhưng cần theo dõi thêm.
 
 ## 4. Verdict
-- **Trade plan**: SHORT F1 (vì slope yếu dưới 30th percentile, không có động lực đẩy, nên futures sẽ đi ngang hoặc giảm nhẹ khi VIN mất sức).
-- **Leading indicator cần theo dõi**: Nhóm Ngân hàng (VCB, BID, CTG) — nếu các mã bank bật tăng, thì có thể “cứu” futures khỏi đà giảm nhẹ, lúc đó đóng short. Nếu VIC phá dưới 192.00 (≈ 192,000 VND ~ −1.8%), thì chuyển sang NO TRADE vì neo gãy.
-- **Stop-loss reference**: VN30F1M stop-loss tại 1,939.00 × (1 + 0.5%) ≈ 1,948.70 điểm (nếu futures tăng vượt mức này lúc đầu phiên).
+- **Trade plan: NO TRADE** — ANCHORING không cung cấp đủ edge để long hay short F1, vì cả hai hướng đều có rủi ro: short thì sợ VIN neo giá, long thì slope yếu. Không đủ cơ sở mở spread VIN-vs-Bank vì chưa thấy dấu hiệu rotation.
+- **Leading indicator cần theo dõi:** VIC intraday — nếu VIC break dưới 192.5 VND (tương đương 192,500 VND, khoảng -1.5% từ giá hiện tại) thì có thể ANCHORING bị phá, chuyển sang DECOUPLING — lúc đó mới có tín hiệu Short F1.
+- **Stop-loss reference:** Nếu trade Long F1, stop-loss tại 1,920 điểm (dưới MA20 giả định ~30 ticks so với entry 1,939). Nếu trade Short F1, stop-loss tại 1,955 điểm (trên kháng cự).
 
 ## 5. Structured Tail
 ```json
@@ -22,7 +24,7 @@ Trạng thái ANCHORING có nghĩa: trong intraday, MM sẽ cố gắng giữ VI
   "regime": "ANCHORING",
   "slope_percentile": 26.7,
   "corr_percentile": 75.0,
-  "trade_signal": "short_f1",
+  "trade_signal": "no_trade",
   "confidence": "medium"
 }
 ```
