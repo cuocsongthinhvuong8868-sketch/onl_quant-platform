@@ -1,10 +1,10 @@
-name: News Sentiment Factor Feed 30m
+name: News Sentiment Factor Feed Daily
 
 on:
   workflow_dispatch:
   schedule:
-    # Every 30 minutes, UTC. GitHub scheduled runs can be delayed under load.
-    - cron: '*/30 * * * *'
+    # 14:00 Vietnam time (UTC+7) = 07:00 UTC. GitHub scheduled runs can be delayed under load.
+    - cron: '0 7 * * *'
 
 permissions:
   contents: write
@@ -39,10 +39,10 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Mozyfin news feed
-        run: python command/update_sentiment_factor_news.py --once --source mozyfin --limit-mozyfin 100
+        run: python command/update_sentiment_factor_news.py --once --source mozyfin --limit-mozyfin 1000
 
       - name: Run WiData market signal feed
-        run: python command/update_sentiment_factor_news.py --once --source widata --limit-widata 50
+        run: python command/update_sentiment_factor_news.py --once --source widata --limit-widata 500
 
       - name: Validate generated sentiment feed
         run: |
