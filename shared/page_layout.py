@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from html import escape
 from typing import Any
 
@@ -132,6 +133,204 @@ div[data-testid="stMetric"] [data-testid="stMetricDelta"] > div {
 """
 
 
+def check_password() -> None:
+    """
+    Kiểm tra mật khẩu đăng nhập của người dùng.
+    Nếu chưa đăng nhập, hiển thị form đăng nhập và dừng thực thi script.
+    """
+    configured_password = None
+
+    # Thử lấy từ streamlit secrets
+    try:
+        if st.secrets:
+            for key in ["LOGIN_PASSWORD", "login_password", "PASSWORD", "password"]:
+                if key in st.secrets:
+                    configured_password = str(st.secrets[key])
+                    break
+    except Exception:
+        pass
+
+    # Thử lấy từ biến môi trường (fall-back)
+    if not configured_password:
+        for key in ["LOGIN_PASSWORD", "PASSWORD"]:
+            val = os.getenv(key)
+            if val:
+                configured_password = val
+                break
+
+    # Nếu chưa cấu hình mật khẩu ở bất kỳ đâu, hiển thị hướng dẫn thiết lập
+    if not configured_password:
+        st.warning("🔒 **Security Setup Required**")
+        st.info(
+            "Hệ thống yêu cầu mật khẩu đăng nhập nhưng chưa có mật khẩu nào được thiết lập.\n\n"
+            "**Cách thiết lập:**\n"
+            "1. **Chạy Local:** Tạo file `.streamlit/secrets.toml` trong thư mục gốc dự án và thêm:\n"
+            "   ```toml\n"
+            "   password = \"mat_khau_cua_ban\"\n"
+            "   ```\n"
+            "2. **Streamlit Cloud:** Vào cài đặt ứng dụng (App settings) -> **Secrets** và thêm:\n"
+            "   ```toml\n"
+            "   password = \"mat_khau_cua_ban\"\n"
+            "   ```"
+        )
+        st.stop()
+
+    # Nếu đã xác thực thành công trong session_state
+    if st.session_state.get("authenticated") is True:
+        # Hiển thị nút đăng xuất ở Sidebar cho tiện ích
+        with st.sidebar:
+            st.markdown("---")
+            if st.button("🔒 Đăng xuất", key="logout_btn", use_container_width=True):
+                st.session_state["authenticated"] = False
+                st.rerun()
+        return
+
+    # Ẩn sidebar khi chưa đăng nhập
+    st.markdown(
+        """
+        <style>
+        [data-testid="stSidebar"] {
+            display: none;
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Thêm CSS style cao cấp cho form đăng nhập
+    st.markdown(
+        """
+        <style>
+        .login-wrapper {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+            padding: 2.5rem;
+            max-width: 440px;
+            margin: 5rem auto 1.5rem auto;
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(12px);
+            -webkit-backdrop-filter: blur(12px);
+            border-radius: 16px;
+            border: 1px solid rgba(226, 232, 240, 0.8);
+            box-shadow: 0 10px 25px -5px rgba(0, 0, 0, 0.05), 0 8px 10px -6px rgba(0, 0, 0, 0.05);
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .login-wrapper {
+                background: rgba(30, 41, 59, 0.7);
+                border: 1px solid rgba(255, 255, 255, 0.05);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.3), 0 10px 10px -10px rgba(0, 0, 0, 0.3);
+            }
+        }
+        
+        .login-logo {
+            font-size: 3.5rem;
+            margin-bottom: 1rem;
+            display: inline-block;
+            animation: pulse 2.5s infinite ease-in-out;
+        }
+        
+        .login-title {
+            font-size: 1.75rem;
+            font-weight: 700;
+            margin-bottom: 0.5rem;
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%);
+            -webkit-background-clip: text;
+            -webkit-text-fill-color: transparent;
+            text-align: center;
+        }
+        
+        .login-subtitle {
+            font-size: 0.875rem;
+            color: #64748b;
+            margin-bottom: 2rem;
+            text-align: center;
+            line-height: 1.5;
+        }
+        
+        @media (prefers-color-scheme: dark) {
+            .login-subtitle {
+                color: #94a3b8;
+            }
+        }
+        
+        /* Cấu hình Streamlit Form */
+        div[data-testid="stForm"] {
+            border: none !important;
+            padding: 0 !important;
+            background: transparent !important;
+        }
+        
+        /* Cấu hình nút bấm đăng nhập */
+        div[data-testid="stForm"] button[type="submit"] {
+            background: linear-gradient(135deg, #3b82f6 0%, #8b5cf6 100%) !important;
+            color: white !important;
+            border: none !important;
+            font-weight: 600 !important;
+            padding: 0.75rem 1.5rem !important;
+            border-radius: 8px !important;
+            transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1) !important;
+            width: 100% !important;
+            box-shadow: 0 4px 12px rgba(59, 130, 246, 0.25) !important;
+            cursor: pointer !important;
+        }
+        
+        div[data-testid="stForm"] button[type="submit"]:hover {
+            transform: translateY(-2px) !important;
+            box-shadow: 0 6px 20px rgba(59, 130, 246, 0.35) !important;
+            filter: brightness(1.05) !important;
+        }
+        
+        div[data-testid="stForm"] button[type="submit"]:active {
+            transform: translateY(0) !important;
+        }
+        
+        @keyframes pulse {
+            0% { transform: scale(1); }
+            50% { transform: scale(1.08); }
+            100% { transform: scale(1); }
+        }
+        </style>
+        """,
+        unsafe_allow_html=True
+    )
+
+    # Hiển thị form đăng nhập căn giữa
+    st.markdown(
+        """
+        <div class="login-wrapper">
+            <div class="login-logo">📊</div>
+            <div class="login-title">Quant Platform</div>
+            <div class="login-subtitle">Hệ thống phân tích định lượng đa chiều.<br>Vui lòng nhập mật khẩu truy cập để tiếp tục.</div>
+        </div>
+        """,
+        unsafe_allow_html=True
+    )
+    
+    col1, col2, col3 = st.columns([1, 4, 1])
+    with col2:
+        with st.form("login_form"):
+            password_input = st.text_input(
+                "Mật khẩu truy cập",
+                type="password",
+                placeholder="Nhập mật khẩu...",
+                label_visibility="collapsed"
+            )
+            submitted = st.form_submit_button("Đăng nhập")
+            
+            if submitted:
+                if password_input == configured_password:
+                    st.session_state["authenticated"] = True
+                    st.success("Đăng nhập thành công! Đang chuyển hướng...")
+                    st.rerun()
+                else:
+                    st.error("Mật khẩu không chính xác. Vui lòng thử lại.")
+    
+    st.stop()
+
+
 def setup_page(page_title: str) -> None:
     st.set_page_config(
         page_title=page_title,
@@ -141,6 +340,9 @@ def setup_page(page_title: str) -> None:
     )
 
     st.markdown(GLOBAL_STYLE, unsafe_allow_html=True)
+
+    # Kiểm tra mật khẩu đăng nhập trước khi hiển thị bất kỳ nội dung nào
+    check_password()
 
 
 def tone_for_signal(value: Any, default: str = "neutral") -> str:
