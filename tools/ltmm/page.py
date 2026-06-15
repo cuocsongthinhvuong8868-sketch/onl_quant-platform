@@ -427,7 +427,32 @@ def _render_tool2_bnd(data: dict[str, pd.DataFrame]) -> None:
 
 # --- AI CIO Renderer (Reads from AI_CIO_raw) ---
 
-def _render_ai_cio() -> None:
+def _get_report_date(path: Path) -> dt.date:
+    """Trích xuất ngày từ tên file để sắp xếp chính xác."""
+    stem = path.stem
+    # Tên có cấu trúc: ltmm_analyst_provider_ddmmyy
+    parts = stem.split("_")
+    if len(parts) >= 2:
+        last_part = parts[-1]
+        if last_part.isdigit() and len(last_part) == 6:
+            try:
+                return dt.datetime.strptime(last_part, "%d%m%y").date()
+            except ValueError:
+                pass
+    # Định dạng DDMMYYYY
+    if len(stem) == 8 and stem.isdigit():
+        try:
+            return dt.datetime.strptime(stem, "%d%m%Y").date()
+        except ValueError:
+            pass
+    # Fallback theo st_mtime
+    try:
+        return dt.date.fromtimestamp(path.stat().st_mtime)
+    except Exception:
+        return dt.date.min
+
+
+def _render_ai_cio(active_date: dt.date | None = None) -> None:
     _render_topbar(
         "🤖 AI CIO - Cố vấn LTMM",
         "Báo cáo phân tích chuyên sâu mô hình truyền dẫn LTMM và khuyến nghị phân bổ tài sản vĩ mô.",
@@ -436,8 +461,11 @@ def _render_ai_cio() -> None:
     RAW_DIR.mkdir(parents=True, exist_ok=True)
     _all_caches = list(RAW_DIR.glob("*.txt")) + list(RAW_DIR.glob("*.md"))
 
+    # Sắp xếp các báo cáo theo ngày thực tế trích xuất từ tên file (mới nhất lên trước)
+    sorted_caches = sorted(_all_caches, key=_get_report_date, reverse=True)
+
     _options = {}
-    for path in sorted(_all_caches, key=lambda p: p.stat().st_mtime, reverse=True):
+    for path in sorted_caches:
         stem = path.stem
         # Extract date details if matching standard formats
         parts = stem.split("_")
@@ -463,11 +491,22 @@ def _render_ai_cio() -> None:
             """
         )
     else:
+        # Tìm chỉ mục (index) của báo cáo khớp với ngày được chọn ở Sidebar
+        default_index = 0
+        if active_date is not None:
+            for idx, (label, path) in enumerate(_options.items()):
+                if _get_report_date(path) == active_date:
+                    default_index = idx
+                    break
+
+        # Sử dụng key động theo active_date để tự động cập nhật selectbox khi đổi ngày ở sidebar
+        selectbox_key = f"cio_history_select_{active_date.strftime('%Y%m%d') if active_date else 'default'}"
+
         _selected_label = st.selectbox(
             "Chọn báo cáo AI CIO để đọc:",
             options=list(_options.keys()),
-            index=0,  # Luôn mặc định chọn báo cáo mới nhất
-            key="cio_history_select",
+            index=default_index,
+            key=selectbox_key,
         )
         selected_path = _options[_selected_label]
         with open(selected_path, "r", encoding="utf-8") as f:
@@ -543,6 +582,15 @@ def render() -> None:
         use_container_width=True,
     )
 
+    # Trích xuất ngày đang được lựa chọn từ file JSON hoạt động
+    active_date = None
+    json_stem = active_json_path.stem
+    if len(json_stem) == 8 and json_stem.isdigit():
+        try:
+            active_date = dt.datetime.strptime(json_stem, "%d%m%Y").date()
+        except ValueError:
+            pass
+
     # --- 4. Route views inside Tabs in main page area ---
     tab1, tab2, tab3 = st.tabs([
         "📊 Tool 1 - THM (Health Monitor)",
@@ -555,7 +603,7 @@ def render() -> None:
     with tab2:
         _render_tool2_bnd(data)
     with tab3:
-        _render_ai_cio()
+        _render_ai_cio(active_date)
 
 if __name__ == "__main__":
     st.set_page_config(page_title="Quant Platform Integration", layout="wide")
