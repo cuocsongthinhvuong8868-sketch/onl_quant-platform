@@ -143,7 +143,7 @@ def render():
                     with st.spinner("AI đang phân tích cấu trúc độ rộng và dòng tiền..."):
                         try:
                             cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                             with open(str(ROOT_DIR / "promt" / "Market Breadth promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()

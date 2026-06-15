@@ -100,7 +100,7 @@ def render():
     api_key_raw = st.sidebar.text_input("API Key (hoặc shortcut 4 số):", type="password", key="esr_api_key",
         placeholder="sk-... hoặc 4 số",
         help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:
@@ -334,7 +334,7 @@ def render():
                     with st.spinner("AI đang phân tích rủi ro hệ thống và phân rã PCA..."):
                         try:
                             cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                             with open(str(ROOT_DIR / "promt" / "ESR monitor promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()

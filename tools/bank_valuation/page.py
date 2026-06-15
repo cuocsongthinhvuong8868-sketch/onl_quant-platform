@@ -466,7 +466,7 @@ def render():
         key="bank_valuation_ai_key",
         placeholder="sk-... hoặc 4 số",
     )
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:

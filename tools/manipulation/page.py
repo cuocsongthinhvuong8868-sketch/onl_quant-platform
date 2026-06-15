@@ -129,7 +129,7 @@ def render():
                     with st.spinner("AI đang phân tích dấu hiệu thao túng..."):
                         try:
                             cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                             with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()

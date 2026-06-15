@@ -50,7 +50,7 @@ def render_sidebar() -> dict:
         help="Shortcut 4 số → resolve từ Streamlit Secrets `AI_KEY_xxxx`.",
     )
     from shared.api_key_helper import resolve_api_key
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:

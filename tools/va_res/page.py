@@ -41,7 +41,7 @@ def show():
         placeholder="sk-... hoặc 4 số",
         help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
     from shared.api_key_helper import resolve_api_key
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:
@@ -319,7 +319,7 @@ def show():
 
                                     # ── Gọi AI ──
                                     cfg = AI_PROVIDER_MAP[ai_provider]
-                                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                                     with open(str(ROOT_DIR / "promt" / "va_res_promt.md"), "r", encoding="utf-8") as f:
                                         prompt_template = f.read()

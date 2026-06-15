@@ -20,7 +20,7 @@ import streamlit as st
 import re
 
 
-def resolve_api_key(raw_input: str):
+def resolve_api_key(raw_input: str, provider_key: str = ""):
     """
     Giải mã API Key từ shortcut hoặc key thật.
 
@@ -40,6 +40,8 @@ def resolve_api_key(raw_input: str):
 
     # Kiểm tra nếu là 4 digit number -> shortcut
     if raw_input.isdigit() and len(raw_input) == 4:
+        if provider_key == "kimi-2.6-local" and raw_input == "1234":
+            return raw_input, "🔑 Đang dùng key local DS2API `1234`", False
         secret_name = f"AI_KEY_{raw_input}"
         try:
             resolved = st.secrets[secret_name]

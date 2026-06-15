@@ -150,7 +150,7 @@ def render():
                         try:
                             from openai import OpenAI
                             cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                             with open(str(ROOT_DIR / "promt" / "risk adjusted growth promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()

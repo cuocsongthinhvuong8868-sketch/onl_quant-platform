@@ -620,7 +620,7 @@ def _render_ai_section(scored: dict, agg: dict, port_pct: float, params: dict) -
             with st.spinner("AI đang phân tích portfolio..."):
                 try:
                     system_prompt, user_prompt = _build_ai_prompt(scored, agg, port_pct, params)
-                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
                     response = client.chat.completions.create(
                         model=cfg["api_model"],
                         messages=[

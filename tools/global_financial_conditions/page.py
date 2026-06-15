@@ -117,7 +117,7 @@ def render():
         help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets.",
     )
     from shared.api_key_helper import resolve_api_key
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:
@@ -388,7 +388,8 @@ def render():
                             try:
                                 cfg = AI_PROVIDER_MAP[ai_provider]
                                 client = OpenAI(api_key=api_key.strip(),
-                                                base_url=cfg["base_url"])
+                                                base_url=cfg["base_url"],
+                                                timeout=cfg.get("timeout", 180))
 
                                 prompt_path = ROOT_DIR / "promt" / "global_financial_conditions_promt.md"
                                 with open(prompt_path, "r", encoding="utf-8") as f:

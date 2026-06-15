@@ -225,6 +225,13 @@ except ImportError:
             "api_model": "kimi-k2.6",
             "base_url": "https://api.moonshot.ai/v1",
         },
+        "kimi-2.6-local": {
+            "display": "Kimi 2.6 Local",
+            "api_model": "kimi-k2.6",
+            "base_url": "http://127.0.0.1:5001/v1",
+            "temperature": 0.4,
+            "timeout": 600,
+        },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
             "api_model": "deepseek-chat",
@@ -305,7 +312,7 @@ def summarize_executive_report_for_telegram(
         return cache_path.read_text(encoding="utf-8").strip()
 
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["deepseek-v4-pro"])
-    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
     model = cfg["api_model"]
     temperature = min(float(cfg.get("temperature", 0.5)), 0.3)
     score_val, regime_val = parse_score_regime(report_text)
@@ -616,6 +623,11 @@ def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> s
         target_date = date.today() - timedelta(days=days_back)
         date_str = target_date.strftime('%d%m%y')
         path = cache_dir / f"executive_summary_{provider_key}_{date_str}.txt"
+        if not path.exists():
+            # Fallback sang bất kỳ model/provider nào khác có sẵn báo cáo cho ngày này
+            alt_paths = list(cache_dir.glob(f"executive_summary_*_{date_str}.txt"))
+            if alt_paths:
+                path = alt_paths[0]
         if path.exists():
             with open(path, "r", encoding="utf-8") as f:
                 content = f.read().strip()
@@ -1884,7 +1896,7 @@ def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
-    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
     model = cfg["api_model"]
     temperature = cfg.get("temperature", 1.0)
     

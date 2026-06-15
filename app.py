@@ -108,6 +108,13 @@ except ImportError:
             "api_model": "kimi-k2.6",
             "base_url": "https://api.moonshot.ai/v1",
         },
+        "kimi-2.6-local": {
+            "display": "Kimi 2.6 Local",
+            "api_model": "kimi-k2.6",
+            "base_url": os.getenv("KIMI_LOCAL_BASE_URL", "http://127.0.0.1:5001/v1"),
+            "temperature": 0.4,
+            "timeout": 600,
+        },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
             "api_model": "deepseek-chat",
@@ -407,7 +414,7 @@ if st.session_state.show_cio_input:
         )
         cio_key_raw = st.text_input("Nhập API Key (hoặc shortcut 4 số):", type="password", key="cio_api_key",
             help="Gõ API key thật (sk-...) hoặc shortcut 4 số đã lưu trong Streamlit Secrets (VD: 1234)")
-        cio_key, cio_key_msg, cio_key_err = _resolve_api_key(cio_key_raw) if cio_key_raw else ("", "", False)
+        cio_key, cio_key_msg, cio_key_err = _resolve_api_key(cio_key_raw, cio_provider) if cio_key_raw else ("", "", False)
         if cio_key_err:
             st.error(cio_key_msg)
         elif cio_key_msg:
@@ -423,7 +430,7 @@ if st.session_state.show_cio_input:
                     try:
                         from openai import OpenAI
                         _cfg = AI_PROVIDER_MAP[cio_provider]
-                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"])
+                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"], timeout=_cfg.get("timeout", 180))
                         _resp = _client.chat.completions.create(
                             model=_cfg["api_model"],
                             messages=[{"role": "user", "content": "Hello"}],
@@ -465,7 +472,7 @@ if st.session_state.show_cio_input:
                     try:
                         from openai import OpenAI
                         _cfg = AI_PROVIDER_MAP[cio_provider]
-                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"])
+                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"], timeout=_cfg.get("timeout", 180))
                         _client.chat.completions.create(
                             model=_cfg["api_model"],
                             messages=[{"role": "user", "content": "Hi"}],

@@ -146,7 +146,7 @@ def _render_ai_section(payload: dict[str, str], ai_provider: str, api_key: str) 
                             from openai import OpenAI
 
                             cfg = AI_PROVIDER_MAP[ai_provider]
-                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+                            client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
 
                             parts = full_prompt.split("# INPUT DATA", 1)
                             system_prompt = parts[0].strip()
@@ -242,7 +242,7 @@ def render() -> None:
         key="vn100_api_key",
         placeholder="sk-... hoặc 4 số",
     )
-    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw)
+    api_key, api_key_msg, api_key_err = resolve_api_key(api_key_raw, ai_provider)
     if api_key_err:
         st.sidebar.error(api_key_msg)
     elif api_key_msg:

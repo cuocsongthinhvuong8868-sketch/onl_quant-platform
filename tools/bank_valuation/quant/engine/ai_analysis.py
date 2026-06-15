@@ -271,7 +271,7 @@ def run_ai_analysis(
 
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["deepseek-v4-pro"])
     system_prompt, user_prompt = build_bank_valuation_ai_prompt(data, ohlcv_source, focus_question)
-    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"])
+    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
     response = client.chat.completions.create(
         model=cfg["api_model"],
         messages=[
