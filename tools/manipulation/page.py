@@ -134,33 +134,56 @@ def render():
                             with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()
 
+                            from scipy.stats import percentileofscore as _pctile
+
                             latest = result.iloc[-1]
                             date_str = result.index[-1].strftime('%d/%m/%Y')
                             corr_val = float(latest["Correlation"])
                             slope_val = float(latest["OLS_Slope"])
-                            var_val = float(latest["VaR_95"])
-                            cvar_val = float(latest["CVaR_95"])
-                            pr_corr = float(latest["PR_Corr"])
-                            pr_slope = float(latest["PR_Slope"])
 
-                            # Thống kê regime từ event study
+                            # Percentile full-history (khớp UI charts.py)
+                            slope_pr = _pctile(result["OLS_Slope"].dropna(), slope_val, kind="rank")
+                            corr_pr  = _pctile(result["Correlation"].dropna(), corr_val, kind="rank")
+                            slope_status = "Cao" if slope_pr >= 80 else "Thap" if slope_pr <= 20 else "Trung binh"
+                            corr_status  = "Rat chat" if corr_pr >= 80 else "Phan ky" if corr_pr <= 20 else "Long"
+
+                            # Gia thuc te VIC/VHM/VRE + VN30F1M (chong AI hallucinate)
+                            last_px = df_prepared.iloc[-1]
+                            def _fmt_stk(v):
+                                return f"{v:.2f} (≈ {int(v*1000):,} VND)" if (not __import__('math').isnan(v) and v > 0) else "N/A"
+                            def _fmt_f1(v):
+                                return f"{v:,.2f} diem" if (not __import__('math').isnan(v) and v > 0) else "N/A"
+                            vic_close = _fmt_stk(float(last_px.get("VIC", float("nan"))))
+                            vhm_close = _fmt_stk(float(last_px.get("VHM", float("nan"))))
+                            vre_close = _fmt_stk(float(last_px.get("VRE", float("nan"))))
+                            f1m_close = _fmt_f1(float(last_px.get("VN30F1M", float("nan"))))
+
+                            # Event study: regime + momentum
+                            t0_str = t0_dt.strftime('%d/%m/%Y')
                             if re_df is not None and not re_df.empty:
-                                counts = re_df["Regime"].value_counts()
-                                dominant = counts.idxmax()
-                                coupling_pct = counts.get("COUPLING", 0) / len(re_df) * 100
+                                regime     = re_df["Regime"].iloc[-1]
+                                d_corr     = re_df["Delta_PR_Corr"].iloc[-1]
+                                d_slope    = re_df["Delta_PR_Slope"].iloc[-1]
                             else:
-                                dominant = "N/A"
-                                coupling_pct = 0
+                                regime = "N/A"
+                                d_corr = d_slope = 0.0
+                            momentum_str = f"DeltaCorr = {d_corr:.2f}, DeltaSlope = {d_slope:.2f}"
 
-                            full_prompt = prompt_template.replace("{date_str}", date_str)\
-                                                         .replace("{corr}", f"{corr_val:.3f}")\
-                                                         .replace("{slope}", f"{slope_val:.3f}")\
-                                                         .replace("{var_95}", f"{var_val*100:.2f}%")\
-                                                         .replace("{cvar_95}", f"{cvar_val*100:.2f}%")\
-                                                         .replace("{pr_corr}", f"{pr_corr:.2%}")\
-                                                         .replace("{pr_slope}", f"{pr_slope:.2%}")\
-                                                         .replace("{dominant_regime}", dominant)\
-                                                         .replace("{coupling_pct}", f"{coupling_pct:.1f}%")
+                            full_prompt = prompt_template\
+                                .replace("{date_str}",    date_str)\
+                                .replace("{vic_close}",   vic_close)\
+                                .replace("{vhm_close}",   vhm_close)\
+                                .replace("{vre_close}",   vre_close)\
+                                .replace("{f1m_close}",   f1m_close)\
+                                .replace("{slope_val}",   f"{slope_val:.3f}")\
+                                .replace("{slope_pr}",    f"{slope_pr:.1f}")\
+                                .replace("{slope_status}", slope_status)\
+                                .replace("{corr_val}",    f"{corr_val:.3f}")\
+                                .replace("{corr_pr}",     f"{corr_pr:.1f}")\
+                                .replace("{corr_status}", corr_status)\
+                                .replace("{t0_str}",      t0_str)\
+                                .replace("{regime}",      regime)\
+                                .replace("{momentum_str}", momentum_str)
 
                             parts = full_prompt.split("# INPUT DATA")
                             system_prompt = parts[0].strip()

@@ -1,32 +1,3 @@
-## 1. Observations
-- OLS Slope chỉ 0.25, nằm ở **percentile 3.3% (cực thấp)**, cho thấy biến động của composite VIC/VHM/VRE gần như không truyền tải vào VN30F1M.
-- Hệ số tương quan 0.63 (percentile 26.7%) – mối liên kết còn giữ nhưng không chặt, đặc trưng của chế độ “mỏ neo”.
-- Regime = **ANCHORING**: ΔCorr = +0.25 (> 0.15), ΔSlope = –0.53 (< –0.15) – Vingroup đang giữ vai trò neo giá, không dẫn dắt.
+Xin chào. Dữ liệu đầu vào bạn cung cấp đang ở dạng placeholder `{...}`, mình không có giá thực tế của VIC, VHM, VRE, VN30F1M hay các chỉ số mô hình (slope, corr, percentile). Theo quy tắc, mình **không được bịa số tuyệt đối** — mọi phân tích phải dựa trên số đóng cửa real-time.
 
-## 2. Microstructure Read
-Vai trò của VIC/VHM/VRE lên VN30F1M hiện tại là **phòng thủ, không dẫn dắt**. Dù tương quan vẫn ở mức chấp nhận được (0.63) nhưng độ co giãn (slope) rất yếu, tức mỗi 1% thay đổi của composite VIN chỉ làm contract di chuyển ~0.25 điểm. Với slope ở ngưỡng <20th, thị trường đang dần rời bỏ VIN; tuy nhiên corr chưa sụt mạnh cho thấy các tay chơi lớn (MM) vẫn chủ động giữ giá nhóm này nhằm ổn định chỉ số. Không có hiện tượng can thiệp bất thường (không có cả 2 percentile >80th). Dòng tiền thực sự đang nghiêng về nhóm khác (Ngân hàng, Chứng khoán).
-
-## 3. Event Study Interpretation
-**ANCHORING** báo hiệu Vingroup sẽ không tạo ra các cú bứt phá mạnh trong phiên. Intraday, VN30F1M có xu hướng dao động hẹp, phụ thuộc nhiều vào biến động của nhóm tài chính. Qua đêm: rủi ro gap từ nhóm VIN bị hãm bớt, nhưng cũng triệt tiêu cơ hội bám theo sóng VIN. Với cấu trúc này, chiến lược dựa trên VIN không có edge rõ rệt.
-
-## 4. Verdict
-**NO TRADE** – môi trường ANCHORING với slope cực thấp không cung cấp tín hiệu đáng tin cậy để Long hay Short VN30F1M. Nếu buộc phải theo dõi, cần chuyển trọng tâm sang nhóm dẫn dắt thay thế như Ngân hàng (CTG, VPB, TCB, BID).
-
-- **Chỉ báo dẫn dắt cần theo dõi**: Biến động của cổ phiếu ngân hàng lớn, đặc biệt khi chúng phá vỡ các mức kháng cự/hỗ trợ kỹ thuật.
-- **Stop-loss tham khảo (cho vị thế giả định)**:  
-  Nếu Long F1, có thể đặt dừng lỗ tại 1,964.00 – 1.5% ≈ **1,934.54 điểm**.  
-  Hoặc kích hoạt nếu VIC phá thủng ngưỡng giữ giá: VIC < 205.50 – 2% ≈ **201.39**.  
-  (Tất cả tính trực tiếp từ giá đóng cửa ngày 19/06/2026).
-
-## 5. Structured Tail
-```json
-{
-  "tool": "manipulation",
-  "date": "19/06/2026",
-  "regime": "ANCHORING",
-  "slope_percentile": 3.3,
-  "corr_percentile": 26.7,
-  "trade_signal": "no_trade",
-  "confidence": "low"
-}
-```
+Vui lòng điền lại INPUT section với giá đóng cửa hôm nay (19/06/2026) từ data_lake, cùng snapshot mô hình chi tiết. Mình sẽ phân tích ngay theo đúng yêu cầu OUTPUT (quan sát, microstructure read, event study, verdict, structured tail) — tất cả bằng tiếng Việt, ~250 từ, và dùng % trên giá hiện tại để tính stop-loss/target.

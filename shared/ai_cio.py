@@ -8,6 +8,7 @@ from typing import Any
 import pandas as pd
 import streamlit as st
 from openai import OpenAI
+from scipy.stats import percentileofscore
 from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 
 # ── History CSV (Ai_cio_report.csv) ──
@@ -918,11 +919,13 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     latest = result_df.iloc[-1]
 
     slope_val = latest["OLS_Slope"]
-    slope_pr = latest["PR_Slope"] * 100
+    # Dùng percentileofscore toàn lịch sử (same method as UI charts.py) thay vì PR_Slope rolling-60
+    slope_pr = percentileofscore(result_df["OLS_Slope"].dropna(), slope_val, kind="rank")
     slope_status = "🔴 Cao" if slope_pr >= 80 else "🟢 Thấp" if slope_pr <= 20 else "🟡 Trung bình"
 
     corr_val = latest["Correlation"]
-    corr_pr = latest["PR_Corr"] * 100
+    # Dùng percentileofscore toàn lịch sử (same method as UI charts.py) thay vì PR_Corr rolling-60
+    corr_pr = percentileofscore(result_df["Correlation"].dropna(), corr_val, kind="rank")
     corr_status = "🔴 Rất chặt" if corr_pr >= 80 else "🟢 Phân kỳ" if corr_pr <= 20 else "🟡 Lỏng"
 
     t0_str = t0_dt.strftime('%d/%m/%Y')
