@@ -1,0 +1,30 @@
+## 1. Observations
+- VN30 Stress Index: 0.00%, không có mã nào thủng VaR 95%.
+- Số mã thủng VaR 95%: 0/30, không ghi nhận đột biến rủi ro riêng lẻ.
+- Complacency Index: 4.63%, thấp xa ngưỡng 80%; có 5 mã mispriced (top 3: OCB, VHM, VND).
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress ở mức 0.00%, hoàn toàn không có dấu hiệu lây lan real-time. Việc không có mã nào thủng VaR 95% đồng nghĩa không tồn tại đầu sóng systemic hay sự cố cá biệt nào cần xử lý khẩn cấp. Về mặt định lượng, rủi ro đuôi béo trên rổ VN30 ngày 19/06/2026 được xác nhận là không khởi phát.
+
+## 3. Complacency Assessment (Module C)
+Complacency 4.63% chỉ mang một hàm ý: thị trường **không ở regime ngủ quên** – tức không có hiện tượng spread bị nén trên diện rộng. Việc này **không suy ra** thị trường ổn định, thiếu áp lực bán hay đang vận hành trơn tru. Stress Index = 0% và không breach cũng không đủ để gọi trạng thái bình an tuyệt đối; thị trường hoàn toàn có thể đang trong pha tăng mạnh tự nhiên có spread giãn, hoặc giai đoạn tạm lắng trước biến động.
+
+Năm mã mispriced (OCB, VHM, VND, ...) phản ánh cục bộ tồn tại những tài sản có phần bù rủi ro bị nén bất thường, nhưng số lượng nhỏ và Complacency thấp cho thấy chưa hình thành nguy cơ hệ thống. Rủi ro tiềm ẩn chủ yếu nằm ở các mã này nếu thị trường đảo chiều mạnh.
+
+## 4. Stock-Level Risk Calls
+- Module B không có breach → không phát sinh nhu cầu bán/giảm tỷ trọng khẩn cấp cho bất kỳ mã VN30 nào.
+- Module C cảnh báo tiềm ẩn từ OCB, VHM, VND do spread bị nén chặt. Khi thị trường biến động, những mã này dễ điều chỉnh sâu hơn mặt bằng chung. Nhà đầu tư nên giám sát các tín hiệu kỹ thuật như thủng MA20/MA50 trên khung D1; nếu tín hiệu bán xác nhận, có thể cân nhắc giảm tỷ trọng theo tỷ lệ rủi ro (ví dụ: cắt giảm một phần so với giá hiện tại, theo mức % tuỳ khung quản trị rủi ro).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VHM", "VND"],
+  "confidence": "medium"
+}
+```

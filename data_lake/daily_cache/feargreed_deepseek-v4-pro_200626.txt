@@ -1,0 +1,31 @@
+## 1. Observations
+- Risk Score 52.6, nằm sát trung tâm vùng NEUTRAL (40–60), biến động phiên nhẹ (+0.3).
+- EGARCH Vol duy trì 0.4%, không thay đổi so với phiên trước – mức thấp so với lịch sử.
+- Rolling Skewness 0.20 (dương nhẹ) – đuôi phân phối nghiêng về phía lợi nhuận nhưng không mạnh.
+- Downside Correlation 9.5% so với Upside Correlation 29.8% – tương quan khi giảm thấp hơn đáng kể so với khi tăng, cho thấy rủi ro lan tỏa lúc thị trường yếu không cao.
+
+## 2. Interpretation
+Dữ liệu hiện tại phản ánh pha thị trường phân hóa (stock-picking) với rủi ro hệ thống thấp. Môi trường vol thấp, skew dương nhẹ và tương quan xu hướng tăng vừa phải chỉ ra dòng tiền vẫn chọn lọc cổ phiếu riêng lẻ, chưa hình thành động thái đám đông mua hay bán trên diện rộng.
+
+## 3. Cross-Check
+- Score (52.6, NEUTRAL) vs EGARCH Vol (0.4%, thấp): vol thấp thường đi kèm GREED, nhưng score chưa vượt 60. Điều này không tạo divergence lớn mà củng cố cho bức tranh trung tính, nơi thị trường bình ổn nhưng thiếu động lực đẩy lên vùng tham lam.
+- Skewness (0.20) vs Up/Down Correlation: skew dương nhất quán với up-corr cao hơn down-corr; không có sự lệch pha đáng lo ngại. Tín hiệu đồng thuận rằng áp lực bán đồng loạt chưa xuất hiện.
+
+## 4. Verdict
+NO ACTIONABLE SIGNAL: các chỉ báo không cung cấp đủ bằng chứng để dịch chuyển mức beta. Trong trạng thái phân hóa với vol thấp, xác suất cao danh mục nên duy trì beta gần trung lập (β ≈ 0.85) và tập trung vào chọn lọc cổ phiếu thay vì đặt cược có tính định hướng chỉ số.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "19/06/2026",
+  "regime": "NEUTRAL",
+  "score": 52.6,
+  "confidence": "medium",
+  "beta_target": 0.85,
+  "key_signals": [
+    "Score sát trung tâm NEUTRAL, vol thấp 0.4%",
+    "Skewness dương nhẹ + up-corr >> down-corr củng cố phân hóa"
+  ]
+}
+```

@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-20",
+  "composite_score": 11,
+  "regime": "EXTREME CRISIS",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 12,
+      "unit": "sessions",
+      "description": "Số phiên căng thẳng dưới 5 cho thấy thanh khoản liên ngân hàng ổn định"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 39.8,
+      "unit": "%",
+      "description": "Tỷ lệ cổ phiếu trên MA20 >45% báo hiệu phục hồi kỹ thuật rộng"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.8,
+      "unit": "%",
+      "description": "SSI <55% sẽ giảm cảnh báo rủi ro hệ thống"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "ξ <0.25 giúp phân phối trở lại vùng đuôi mỏng, rủi ro cực đoan hạ"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 3.333,
+      "unit": "th pct",
+      "description": "Khi Vingroup Slope Percentile dưới 70, rủi ro lây lan từ nhóm này bị vô hiệu"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 98.4,
+      "unit": "th pct",
+      "description": "CQS Percentile <80 cho thấy áp lực tín dụng junk tier hạ nhiệt đáng kể"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-20",
+  "source": "ai_cio_executive_summary"
+}

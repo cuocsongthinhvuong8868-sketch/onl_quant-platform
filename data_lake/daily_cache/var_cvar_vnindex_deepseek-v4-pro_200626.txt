@@ -1,0 +1,39 @@
+## 1. Observations  
+- **Historical VaR 95%** = -1.65%, sát với parametric VaR 95% (-1.48%), cho thấy phân phối trung tâm gần Gaussian.  
+- **EVT VaR 99%** = -3.69%, sâu hơn hẳn so với các mức VaR 95%, báo hiệu rủi ro đuôi cực đoan đáng kể.  
+- **ξ = +0.345** – vượt ngưỡng 0.30, xếp vào vùng **fat tail** (đuôi cực dày), nơi ES có thể không hội tụ.  
+- **Hill = +0.447** – xác nhận cùng hướng, độ lớn tương đương, củng cố tín hiệu đuôi dày.  
+
+## 2. Tail Thickness Diagnosis  
+- ξ = 0.345 > 0.30 → **FAT TAIL**: Gaussian sẽ đánh giá thấp rủi ro cực đoan một cách trầm trọng.  
+- Hill = 0.447 > 0.30, cùng dấu, chênh lệch ~0.1 (không gây nghi ngờ) → **tín hiệu cross-check mạnh**, tăng độ tin cậy.  
+- ES‑VaR spread = 1.37% > σ₃₀ = 0.80% → **thực nghiệm xác nhận fat tail**, đuôi dày tạo ra tổn thất trung bình vượt xa mức biến động ngày thường.  
+
+## 3. Gaussian Gap  
+- Gaussian VaR 99% tính từ Parametric VaR 95%: μ ≈ -1.48% + 1.645×0.80% = -0.164%.  
+- Gaussian VaR 99% = μ - 2.33×σ = -0.164% - 1.864% = **-2.03%** (làm tròn).  
+- EVT VaR 99% = -3.69% → Chênh lệch tuyệt đối **1.66 điểm phần trăm** (>> 1pp).  
+- Kết luận: **Gaussian model completely broken** cho phân bổ vốn rủi ro – không thể dùng σ‑based sizing khi đuôi dày như vậy.
+
+## 4. Verdict — Hedging Implications  
+- Với ξ > 0.30: **tránh chiến lược momentum**, vì đuôi trái cực dày dễ quét sạch lợi nhuận.  
+- **Hành động phòng hộ khuyến nghị:**  
+  - Mua **puts ITM** (in‑the‑money) để bảo vệ trực tiếp trước drawdown cực mạnh.  
+  - **Short futures** để giảm exposure ròng, chuyển sang thế phòng thủ.  
+  - Giảm đòn bẩy tối đa, không dùng Gaussian VaR làm căn cứ cắt lỗ.  
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "19/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.66,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```
