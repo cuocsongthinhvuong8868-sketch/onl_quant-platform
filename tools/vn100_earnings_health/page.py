@@ -10,6 +10,7 @@ import streamlit as st
 
 from config import AI_PROVIDER_MAP, ROOT_DIR
 from shared.api_key_helper import resolve_api_key as resolve_platform_api_key
+from shared.page_layout import render_signal_card
 from tools.vn100_earnings_health.quant.ai_analysis import (
     PROMPT_PATH,
     cache_path,
@@ -24,6 +25,54 @@ from tools.vn100_earnings_health.quant.pipeline import run_and_write
 CORE_LABELS = {column: DISPLAY_CORE_NAMES.get(column, column) for column in CORE_COLUMNS}
 CORE_LABELS["leverage_stress_score"] = "Leverage Stress"
 CORE_LABELS["corporate_health_score"] = "Corporate Health"
+
+
+def resolve_vn100_tone(label: str, value_str: str) -> str:
+    label_lower = label.lower()
+    val_lower = value_str.lower().strip()
+
+    if val_lower in ("na", "n/a", "insufficient data", "none", "no clear size leadership in the aggregate score"):
+        return "neutral"
+
+    # AI Interpretation metrics
+    if label_lower == "confidence":
+        if "high" in val_lower: return "positive"
+        if "low" in val_lower: return "danger"
+        return "neutral"
+    if "accounting" in label_lower or "cash-confirmed" in label_lower or "cash confirmed" in label_lower:
+        if "strong" in val_lower or "healthy" in val_lower: return "positive"
+        if "weak" in val_lower: return "danger"
+        return "warning"
+
+    # Regime names / labels
+    if "regime" in label_lower or "sector" in label_lower:
+        if any(w in val_lower for w in ("expansion", "recovery", "improvement", "broad", "healthy")):
+            return "positive"
+        if any(w in val_lower for w in ("stress", "weakening", "narrow", "danger")):
+            return "danger"
+        if any(w in val_lower for w in ("divergent", "mixed", "moderate", "warning")):
+            return "warning"
+
+    # Numeric values (Stress vs Health)
+    clean_val = value_str.replace("%", "").strip()
+    try:
+        val_num = float(clean_val)
+        if "stress" in label_lower:
+            if val_num >= 60: return "danger"
+            if val_num >= 50: return "warning"
+            return "positive"
+        else:
+            # For breadth/diffusion, they are often in 0-1 scale if not formatted with %
+            # But here they are formatted with % (e.g. 58.3%) so val_num is 58.3
+            if val_num >= 65 or (val_num >= 0.65 and val_num <= 1.0): return "positive"
+            if val_num < 45 or (val_num < 0.45 and val_num <= 1.0): return "danger"
+            if val_num < 55 or (val_num < 0.55 and val_num <= 1.0): return "warning"
+            return "neutral"
+    except ValueError:
+        pass
+
+    from shared.page_layout import tone_for_signal
+    return tone_for_signal(value_str)
 
 
 @st.cache_data(show_spinner=False)
@@ -84,7 +133,9 @@ def current_and_previous(company: pd.DataFrame, period: str, mode: str) -> pd.Da
 def metric_row(items: list[tuple[str, str, str | None]]) -> None:
     columns = st.columns(len(items))
     for column, (label, value, delta) in zip(columns, items):
-        column.metric(label, value, delta=delta)
+        tone = resolve_vn100_tone(label, value)
+        with column:
+            render_signal_card(label, value, tone=tone, caption=delta)
 
 
 def strip_duplicate_ai_verdict(markdown_text: str) -> str:
@@ -393,7 +444,16 @@ def company_page(data: dict, mode: str, period: str) -> None:
             flags = json.loads(flags)
         except Exception:
             flags = [flags]
-    if flags:
+            
+    # Chuyển đổi numpy array hoặc iterable khác thành list chuẩn để tránh lỗi ambiguity truth value
+    if hasattr(flags, "tolist"):
+        flags = flags.tolist()
+    elif not isinstance(flags, list) and hasattr(flags, "__iter__"):
+        flags = list(flags)
+    elif not isinstance(flags, list):
+        flags = [flags] if flags else []
+
+    if isinstance(flags, list) and len(flags) > 0:
         st.subheader("Diagnostic Flags")
         st.write(" ".join([f"`{flag}`" for flag in flags]))
 
@@ -494,10 +554,14 @@ def ai_interpretation_page(data: dict, mode: str, ai_provider: str, api_key: str
         st.markdown(f"**{payload['final_verdict']}**")
         st.write(payload["final_macro_read"])
         cols = st.columns(4)
-        cols[0].metric("Confidence", payload["final_confidence"])
-        cols[1].metric("Accounting Recovery", payload["accounting_recovery_read"])
-        cols[2].metric("Cash-Confirmed Recovery", payload["cash_confirmed_recovery_read"])
-        cols[3].metric("Sector Diffusion", payload["sector_diffusion_read"])
+        with cols[0]:
+            render_signal_card("Confidence", payload["final_confidence"], tone=resolve_vn100_tone("Confidence", payload["final_confidence"]))
+        with cols[1]:
+            render_signal_card("Accounting Recovery", payload["accounting_recovery_read"], tone=resolve_vn100_tone("Accounting Recovery", payload["accounting_recovery_read"]))
+        with cols[2]:
+            render_signal_card("Cash-Confirmed Recovery", payload["cash_confirmed_recovery_read"], tone=resolve_vn100_tone("Cash-Confirmed Recovery", payload["cash_confirmed_recovery_read"]))
+        with cols[3]:
+            render_signal_card("Sector Diffusion", payload["sector_diffusion_read"], tone=resolve_vn100_tone("Sector Diffusion", payload["sector_diffusion_read"]))
         st.caption(f"Systemic stress: {payload['systemic_stress_read']} · Analytical stance: {payload['final_stance']}")
         st.markdown(f"**Sector leadership:** {payload['sector_leadership_read']}")
         st.markdown(f"**Big-cap read:** {payload['big_cap_read']}")
