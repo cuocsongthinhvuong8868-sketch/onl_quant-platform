@@ -1,0 +1,32 @@
+## 1. Observations
+- VN30 Stress Index: 6.67% (ngưỡng cảnh báo 40%) – dưới ngưỡng kích hoạt lây lan hệ thống.
+- Breaches: 2/30 mã thủng VaR 95%, số lượng rất thấp, không tạo thành làn sóng.
+- Complacency Index: 4.63% (ngưỡng nguy hiểm 80%) – rất thấp, không có dấu hiệu bị nén spread trên diện rộng.
+- Mispriced: 5 mã có spread bị nén, số lượng nhỏ, tập trung vào nhóm cổ phiếu riêng lẻ.
+
+## 2. Contagion Assessment (Module B)
+- Stress Index 6.67% cho thấy mức độ lây lan hiện tại rất thấp, hoàn toàn dưới ngưỡng 40% – không có dấu hiệu rủi ro hệ thống đang lan rộng trong VN30.
+- 2 breaches là PLX và GAS: đây là sự cố cá biệt, chưa tạo thành đầu sóng systemic. Các mã này thường có thanh khoản thấp/rủi ro ngành riêng (xăng dầu, khí) khiến VaR dễ bị thủng đơn lẻ. Cần theo dõi thêm tín hiệu từ nhóm năng lượng, nhưng hiện tại chưa cần hành động toàn danh mục.
+
+## 3. Complacency Assessment (Module C)
+- Complacency Index 4.63% ở mức rất thấp, hoàn toàn dưới ngưỡng 80%. Điều này có nghĩa thị trường KHÔNG đang ở regime ngủ quên – spread không bị nén diện rộng.
+- **Điều này KHÔNG đồng nghĩa thị trường ổn định.** Complacency thấp có thể đi kèm với nhiều trạng thái khác nhau: hoảng loạn (vol cao, spread giãn), uptrend mạnh (thanh khoản cao), hoặc sideway vol cao. Kết hợp với Stress Index thấp (6.67%) và số breach thấp, khả năng cao thị trường đang trong trạng thái vận hành bình thường – không ngủ quên nhưng cũng không rơi vào khủng hoảng.
+
+## 4. Stock-Level Risk Calls
+- **PLX (Breach sâu nhất):** Reduce 50% vị thế. Nếu thủng thêm 3% từ giá hiện tại, cắt lỗ toàn bộ. Có khả năng chịu áp lực từ điều chỉnh giá nhiên liệu hoặc thanh khoản yếu.
+- **GAS (Breach thứ 2):** Reduce 30% vị thế. Stop-loss tại thủng MA20 ngày D1 (khoảng 2-3% từ giá hiện tại). Rủi ro lây lan từ PLX nếu nhóm năng lượng bị sell-off.
+- **OCB, VHM, VND (Mispriced – spread nén):** Cảnh báo tiềm ẩn rủi ro bị định giá sai, nhưng chưa có tín hiệu lây lan. Spread nén cục bộ có thể là do giao dịch thiếu thanh khoản hoặc bị can thiệp. Chưa cần hành động ngay, nhưng cần theo dõi trong 5-10 phiên tới nếu spread bắt đầu giãn đột ngột.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 6.67,
+  "breach_count": 2,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["PLX", "GAS"],
+  "confidence": "high"
+}
+```

@@ -1,0 +1,50 @@
+# Phân Tích Economic Alpha – Ngân Hàng Việt Nam
+
+## 1. Scenario Assessment
+Kịch bản Tiêu chuẩn với K=1.0 và CoE=14% là **baseline phù hợp** cho ngành ngân hàng VN giai đoạn thắt chặt. Stress test BVPS -5%, P/B -5% tạo ra môi trường **vừa phải nhưng có áp lực**. Mặt bằng ngành phân hóa rõ: **chỉ 3/6 mã Alpha dương**, cho thấy ngành đang tạo được một phần giá trị thặng dư nhưng không đồng đều. HDB (5.8%) là điểm sáng hiếm hoi, trong khi 3 mã âm sâu (-7% đến -12.4%) phản ánh đốt vốn cổ đông rõ rệt.
+
+## 2. Top Alpha Decomposition
+
+| Mã | Alpha | P/B | Động lực chính | Animal Profile |
+|---|---|---|---|---|
+| **HDB** | 5.8% | 1.26 | **P/B rẻ + ROE bền vững** – kết hợp giữa định giá hấp dẫn và nền tảng lợi nhuận chất lượng, σ ROE thấp, retention cao | **Fortress** 🏰 |
+| **CTG** | 3.8% | 1.01 | **P/B rẻ nhất top** – gần mức 1.0, định giá phản ánh rủi ro nhưng ROE lịch sử ổn, risk penalty thấp. Payout thấp → compounding tốt | **Fortress** (gần) |
+| **SHB** | 3.6% | 0.95 | **P/B dưới 1.0** – deep value. Driver chính là định giá rẻ sâu, bù cho ROE tương đối thấp hơn. Cần theo dõi σ ROE để tránh cheap trap | **Cheap-but-not-trap** (có điều kiện) |
+
+**Kết luận:** Top 3 không phải “growth trap”. HDB và CTG có chất lượng Fortress rõ nét. SHB là tình huống định giá rẻ nhưng cần kiểm tra độ ổn định ROE.
+
+## 3. Value Traps Warning
+
+| Mã | Alpha | P/B | Chẩn đoán |
+|---|---|---|---|
+| **EIB** | -12.4% | 1.51 | **Growth Trap điển hình** – P/B trên 1.5 nhưng ROE bất ổn, σ(ROE) cao → Risk Penalty cực lớn. Đốt vốn nghiêm trọng. |
+| **VCB** | -7.2% | 2.27 | **Premium Burn** – P/B quá cao so với ROE có thể bị giảm tốc. Không tạo giá trị thặng dư, chỉ kỳ vọng tương lai. |
+| **LPB** | -7.0% | 2.89 | **Premium Burn nặng nhất** – P/B gần 3x, ROE không đủ bù. Rủi ro điều chỉnh P/B lớn khi stress test ập đến. |
+
+**Cảnh báo:** EIB, VCB, LPB đều có Alpha âm sâu → **cấm mua** nếu chỉ theo khung value. Đặc biệt LPB và VCB: giá đắt mà không có chất lượng tương xứng.
+
+## 4. Portfolio Construction
+
+**Core Holding (60-70% bank allocation):** 
+- **HDB** – Fortress số một, kết hợp ROE cao + P/B rẻ + σ thấp
+- **CTG** – Fortress giá rẻ, P/B gần 1x, độ an toàn cao
+
+**Tactical (20-30%):**
+- **SHB** – Cheap-but-not-trap (cần giám sát chặt ROE hàng quý). Chỉ nên giữ tỷ trọng nhỏ.
+
+**Cấm mua / Underweight:**
+- **EIB** – Đốt vốn nghiêm trọng
+- **VCB, LPB** – Premium Burn, rủi ro P/B giảm khi thị trường thắt chặt
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "CTG"],
+  "avoid_list": ["EIB", "VCB", "LPB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```

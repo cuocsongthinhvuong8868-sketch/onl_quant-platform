@@ -1,0 +1,34 @@
+## 1. Observations
+- Risk Score ở 55.7, nằm giữa vùng NEUTRAL (40-60), giảm nhẹ 0.5 điểm so với phiên trước.
+- EGARCH Vol chuẩn hóa ở 5.2%, thấp hơn ngưỡng FEAR (>10%) và giảm mạnh 4.4% so với phiên trước.
+- Rolling Skewness ở 0.05, gần mức 0 (phân phối đối xứng) và không âm sâu (< -0.3).
+- Upside Correlation (35.3%) cao gấp ~2.8 lần Downside Correlation (12.7%), cho thấy các cổ phiếu tăng cùng nhau nhiều hơn giảm.
+
+## 2. Interpretation
+Dữ liệu hiện tại cho thấy thị trường đang ở pha NEUTRAL với xu hướng dịch chuyển nhẹ về Greed: vol giảm nhanh, skewness không âm, và lực kéo đồng thuận tăng (upside corr > downside corr). Đây là cấu trúc của thị trường phân hóa nhưng có dấu hiệu thu hẹp biên độ rủi ro hệ thống.
+
+## 3. Cross-Check
+- **Score (55.7) vs EGARCH Vol (5.2%)**: Consistent — Score ở NEUTRAL và vol giảm mạnh ủng hộ việc không có panic/fear.
+- **Skewness (0.05) vs Correlations (U12.7%, D35.3%)**: Cùng dấu dương — Skew gần 0 không báo hiệu đuôi rủi ro, và up-corr > down-corr cho thấy flows đang ủng hộ phe mua. Không có divergence.
+
+## 4. Verdict
+- **Beta exposure đề xuất: 0.6** (trên thang 0-1.0) — nâng nhẹ từ mức neutral (0.5) dựa trên tín hiệu vol giảm và skew ổn định.
+- **Hành động**: Tăng tỷ trọng danh mục lên mức slightly overweight, ưu tiên cổ phiếu có thanh khoản tốt. Thiết lập trailing stop ngắn (5-7%) cho vị thế mới. Không hedge rủi ro hệ thống ở ngưỡng hiện tại, nhưng sẵn sàng giảm beta nếu Score breakout dưới 45 kèm vol tăng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "05/06/2026",
+  "regime": "NEUTRAL",
+  "score": 55.7,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Score 55.7 trong vùng NEUTRAL (40-60), giảm nhẹ 0.5 điểm",
+    "EGARCH vol 5.2%, giảm mạnh 4.4% - dấu hiệu nén biên độ rủi ro",
+    "Skewness 0.05 - phân phối đối xứng, không tail risk",
+    "Upside corr 35.3% > Downside corr 12.7% - đồng thuận tăng mạnh hơn giảm"
+  ]
+}
+```

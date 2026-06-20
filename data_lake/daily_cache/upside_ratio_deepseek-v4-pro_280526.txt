@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu (Upside):** Hiện tại 5.88% thấp hơn nhiều so với Mu dài hạn 14.12% (delta -8.24%). Phi = +0.179 > +0.10 → **Momentum (đà mua)**.
+- **Lực cung (Downside):** Hiện tại 14.35% xấp xỉ Mu 14.23% (delta +0.12%). Phi = +0.217 > +0.10 → **Momentum (đà bán)**.
+- Cả hai chiều đều ở chế độ momentum, nhưng lực cầu đang bị nén mạnh dưới trung bình, trong khi lực cung ở mức trung bình lịch sử.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền:** **Phân phối (Distribution)** — Lực cầu nén dưới Mu (5.88% << 14.12%) kết hợp lực cung trung bình sát Mu → áp lực bán đang chiếm ưu thế, dòng tiền rút dần.
+- **Momentum thực sự:** Cả hai bên đều giữ momentum (Phi > +0.10), nhưng so sánh |Phi|: **Cung (0.217) mạnh hơn Cầu (0.179)**. Điều này xác nhận đà bán đang áp đảo đà mua, thị trường nghiêng về phía cung.
+
+## 3. Stress-Test Read
+- **P95 Downside = 27.90%:** Trong 5% kịch bản xấu nhất, biên độ panic sell có thể lên gần 28% trong 19 phiên — rủi ro đuôi rất dày.
+- **Asymmetry:** P95 Upside = 23.96% < P95 Downside = 27.90% → **Tail risk bán dày hơn tail risk mua**. Xác suất panic sell cao hơn xác suất bùng nổ mua ở biên độ cực đoan.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân:** 10% (rất thấp, chỉ dành cho vị thế phòng thủ).
+- **Strategy:** **Phòng thủ (Defensive)** — Không mua đuổi, không bắt đáy khi đà bán còn mạnh và tail risk nghiêng về downside.
+- **Confidence:** Medium — dữ liệu rõ xu hướng phân phối, nhưng cần thêm tín hiệu xác nhận từ khối lượng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.90,
+  "p95_upside_pct": 23.96,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

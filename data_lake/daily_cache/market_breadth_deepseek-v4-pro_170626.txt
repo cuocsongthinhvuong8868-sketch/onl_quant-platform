@@ -1,0 +1,36 @@
+## 1. Observations
+- **MA20 (50.4%)**: Mức trung bình, gần vùng cân bằng — không quá nóng cũng không quá lạnh.
+- **MA60 (35.1%)**: Thấp hơn ngưỡng 50%, cho thấy đa số mã chưa hồi phục đủ 1 quý.
+- **MA125 (28.7%)**: Thấp, phản ánh chu kỳ kinh doanh nửa năm còn yếu.
+- **MA252 (30.1%)**: Thấp, dưới ngưỡng 40% — thị trường dài hạn đang trong pha Bear regime nhẹ.
+
+## 2. Structural Health
+Bốn đường MA không có sự đồng thuận: **MA20 ở mức trung bình (50.4%)**, trong khi **MA60, MA125, MA252 đều dưới 40%**. Đây là dạng **Divergence rõ rệt** — ngắn hạn có sức bật nhưng dài hạn vẫn yếu.
+
+Pattern phù hợp: **Divergence** (MA20 trung bình nhưng MA252 < 40%). Thị trường đang trong trạng thái **kém ổn định**, thiếu động lực bền vững để chuyển sang uptrend mới.
+
+## 3. Money Flow Leadership
+- **Top MA20 (ngắn hạn)**: Đa dạng ngành — Chứng khoán (AAS, ABS), Bất động sản (AGG, AGR), Năng lượng (AAA, ANV), Cảng biển (ACV). Thiếu sự tập trung vào một ngành dẫn dắt rõ rệt.
+- **Top MA252 (dài hạn)**: Ngân hàng (BIC, BID), Thực phẩm (BAF, BFC), Vật liệu xây dựng (BCC), Chứng khoán (ABB, ADS). Overlap với MA20 chỉ có ABB, ADS.
+- **Smart money**: Thiên về **Defensive + Financials** (Ngân hàng, Bảo hiểm), không ưu tiên aggressive growth. Sự thiếu đồng nhất giữa ngắn và dài hạn cho thấy dòng tiền đang thăm dò, chưa có xác nhận xu hướng.
+
+## 4. Verdict
+- **Strategy: Defensive cash-up / Wait for confirmation** — Divergence rõ giữa MA20 (trung bình) và MA252 (yếu) => không nên chạy theo sóng ngắn.
+- **Đòn bẩy: 0% margin** (MA252 < 40%, có divergence, không đáp ứng điều kiện an toàn).
+- **Hành động**: Giữ tỷ trọng tiền mặt cao. Chỉ gia tăng khi MA60 vượt 50% hoặc MA252 cải thiện lên trên 40% + có sự đồng thuận giữa các horizon.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 50.4,
+  "ma60_pct": 35.1,
+  "ma125_pct": 28.7,
+  "ma252_pct": 30.1,
+  "regime": "divergence",
+  "leadership_sector": "defensive",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```

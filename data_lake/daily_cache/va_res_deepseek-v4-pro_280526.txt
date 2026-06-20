@@ -1,0 +1,32 @@
+```markdown
+## 1. Observations
+- VN30 Stress Index: 16.67% (ngưỡng cảnh báo 40%)
+- Số mã thủng VaR 95% trên VN30: 5/30
+- Complacency Index toàn thị trường: 5.56% (ngưỡng nguy hiểm 80%)
+- Số mã mispriced trên toàn thị trường: 6
+
+## 2. Contagion Assessment (Module B)
+Stress Index ở mức 16.67%, thấp hơn đáng kể so với ngưỡng cảnh báo 40%. Điều này cho thấy **chưa có hiện tượng lây lan rủi ro mang tính hệ thống** trên nhóm VN30 ở thời điểm hiện tại. 5/30 mã thủng VaR 95% là một con số đáng chú ý nhưng chưa đến mức báo động systemic. Top 3 breach sâu nhất (HDB, TCB, VCB) có khả năng là những sự cố cá biệt, liên quan đến yếu tố vi mô nội tại của từng cổ phiếu hơn là tín hiệu đầu sóng cho một đợt bán tháo toàn thị trường. Cần theo dõi sát diễn biến các mã này trong 1-2 phiên tới để xác nhận.
+
+## 3. Complacency Assessment (Module C)
+Complacency Index ở mức rất thấp 5.56%, cho thấy thị trường **KHÔNG đang ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định.** Trên thực tế, với Stress Index đang ở mức thấp (16.67%), mức Complacency thấp này phản ánh một trạng thái spread giãn rộng, thanh khoản cao hoặc biến động mạnh (điển hình của các pha uptrend hoặc downtrend). Nếu kết hợp với số lượng breach tăng lên trong Module B, kịch bản thị trường đang trong một đợt điều chỉnh/phân phối có khối lượng là khả thi hơn cả. Không có dấu hiệu rủi ro bị che giấu, định giá sai ở cấp độ toàn thị trường.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):**
+    - **HDB, TCB, VCB:** Các vị thế nắm giữ cần đặt stop-loss chặt, khuyến nghị giảm tỷ trọng nếu giá đóng cửa thủng MA20 trên khung D1. Đây là các mã có thanh khoản tốt, mức breach sâu có thể là tín hiệu dòng tiền thông minh đang rút ra.
+- **Top 3 Mispriced (Module C):**
+    - **HSG, VRE, VTO:** Spread bị nén chặt trong bối cảnh Complacency thấp toàn thị trường. Đây là tín hiệu cảnh báo tiềm ẩn về sự mất thanh khoản cục bộ hoặc lệnh dàn hàng. Không khuyến nghị giao dịch. Cảnh báo rủi ro gap giá nếu có tin tức bất ngờ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 16.67,
+  "breach_count": 5,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["HDB", "TCB", "VCB"],
+  "confidence": "medium"
+}
+```

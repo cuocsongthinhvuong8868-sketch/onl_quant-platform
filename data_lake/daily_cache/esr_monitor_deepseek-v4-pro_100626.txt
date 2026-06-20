@@ -1,0 +1,44 @@
+# ESR MONITOR — 10/06/2026
+
+## 1. Observations
+- **SSI (Systemic Stress Index): 65.7%** — nằm trong vùng WARNING (0.50–0.80)
+- **Market State: EUPHORIC_RISK** — HMM × trend filter xác nhận stress cao + uptrend
+- **Top 3 Pillar Drivers:** S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- **Pillar Mode:** downside — chỉ tính phiên giảm
+
+## 2. Risk Decomposition
+
+Pillar **S_LIQ** (36%) dẫn dắt bảng với lực đẩy lớn nhất. Đây là tín hiệu **volume dry-up** — thanh khoản tổng dollar volume đang thấp hơn đáng kể so với chuẩn 1 năm. Khi combination với **S_COR** (17%) — PCA concentration ở mức 38.3% — cho thấy các mã VN30 đang di chuyển đồng pha với khối lượng giao dịch suy yếu, tạo thành cấu trúc **bull-trap signature** điển hình. 
+
+**S_VAL** (32%) phản ánh valuation tension khi return 252d đã giảm tốc trong khi deposit rate duy trì tương đối cao, làm suy yếu risk premium.
+
+Toàn bộ cấu trúc được tính toán ở chế độ downside — chỉ sử dụng các phiên giảm giá — khiến tín hiệu stress này chủ yếu phản ánh **cung áp lực bán thực tế, không phải biến động hai chiều**.
+
+## 3. Cross-Check
+
+**Price vs SSI divergence:** VN30 đóng cửa **dưới MA125** trong khi SSI ở WARNING — đây là tín hiệu yếu hơn bull-trap so với trường hợp "giá đỉnh mới + SSI cao", nhưng vẫn cho thấy cấu trúc giá đang yếu trong bối cảnh stress tích lũy. Không có divergence mạnh, chỉ có drift âm.
+
+**HMM regime alignment:** HMM xác nhận EUPHORIC_RISK — khớp hoàn toàn với SSI WARNING. Không lệch, không cần flag.
+
+## 4. Verdict
+
+**Cash weight đề xuất: 55%** — danh mục thận trọng trong EUPHORIC_RISK, đặc biệt khi giá đã thủng MA125 nhưng chưa xác nhận downtrend mới. S_LIQ dry-up + S_COR herding tạo bức tranh sideway đi ngang có tilt bán nhiều hơn mua.
+
+**Hedge action: reduce_beta** — chưa cần short full vì chưa có tín hiệu CRITICAL, nhưng cần hạ beta danh mục về mức defensive. Mua put xa tiền (OTM) cho VN30F1M với kỳ hạn 1-2 phiên nếu SSI tiếp cận 70%.
+
+**No conflicting pillar signal** — cả 3 driver đều hội tụ về cùng một hướng risk-off.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.7,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 55,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

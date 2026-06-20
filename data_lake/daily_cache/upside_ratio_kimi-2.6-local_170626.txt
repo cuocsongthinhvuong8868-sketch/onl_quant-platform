@@ -1,0 +1,31 @@
+## 1. Observations
+- Upside nén: 10.82% < 13.35% (delta -2.53pp); Downside nén: 5.65% << 13.65% (delta -8.00pp) — cả hai chiều đều nén dưới trung bình dài hạn
+- Phi_up = 0.192 > 0.10: momentum đà mua; Phi_dn = 0.223 > 0.10: momentum đà bán — cả hai chiều đều ở regime momentum
+- |Phi_dn| > |Phi_up| (0.223 vs 0.192): momentum bán mạnh hơn 16% so với momentum mua
+
+## 2. Supply-Demand Dynamics
+- **Zombification**: Cả upside lẫn downside đều nén dưới mu, thanh khoản cạn. Không phải tích lũy (không ngược chiều) cũng không phải phân phối (không cùng chiều up thấp + down cao).
+- **Momentum winner: Supply**. |Phi_dn| = 0.223 > |Phi_up| = 0.192. Đà bán có inertia cao hơn; khi kích hoạt, cung sẽ bung nhanh hơn cầu.
+
+## 3. Stress-Test Read
+- P95 Downside 26.69%: panic sell có thể đẩy 1/4 bộ mã giảm >2% trong 1 phiên — biên độ gãy rất rộng.
+- **Asymmetry nghiêng cung**: P95_Dn (26.69%) > P95_Up (23.61%), chênh 3.08pp. Tail risk bên bán dày hơn; skew âm rõ rệt.
+
+## 4. Verdict
+- **Deployment: 0%**
+- **Strategy: phòng thủ**
+- Không phải NO ACTIONABLE (cả hai Phi đều > 0.10), nhưng zombification + momentum bán mạnh hơn + tail asymmetry nghiêng downside = không có lợi thế xác suất cho phía long. Giữ tiền mặt, chờ breakdown của zombification (upside hoặc downside bùng ra) để xác định direction.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.69,
+  "p95_upside_pct": 23.61,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

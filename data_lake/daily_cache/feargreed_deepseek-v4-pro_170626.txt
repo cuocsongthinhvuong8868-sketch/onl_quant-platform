@@ -1,0 +1,34 @@
+## 1. Observations
+- Risk Score: 55.7/100, tăng +1.8 so với phiên trước, nằm trong vùng NEUTRAL (40-60).
+- EGARCH Vol chuẩn hóa: 20.2%, tăng +3.2% so với phiên trước, cao hơn mức trung bình ngưỡng GREED (<15%).
+- Rolling Skewness: 0.11, dương nhẹ nhưng dưới ngưỡng tín hiệu GREED (>0.25).
+- Downside Correlation: 12.1% (thấp), Upside Correlation: 29.4% (cao gấp ~2.4 lần downside).
+
+## 2. Interpretation
+Dữ liệu phản ánh một thị trường đang trong pha **phân hóa (Stock-Picking)**, nơi các cổ phiếu tăng không đồng bộ (upside corr thấp hơn ngưỡng GREED ~40-50%) và xác suất rủi ro hệ thống chưa cao (downside corr thấp), bất chấp sự gia tăng đột biến của volatility.
+
+## 3. Cross-Check
+- **Score (55.7) vs EGARCH Vol (20.2%): divergence rõ rệt.** Score ở vùng Neutral, trong khi Vol đã vượt xa ngưỡng bình thường — đây là tín hiệu cảnh báo (flag) vì dữ liệu hành vi giá và dữ liệu rủi ro đang mâu thuẫn.
+- **Skewness (0.11) vs Correlation (Down 12.1%, Up 29.4%): không consistent.** Skewness dương thường đi kèm với upside corr cao (crowded long), nhưng thực tế upside corr chỉ 29.4% — phản ảnh sự thiếu bền vững trong lực kéo.
+- **Kết luận cross-check: signals lệch nhiều hơn đồng thuận; consistent chỉ đạt ~40%.**
+
+## 4. Verdict
+- **Beta exposure đề xuất: 0.5 (giảm từ 0.7 mặc định Neutral).**
+- **Hành động cụ thể:** Giảm tỷ trọng beta dựa trên tín hiệu cảnh báo từ divergence Vol-Score. Không Long ròng, không Short ròng. Phân bổ danh mục thiên về các cổ phiếu có tính phòng thủ tương đối (beta thấp, thanh khoản cao) để làm đệm cho đà tăng bất ngờ của vol.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "17/06/2026",
+  "regime": "NEUTRAL",
+  "score": 55.7,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Score neutral nhưng EGARCH Vol tăng mạnh +3.2% — divergence cảnh báo",
+    "Upside corr 29.4% không hỗ trợ skewness dương 0.11",
+    "Downside corr thấp (12.1%) giữ xác suất tail risk dưới mức cao"
+  ]
+}
+```

@@ -1,0 +1,35 @@
+## 1. Observations
+
+- **Spread Z-Score**: -0.54σ — nằm trong vùng trung tính so với đường trung bình 60 phiên.
+- **DPI**: 40.0% — dưới ngưỡng 70%, cho thấy chưa hình thành regime phân tán kéo dài.
+- **Avg Pairwise Correlation**: 0.006 — gần như bằng 0, phản ánh mức độ phân hóa cực mạnh giữa các cổ phiếu trong rổ.
+- **CS Skewness & Kurtosis**: N/A — không có dữ liệu về đuôi phân phối; hạn chế khả năng xác định hướng tail.
+
+## 2. Structural State
+
+Thị trường hiện đang ở trạng thái **bình thường (non-stressed)**. Spread_Z ở mức trung tính (-0.54σ) kết hợp với DPI thấp (40.0%) cho thấy không có lực căng bất thường hay sự kiện outlier nào kéo giãn cấu trúc trong thời gian gần đây. Stress nếu có chỉ là **cục bộ và nhất thời**, không mang tính regime persistent.
+
+## 3. Cross-Check & Tail Direction
+
+Do thiếu dữ liệu Skewness và Kurtosis, không thể đánh giá trực diện hướng tail hay mức độ fat-tail. Tuy nhiên, với Spread gần mức trung bình và DPI thấp, có thể suy luận rằng **phân phối lợi nhuận chưa bị bóp méo bởi các outlier cực đoan**. Các mô hình phân phối chuẩn vẫn còn ứng dụng trong khung phân tích hiện tại.
+
+## 4. Regime Mapping
+
+Dựa trên 2D Regime Map (DPI thấp × Corr thấp), thị trường đang vận hành trong ô **Healthy Stock-Picking** — một môi trường lành mạnh cho chiến lược chọn cổ phiếu riêng lẻ.
+
+**Risk lớn nhất cho Portfolio Manager**: Mặc dù đây là môi trường thuận lợi cho stock-picking, nhưng correlation gần 0 đồng nghĩa với việc đa dạng hóa danh mục không mang lại hiệu quả giảm rủi ro như kỳ vọng. Rủi ro chính đến từ **concentration risk** — nếu quá tập trung vào một vài cổ phiếu có alpha tốt, danh mục có thể chịu biến động lớn từ các cú sốc riêng lẻ.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "12/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.54,
+  "dpi_pct": 40.0,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

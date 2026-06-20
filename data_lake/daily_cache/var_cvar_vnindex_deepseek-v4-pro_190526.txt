@@ -1,0 +1,46 @@
+## 1. Observations
+
+- **Historical VaR 95% (3Y):** -1.64%, nhẹ hơn Parametric Gaussian ước tính (-1.46%), nhưng chi tiết hơn là ES 95% rất sâu: -3.00%.
+- **EVT VaR 99% (1/100):** -3.66%. Sự kiện 1% xác suất theo GPD thiệt hại lớn hơn nhiều so với ngưỡng VaR 95%.
+- **ξ (GPD shape):** +0.346. Nằm trong vùng "fat tail." Xác suất mất mát cực đoan cao hơn phân phối chuẩn nhiều lần.
+- **Hill index (cross-check):** +0.471. Cùng dấu (+) với ξ, nhưng magnitude cao hơn ξ khoảng 0.125 → threshold sensitivity.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346:** thuộc bracket **FAT TAIL** (> 0.30). Đuôi cực dày, rủi ro hệ thống cao. Gaussian sẽ underestimate sâu.
+- **Hill = 0.471:** cùng dấu với ξ, khẳng định tail nặng. Tuy nhiên, Hill cao hơn ξ đáng kể (0.471 > 0.346) → có threshold sensitivity, không hoàn toàn robust. Confidence không tuyệt đối.
+- **ES − VaR spread:** -1.36%, lớn hơn σ₃₀ (1.13%). Theo tiêu chuẩn thực nghiệm, spread > σ₃₀ là dấu hiệu xác nhận fat tail. Fat tail được corroborate chặt chẽ.
+
+## 3. Gaussian Gap
+
+- Tính **Gaussian VaR 99%** (μ + z₀.₀₁·σ, với z₀.₀₁ = -2.33, μ ≈ 0, σ = 1.13%): ≈ **-2.63%**.
+- **EVT VaR 99%:** -3.66%.
+- **Gaussian Gap:** |(-3.66%) - (-2.63%)| = **1.03 pp**.
+- Gap vượt 1 pp → Gaussian model bị **broken** ở tail 99%. Không dùng Gaussian làm cơ sở phân bổ vốn rủi ro cho sự kiện hiếm.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30:
+- Tránh chiến lược momentum (dễ bị gap down).
+- Mua **put options ITM** (vì OTM có thể không cover đủ độ sâu tail).
+- **Short futures hedge** để giảm delta khi thị trường biến động cực đoan.
+- Không leverage. Giảm position size tổng thể.
+
+**Hành động:** SHORT FUTURES + BUY PUTS ITM. Giảm 50–70% extreme risk exposure.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "19/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.03,
+  "hedge_action": "buy_puts_itm_short_futures",
+  "confidence": "medium"
+}
+```

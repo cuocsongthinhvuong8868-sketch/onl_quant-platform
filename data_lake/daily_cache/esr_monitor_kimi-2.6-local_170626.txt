@@ -1,0 +1,42 @@
+## 1. Observations
+- SSI = 66.0%, thuộc vùng **WARNING** (0.50–0.80)
+- Market State: **EUPHORIC_RISK** (high stress + uptrend filter, dù VN30 đóng dưới MA125)
+- Top 3 drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- PCA Concentration PC1 = 38.3% — mức trung bình, chưa extreme herding
+
+## 2. Risk Decomposition (Bóc tách)
+
+**S_LIQ dẫn dắt (36%)**: Volume khô cạn vs 1Y norm. Dòng tiền rút ròng cấu trúc, thanh khoản MA20 thấp hơn đáng kể so với MA252. Đây không phải panic-selling có volume mà là **distribution silencieuse** — đặc trưng bull-trap khi giá còn giữ đỉnh nhưng không có confirmation volume.
+
+**S_VAL (32%)**: Valuation tension cao — 252d return VN30 spread trên deposit rate đang ở vùng căng. Tức là compensation cho risk premium không còn hấp dẫn.
+
+**S_COR (17%)**: Systemic correlation tăng nhẹ (EVR PC1 38.3%), chưa extreme nhưng đủ cho thấy 30 mã bắt đầu đồng pha hơn bình thường.
+
+**Tổng hợp**: S_LIQ + S_VAL cao, S_COR vừa đủ → **bull-trap signature rõ ràng**: giá giữ đỉnh/đi ngang trên nền thanh khoản teo tóp, valuation không hỗ trợ, correlation âm ỉ tăng. Không có S_VOL hay S_PRES dẫn đầu → chưa panic, đang **pre-positioning phase**.
+
+## 3. Cross-Check
+
+**VN30 vs SSI divergence**: VN30 đóng dưới MA125, tức trend filter đã không còn uptrend rõ ràng. Tuy nhiên HMM vẫn xếp **EUPHORIC_RISK** (high stress + uptrend) — có lệch nhẹ. Có thể uptrend filter dùng MA20/MA60 và giá vẫn trên, hoặc model lag. **Flag: regime có thể flip sang ACTIVE_STRESS nếu VN30 xác nhận break MA125**.
+
+**HMM × SSI consistency**: SSI 66% (WARNING) + HMM EUPHORIC_RISK = **nhất quán về mặt stress cao**, nhưng trend filter cần monitor gấp. Nếu giá xác nhận dưới MA125, regime sẽ là ACTIVE_STRESS — lúc đó SSI có thể spike nhanh.
+
+## 4. Verdict
+
+- **Cash target: 40%** — tăng từ baseline 20% lên defensive. Chưa full cash vì SSI chưa CRITICAL và chưa có S_VOL/S_PRES dẫn đầu.
+- **Hedge action: reduce_beta + mua put VN30** (delta ~10-15% danh mục). Không short futures outright vì chưa có trend down xác nhận + volume dry-up có thể kéo squeeze ngắn hạn.
+- **Trigger nâng cash lên 70%**: SSI > 80% hoặc S_VOL/S_PRES vượt S_LIQ trong top driver.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 66.0,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,34 @@
+## 1. Observations
+- VN30 Stress Index: 0.00% (alert threshold: 40%) — không có mã nào thủng VaR 95% trong rổ VN30.
+- # mã thủng VaR 95%: 0/30 — không ghi nhận breach.
+- Complacency Index: 5.56% (danger threshold: 80%) — rất thấp, # mã mispriced: 6 (HSG, OCB, VHM là top 3).
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index ở mức 0.00% cho thấy **không có dấu hiệu lây lan đang diễn ra real-time** trong rổ bluechip. Tất cả 30 mã đều giữ giá trong phạm vi VaR 95%, không có breach nào để truyền tín hiệu systemic.
+- Vì Top 3 breach rỗng, không thể kết luận "sự cố cá biệt" hay "đầu sóng". Trạng thái này là phẳng, không có áp lực bán cục bộ từ VN30.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- Complacency Index ở mức **5.56% (rất thấp)**. Theo đúng bản chất: **thị trường KHÔNG đang ở regime ngủ quên**. Điều này KHÔNG đồng nghĩa thị trường ổn định hay không có áp lực bán. Thực tế, với Stress Index = 0% nhưng Complacency thấp, thị trường có thể đang ở pha vận động bình thường với spread giãn tự nhiên, hoặc đang trong xu hướng rõ nét (tăng/giảm) mà không có dấu hiệu nén rủi ro.
+- 6 mã bị mispriced (spread nén chặt) là tín hiệu cục bộ, chưa đủ để kết luận định giá sai diện rộng.
+
+## 4. Stock-Level Risk Calls
+**Top 3 Crash (Module B):** Không có — không có khuyến nghị cụ thể.
+
+**Top 3 Mispriced (Module C):** HSG, OCB, VHM — spread bị nén, rủi ro mất thanh khoản cục bộ.  
+- **HSG:** Cần theo dõi breakout/breakdown khỏi vùng giá hiện tại. Nếu khối lượng tăng đột biến kèm spread giãn, có thể là tín hiệu đảo chiều. Stop-loss tham khảo ở mức thủng MA20 trên D1.
+- **OCB:** Spread hẹp kéo dài tiềm ẩn biến động bất ngờ. Cảnh báo cho vị thế đang nắm giữ; ưu tiên giảm tỷ trọng nếu giá thủng vùng hỗ trợ MA50.
+- **VHM:** Tương tự OCB, spread nén nhưng thanh khoản duy trì. Không khuyến nghị gấp, nhưng cần đặt trailing stop-loss chặt hoặc chốt lời từ từ nếu đang có lãi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["HSG", "OCB", "VHM"],
+  "confidence": "high"
+}
+```

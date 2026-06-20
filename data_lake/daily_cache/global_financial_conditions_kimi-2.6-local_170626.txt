@@ -1,0 +1,101 @@
+ ## 1. Cross-Asset Snapshot
+
+**Volatility cluster:** OVX 64% (ELEVATED), VIX 31% (LOW), SKEW 30% (LOW), MOVE 24% (LOW), VVIX 6% (LOW). OVX > 50 báo hiệu oil shock đang hoạt động; VIX 16.20 thấp hơn ngưỡng 20-22 của risk-off thông thường.
+
+**Credit cluster:** CCC OAS 79% (ELEVATED, gần HIGH), EM OAS 1% (LOW), HY OAS 2% (LOW), IG OAS 2% (LOW). CCC 9.37% gần ngưỡng distress 10%; HY 2.66% và IG 0.73% compression mạnh cho thấy liquidity dồi dào ở phân khúc investment grade và broad high yield.
+
+**Macro Overlay:** DXY 84% (HIGH), 2s10s 1% (LOW — curve steepening bất thường từ mức rất thấp).
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Thị trường đang "bệnh lạ": giá dầu loạn nhịp (OVX cao) nhưng cổ phiếu Mỹ vẫn bình thản (VIX thấp). Trong khi đó, các công ty yếu nhất (CCC) đang bị đẩy lãi suất vay lên cao, còn công ty khỏe (IG) thì vay rẻ chưa từng thấy. Đồng USD mạnh lên (DXY cao) như một cái nam châm hút tiền về Mỹ, trong khi đường cong lợi suất (2s10s) đang ở trạng thái "báo động vàng" về tăng trưởng.
+
+---
+
+## 2. PCA Composite Interpretation
+
+PC1 EMA(5) smoothed ở -0.17σ, percentile 50% → **ELEVATED regime** (sát ngưỡng CALM nhưng chưa qua). Driver: **NO_STRESS** — không có core indicator nào vượt 80th percentile trong 6-core. Tuy nhiên, PC2 +1.23σ cho thấy **divergence rõ nét**: credit dimension (đặc biệt CCC) đang tách biệt khỏi vol dimension. Đây là "credit-led divergence" — stress không đồng loạt mà tập trung ở junk tier.
+
+PC1 raw -0.59σ thấp hơn smoothed, cho thấy momentum gần đây đang "tốt lên" (stress giảm) nhưng chưa đủ để đẩy regime xuống CALM.
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> "Chỉ số stress tổng hợp" PC1 như nhiệt kế toàn thị trường: đang ở mức "hơi nóng" (50%) chứ không phải sốt cao. Điều đáng sợ là PC2 — nó cho thấy "kẻ đầu sỏ" không phải cổ phiếu hay lãi suất, mà là **nợ rác (junk bond)**. Tưởng tượng một ngôi nhà: mái ngói (cổ phiếu) vẫn yên ổn, nhưng móng nhà (nợ doanh nghiệp yếu) đang nứt. Đó là dấu hiệu muộn của chu kỳ tín dụng.
+
+---
+
+## 3. Credit Cycle Read
+
+Credit Quality Spread (CCC − HY) 6.71% ở **percentile 93%** — đây là tín hiệu **late-cycle deterioration** mạnh nhất trong dataset. Cấu trúc: CCC 79% vs HY 2% vs IG 2% cho thấy **"barbell compression"** — IG/HY spread thắt chặt do hunt-for-yield, trong khi CCC bị repricing mạnh. Điều này không phải "broad credit stress" (IG/HY cùng widen) mà là **"credit quality bifurcation"** — nhà đầu tư vẫn ôm IG/HY nhưng bán tháo CCC.
+
+EM OAS 1.41% ở percentile 1% — **extreme compression**, signal dòng vốn EM chảy mạnh do carry trade, nhưng điều này tạo **asymmetric vulnerability**: bất kỳ shock nào cũng trigger rapid unwinding.
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Khoảng cách giữa "nợ rác nguy hiểm nhất" (CCC) và "nợ rác thường" (HY) đang ở mức cao nhất gần 1 năm. Điều này như thể: ngân hàng vẫn cho vay dễ dàng với khách hàng khá giả, nhưng bắt đầu siết nợ với người nghèo nhất. EM OAS thấp kỷ lục nghĩa là tiền đang "say sưa" chảy vào trái phiếu các nước mới nổi — nhưng khi tỉnh rượu, họ sẽ chạy nhanh hơn lúc vào.
+
+---
+
+## 4. Volatility Breadth
+
+VIX/MOVE/SKEW đồng thuận ở LOW (24-31%) — **no vol stress consensus**. Tuy nhiên, OVX 64% (ELEVATED) và VVIX 6% (extreme LOW) tạo **divergent sub-signal**:
+
+- OVX > 50 chưa được capture trong PC1 6-core (PC1 chỉ gồm VIX/MOVE/SKEW/HY/CCC/IG) → **oil shock là idiosyncratic risk ngoài composite**
+- VVIX 6% cho thấy derivatives market **quá complacent** — vol-of-vol thấp như vậy là điều kiện cần cho VIX spike (nếu có catalyst)
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Ba "ông lớn" biến động (VIX, MOVE, SKEW) đang... ngủ. Nhưng OVX (dầu thô) đang hét to. VVIX thấp kỷ lục như thị trường phái sinh đang "ngủ say" — đây là lúc nguy hiểm nhất, vì khi mọi người quá tự tin, một cú giật nhỏ cũng thành đại hồng thủy. Giống như biển lặng trước bão.
+
+---
+
+## 5. Macro Overlay
+
+2s10s +0.38% ở percentile 1% — curve **steepened từ inversion sâu** (giả định 12-18 tháng trước curve âm). Đây là pattern **"bear steepening" hoặc "recession steepening"** — long end tăng nhanh hơn short end do term premium repricing hoặc supply concern (Treasury issuance), chứ không phải growth optimism. DXY 99.54 ở 84th percentile — **USD strength** đang ở vùng pressure lên EM FX.
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Đường cong lợi suất từng "cúi đầu" (âm) báo suy thoái, giờ "ngẩng lên" nhưng không phải vì kinh tế khỏe — mà vì lo ngại chính phủ Mỹ vay nợ quá nhiều. DXY mạnh như "hố đen" hút tiền toàn cầu: nhà đầu tư bán VND, bán cổ phiếu Việt Nam, chuyển về USD. FDI vào Việt Nam sẽ chậm lại vì đồng USD "đắt" hơn để đầu tư.
+
+---
+
+## 6. Momentum
+
+PC1 5-day change -1.40σ — **stress decelerating mạnh** (raw giảm nhanh hơn smoothed). Tuy nhiên, đây là deceleration từ mức ELEVATED chứ không phải từ STRESS — nghĩa là "hơi ấm lên" nhưng không phải "nắng hè". Sự lệch pha giữa raw (-0.59σ) và smoothed (-0.17σ) cho thấy momentum tích cực nhưng **chưa sustainable** nếu CCC stress và DXY strength tiếp diễn.
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Căng thẳng đang "hạ nhiệt" nhanh trong 5 ngày qua — nhưng giống như cơn sốt hạ sau khi uống thuốc, không chắc đã khỏi bệnh. Nếu "móng nhà" (CCC) vẫn nứt và "nam châm USD" vẫn hút, sự bình yên này có thể chỉ là tạm thời.
+
+---
+
+## 7. Spillover to VN-Index (4-8 tuần)
+
+Cấu trúc **ELEVATED + NO_STRESS + Macro Overlay (DXY HIGH, 2s10s LOW percentile)** tạo **asymmetric headwind profile** cho VN-Index:
+
+| Kênh truyền dẫn | Mức độ | Cơ chế |
+|---|---|---|
+| DXY ↑ | **HIGH** | VND pressure → FDI outflow → VN-Index foreign sell |
+| OVX ↑ | **MEDIUM** | Oil shock → CPI VN ↑ → SBV hawkish → liquidity tighten |
+| CCC OAS ↑ | **MEDIUM** | Late-cycle warning → defensive positioning EM |
+| EM OAS ↓ (compression) | **RISK** | Carry trade vulnerable → sudden stop risk |
+| 2s10s steepening | **MEDIUM** | Recession demand shock → VN exports |
+
+Không có **single dominant driver** nhưng **gọng kìm 3 chân**: (1) USD strength ép VND và FDI, (2) oil volatility ép lạm phát và chính sách tiền tệ, (3) CCC late-cycle warning giảm risk appetite cho EM. VN-Index với beta cao và foreign ownership significant sẽ **underperform** trong 4-8 tuần tới nếu DXY sustain >99.
+
+💡 **Diễn giải bình dân (Layman's terms)**
+> Chứng khoán Việt Nam đang bị kẹp giữa ba lực cản: (1) Đồng USD mạnh khiến nhà đầu tư nước ngoài rút tiền về Mỹ, (2) Giá dầu loạn nhịp đẩy lạm phát, buộc Ngân hàng Nhà nước phải siết tiền tệ, (3) Nợ doanh nghiệp yếu toàn cầu báo động khiến người ta ngại mua rủi ro ở các nước mới nổi. Ba cái này như ba cái kìm ép VN-Index — không chắc sẽ sập, nhưng khó bay cao.
+
+---
+
+## 8. KẾT LUẬN
+
+**Regime vĩ mô:** ELEVATED với credit-quality bifurcation (CCC stress vs IG/HY compression), DXY strength, và oil idiosyncratic risk. **Dòng tiền 2-4 tuần:** Bias **outflow/risk-off** cho EM equities do USD pressure và late-cycle credit warning, dù vol surface hiện tại complacent.
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 50,
+  "regime": "ELEVATED",
+  "driver": "NO_STRESS",
+  "credit_cycle_signal": "deteriorating",
+  "vol_breadth": "divergent",
+  "macro_overlay": "usd_strength",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```

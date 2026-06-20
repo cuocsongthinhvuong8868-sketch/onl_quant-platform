@@ -1,0 +1,36 @@
+## 1. Observations
+
+- **Stress Index:** 0.00% (ngưỡng cảnh báo 40%)
+- **Số mã thủng VaR 95%:** 0 / 30
+- **Complacency Index:** 5.56% (ngưỡng nguy hiểm 80%)
+- **Số mã mispriced:** 6 (Top: VIB, OCB, VHM)
+
+## 2. Contagion Assessment (Module B)
+
+- **VN30 Stress Index ở mức 0%** cho thấy hoàn toàn không có dấu hiệu lây lan thủng VaR trong rổ bluechip. Không một mã nào breach, không có shock cục bộ nào lan rộng ra hệ thống. Trạng thái này cho thấy thị trường VN30 đang ở pha tĩnh, không có áp lực bán tháo tập trung.
+- **Top 3 crash: Không có.** Sự vắng mặt hoàn toàn của breach đồng nghĩa không tồn tại sự cố cá biệt nào đủ mạnh để kích hoạt cảnh báo. Rủi ro systemic do lây lan từ các mã riêng lẻ hiện bằng 0.
+
+## 3. Complacency Assessment (Module C)
+
+- **Complacency Index ở mức rất thấp (5.56%).** Theo đúng bản chất, điều này chỉ cho thấy thị trường **KHÔNG đang ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định**. Với Stress Index = 0%, khả năng cao thị trường đang ở pha uptrend mạnh hoặc sideway biên độ rộng, nơi spread tự nhiên giãn ra — chứ không phải do bị nén chặt. Không có dấu hiệu định giá sai rủi ro diện rộng.
+- **6 mã mispriced** tuy nhiên cho thấy một số cổ phiếu riêng lẻ có spread bị nén cục bộ, đặc biệt là VIB, OCB, VHM. Đây là tín hiệu cảnh báo tiềm ẩn ở cấp độ stock, chứ không phải thị trường chung.
+
+## 4. Stock-Level Risk Calls
+
+- **Top 3 Crash (Module B):** Danh sách rỗng → không có khuyến nghị bán/giảm tỷ trọng từ module này.
+- **Top 3 Mispriced (VIB, OCB, VHM):** Spread bị nén chặt trên các mã này làm tăng xác suất xảy ra biến động giá đột ngột nếu thanh khoản đảo chiều. Cảnh báo: theo dõi sát khối lượng giao dịch và độ rộng spread real-time; có thể kích hoạt stop-loss nếu giá breakout khỏi vùng tích lũy hiện tại với vol đột biến.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIB", "OCB", "VHM"],
+  "confidence": "high"
+}
+```

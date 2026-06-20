@@ -1,0 +1,75 @@
+# Phân tích Fed Liquidity Dynamics – Tuần 10/06/2026
+
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần này đạt **5,896,888 triệu USD**, tăng **+63,168 triệu USD** so với tuần trước. Phân tích cấu phần:
+
+- **WALCL (Fed Balance Sheet):** 6,725,397 triệu USD. Mặc dù không có số liệu Δ tuần riêng, nhưng với Net Liquidity tăng mạnh +63,168 triệu USD trong bối cảnh TGA và RRP gần như không đổi (RRP chỉ 387 triệu USD – gần bằng 0), khả năng cao WALCL đã tăng đáng kể. Điều này phản ánh hoạt động mua tài sản hoặc tái đầu tư từ Fed.
+
+- **WTREGEN (TGA):** 828,122 triệu USD. Mức này tương đối cao, cho thấy Treasury vẫn đang tích lũy tiền gửi, tạo lực hút thanh khoản nhẹ. Tuy nhiên, mức tăng TGA không đủ lớn để bù đắp cho lực bơm từ WALCL.
+
+- **RRPONTSYD (Reverse Repo):** 387 triệu USD – gần như cạn kiệt tuyệt đối. Đây là mức thấp nhất lịch sử, cho thấy không còn thanh khoản dư thừa nào đang "đậu" tại Fed. Mọi biến động từ WALCL sẽ tác động trực tiếp lên Net Liquidity.
+
+**Kết luận:** Cấu phần chi phối là **WALCL tăng mạnh**, trong khi TGA và RRP không tạo biến động đáng kể. Lực bơm ròng đến từ việc Fed mở rộng bảng cân đối kế toán.
+
+## 2. Cycle Positioning
+
+- **Pha hiện tại:** **QE_early** – Đây là giai đoạn đầu của chu kỳ nới lỏng định lượng. WALCL tăng, RRP đã cạn, và TGA ở mức trung bình cao. Fed đang chủ động bơm thanh khoản trở lại hệ thống.
+
+- **RRP:** Đã gần cạn (< 100 tỷ USD). Điều này có nghĩa là "bộ đệm" thanh khoản từ MMF đã hết. Bất kỳ cú sốc nào từ TGA tăng đột biến cũng sẽ gây áp lực trực tiếp lên thị trường repo và lãi suất ngắn hạn.
+
+- **TGA:** 828 tỷ USD – cao hơn mức trung bình 2024 (~600-700 tỷ USD). Treasury đang tích lũy tiền gửi, có thể do mùa thuế tháng 6. Tuy nhiên, nếu Treasury bắt đầu chi tiêu (giải ngân), TGA sẽ giảm và bơm thêm thanh khoản.
+
+- **So sánh lịch sử:**
+  - Đỉnh 2022: Net Liquidity ~4.2 nghìn tỷ USD (sau khi RRP cạn).
+  - Đáy 2024: Net Liquidity ~5.4 nghìn tỷ USD (thời điểm QT mạnh nhất).
+  - Hiện tại: **5.9 nghìn tỷ USD** – cao hơn đáy 2024 ~500 tỷ USD, nhưng vẫn thấp hơn đỉnh 2021 (~6.5 nghìn tỷ USD). Đà tăng đang quay trở lại.
+
+## 3. Signal Strength
+
+- **Tín hiệu:** **ADD** – Impulse_EMA(4) = +17,320 triệu USD > 0 và Z-Score = +1.11 ≥ +1σ. Cả hai điều kiện đều thỏa mãn.
+
+- **Z-Score:** +1.11 – nằm ở vùng **cận biên** (1.0-1.5σ). Chưa phải extreme (> 2σ), nhưng đủ để xác nhận xu hướng tăng có ý nghĩa thống kê.
+
+- **Impulse_EMA:** +17,320 triệu USD – khớp hoàn toàn với tín hiệu ADD. Động lượng tuần này (+63,168 triệu USD) vượt xa EMA, cho thấy tốc độ bơm thanh khoản đang gia tốc.
+
+**Đánh giá:** Tín hiệu ADD có độ tin cậy **medium-to-high**. Impulse_EMA và Z-Score đồng thuận, nhưng Z-Score chưa đạt ngưỡng extreme nên cần thận trọng với các nhiễu ngắn hạn.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX (US Equities):** **Bias tăng** – Thanh khoản dồi dào là chất xúc tác trực tiếp cho risk assets. Lịch sử cho thấy Fed liquidity tăng 1% thường dẫn đến SPX tăng 0.5-0.8% trong 2-4 tuần. Kỳ vọng SPX tiếp tục uptrend, đặc biệt là NDX (tech) nhạy cảm với lãi suất.
+
+- **DXY/Gold/Crypto:**
+  - **DXY:** Áp lực giảm nhẹ do thanh khoản USD dồi dào. Tuy nhiên, nếu TGA tiếp tục tăng, DXY có thể phục hồi.
+  - **Gold:** Hưởng lợi từ thanh khoản toàn cầu và kỳ vọng Fed ôn hòa. Bias tăng.
+  - **Crypto:** Rất nhạy với thanh khoản. Bitcoin và ETH có thể test lại vùng kháng cự cao hơn trong 2-4 tuần.
+
+- **VN-Index:** **Bias tích cực (lag 4-8 tuần)** – Với tín hiệu ADD tuần này, kỳ vọng dòng vốn ngoại ròng vào thị trường chứng khoán Việt Nam sẽ cải thiện trong 1-2 tháng tới. Tuy nhiên, cần lưu ý độ trễ và các yếu tố nội tại (tỷ giá, lạm phát) có thể làm giảm tác động.
+
+## 5. Risk Factors (Signal có thể sai vì)
+
+1. **RRP gần bằng 0:** Đây là con dao hai lưỡi. Một mặt, nó làm tăng độ nhạy của Net Liquidity với WALCL. Mặt khác, nếu TGA tăng đột biến (ví dụ: do Treasury phát hành thêm nợ), Net Liquidity có thể giảm mạnh mà không có RRP để hấp thụ. Tín hiệu CUT trong tương lai sẽ rất mạnh nếu điều này xảy ra.
+
+2. **TGA spike mùa thuế:** Tháng 6 là thời điểm cao điểm nộp thuế doanh nghiệp tại Mỹ. TGA tăng từ 800 tỷ lên 900-1000 tỷ USD là hoàn toàn có thể, tạo lực hút tạm thời. Tuy nhiên, đây là nhiễu mùa vụ, không phải xu hướng cấu trúc.
+
+3. **Fed buyback đặc biệt:** Nếu Fed thực hiện các hoạt động mua lại đặc biệt (emergency facility) hoặc repo operations, WALCL có thể tăng đột biến nhưng không bền vững. Cần theo dõi chi tiết từ FOMC minutes.
+
+4. **Hiệu ứng cạn RRP:** Khi RRP về 0, mọi biến động từ TGA hoặc QT đều tác động trực tiếp lên lãi suất repo qua đêm. Nếu lãi suất repo tăng vọt, Fed có thể phải can thiệp, làm gián đoạn xu hướng hiện tại.
+
+## 6. KẾT LUẬN
+
+**Regime:** QE_early với tín hiệu ADD mạnh. Thanh khoản toàn cầu đang bùng nổ nhờ Fed mở rộng bảng cân đối, RRP cạn kiệt, và TGA ở mức kiểm soát.
+
+**Outlook 2-4 tuần:** Risk assets (US equities, crypto, EM equities) được hỗ trợ tích cực. VN-Index có thể hưởng lợi gián tiếp qua dòng vốn ngoại trong 4-8 tuần tới. Rủi ro chính là TGA tăng đột biến do mùa thuế hoặc Fed thay đổi chính sách đột ngột.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.888,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QE_early",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,51 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.65% (thấp hơn parametric 18 bps, đã phản ánh đuôi nặng hơn normal)
+- **EVT VaR 99%**: -3.69% (mức thua lỗ 1/100 ngày giao dịch)
+- **ξ (GPD shape)**: +0.345 — vượt ngưỡng 0.30, xác nhận trạng thái **fat tail**
+- **Hill index**: +0.447 — cùng dấu dương, magnitude lớn hơn ξ khoảng 0.10, vẫn trong cùng chế độ đuôi cực dày
+
+## 2. Tail Thickness Diagnosis
+
+ξ = 0.345 thuộc bracket **FAT TAIL** (> 0.30). Đây là ngưỡng cảnh báo rủi ro cực đoan, nơi các mô hình Gaussian bắt đầu underestimate thảm họa.
+
+Hill index = 0.447 xác nhận consistent signal (cùng dấu dương, cùng magnitude). Tuy nhiên, Hill cao hơn ξ 0.102 — divergence nhẹ này cho thấy threshold sensitivity: nếu chọn ngưỡng exceedance khác, ξ có thể dao động 0.30–0.45. Confidence **medium**, không thể loại trừ threshold bias.
+
+ES − VaR spread = -1.37%, lớn hơn σ₃₀ (0.83%) khoảng 1.65 lần. Đây là bằng chứng thực nghiệm mạnh: đuôi phân phối dày hơn đáng kể so với kỳ vọng normal. Historical CVaR 95% (-3.02%) gấp ~2 lần VaR thường, mô típ kinh điển của phân phối fat-tailed.
+
+## 3. Gaussian Gap
+
+**Tính Gaussian VaR 99%** (giả định μ ≈ 0, z₀.₀₁ = -2.33):
+- VaR Gaussian 99% ≈ 0 + (-2.33 × 0.83%) = **-1.93%**
+- EVT VaR 99%: **-3.69%**
+- **Gaussian Gap** = 3.69% - 1.93% = **1.76 percentage points** (EVT sâu hơn Gaussian 91%)
+
+Gap vượt xa ngưỡng 1pp (1.76pp). Kết luận: **Gaussian model bị broken hoàn toàn** ở quantile 99%. Sử dụng Parametric VaR 95% cho risk capital allocation sẽ gây underestimation nghiêm trọng. EVT VaR 99% (1.91 lần σ₉₉) là ước lượng đáng tin cậy hơn.
+
+## 4. Verdict — Hedging Implications
+
+ξ > 0.30 → **fat tail regime confirmed**. Hành động bắt buộc:
+
+- **Tránh momentum strategies** hoàn toàn: đuôi cực dày làm cho drawdown nhanh không tưởng khi momentum đảo chiều
+- **Mua puts ITM**: strike gần current price, vì tail risk đã được xác nhận — OTM puts rẻ nhưng có thể không đủ bảo vệ (ξ cao → jump size lớn bất ngờ)
+- **Short futures hedge**: coverage tối thiểu 10–15% NAV (tỷ lệ tương ứng với EVT ES 99% = -6.15%)
+- **Delta hedging**: kiểm tra gamma exposure — fat tail thường đi kèm gamma cực đoan, cần giảm convexity rủi ro
+
+Không khuyến nghị giảm leverage đơn thuần (30–50%), vì với ξ > 0.30 và gap 1.76pp, giảm 30% leverage vẫn không đủ an toàn. Hedging cứng là bắt buộc.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "12/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.76,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "medium"
+}
+```

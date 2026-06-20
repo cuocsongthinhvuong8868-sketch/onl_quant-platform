@@ -1,0 +1,32 @@
+## 1. Observations
+- **VN30 Stress Index**: 0.00% (ngưỡng cảnh báo: 40%)
+- **Số mã thủng VaR 95%**: 0/30 (không có breach)
+- **Complacency Index**: 5.56% (ngưỡng nguy hiểm: 80%)
+- **Số mã mispriced**: 6
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index ở mức 0.00%, không có mã nào trong rổ VN30 vi phạm VaR 95%. Điều này cho thấy không có dấu hiệu lây lan rủi ro real-time giữa các mã vốn hóa lớn. Hệ thống đang ở trạng thái "không có stress cục bộ" trên nhóm bluechip.
+- Top 3 breach sâu nhất: Không có. Do đó không thể xác định sự cố cá biệt hay đầu sóng systemic. Tình hình contagion hiện tại là trung tính – không có xung lực giảm giá đáng kể từ các mã trụ.
+
+## 3. Complacency Assessment (Module C)
+- Complacency Index ở mức 5.56% – rất thấp, cách xa ngưỡng nguy hiểm 80%.
+- Điều này có nghĩa: **Thị trường KHÔNG ở regime ngủ quên. Điều này KHÔNG đồng nghĩa thị trường ổn định.** Chúng ta chỉ có thể kết luận rằng spread không bị nén chặt trên diện rộng – khả năng cao thị trường đang có biến động giá đáng kể (uptrend mạnh hoặc điều chỉnh sâu). Để phân biệt, cần đối chiếu với Stress Index: 0.00% cho thấy nếu có biến động, đó không phải từ lây lan trong VN30.
+- **Không suy diễn** rằng thị trường an toàn hay không có áp lực bán.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B)**: Không có. Không đưa ra khuyến nghị bán/giảm tỷ trọng từ Module này.
+- **Top 3 Mispriced (Module C)**: OCB, VHM, HQC – spread đang bị nén chặt nhất thị trường. Cảnh báo tiềm ẩn: các mã này có thể đang ở trạng thái thanh khoản thấp hoặc bị định giá sai tạm thời. Nhà đầu tư nên thận trọng với lệnh thị trường, đặc biệt nếu có tin bất ngờ. Không khuyến nghị hành động cụ thể vì thiếu dữ liệu xu hướng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VHM", "HQC"],
+  "confidence": "high"
+}
+```

@@ -1,0 +1,28 @@
+## 1. Observations
+- **OLS Slope**: 0.41 (Percentile 86.7th — 🔴 Cao). Mối quan hệ giữa VIN composite và VN30F1M đang ở vùng hiếm, slope dốc hơn 86.7% lịch sử.
+- **Correlation**: 0.72 (Percentile 88.3th — 🔴 Rất chặt). Tương quan gần như tuyệt đối, VIN composite và futures di chuyển cùng nhịp.
+- **Regime**: COUPLING (ΔCorr = +0.68 > +0.15, ΔSlope = +0.67 > +0.15). VIN đang dẫn dắt futures một cách áp đảo.
+
+## 2. Microstructure Read
+Cả hai percentile đều trên 80th (86.7 và 88.3) — đây là tín hiệu bất thường, có khả năng can thiệp từ market maker hoặc dòng tiền lớn đang đẩy VIN composite làm "kèo thơm" cho futures. VIC (210,800 VND) và VHM (157,700 VND) đang là trụ chính, VRE (32,250 VND) đóng vai trò phụ trợ. Không có dấu hiệu "thoát hàng" vì tương quan vẫn rất chặt.
+
+## 3. Event Study Interpretation
+COUPLING ở mức extreme này cho thấy intraday có edge rõ: nếu VIN tăng, futures sẽ tăng theo ngay. Tuy nhiên, với slope quá dốc và percentile cao, rủi ro "quay đầu" cũng lớn — không nên giữ overnight. Regime không phải TÍN HIỆU GIẢ, nên có thể trade.
+
+## 4. Verdict
+**Trade Plan**: **Long F1** — nhịp đầu phiên (nếu VIN giữ vững trên VIC 210.80 và VHM 157.70).  
+**Leading Indicator**: Theo dõi VIC — nếu break dưới 210.80 (210,800 VND) × (1 − 2%) ≈ 206,584 VND (tương đương ~206.58), tín hiệu suy yếu. Cũng watch nhóm Ngân hàng (VCB, BID) để kiểm tra dòng tiền lan tỏa.  
+**Stop-loss reference**: VIC stop-loss tại 206.58 (≈ 206,580 VND, dưới 2% giá hiện tại). Nếu VIC mất mốc này, vào short F1 ngay.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "medium"
+}
+```

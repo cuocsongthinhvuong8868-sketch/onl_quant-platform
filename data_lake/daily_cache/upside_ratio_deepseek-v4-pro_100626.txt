@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu hiện tại (14.82%) cao hơn mu dài hạn (13.56%)** → cầu đang mạnh hơn trung bình lịch sử, tín hiệu mua chủ động.
+- **Lực cung hiện tại (4.00%) thấp hơn mu dài hạn (14.08%)** → cung đang suy yếu rõ rệt, áp lực bán thấp bất thường.
+- **Cả hai chiều đều có Phi > +0.10**: Cầu Phi=0.195 (momentum tăng), Cung Phi=0.191 (momentum giảm) → xác nhận đà duy trì trạng thái hiện tại.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái hiện tại: Zombification (thanh khoản cạn)**. Cả lực cầu (14.82%) và lực cung (4.00%) đều ở mức thấp so với mu trung bình lịch sử (cầu: ↑ nhưng vẫn thấp, cung: ↓ sâu hơn). Điều này cho thấy dòng tiền đang co cụm, không có xung lực mua-bán mạnh mẽ.
+- **Bên giữ momentum thực sự: Cả hai gần như cân bằng** (|Phi_up|=0.195 vs |Phi_dn|=0.191). Tuy nhiên, do cung đang ở mức cực kỳ thấp (4%) so với mu (14%), bên bán đã gần như "biến mất" – nếu cầu duy trì hoặc tăng nhẹ, thị trường dễ bị đẩy lên do thiếu hàng.
+
+## 3. Stress-Test Read
+- **P95 Downside = 26.54%**: Đây là kịch bản panic sell, nếu cầu đột ngột sụp đổ và cung bùng nổ, biên độ giảm có thể rất sâu (gần 27%).
+- **Asymmetry**: P95 Downside (26.54%) > P95 Upside (23.59%) → tail risk bên bán dày hơn. Thị trường thà sốc giảm mạnh còn hơn tăng nóng, phản ánh trạng thái "yếu tiềm ẩn" dù bề mặt đang tĩnh lặng.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 10%** – chỉ dành cho vị thế thăm dò, không full margin.
+- **Strategy: Defensive (phòng thủ) + rình bắt đáy** – không mua đuổi do nguy cơ panic sell còn cao hơn cơ hội tăng. Chờ cầu breakout >20% hoặc cung tăng đột biến để xác nhận xu hướng.
+- **Không NO ACTIONABLE** vì Phi cả hai chiều đều > +0.1, có tín hiệu momentum rõ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "neutral",
+  "p95_downside_pct": 26.54,
+  "p95_upside_pct": 23.59,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

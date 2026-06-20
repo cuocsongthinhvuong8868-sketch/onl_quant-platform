@@ -1,0 +1,31 @@
+## 1. Observations
+- **OLS Slope**: 0.41 (Percentile: 86.7th — 🔴 Rất cao, cho thấy VIN composite đang dẫn dắt VN30F1M rất mạnh, biến động 1% ở VIN kéo ~0.41% ở futures).
+- **Correlation**: 0.72 (Percentile: 88.3th — 🔴 Rất chặt, gần như mọi biến động giá của VIN đều được phản ánh ngay lập tức lên F1).
+- **Current Regime**: COUPLING (ΔCorr = +0.68, ΔSlope = +0.67 — cả hai delta đều vượt ngưỡng +0.15, xác nhận xu hướng gắn kết cực mạnh).
+
+## 2. Microstructure Read
+Cả hai percentile đều trên 80th — đây là cấu hình **cực kỳ bất thường**, không đơn thuần là dẫn dắt tự nhiên. Rất có khả năng có sự can thiệp của tổ chức lớn (Market Maker hoặc nhóm quỹ) đang dùng VIC/VHM/VRE để kéo/nâng đỡ VN30F1M. Với VIC ở 210,800 VND, VHM 147,400 VND và VRE 31,250 VND, bộ ba này đang chi phối tuyệt đối thị trường — không còn chỗ cho Bank/Chứng dẫn dắt riêng lẻ.
+
+## 3. Event Study Interpretation
+COUPLING ở mức extreme (86.7th + 88.3th) là tín hiệu mạnh cho intraday: bất kỳ đợt tăng/giảm nào của VIC hoặc VHM sẽ được futures hấp thụ gần như tức thời. Tuy nhiên, đây cũng là dấu hiệu "quá gắn kết" — nếu VIC đột ngột quay đầu, futures sẽ giảm rất nhanh. Overnight, slope 0.41 tiềm ẩn rủi ro gap nếu tin tức về VIN xuất hiện sau giờ.
+
+## 4. Verdict
+- **Trade plan**: **Long F1** (Signal rõ ràng theo COUPLING, nhưng chỉ intraday).
+- **Leading indicator**: Theo dõi **VIC** (giá hiện tại 210,800 VND) và **VHM** (147,400 VND) — nếu VIC xanh trên tham chiếu, giữ Long F1; nếu VIC đỏ, thoát ngay.
+- **Stop-loss reference**:
+  - Đối với giao dịch Long F1: Dựa vào VIC (đỉnh của hệ). Stop-loss nếu VIC mất 2% → 210,800 × (1 – 0.02) = **206,584 VND** (~206.60).
+  - Không cần stop bằng điểm số F1, vì chúng ta đã biết VIC dẫn dắt hoàn toàn.
+- **Thời hạn**: Chỉ giữ intraday — không qua đêm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```

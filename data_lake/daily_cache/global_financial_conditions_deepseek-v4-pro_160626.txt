@@ -1,0 +1,146 @@
+# BÁO CÁO GLOBAL FINANCIAL CONDITIONS
+**Ngày:** 2026-06-15
+**Regime:** ELEVATED | **Driver:** CCC_CREDIT_DRIVEN
+
+---
+
+## 1. Cross-Asset Snapshot
+
+### Phân tích học thuật (Academic)
+
+Bức tranh tài chính toàn cầu ngày 15/06/2026 cho thấy sự phân hóa cực kỳ rõ nét giữa các nhóm tài sản:
+
+**Nhóm Volatility (ELEVATED → LOW):**
+- **OVX (61% percentile):** 47.75 bps — gần chạm ngưỡng 50 (oil shock threshold). Oil ETF vol đang ở mức cao, phản ánh căng thẳng năng lượng / địa chính trị (Trung Đông, OPEC+).
+- **VIX (61% percentile):** 17.68 — dưới ngưỡng 30 (elevated), nhưng percentile 61% cho thấy equity vol đang ở phân vị cao hơn trung bình 1 năm.
+- **SKEW (44% percentile):** 144.3 — dưới ngưỡng 145 (tail fear), nhưng không thấp. Thị trường chưa hedge black-swan mạnh.
+- **MOVE (31% percentile):** 69.4 bps — rất thấp, cho thấy rates vol đang bình lặng. Fed path không gây bất ngờ.
+- **VVIX (6% percentile):** 87.6 — gần đáy 1 năm. Derivatives market đang rất tự tin, không có early warning từ vol-of-vol.
+
+**Nhóm Credit (PHÂN HÓA CỰC ĐỘ):**
+- **CCC OAS (87% percentile):** 9.48% — gần ngưỡng 10% (deep distress). Deep junk đang bị định giá rủi ro vỡ nợ rất cao.
+- **HY OAS (5% percentile):** 2.71% — cực kỳ thấp. Broad high yield đang "dễ chịu".
+- **IG OAS (7% percentile):** 0.74% — rất thấp. Investment grade không hề stress.
+- **EM OAS (3% percentile):** 1.43% — gần đáy. EM credit spread đang rất tight.
+
+**Nhóm Macro Overlay:**
+- **DXY (89% percentile):** 99.66 — USD mạnh gần đỉnh 1 năm, nhưng chưa tới 110 (extreme).
+- **2s10s (2% percentile):** +0.40% — gần đáy 1 năm. Đường cong đã thoát khỏi đảo ngược (inverted) nhưng đang ở mức rất thấp, báo hiệu suy thoái đang diễn ra hoặc sắp tới.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Hãy tưởng tượng thị trường tài chính như một tòa nhà. Hôm nay, tầng hầm (nợ rác - junk bonds) đang bốc mùi khét lẹt (CCC OAS cao), nhưng các tầng trên (cổ phiếu, trái phiếu tốt) vẫn sạch sẽ và yên tĩnh (VIX thấp, IG OAS thấp). Đồng thời, giá dầu đang nhảy múa điên cuồng (OVX cao) và đồng đô-la Mỹ đang mạnh lên (DXY cao). Đây là một cấu trúc rất kỳ lạ: "tầng hầm cháy âm ỉ" trong khi "tầng trên vẫn tổ chức tiệc".
+
+---
+
+## 2. PCA Composite Interpretation
+
+### Phân tích học thuật (Academic)
+
+- **PC1 (stress factor, EMA(5) smoothed):** +0.21σ — percentile 59%. Rơi vào **ELEVATED** regime (≥ 80% là STRESS). Stress tổng thể đang ở mức cao hơn trung bình nhưng chưa phải khủng hoảng.
+- **Driver: CCC_CREDIT_DRIVEN** — phù hợp với snapshot: CCC OAS là chỉ báo duy nhất trong 6-core (VIX/MOVE/SKEW/HY/CCC/IG) vượt ngưỡng 80% percentile. Stress tập trung hoàn toàn vào deep junk.
+- **PC2 (divergence factor):** +0.88σ — rất cao. Cho thấy sự phân kỳ cực mạnh giữa vol-driven stress (thấp) và credit-driven stress (cao). Cụ thể: VIX, MOVE, SKEW đều ở mức thấp (vol bình thường) trong khi CCC OAS bùng nổ (credit stress). Đây là cấu trúc "bất thường" — thị trường đang bỏ qua tín hiệu từ deep junk.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+"Kẻ đầu sỏ" gây ra sự bất ổn hôm nay không phải là nỗi sợ hãi chung của thị trường chứng khoán (VIX thấp), cũng không phải là lo lắng về lãi suất (MOVE thấp). Thủ phạm chính là **nỗi lo vỡ nợ của các doanh nghiệp yếu kém nhất** (CCC OAS cao). Giống như một tòa nhà chỉ có một phòng bốc cháy dữ dội, nhưng hệ thống báo cháy trung tâm lại chưa kích hoạt. Sự "lơ là" này (PC2 cao) là dấu hiệu nguy hiểm.
+
+---
+
+## 3. Credit Cycle Read
+
+### Phân tích học thuật (Academic)
+
+- **Credit Quality Spread (CQS = CCC − HY):** 6.77% — **percentile 99%**. Đây là tín hiệu cực kỳ nghiêm trọng. Sự chênh lệch giữa deep junk (CCC) và broad junk (HY) đang ở mức cao nhất trong 1 năm.
+- **So sánh chi tiết:**
+    - CCC OAS (87% percentile) >> HY OAS (5% percentile) >> IG OAS (7% percentile).
+    - **Kết luận:** Credit deterioration **hoàn toàn confined ở junk tier**, đặc biệt là deep junk. Broad credit repricing (HY + IG cùng cao) chưa xảy ra. Đây là cấu trúc **late-cycle điển hình**: rủi ro tập trung ở tầng dưới cùng của thị trường tín dụng, trong khi phần còn lại vẫn "bình thường".
+- **EM OAS (3% percentile):** 1.43% — cực kỳ thấp. Dòng vốn vào EM (trái phiếu) vẫn đang rất mạnh, chưa có dấu hiệu stress contagion từ US junk sang EM credit. Tuy nhiên, đây có thể là "sự yên bình trước cơn bão".
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Hãy nghĩ về thị trường trái phiếu như một chiếc thang: bậc trên cùng là trái phiếu chính phủ an toàn nhất, bậc dưới cùng là "rác" (junk bonds). Hôm nay, chỉ có bậc thấp nhất (CCC - rác sâu) đang kêu cót két báo hiệu sắp gãy. Các bậc cao hơn (HY - rác thường, IG - trái phiếu tốt) vẫn chắc chắn. Khoảng cách giữa bậc rác sâu và rác thường (CQS) đang giãn ra cực đại, báo hiệu rằng **các công ty yếu nhất đang hấp hối**, nhưng chưa lan sang toàn bộ nền kinh tế.
+
+---
+
+## 4. Volatility Breadth
+
+### Phân tích học thuật (Academic)
+
+- **Consensus (VIX/MOVE/SKEW):** Cả ba đều dưới 50% percentile (ngoại trừ VIX 61%). Không có sự đồng thuận về stress từ nhóm vol. Thị trường đang "bình thường hóa" rủi ro từ góc nhìn biến động.
+- **OVX (61% percentile):** 47.75 bps — cảnh báo oil shock. OVX cao không được capture trong PC1 (vì PC1 chỉ dùng 6-core: VIX/MOVE/SKEW/HY/CCC/IG). Đây là tín hiệu riêng: **năng lượng đang là điểm nóng**.
+- **VVIX (6% percentile):** 87.6 — gần đáy. Derivatives market không hề lo lắng về một VIX spike sắp tới. Điều này trái ngược hoàn toàn với tín hiệu từ CCC OAS.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Nỗi sợ của thị trường hôm nay rất "kỳ quặc". Những thước đo nỗi sợ thông thường (VIX cho cổ phiếu, MOVE cho trái phiếu) đều đang ngủ yên. Tuy nhiên, có hai tín hiệu riêng lẻ đang báo động: **giá dầu biến động mạnh** (OVX) và **nỗi lo vỡ nợ âm thầm** (CCC OAS). Giới đầu tư chuyên nghiệp (phái sinh) lại tỏ ra rất bình thản (VVIX thấp). Sự mâu thuẫn này cho thấy thị trường đang "phớt lờ" một rủi ro lớn đang âm ỉ.
+
+---
+
+## 5. Macro Overlay
+
+### Phân tích học thuật (Academic)
+
+- **2s10s (+0.40%, percentile 2%):** Đường cong đã thoát khỏi đảo ngược (inverted) và đang ở giai đoạn **re-steepening từ đáy**. Đây là tín hiệu kinh điển cho thấy **suy thoái đang diễn ra hoặc sắp xảy ra** (theo lý thuyết đường cong lợi suất). Percentile 2% cho thấy mức độ "bất thường" của đường cong đang ở mức cực đoan.
+- **DXY (99.66, percentile 89%):** USD đang ở mức rất mạnh so với 1 năm trước. Mặc dù chưa tới 110 (extreme), nhưng percentile 89% cho thấy áp lực USD đang gia tăng. **Cơ chế truyền dẫn:** DXY cao → VND áp lực → NHNN can thiệp → thanh khoản VND giảm → lãi suất trong nước tăng → VN-Index chịu áp lực.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Hai "cơn gió ngược" lớn nhất đang thổi vào nền kinh tế toàn cầu: **Mỹ đang tiến gần đến suy thoái** (đường cong lợi suất báo hiệu) và **đồng đô-la Mỹ đang mạnh lên** (DXY cao). Đối với Việt Nam, USD mạnh đồng nghĩa với việc hàng hóa xuất khẩu đắt đỏ hơn, dòng vốn FDI có thể chậm lại, và Ngân hàng Nhà nước sẽ phải thắt chặt chính sách để bảo vệ tỷ giá, gây áp lực lên thị trường chứng khoán.
+
+---
+
+## 6. Momentum
+
+### Phân tích học thuật (Academic)
+
+- **PC1 raw hôm nay:** -0.12σ (giảm so với smoothed +0.21σ).
+- **PC1 5-day change (raw):** -0.52σ — **giảm mạnh trong 5 ngày**.
+- **Kết luận:** Stress đang **decelerate** (giảm tốc). Mặc dù regime vẫn là ELEVATED, nhưng momentum đang cho thấy áp lực tài chính đang hạ nhiệt nhanh chóng. Sự lệch pha giữa smoothed (+0.21σ) và raw (-0.12σ) cho thấy stress đã đạt đỉnh gần đây và đang quay đầu.
+- **Cảnh báo:** Raw giảm mạnh + smoothed chưa kịp adapt = có thể là tín hiệu sớm của một regime shift từ ELEVATED xuống CALM, nhưng cần thêm dữ liệu để xác nhận.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Tin tốt là cơn bão tài chính đang **dịu đi** trong 5 ngày qua. Áp lực từ nợ rác (CCC) đã giảm bớt phần nào. Tuy nhiên, giống như cơn bão vừa đi qua, bầu trời vẫn còn u ám (regime ELEVATED). Chúng ta cần theo dõi thêm vài ngày nữa để biết liệu đây là tạm lắng hay là sự kết thúc thực sự của căng thẳng.
+
+---
+
+## 7. Spillover to VN-Index (4-8 tuần)
+
+### Phân tích học thuật (Academic)
+
+Dựa trên cấu trúc **ELEGATED + CCC_CREDIT_DRIVEN** và **Macro Overlay**, tác động lan tỏa đến VN-Index trong 4-8 tuần tới là **NEGATIVE**, với các cơ chế sau:
+
+1.  **CCC OAS cao (87% percentile) → Carry Trade Unwind → EM Stress Contagion:** Khi deep junk bị định giá lại rủi ro vỡ nợ, các quỹ đầu tư sử dụng chiến lược carry (vay USD lãi suất thấp, đầu tư vào EM lãi suất cao) sẽ phải unwinding. Dòng tiền rút khỏi EM, bao gồm Việt Nam, gây áp lực lên VN-Index.
+2.  **OVX cao (61% percentile) → Oil Shock → CPI VN ↑ → SBV Tightening:** Việt Nam là nước nhập khẩu dòng. OVX cao báo hiệu giá dầu biến động mạnh, có thể dẫn đến giá xăng dầu trong nước tăng, đẩy CPI lên. SBV sẽ phải thắt chặt chính sách tiền tệ (tăng lãi suất) để kiểm soát lạm phát, gây áp lực lên thị trường chứng khoán.
+3.  **DXY cao (89% percentile) → VND Pressure → FDI Outflow:** USD mạnh gây áp lực lên VND. NHNN có thể phải bán ngoại tệ hoặc tăng lãi suất để bảo vệ tỷ giá, làm giảm thanh khoản hệ thống và ảnh hưởng tiêu cực đến dòng vốn FDI.
+4.  **2s10s thấp (2% percentile) → Recession Risk US → Demand Shock EM Exports:** Suy thoái kinh tế Mỹ sẽ làm giảm nhu cầu nhập khẩu, ảnh hưởng đến xuất khẩu của Việt Nam (dệt may, điện tử, đồ gỗ), tác động tiêu cực đến tăng trưởng GDP và lợi nhuận doanh nghiệp.
+
+**💡 Diễn giải bình dân (Layman's terms):**
+
+Hãy tưởng tượng VN-Index như một chiếc thuyền nhỏ đang lênh đênh trên biển lớn. Ba "cơn sóng dữ" đang ập tới:
+- **Sóng thần từ nợ rác Mỹ:** Các quỹ đầu tư nước ngoài đang rút tiền về để bù lỗ cho các khoản nợ xấu, khiến dòng tiền vào chứng khoán Việt Nam giảm.
+- **Sóng dầu:** Giá dầu tăng làm xăng dầu trong nước đắt đỏ, gây lạm phát, buộc Ngân hàng Nhà nước phải tăng lãi suất, khiến cổ phiếu trở nên kém hấp dẫn.
+- **Sóng USD:** Đô-la Mỹ mạnh lên làm đồng Việt Nam yếu đi, gây áp lực lên tỷ giá và dòng vốn đầu tư nước ngoài.
+
+Cả ba "gọng kìm" này sẽ tạo thành một lực cản (headwind) rất lớn cho VN-Index trong 1-2 tháng tới.
+
+---
+
+## 8. KẾT LUẬN
+
+**Regime vĩ mô hiện tại là ELEVATED, dẫn dắt bởi rủi ro tín dụng deep junk (CCC_CREDIT_DRIVEN), với các lớp overlay là oil shock (OVX) và USD strength (DXY).** Mặc dù momentum stress đang giảm (PC1 5-day change âm), nhưng cấu trúc phân hóa cực đoan (CQS percentile 99%) và các tín hiệu macro (2s10s thấp, DXY cao) cho thấy rủi ro suy thoái và áp lực dòng vốn vẫn còn rất lớn. **Dự báo dòng tiền vào risk assets (bao gồm VN-Index) sẽ tiếp tục chịu áp lực trong 2-4 tuần tới, với xu hướng giảm điểm là chủ đạo.**
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 59,
+  "regime": "ELEVATED",
+  "driver": "CCC_CREDIT_DRIVEN",
+  "credit_cycle_signal": "deteriorating",
+  "vol_breadth": "divergent",
+  "macro_overlay": "recession_risk_usd_strength",
+  "spillover_vnindex": "negative",
+  "confidence": "high"
+}
+```

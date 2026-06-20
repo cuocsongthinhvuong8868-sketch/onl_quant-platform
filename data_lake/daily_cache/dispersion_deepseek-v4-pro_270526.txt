@@ -1,0 +1,30 @@
+## 1. Observations
+- Spread_Z ở mức -0.05σ, hoàn toàn trung tính — không có sự kéo căng bất thường nào so với đường trung bình 60 phiên.
+- DPI đạt 43.3%, thấp hơn ngưỡng 70% đáng kể — dispersion không duy trì thành regime mà chỉ mang tính chất tức thời.
+- Average Pairwise Correlation (Ledoit-Wolf) chỉ 0.012 — gần như bằng 0, phản ánh sự phân hóa cực mạnh giữa các cổ phiếu.
+- Cross-Sectional Skewness và Kurtosis không có dữ liệu, hạn chế khả năng đánh giá tính đối xứng và mức độ fat-tail của phân phối.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **hoàn toàn bình thường**, không hề bị stress. DPI thấp (43.3%) kết hợp với Spread_Z gần 0 cho thấy không có regime dispersion nào đang diễn ra. Mức độ phân tán hiện tại là sản phẩm của biến động ngẫu nhiên thông thường, không phải một sự kiện cấu trúc. Không có stress cục bộ nào đáng kể vì Spread_Z âm nhẹ, và cũng không có regime stress kéo dài vì DPI dưới ngưỡng 70%.
+
+## 3. Cross-Check & Tail Direction
+Do không có dữ liệu Skewness và Kurtosis, không thể xác định chính xác hướng của đuôi phân phối hay mức độ xuất hiện các outlier. Tuy nhiên, với Spread dương (9.37%) nhưng Spread_Z trung tính, có thể suy luận rằng mức độ phân tán hiện tại đã được thị trường "digest" trong 60 phiên vừa qua — nghĩa là không có sự bất ngờ nào từ phía tail. Không có dấu hiệu nào của sập đuôi hay cú đẩy bất thường.
+
+## 4. Regime Mapping
+Theo 2D Regime Map, với DPI thấp (43.3%) và Correlation gần 0 (0.012), thị trường đang nằm trong ô **Healthy Stock-Picking** — môi trường phân hóa lành mạnh. Đây là chế độ lý tưởng cho các chiến lược chọn cổ phiếu riêng lẻ dựa trên cơ bản. 
+
+**Risk lớn nhất cho Portfolio Manager:** **Concentration risk**. Khi correlation chạm đáy, alpha được tạo ra từ việc chọn đúng cổ phiếu thắng và né cổ phiếu thua. Nhưng nếu nhà quản lý tập trung quá mức vào một hoặc một nhóm cổ phiếu, rủi ro phân hóa (idiosyncratic risk) sẽ trở nên chi phối. Ngược lại, đây không phải là lúc lo sợ về liquidity dry-up hay herding crash vì cả hai nguy cơ đó chỉ xuất hiện khi correlation cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "27/05/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.05,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.012,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```

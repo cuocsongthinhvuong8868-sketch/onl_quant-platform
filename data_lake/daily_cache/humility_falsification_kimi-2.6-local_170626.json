@@ -1,0 +1,264 @@
+{
+  "provider_key": "kimi-2.6-local",
+  "generated_at": "2026-06-17T21:45:23",
+  "t_data_date": "2026-06-17",
+  "target_report_date": "2026-06-16",
+  "report_match": "fallback:2026-06-15",
+  "report_path": "C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\executive_summary_kimi-2.6-local_150626.txt",
+  "report_mtime": "report:2026-06-15T14:58:10|sidecar:2026-06-15T14:58:10",
+  "parsed": {
+    "report_date": "2026-06-15",
+    "composite_score": 15.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 14.0,
+        "unit": "sessions",
+        "description": "If VNIBOR 20D STRESS/WARNING sessions drop below 5 with ON MA5 20D change turning negative, liquidity squeeze is truly easing"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 29.2,
+        "unit": "%",
+        "description": "If Breadth MA20 exceeds 45% and sustains for 5+ sessions, market breadth recovery is confirmed not just a technical bounce"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 65.9,
+        "unit": "%",
+        "description": "If SSI drops below 55% and market state exits EUPHORIC_RISK, accumulated stress is releasing"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "Tail Index (xi)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.345,
+        "unit": "",
+        "description": "If EVT xi falls below 0.25 with Hill estimator confirming, fat tail regime ends and tail risk becomes manageable"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 26.7,
+        "unit": "th pct",
+        "description": "If Vingroup Slope Percentile stays below 70th AND Correlation Percentile drops below 70th, VIN no longer anchors F1"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 100.0,
+        "unit": "th pct",
+        "description": "If CQS Percentile falls below 80th and HY OAS percentile rises above 50th, contagion risk decreases and credit stress is no longer extreme"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-06-15",
+      "composite_score": 15,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 14,
+          "unit": "sessions",
+          "description": "If VNIBOR 20D STRESS/WARNING sessions drop below 5 with ON MA5 20D change turning negative, liquidity squeeze is truly easing"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 29.2,
+          "unit": "%",
+          "description": "If Breadth MA20 exceeds 45% and sustains for 5+ sessions, market breadth recovery is confirmed not just a technical bounce"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 65.9,
+          "unit": "%",
+          "description": "If SSI drops below 55% and market state exits EUPHORIC_RISK, accumulated stress is releasing"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "Tail Index (xi)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.345,
+          "unit": "",
+          "description": "If EVT xi falls below 0.25 with Hill estimator confirming, fat tail regime ends and tail risk becomes manageable"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 26.7,
+          "unit": "th pct",
+          "description": "If Vingroup Slope Percentile stays below 70th AND Correlation Percentile drops below 70th, VIN no longer anchors F1"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 100,
+          "unit": "th pct",
+          "description": "If CQS Percentile falls below 80th and HY OAS percentile rises above 50th, contagion risk decreases and credit stress is no longer extreme"
+        }
+      ],
+      "provider_key": "kimi-2.6-local",
+      "saved_at": "2026-06-15",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "14.0 sessions",
+      "T actual": 13.0,
+      "T actual display": "13.0 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "Intact",
+      "Data date": "2026-06-15",
+      "Description": "If VNIBOR 20D STRESS/WARNING sessions drop below 5 with ON MA5 20D change turning negative, liquidity squeeze is truly easing",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "29.2%",
+      "T actual": 50.35294117647059,
+      "T actual display": "50.4%",
+      "Delta": 21.152941176470588,
+      "Delta display": "+21.2%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-17",
+      "Description": "If Breadth MA20 exceeds 45% and sustains for 5+ sessions, market breadth recovery is confirmed not just a technical bounce",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "65.9%",
+      "T actual": 66.0234464176022,
+      "T actual display": "66.0%",
+      "Delta": 0.12344641760219588,
+      "Delta display": "+0.123%",
+      "Status": "Intact",
+      "Data date": "2026-06-17",
+      "Description": "If SSI drops below 55% and market state exits EUPHORIC_RISK, accumulated stress is releasing",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "Tail Index (xi)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.345",
+      "T actual": 0.3454435282173134,
+      "T actual display": "0.345",
+      "Delta": 0.00044352821731341585,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-06-17",
+      "Description": "If EVT xi falls below 0.25 with Hill estimator confirming, fat tail regime ends and tail risk becomes manageable",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "26.7 th pct",
+      "T actual": 11.666666666666668,
+      "T actual display": "11.7 th pct",
+      "Delta": -15.033333333333331,
+      "Delta display": "-15.0 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-17",
+      "Description": "If Vingroup Slope Percentile stays below 70th AND Correlation Percentile drops below 70th, VIN no longer anchors F1",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "100.0 th pct",
+      "T actual": 93.45238095238096,
+      "T actual display": "93.5 th pct",
+      "Delta": -6.547619047619037,
+      "Delta display": "-6.548 th pct",
+      "Status": "Intact",
+      "Data date": "2026-06-16",
+      "Description": "If CQS Percentile falls below 80th and HY OAS percentile rises above 50th, contagion risk decreases and credit stress is no longer extreme",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 13,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "breadth": {
+      "value": 50.35294117647059,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "ssi": {
+      "value": 66.0234464176022,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "coupling": {
+      "value": 11.666666666666668,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "gfc": {
+      "value": 93.45238095238096,
+      "date": "2026-06-16",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 6,
+  "total": 6
+}

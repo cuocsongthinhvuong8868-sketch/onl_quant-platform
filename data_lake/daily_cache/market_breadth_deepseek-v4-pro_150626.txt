@@ -1,0 +1,45 @@
+## 1. Observations
+
+- **MA20 (38.4%)**: Ở mức thấp trung bình – momentum ngắn hạn yếu, không thuộc vùng oversold/gần đáy
+- **MA60 (32.2%)**: Mức thấp – cho thấy hầu hết cổ phiếu vẫn trong vùng điều chỉnh trung hạn
+- **MA125 (27.1%)**: Mức thấp – chu kỳ bán niên duy trì yếu kém
+- **MA252 (29.2%)**: Mức thấp – xác nhận thị trường vận hành dưới xu hướng dài hạn
+
+## 2. Structural Health
+
+Bốn đường MA dần dốc xuống khi kỳ hạn kéo dài (38.4% → 32.2% → 27.1% → 29.2%), tạo cấu trúc dốc âm điển hình. **Divergence** không rõ ràng vì cả ngắn và dài hạn đều yếu.
+
+Tuy nhiên, MA20 (38.4%) thấp hơn MA252 (29.2%) không đủ để phân loại Bear Trap hoặc Bull Trap. Phù hợp nhất với pattern **Bear Confirmed**: MA20 ~38% (< 30% tiêu chuẩn nhưng sát ngưỡng), MA252 ~29% (< 40%). Đây là môi trường suy yếu cơ cấu.
+
+## 3. Money Flow Leadership
+
+**Top giữ MA20 (ngắn hạn)**: AAA (Thép), ACV (Cảng), AGR (Nông nghiệp), ABS, ADS, AFX (Dịch vụ Dầu khí?) – thiên về **Manufacturing/Logistics/Dầu khí nhỏ**, không thấy Bank/Broker/Real Estate.
+
+**Top giữ MA252 (dài hạn)**: ABB, ADS, AFX, AMS, APF, ASP, BCA, BFC, BIC, BID – xuất hiện **Banks (BID, BIC)** và **Financials**, kết hợp với một vài cổ phiếu overlap (ABB, ADS, AFX).
+
+Overlap giữa ngắn và dài hạn = 3 mã (ABB, ADS, AFX) – rất thấp. Smart money dài hạn đang đứng trong Banks/Financials (defensive), trong khi dòng tiền ngắn hạn chạy vào Manufacturing/Energy/cổ phiếu nhỏ (aggressive nhưng phân tán).
+
+## 4. Verdict
+
+Cấu trúc **Bear Confirmed** + dòng tiền không đồng thuận giữa ngắn và dài hạn. Mặc dù không phải divergence rõ (vì MA20 và MA252 cùng yếu), MA20 vừa chạm ~38% cho thấy một nhịp hồi có thể xuất hiện, nhưng đây là cơ hội **Mean-reversion T+** chứ không phải trend-follow.
+
+- **Strategy**: Mean-reversion T+ với quy mô nhỏ, kết hợp defensive cash-up
+- **Đòn bẩy**: **0% margin** (MA252 < 40%, không thỏa điều kiện margin)
+- **Không có WAIT FOR CONFIRMATION** vì không có divergence rõ giữa MA20 và MA252; thay vào đó là **DEFENSIVE CAUTIOUS**
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 38.4,
+  "ma60_pct": 32.2,
+  "ma125_pct": 27.1,
+  "ma252_pct": 29.2,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "mean_revert",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,29 @@
+## 1. Observations
+- Risk Score đạt 53.4, chạm vào ngưỡng dưới của NEUTRAL zone (40-60) và đã tăng +2.5 so với phiên trước.
+- EGARCH Vol chuẩn hóa là 17.1% (cao hơn ngưỡng 15%) và tăng mạnh +7.1% so với phiên trước, ghi nhận mức tăng tốc đáng kể.
+- Rolling Skewness dương (0.11), nằm trong vùng [-0.2, 0.2] cho thấy phân phối lợi nhuận đối xứng tương đối.
+- Downside Correlation (11.9%) thấp hơn nhiều so với Upside Correlation (25.4%), tạo ra chênh lệch ~13.5 điểm phần trăm.
+
+## 2. Interpretation
+Dữ liệu hiện tại phản ánh một thị trường đang trong pha phân hóa mạnh (NEUTRAL/STOCK PICKING) với sự xuất hiện của tín hiệu cảnh báo từ sự gia tăng đột biến của biến động kỳ vọng. Mặc dù tâm lý chưa ngả hẳn sang sợ hãi, cấu trúc rủi ro đang thay đổi nhanh chóng.
+
+## 3. Cross-Check
+- **Score (53.4) vs EGARCH-vol (17.1%):** Divergence rõ rệt. Score tăng nhẹ (tín hiệu tích cực hơn) nhưng EGARCH-vol tăng mạnh (tín hiệu rủi ro cao hơn) → **FLAG**. Đây là divergence quan trọng, báo hiệu tâm lý chưa kịp phản ánh sự gia tăng rủi ro hệ thống.
+- **Skewness (0.11) vs Upside/Downside Corr:** Skewness dương nhẹ gợi ý thiên lệch tích cực, nhưng Upside Corr gấp đôi Downside Corr cho thấy một chiều hướng phân hóa bất thường: khi thị trường tăng, các cổ phiếu kéo nhau đi lên nhiều hơn là khi thị trường giảm. Điều này consistent với môi trường STOCK PICKING hơn là risk-on/rộng rãi.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.3**
+Trên dữ liệu hiện tại với divergence giữa Score và Vol, xác suất cao nhất là thị trường đang hình thành một pha tích lũy có biến động cao. Hành động phòng thủ: giảm beta xuống 0.3, ưu tiên các cổ phiếu phòng thủ/defensive có Upside Corr thấp. Chưa đủ cơ sở để tấn công mạnh do EGARCH-vol đang tăng tốc.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "16/06/2026",
+  "regime": "NEUTRAL",
+  "score": 53.4,
+  "confidence": "medium",
+  "beta_target": 0.3,
+  "key_signals": ["Score tăng nhẹ trong zone NEUTRAL", "EGARCH-vol tăng tốc +7.1% vượt ngưỡng 15%", "Divergence giữa Score và Vol", "Upside Corr gấp đôi Downside Corr"]
+}
+```

@@ -1,0 +1,38 @@
+## 1. Observations
+- **SSI**: 64.4% – nằm trong vùng WARNING (50–80%)
+- **Market State**: HEALTHY (HMM + trend filter cho thấy uptrend)
+- **Top 3 Pillar Weights**: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- **PCA Concentration**: EVR PC1 = 38.4% – mức tương quan hệ thống trung bình-thấp
+
+## 2. Risk Decomposition
+**Pillar dẫn dắt**: S_LIQ (36%) – **Volume Dry-Up** cao, nghĩa là volume giao dịch tổng thể đang khô cạn so với chuẩn 1 năm. Đây là tín hiệu thiếu dòng tiền xác nhận cho đà tăng.
+
+S_VAL (32%) phản ánh valuation tension: VN30 đã tăng đáng kể so với lãi suất tiền gửi, margin an toàn thu hẹp.
+
+S_COR (17%) ở mức trung bình (EVR PC1 ~38%) cho thấy chưa có herding mạnh, nhưng khi volume dry-up + valuation căng kết hợp → cấu trúc bull-trap tiềm năng: giá vẫn đi lên nhưng thiếu volume xác nhận, dễ đảo chiều nếu có catalyst tiêu cực.
+
+## 3. Cross-Check
+**Divergence giá – SSI**: Có sự phân kỳ đáng chú ý. VN30 đóng cửa ở mức cao, nằm trên MA125, nhưng SSI đã ở WARNING (64.4%). Đây là risk divergence cổ điển: giá tạo đỉnh mới trong khi stress ngầm leo thang.
+
+**HMM vs SSI**: HMM ghi nhận HEALTHY (dựa trên trend filter), trong khi SSI đã trên threshold WARNING. Sự lệch pha này cần được coi là cảnh báo sớm: hệ thống HMM chưa kịp phản ánh stress tích lũy. KHÔNG được bỏ qua do confirmation bias từ price action.
+
+## 4. Verdict
+**Cash weight đề xuất**: 40% – giảm từ mức full-invest do SSI đã chạm WARNING và top driver là volume dry-up.
+
+**Hedge action**: **Short VN30F1M** – mở vị thế hedge 20-30% danh mục tương ứng với tỷ lệ cash giảm. Volume dry-up + valuation căng khiến rủi ro điều chỉnh tăng, trong khi HMM chưa phản ánh kịp.
+
+**Lưu ý**: Pillar drivers không mâu thuẫn – cả S_LIQ, S_VAL, S_COR đều chỉ về một kịch bản giảm dần động lực tăng. Tín hiệu có thể hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.4,
+  "regime": "WARNING",
+  "market_state": "HEALTHY",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

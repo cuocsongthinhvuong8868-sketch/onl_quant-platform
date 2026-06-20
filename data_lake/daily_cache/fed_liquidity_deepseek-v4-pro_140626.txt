@@ -1,0 +1,52 @@
+# Phân Tích Fed Liquidity – Tuần 10/06/2026
+
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần này đạt **5,896,888 triệu USD**, tăng **+63,168 triệu USD** so với tuần trước. Phân tích cấu phần:
+
+- **WALCL (Fed Balance Sheet):** 6,725,397 triệu USD – tăng nhẹ, phản ánh Fed vẫn đang trong quá trình mua tài sản (QE) hoặc tái đầu tư trái phiếu đáo hạn.
+- **WTREGEN (TGA):** 828,122 triệu USD – tăng mạnh so với tuần trước, cho thấy Treasury đang tích lũy tiền gửi (hút thanh khoản khỏi hệ thống). Đây là yếu tố kìm hãm đà tăng của Net Liquidity.
+- **RRPONTSYD (Reverse Repo):** 387 triệu USD – gần như cạn kiệt, không còn là công cụ hút thanh khoản đáng kể.
+
+**Kết luận:** Động lực chính cho đà tăng Net Liquidity tuần này là **WALCL tăng** (QE), trong khi TGA tăng phần nào triệt tiêu tác động. RRP đã gần về 0, không còn dư địa để hút thêm.
+
+## 2. Cycle Positioning
+
+- **Pha hiện tại:** QE muộn (QE late). Fed vẫn đang mở rộng bảng cân đối kế toán, nhưng tốc độ đã chậm lại so với giai đoạn 2020-2021.
+- **RRP:** Đã gần cạn (< 100 tỷ USD), không còn là bộ đệm hút thanh khoản. Điều này làm tăng độ nhạy của thị trường với các biến động TGA.
+- **TGA:** Đang tăng do mùa thuế (June), nhưng đây là hiện tượng mang tính chu kỳ. Khi Treasury chi tiêu, TGA sẽ giảm trở lại, bơm thanh khoản vào hệ thống.
+- **So sánh lịch sử:** Net Liquidity hiện tại (~5,897 tỷ USD) cao hơn đáy 2024 (~5,400 tỷ USD) nhưng thấp hơn đỉnh 2022 (~6,200 tỷ USD). Vẫn còn dư địa tăng nếu Fed tiếp tục QE.
+
+## 3. Signal Strength
+
+- **Tín hiệu:** **ADD** – Impulse_EMA(4) = +17,320 triệu USD > 0 và Z-Score = +1.11 ≥ +1σ.
+- **Độ mạnh Z-Score:** Cận biên (1.0-1.5σ). Chưa phải extreme (> 2σ), cho thấy đà tăng thanh khoản đang mạnh nhưng chưa quá nóng.
+- **Impulse_EMA:** Khớp với tín hiệu ADD. Impulse tuần này (+63,168 triệu USD) vượt xa EMA(4), xác nhận xu hướng tăng ngắn hạn.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX:** Bias tích cực. Thanh khoản dồi dào hỗ trợ định giá cao, đặc biệt là các cổ phiếu công nghệ vốn nhạy cảm với lãi suất và dòng tiền rẻ.
+- **DXY/Gold/Crypto:** DXY có thể chịu áp lực giảm nhẹ do thanh khoản USD dồi dào. Gold và Crypto hưởng lợi từ môi trường lỏng lẻo, dòng tiền tìm kiếm tài sản thay thế.
+- **VN-Index (lag 4-8 tuần):** Bias **positive**. Lịch sử cho thấy correlation +0.25-0.35 với Fed liquidity 1 tháng trước. Thanh khoản toàn cầu tăng → dòng vốn ngoại ròng vào EM, hỗ trợ VN-Index trong 1-2 tháng tới.
+
+## 5. Risk Factors (Signal Có Thể Sai Vì)
+
+- **RRP gần zero:** Khi RRP đã cạn, tín hiệu CUT (nếu xảy ra) sẽ yếu hơn vì không còn công cụ hút thanh khoản. Tuy nhiên, điều này cũng làm tăng độ nhạy của thị trường với các cú sốc TGA.
+- **TGA spike do mùa thuế:** TGA tăng mạnh vào tháng 6 là hiện tượng thường niên, không phải tín hiệu thắt chặt chủ ý. Khi Treasury chi tiêu, TGA sẽ giảm, bơm lại thanh khoản.
+- **Fed buyback đặc biệt:** Nếu Fed triển khai các chương trình mua lại đặc biệt (emergency facility), WALCL có thể tăng đột biến, làm méo tín hiệu.
+
+## 6. KẾT LUẬN
+
+**Regime:** QE muộn, thanh khoản toàn cầu đang ở pha mở rộng nhưng tốc độ chậm lại. Tín hiệu ADD với Z-Score cận biên cho thấy môi trường thuận lợi cho risk assets trong 2-4 tuần tới, đặc biệt là US equities và crypto. VN-Index có thể hưởng lợi với độ trễ 4-8 tuần nhờ dòng vốn ngoại ròng.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.888,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

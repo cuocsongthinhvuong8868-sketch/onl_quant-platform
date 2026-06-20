@@ -1,0 +1,59 @@
+# Phân tích Economic Alpha - Kịch bản Trung lập (K=1.0, CoE=14%)
+
+## 1. Scenario Assessment
+
+Với K=1.0 và CoE=14% là baseline phù hợp cho ngành ngân hàng Việt Nam trong giai đoạn ổn định. Stress test BVPS/P/B không thay đổi cho thấy đây là scenario trung tính, không gây sốc cho mô hình.
+
+**Mặt bằng ngành: Đốt vốn lan rộng.** Chỉ 1/6 bank có Alpha dương (+1.0% - SHB), còn lại âm sâu. ACB dù ROE 23% vẫn Alpha -0.8%, cho thấy định giá P/B 1.22 đã "ngấm" hết lợi thế. Ngành đang thiếu động lực value creation thực sự.
+
+## 2. Top Alpha Decomposition
+
+**SHB (Alpha +1.0%) - Fortress thu nhỏ:**
+- Driver chính: **P/B rẻ (0.95x)**, kết hợp ROE 17.5% ổn định (σ 1.9% thấp nhất 6 bank) + Payout cực thấp 8.6% → giữ được lợi nhuận tái đầu tư cao.
+- Phân loại: Gần với **Fortress** nhất nhờ sự kết hợp "rẻ + bền + ít chia". Nhược điểm: ROE chưa cao.
+
+**ACB (Alpha -0.8%) - Premium Burn nhẹ:**
+- ROE 23% là tốt nhất, σ 2.7% chấp nhận được, nhưng P/B 1.22x không đủ rẻ để vượt CoE 14%. 
+- Phân loại: **Premium Burn**. Chất lượng cao bị định giá "đúng" → không tạo alpha.
+
+**SSB (Alpha -1.3%) - Cheap Trap:**
+- P/B 1.05x rẻ, nhưng ROE 15.6% chỉ ngang CoE, σ 2.2% tạo Risk Penalty kéo lợi suất kỷ luật xuống.
+- Phân loại: **Cheap Trap** – rẻ nhưng không tạo ra đủ lợi nhuận để bù chi phí vốn.
+
+## 3. Value Traps Warning
+
+**LPB (Alpha -12.1%) - Premium Burn cổ điển:**
+- P/B 2.94x cao nhất ngành, ROE 21.1% không đủ để bù. Risk Penalty 3.8% lớn do σ cao → "ngấm" thêm vào lợi suất. Tránh tuyệt đối.
+
+**EIB (Alpha -11.5%) - Double Trap:**
+- ROE chỉ 10.0% (dưới CoE) + P/B 1.52x (đắt so với ROE) + σ 3.8% cao → vừa yếu sinh lời vừa rủi ro. Đây là bank yếu nhất về cơ bản.
+
+**VPB (Alpha -10.2%) - Growth Trap + Premium Burn:**
+- ROE 14.1% thấp hơn CoE, nhưng σ 4.7% cao nhất → Risk Penalty lớn nhất. P/B 1.24x đắt so với ROE. Không nên chạm vào.
+
+## 4. Portfolio Construction
+
+**Core Holding (Fortress - 60-70% bank allocation):**
+- **SHB** – bank duy nhất tạo alpha dương. P/B dưới 1 + ROE ổn định + payout thấp = compounding machine tiềm năng.
+
+**Tactical (Cheap-but-not-trap - 20-30%):**
+- **SSB** – P/B 1.05x gần sổ sách, nếu ROE cải thiện có thể trở thành Fortress. Cần watch >20% allocation.
+
+**Cấm mua / Underweight cứng:**
+- **LPB** (P/B 2.94 quá đắt)
+- **EIB** (ROE kém nhất, P/B 1.52 không hợp lý)
+- **VPB** (σ quá cao, rủi ro không kiểm soát được)
+- **ACB** (dù chất lượng tốt nhưng không tạo alpha ở định giá hiện tại → chỉ hold nếu đã có, không mua mới)
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "ACB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

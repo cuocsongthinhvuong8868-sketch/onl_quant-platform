@@ -1,0 +1,31 @@
+## 1. Observations
+- VN30 Stress Index: 3.33% (ngưỡng alert: 40%) — ở vùng rất thấp
+- # mã thủng VaR 95%: 1/30 — chỉ có 1 cổ phiếu breach
+- Complacency Index: 5.56% (ngưỡng danger: 80%) — ở vùng rất thấp
+- # mã mispriced: 6 — số lượng có dấu hiệu spread bị nén
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress Index ở mức 3.33%, rất thấp so với ngưỡng cảnh báo 40%. Điều này cho thấy không có dấu hiệu lây lan stress real-time trên rổ VN30. Các cú sốc nếu có đang được hấp thụ riêng lẻ, không lan rộng thành systemic.
+- Top 1 breach duy nhất: VJC — đây là sự cố cá biệt của mã này, chưa phải đầu sóng cho một đợt lây lan trên diện rộng. Tuy nhiên, cần theo dõi chất lượng spread và thanh khoản của VJC trong 1-2 phiên tới.
+
+## 3. Complacency Assessment (Module C)
+- Complacency Index ở mức 5.56% — **rất thấp**. Kết luận: thị trường **KHÔNG đang ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định**.
+- Thực tế, với Stress Index cũng thấp (3.33%), cấu trúc rủi ro hiện tại cho thấy thị trường đang trong giai đoạn spread giãn rộng tự nhiên — không có dấu hiệu bị nén bù rủi ro. Cần đặt trong bối cảnh xu hướng chính (uptrend/giảm/đi ngang) để xác định bản chất của spread giãn này. Nếu là uptrend mạnh, spread giãn là bình thường.
+
+## 4. Stock-Level Risk Calls
+- **Top 1 Crash (Module B) — VJC**: Đã thủng VaR 95%. Khuyến nghị giảm tỷ trọng VJC về mức 50% so với hiện tại. Nếu thủng tiếp MA20 trên D1, cân nhắc thoát toàn bộ.
+- **Top 3 Mispriced (Module C)**: OCB, VRE, VHM có spread bị nén chặt — dấu hiệu thanh khoản thấp và giá đang được giữ nhân tạo. Cảnh báo: nếu có tin tức bất lợi, các mã này có thể gap gap mạnh. Không khuyến nghị mua mới, ưu tiên giảm dần tỷ trọng nếu đang nắm giữ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["VJC", "OCB", "VRE", "VHM"],
+  "confidence": "medium"
+}
+```

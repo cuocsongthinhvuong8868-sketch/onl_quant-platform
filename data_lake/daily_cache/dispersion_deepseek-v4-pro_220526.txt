@@ -1,0 +1,30 @@
+## 1. Observations
+- **Spread (8.21%) & Spread_Z (-0.47σ):** Mức dispersion đang ở dưới trung bình 60 ngày, không có tín hiệu kéo căng đáng kể.
+- **DPI 46.7%:** Dưới ngưỡng 70%, cho thấy dispersion hôm nay không phải là khởi đầu của một chế độ lan tỏa kéo dài.
+- **Avg Pairwise Correlation 0.052:** Cực kỳ thấp, gần như không có sự đồng thuận nào giữa các cổ phiếu. Đây là môi trường phân hóa mạnh.
+- **Skewness & Kurtosis: N/A:** Thiếu dữ liệu thống kê bậc cao để phân tích sâu về hành vi đuôi.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **bình thường (non-stressed)**. Cả DPI (46.7%) và Spread_Z (-0.47σ) đều ở mức thấp, cho thấy cấu trúc thị trường không có dấu hiệu căng thẳng. Không có dấu hiệu của một sự kiện outlier cục bộ (vì Spread_Z thấp) và cũng không có chế độ phân tán dai dẳng (vì DPI thấp). Đây là trạng thái "tĩnh" hay "sideways" về mặt cấu trúc.
+
+## 3. Cross-Check & Tail Direction
+**Không thể xác định.** Do dữ liệu Cross-Sectional Skewness và Kurtosis không khả dụng, chúng ta không thể xác định hướng của tail (đuôi âm hay dương) hay mức độ "béo" của chúng. Giả định an toàn nhất là phân phối lợi nhuận hiện tại tương đối đối xứng và không có các outlier cực đoan chi phối phiên này.
+
+## 4. Regime Mapping
+Đối chiếu với 2D Map (DPI thấp × Corr thấp), trạng thái hiện tại tương ứng với ô **Healthy Stock-Picking**.
+- **Môi trường:** Lý tưởng cho chiến lược chọn cổ phiếu dựa trên phân tích cơ bản hoặc kỹ thuật riêng lẻ. Các cổ phiếu đang tự vận động dựa trên câu chuyện riêng, không bị chi phối bởi tâm lý bầy đàn toàn thị trường.
+- **Risk lớn nhất cho PM:** **Concentration risk (rủi ro tập trung).** Trong môi trường phân hóa cao, một danh mục tập trung quá mức vào vài mã có thể tạo ra biến động lớn nếu các mã đó không đồng nhất với kỳ vọng. Tuy nhiên, đây lại là cơ hội cho các PM có năng lực chọn stock tốt. Nguy cơ thanh khoản khô hạn (liquidity dry-up) hay sập bầy đàn (herding crash) là thấp nhất trong các regime.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "22/05/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.47,
+  "dpi_pct": 46.7,
+  "avg_corr": 0.052,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,42 @@
+## 1. Observations
+
+- **MA20 (1 tháng):** 24.2% — **Thấp** (oversold vùng < 30%, gần biên 20%)
+- **MA60 (1 quý):** 27.1% — **Thấp** (dưới ngưỡng xác nhận điều chỉnh kết thúc 50%)
+- **MA125 (6 tháng):** 25.9% — **Thấp** (nửa năm yếu, ít mã duy trì đà chu kỳ)
+- **MA252 (1 năm):** 29.2% — **Thấp** (dưới 40%, xác nhận môi trường Bear regime)
+
+## 2. Structural Health
+
+Bốn đường MA đều ở vùng rất thấp (24–29%), thể hiện sự **đồng thuận giảm mạnh** trên mọi khung thời gian. Không có kịch bản divergence nào. Pattern khớp là **Bear Confirmed**: MA20 < 30% AND MA252 < 40% → đây là tín hiệu yếu kém mang tính cấu trúc, không đơn thuần là biến động ngắn hạn.
+
+Thị trường đang trong pha secular weakness — phần lớn cổ phiếu giao dịch dưới tất cả các đường trung bình động trọng yếu, từ ngắn đến dài hạn.
+
+## 3. Money Flow Leadership
+
+**Top volume MA20 (ngắn hạn):** ABB, ACB, AMS, API, APS, BIC, BKG, BMS, BWE, CLI — chủ yếu là **Banks (ACB, BIC)** và **Brokers/Chứng khoán (AMS, API, BMS)**. Không thấy Real Estate hay Manufacturing nổi bật.
+
+**Top volume MA252 (dài hạn leader):** ABB, ACB, ADS, AMS, APF, ASP, BCA, BFC, BIC, BID — overlap rất cao với short-term: ABB, ACB, AMS, BIC xuất hiện ở cả hai danh sách. Điều này cho thấy dòng tiền đang tập trung rất hẹp vào nhóm Banks và Brokers, nhưng không đủ sức lan tỏa.
+
+**Smart money** ưu tiên nhóm **Financials** (ngân hàng + chứng khoán), mang tính cyclical nhẹ — không đủ mạnh để coi là defensive hay aggressive rõ rệt.
+
+## 4. Verdict
+
+Chiến lược khả dụng duy nhất: **Defensive cash-up / Mean-reversion T+ siêu ngắn** — tuyệt đối không trend-following.
+
+- **Đòn bẩy: 0% margin** (MA252 = 29% — quá xa ngưỡng 70%, không hội đủ điều kiện margin)
+- Tín hiệu Bear Confirmed + dòng tiền hẹp → "**WAIT FOR CONFIRMATION**" trước khi tham gia. Không mua đuổi, không catch falling knife.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 24.2,
+  "ma60_pct": 27.1,
+  "ma125_pct": 25.9,
+  "ma252_pct": 29.2,
+  "regime": "bear_confirmed",
+  "leadership_sector": "financials",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

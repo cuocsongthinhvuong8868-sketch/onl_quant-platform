@@ -1,0 +1,56 @@
+# Phân Tích Fed Liquidity – Tuần 2026-06-10
+
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần này đạt **5,896,888 triệu USD**, tăng **+63,168 triệu USD** so với tuần trước. Phân tích cấu phần:
+
+- **WALCL (Fed Balance Sheet)**: 6,725,397 triệu USD – tăng nhẹ, phản ánh Fed đang trong giai đoạn cuối của QT nhưng có thể đã thực hiện các hoạt động mua lại (buyback) hoặc tái đầu tư một phần.
+- **TGA (Treasury General Account)**: 828,122 triệu USD – giảm so với tuần trước, cho thấy Treasury đang chi tiêu nhiều hơn thu, bơm thanh khoản trở lại hệ thống.
+- **RRP (Reverse Repo)**: 387 triệu USD – gần như cạn kiệt, không còn đóng vai trò hút thanh khoản đáng kể.
+
+**Kết luận**: Cấu phần chi phối là **TGA giảm** (bơm thanh khoản) kết hợp với **WALCL ổn định**. RRP không còn tác dụng.
+
+## 2. Cycle Positioning
+
+- **Pha hiện tại**: **QT cuối kỳ / chuyển sang neutral**. Fed vẫn đang giảm bảng cân đối nhưng tốc độ chậm lại đáng kể. TGA giảm mạnh tạo hiệu ứng bơm ròng.
+- **RRP**: Đã gần cạn (< 100 tỷ USD), không còn buffer để hút thanh khoản. Đây là tín hiệu cho thấy hệ thống tài chính đang thiếu dư địa hấp thụ shock.
+- **TGA**: Đang trong pha xả (chi tiêu), trái ngược với mùa thuế tháng 6 thường gây tích lũy. Có thể do Treasury chủ động bơm tiền để hỗ trợ thị trường.
+- **So sánh lịch sử**: Net Liquidity hiện tại ~5,897 tỷ USD, thấp hơn đỉnh 2022 (~9,000 tỷ USD) nhưng cao hơn đáy 2024 (~5,200 tỷ USD). Đang ở vùng trung bình-thấp.
+
+## 3. Signal Strength
+
+- **Tín hiệu**: **ADD** – Impulse_EMA = +17,320 triệu USD > 0, Z-Score = +1.11 ≥ +1σ.
+- **Z-Score**: +1.11 – **cận biên** (1.0-1.5σ), chưa phải extreme (> 2σ). Tín hiệu có ý nghĩa nhưng không quá mạnh.
+- **Impulse_EMA**: Dương và khớp với signal, xác nhận xu hướng tăng thanh khoản đang được duy trì.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX**: **Bias tích cực**. Thanh khoản tăng hỗ trợ định giá, đặc biệt khi RRP cạn buộc tiền đổ vào risk assets. Kỳ vọng SPX tiếp tục uptrend ngắn hạn.
+- **DXY/Gold/Crypto**: 
+  - DXY: Áp lực giảm nhẹ do thanh khoản USD dồi dào.
+  - Gold: Hưởng lợi từ DXY yếu + thanh khoản dư thừa.
+  - Crypto: Nhạy nhất với thanh khoản – bias tăng mạnh (ADD signal).
+- **VN-Index**: **Bias tích cực với lag 4-8 tuần**. Thanh khoản Fed tăng → DXY giảm → EM FX mạnh lên → FDI và dòng vốn ngoại vào Việt Nam. Tuy nhiên, tác động sẽ chậm hơn US equities.
+
+## 5. Risk Factors (Signal Có Thể Sai Vì)
+
+1. **RRP gần zero**: Khi RRP cạn, mọi biến động TGA đều tác động trực tiếp lên thanh khoản. Nếu TGA bất ngờ tăng (do Treasury phát hành nợ), Net Liquidity sẽ giảm mạnh – làm suy yếu tín hiệu ADD.
+2. **Mùa thuế tháng 6**: Thông thường TGA tăng trong tháng 6 do thu thuế. Nếu tuần này TGA giảm là bất thường, có thể do điều chỉnh kỹ thuật tạm thời.
+3. **Fed buyback**: Nếu Fed đang thực hiện buyback (mua lại trái phiếu) để hỗ trợ thanh khoản, đây là yếu tố đặc biệt không bền vững.
+4. **Dữ liệu chưa đủ dài**: Z-Score chỉ +1.11, chưa đủ mạnh để khẳng định xu hướng bền vững.
+
+## 6. KẾT LUẬN
+
+**Regime: QT cuối kỳ, thanh khoản đang được bơm trở lại nhờ TGA giảm và RRP cạn. ADD signal có giá trị nhưng ở mức cận biên. Outlook 2-4 tuần: risk assets (US equities, crypto, EM) được hỗ trợ, nhưng cần theo dõi sát biến động TGA và bất kỳ tín hiệu đảo chiều nào từ Fed.**
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.888,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QT_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

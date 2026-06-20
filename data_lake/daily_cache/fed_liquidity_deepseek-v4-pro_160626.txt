@@ -1,0 +1,57 @@
+# Phân Tích Fed Liquidity – Tuần 10/06/2026
+
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần này đạt **5,897 tỷ USD**, tăng **+63,2 tỷ USD** so với tuần trước. Cấu phần chi phối:
+
+- **WALCL (Fed Balance Sheet):** 6,725 tỷ USD – tăng nhẹ, phản ánh Fed vẫn đang trong chế độ nới lỏng thụ động (QT chậm lại + buyback MBS).
+- **TGA (Treasury General Account):** 828 tỷ USD – tăng mạnh so với tuần trước, cho thấy Treasury đang tích lũy tiền mặt (thuế mùa June). Đây là lực hút thanh khoản ròng.
+- **RRP (Reverse Repo):** 387 triệu USD – gần như cạn kiệt. Con số này không còn đóng vai trò đệm thanh khoản.
+
+**Kết luận cơ học:** Impulse +63 tỷ USD đến từ WALCL tăng + TGA giảm nhẹ so với kỳ vọng. RRP đã chết về mặt chức năng.
+
+## 2. Cycle Positioning
+
+- **Regime hiện tại: QE muộn (QE late).** Fed vẫn đang giảm tốc QT, kết hợp với buyback MBS để bơm thanh khoản thụ động. Tuy nhiên, TGA tăng mạnh đang kìm hãm đà tăng Net Liquidity.
+- **RRP:** Đã gần về 0 (< 1 tỷ USD). Điều này có nghĩa: mọi cú sốc thanh khoản từ TGA hoặc QT sẽ tác động trực tiếp lên reserves, không còn đệm.
+- **So sánh lịch sử:**
+  - Đỉnh 2022: ~6,000 tỷ USD (gần bằng hiện tại).
+  - Đáy 2024: ~5,400 tỷ USD.
+  - Hiện tại: 5,897 tỷ USD – đang tiến gần đỉnh cũ, nhưng chưa vượt.
+
+## 3. Signal Strength
+
+- **Signal: ADD** – đúng theo logic: Impulse_EMA > 0 (+17,3 tỷ) và Z-Score ≥ +1σ (+1.11).
+- **Z-Score = +1.11:** Cận biên (1.0-1.5σ). Chưa phải extreme (> 2σ). Điều này cho thấy thanh khoản đang mạnh nhưng không quá nóng.
+- **Impulse_EMA:** Khớp với signal. Tuy nhiên, Impulse tuần này (+63 tỷ) cao hơn nhiều so với EMA(4) (+17 tỷ), báo hiệu một cú bơm thanh khoản đột biến.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX:** Tích cực. Thanh khoản dồi dào + RRP cạn = tiền chảy vào risk assets. Kỳ vọng US equities tiếp tục uptrend trong 2-4 tuần tới.
+- **DXY/Gold/Crypto:**
+  - DXY: Áp lực giảm nhẹ do thanh khoản toàn cầu tăng.
+  - Gold: Hưởng lợi từ DXY yếu + thanh khoản dồi.
+  - Crypto: Tương quan cao với Fed liquidity. ADD signal = bullish cho BTC/ETH.
+- **VN-Index (lag 4-8 tuần):** Tích cực. Lịch sử cho thấy correlation 0.25-0.35 với Fed liquidity 1 tháng trước. Kỳ vọng dòng vốn ngoại ròng cải thiện trong 4-6 tuần tới.
+
+## 5. Risk Factors (Signal Có Thể Sai Vì)
+
+- **RRP gần zero:** Đây là con dao hai lưỡi. Nếu TGA tăng đột biến (thuế June), thanh khoản sẽ giảm nhanh mà không có đệm. Signal ADD có thể yếu đi nếu TGA tiếp tục tăng.
+- **TGA spike do tax season:** Tháng 6 là mùa thuế. TGA có thể tăng thêm 100-200 tỷ USD, hút thanh khoản tương ứng. Đây là nhiễu mùa vụ.
+- **Fed buyback đặc biệt:** Fed đang mua lại MBS để tái đầu tư. Nếu chương trình này kết thúc sớm, thanh khoản sẽ giảm.
+
+## 6. KẾT LUẬN
+
+**Regime: QE muộn, thanh khoản dồi dào nhưng đang tiến gần đỉnh lịch sử. Outlook 2-4 tuần: Tích cực cho risk assets (US equities, crypto, EM equities). Tuy nhiên, rủi ro từ TGA tăng mùa vụ có thể tạo biến động ngắn hạn.**
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.9,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

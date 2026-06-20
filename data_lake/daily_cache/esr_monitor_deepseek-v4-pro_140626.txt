@@ -1,0 +1,46 @@
+## 1. Observations
+
+- SSI ở mức 65.9%, nằm trong vùng WARNING, chưa chạm CRITICAL.
+- Market State là EUPHORIC RISK (HMM trùng khớp) — high stress + downtrend (below MA125).
+- Top 3 pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
+- Pillar Mode: downside — tín hiệu chỉ được tính trên các phiên giảm.
+
+## 2. Risk Decomposition (Bóc tách)
+
+Pillar dẫn dắt là **S_LIQ (36%)** — volume dry-up. Dữ liệu cho thấy thanh khoản dollar volume đang khô cạn so với chuẩn 1 năm. Đây không phải tín hiệu bình thường: trong bối cảnh VN30 đã giảm xuống dưới MA125, volume yếu phản ánh dòng tiền lớn đứng ngoài, thiếu lực cầu bắt đáy.
+
+**S_VAL (32%)** đứng thứ hai, phản ánh valuation tension cao — lợi nhuận 252 ngày đang bị bào mòn khi lãi suất huy động duy trì ở mức hấp dẫn tương đối.
+
+**S_COR (17%)** tăng nhẹ nhưng chưa áp đảo — PCA concentration chỉ 38.3%, cho thấy chưa có herding cực đoan, nhưng dấu hiệu đã manh nha: khi volume cạn, các mã bắt đầu di chuyển đồng loạt hơn.
+
+Tổ hợp **S_LIQ + S_VAL + S_COR** — volume khô + định giá căng + correlation tăng — đây là cấu trúc điển hình của bull-trap đang đảo chiều: thị trường không còn lực đỡ từ dòng tiền, chỉ còn kỳ vọng giá rẻ, nhưng kỳ vọng không đủ để kích hoạt lực cầu.
+
+## 3. Cross-Check
+
+**Price action vs SSI**: VN30 hiện dưới MA125, không phải đỉnh mới — vậy divergence "giá đỉnh + SSI cao" không xuất hiện. Tuy nhiên, điều đáng chú ý: SSI vẫn ở WARNING mặc dù giá đã giảm. Điều này cho thấy stress chưa giải tỏa, mà đang chuyển từ "bull-trap tích lũy" sang "chờ catalyst giảm tiếp".
+
+**HMM regime**: Khớp với SSI — cả hai đều xác nhận EUPHORIC RISK. Không có lệch pha. Ngưỡng HMM Decision Threshold (0.534) đã được vượt qua, xác nhận chế độ rủi ro cao đang active.
+
+## 4. Verdict
+
+Cấu trúc pillar không mâu thuẫn — cả ba đều đồng thuận theo hướng stress tích lũy. Do đó có tín hiệu hành động rõ ràng.
+
+- **Cash weight đề xuất**: 65% cash. Chỉ giữ 35% danh mục ở vị thế defensive (tiền mặt + trái phiếu ngắn hạn).
+- **Hedge action**: Short VN30F1M với khối lượng 10-15% NAV — không phải để trade xu hướng mà để hedge systemic risk đang âm thầm chuyển từ trạng thái cảnh báo sang kích hoạt.
+
+Lý do: volume dry-up là tín hiệu leading, thường xuất hiện trước các nhịp giảm có thanh khoản. Khi S_COR bắt đầu tăng (hiện 17%), rủi ro herding bán trong những phiên tới sẽ hiện thực hóa.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 65,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

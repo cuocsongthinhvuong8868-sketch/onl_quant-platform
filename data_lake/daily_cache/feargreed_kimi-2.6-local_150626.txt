@@ -1,0 +1,32 @@
+## 1. Observations
+- Risk Score 48.7/100, nằm trong band 40-60 (NEUTRAL), Δ+1.5 từ phiên trước — sát ngưỡng trên của vùng trung lập.
+- EGARCH Vol 13.5%, giảm -7.1% — vol đang compress, dưới mức trung bình động thái gần.
+- Rolling Skewness 0.00 — phân phối gần đối xứng, không bias rõ ràng.
+- Upside Correlation 29.0% vs Downside Correlation 11.5% — spread +17.5pp, up-corr > down-corr.
+
+## 2. Interpretation
+- Data đang ánh xạ pha NEUTRAL/STOCK-PICKING: vol nén + skew flat + up-corr cao hơn down-corr cho thấy dòng tiền chưa hoảng loạn nhưng cũng chưa greed. Xác suất cao thị trường đang ở trạng thái phân hóa mạnh, beta tổng thể kém hiệu quả.
+
+## 3. Cross-Check
+- **Score vs EGARCH-vol**: CONSISTENT. Score tăng nhẹ (+1.5) trong khi vol giảm (-7.1%) — cả hai hướng về "calm" trong vùng trung lập, không divergence.
+- **Skewness vs Correlation**: DIVERGENCE FLAG. Skewness = 0.00 (neutral) nhưng up-corr 29.0% gấp ~2.5x down-corr 11.5%. Spread này cho thấy đám đông đang chase upside nhiều hơn hedge downside, tạo lệch vị thế long ngầm dù skew chưa dương.
+
+## 4. Verdict
+- **Beta target: 0.55** — giữ neutral-slight-long, không all-in.
+- **Hành động**: (1) Ưu tiên stock-picking alpha over beta; (2) Hedge tail-risk qua OTM puts nếu up-corr tiếp tục widen >35% (dấu hiệu crowded long); (3) Không nên short blanket vì vol nén + down-corr thấp chưa xác nhận breakdown.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "12/06/2026",
+  "regime": "NEUTRAL",
+  "score": 48.7,
+  "confidence": "medium",
+  "beta_target": 0.55,
+  "key_signals": [
+    "up-corr 29.0% >> down-corr 11.5%: implicit long crowding despite flat skew",
+    "vol compression -7.1% with score rising: calm surface, watch for vol expansion trigger"
+  ]
+}
+```

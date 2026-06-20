@@ -1,0 +1,36 @@
+## 1. Observations
+- **Historical VaR 95% (3Y)**: -1.65%, sát với parametric Gaussian VaR (-1.47%) ở ngưỡng thông thường, nhưng chưa phản ánh đuôi cực đoan.
+- **EVT VaR 99%**: -3.69% (sự kiện 1/100 ngày), sâu hơn đáng kể so với ngưỡng 95% thông thường.
+- **ξ (GPD shape)**: +0.345 — vượt ngưỡng 0.30, xác nhận **fat tail** (đuôi cực dày).
+- **Hill index**: +0.447, cùng dấu và độ lớn tương đương với ξ → tín hiệu robust, không phải nhiễu ngưỡng.
+
+## 2. Tail Thickness Diagnosis
+- **ξ = 0.345** thuộc bracket **> 0.30 (FAT TAIL)**. Điều này có nghĩa phân phối lợi nhuận có đuôi trái dày hơn phân phối Gaussian rất nhiều, rủi ro cực đoan hiện hữu.
+- **Hill index (+0.447) confirm** chặt chẽ cả về dấu và độ lớn tương đương với ξ. Cross-check đạt mức robust → tail signal đáng tin cậy, không nhạy cảm ngưỡng.
+- **ES − VaR Spread = -1.37%**, lớn hơn σ₃₀ (0.81%). Theo reference, đây là dấu hiệu thực nghiệm xác nhận fat tail — khoảng cách giữa kỳ vọng thua lỗ và VaR vượt xa độ lệch chuẩn.
+
+## 3. Gaussian Gap
+- Giả sử Gaussian VaR 99% ≈ μ − 2.33·σ₃₀ = 0% (μ ≈ 0 theo thường lệ) − 2.33×0.81% = **-1.89%**.
+- EVT VaR 99% = **-3.69%**.
+- **Gap = -3.69% − (-1.89%) = 1.80 pp > 1 pp**.
+- Gaussian model underestimate rủi ro cực đoan một cách nghiêm trọng. Không thể sử dụng Gaussian để phân bổ risk capital hay đặt stop-loss.
+
+## 4. Verdict — Hedging Implications
+- **ξ > 0.30 → FAT TAIL regime**.
+- **Khuyến nghị**: Tránh các chiến lược momentum (buy dip, hold long pure) vì drawdown 3-5% có thể xảy ra đột ngột. Mua **put ITM** (strike gần spot, vì đuôi dày có thể thụt sâu bất ngờ). **Short futures** là hedge hiệu quả nhất, nhưng cần lưu ý chi phí carry. Giảm systematic leverage xuống mức tối thiểu. Không khuyến khích bán premium (short vol) vì mức premium không đủ bù cho tail risk.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "18/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.80,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

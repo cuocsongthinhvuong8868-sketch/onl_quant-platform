@@ -1,0 +1,68 @@
+**BÁO CÁO SENTIMENT VN MACRO | 2026-06-17**
+
+---
+
+## 1. REGIME SENTIMENT
+
+| Window | Regime | Macro Composite | Xu hướng |
+|--------|--------|---------------|----------|
+| 1d | **strong_risk_on** | +0.5791 | Tăng mạnh |
+| 7d | **strong_risk_on** | +0.3991 | Tăng |
+| 30d | **risk_on** | +0.2966 | Tăng chậm |
+
+**Nhận xét:** Cả 3 window đều risk-on, nhưng độ mạnh giảm dần khi kéo dài horizon. 1d đang "nóng" nhất so với trung hạn → sentiment ngắn hạn overshoot so với trend 30d, cần đề phòng mean-reversion.
+
+---
+
+## 2. CHANNEL DRIVER MẠNH NHẤT
+
+| Risk-on | Score | Risk-off | Score |
+|---------|-------|----------|-------|
+| monetary_policy | +2.000 | liquidity | -0.019 (1d) / -0.061 (7d) |
+| commodity | +2.000 (1d) | banking_system | 0.000 |
+| earnings | +0.827–1.288 | inflation | 0.000 |
+| credit_stress | +0.463–1.149 | fiscal_public_investment | 0.000 |
+
+**Điểm then chốt:** Risk-on hoàn toàn thống trị từ monetary policy (ECB hike) và commodity (than cốc). Liquidity là channel negative duy nhất có score đáng kể, nhưng magnitude rất nhỏ so với positive drivers.
+
+---
+
+## 3. TOP DRIVERS (từ input, không bịa)
+
+**Positive:**
+- ECB tăng 25bps deposit rate → 2.65% (score +1.529) — *tín hiệu DM central bank confidence*
+- Tỷ giá trung tâm VND tăng 3 phiên liên tiếp: 25,155 → 25,175 (score +1.432, +1.412, +0.976) — *nhẹ nhưng consistent*
+- Than cốc TQ lập đỉnh 1 năm 1,887.5 CNY/tấn (+2.4%) (score +1.273) — *proxy nhu cầu thép/đầu tư công*
+- Lợi suất TPCP đi ngang (score +0.230) — *credit stress không leo thang*
+
+**Negative:**
+- Lãi suất huy động tăng trở lại — *cuộc đua vốn nóng lên* (score -0.194)
+- NHNN hút ròng OMO 3 phiên gần nhất: ~9.9K, 18K, 22.1K tỷ đồng (score -0.179 đến -0.684) — *tightening liquidity operations*
+- Giá heo hơi thấp nhất 1 tháng: 65,000 đ/kg (score -1.269) — *deflationary pressure nông sản*
+- Nhựa PVC TQ sát đáy 10 năm (score -0.689) — *weak construction demand*
+
+---
+
+## 4. TÁC ĐỘNG LÊN AI CIO
+
+| Layer | Assessment | Ghi chú |
+|-------|-----------|---------|
+| **Sentiment vs Macro layer** | **SUPPORTS** | Risk-on consistent, nhưng macro composite 1d (+0.58) cao hơn 30d (+0.30) → sentiment đang chạy trước fundamentals |
+| **Market-internal tools** | **NEUTRAL → SLIGHT CONFLICT** | Liquidity channel negative nhỏ nhưng OMO hút ròng thực sự; nếu market-internal đang thấy volume/depth yếu thì conflict |
+
+**Khuyến nghị overlay:** Sentiment ủng hộ tăng tỷ trọng risk, nhưng **không all-in** — khoảng cách 1d/30d cho thấy short-term euphoria. Nếu macro model đang cautious, sentiment không đủ mạnh để override.
+
+---
+
+## 5. CAVEATS
+
+| Loại | Mô tả |
+|------|-------|
+| **Source coverage** | Mozyfin chiếm 73–86% across windows, Widata 13–24%. Thiếu diversification; bias nếu Mozyfin có editorial tilt |
+| **Stale feed** | Generated 18:56, t-0. Tin OMO 07:00, ECB 07:00 — **~12h stale** cho phiên giao dịch tiếp theo. Kiểm tra có tin mới post-19:00 không |
+| **Headline noise** | "Trump's MIA MOU" (Fortune) và "Iran got what it wanted" — geopolitical clickbait, score thấp (-0.167) nhưng có thể amplify nếu escalate |
+| **Commodity mix** | Than cốc tăng mạnh (+1.273) vs heo hơi/PVC giảm sâu → commodity channel không monolithic; sector rotation risk |
+
+---
+
+**TÓM TẮT EXECUTIVE:** Sentiment đang ủng hộ risk-on, nhưng độ "nóng" ngắn hạn cao hơn trung hạn. Liquidity operations NHNN là rủi ro underwatch. Dùng sentiment này để **tăng tốc entry** nếu market-internal xác nhận, không dùng làm **lý do standalone** để override risk management.

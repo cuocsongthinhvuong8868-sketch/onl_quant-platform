@@ -1,0 +1,35 @@
+## 1. Observations
+- Risk Score 51.9, nằm trong vùng NEUTRAL (40-60), tăng +3.2 so với phiên trước.
+- EGARCH Vol 10.3%, giảm -4.0% so với phiên trước, vẫn cao hơn ngưỡng trung bình (~8%).
+- Rolling Skewness +0.16, dương nhưng yếu (< ngưỡng +0.3 để xác nhận Greed).
+- Upside Correlation (28.6%) gấp ~2.4 lần Downside Correlation (11.7%), cho thấy hiệu ứng phân hóa mạnh.
+
+## 2. Interpretation
+Thị trường đang trong pha NEUTRAL/STOCK-PICKING với các dấu hiệu cho thấy dòng tiền có chọn lọc: nhóm cổ phiếu tăng vẫn duy trì được sự đồng thuận cao hơn nhóm giảm. Risk Score duy trì trong biên độ cân bằng, chưa xuất hiện áp lực bán tháo hệ thống hay tâm lý hưng phấn cực đoan.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol:** Score tăng (+3.2) cùng lúc Vol giảm (-4.0%) → consistent với tín hiệu hạ nhiệt rủi ro.
+- **Skewness vs Correlation:** Skewness dương yếu (+0.16) + Upside Corr cao gấp đôi Downside Corr → consistent với pha phân hóa: phe Long vẫn còn ưu thế nhưng không đồng đều.
+
+Không phát hiện divergence đáng chú ý.
+
+## 4. Verdict
+**Beta exposure: 0.6**
+
+Danh mục nên giữ tỷ trọng trung bình-cao, tập trung vào chiến lược Stock-Picking. Không cần phòng thủ toàn diện vì chưa có tín hiệu rủi ro hệ thống (vol giảm, corr phi đối xứng ở mức an toàn). Hành động: ưu tiên các mã có xác nhận dòng tiền riêng, hạn chế mua đuổi theo nhóm ngành đã tăng nóng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "15/06/2026",
+  "regime": "NEUTRAL",
+  "score": 51.9,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Risk score trung bình, vol hạ nhiệt, không có stress hệ thống",
+    "Upside corr cao gấp 2.4 lần downside corr, phù hợp market phân hóa"
+  ]
+}
+```

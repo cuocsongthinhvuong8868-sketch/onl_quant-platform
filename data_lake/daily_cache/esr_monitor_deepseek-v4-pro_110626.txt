@@ -1,0 +1,43 @@
+# ESR Monitor — 11/06/2026
+
+## 1. Observations
+- SSI ở mức 65.8%, nằm trong vùng WARNING (0.50–0.80)
+- Market State: EUPHORIC RISK — giá đi ngang dưới MA125 nhưng HMM vẫn ghi nhận euphoric regime
+- Top 3 pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- PCA concentration EVR PC1: 38.3% — systemic correlation đang tăng
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ dẫn dắt với 36%** — volume khô cạn so với 1Y norm. MA20/MA252 ratio suy giảm cho thấy dòng tiền đang rút khỏi thị trường, giao dịch chỉ tập trung vào một số mã đầu cơ.
+
+**S_VAL (32%)** — valuation tension đang căng: lợi suất 252 ngày của VN30 bị bào mòn trong khi deposit rate vẫn neo cao, tạo áp lực chi phí cơ hội cho nhà đầu tư.
+
+**S_COR (17%)** — PCA EVR tăng lên 38.3% phản ánh herding behavior: các mã cùng chiều biến động, giảm phân hóa. Đây là dấu hiệu classic của bull-trap: volume khô cạn + herding + định giá căng = khả năng đảo chiều.
+
+**Pillar Mode: downside** — tất cả pillar đều đo trên phiên giảm, không có nhiễu từ phiên tăng.
+
+## 3. Cross-Check
+**Giá vs SSI divergence:** VN30 đóng cửa dưới MA125 trong khi SSI leo lên vùng WARNING (65.8%). Giá không tạo đỉnh mới nhưng nếu nhìn trend ngắn hạn, sự phân kỳ âm đã hình thành. Trường hợp xấu nhất: giá phục hồi nhẹ lên MA125 kèm SSI tiếp tục tăng.
+
+**HMM regime vs SSI:** EUPHORIC RISK + SSI WARNING khớp nhau — không lệch. HMM Decision Threshold 0.533 cho thấy model confidence ở mức trung bình, không đủ mạnh để kích hoạt chuyển sang ACTIVE STRESS. Tuy nhiên, pillar mode = downside cho thấy áp lực từ phe bán đang tích tụ.
+
+## 4. Verdict
+**Cash weight đề xuất: 55%** — giảm tỷ trọng cổ phiếu khi SSI vào WARNING + S_LIQ và S_COR cùng tăng.
+
+**Hedge action: Short VN30F1M** để phòng vệ danh mục. Không mua put do implied vol có thể chưa phản ánh đủ rủi ro.
+
+**Cảnh báo:** Nếu S_LIQ tiếp tục tăng >40% trong phiên tới, khả năng chuyển sang ACTIVE STRESS sẽ gia tăng. Volume dry-up là tín hiệu leading, báo trước sự suy yếu của lực cầu.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.8,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 55,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

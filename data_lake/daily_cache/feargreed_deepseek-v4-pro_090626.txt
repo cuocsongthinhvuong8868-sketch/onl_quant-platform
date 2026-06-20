@@ -1,0 +1,33 @@
+## 1. Observations
+- Risk Score đạt 49.7, giảm -2.9 so với phiên trước, nằm ở ngưỡng dưới vùng NEUTRAL (40-60), gần sát ranh giới FEAR (<40).
+- EGARCH Vol (chuẩn hóa) hiện là 17.5%, tăng mạnh +12.3% so với phiên trước, vượt xa ngưỡng trung bình điển hình (~10-12%), báo hiệu biến động kỳ vọng đang leo thang đột ngột.
+- Rolling Skewness ở -0.07, chạm ngưỡng âm nhẹ, cho thấy đuôi phân phối lệch về phía lợi nhuận âm (rủi ro giảm điểm).
+- Upside Correlation (37.3%) vẫn cao hơn gấp ~2.4 lần Downside Correlation (15.7%).
+
+## 2. Interpretation
+Dữ liệu trên cho thấy thị trường đang chuyển từ trạng thái trung tính sang giai đoạn cảnh báo rủi ro: điểm số giảm, biến động kỳ vọng tăng vọt, và skewness chớm âm. Đây không phải tín hiệu phân hóa mạnh (stock-picking thuận lợi) mà là dấu hiệu cho thấy đám đông đang bắt đầu nghiêng về phòng thủ, làm giảm xác suất của một xu hướng tăng bền vững.
+
+## 3. Cross-Check
+*   **Score vs EGARCH Vol:** **Divergence rõ rệt.** Score giảm nhẹ (-2.9) trong khi Vol tăng đột biến (+12.3%). Điều này không nhất quán: Vol tăng mạnh thường đi kèm với sự sụt giảm sâu hơn của điểm sợ hãi. Dữ liệu hiện tại cho thấy thị trường đang chịu áp lực gia tăng về biến động nhưng tâm lý đám đông chưa kịp hoảng loạn.
+*   **Skewness vs Correlation:** **Tương đối consistent.** Skewness âm nhẹ đi cùng với Downside Correlation thấp hơn Upside Correlation. Điều này cho thấy các cổ phiếu vẫn có xu hướng tăng cùng nhau nhiều hơn là giảm, nhưng đuôi rủi ro đang lộ diện.
+
+## 4. Verdict
+**NO ACTIONABLE SIGNAL: Tín hiệu mâu thuẫn giữa rủi ro hệ thống gia tăng (Vol cao, Skewness âm) và tâm lý thị trường chưa xác nhận (Score vẫn ở mức trung tính cao 49.7).** Dữ liệu không đủ thuyết phục để chuyển sang chiến lược phòng thủ hoàn toàn (beta thấp), cũng như chưa đủ an toàn để duy trì beta cao. Khuyến nghị giữ nguyên mức beta hiện tại, theo dõi tín hiệu của phiên tiếp theo để xác nhận hướng đi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "09/06/2026",
+  "regime": "NEUTRAL",
+  "score": 49.7,
+  "confidence": "low",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Score giảm chậm về rìa thấp NEUTRAL (49.7)",
+    "EGARCH Vol tăng đột biến +12.3% báo hiệu rủi ro hệ thống gia tăng",
+    "Skewness âm nhẹ (-0.07) nhưng Upside Corr vẫn cao hơn Downside Corr",
+    "Divergence giữa tâm lý và biến động làm giảm độ tin cậy của tín hiệu"
+  ]
+}
+```

@@ -1,0 +1,33 @@
+## 1. Observations
+- Risk Score ở 52.6, giảm -3.2 điểm so với phiên trước, nằm trong vùng trung tính (40-60).
+- EGARCH Vol ở 5.2%, giảm -0.4%, vẫn duy trì ở mức thấp hơn ngưỡng FEAR điển hình.
+- Rolling Skewness ở -0.05, rất gần 0 — không cho thấy sự lệch mạnh về phân phối lợi nhuận.
+- Upside Correlation (35.5%) cao hơn Downside Correlation (15.5%) hơn gấp đôi.
+
+## 2. Interpretation
+Dữ liệu hiện tại mô tả một thị trường đang trong pha "phân hóa" (stock-picking regime): vol thấp, correlation phân bố lệch về phía upside, nhưng skewness không rõ ràng. Không có dấu hiệu của rủi ro hệ thống.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: Score trung tính, Vol giảm nhẹ → consistent (không mâu thuẫn). Vol thấp ủng hộ trạng thái không sợ hãi.
+- **Skewness vs Correlation**: Skewness gần 0 nhưng correlation lệch hẳn về upside (35.5% vs 15.5%) → divergence nhẹ. Điều này gợi ý rằng nếu có biến động, biến động tăng có khả năng được đám đông follow hơn là biến động giảm. Không phải tín hiệu nguy hiểm.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.6**
+- Hành động: **NO ACTIONABLE SIGNAL** — Dữ liệu thể hiện một thị trường trung tính, phân hóa, không có tín hiệu rủi ro hệ thống đủ mạnh để điều chỉnh beta mạnh. Giữ danh mục stock-picking với beta trung bình, không thay đổi hướng chiến lược vĩ mô.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "08/06/2026",
+  "regime": "NEUTRAL",
+  "score": 52.6,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Score giảm nhẹ nhưng vẫn neutral",
+    "Vol giảm 0.4% xuống 5.2% — không tạo áp lực",
+    "Upside corr vượt trội downside corr 2x, không dấu hiệu sợ hãi"
+  ]
+}
+```

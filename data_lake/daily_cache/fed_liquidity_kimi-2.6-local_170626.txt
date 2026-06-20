@@ -1,0 +1,48 @@
+ ## 1. Mechanical Decomposition
+
+Impulse tuần này **+63,168 triệu USD** — động lực chính đến từ **WALCL tăng** (Fed balance sheet mở rộng) hoặc **TGA giảm mạnh** (Treasury chi tiêu bơm tiền về hệ thống ngân hàng). RRPONTSYD ở **387 triệu USD** — praktisch đã cạn kiệt, không còn dư địa rút tiền từ reverse repo để bơm thanh khoản. Đây là điểm quan trọng: RRP từng là buffer hấp thụ ~2,500 tỷ USD năm 2022, nay gần như vô hiệu. TGA ở **828 tỷ USD** ở mức cao lịch sử, tạo potential drag nếu Treasury tiếp tục tích lũy.
+
+## 2. Cycle Positioning
+
+Fed đang ở **QT_active** về mặt chính sách danh nghĩa, nhưng **liquidity đang bùng nổ thực tế** do TGA xả và/hoặc Fed tạm dừng runoff. RRP **< $1B** = cạn hoàn toàn, không còn van xả ngược. TGA **$828B** cao hơn mục tiêu Treasury thường giữ (~$500-750B), nghĩa là **Treasury đang tích lũy** hoặc vừa trải qua tax season (June deadline). Net Liquidity **$5,897B** so với đỉnh 2022 (~$8,500B) thấp hơn ~31%, nhưng so với đáy 2024 (~$5,200B) đã phục hồi ~13%. Đây là **"QT with loose financial conditions"** — paradox phổ biến khi Treasury management và Fed facility đè lên chính sách danh nghĩa.
+
+## 3. Signal Strength
+
+| Metric | Giá trị | Đánh giá |
+|---|---|---|
+| Signal | **ADD** | Confirmed |
+| Z-Score | **+1.11σ** | Cận biên 1.0-1.5σ, chưa extreme |
+| Impulse_EMA(4) | **+$17.3B** | Positive, khớp direction |
+
+Z-Score +1.11σ là **vừa đủ vượt ngưỡng +1σ** cho ADD, không phải momentum cực đoan. Impulse_EMA(4) dương và nhỏ hơn impulse thô, cho thấy acceleration gần đây nhưng chưa sustained quá mức. Signal **medium strength** — không phải conviction trade nhưng đủ để bias risk-on.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX**: **Positive bias**. Liquidity impulse +$63B/tuần hỗ trợ multiple expansion, đặc biệt growth/mag7. Lag 1-2 tuần.
+- **DXY**: **Negative bias** hoặc range-bound. Fed liquidity dồi dào làm giảm safe-haven demand USD.
+- **Gold**: **Neutral-to-positive**. Real rates xuống + DXY yếu hỗ trợ, nhưng không phải direct driver chính.
+- **Crypto (BTC/ETH)**: **Positive bias**. High-beta liquidity proxy, phản ứng nhanh nhất với impulse (lag <1 tuần).
+- **VN-Index**: **Positive bias với lag 4-8 tuần**. Kênh: DXY yếu → VND stable → FDI confidence + foreign inflows. Correlation 0.25-0.35 không mạnh nhưng directional. **Lưu ý**: VN-Index còn phụ thuộc domestic credit growth và SBV policy — Fed liquidity là necessary, not sufficient condition.
+
+## 5. Risk Factors (signal có thể sai)
+
+1. **RRP gần zero**: Không còn "free liquidity" từ reverse repo drain. Nếu TGA tăng trở lại (Treasury tích lũy cho spending cliff), Net Liquidity có thể đảo chiều nhanh mà không có RRP buffer đệm.
+2. **TGA seasonality**: Tháng 6 là corporate tax deadline — TGA $828B có thể reflect tax inflow tạm thời. Nếu Treasury bắt đầu chi mạnh (infrastructure, interest payments), TGA xả tiếp; nếu không, drag quay lại.
+3. **Fed facility opacity**: WALCL tăng có thể do emergency lending (BTFP-style) hoặc coupon reinvestment nuance — cần breakdown chi tiết để xác nhận "organic" vs "forced" liquidity.
+4. **Fiscal dominance**: Treasury issuance schedule và debt ceiling dynamics có thể override Fed liquidity mechanism.
+
+## 6. KẾT LUẬN
+
+**Regime: QT_active nhưng financial conditions easing.** Fed liquidity đang ở phase "late-cycle QT with Treasury-assisted loosening" — không phải QE danh nghĩa nhưng functionally similar. Outlook 2-4 tuần: **risk-on bias, nhưng conviction thấp hơn so với Z > +2σ.** Theo dõi TGA trajectory và WALCL breakdown để xác nhận sustainability.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.9,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QT_active",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

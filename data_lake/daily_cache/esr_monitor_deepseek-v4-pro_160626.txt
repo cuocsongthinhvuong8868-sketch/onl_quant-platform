@@ -1,0 +1,49 @@
+# ESR Monitor — 16/06/2026
+
+## 1. Observations
+- **SSI**: 66.1% — vùng WARNING, đã vượt ngưỡng 0.50 nhưng chưa chạm CRITICAL
+- **Market State**: EUPHORIC RISK (HMM × trend filter = high stress + downtrend → nhưng filter cho thấy giá đã break xuống dưới MA125)
+- **Top 3 Pillar Drivers**:
+  - #1: S_LIQ (36%) — thanh khoản khô cạn nhất trong top driver
+  - #2: S_VAL (32%) — valuation tension đang co kéo
+  - #3: S_COR (17%) — PCA(1) EVR tăng nhẹ nhưng chưa áp đảo
+
+## 2. Risk Decomposition
+
+**S_LIQ (36%) — Volume Dry-Up**  
+Thanh khoản dollar volume đang suy giảm rõ rệt so với chuẩn 1 năm. Chỉ số −log(MA20/MA252) cho thấy khối lượng giao dịch hiện tại thấp hơn nhiều so với mức trung bình lịch sử. Đây là tín hiệu "thị trường cạn lực đỡ" — khi giá giảm nhưng không có volume bắt đáy.
+
+**S_VAL (32%) — Valuation Tension**  
+Return 252 ngày của VN30 cao hơn lãi suất tiền gửi một biên độ đáng kể. Tuy nhiên, với giá đã nằm dưới MA125, quán tính tăng trưởng dài hạn đang bị thử thách. Nếu tension này đảo chiều, áp lực điều chỉnh valuation sẽ gia tăng.
+
+**S_COR (17%) — Systemic Correlation**  
+EVR PC1 ở mức 38.3% vẫn còn thấp hơn ngưỡng herding cổ điển (>45%), nhưng xu hướng sideways kết hợp với volume khô báo hiệu rủi ro "đợi nhau bán" — khi nhà đầu tư tổ chức đồng loạt rút thanh khoản khỏi cùng một nhóm cổ phiếu.
+
+**Tổng thể signature**: **S_LIQ + S_VAL + S_COR = "Liquidity drought during overvaluation"** — thị trường đang trong pha "bull trap" điển hình: giá vẫn neo cao nhưng không ai mua, chỉ còn lực bán tồn đọng.
+
+## 3. Cross-Check
+
+- **VN30 vs SSI divergence**: Giá đã rơi xuống dưới MA125 (downtrend confirmed) trong khi SSI ở WARNING. Đây không còn là bull-trap tiềm ẩn — đây là active stress đang hình thành: giá xu hướng xuống + stress hệ thống cao = ACTIVE_STRESS đang chờ được xác nhận bởi HMM.
+- **HMM regime vs SSI**: HMM báo EUPHORIC_RISK (downtrend khởi đầu) nhưng market state lại là EUPHORIC RISK (remain). Có divergence nhẹ: stress đã tích lũy đủ để chuyển sang ACTIVE_STRESS nếu SSI vượt 70%. HMM threshold 0.534 chưa kích hoạt, nhưng liệu có đang trễ?
+
+## 4. Verdict
+
+- **Cash weight đề xuất**: 45% — rút bớt danh mục khi stress chưa tới CRITICAL nhưng thanh khoản đã khô
+- **Hedge action**: **Short VN30F1M** — tận dụng derivative để bảo vệ danh mục khi ACTIVE_STRESS chưa được xác nhận đầy đủ nhưng các pillar đã đồng loạt báo hiệu. Giảm beta trực tiếp là cần thiết.
+- **Lưu ý**: S_LIQ + S_VAL mâu thuẫn với S_COR thấp (17%). Volume khô nhưng chưa có herding → hành động kiềm chế chưa đạt mức alarm. **Tuy nhiên** pillar mode "downside" + giá dưới MA125 là đủ để chuyển phased defense.
+
+**No actionable signal to chase shorts aggressively**, nhưng defensive action là bắt buộc.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 66.1,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

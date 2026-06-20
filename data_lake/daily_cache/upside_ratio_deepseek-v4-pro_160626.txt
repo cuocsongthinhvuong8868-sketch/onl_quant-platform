@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu (Upside Breadth):** Hiện tại 13.18% gần sát với mức dài hạn 13.44% (chênh lệch -0.26 p.p), không có tín hiệu bất thường. Phi = +0.193 xác nhận **Momentum (Đà Mua)** – cầu có xu hướng tiếp diễn.
+- **Lực cung (Downside Breadth):** Hiện tại 3.06% thấp hơn rất nhiều so với mức dài hạn 13.63% (chênh lệch -10.57 p.p), cho thấy áp lực bán đang cực kỳ yếu. Phi = +0.215 xác nhận **Momentum (Đà Bán)** – dẫu thấp nhưng nếu tăng sẽ mang tính đà.
+- Cả hai chiều đều đang trong **Momentum regime** (Phi > 0.10), báo hiệu xu hướng hiện tại có khả năng tự duy trì.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền hiện tại: Zombification.** Cả hai chiều đều ở thấp hơn mức dài hạn: cầu gần trung bình, cung thấp bất thường. Thanh khoản đang cạn kiệt, đặc biệt ở chiều bán – thị trường co cụm, thiếu động lực tăng rõ rệt.
+- **Momentum winner:** Cả hai bên đều có momentum dương (Phi > 0.10), nhưng so sánh |Phi_up| (0.193) vs |Phi_dn| (0.215) cho thấy **cung giữ momentum mạnh hơn một chút**. Nghĩa là nếu có sóng gió, phe bán có khả năng bùng lên nhanh hơn phe mua.
+
+## 3. Stress-Test Read
+- **P95 Downside = 26.56%:** Nếu panic sell xảy ra, biên độ giảm cực đoan có thể lên tới 26.56% – vùng rủi ro rất nặng, phản ánh tail risk lớn ở đuôi âm.
+- **Asymmetry:** P95 Downside (26.56%) > P95 Upside (23.42%); chênh lệch +3.14 p.p. Bên bán có tail dày hơn, xác suất xảy ra kịch bản cực đoan ở chiều giảm cao hơn. Nhà đầu tư cần ưu tiên quản trị rủi ro hơn là tìm kiếm lợi nhuận.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 10%.** Vì cả hai đều trong momentum regime, sai lệch tăng/giảm hiện tại thường tự tiếp diễn – không nên mua đuổi khi cầu đang yếu. Tỷ lệ rất thấp để phòng thủ trước tail risk.
+- **Strategy: Phòng thủ (Defensive).** Không mua đuổi, không bắt đáy; giữ tiền mặt, chờ breakout hoặc pullback thực sự.
+- **KHÔNG phải random walk** (cả hai Phi > 0.10) nên không đưa "NO ACTIONABLE".
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.56,
+  "p95_upside_pct": 23.42,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

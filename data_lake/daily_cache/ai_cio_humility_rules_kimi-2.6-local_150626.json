@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-15",
+  "composite_score": 15,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 14,
+      "unit": "sessions",
+      "description": "If VNIBOR 20D STRESS/WARNING sessions drop below 5 with ON MA5 20D change turning negative, liquidity squeeze is truly easing"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 29.2,
+      "unit": "%",
+      "description": "If Breadth MA20 exceeds 45% and sustains for 5+ sessions, market breadth recovery is confirmed not just a technical bounce"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.9,
+      "unit": "%",
+      "description": "If SSI drops below 55% and market state exits EUPHORIC_RISK, accumulated stress is releasing"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "If EVT xi falls below 0.25 with Hill estimator confirming, fat tail regime ends and tail risk becomes manageable"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 26.7,
+      "unit": "th pct",
+      "description": "If Vingroup Slope Percentile stays below 70th AND Correlation Percentile drops below 70th, VIN no longer anchors F1"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 100,
+      "unit": "th pct",
+      "description": "If CQS Percentile falls below 80th and HY OAS percentile rises above 50th, contagion risk decreases and credit stress is no longer extreme"
+    }
+  ],
+  "provider_key": "kimi-2.6-local",
+  "saved_at": "2026-06-15",
+  "source": "ai_cio_executive_summary"
+}

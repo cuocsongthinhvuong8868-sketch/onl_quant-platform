@@ -1,0 +1,34 @@
+# VaRES Daily Risk Brief — 19/05/2026
+
+## 1. Observations
+- VN30 Stress Index: 16.67% (ngưỡng cảnh báo: 40%)
+- Số mã thủng VaR 95%: 5/30
+- Complacency Index: 2.97% (ngưỡng nguy hiểm: 80%)
+- Số mã mispriced: 3
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở mức 16.67%, dưới ngưỡng alert 40%. Điều này cho thấy áp lực lây lan đang ở mức thấp đến trung bình — chưa có dấu hiệu systemic stress lan rộng trên nhóm bluechip. Tuy nhiên, 5/30 mã thủng VaR 95% là con số đáng chú ý, tập trung ở GAS, PLX, GVR. Ba mã này đều thuộc nhóm năng lượng và nguyên vật liệu, gợi ý một sự cố mang tính ngành hơn là đầu sóng systemic. Chưa có bằng chứng cho thấy đây là điểm khởi đầu của một chuỗi lây nhiễm chéo. Cần theo dõi nếu số breach tăng lên 8+ trong 2–3 phiên tới.
+
+## 3. Complacency Assessment (Module C)
+Complacency Index ở mức 2.97% — rất thấp so với ngưỡng nguy hiểm 80%. Kết luận duy nhất có thể rút ra: **thị trường KHÔNG ở regime ngủ quên (complacent). Điều này KHÔNG đồng nghĩa thị trường ổn định.** Chỉ số spread đang giãn rộng, phù hợp với một thị trường đang có biến động — có thể là điều chỉnh, hoảng loạn, hoặc uptrend mạnh. Kết hợp với Stress Index 16.67% (dưới 40%), kịch bản hiện tại nghiêng về điều chỉnh cục bộ hơn là khủng hoảng lan rộng. Nhóm mispriced (BID, VTO, VIC) đại diện cho các mã có spread bị nén bất thường trong bối cảnh chung spread đang giãn — đây là các điểm nghẽn thanh khoản cục bộ cần lưu ý.
+
+## 4. Stock-Level Risk Calls
+**Top 3 Crash (Module B):**
+- **GAS**, **PLX**, **GVR**: khuyến nghị giảm tỷ trọng. Đặt stop-loss tại mức thủng MA20 trên khung D1. Nếu breach kéo dài quá 3 phiên liên tiếp, cân nhắc cắt lỗ sớm 5–7% từ giá hiện tại.
+
+**Top 3 Mispriced (Module C):**
+- **BID**, **VTO**, **VIC**: spread bị nén trong khi thị trường chung spread giãn — tiềm ẩn rủi ro điều chỉnh đột ngột khi thanh khoản hồi phục. Không khuyến nghị giao dịch ngay; theo dõi khối lượng breakout.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 16.67,
+  "breach_count": 5,
+  "complacency_pct": 2.97,
+  "mispriced_count": 3,
+  "regime": "spread_normal",
+  "watchlist_short": ["GAS", "PLX", "GVR"],
+  "confidence": "medium"
+}
+```

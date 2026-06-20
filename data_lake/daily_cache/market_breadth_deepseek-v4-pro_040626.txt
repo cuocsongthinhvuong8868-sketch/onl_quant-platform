@@ -1,0 +1,35 @@
+## 1. Observations
+- **MA20 (27.8%)**: Ở vùng thấp – gần mức oversold (<30%), phản ánh xung lực ngắn hạn rất yếu.
+- **MA60 (34.4%)**: Ở mức trung bình thấp – cho thấy đà trung hạn chưa có tín hiệu hồi phục rõ rệt.
+- **MA125 (28.9%)**: Ở vùng thấp – chu kỳ nửa năm đang suy yếu.
+- **MA252 (32.2%)**: Ở vùng thấp – xác nhận thị trường đang trong pha secular weakness (dưới 40%).
+
+## 2. Structural Health
+- **Divergence không rõ rệt**: Cả 4 horizon đều đồng loạt ở vùng thấp (27.8% → 34.4% → 28.9% → 32.2%). Đây là cấu trúc phẳng và suy yếu đồng thuận, không có sự trái chiều mạnh giữa MA20 và MA252.
+- **Pattern khớp: Bear Confirmed** – MA20 < 30% kết hợp MA252 < 40% → xác nhận xu hướng yếu kéo dài. Không có dấu hiệu bear trap vì MA252 cũng đang rất thấp.
+
+## 3. Money Flow Leadership
+- **Top volume MA20**: Áp đảo bởi nhóm **Brokers** (AAS, ABS, APS) và **Banks** (ABB, ACB). Một số mã Manufacturing/Construction (AMS, ASM) xuất hiện nhưng không chiếm ưu thế.
+- **Top volume MA252**: Overlap rõ với short-term: ABB, ACB, AFX, AMS, ASP. Dòng tiền dài hạn tập trung mạnh vào **Banks** và **Brokers** – cho thấy smart money đang ưu tiên nhóm Financials.
+- **Phân bổ**: Thiên về **Financials (defensive-cyclical hybrid)** – không hẳn defensive thuần (như Utilities) cũng không phải aggressive (Steel). Dòng tiền có tính phòng thủ tương đối nhưng vẫn kỳ vọng chu kỳ.
+
+## 4. Verdict
+- **Strategy: Defensive cash-up**. Với Bear Confirmed regime, ưu tiên giữ tiền mặt cao, hạn chế giao dịch. Cơ hội chỉ mang tính mean-reversion T+ cho các mã Financials đang giữ MA20/MA252.
+- **Đòn bẩy: 0% margin**. Không đủ điều kiện để sử dụng margin khi MA252 ở 32.2% (dưới 70%) và cả 4 horizon đều yếu.
+- **Không cần WAIT FOR CONFIRMATION** vì không có divergence giữa MA20 và MA252 – cấu trúc đã xác nhận xu hướng yếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 27.8,
+  "ma60_pct": 34.4,
+  "ma125_pct": 28.9,
+  "ma252_pct": 32.2,
+  "regime": "bear_confirmed",
+  "leadership_sector": "financials",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

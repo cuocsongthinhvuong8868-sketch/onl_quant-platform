@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu hiện tại (5.65%) thấp hơn rõ rệt so với Mu dài hạn (13.46%)** — dòng tiền mua đang suy yếu nghiêm trọng, phiên giao dịch gần như không có lực cầu chủ động.
+- **Lực cung hiện tại (8.00%) cũng dưới Mu dài hạn (13.72%)** nhưng mức chênh lệch nhỏ hơn, cho thấy áp lực bán chưa bùng nổ nhưng đã bắt đầu gia tăng.
+- **Cả hai chiều đều ở Momentum regime** (Phi_up = 0.201 > +0.10; Phi_dn = 0.212 > +0.10) — đà hiện tại có khả năng tiếp diễn, không có dấu hiệu đảo chiều.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền: Distribution (phân phối)**. Cả cầu và cung đều dưới Mu dài hạn, nhưng cầu giảm sâu hơn cung, tạo cấu trúc "cầu yếu – cung trung bình". Đây là tín hiệu điển hình của giai đoạn phân phối: thanh khoản thấp, nhà đầu tư lớn xả hàng âm thầm.
+- **Bên giữ momentum thực sự: Supply (cung)**. Dù |Phi_dn| (0.212) nhỉnh hơn |Phi_up| (0.201) không đáng kể, nhưng lực cung đang ở gần Mu hơn (8.00% vs 13.72%) và có đà bán rõ rệt. Lực cầu quá yếu để duy trì bất kỳ động lực tăng nào.
+
+## 3. Stress-Test Read
+- **P95 Downside (26.53%) > P95 Upside (23.53%)** — tail risk bên bán dày hơn bên mua. Trong kịch bản stress, biên độ giảm có thể lớn hơn biên độ tăng khoảng 3 điểm %.
+- **Asymmetry nghiêng về supply**: Nếu thị trường gãy, mức panic sell 26.53% là con số cần được quản trị rủi ro nghiêm túc. Upside tail tuy vẫn hiện diện nhưng không đủ bù đắp rủi ro giảm.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 15%** — chỉ giữ vị thế rất nhỏ, ưu tiên phòng thủ.
+- **Strategy: Phòng thủ (Defensive)**. Không mua đuổi, không bắt đáy. Chờ tín hiệu lực cầu hồi phục (cầu vượt lên trên Mu) hoặc ít nhất một chiều chuyển sang mean-reversion.
+- Cả hai chiều đều là momentum, nên không có "NO ACTIONABLE", nhưng rủi ro đang nghiêng về phía supply.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.53,
+  "p95_upside_pct": 23.53,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

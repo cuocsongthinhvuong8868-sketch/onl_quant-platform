@@ -1,0 +1,35 @@
+## 1. Observations
+
+- **MA20 (46.1%)**: Mức trung bình, tiến gần vùng ngưỡng 50% nhưng chưa xác nhận đột phá.
+- **MA60 (34.4%)**: Ở vùng thấp – cho thấy phần lớn mã vẫn chưa hồi phục xu hướng trung hạn sau đợt giảm.
+- **MA125 (28.0%)**: Rất thấp, tín hiệu chu kỳ nửa năm yếu, đa số mã đang trong vùng điều chỉnh kéo dài.
+- **MA252 (29.6%)**: Thấp – dưới 40%, khẳng định cấu trúc thị trường dài hạn vẫn mang tính chất bearish.
+
+## 2. Structural Health
+Bốn đường MA không đồng thuận. MA20 có cải thiện nhẹ (từ thấp lên trung bình) nhưng MA60, MA125 và MA252 đều dưới 35%. Điều này tạo ra cấu trúc **Divergence** rõ rệt: xung lực ngắn hạn đang phục hồi nhưng nền tảng dài hạn còn yếu — không đủ mạnh để xác nhận uptrend bền vững. Pattern hiện tại không khớp hoàn toàn với Bull Trap vì MA20 chưa chạm overbought (>80%), nhưng sự lệch pha giữa ngắn và dài hạn phản ánh sự thiếu ổn định.
+
+## 3. Money Flow Leadership
+- **Top MA20 (ngắn hạn)**: Nổi bật là các mã ngành *Manufacturing/Industrial* (AAA, ABS, ACV, ADS, APG), *Brokers* (AAS), *Energy* (AGG), *Financials* (ABB). Dòng tiền ngắn hạn phân tán, không tập trung vào một nhóm ngành duy nhất, thể hiện tính chất “hồi kỹ thuật” hơn là dẫn dắt có chủ đích.
+- **Top MA252 (dài hạn)**: Tập trung ở *Manufacturing* (ABB, ADS, AFX, APF, BFC), *Agri/Food* (BAF), *Financials* (BIC). Overlap với ngắn hạn (ABB, ADS, AFX) cho thấy một nhóm nhỏ mã có cả xung lực ngắn hạn lẫn nền tảng dài hạn vững – đây là tín hiệu smart money đang pick selectively, nhưng chưa lan tỏa.
+- **Thiên hướng**: Defensive (Manufacturing/Financials) + Cyclical-industrial, không thấy Banks/Utilities chiếm ưu thế. Smart money đang thận trọng, ưu tiên các mã có nền tảng cơ bản tốt, không đuổi theo tăng nóng.
+
+## 4. Verdict
+- **Strategy**: **Mean-reversion T+** kết hợp **WAIT FOR CONFIRMATION**.
+- **Đòn bẩy**: **0% margin** — MA252 < 40% và xuất hiện divergence rõ giữa MA20 (phục hồi) và MA252 (yếu), không đủ điều kiện dùng margin.
+- Thị trường đang trong giai đoạn chuyển tiếp chưa rõ ràng. Nhà đầu tư nên hạn chế mua đuổi, chỉ giao dịch T+ lướt sóng với các mã có xác nhận từ cả dòng tiền ngắn hạn và dài hạn (overlap list), và giữ tỷ trọng cash cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 46.1,
+  "ma60_pct": 34.4,
+  "ma125_pct": 28.0,
+  "ma252_pct": 29.6,
+  "regime": "divergence",
+  "leadership_sector": "mixed",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```

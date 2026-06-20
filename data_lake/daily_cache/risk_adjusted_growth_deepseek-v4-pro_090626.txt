@@ -1,0 +1,41 @@
+## 1. Scenario Assessment
+
+Với K=1.0 (risk penalty multiplier tiêu chuẩn) và Cost of Equity 14% – đây là baseline phù hợp cho ngành ngân hàng VN trong bối cảnh lãi suất điều hành neo cao và rủi ro nợ xấu tiềm ẩn. Stress test BVPS giảm 5% và P/B penalty 5% tạo ra một scenario khắc nghiệt vừa phải, đủ để sàng lọc các ngân hàng có chất lượng tài sản yếu.
+
+Mặt bằng ngành phân hóa rõ rệt: **Top 3 tạo Alpha dương (3.9%–6.2%), trong khi Bottom 3 đốt vốn nghiêm trọng (Alpha từ -7.1% đến -12.3%).** Điều này cho thấy không phải "sector-wide distress" mà là câu chuyện stock-picking rõ ràng.
+
+## 2. Top Alpha Decomposition
+
+**1. HDB (Alpha 6.2%, P/B 1.24):** Fortress điển hình. P/B 1.24 là mức định giá hợp lý, không quá rẻ nhưng vẫn tạo được Alpha dương nhờ ROE cao bền vững và σ(ROE) thấp. Chất lượng tài sản vượt trội là driver chính.
+
+**2. CTG (Alpha 4.1%, P/B 1.00):** P/B = 1.0 = ngưỡng bảo toàn vốn cổ đông. Định giá cực rẻ (gần như không có premium) là driver chính. Tuy nhiên, đây có thể là **Cheap Trap nếu ROE không ổn định**. Cần theo dõi biến động ROE.
+
+**3. SHB (Alpha 3.9%, P/B 0.93):** P/B <1 (định giá dưới giá trị sổ sách) là lợi thế lớn. Dù ROE không quá cao, nhưng σ(ROE) thấp + P/B rẻ tạo ra Disciplined Return hấp dẫn. **Cheap-but-not-trap** nếu ROE được duy trì.
+
+## 3. Value Traps Warning
+
+**EIB (Alpha -12.3%, P/B 1.49):** Risk Penalty cực lớn (σ(ROE) cao). P/B 1.49 không phải quá đắt, nhưng lợi nhuận bất ổn khiến chi phí vốn ăn mòn hoàn toàn. **Growth Trap điển hình.**
+
+**VCB (Alpha -7.2%, P/B 2.26):** P/B 2.26 là premium quá cao so với ROE hiện tại. Dù là ngân hàng tốt, nhưng định giá phản ánh quá nhiều kỳ vọng. **Premium Burn rõ rệt.**
+
+**LPB (Alpha -7.1%, P/B 2.94):** P/B 2.94 – mức đắt nhất toàn danh sách. Định giá phí bất hợp lý, không tương xứng với ROE thực tế. **Premium Burn + Risk Penalty lớn** từ σ(ROE) giao động.
+
+## 4. Portfolio Construction
+
+- **Core Holding (60–70%):** **HDB** – Fortress chất lượng cao, Alpha ổn định.
+- **Tactical (20–30%):** **CTG** và **SHB** – định giá rẻ hỗ trợ Alpha nếu ROE không suy giảm. CTG cần watchlist Cheap Trap.
+- **Cấm mua/Underweight:** **EIB, VCB, LPB** – cả 3 đều đốt vốn ở các mức độ khác nhau. VCB và LPB đặc biệt nguy hiểm do P/B cao (premium kỳ vọng quá lớn).
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB"],
+  "tactical_holdings": ["CTG", "SHB"],
+  "avoid_list": ["EIB", "VCB", "LPB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```

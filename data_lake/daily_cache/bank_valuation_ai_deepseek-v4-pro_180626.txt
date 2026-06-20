@@ -1,0 +1,47 @@
+# BÁO CÁO BANK VALUATION FEED CHO AI CIO
+
+**Ngày báo cáo AI: 18/06/2026**
+
+## 1. Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng
+
+- **Điểm độ rộng định giá: -56.5%** (ngưỡng dưới -50%)
+- **Số mã:** Định giá cao 14/23 (60.9%), Hợp lý 7/23 (30.4%), Rẻ rõ rệt 0, Rẻ nhưng rủi ro 2
+- **Kết luận: Định giá cao trên diện rộng.** Biên an toàn âm sâu: gap trung vị -15.1%, gap vốn hóa -22%, thể hiện thị trường đang chiết khấu rủi ro tín dụng quá thấp vào giá cổ phiếu ngân hàng.
+
+## 2. Luận điểm chính
+
+- **60.9% số ngân hàng bị định giá cao** - đây là tỷ lệ chiếm áp đảo, không còn mang tính chọn lọc. Điểm độ rộng -56.5% nằm sâu trong vùng đỏ, báo hiệu xác suất điều chỉnh cao.
+- **Không có mã rẻ rõ rệt nào**, chỉ có 2 mã "rẻ nhưng rủi ro" (NAB, KLB) với risk score cao (42.6-51.9) - đây là rẻ kém chất lượng, không phải cơ hội an toàn.
+- **Gap vốn hóa -22%** cho thấy các ngân hàng lớn (VCB, BID, CTG) đang bị định giá quá cao so với nội tại, kéo chỉ số thị trường xuống.
+- **Tương phản rõ:** Các mã gap dương cao nhất (NAB +52%, KLB +26%) lại có risk score cao và data quality trung bình, trong khi các mã blue-chip (VCB, LPB) gap âm rất sâu (-42% đến -47%).
+- **Điểm định giá tương đối -8.7%** khẳng định việc định giá cao không chỉ tuyệt đối mà còn tương đối so với peer.
+
+## 3. Kiểm tra chéo từ xác nhận thị trường
+
+- **Thị trường đang phủ định kết luận regime.** 2 mã rẻ duy nhất (NAB, KLB) được "Undervalued, Price Confirmed" - giá đang tăng xác nhận định giá rẻ. Tuy nhiên, đây là rủi ro cao, không đại diện cho toàn nhóm.
+- **Các mã Fair Value** chỉ có 2 mã "Fair Value, Market Agrees" (TPB, MBB). ACB và CTG bị "Fair, Weak Price Action" - giá không ủng hộ.
+- **Confirmation score yếu nhất** thuộc về các mã overvalued: PGB (5.1), ACB (13.8), EIB (18.6) - thị trường đang xác nhận định giá cao = nguy cơ điều chỉnh giá.
+
+## 4. Tín hiệu theo mã
+
+### Đáng theo dõi (nhóm hợp lý/rẻ):
+- **NAB, KLB**: Rẻ nhưng rủi ro, giá đã xác nhận, beta thấp (0.6-0.85) - chỉ dành cho allocation nhỏ, cần quản trị rủi ro chặt.
+- **TPB, MBB**: Fair Value, thị trường đồng thuận, risk score trung bình - có thể giữ nhưng không mua thêm.
+- **ACB, CTG**: Fair Value nhưng weak price action - cảnh báo giá có thể điều chỉnh về vùng định giá thấp hơn.
+
+### Rủi ro / Value trap:
+- **NVB (-88.9%), EIB (-65.6%), BVB (-61.3%)**: gap âm sâu nhất, risk score cao nhất (58-68), NVB thiếu CAR, NPL cao (8.6%). Đây không phải cơ hội mà là bẫy giá trị.
+- **VPB, LPB, VCB**: gap âm rất sâu (-36% đến -47%) do định giá thị trường quá cao, risk score từ trung bình đến cao.
+- **PGB, HDB**: confirmation score rất thấp + định giá cao = giá sắp điều chỉnh.
+
+## 5. Rủi ro dữ liệu và bước tiếp theo
+
+- **Data quality cảnh báo:**
+  - NVB: thiếu CAR, dùng fallback cho capital dilution risk → điểm rủi ro có thể chưa phản ánh đủ mức độ tồi tệ thực tế.
+  - BAB, SGB: không có giá thị trường, beta dùng mặc định → không thể tính gap; không đưa vào phân loại regime.
+  - Tất cả mã rẻ (NAB, KLB) đều có risk score > 40: credit cycle score và capital dilution risk cao.
+- **Bước tiếp theo trước khi dùng tín hiệu:**
+  1. Xem xét NVB, EIB, BVB có dấu hiệu tái cấu trúc hay không nếu muốn bottom-fishing (rủi ro rất cao).
+  2. Kiểm chứng CAR và NPL của NVB từ báo cáo tài chính gần nhất.
+  3. Không tăng tỷ trọng nhóm ngân hàng khi regime đang ở vùng "định giá cao trên diện rộng".
+  4. Chỉ giữ các mã có confirmation score > 70 (ABB, MSB, VAB) và risk score thấp hoặc trung bình.

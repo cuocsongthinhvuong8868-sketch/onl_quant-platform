@@ -1,0 +1,264 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-06-15T14:50:44",
+  "t_data_date": "2026-06-15",
+  "target_report_date": "2026-06-14",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_140626.txt",
+  "report_mtime": "report:2026-06-15T14:46:49|sidecar:2026-06-15T14:46:49",
+  "parsed": {
+    "report_date": "2026-06-14",
+    "composite_score": 11.0,
+    "regime": "CRISIS/PRE-CRASH",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 14.0,
+        "unit": "sessions",
+        "description": "Nếu số phiên STRESS/WARNING giảm xuống dưới 5, VNIBOR squeeze đã kết thúc"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 29.2,
+        "unit": "%",
+        "description": "Nếu Breadth MA20 vượt 45%, thị trường thoát Bear Confirmed"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 65.9,
+        "unit": "%",
+        "description": "Nếu SSI xuống dưới 55%, hệ thống thoát WARNING"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "Tail Index (xi)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.345,
+        "unit": "",
+        "description": "Nếu ξ xuống dưới 0.25, Fat Tail regime kết thúc"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 26.7,
+        "unit": "th pct",
+        "description": "Nếu Slope Percentile duy trì dưới 70th, Vingroup không còn rủi ro dẫn dắt F1"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.8,
+        "unit": "th pct",
+        "description": "Nếu CQS percentile xuống dưới 80th, credit stress toàn cầu hạ nhiệt"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-06-14",
+      "composite_score": 11,
+      "regime": "CRISIS/PRE-CRASH",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 14,
+          "unit": "sessions",
+          "description": "Nếu số phiên STRESS/WARNING giảm xuống dưới 5, VNIBOR squeeze đã kết thúc"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 29.2,
+          "unit": "%",
+          "description": "Nếu Breadth MA20 vượt 45%, thị trường thoát Bear Confirmed"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 65.9,
+          "unit": "%",
+          "description": "Nếu SSI xuống dưới 55%, hệ thống thoát WARNING"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "Tail Index (xi)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.345,
+          "unit": "",
+          "description": "Nếu ξ xuống dưới 0.25, Fat Tail regime kết thúc"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 26.7,
+          "unit": "th pct",
+          "description": "Nếu Slope Percentile duy trì dưới 70th, Vingroup không còn rủi ro dẫn dắt F1"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.8,
+          "unit": "th pct",
+          "description": "Nếu CQS percentile xuống dưới 80th, credit stress toàn cầu hạ nhiệt"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-06-14",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "14.0 sessions",
+      "T actual": 14.0,
+      "T actual display": "14.0 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-06-11",
+      "Description": "Nếu số phiên STRESS/WARNING giảm xuống dưới 5, VNIBOR squeeze đã kết thúc",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "29.2%",
+      "T actual": 38.35294117647059,
+      "T actual display": "38.4%",
+      "Delta": 9.152941176470588,
+      "Delta display": "+9.153%",
+      "Status": "Intact",
+      "Data date": "2026-06-15",
+      "Description": "Nếu Breadth MA20 vượt 45%, thị trường thoát Bear Confirmed",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "65.9%",
+      "T actual": 66.03558689174265,
+      "T actual display": "66.0%",
+      "Delta": 0.1355868917426477,
+      "Delta display": "+0.136%",
+      "Status": "Intact",
+      "Data date": "2026-06-15",
+      "Description": "Nếu SSI xuống dưới 55%, hệ thống thoát WARNING",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "Tail Index (xi)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.345",
+      "T actual": 0.3454435282173134,
+      "T actual display": "0.345",
+      "Delta": 0.00044352821731341585,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-06-15",
+      "Description": "Nếu ξ xuống dưới 0.25, Fat Tail regime kết thúc",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "26.7 th pct",
+      "T actual": 25.0,
+      "T actual display": "25.0 th pct",
+      "Delta": -1.6999999999999993,
+      "Delta display": "-1.7 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-15",
+      "Description": "Nếu Slope Percentile duy trì dưới 70th, Vingroup không còn rủi ro dẫn dắt F1",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.8 th pct",
+      "T actual": 99.8015873015873,
+      "T actual display": "99.8 th pct",
+      "Delta": 0.0015873015873069107,
+      "Delta display": "+0.002 th pct",
+      "Status": "Intact",
+      "Data date": "2026-06-12",
+      "Description": "Nếu CQS percentile xuống dưới 80th, credit stress toàn cầu hạ nhiệt",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 14,
+      "date": "2026-06-11",
+      "error": ""
+    },
+    "breadth": {
+      "value": 38.35294117647059,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "ssi": {
+      "value": 66.03558689174265,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "coupling": {
+      "value": 25.0,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.8015873015873,
+      "date": "2026-06-12",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}

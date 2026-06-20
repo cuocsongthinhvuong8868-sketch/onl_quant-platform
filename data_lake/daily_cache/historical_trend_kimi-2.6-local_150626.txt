@@ -1,0 +1,220 @@
+### 📈 BẢN TÓM TẮT XU HƯỚNG LỊCH SỬ (T-7 ĐẾN T-1)
+
+---
+
+#### 1. Biến thiên Điểm số & Macro Regime (Score & Regime Evolution)
+
+**Composite Score: Cứng nhắc ở 11/100 xuyên suốt 7 phiên liên tiếp (T-7 đến T-1), không có bất kỳ biến động nào.**
+
+| Phiên | Score | Regime | Phiên thứ |
+|-------|-------|--------|-----------|
+| T-7 (06/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 1 |
+| T-6 (08/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 2 |
+| T-5 (09/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 3 |
+| T-4 (10/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 4 |
+| T-3 (11/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 5 |
+| T-2 (12/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 6 |
+| T-1 (14/06) | 11/100 | CRISIS/PRE-CRASH | Phiên 7 |
+
+**Đánh giá chuyển dịch (Delta):** Score đi ngang hoàn toàn, không cải thiện cũng không xấu đi ở mức tổng hợp. Tuy nhiên, **cấu trúc bên trong đang chuyển dịch tinh vi**: Market Internal Score giảm từ 17/100 (T-7) xuống 15/100 (T-6 rồi giữ nguyên), phản ánh Breadth MA20 chạm đáy 19.8% tại T-6 rồi hồi phục dần lên 29.2% tại T-2. Macro Risk Score giữ nguyên 18/100, Tail Risk Score giữ nguyên 5/100. **Không có tín hiệu đảo chiều regime** — CRISIS/PRE-CRASH đã trở thành trạng thái "đóng băng" kéo dài 7 phiên, điều này cảnh báo thị trường đang tích lũy quán tính cực đoan chứ không phải đang phục hồi.
+
+---
+
+#### 2. Động lượng Thanh khoản Vĩ mô (Macro & Liquidity Momentum)
+
+**Fed Liquidity — Từ HOLD sang ADD nhưng với độ trễ đáng kể:**
+
+- **T-7 đến T-5:** Fed Liquidity ở trạng thái HOLD. Net Liquidity 5,828 tỷ USD, Impulse tuần âm lần đầu (-2,086 tỷ USD), Z-Score +0.01 (trung tính). RRP gần cạn kiệt (3.7 tỷ USD) — nguồn bơm thụ động đã tắt. Tín hiệu trung tính, không hỗ trợ cũng không kìm hãm.
+- **T-4 đến T-1:** Fed chuyển sang ADD signal. Net Liquidity tăng mạnh +63,168 triệu USD, Z-Score +1.11 (cận biên 1.0-1.5σ). WALCL tăng theo lộ trình (QE muộn), TGA giảm do Treasury xả tiền tài trợ chi tiêu. **Tuy nhiên, đây là thanh khoản cơ học từ QE, không phải thanh khoản cấp cứu.** Spillover VN-Index positive nhưng có độ trễ 4-8 tuần.
+
+**VNIBOR — Snapshot hạ nhiệt nhưng trend vẫn tightening (xu hướng cải thiện nhẹ nhưng chưa đảo chiều):**
+
+| Phiên | ON Rate | Z-Score | Số phiên STRESS/20 | ON MA5 20D Change | Trạng thái |
+|-------|---------|---------|-------------------|-------------------|------------|
+| T-7 | 5.30% | +1.24 (87.7th) | 15/20 | +0.88% | TIGHT + WARNING |
+| T-6 | 6.13% | +1.11 (86.5th) | 16/20 | +1.00% | TIGHT + STRESS |
+| T-5 | 9.35% | +0.93 (84.9th) | 17/20 | +3.02% | TIGHT + STRESS |
+| T-4 | 5.80% | +0.82 (83.3rd) | 16/20 | +0.70% | TIGHT + NEUTRAL |
+| T-3 | 4.85% | +0.73 (82.9th) | 15/20 | +0.51% | TIGHT + NEUTRAL |
+| T-2 | 4.34% | +0.60 (79.8th) | 14/20 | +0.27% | TIGHT + NEUTRAL |
+| T-1 | 4.34% | +0.60 (79.8th) | 14/20 | +0.27% | TIGHT + NEUTRAL |
+
+**Xu hướng chuyển dịch:** ON rate giảm mạnh từ đỉnh 9.35% (T-5) về 4.34% (T-2, T-1), đường cong lãi suất bình thường hóa (1W-ON từ -1.36% đảo ngược trở lại +0.83% dương). Số phiên STRESS giảm từ 17 xuống 14. **Đây là "lũ rút" — snapshot hạ nhiệt nhưng trend 20 phiên vẫn tightening với slope +0.049%/phiên, 14/20 phiên STRESS, 19/20 phiên TIGHT.** Squeeze chưa kết thúc, chỉ tạm dịu.
+
+**LTMM — Kênh truyền dẫn liên tục bị tắc nghẽn:**
+
+- Xuyên suốt 7 phiên: Macro state **STRESS_TRANSMITTING** không đổi.
+- FRI_collateral giữ nguyên ở 0.915 (tightening — warning) — nút thắt cổ chai chính không giải phóng.
+- **2 trigger FIRE đã kích hoạt xuyên suốt**: developer_cashflow_to_bank_stress (3/3) + transmission_breakdown (1/1). collateral_chain_breakdown ở 2/3 — cận kề kích hoạt.
+- Tại T-1: Fund system cash posture stress +1.688 — cao nhất hệ thống, xác nhận đứt gãy truyền dẫn thanh khoản từ thượng nguồn xuống thị trường.
+- Foreign flow 5d pressure ở 1.552 (stress) — áp lực bán ròng nước ngoài duy trì.
+
+**Global Financial Conditions — Credit stress leo thang kỷ lục:**
+
+- CQS (CCC − HY OAS) tăng từ 99th (T-7) → 98th (T-6) → 99.4th (T-5) → 98.8th (T-4) → 97.8th (T-3) → 99.8th (T-2, T-1). **T-1 đạt percentile 100% (6.78%) — mức kỷ lục mới.**
+- CCC OAS 88th-91st percentile — deep junk stress bền vững.
+- DXY tăng từ 78th (T-7) → 93rd (T-2) → 91% (T-1) — USD mạnh bất thường gây áp lực EM.
+- OVX 65-73rd percentile — oil shock active.
+- VIX 26th-88th percentile — equity fear biến động.
+- US Margin Debt/M2 = 5.72%, 10Y percentile 100th, Z-Score 5Y +2.29σ — **crowded leverage ở mức kỷ lục, cảnh báo deleveraging risk.**
+
+**Kết luận động lượng vĩ mô:** Thanh khoản thượng nguồn (Fed) chuyển từ HOLD sang ADD, nhưng kênh truyền dẫn trong nước (LTMM) bị tắc nghẽn nghiêm trọng. Global credit stress leo thang kỷ lục tạo "gọng kìm" 3 chiều: credit stress + oil shock + USD strength. VNIBOR snapshot hạ nhiệt nhưng trend vẫn tightening. **Động lượng tổng thể: áp lực vĩ mô đang gia tăng, không giảm.**
+
+---
+
+#### 3. Nội tại Thị trường & Sức khỏe Lợi nhuận (Market Internal & Fundamental Shift)
+
+**Độ rộng thị trường (Breadth) — Hồi phục nhẹ từ đáy nhưng vẫn oversold:**
+
+| Phiên | Breadth MA20 | Breadth MA125 | Trạng thái |
+|-------|-------------|---------------|------------|
+| T-7 | N/A | 27.8% | Bear Confirmed |
+| T-6 | 19.8% (đáy) | 25.6% | Bear Confirmed |
+| T-5 | 24.2% | 25.9% | Bear Confirmed |
+| T-4 | 28.7% | 28.2% | Bear Confirmed |
+| T-3 | 29.6% | 27.1% | Bear Confirmed |
+| T-2 | 29.2% | 25.4% | Bear Confirmed |
+| T-1 | 29.2% | 25.4% | Bear Confirmed |
+
+**Xu hướng chuyển dịch:** Breadth MA20 chạm đáy 19.8% tại T-6 (oversold cực đoan), sau đó hồi phục dần lên 29.2% tại T-2/T-1 (+9.4pp từ đáy). Tuy nhiên, **vẫn dưới ngưỡng 30% — Bear Confirmed trên mọi khung thời gian**. Breadth MA125 giảm từ 27.8% → 25.4% (-2.4pp) — xu hướng dài hạn vẫn xấu đi. Đây là hồi phục kỹ thuật trong xu hướng giảm, không phải đảo chiều.
+
+**Dispersion — Phân hóa cực đại:**
+
+- Avg Correlation giữ nguyên 0.005-0.006 xuyên suốt — phân hóa cực đại, môi trường stock-picking.
+- DPI giảm từ 45.0% (T-7) → 41.7% (T-6) → 43.3% (T-5) → 40.0% (T-2, T-1) — stock-picking cơ hội thu hẹp dần.
+- Spread_Z biến động từ -0.28σ (T-7) → +0.75σ (T-5) → -0.54σ (T-2) — không có xu hướng rõ ràng.
+
+**Upside Ratio — Zombification/Distribution:**
+
+- T-7: Zombification, Cung momentum (0.212) > Cầu (0.186), P95 Downside 26.97%
+- T-6: Distribution, Cung (0.213) > Cầu (0.194), P95 Downside 27.96%
+- T-5: Distribution, Cung (0.206) > Cầu (0.200), P95 Downside 27.01%
+- T-4: Zombification, Cầu (0.195) > Cung (0.191), P95 Downside 26.54%
+- T-3: Zombification, Cầu (0.197) > Cung (0.210), P95 Downside 26.64%
+- T-2: Zombification, Cầu (0.201) < Cung (0.212), P95 Downside 26.75%
+- T-1: Distribution, Cung > Cầu
+
+**Xu hướng:** Cung momentum liên tục nhỉnh hơn hoặc cân bằng với cầu, thanh khoản cạn kiệt. P95 Downside dao động 26.5-28% — Blast Radius rất rộng.
+
+**VN100 Earnings Health — Divergence lớn nhất trong toàn bộ chuỗi:**
+
+- **Score giữ nguyên +0.171 (Recovery regime) xuyên suốt 7 phiên** — không thay đổi.
+- **5-quarter trend:** Cải thiện rõ rệt từ -0.114 (2025Q1) → +0.171 (2026Q1), +0.285 điểm sau 4 quý.
+- **Breadth rộng:** 80/97 ticker dương — phục hồi nền rộng.
+- **Sector leadership:** Consumer/Retail (+0.294) dẫn đầu, Bank (+0.132) phục hồi chậm. Real Estate (-0.010) và Utilities/Energy (-0.041) yếu nhất.
+- **PCA validation:** Factor score +0.642, PC1 explained 57.3%, correlation EW vs PC1 = 0.988 — common cycle thật, không bị méo bởi một sector.
+
+**Xu hướng chuyển dịch:** VN100 Earnings Health **không thay đổi** trong suốt 7 phiên — đây là dữ liệu quarterly, không cập nhật daily. Tuy nhiên, **divergence với price action ngày càng lớn**: trong khi market-internal consensus (Breadth, SSI, EVT) đều báo CRISIS, earnings fundamental báo Recovery với breadth rộng. Đây là cơ hội định giá dài hạn, không phải tín hiệu mua ngắn hạn.
+
+**Risk-Adjusted Growth (Economic Alpha) — Thu hẹp dần, Fortress thay đổi:**
+
+| Phiên | Số bank Alpha > 0 | Fortress chính | Alpha Fortress | Thay đổi |
+|-------|------------------|----------------|---------------|----------|
+| T-7 | 3/6 | HDB | +5.8% | — |
+| T-6 | 3/6 | HDB | +6.2% | — |
+| T-5 | 3/6 | HDB | +6.2% | — |
+| T-4 | 3/6 | HDB | +6.0% | — |
+| T-3 | 3/6 | HDB | +6.2% | — |
+| T-2 | 1/6 | SHB | +1.2% | **HDB mất top Alpha** |
+| T-1 | 1/6 | SHB | +1.2% | SHB duy trì |
+
+**Xu hướng chuyển dịch:** Số lượng bank có Alpha dương thu hẹp từ 3/6 xuống 1/6 — môi trường tạo giá trị thặng dư đang suy giảm. HDB (Alpha +6.2%) bị SHB (Alpha +1.2%) thay thế làm Fortress duy nhất tại T-2/T-1. Các bank Alpha âm sâu: LPB (-12.0%), EIB (-11.4%), VPB (-10.1%) — bẫy giá trị/premium burn nguy hiểm. **Đây là tín hiệu tiêu cực: ngay cả nhóm ngân hàng — truyền thống là điểm tựa của thị trường — cũng đang mất khả năng tạo Alpha.**
+
+---
+
+#### 4. Tích tụ Rủi ro Đuôi (Tail Risk Accumulation)
+
+**Systemic Stress Index (SSI) — Leo thang bền vững, không có dấu hiệu hạ nhiệt:**
+
+| Phiên | SSI | Phiên WARNING | Market State | Driver chính |
+|-------|-----|---------------|--------------|--------------|
+| T-7 | 65.6% | 14 phiên | EUPHORIC RISK | S_LIQ 36% |
+| T-6 | 65.7% | 15 phiên | ACTIVE STRESS | S_LIQ 36% |
+| T-5 | 65.7% | 16 phiên | EUPHORIC RISK | S_LIQ 36% |
+| T-4 | 65.7% | 16 phiên | EUPHORIC RISK | S_LIQ 36% |
+| T-3 | 65.8% | 17 phiên | EUPHORIC RISK | S_LIQ 36% |
+| T-2 | 65.9% | 18 phiên | EUPHORIC RISK | S_LIQ 36% |
+| T-1 | 65.9% | 18 phiên | EUPHORIC RISK | S_LIQ 36% |
+
+**Xu hướng chuyển dịch:** SSI tăng từ 65.6% → 65.9% (+0.3pp), kéo dài từ 14 phiên WARNING lên 18 phiên liên tiếp. **Đây là trạng thái tích tụ stress ngầm bền vững — không phải spike đột ngột.** Driver chính luôn là S_LIQ (36%) — volume dry-up, cấu trúc bull-trap cổ điển. Market state EUPHORIC RISK (stress cao kết hợp uptrend giá) xuyên suốt — thị trường đang trong pha "hoảng loạn kiểu mới": giá không sập mạnh nhưng thanh khoản suy kiệt và stress hệ thống leo thang.
+
+**EVT Tail-Index (ξ) — Fat Tail bền vững:**
+
+| Phiên | ξ | Hill | Gaussian Gap | ES − VaR Spread | Trạng thái |
+|-------|---|------|--------------|-----------------|------------|
+| T-7 | 0.346 | 0.471 | 1.82pp | -1.36% | FAT TAIL |
+| T-6 | 0.346 | 0.471 | 1.56pp | -1.37% | FAT TAIL |
+| T-5 | 0.345 | 0.447 | 1.64pp | -1.37% | FAT TAIL |
+| T-4 | 0.345 | 0.447 | 1.64pp | -1.37% | FAT TAIL |
+| T-3 | 0.345 | 0.447 | 1.71pp | -1.37% | FAT TAIL |
+| T-2 | 0.345 | 0.447 | 1.76pp | -1.37% | FAT TAIL |
+| T-1 | 0.345 | 0.447 | 1.76pp | -1.37% | FAT TAIL |
+
+**Xu hướng chuyển dịch:** ξ giảm nhẹ từ 0.346 → 0.345 nhưng **vẫn vững chắc trên ngưỡng 0.30** (Fat Tail confirmed). Hill estimator 0.447 xác nhận robust. Gaussian Gap dao động 1.56-1.82pp — vượt xa ngưỡng 1pp, mô hình Gaussian hoàn toàn broken ở tail 99%. ES − VaR spread ~-1.37% > σ₃₀ (0.79-0.90%) — thiệt hại ngoài VaR cực kỳ nghiêm trọng. **Rủi ro đuôi đang ở trạng thái "đóng băng" ở mức cực đoan — không cải thiện, không leo thang thêm, nhưng bền vững.**
+
+**VaRES — "False Calm" nguy hiểm:**
+
+| Phiên | Stress Index | Mã thủng VaR | Complacency | Mispriced |
+|-------|-------------|--------------|-------------|-----------|
+| T-7 | 0.00% | 0/30 | 6.48% | 7 mã |
+| T-6 | 30.00% | 9/30 (VIC,VJC,BVH) | 6.48% | 7 mã |
+| T-5 | 0.00% | 0/30 | 5.56% | 6 mã |
+| T-4 | 0.00% | 0/30 | 5.56% | 6 mã |
+| T-3 | 3.33% | 1/30 (VJC) | 4.63% | 5 mã |
+| T-2 | 3.33% | 1/30 (VHM) | 4.63% | 5 mã |
+| T-1 | 3.33% | 1/30 (VHM) | 4.63% | 5 mã |
+
+**Xu hướng chuyển dịch:** Stress Index biến động mạnh — từ 0% → 30% (T-6) rồi giảm về 3.33%. Tuy nhiên, **đây không phải tín hiệu cải thiện**. Tại T-6, 9/30 mã thủng VaR (VIC, VJC, BVH dẫn đầu) báo hiệu stress đang lan rộng. Tại T-1, chỉ còn 1/30 (VHM) nhưng Complacency 4.63% cho thấy thị trường không ngủ quên — stress đang tích tụ ngầm. **Đây là "false calm" nguy hiểm: stress không biểu hiện qua số lượng mã thủng VaR nhưng tích tụ qua SSI và EVT.**
+
+**Kết luận tích tụ rủi ro đuôi:** Cả 3 lớp (SSI, EVT, VaRES) đồng thuận ở mức EXTREME xuyên suốt 7 phiên. SSI leo thang từ 65.6% → 65.9% (18 phiên WARNING). ξ vững chắc 0.345 > 0.30. VaRES biến động nhưng "false calm" với Complacency thấp. **Rủi ro đuôi đang tích tụ ngầm bền vững — không phải trạng thái manageable, cũng không phải đang leo thang đột ngột, mà là "pressure cooker" chờ kích nổ.**
+
+---
+
+#### 5. Nhật ký Humility & Falsification (Humility Check History)
+
+**Luận điểm chính: CRISIS/PRE-CRASH (Score 11, Cash 97-100%)**
+
+| Phiên | Thesis Status | Rules FALSIFIED | Rules INTACT | Đánh giá |
+|-------|-------------|-----------------|--------------|----------|
+| T-7 | WATCH | 1/6: Vingroup Coupling (86.7th → 36.7th) | 5/6 | Coupling giảm = tích cực |
+| T-6 | WATCH | 1/6: Vingroup Coupling (35.0th) | 5/6 | Coupling giảm = tích cực |
+| T-5 | WATCH | 1/6: Vingroup Coupling (33.3th) | 5/6 | Coupling giảm = tích cực |
+| T-4 | WATCH | 1/6: Vingroup Coupling (31.7th) | 5/6 | Coupling giảm = tích cực |
+| T-3 | WATCH | 1/6: Vingroup Coupling (30.0th) | 5/6 | Coupling giảm = tích cực |
+| T-2 | WATCH | 1/6: Vingroup Coupling (26.7th) | 5/6 | Coupling giảm = tích cực |
+| T-1 | WATCH | 1/6: Vingroup Coupling (26.7th) | 5/6 | Coupling giảm = tích cực |
+
+**5/6 rules INTACT xuyên suốt:**
+1. VNIBOR STRESS: 14-17 phiên > 5 (luôn vi phạm ngưỡng)
+2. Breadth MA20: 19.8-29.6% < 45% (luôn vi phạm ngưỡng)
+3. SSI: 65.6-65.9% > 55% (luôn vi phạm ngưỡng)
+4. EVT ξ: 0.345-0.346 > 0.25 (luôn vi phạm ngưỡng)
+5. CQS: 97.8-100th > 80th (luôn vi phạm ngưỡng)
+
+**Rule FALSIFIED duy nhất:** Vingroup Coupling Slope Percentile giảm từ 86.7th → 26.7th — **đây là tín hiệu TÍCH CỰC**: Vingroup không còn dẫn dắt F1, giảm rủi ro flash crash từ coupling phá vỡ. Tuy nhiên, rule falsified này không đủ để override 5 rules INTACT còn lại.
+
+**Cảnh báo bias cho CIO hiện tại (T):**
+
+1. **Bias "bắt đáy sớm" (Bottom-fishing bias):** VN100 Earnings Health báo Recovery (+0.171, 80/97 ticker dương) có thể kích thích khao khát giải ngân. Tuy nhiên, **divergence này đã tồn tại 7 phiên mà không tạo ra đảo chiều** — earnings tốt không override được tail risk extreme và macro headwind.
+
+2. **Bias "thanh khoản đã cải thiện" (Liquidity illusion):** VNIBOR ON giảm từ 9.35% về 4.34%, số phiên STRESS giảm từ 17 xuống 14. Tuy nhiên, **trend 20 phiên vẫn tightening, LTMM transmission_breakdown vẫn FIRE, Fund cash posture stress +1.688** — thanh khoản không đến được thị trường.
+
+3. **Bias "volatility đã hạ nhiệt" (Vol complacency):** EGARCH vol giảm từ 18.7% → 13.1% (-5.6%). Tuy nhiên, **SSI vẫn 65.9%, ξ vẫn 0.345 — đây là "false calm"**, vol giảm trong bối cảnh stress tích tụ ngầm còn nguy hiểm hơn vol tăng.
+
+4. **Bias "Fed đang bơm tiền" (Fed liquidity optimism):** Fed ADD signal (+63,168 triệu USD) là tín hiệu tích cực. Tuy nhiên, **độ trễ 4-8 tuần, CQS kỷ lục, DXY mạnh, US Margin Debt/M2 100th percentile** — thanh khoản Fed chưa đủ để override credit stress toàn cầu và crowded leverage.
+
+**Điều kiện falsify luận điểm CRISIS (cần 3/6 đồng thời):**
+1. VNIBOR STRESS < 5/20 phiên + ON MA5 20D change âm
+2. Breadth MA20 > 45%
+3. SSI < 55%
+4. EVT ξ < 0.25
+5. CQS < 80th percentile
+6. VaRES Stress Index > 40% (contagion) — *điều này sẽ củng cố CRISIS chứ không falsify*
+
+**Trạng thái hiện tại:** 0/6 điều kiện được thỏa mãn. Luận điểm CRISIS/PRE-CRASH vẫn vững chắc. Tuy nhiên, CIO hiện tại cần đặc biệt thận trọng với **bottom-fishing bias** do VN100 Recovery tạo divergence hấp dẫn nhưng nguy hiểm.
+
+---
+
+**Tóm tắt tổng hợp cho Main AI CIO phiên T:**
+
+Thị trường đang ở trạng thái **CRISIS/PRE-CRASH "đóng băng" kéo dài 7 phiên** với Score 11/100 cố định. Cấu trúc bên trong đang chuyển dịch tinh vi: **tích cực nhẹ** từ VNIBOR snapshot hạ nhiệt, EGARCH vol giảm, Vingroup Coupling giảm (giảm rủi ro flash crash), Breadth hồi từ đáy 19.8%; nhưng **tiêu cực bền vững** từ SSI leo thang 18 phiên WARNING, CQS kỷ lục 100th percentile, LTMM transmission_breakdown FIRE, Fund cash posture stress cao nhất hệ thống, và Risk-Adjusted Growth thu hẹp về chỉ còn 1/6 bank có Alpha dương. Divergence lớn nhất — VN100 Earnings Health Recovery vs Market Internal CRISIS — đã tồn tại 7 phiên mà không tạo đảo chiều. **Khuyến nghị: duy trì 100% Cash, không giải ngân cổ phiếu cơ sở, chỉ xem xét Short VN30F1M tối đa 20% NAV nếu có tín hiệu kỹ thuật phù hợp.**

@@ -1,0 +1,30 @@
+## 1. Observations
+- **OLS Slope**: 0.31, Percentile 26.7th — mức **thấp** trong lịch sử, cho thấy mức độ tác động của VIN lên VN30F1M đang yếu dần.
+- **Correlation**: 0.66, Percentile 75.0th — mức **cao**, phản ánh sự đồng pha vẫn còn mạnh giữa VIN và thị trường.
+- **Regime**: **ANCHORING** (ΔCorr = +0.68 > +0.15, ΔSlope = -0.17 < -0.15). Tương quan cao vẫn duy trì, nhưng slope đã suy yếu rõ rệt.
+
+## 2. Microstructure Read
+- VIC/VHM/VRE vẫn **chi phối** mặt giá VN30F1M nhưng **không còn dẫn dắt động lượng** (hệ số OLS sụt giảm đáng kể). Nhóm VIN đang ở vai trò “giữ giá” hơn là “đẩy giá”.
+- Không có dấu hiệu can thiệp bất thường: cả 2 percentile đều không nằm ngoài biên 80th hoặc < 20th. Thị trường vẫn xoay quanh VIN nhưng **sức ảnh hưởng thu hẹp**.
+
+## 3. Event Study Interpretation
+- **ANCHORING**: Tín hiệu cho thấy **Market Makers** hay nhóm lớn vẫn dùng VIC, VHM, VRE để neo giá, nhưng không tạo được áp lực đẩy lên cao. Điều này dẫn đến rủi ro **sideways trước khi đảo chiều** — thường bất lợi cho việc long F1 thuần nếu không có breakout.
+- **Không phải tín hiệu giả** — có thể giao dịch nhưng cần thận trọng.
+
+## 4. Verdict
+- **Trade Plan**: **NO TRADE** / **Có thể cân nhắc Short F1 nếu VIC mất hỗ trợ**. Hiện tại, ANCHORING + slope yếu không ủng hộ long F1. Nếu nhóm Bank (VCB, BID, ACB) bất ngờ dẫn dắt, ý tưởng Spread VIN-vs-Bank mở ra, nhưng chưa đủ tín hiệu.
+- **Leading indicator**: Theo dõi **VIC** break below **MA20** (≈ 189.50) hoặc **VHM** mất **MA50** (≈ 133.00), kết hợp khối lượng gia tăng là lúc vào Short F1.
+- **Stop-loss reference**: Nếu short F1 tại 1,939 điểm: stop-loss nếu buy VN30F1M vượt kháng cự 1,950 điểm (+0.6%) hoặc VIC hồi phục +2% lên ~ 199.40 signal false.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "12/06/2026",
+  "regime": "ANCHORING",
+  "slope_percentile": 26.7,
+  "corr_percentile": 75.0,
+  "trade_signal": "short_f1",
+  "confidence": "low"
+}
+```

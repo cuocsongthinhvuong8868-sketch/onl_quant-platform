@@ -1,0 +1,59 @@
+## 1. Regime & Xu hướng Sentiment
+
+| Window | Regime | Composite Score | Hướng |
+|--------|--------|----------------|-------|
+| 1d     | **strong_risk_on** | +0.579 | 🟢 Tích cực mạnh nhất |
+| 7d     | strong_risk_on | +0.399 | 🟢 Tích cực nhưng chậm lại |
+| 30d    | risk_on | +0.297 | 🟢 Tích cực nhưng yếu dần |
+
+**Nhận xét**: Sentiment đang **tăng tốc mạnh** từ risk_on lên strong_risk_on trong 1 ngày qua, composite score cải thiện rõ (+0.579 vs +0.399 7d). Các window không lệch hướng, tất cả đều xanh.
+
+---
+
+## 2. Channel kéo risk-on/risk-off mạnh nhất
+
+| Channel | 1d Score | 7d Score | Tác động |
+|---------|----------|----------|----------|
+| **monetary_policy** | +2.000 | +2.000 | 🟢 Kéo risk-on mạnh nhất (ECB rate hike) |
+| **fx_external** | +1.016 | +0.827 | 🟢 Tỷ giá trung tâm tăng liên tục |
+| **commodity** | +2.000 | +0.027 | 🟢 Đột biến positive 1d (than cốc TQ đỉnh 1 năm) |
+| **earnings** | +1.288 | +0.827 | 🟢 Kênh kết quả kinh doanh tích cực |
+| **liquidity** | **-0.019** | **-0.061** | 🔴 Kênh âm duy nhất (NHNN hút ròng mạnh) |
+
+---
+
+## 3. Top Drivers Quan Trọng
+
+### Positive (Risk-On)
+1. **ECB tăng lãi suất 25bps lên 2.65%** – channel monetary_policy, score +1.529 – Tín hiệu sức khỏe kinh tế toàn cầu
+2. **Tỷ giá trung tâm tăng liên tục 3 phiên** (25.155 → 25.165 → 25.175) – channel fx_external, score +1.432 – Dòng vốn ngoại vào
+3. **Giá than cốc Trung Quốc lập đỉnh 1 năm** tại 1.887,5 CNY/tấn – channel commodity, score +1.273 – Nguyên liệu sản xuất hồi phục
+4. **Lợi suất TPCP đi ngang** – channel credit_stress, score +0.230 – Thị trường nợ ổn định
+5. **Bộ Tài chính ưu đãi thuế xăng E10** – channel growth, score +0.168 – Chính sách hỗ trợ năng lượng sạch
+
+### Negative (Risk-Off)
+1. **Lãi suất huy động tăng trở lại** – channel liquidity, score -0.194 – Áp lực vốn nóng (doanh nghiệp)
+2. **NHNN hút ròng ~9.938 tỷ đồng qua OMO** phiên 17/06 – channel liquidity, score -0.179 – Thắt chặt thanh khoản
+3. **Iran-Mỹ thỏa thuận gây bất ổn đánh giá** – channel growth, score -0.167 – Rủi ro địa chính trị
+4. **Doanh nghiệp Việt đối mặt áp lực tài chính** – channel growth, score -0.167 – Thanh khoản DN khó khăn
+5. **Giá dầu giảm nhẹ chờ thỏa thuận Iran** – channel growth, score -0.166 – Hàng hóa yếu
+
+---
+
+## 4. Tác động lên AI CIO
+
+| Layer | Tác động | Chi tiết |
+|-------|----------|----------|
+| **Macro layer** | ✅ **Supports** | Regime strong_risk_on + composite dương cao (0.58) phù hợp với xu hướng dòng vốn toàn cầu vào EM, ECB hike cho thấy sức khỏe kinh tế. Tỷ giá tăng là tín hiệu VND ổn định thu hút vốn. |
+| **Market-internal tools** | ⚠️ **Mixed – cần cảnh giác** | Liquidity đang âm (NHNN hút ròng mạnh) mâu thuẫn với risk-on tổng thể. Lãi suất huy động tăng là rủi ro cho chi phí vốn, có thể ảnh hưởng đến P/E và định giá. |
+
+**Kết luận**: Sentiment ủng hộ risk-on ở macro nhưng tools internal cần theo dõi sát thanh khoản VND – đây là điểm trừ duy nhất trong bức tranh tổng thể hiện tại.
+
+---
+
+## 5. Caveat
+
+- **Source coverage**: 67% từ mozyfin, 33% từ widata – thiếu các nguồn lớn như Reuters hay Bloomberg, tin có thể thiên lệch
+- **Stale feed**: Generated at 18:56 ngày 17/06 – feed mới, không stale
+- **Headline noise**: ECB hike dù positive nhưng chỉ là 25bps – không phải tín hiệu đột biến. Tin "Iran got what it wanted" rút từ Fortune có thể là clickbait
+- **Rủi ro**: NHNN đang hút ròng liên tục 15-16-17/06 (tổng ~50.000 tỷ trong 3 phiên) – nếu kéo dài sẽ đảo chiều sentiment

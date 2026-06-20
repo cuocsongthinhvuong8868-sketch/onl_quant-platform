@@ -1,0 +1,43 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.64% — gần gấp đôi Parametric VaR (-1.29%), cho thấy phân phối lợi nhuận không chuẩn.
+- **EVT VaR 99%**: -3.66% — tổn thất 1% nguy hiểm nhất có thể vượt quá 3.5%.
+- **ξ (GPD shape)**: +0.346 — vượt ngưỡng FAT TAIL (ξ > 0.30).
+- **Hill index**: +0.471 — cùng dấu dương với ξ, xác nhận đuôi dày.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346** thuộc bracket **FAT TAIL** (ξ > 0.30). Mô hình Gaussian đánh giá thấp rủi ro đuôi một cách nguy hiểm, và ES 99% ở -6.11% nằm ngoài khả năng dự báo của phân phối chuẩn.
+- **Hill index +0.471** ≈ ξ +0.346 × 1.36 → **Cross-check xác nhận**. Cả hai tham số cùng dấu và cùng magnitude (Hill lớn hơn một chút), tín hiệu robust.
+- **ES − VaR spread = -1.36%** > **σ₃₀ = 0.79%** : chênh lệch gần gấp đôi độ lệch chuẩn, chứng thực bằng chứng thực nghiệm về fat tail.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%**: μ − 2.33σ ≈ -1.84% (giả sử μ ≈ 0, σ = 0.79%).
+- **EVT VaR 99%**: -3.66%.
+- **Gap = 1.82pp** (> 1.0pp) → **Mô hình Gaussian bị broken**. Lợi nhuận thực tế có thể rơi sâu hơn 1.8% so với dự báo normal. Sử dụng Gaussian để phân bổ vốn rủi ro là sai lệch nghiêm trọng.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30:
+- **Không dùng** σ-based position sizing (Gaussian underestimate).
+- **Tránh** momentum strategies — upside bù không đủ cho tail risk.
+- **Hành động ưu tiên**: mua **Puts ITM** (delta 0.5-0.7) để bảo vệ danh mục với drawdown -3% trở lên. Kết hợp **short VN30 futures** nếu có alpha negative trên net exposure.
+- Giảm leverage 50-70% đối với các vị thế long đơn thuần.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "05/06/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.82,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

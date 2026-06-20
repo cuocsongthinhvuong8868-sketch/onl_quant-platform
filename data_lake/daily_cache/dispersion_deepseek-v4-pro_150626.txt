@@ -1,0 +1,38 @@
+## 1. Observations
+
+- **Spread_Z = -0.45σ**: Độ phân tán quan sát được thấp hơn mức trung bình 60 ngày một chút, không nằm ở vùng kéo căng.
+- **DPI = 38.3%**: Ở mức dưới trung bình. Độ phân tán không bền vững, mang tính cục bộ và yếu.
+- **Avg Pairwise Correlation = 0.006**: Gần như bằng 0. Không có sự bầy đàn; thị trường đang phân hóa hoàn toàn ở cấp độ cặp đôi.
+- **CS Skewness / Kurtosis: N/A**: Không có dữ liệu về đuôi phân phối — thiếu công cụ xác định outlier chi phối. Cần bổ sung dữ liệu này.
+
+## 2. Structural State
+
+- **Trạng thái lành mạnh, không stress.** Cả DPI (38.3%) và Spread_Z (-0.45σ) đều ở vùng trung tính đến thấp.
+- Không có dấu hiệu kéo căng cục bộ (Spread_Z thấp) hay kéo dài (DPI không đủ cao). Thị trường hiện hoạt động trong trạng thái **mean-reverting dispersion** với mức độ phân tán vừa phải, không có xung lực tail nào áp đảo cấu trúc.
+
+## 3. Cross-Check & Tail Direction
+
+- **Không thể xác định hướng tail** do CS Skewness và Kurtosis đều là N/A. Đây là một hạn chế lớn: không có thông tin về việc đuôi phân phối đang bị kéo về phía nào (negative/positive) và liệu có tồn tại fat-tail outlier hay không.
+- **Khuyến nghị:** Yêu cầu cập nhật dữ liệu thống kê mô tả cross-sectional (Skew và Kurt) trước khi đưa ra chẩn đoán về cấu trúc rủi ro đuôi. Hiện tại, mặc định mô hình là không có outlier chi phối.
+
+## 4. Regime Mapping
+
+- **Đối chiếu 2D Map:**
+  - **DPI thấp** + **Corr thấp** → **Healthy Stock-Picking Environment**
+- Thị trường không có herding, không có hoảng loạn, không có phân phối đỉnh. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu riêng lẻ.
+- **Risk lớn nhất cho Portfolio Manager:** **Concentration risk.** Khi tương quan bằng 0, rủi ro không được pha loãng qua diversification cổ điển. Một danh mục đa dạng hóa theo beta sẽ không có tác dụng nếu các cổ phiếu phân hóa mạnh; lợi nhuận và thua lỗ phụ thuộc hoàn toàn vào lựa chọn stock-picking của PM.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "15/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.45,
+  "dpi_pct": 38.3,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

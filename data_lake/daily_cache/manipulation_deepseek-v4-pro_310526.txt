@@ -1,0 +1,30 @@
+## 1. Observations
+- **OLS Slope = 0.41** (86.7th percentile 🔴 Cao): Hệ số dốc giữa composite VIN và VN30F1M đang ở vùng rất cao, cho thấy mỗi biến động 1% của VIC/VHM/VRE tác động mạnh bất thường lên futures.
+- **Correlation = 0.72** (88.3th percentile 🔴 Rất chặt): Mức tương quan lịch sử gần như cao nhất, VIN đang chi phối hoàn toàn VN30F1M.
+- **Regime = COUPLING** (cả ΔCorr = 0.68, ΔSlope = 0.67 đều > +0.15): VIN composite đang dẫn dắt futures một cách áp đảo.
+
+## 2. Microstructure Read
+Cả hai percentile đều > 80th (86.7% và 88.3%) — đây là bất thường. Điều này có nghĩa VIC/VHM/VRE đang là lực kéo chính, khả năng cao có can thiệp từ market maker hoặc dòng tiền lớn đẩy nhóm Vingroup để kéo VN30F1M. Tuy nhiên, với VRE chỉ 32,250 VND và VIC 211,300 VND, độ vênh giá trị rất lớn — cần cảnh giác nếu dòng tiền chỉ tập trung vào VIC.
+
+## 3. Event Study Interpretation
+COUPLING regime có ý nghĩa: **Edge tracking rõ ràng cho intraday**. Khi Slope và Corr cùng tăng mạnh, các biến động của VIC trực tiếp ảnh hưởng đến VN30F1M. Đây là cơ hội nếu bắt kịp momentum, nhưng rủi ro nếu can thiệp dừng đột ngột. Không nên giữ qua đêm trừ khi signal end-of-day xác nhận.
+
+## 4. Verdict
+- **Trade plan: Long F1** — chờ pullback nhẹ (giảm 0.5-1%) vào đầu phiên rồi mở long, tận dụng coupling strength.
+- **Leading indicator:** Theo dõi volume đột biến ở VIC (211,300 VND) và VHM (156,000 VND). Nếu VIC tăng > 1% phiên trước, F1 khả năng cao mở gap.
+- **Stop-loss reference:** Nếu vào long F1 tại entry ~1240 (giả định), stop-loss dưới 1225 (≈1.2%). Nếu giao dịch VIC làm hedge: stop tại 211.30 × (1 - 2%) ≈ 207.10.
+
+**Cảnh báo:** Vì cả hai percentile đều cực cao, nguy cơ đảo chiều can thiệp là rõ rệt. Nếu VIC không duy trì được trên 211, cắt lỗ khẩn — không giữ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 86.7,
+  "corr_percentile": 88.3,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```

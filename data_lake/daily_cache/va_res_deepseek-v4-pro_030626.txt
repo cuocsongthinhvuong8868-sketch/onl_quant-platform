@@ -1,0 +1,36 @@
+## 1. Observations
+- VN30 Stress Index: 0.00% (ngưỡng alert: 40%)
+- Số mã thủng VaR 95%: 0/30
+- Complacency Index: 7.41% (ngưỡng danger: 80%)
+- Số mã mispriced (spread bị nén): 8
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index ở mức 0.00% và không có mã nào thủng VaR 95%. Điều này cho thấy **hoàn toàn không có dấu hiệu lây lan rủi ro** trong rổ VN30 tại thời điểm hiện tại. Không có sự cố cá biệt hay đầu sóng systemic nào được ghi nhận. Thị trường đang ở trạng thái không có áp lực bán đột biến tập trung vào các bluechip.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency Index ở mức **7.41% – rất thấp**, dưới mọi ngưỡng cảnh báo. **Kết luận duy nhất:** thị trường **KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa** thị trường đang ổn định hay vận hành bình thường.
+
+Kết hợp với Stress Index = 0.00%, regime hiện tại là **spread giãn rộng tự nhiên** – không phải từ hoảng loạn, mà từ giao dịch chủ động, phân hóa mạnh. Thị trường có thể đang trong uptrend hoặc sideway biên độ rộng với thanh khoản tốt, nơi spread bid-ask không bị nén ép.
+
+Có 8 mã bị mispriced (spread bị nén chặt nhất) gồm HSG, OCB, VTO. Đây là nhóm cổ phiếu có **thanh khoản cục bộ thấp** hoặc đang bị định giá sai tạm thời, nhưng chưa đủ lan rộng để tạo complacency toàn thị trường.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có. Không phát sinh tín hiệu bán khẩn cấp nào trong rổ VN30.
+- **Top 3 Mispriced (Module C) – Cảnh báo tiềm ẩn:**
+  - **HSG:** Spread nén. Cảnh báo nếu khối lượng giao dịch bắt đầu co lại kèm giá giảm >3% trong 1 phiên.
+  - **OCB:** spread thị trường thu hẹp bất thường. Cần theo dõi breakout/breakdown vùng 25-session range.
+  - **VTO:** rủi ro điều chỉnh nếu thủng MA20 D1 kèm khối lượng gia tăng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 7.41,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["HSG", "OCB", "VTO"],
+  "confidence": "high"
+}
+```

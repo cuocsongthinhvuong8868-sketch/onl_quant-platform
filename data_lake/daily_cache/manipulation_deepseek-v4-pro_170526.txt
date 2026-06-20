@@ -1,0 +1,28 @@
+## 1. Observations
+- **Slope 0.42** ở percentile 100.0 — cực đại lịch sử, cho thấy mức độ ảnh hưởng của VIC/VHM/VRE lên VN30F1M chưa từng có.
+- **Correlation 0.72** cũng ở percentile 100.0 — mối quan hệ giữa VIN composite và futures rất chặt chẽ, gần như tuyệt đối.
+- **Regime** xác nhận **COUPLING** thuần túy: ΔCorr = 0.80 và ΔSlope = 0.80, cả hai đều vượt ngưỡng +0.15 — VIN đang là lực lái chính.
+
+## 2. Microstructure Read
+Cả slope và correlation đều ở mức bất thường (100th percentile) — đây là tín hiệu can thiệp rất mạnh. VIC/VHM/VRE không chỉ dẫn dắt mà gần như là yếu tố duy nhất quyết định chuyển động của futures. Điều này không phải hành vi thị trường tự nhiên mà có dấu hiệu của hành động phối hợp giữa các mã VIN họ. Rủi ro ở đây là nếu sức nặng này đột ngột suy yếu, futures sẽ dễ bị đảo chiều nhanh.
+
+## 3. Event Study Interpretation
+COUPLING với cường độ cực đại khẳng định VIN đang kiểm soát hoàn toàn nhịp intraday. Kịch bản thường thấy: VIC/VHM/VRE khớp lệnh chủ động → futures chạy theo spread. Cơ hội là tracking để bắt sóng tăng/giảm kỹ thuật. Tuy nhiên rủi ro chính là "over-coupling": một khi phe MM dừng hỗ trợ, slope sẽ co lại nhanh và futures bay ngược lại. Với coupling này, trade qua đêm bị cấm — lý do: nếu tin buổi chiều không giữ được cấu trúc VIN, futures sẽ gap ngược.
+
+## 4. Verdict
+- **Trade plan: Long F1** — tận dụng đà coupling thuận.
+- **Leading indicator**: Bộ VIC/VHM/VRE (theo dõi khớp lệnh bid-ask, nếu xuất hiện xả hàng chủ động ở VIC là tín hiệu thoát ngay); spread VIN vs VN30, nếu spread nới quá mức > 2% trong ngày → đánh tay đôi sell spread.
+- **Stop-loss**: 0.35% từ entry intraday (khoảng 5 tick VN30F1M) — chốt nếu correlation bắt đầu suy giảm dưới 0.65.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "15/05/2026",
+  "regime": "COUPLING",
+  "slope_percentile": 100.0,
+  "corr_percentile": 100.0,
+  "trade_signal": "long_f1",
+  "confidence": "high"
+}
+```

@@ -1,0 +1,62 @@
+# PHÂN TÍCH ECONOMIC ALPHA – NGÂN HÀNG VIỆT NAM
+**Kịch bản:** Tiêu chuẩn (K=1.0, CoE=14%, Stress BVPS -5%, P/B -5%)
+
+---
+
+## 1. Đánh giá Kịch bản
+
+**Mức độ nghiêm trọng:** Baseline. Với CoE 14%, chỉ những bank có Disciplined Return > 14% mới tạo ra Alpha dương. Thị trường hiện tại chỉ có **3/6 mã trong Top/Bottom** đạt Alpha > 0 – phần lớn ngành đang đốt vốn cổ đông nếu đo bằng Economic Alpha. Stress test (-5% BVPS, -5% P/B) làm xói mòn thêm margin an toàn, nhưng không đẩy toàn bộ ngành vào vùng nguy hiểm.
+
+---
+
+## 2. Phân tích Top 3 Alpha Cao
+
+| Mã | Alpha | P/B | Phân loại động vật | Driver chính |
+|----|-------|-----|-------------------|--------------|
+| **HDB** | **+4.9%** | 1.32 | **Fortress** | P/B rẻ (1.32) + ROE lịch sử ổn định (~19-21%) + σ(ROE) thấp → Compounding mạnh. Payout thấp giúp retention cao. |
+| **SHB** | **+3.6%** | 0.95 | **Cheap-but-not-trap** | P/B <1 (discount to book) là động lực chính. Cần kiểm tra ROE có bền vững không – nếu ROE > 15% thì đây là "Hidden Fortress". |
+| **CTG** | **+3.0%** | 1.06 | **Fortress tiềm năng** | P/B gần 1 (định giá hợp lý) + quy mô lớn + σ(ROE) thấp. State-owned nhưng có chất lượng tài sản ổn định. |
+
+→ **Cả 3 đều không phải Growth Trap.** HDB và CTG có profile Fortress rõ nét.
+
+---
+
+## 3. Cảnh báo Bẫy Giá trị
+
+Top 3 Alpha âm sâu – đây là **Premium Burn** điển hình:
+
+- **EIB (-12.7%, P/B 1.57):** P/B khá cao so với chất lượng tài sản. σ(ROE) có thể rất lớn → Risk Penalty nuốt chửng lợi nhuận. Định giá không tương xứng rủi ro.
+- **LPB (-8.2%, P/B 3.42):** P/B cực đại (3.42) nhưng không có ROE tương ứng → "Vua Premium" đốt vốn. Chỉ spec, không value.
+- **VCB (-7.5%, P/B 2.36):** ROE cao (20-23%) nhưng P/B quá đắt (2.36) + σ(ROE) tăng theo quy mô → Premium Burn hoàn hảo. Ngay cả khi giá tăng, Economic Alpha vẫn âm.
+
+⚠ **Cả 3 đều CẤM MUA trong kịch bản này.**
+
+---
+
+## 4. Đề xuất Danh mục
+
+**Core Holding (65% bank allocation):** HDB, CTG  
+→ Fortress thực thụ: P/B rẻ, ROE ổn định, payout thấp.
+
+**Tactical (25%):** SHB  
+→ P/B discount lớn, cần monitor ROE Q2/Q3; nếu ROE duy trì > 15% thì mới chuyển lên Core.
+
+**Cấm tuyệt đối (10% còn lại dùng để cash):** EIB, LPB, VCB  
+→ Không có lý do value để giữ.
+
+---
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Tiêu chuẩn",
+  "core_holdings": ["HDB", "CTG"],
+  "avoid_list": ["EIB", "LPB", "VCB"],
+  "sector_view": "bullish",
+  "confidence": "high"
+}
+```
+
+✅ **Kết luận:** Cơ hội tập trung ở HDB và CTG. SHB là bet định giá hời nếu chấp nhận rủi ro ngắn hạn. Tránh xa 3 bank đốt vốn kể trên.

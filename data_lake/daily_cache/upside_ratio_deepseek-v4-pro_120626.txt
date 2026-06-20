@@ -1,0 +1,31 @@
+## 1. Observations
+- Lực cầu hiện tại (5.65%) thấp hơn đáng kể so với trung bình dài hạn (13.46%), cho thấy áp lực mua đang suy yếu rõ rệt.
+- Lực cung hiện tại (8.00%) cũng thấp hơn mu dài hạn (13.72%), nhưng mức chênh lệch nhỏ hơn, thể hiện bên bán chưa thực sự bùng nổ.
+- Cả hai chiều đều có Phi dương mạnh (0.201 và 0.212), vượt ngưỡng +0.10 → cả hai đều đang trong momentum regime, đà tiếp diễn.
+
+## 2. Supply-Demand Dynamics
+- Cả lực cầu và lực cung đều đang thấp hơn mu dài hạn (cùng chiều thấp) → trạng thái **zombification** (thanh khoản cạn kiệt). Không có dấu hiệu phân phối hay tích lũy rõ ràng.
+- So sánh |Phi_dn| (0.212) > |Phi_up| (0.201) → bên cung đang giữ momentum mạnh hơn một chút. Dòng tiền bán có khả năng duy trì áp lực cao hơn so với bên mua.
+
+## 3. Stress-Test Read
+- P95 Downside = 26.75%: nếu kịch bản panic sell xảy ra, biên độ sụt giảm rất lớn (hơn 1/4 vốn hóa thị trường).
+- P95 Upside = 23.84% thấp hơn P95 Downside → tail risk bên bán (downside) dày hơn và nguy hiểm hơn. Mức chênh lệch ~2.91% cho thấy rủi ro giảm điểm chiếm ưu thế.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 5%** (gần như không hành động, chỉ giữ vị thế tối thiểu).
+- **Strategy: phòng thủ** — không mua đuổi vì đà cầu yếu, không rình bắt đáy vì bên cung giữ momentum mạnh và tail risk dày.
+- Cả hai chiều đều đang trong momentum (không phải random walk) nên không fallback vào “NO ACTIONABLE”, nhưng tín hiệu hiện tại quá bất lợi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.75,
+  "p95_upside_pct": 23.84,
+  "deployment_pct": 5,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

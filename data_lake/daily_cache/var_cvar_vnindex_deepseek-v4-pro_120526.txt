@@ -1,0 +1,22 @@
+# Phân tích Rủi ro Đuôi VNINDEX – Ngày 12/05/2026
+
+## 1. Đánh giá Rủi ro Đuôi
+
+**Mức độ rủi ro đuôi: CAO.** Historical VaR (-1.64%) sâu hơn Parametric VaR (-1.43%), chênh lệch -0.21%. Điều này xác nhận phân phối lợi suất VNINDEX có đuôi nặng hơn phân phối chuẩn. Mô hình Gaussian đang đánh giá thấp rủi ro – nếu dùng Parametric VaR, nhà quản lý sẽ bị “lừa” bởi kỳ vọng lạc quan về mức độ tổn thất tối đa.
+
+## 2. Phân tích Expected Shortfall
+
+**ES = -3.00%.** Khoảng cách ES – Historical VaR = -1.36%, một con số đáng báo động. Khi đuôi trái xảy ra, tổn thất trung bình trong 5% kịch bản tồi tệ nhất gấp **gần 2 lần** mức VaR 95%. Đây là tín hiệu rõ ràng về **fat tail**: các cú sốc tiêu cực không chỉ hiếm mà còn rất sâu. VaR đơn thuần không đủ để quản trị rủi ro, vì bỏ qua mức độ nghiêm trọng của các sự kiện đuôi.
+
+## 3. So sánh Chuẩn Gaussian vs Thực tế
+
+**Kết luận: Thị trường có đuôi béo (fat tail).** Historical VaR sâu hơn Parametric VaR chứng minh giả định chuẩn bị vi phạm. ES sâu gấp đôi VaR càng củng cố nhận định này. Rủi ro không chỉ đến từ tần suất mà còn từ cường độ thua lỗ cực đoan.
+
+## Khuyến nghị
+
+- **Không sử dụng Parametric VaR làm thước đo chính** – nó đánh giá thấp rủi ro hệ thống.
+- **Tập trung vào ES** và kịch bản stress test 3-5 sigma.
+- **Cân nhắc hedging đuôi** (tail hedging) với quyền chọn OTM hoặc danh mục tài sản trú ẩn (vàng, TPCP).
+- **Giám sát chặt ES-VaR spread** – nếu spread nới rộng thêm, sẵn sàng cho các đợt giảm sâu bất thường.
+
+**Tóm lại: Rủi ro đuôi đang ở mức cảnh báo. Mô hình Gaussian là kẻ thù của quản trị rủi ro trong bối cảnh này.**

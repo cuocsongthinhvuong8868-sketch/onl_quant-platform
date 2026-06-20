@@ -1,0 +1,55 @@
+## 1. Regime News Sentiment & Hướng Thay Đổi
+
+| Window | Regime | Composite | Hướng |
+|--------|--------|-----------|-------|
+| **1d** | **strong_risk_on** | **+0.4228** | Mạnh hơn 7d & 30d |
+| **7d** | risk_on | +0.3143 | Trung gian |
+| **30d** | risk_on | +0.2131 | Cơ sở |
+
+➡️ **Nhận định:** Sentiment đang tăng tốc risk-on trong ngắn hạn (1d > 7d > 30d). Các window đều đồng thuận risk-on, nhưng cường độ 1d áp đảo, báo hiệu xung lực tích cực mới.
+
+## 2. Channel Kéo Risk-On / Risk-Off Mạnh Nhất
+
+**Kéo Risk-On (dương mạnh nhất):**
+- **monetary_policy**: +2.000 (1d) — cực kỳ tích cực
+- **earnings**: +1.528 (1d)
+- **credit_stress**: +1.143 (1d)
+- **real_estate_collateral**: +0.547 (1d)
+- **growth**: +0.167 (1d) — từ các tin Hà Nội và xuất khẩu
+
+**Kéo Risk-Off (âm mạnh nhất):**
+- **commodity**: -0.789 (1d) — duy nhất âm nặng
+- **liquidity**: -0.245 (1d) — do NHNN hút ròng OMO
+
+## 3. Top Positive & Negative Drivers
+
+**Top Positive (quan trọng):**
+1. **Tỷ giá trung tâm 25,165, tăng 10** — channel fx_external, score +1.412. Cho thấy VND ổn định/ tích cực, hỗ trợ dòng vốn.
+2. **Hà Nội đầu tư 3.562 tỷ xây nhà ở cho thuê** — channel real_estate_collateral, +0.191. Tín hiệu hỗ trợ thị trường BĐS.
+3. **Hà Nội Nghị quyết thúc đẩy kinh tế đêm** — growth, +0.168. Kích thích tiêu dùng nội địa.
+4. **Tuần hàng Việt Nam tại AEON Nhật Bản** — growth, +0.167. Mở rộng xuất khẩu.
+5. **Lợi suất TPCP đi ngang** — credit_stress, +0.229. Ổn định thị trường nợ.
+
+**Top Negative (quan trọng):**
+1. **NHNN hút ròng 22,121.8 tỷ qua OMO** — liquidity, -0.663. Thắt chặt thanh khoản ngắn hạn.
+2. **DXY giảm mạnh 0.5%** — fx_external, -0.628. Gây áp lực tỷ giá gián tiếp.
+3. **Giá nhựa PVC Trung Quốc thủng đáy tháng** — commodity, -0.689. Ảnh hưởng đến chi phí nguyên liệu.
+4. **Giá quặng sắt Trung Quốc đáy 6 tháng** — commodity, -0.547. Tác động tiêu cực đến thép và bất động sản.
+5. **Giá vàng nhẫn SJC đáy 6 tháng** — commodity, -0.547. Phản ánh suy yếu nhu cầu trú ẩn.
+
+## 4. Tác Động Lên AI CIO
+
+✅ **Supports macro risk-on** — Regime 1d strong_risk_on, composite đồng thuận tăng dần. Monetary_policy (+2.0) và credit_stress (+1.14) là hai channel mạnh nhất, hoàn toàn ủng hộ quan điểm mở rộng.
+
+✅ **Consistent with market-internal tools** — Tỷ giá ổn định, lợi suất đi ngang, tín hiệu bất động sản tích cực. Không có mâu thuẫn với tín hiệu kỹ thuật.
+
+⚠️ **Lưu ý:** NHNN hút ròng OMO 22K tỷ là điểm nghịch lý — thanh khoản bị thắt ngắn hạn nhưng sentiment tổng thể vẫn risk-on. Cần theo dõi nếu thanh khoản kéo dài sẽ chuyển thành rủi ro.
+
+## 5. Caveat
+
+- **Source coverage:** mozyfin chiếm 63% (1d) và 77% (7d) — thiên lệch về dữ liệu từ các nguồn định lượng, ít tin chính trị-xã hội. Widata chỉ 37% (1d) — tin vĩ mô Trung Quốc có thể thiếu.
+- **Stale feed:** Generated_at 2026-06-15T20:22:44, dữ liệu phiên hôm nay, vẫn còn tươi. Không có vấn đề về độ trễ.
+- **Headline noise:** 
+   * Tin "Wind industry accuses Pentagon" và "Duce! Duce!" là tin quốc tế bên ngoài Việt Nam, tác động thấp đến thị trường nội địa — score -0.168 (âm nhẹ, không đáng kể).
+   * Tin "DXY giảm 0.5%" bị xếp âm (-0.628) nhưng thực tế DXY yếu lại hỗ trợ VND và dòng vốn — cần filter theo logic ngược.
+   * NHNN hút ròng OMO 22K tỷ là hành động rõ ràng, không noise.

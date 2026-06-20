@@ -1,0 +1,36 @@
+## 1. Observations
+
+- **Lực cầu (Upside Breadth):** Hiện tại 7.29%, thấp hơn đáng kể so với mu dài hạn 14.00% (delta = -6.71pp). Phi = 0.180 (> +0.10) → **Momentum giảm** (đà yếu tiếp diễn).
+- **Lực cung (Downside Breadth):** Hiện tại 15.06%, cao hơn mu dài hạn 14.32% (delta = +0.74pp). Phi = 0.216 (> +0.10) → **Momentum tăng** (đà bán mạnh lên).
+- Cả hai chiều đều ở regime momentum (Phi > +0.10), không có dấu hiệu mean-reversion hay random walk.
+
+## 2. Supply-Demand Dynamics
+
+- **Trạng thái dòng tiền: PHÂN PHỐI (Distribution).** Dấu hiệu rõ ràng: cầu dưới mu (7.29% << 14.00%) trong khi cung trên mu (15.06% > 14.32%) - cùng chiều cả hai theo reference.
+- Bên giữ momentum thực sự: **SUPPLY (Cung) thắng thế.** |Phi_down| = 0.216 > |Phi_up| = 0.180, cho thấy đà bán có độ bền và tốc độ lan tỏa cao hơn đà mua. Dòng tiền đang rút ra khỏi thị trường một cách có hệ thống.
+
+## 3. Stress-Test Read
+
+- **P95 Downside = 27.23%:** Nếu panic sell xảy ra, gần 1/3 danh mục (27.23% số mã) có thể giảm > -2%/phiên. Đây là mức stress đáng lo ngại.
+- **Asymmetry: P95 Downside (27.23%) > P95 Upside (24.10%).** Tail risk bên bán dày hơn bên mua 3.13pp. Xác suất kịch bản cực đoan tiêu cực cao hơn tích cực. Độ lệch này củng cố tín hiệu phân phối.
+
+## 4. Verdict
+
+- **Tỷ trọng giải ngân: 10%** (rất thấp, chỉ dành cho vị thế phòng thủ hoặc điểm vào siêu ngắn).
+- **Strategy: PHÒNG THỦ (Defensive).** Không mua đuổi, không bắt đáy vì đà bán vẫn đang tăng tốc (Phi = 0.216). Chỉ hành động nếu có tín hiệu đảo chiều (Phi âm) hoặc lực cầu hồi phục vượt mu.
+- **Cảnh báo:** Phi cả 2 chiều đều > +0.10 → không phải regime nhiễu. Tín hiệu phân phối rõ ràng, cần thận trọng.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.23,
+  "p95_upside_pct": 24.10,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

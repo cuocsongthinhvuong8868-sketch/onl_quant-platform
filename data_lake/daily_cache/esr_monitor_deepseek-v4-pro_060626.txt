@@ -1,0 +1,31 @@
+## 1. Observations
+- SSI ở mức 65.6% – nằm trong vùng WARNING, cách ngưỡng CRITICAL 14.4pp.
+- Market State: EUPHORIC RISK – giá uptrend nhưng stress hệ thống cao.
+- Top 3 pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
+- Pillar Mode: downside – chỉ số stress được tính trên chuỗi phiên giảm.
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ dẫn dắt ở 36%** – volume khô cạn so với 1Y norm. Đây là tín hiệu thanh khoản suy yếu nghiêm trọng: dòng tiền vào thị trường đang cạn dần, khối lượng giao dịch thấp hơn đáng kể so với trung bình 252 phiên. Kết hợp với **S_VAL 32%** – valuation tension cao do lợi nhuận 252d vượt xa lãi suất tiền gửi, tạo khoảng cách định giá khó bền vững. **S_COR 17%** phản ánh systemic correlation gia tăng – các mã VN30 đang vận động đồng pha hơn, dấu hiệu của hành vi herding. Bộ ba này tạo thành signature bull-trap điển hình: giá tăng nhưng thanh khoản khô, định giá căng, và thị trường đồng loạt xoay chiều khi có catalyst.
+
+## 3. Cross-Check
+- **Divergence giá – SSI:** VN30 đóng cửa trên MA125 (uptrend) nhưng SSI ở WARNING – divergence âm rõ rệt. Giá ở vùng cao + stress hệ thống tích lũy = bull-trap risk được xác nhận bởi cả SSI và pillar composition.
+- **HMM regime vs SSI:** Khớp hoàn toàn. EUPHORIC RISK là trạng thái HMM phản ánh chính xác high stress + uptrend. Không có lệch pha.
+
+## 4. Verdict
+- **Cash weight đề xuất: 70%** – giảm mạnh danh mục cổ phiếu, giữ thanh khoản cao để đối phó với kịch bản bull-trap sụp đổ.
+- **Hedge action: Short VN30F1M** – sử dụng hợp đồng tương lai để phòng vệ danh mục còn lại. Mua put cũng khả dụng nếu chi phí thấp, nhưng short futures linh hoạt hơn trong môi trường thanh khoản khô.
+- **Lưu ý:** Cả 3 pillar đều đồng thuận bearish → không có mâu thuẫn. Tín hiệu action rõ ràng, không cần chờ thêm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.6,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "short_futures",
+  "confidence": "high"
+}
+```

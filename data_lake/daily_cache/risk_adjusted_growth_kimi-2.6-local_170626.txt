@@ -1,0 +1,41 @@
+## 1. Scenario Assessment
+
+K=1.0 + CoE=14% là baseline chuẩn cho VN bank, không khắc nghiệt. Tuy nhiên, **toàn ngành đang đốt vốn**: ngay cả Top 1 SHB cũng chỉ Alpha 0.9%, ACB/SSB âm. Điều này cho thấy mặt bằng P/B chưa đủ rẻ để bù đắp CoE 14%, hoặc ROE bị risk penalty ăn mòn nghiêm trọng. Không phải scenario khắc nghiệt — là **ngành yếu ở vùng giá hiện tại**.
+
+## 2. Top Alpha Decomposition
+
+| Mã | Driver chính | Phân loại |
+|---|---|---|
+| **SHB** | P/B 0.95 rẻ nhất nhóm + σROE 1.9% thấp nhất + payout 8.6% giữ lại compounding | **Fortress** — ROE 17.5% không cao nhất nhưng ổn định, định giá bảo vệ |
+| **ACB** | ROE 23% mạnh nhất nhưng P/B 1.20 + σ 2.7% làm mất lợi thế | **Growth Trap** — chất lượng tốt nhưng định giá không đủ rẻ, risk penalty ăn mòn |
+| **SSB** | P/B 1.05 khá rẻ, payout 0% full retention, nhưng ROE 15.6% bình thường | **Cheap-but-not-trap** — biên an toàn mỏng, cần ROE cải thiện |
+
+## 3. Value Traps Warning
+
+| Mã | Bản chất | Nguyên nhân chính |
+|---|---|---|
+| **LPB** | **Premium Burn nặng** | P/B 2.97 quá đắt — dù ROE 21.1% tốt, risk penalty 3.8% + định giá cao nuốt chửng alpha |
+| **EIB** | **Cheap Trap** | P/B 1.53 tưởng rẻ nhưng ROE 10% quá thấp, σ 3.8% cao → không đủ return bù CoE |
+| **VPB** | **Growth Trap** | ROE 14.1% bình thường, σ 4.7% cao nhất nhóm, payout 24.6% lãng phí retention |
+
+## 4. Portfolio Construction
+
+- **Core Holding (60-70%)**: **SHB** — duy nhất Fortress, Alpha > 0
+- **Tactical (20-30%)**: **SSB** — cheap, no payout, chờ ROE inflection; **ACB** underweight nếu muốn exposure chất lượng
+- **Cấm mua / underweight**: **LPB, EIB, VPB** — LPB đặc biệt toxic do P/B ảo tưởng
+
+> **Không full AVOID SECTOR** vì SHB còn Alpha dương, nhưng **tổng bank allocation nên thấp** — phần lớn vốn chờ scenario mềm hơn hoặc P/B giảm sâu hơn.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "tactical": ["SSB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

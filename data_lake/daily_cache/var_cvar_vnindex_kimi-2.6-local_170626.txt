@@ -1,0 +1,66 @@
+## 1. Observations
+
+- **Historical VaR 95% (-1.65%)** sâu hơn Parametric (-1.44%) 21 bps, dấu hiệu Gaussian đang underestimate ngay cả ở quantile 95%
+- **EVT VaR 99% (-3.69%)** gấp ~2.5x Historical VaR 95%, cho thấy đuôi phân phối mở rộng nhanh khi đi sâu vào tail
+- **ξ = +0.345** vượt ngưỡng 0.30, rơi vào regime **fat tail** — ES 99% có thể không hội tụ nếu ξ tiến gần 1.0
+- **Hill = +0.447** cùng dấu dương với ξ, magnitude lớn hơn ~29% — cả hai estimators đều báo tail cực dày
+
+---
+
+## 2. Tail Thickness Diagnosis
+
+| Metric | Kết quả |
+|--------|---------|
+| ξ bracket | **FAT TAIL** (>0.30) |
+| Hill cross-check | **Confirm** — cùng dương, không diverge |
+| ES−VaR spread | −1.37% vs σ₃₀ 0.78% → **spread > 1.76× σ** |
+
+Hai estimators độc lập (GPD POT vs Hill) cùng báo ξ > 0.30. ES−VaR spread vượt xa σ₃₀, corroborate fat tail empirically. Tail không chỉ "heavy" mà là "fat" — mật độ xác suất ở extreme quantile cao hơn Gaussian đáng kể.
+
+---
+
+## 3. Gaussian Gap
+
+**Gaussian VaR 99%** = μ + z₀.₀₁·σ ≈ 0 − 2.33 × 0.78% = **−1.82%**
+
+| | Value |
+|--|-------|
+| EVT VaR 99% | −3.69% |
+| Gaussian VaR 99% | −1.82% |
+| **Gap** | **−1.87 pp** |
+
+Gap **1.87 pp > 1 pp threshold** → Gaussian model **broken** ở tail. Dùng Gaussian cho risk capital allocation sẽ thiếu hụt ~50% capital cần thiết để cover 1/100-event. Parametric VaR 95% (−1.44%) còn lạc quan hơn cả Gaussian 99%.
+
+---
+
+## 4. Verdict — Hedging Implications
+
+**ξ = 0.345 > 0.30** → Regime **FAT TAIL**
+
+| Hành động | Khuyến nghị |
+|-----------|-------------|
+| Leverage | **Giảm tối đa** — momentum strategies đặc biệt nguy hiểm khi tail fat |
+| Options | **Mua puts ITM** (delta > 0.50) thay vì OTM — gamma risk ở crash cao, ITM giảm slippage execution |
+| Futures | **Short futures hedge** nếu portfolio beta > 0.8 |
+| VaR-based limit | Không dùng Gaussian; đặt limit theo EVT ES 99% (−6.15%) |
+
+Lưu ý: ES 99% = −6.15% với ξ = 0.345 gần ngưỡng concern — nếu ξ tiến lên 0.50+, ES bắt đầu mất ổn định. Monitor ξ rolling 6-month.
+
+---
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "17/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.87,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

@@ -1,0 +1,50 @@
+## 1. Observations
+
+- **Historical VaR 95%** (3Y rolling): -1.65%, sát với Parametric VaR 95% (-1.47%), cho thấy khu vực trung tâm phân phối tương đối ổn định.
+- **EVT VaR 99%**: -3.69% — mức thua lỗ 1/100 ngày giao dịch.
+- **ξ (GPD shape)**: +0.345 — vượt ngưỡng 0.30, xác nhận đuôi cực dày (fat tail).
+- **Hill index**: +0.447 — cùng dấu và lớn hơn ξ, củng cố tín hiệu đuôi nặng nhưng có độ nhạy ngưỡng.
+
+## 2. Tail Thickness Diagnosis
+
+ξ = 0.345 thuộc bracket **FAT TAIL** (> 0.30). Điều này có nghĩa các sự kiện cực đoan (losses 3-5%+ trong 1 ngày) xảy ra với tần suất cao hơn nhiều so với phân phối Gauss.
+
+Hill index (+0.447) cùng dấu với ξ, độ lớn tương đương (cùng scale 0.3-0.5) → **robust signal** về đuôi nặng. Tuy nhiên, chênh lệch ~0.10 giữa ξ và Hill cho thấy threshold sensitivity: nếu chọn ngưỡng exceedances thấp hơn (vd. top 5%) thì ξ có thể biến động ±0.05-0.10.
+
+ES − VaR spread = -1.37% (tức là -137 bps). σ₃₀ = 0.83% (83 bps). Spread > σ₃₀ (137 > 83) → **fat tail confirmed empirically**: trung bình các tổn thất vượt VaR lớn hơn 1.65 độ lệch chuẩn, vượt xa kỳ vọng của mô hình normal.
+
+## 3. Gaussian Gap
+
+Gaussian VaR 99% (μ + z·σ) = -2.33 × 0.83% ≈ **-1.93%** (giả sử μ ≈ 0).
+
+EVT VaR 99% = **-3.69%**.
+
+Gaussian gap = |(-3.69%) - (-1.93%)| = **1.76 percentage points** (> 1 pp).
+
+→ **Gaussian model bị broken**. Sử dụng VaR 99% Gaussian để phân bổ vốn rủi ro sẽ underestimate mức thua lỗ 1/100 ~ 1.8 lần. Risk capital allocation dựa trên Normal sẽ không đủ an toàn.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ > 0.30 và Gaussian gap > 1.5 pp, chế độ đuôi cực dày đã được xác nhận:
+
+- **Tránh momentum strategies**: drawdown 3-5% trong 1 ngày không phải outlier mà là risk event có xác suất hữu hạn (≈ 0.5%-1%/ngày).
+- **Mua puts ITM** (strike ~ 1.5σ-2σ OTM): chi phí cao hơn OTM nhưng bảo vệ trực diện losses -4% đến -6% như EVT ES 99% (-6.15%).
+- **Short futures hedge**: nên build dần vị thế short phủ 20-30% danh mục, đặc biệt khi VNINDEX ở vùng cao σ₃₀ chưa giảm.
+- **Không khuyến nghị giảm leverage thuần túy (30-50%)** vì ξ ở sát ranh trên fat tail, nhưng nên giảm concentrated bet (single-stock long) và tăng cash hoặc short ETF.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "15/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.76,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

@@ -1,0 +1,29 @@
+## 1. Observations
+- Risk Score 55.7 (+1.8): nằm trong band 40-60 NEUTRAL, gần upper bound
+- EGARCH Vol 20.2% (+3.2%): tăng nhanh, vượt quá ngưỡng bình thường của pha NEUTRAL
+- Rolling Skewness 0.11: dương nhẹ, không đủ mạnh để xác nhận GREED
+- Upside Correlation 29.4% vs Downside 12.1%: chênh lệch 17.3pp, up-corr chi phối
+
+## 2. Interpretation
+Score ở NEUTRAL nhưng EGARCH vol tăng 3.2% cho thấy pha phân hoá đang nén — up-corr cao gợi ý đám đông vẫn chase beta, trong khi vol expansion là early warning của instability. Trên dữ liệu hiện tại, xác suất cao thị trường đang ở late NEUTRAL chuyển tiếp, chưa phải GREED nhưng không còn stock-picking dễ dàng.
+
+## 3. Cross-Check
+- **Score vs EGARCH-vol: DIVERGENCE** — Score tăng nhẹ (+1.8) nhưng vol tăng mạnh (+3.2%). Vol expansion trong NEUTRAL band = risk building, không consistent với score ổn định
+- **Skewness vs Correlation: DIVERGENCE** — Skewness 0.11 (yếu) nhưng up-corr 29.4% (mạnh). Up-crowded không được xác nhận bởi skew, cho thấy rally breadth có thể hẹp
+
+## 4. Verdict
+- **Beta target: 0.55**
+- Hành động: giảm từ full beta xuống 0.55; ưu tiên stock-picking ở names có down-corr thấp hơn benchmark; đặt stop-loss chặt hơn 1.5 ATR do vol expansion. Không short, không all-in long.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "17/06/2026",
+  "regime": "NEUTRAL",
+  "score": 55.7,
+  "confidence": "medium",
+  "beta_target": 0.55,
+  "key_signals": ["Vol expansion diverges from stable score", "Up-corr high but skewness weak — narrow breadth risk"]
+}
+```

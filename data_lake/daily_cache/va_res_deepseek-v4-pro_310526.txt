@@ -1,0 +1,31 @@
+## 1. Observations
+- **Stress Index (VN30):** 3.33% (ngưỡng cảnh báo: 40%)
+- **Mã thủng VaR 95%:** 1/30
+- **Complacency Index (Toàn thị trường):** 6.48% (ngưỡng nguy hiểm: 80%)
+- **Mã mispriced:** 7
+
+## 2. Contagion Assessment (Module B)
+- **VN30 Stress Index ở mức 3.33%:** Rất thấp, cho thấy hầu như không có hiệu ứng lây lan đang diễn ra thời gian thực. Cấu trúc tương quan trong rổ VN30 vẫn ổn định.
+- **Top 3 crash (SSB):** Đây là sự cố cá biệt. Với chỉ 1/30 mã thủng VaR 95%, đây không phải đầu sóng của một sự kiện systemic. Rủi ro tập trung tại SSB, chưa lan rộng.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- **Complacency Index ở mức 6.48% (rất thấp):** Kết luận duy nhất: thị trường **KHÔNG** đang ở regime ngủ quên hay mất cảnh giác (distribution top, accumulation/sideways). Điều này hoàn toàn **không đồng nghĩa** thị trường ổn định.
+- **Phân tích dựa trên Stress Index**: Stress Index thấp (3.33%) cho thấy thị trường không đang trong trạng thái hoảng loạn hoặc sụp đổ. Các regime như uptrend mạnh cũng có thể tạo Complacency thấp do spread giãn rộng. Tuy nhiên, với Stress Index thấp, kịch bản hoảng loạn hiện tại bị loại trừ. Thị trường có thể đang vận hành trong xu hướng tăng hoặc đi ngang biên độ rộng (vol cao) — không phải trạng thái bị nén rủi ro.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B) — SSB:** Cần kiểm tra nguyên nhân. Giảm tỷ trọng ngay nếu thủng MA20 trên D1. Tránh bắt đáy cho đến khi khối lượng giao dịch giảm và giá ổn định trên các vùng hỗ trợ kỹ thuật quan trọng.
+- **Top 3 Mispriced (Module C) — HSG, VRE, VTO:** Spread bị nén bất thường so với thanh khoản trung bình. Cảnh báo tiềm ẩn: có thể đang chuẩn bị có biến động mạnh do thông tin chưa được định giá hoặc lệnh lớn đang âm thầm được khớp. Không nên vào lệnh ngay. Chờ thanh khoản bùng nổ theo một hướng rõ ràng để xác nhận breakout/breakdown.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["SSB"],
+  "confidence": "medium"
+}
+```

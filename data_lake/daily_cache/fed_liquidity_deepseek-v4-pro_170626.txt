@@ -1,0 +1,56 @@
+# Phân tích Fed Liquidity Dynamics – Tuần 10/06/2026
+
+## 1. Mechanical Decomposition
+
+Tuần này, **Net Liquidity tăng mạnh +63,168 triệu USD**, đưa tổng thanh khoản ròng lên 5,896,888 triệu USD. Phân tích cấu phần:
+
+- **WALCL (Fed Balance Sheet):** 6,725,397 triệu USD – không có biến động đột biến so với tuần trước, cho thấy Fed vẫn duy trì trạng thái balance sheet ổn định, không có QE hay QT mới.
+- **WTREGEN (TGA):** 828,122 triệu USD – tăng nhẹ, phản ánh Treasury đang tích lũy tiền gửi (có thể do mùa thuế tháng 6). Tuy nhiên, mức tăng này không đủ lớn để hút thanh khoản đáng kể.
+- **RRPONTSYD (Reverse Repo):** 387 triệu USD – gần như cạn kiệt (chỉ còn ~0.4 tỷ USD). Đây là yếu tố then chốt: khi RRP xuống gần zero, toàn bộ dòng tiền từ MMF không còn bị hút vào Fed nữa, tạo hiệu ứng bơm thanh khoản gián tiếp.
+
+**Kết luận cấu phần:** RRP cạn kiệt là động lực chính cho impulse dương tuần này, bất chấp TGA tăng nhẹ. WALCL đóng vai trò trung tính.
+
+## 2. Cycle Positioning
+
+- **Pha hiện tại:** Giai đoạn cuối của QT (QT late). Fed vẫn đang giảm balance sheet nhưng với tốc độ chậm dần, và tác động bị triệt tiêu bởi RRP về 0. Thực tế, thanh khoản ròng đang tăng do hiệu ứng "kênh dẫn" từ RRP.
+- **RRP:** Đã gần cạn hoàn toàn (< 100 tỷ USD). Đây là tín hiệu kỹ thuật quan trọng: không còn "bộ đệm" nào để hút thanh khoản nữa.
+- **TGA:** Đang ở mức cao (828 tỷ USD), cho thấy Treasury đang tích lũy tiền gửi (mùa thuế). Nếu Treasury bắt đầu xả TGA để chi tiêu, thanh khoản sẽ còn tăng thêm.
+- **So sánh lịch sử:** Net Liquidity hiện tại (5,897 tỷ USD) cao hơn đáy 2024 (~5,400 tỷ) nhưng vẫn thấp hơn đỉnh 2022 (~6,200 tỷ). Đang ở vùng trung bình-cao trong chu kỳ.
+
+## 3. Signal Strength
+
+- **Tín hiệu: ADD** – Impulse_EMA(4) = +17,320 triệu USD > 0, và Z-Score = +1.11 ≥ +1σ. Đủ điều kiện kích hoạt ADD.
+- **Z-Score:** +1.11 – ở mức cận biên (1.0-1.5σ), chưa phải extreme (> 2σ). Tín hiệu mạnh nhưng không quá khẩn cấp.
+- **Impulse_EMA:** Khớp hoàn hảo với signal. Impulse tuần này (+63,168 triệu) là một trong những impulse dương mạnh nhất trong 52 tuần qua, đẩy EMA lên cao.
+
+**Đánh giá:** Tín hiệu ADD có độ tin cậy trung bình-cao. Không phải extreme nhưng đủ mạnh để tạo risk-on bias.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX:** ADD signal + RRP cạn = dòng tiền dồi dào vào risk assets. Bias **tích cực** cho US equities, đặc biệt large-cap growth (NDX). Lịch sử cho thấy SPX thường phản ứng sau 1-2 tuần.
+- **DXY/Gold:** DXY có thể yếu đi do thanh khoản dồi dào làm giảm nhu cầu USD. Gold hưởng lợi từ DXY yếu + môi trường lỏng lẻo. Bias **tích cực** cho Gold.
+- **Crypto:** Nhạy nhất với thanh khoản. ADD signal + RRP cạn = risk-on mạnh cho Bitcoin và altcoins. Bias **rất tích cực**.
+- **VN-Index:** Với lag 4-8 tuần, impulse dương tuần này sẽ bắt đầu ảnh hưởng đến dòng vốn ngoại vào thị trường Việt Nam từ cuối tháng 6 đến tháng 7. Bias **tích cực** nhưng cần theo dõi thêm DXY và tỷ giá VND.
+
+## 5. Risk Factors (Signal có thể sai vì)
+
+1. **RRP đã quá thấp (~0.4 tỷ USD):** Khi RRP gần zero, tín hiệu CUT trong tương lai sẽ yếu đi vì không còn "room" để hút thanh khoản. Tuy nhiên, hiện tại điều này chỉ làm tăng độ nhạy của ADD.
+2. **TGA spike do mùa thuế (tháng 6):** TGA tăng có thể là tạm thời. Nếu Treasury nhanh chóng xả TGA sau thuế, thanh khoản sẽ còn tăng mạnh hơn. Ngược lại, nếu TGA tiếp tục tích lũy, impulse có thể đảo chiều.
+3. **Fed buyback đặc biệt:** Chưa có dấu hiệu. Fed vẫn duy trì QT, nhưng tốc độ chậm.
+4. **Rủi ro địa chính trị / lạm phát bất ngờ:** Có thể làm gián đoạn risk-on narrative.
+
+## 6. KẾT LUẬN
+
+**Regime hiện tại:** QT late phase với thanh khoản ròng đang tăng do RRP cạn kiệt. Tín hiệu ADD với độ tin cậy trung bình-cao. Outlook 2-4 tuần: **Risk-on bias** cho US equities, crypto, và Gold. VN-Index có thể hưởng lợi từ dòng vốn ngoại với lag 4-8 tuần. Cần theo dõi biến động TGA và DXY trong các tuần tới.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.9,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QT_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,30 @@
+## 1. Observations
+- Spread_Z = -0.25σ: spread âm nhẹ, không có áp lực tail-driven; cấu trúc gần trung bình 60d
+- DPI = 41.7%: dưới ngưỡng 70%, dispersion không có tính kiên định regime
+- Avg Pairwise Correlation = 0.008: gần zero, phân hóa cực đại giữa các cổ phiếu
+- CS Skewness/Kurtosis: N/A — thiếu dữ liệu tail shape, đánh giá tail direction bị hạn chế
+
+## 2. Structural State
+Thị trường ở trạng thái **bình thường, không stressed**. Spread_Z âm nhẹ cho thấy CSAD > CSSD — dispersion đến từ chuyển động đồng đều của đa số, không phải outliers kéo căng. DPI 41.7% xác nhận đây không phải regime persistent. Stress nếu có chỉ là **cục bộ, phiên lẻ** — không đủ bằng chứng cho stress lan tỏa.
+
+## 3. Cross-Check & Tail Direction
+Với Skewness N/A, không thể xác định tail direction từ cross-sectional moments. Tuy nhiên, spread âm (-0.25σ) ngầm暗示 không có tail-driven event: không phải cú sập cá biệt (skew âm sâu) hay cú đẩy điên rồ (skew dương sâu). Kurtosis vắng mặt — không đánh giá được fat-tail risk. **Khuyến nghị bổ sung Skew/Kurtosis real-time** trước khi mở rộng position sizing.
+
+## 4. Regime Mapping
+Đối chiếu 2D Map: **DPI thấp (41.7%) + Corr thấp (0.008)** → **Healthy Stock-Picking regime**. Thị trường đang ở môi trường lý tưởng cho alpha generation: correlation gần zero nghĩa là idiosyncratic risk được định giá rõ, không bị macro factor lấn át.
+
+Risk lớn nhất cho PM: **liquidity dry-up đột ngột**. Corr thấp + DPI thấp tạo ảo giác an toàn, dễ dẫn đến over-leverage trong các position idiosyncratic. Nếu macro shock đánh vào, correlation có thể spike lên nhanh chóng (correlation breakdown) — long-short book dễ bị nén chặt. Không phải herding crash (thiếu điều kiện DPI cao + Corr cao).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "17/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.25,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "low"
+}
+```

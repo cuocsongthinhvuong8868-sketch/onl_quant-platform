@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-17",
+  "composite_score": 11,
+  "regime": "CRISIS / PRE-CRASH",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 13,
+      "unit": "sessions",
+      "description": "Nếu số phiên STRESS/WARNING giảm xuống dưới 5, thanh khoản VNIBOR đã easing thực sự"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 50.4,
+      "unit": "%",
+      "description": "Breadth MA20 đã vượt 45% (FALSIFIED), cần MA60 >50% và MA252 >40% để xác nhận"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 66,
+      "unit": "%",
+      "description": "Nếu SSI giảm xuống dưới 55%, stress hệ thống đã hạ nhiệt"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Nếu EVT ξ giảm xuống dưới 0.25, phân phối đã trở về bình thường"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 11.7,
+      "unit": "th pct",
+      "description": "Vingroup Slope đã dưới 70th (FALSIFIED), coupling không còn là rủi ro chính"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 93.5,
+      "unit": "th pct",
+      "description": "Nếu CQS giảm xuống dưới 80th, credit stress Mỹ đã hạ nhiệt"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-17",
+  "source": "ai_cio_executive_summary"
+}

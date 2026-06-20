@@ -1,0 +1,30 @@
+## 1. Observations
+- Lực cầu hiện tại (7.57%) thấp hơn đáng kể so với mu dài hạn (13.75%), cho thấy động lực mua suy yếu rõ rệt.
+- Lực cung hiện tại (10.36%) cũng thấp hơn mu dài hạn (13.88%), nhưng mức chênh lệch nhỏ hơn so với chiều cầu.
+- Cả hai chiều đều có Phi > +0.10: cầu Phi=0.159 (momentum giảm tiếp), cung Phi=0.257 (momentum bán mạnh hơn).
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền: Distribution (phân phối)**. Cả lực cầu (7.57%) và lực cung (10.36%) đều thấp hơn mu dài hạn (13.75% và 13.88%), cấu trúc "cùng chiều down" → dòng tiền đang rút dần, không có áp lực bán tháo nhưng cũng không có lực mua chủ động.
+- **Momentum thực sự nghiêng về Bên Cung** (|Phi_dn|=0.257 > |Phi_up|=0.159). Đà bán có độ bền cao hơn đà mua, báo hiệu rủi ro suy yếu tiếp diễn.
+
+## 3. Stress-Test Read
+- P95 Downside = 28.85%: nếu panic sell xảy ra, biên độ giảm kỳ vọng ở mức rất sâu, song hiện tại chưa có dấu hiệu kích hoạt (cung đang thấp hơn mu).
+- **Asymmetry âm**: P95 Downside (28.85%) > P95 Upside (25.24%), tail risk bên bán dày hơn. Xác suất xảy ra kịch bản cực đoan tiêu cực cao hơn tích cực.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 15%** (rất thấp).
+- **Strategy: Defensive** (phòng thủ). Cả hai chiều đều trong momentum regime, nhưng lực cầu yếu hơn lực cung, thị trường đang trong pha phân phối. Chưa có tín hiệu bắt đáy. Chờ lực cầu hồi phục vượt mu dài hạn hoặc cung suy yếu (|Phi_dn| giảm <0.10) mới cân nhắc gia tăng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 28.85,
+  "p95_upside_pct": 25.24,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

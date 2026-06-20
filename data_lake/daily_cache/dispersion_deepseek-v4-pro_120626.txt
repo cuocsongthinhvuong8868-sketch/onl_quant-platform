@@ -1,0 +1,36 @@
+## 1. Observations
+
+- **Spread_Z = -0.54σ**: Mức độ phân tán thấp hơn trung bình 60 ngày một chút, không có dấu hiệu căng thẳng cục bộ (outlier-driven).
+- **DPI = 40.0%**: Dưới ngưỡng 70%, cho thấy sự phân tán hiện tại không phải là một regime kéo dài.
+- **Avg Pairwise Correlation = 0.006**: Cực kỳ thấp, gần như bằng 0. Các cổ phiếu đang vận động gần như độc lập hoàn toàn.
+- **Cross-Sectional Skewness/Kurtosis = N/A**: Không có dữ liệu về đuôi phân phối, cần theo dõi thêm nếu có sự kiện bất thường.
+
+## 2. Structural State
+
+- **Trạng thái: Bình thường**, không stressed.
+- DPI thấp (40.0%) kết hợp với Spread_Z âm (-0.54σ) cho thấy một giai đoạn ổn định về mặt cấu trúc. Không có dấu hiệu của sự kéo căng cục bộ (Spread_Z < +1σ) hay một regime phân tán kéo dài (DPI < 70%). Đây là một phiên "thuần" với mức độ đồng thuận thấp nhưng không có sự hỗn loạn.
+
+## 3. Cross-Check & Tail Direction
+
+- **Thiếu dữ liệu (N/A)**: Do không có Cross-Sectional Skewness và Kurtosis, chúng ta không thể xác định hướng của đuôi (tail) hay mức độ fat-tail. Không có bằng chứng cho thấy sự chi phối bởi các outlier (cổ phiếu tăng/giảm cực đoan).
+- **Giả định tạm thời**: Với Spread dương (+10.60%) nhưng Spread_Z âm, điều này cho thấy mức phân tán còn tồn tại nhưng đang trên đà giảm dần và quay về trung bình. Các chuyển động phân hóa có vẻ ngẫu nhiên hơn là có chủ đích từ một nhóm nào đó (có thể là mid-cap headless).
+
+## 4. Regime Mapping
+
+- **Đối chiếu 2D Map**: Với DPI **thấp** (40%) và Corr **thấp** (0.006), trạng thái hiện tại tương ứng với ô **"Healthy Stock-Picking"**.
+- **Risk lớn nhất cho Portfolio Manager**: Rủi ro chính không phải là thanh khoản hay bầy đàn, mà là **rủi ro độc lập (idiosyncratic risk)**. Trong môi trường này, mỗi cổ phiếu đều có câu chuyện riêng, hiệp phương sai gần như bằng 0. Điều này khiến cho chiến lược long/short dựa trên tương quan trở nên vô dụng. Rủi ro là một bet size lớn vào một cổ phiếu cụ thể có thể bị trừng phạt hoàn toàn độc lập với thị trường chung.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "12/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.54,
+  "dpi_pct": 40.0,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

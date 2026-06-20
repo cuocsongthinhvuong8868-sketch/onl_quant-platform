@@ -1,0 +1,30 @@
+## 1. Observations
+- **Lực cầu giảm mạnh so với baseline**: 5.65% hiện tại vs 13.25% dài hạn, chênh lệch -7.6pp → cầu yếu hơn kỳ vọng.
+- **Lực cung cũng giảm so với baseline**: 8.94% vs 13.53%, chênh lệch -4.59pp → cung nén lại, không bán tháo dù cầu yếu.
+- **Cả hai chiều đều ở Momentum Regime**: Phi_cầu = 0.193 (>+0.10), Phi_cung = 0.228 (>+0.10) → đà hiện tại có khả năng duy trì, không phải random walk.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái**: **ZOMBIFICATION**. Cả lực cầu (5.65%) và lực cung (8.94%) đều thấp hơn mu dài hạn đáng kể. Thị trường đang trong trạng thái thanh khoản cạn, không ai mua mạnh, không ai bán mạnh.
+- **Momentum Winner**: **SUPPLY** (cung) chiếm ưu thế nhẹ. |Phi_cung| = 0.228 > |Phi_cầu| = 0.193 → đà bán mạnh hơn đà mua. Nếu có động lực phá vỡ, khả năng nghiêng về phía cung.
+
+## 3. Stress-Test Read
+- **P95 Downside = 27.01%**: Nếu panic sell xảy ra, biên độ giảm có thể lên tới 27% trong 19 phiên — rủi ro đuôi rất dày.
+- **Asymmetry**: P95 Downside (27.01%) > P95 Upside (23.24%). Tail risk bên bán dày hơn bên mua 3.77pp. Dù cả hai đều đáng kể, thị trường đối mặt với rủi ro giảm sâu cao hơn khả năng tăng bùng nổ.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân**: **0%** — không nên mua mới.
+- **Strategy**: **PHÒNG THỦ** (Defensive). Thị trường đang trong trạng thái zombie, momentum nghiêng về cung, tail risk giảm vượt trội. Không phải thời điểm để bắt đáy hay mua đuổi. Chờ breakout rõ ràng hoặc tín hiệu đảo chiều từ một trong hai chiều mới hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 27.01,
+  "p95_upside_pct": 23.24,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

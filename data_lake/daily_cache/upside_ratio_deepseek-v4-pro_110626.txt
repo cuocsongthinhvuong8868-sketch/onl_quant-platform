@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực Cầu**: Hiện tại 7.53% thấp hơn đáng kể so với Mu dài hạn 13.58% (delta = -6.05pp). Phi = +0.197 > +0.10 → momentum mua đang suy yếu nhưng có xu hướng hồi phục đà.
+- **Lực Cung**: Hiện tại 9.18% cũng thấp hơn Mu 13.72% (delta = -4.54pp). Phi = +0.210 > +0.10 → momentum bán đang giảm tốc nhưng vẫn duy trì đà.
+- Cả hai chiều đều ở trạng thái *nén* so với trung bình lịch sử, và đều có Phi dương > 0.10 → đây là regime momentum hai chiều, không phải mean-reversion hay random walk.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền hiện tại: ZOMBIFICATION**. Cả Lực Cầu (7.53%) và Lực Cung (9.18%) đều thấp hơn Mu dài hạn (13.58% và 13.72%). Thị trường đang trong trạng thái thanh khoản cạn kiệt, cả bên mua lẫn bên bán đều yếu — đúng dấu hiệu của "up nén + down nén".
+- **Momentum winner**: So sánh |Phi_up| = 0.197 vs |Phi_dn| = 0.210 → **Supply (bán) giữ momentum nhỉnh hơn một chút**, nhưng sự chênh lệch rất nhỏ (0.013). Cả hai đều có đà nhưng không bên nào áp đảo rõ rệt. Trong regime zombie, momentum yếu dần theo thời gian.
+
+## 3. Stress-Test Read
+- P95 Downside = 26.64%: Nếu panic sell kích hoạt, biên độ giảm kỳ vọng trong 19 phiên lên tới 26.64% — tương đương một đợt crash lịch sử. Đây là tail risk rất dày.
+- **Asymmetry**: P95 Downside (26.64%) > P95 Upside (23.80%). Chênh lệch ~2.84pp nghiêng về phía rủi ro giảm. Tail bán dày hơn tail mua → phân phối xác suất lệch trái (negative skew). Thị trường dễ sập hơn là bùng nổ.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 0%** — không thích hợp để mua trong regime zombie với tail risk giảm vượt trội.
+- **Strategy: Phòng thủ (Defensive)**. Không rình bắt đáy vì động lượng bán vẫn còn (Phi_dn = 0.210), không mua đuổi vì cầu quá yếu. Chỉ giữ tiền mặt hoặc công cụ phòng hộ.
+- Lưu ý: Dù Phi > 0.10, cả hai là momentum, nhưng nội tại là zombie → hành động giá sẽ giằng co chứ không bùng nổ. Nguy cơ một cú sell-off bất ngờ cao hơn cơ hội hồi phục mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.64,
+  "p95_upside_pct": 23.80,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

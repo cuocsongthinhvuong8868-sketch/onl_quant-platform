@@ -1,0 +1,35 @@
+## 1. Observations
+- Risk Score 49.3/100 nằm trong ngưỡng NEUTRAL (40-60), delta +1.5 điểm so với phiên trước, cho thấy xu hướng tăng nhẹ.
+- EGARCH Vol 0.8% đang ở mức thấp, giảm -2.0% so với phiên trước, dưới ngưỡng báo động 1.5%.
+- Rolling Skewness +0.05 gần bằng 0, không cho thấy đuôi âm hay dương rõ rệt.
+- Downside Correlation 14.7% thấp hơn đáng kể so với Upside Correlation 26.6% (chênh lệch ~12pp), phản ánh phân hoá mạnh giữa pha tăng và pha giảm.
+
+## 2. Interpretation
+Dữ liệu hiện tại xác suất cao đang mô tả một thị trường NEUTRAL với tính phân hoá cổ phiếu cao: vol thấp cho thấy không có căng thẳng hệ thống, skewness trung tính và sự lệch pha rõ rệt giữa upside/downside correlation xác nhận các nhóm ngành đang vận động độc lập, không có dòng tiền đồng thuận.
+
+## 3. Cross-Check
+- Score (49.3) vs EGARCH Vol (0.8%): consistent — cả hai đều phản ánh trạng thái NEUTRAL không căng thẳng.
+- Skewness (+0.05) vs Correlation (down 14.7% << up 26.6%): consistent nhẹ — skewness trung tính phù hợp với thị trường phân hoá, không có hiệu ứng đám đông trên cả hai phía.
+
+Tổng thể không phát hiện divergence đáng kể. Tín hiệu đồng nhất ở trạng thái NEUTRAL / STOCK PICKING.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.6** (trung bình-cao).
+Hành động: Duy trì danh mục tập trung vào cổ phiếu riêng lẻ (stock-picking). Không cần phòng thủ toàn diện (vol thấp, skew trung tính) nhưng cũng không nên tăng đòn bẩy (vì chưa có tín hiệu đồng thuận). Xác suất cao VN-Index tiếp tục sideway phân hoá.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "28/05/2026",
+  "regime": "NEUTRAL",
+  "score": 49.3,
+  "confidence": "high",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Vol EGARCH giảm 2% cho thấy không căng thẳng hệ thống",
+    "Chênh lệch Upside/Downside Correlation ~12pp xác nhận phân hoá mạnh",
+    "Skewness trung tính +0.05 không cho thấy rủi ro đuôi"
+  ]
+}
+```

@@ -1,0 +1,37 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14%) là baseline chuẩn cho ngành ngân hàng Việt Nam hiện tại. Mặc dù không khắc nghiệt, mặt bằng Alpha toàn mẫu rất tiêu cực: ngoại trừ SHB (Alpha +1.0%), tất cả các mã khác đều có Alpha âm. Điều này cho thấy đa số ngân hàng đang **đốt vốn cổ đông** (không tạo ra lợi nhuận vượt trội so với chi phí vốn 14%), ngay cả khi giá cổ phiếu vẫn tăng. Stress test BVPS/P/B trung tính nên đây là kết quả thuần từ nội tại doanh nghiệp.
+
+## 2. Top Alpha Decomposition
+**SHB**: Điển hình **Fortress** - ROE 17.5% cao + σROE 1.9% thấp nhất mẫu + P/B rẻ 0.95x + Payout chỉ 8.6%. Công thức tổng hợp mạnh: (17.5%×91.4%)/0.95 - 1×1.9% = 15.0% Disciplined Return, vượt CoE 14%. Đây là bank duy nhất tạo ra giá trị thặng dư ròng cho cổ đông.
+
+**ACB**: "Gần Fortress" - ROE 23% rất cao, P/B 1.24 hợp lý, nhưng σROE 2.7% cao hơn SHB khiến Risk Penalty ăn mòn đủ để đẩy Alpha xuống -1.1%. Vẫn đáng xem xét vì chất lượng tài sản và biên lợi nhuận vượt trội.
+
+**SSB**: **Cheap Trap nhẹ** - ROE 15.6% trung bình, P/B rẻ 1.05x, Payout 0% (không chia cổ tức, giữ lại toàn bộ lợi nhuận để tái đầu tư). Tuy nhiên, ROE không đủ mạnh để bù đắp Risk Penalty, Alpha -1.3%.
+
+## 3. Value Traps Warning
+**LPB**: **Premium Burn** rõ rệt - P/B 2.92x quá đắt so với ROE 21% (σROE 3.8% rủi ro cao). Risk Penalty 3.8% + P/B đẩy Disciplined Return chỉ 2.0% → Alpha -12%. Nhà đầu tư đang trả premium cho tăng trưởng không bền vững.
+
+**EIB**: **Cheap Trap cổ điển** - P/B 1.51x không rẻ, ROE 10% thấp + σROE 3.8% cao. Thu nhập không đủ bù đắp rủi ro. Alpha -11.5%.
+
+**VPB**: **Growth Trap** - ROE 14.1% bình thường nhưng σROE 4.7% cao nhất mẫu (biến động lợi nhuận mạnh). Risk Penalty 4.7% quá lớn, phá hủy hoàn toàn lợi thế từ P/B rẻ 1.24x. Alpha -10.1%.
+
+## 4. Portfolio Construction
+**Core Holding (60-70%)**: Chỉ duy nhất **SHB** đủ điều kiện Fortress với Alpha dương. Tỷ trọng tối đa khuyến nghị trong phần bank allocation.
+
+**Tactical (20-30%)**: **ACB** dù Alpha -1.1% vẫn có ROE mạnh và định giá hợp lý, có thể nắm giữ ngắn hạn nếu có tín hiệu giảm σROE.
+
+**Cấm mua / underweight**: **LPB, EIB, VPB** - cả ba đều có Alpha âm sâu (trên 10%), đốt vốn nghiêm trọng. Không có lý do cơ bản nào để nắm giữ.
+
+**Lưu ý**: Mặc dù SHB có Alpha dương, đây là outlier hiếm hoi. Tổng thể sector không hấp dẫn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

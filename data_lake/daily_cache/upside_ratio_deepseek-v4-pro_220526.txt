@@ -1,0 +1,35 @@
+```markdown
+## 1. Observations
+- **Lực cầu (Upside Breadth):** Hiện tại 7.57%, thấp hơn đáng kể so với trung bình dài hạn 13.99% (-6.42%). Phi = 0.147 (> 0.10) → **Momentum (Đà Mua)**, nhưng đà này đang ở vùng thấp.
+- **Lực cung (Downside Breadth):** Hiện tại 11.16%, thấp hơn trung bình dài hạn 13.78% (-2.62%). Phi = 0.256 (> 0.10) → **Momentum (Đà Bán)**, mạnh gấp ~1.74 lần đà mua.
+- **Tương quan hai chiều:** Cả hai lực cung và cầu đều đang ở dưới mức trung bình dài hạn (UP nén, DOWN nén).
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền hiện tại: ZOMBIFICATION.**
+  - Cả hai chiều cung-cầu đều bị nén về mặt tham chiếu so với trung bình dài hạn. Động thái này biểu thị thanh khoản cạn kiệt, tâm lý thị trường đờ đẫn, khó có biến động mạnh trong ngắn hạn nếu không có catalyst (tin đột biến).
+- **Bên nào nắm momentum thực sự?**
+  - **Cung (Supply)** đang có momentum mạnh hơn (|Phi_dn| = 0.256 > 0.147 = |Phi_up|). Mặc dù biên độ dao động hiện tại của cung thấp, nhưng xác suất tự tương quan cho thấy xu hướng bán ra có độ bền hơn, dễ tạo ra các phiên bất ngờ tăng tốc.
+
+## 3. Stress-Test Read
+- **P95 Downside = 28.64%:** Đây là kịch bản stress tail (xác suất 5%) có thể xảy ra trong T+19 phiên. Một cú panic sell mạnh có thể đẩy thị trường vào trạng thái *crash breadth* với gần 29% mã giảm > -2%.
+- **Asymmetry:** P95_Up (25.38%) < P95_Dn (28.64%). Tail risk bên bán (downside) dày hơn bên mua (upside) một khoảng **3.26 điểm phần trăm**. Thị trường không cân bằng; rủi ro bất ngờ từ phía cung cao hơn đáng kể so với kỳ vọng bùng nổ từ cầu.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 10%**
+- **Strategy: PHÒNG THỦ** — Trạng thái hiện tại là **NO ACTIONABLE** cho việc mua đuổi hay bắt đáy.
+  - Zombification + đà cung mạnh hơn + tail risk lệch trái = môi trường không thể dự báo động thái rõ ràng. Việc vội vàng giải ngân sẽ khiến danh mục chịu tổn thương (gamma-spike) khi cung hồi phục.
+  - Không phải là thời điểm để hành động có tỷ trọng cao. Nên giữ tỷ trọng tối thiểu (0-15%) và chờ tín hiệu phá vỡ rõ ràng, hoặc ít nhất là tín hiệu cầu hồi phục vượt qua mức trung bình dài hạn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 28.64,
+  "p95_upside_pct": 25.38,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

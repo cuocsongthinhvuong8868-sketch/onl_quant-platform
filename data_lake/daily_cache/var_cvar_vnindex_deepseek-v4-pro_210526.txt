@@ -1,0 +1,38 @@
+## 1. Observations
+- Historical VaR 95% ở -1.64% sâu hơn Parametric Gaussian (-1.44%), báo hiệu đuôi thực tế dày hơn giả định normal.
+- EVT VaR 99% đạt -3.66%, tương đương sự kiện 1/100 phiên — gấp ~2.5 lần VaR 95% thông thường.
+- ξ (GPD shape) = +0.346, nằm trong bracket **fat tail** (>0.30), vượt ngưỡng heavy tail (0.15-0.30).
+- Hill index = +0.471, cùng dấu dương và magnitude tương đương ξ → cross-check robust.
+
+## 2. Tail Thickness Diagnosis
+ξ = 0.346 thuộc bracket **fat tail**, xác nhận đuôi phân phối cực kỳ dày. Hill index = 0.471 cho tín hiệu cùng chiều, magnitude không quá chênh lệch (0.346 vs 0.471), giảm lo ngại về threshold sensitivity. ES − VaR spread = -1.36% (giá trị tuyệt đối 1.36%) **lớn hơn** σ₃₀ (1.13%), chứng thực thực nghiệm rủi ro đuôi đang dominate phân phối. Cả ba chỉ báo đều hội tụ: tail regime confirmed ở mức fat.
+
+## 3. Gaussian Gap
+Gaussian VaR 99% ước lượng bằng μ + z·σ với z₀.₀₁ = -2.33 (giả định μ ≈ 0):
+- Gaussian VaR 99% = 0 + (-2.33 × 1.13%) = -2.63%.
+- EVT VaR 99% = -3.66%.
+- Gap = |-3.66% - (-2.63%)| = **1.03 percentage point**.
+Gap > 1pp → mô hình Gaussian bị broken, underestimate rủi ro cực đoan đến mức không thể sử dụng cho risk capital allocation. Việc dựa vào σ-based sizing sẽ dẫn đến thiếu hụt vốn đệm đáng kể trong sự kiện 1%.
+
+## 4. Verdict — Hedging Implications
+Với ξ > 0.30:
+- Tuyệt đối **tránh momentum strategies** (long convexity dễ bị stop-out trong gap down).
+- KHUYẾN NGHỊ **mua puts ITM** (delta 0.5-0.6) để phòng tail risk, kỳ hạn 1-3 tháng, chi phí premium cao hơn OTM nhưng bảo vệ coverage.
+- Kết hợp **short futures hedge** nếu tồn tại basis rõ ràng, hoặc dùng 1-2% NAV mua VN30 put spread để giới hạn max loss.
+- Giảm leverage portfolio về mức 50% so với normal, đặc biệt với các vị thế long vay margin.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "21/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.03,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

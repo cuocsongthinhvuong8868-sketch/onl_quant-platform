@@ -1,0 +1,264 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-06-18T09:52:09",
+  "t_data_date": "2026-06-17",
+  "target_report_date": "2026-06-16",
+  "report_match": "exact",
+  "report_path": "C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\executive_summary_deepseek-v4-pro_160626.txt",
+  "report_mtime": "report:2026-06-17T21:18:30|sidecar:2026-06-17T21:18:30",
+  "parsed": {
+    "report_date": "2026-06-16",
+    "composite_score": 11.0,
+    "regime": "CRISIS / PRE-CRASH",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 14.0,
+        "unit": "sessions",
+        "description": "Số phiên STRESS/WARNING trong 20 phiên giảm xuống dưới 5, xác nhận thanh khoản liên ngân hàng easing thực sự"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 46.1,
+        "unit": "%",
+        "description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận độ rộng thị trường phục hồi bền vững"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 66.1,
+        "unit": "%",
+        "description": "Chỉ số stress hệ thống giảm xuống dưới 55%, thoát khỏi vùng WARNING"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "Tail Index (xi)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.345,
+        "unit": "",
+        "description": "Chỉ số đuôi béo EVT giảm xuống dưới 0.25, đuôi phân phối trở về Gaussian"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 23.3,
+        "unit": "th pct",
+        "description": "Hệ số góc coupling Vingroup-VN30F giảm xuống dưới phân vị 70, xác nhận rủi ro flash crash giảm"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.2,
+        "unit": "th pct",
+        "description": "Chênh lệch credit spread CCC-HY giảm xuống dưới phân vị 80, deep junk stress hạ nhiệt"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-06-16",
+      "composite_score": 11,
+      "regime": "CRISIS / PRE-CRASH",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 14,
+          "unit": "sessions",
+          "description": "Số phiên STRESS/WARNING trong 20 phiên giảm xuống dưới 5, xác nhận thanh khoản liên ngân hàng easing thực sự"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 46.1,
+          "unit": "%",
+          "description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận độ rộng thị trường phục hồi bền vững"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 66.1,
+          "unit": "%",
+          "description": "Chỉ số stress hệ thống giảm xuống dưới 55%, thoát khỏi vùng WARNING"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "Tail Index (xi)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.345,
+          "unit": "",
+          "description": "Chỉ số đuôi béo EVT giảm xuống dưới 0.25, đuôi phân phối trở về Gaussian"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 23.3,
+          "unit": "th pct",
+          "description": "Hệ số góc coupling Vingroup-VN30F giảm xuống dưới phân vị 70, xác nhận rủi ro flash crash giảm"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.2,
+          "unit": "th pct",
+          "description": "Chênh lệch credit spread CCC-HY giảm xuống dưới phân vị 80, deep junk stress hạ nhiệt"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-06-16",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "14.0 sessions",
+      "T actual": 13.0,
+      "T actual display": "13.0 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "Intact",
+      "Data date": "2026-06-15",
+      "Description": "Số phiên STRESS/WARNING trong 20 phiên giảm xuống dưới 5, xác nhận thanh khoản liên ngân hàng easing thực sự",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "46.1%",
+      "T actual": 50.35294117647059,
+      "T actual display": "50.4%",
+      "Delta": 4.252941176470586,
+      "Delta display": "+4.253%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-17",
+      "Description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận độ rộng thị trường phục hồi bền vững",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "66.1%",
+      "T actual": 66.0237601735609,
+      "T actual display": "66.0%",
+      "Delta": -0.07623982643909244,
+      "Delta display": "-0.076%",
+      "Status": "Intact",
+      "Data date": "2026-06-17",
+      "Description": "Chỉ số stress hệ thống giảm xuống dưới 55%, thoát khỏi vùng WARNING",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "Tail Index (xi)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.345",
+      "T actual": 0.3454435282173134,
+      "T actual display": "0.345",
+      "Delta": 0.00044352821731341585,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-06-17",
+      "Description": "Chỉ số đuôi béo EVT giảm xuống dưới 0.25, đuôi phân phối trở về Gaussian",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "23.3 th pct",
+      "T actual": 11.666666666666668,
+      "T actual display": "11.7 th pct",
+      "Delta": -11.633333333333333,
+      "Delta display": "-11.6 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-17",
+      "Description": "Hệ số góc coupling Vingroup-VN30F giảm xuống dưới phân vị 70, xác nhận rủi ro flash crash giảm",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.2 th pct",
+      "T actual": 93.45238095238096,
+      "T actual display": "93.5 th pct",
+      "Delta": -5.74761904761904,
+      "Delta display": "-5.748 th pct",
+      "Status": "Intact",
+      "Data date": "2026-06-16",
+      "Description": "Chênh lệch credit spread CCC-HY giảm xuống dưới phân vị 80, deep junk stress hạ nhiệt",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 13,
+      "date": "2026-06-15",
+      "error": ""
+    },
+    "breadth": {
+      "value": 50.35294117647059,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "ssi": {
+      "value": 66.0237601735609,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "coupling": {
+      "value": 11.666666666666668,
+      "date": "2026-06-17",
+      "error": ""
+    },
+    "gfc": {
+      "value": 93.45238095238096,
+      "date": "2026-06-16",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 6,
+  "total": 6
+}

@@ -1,0 +1,66 @@
+## Ngày báo cáo AI: 16/06/2026
+
+## 1. Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng
+
+- **Phân loại regime:** Định giá cao trên diện rộng
+- **Điểm độ rộng định giá:** -58.7% (dưới ngưỡng -50%)
+- **Số mã:** Định giá cao 14/23 (60.9%), Hợp lý 8/23 (34.8%), Rẻ rõ rệt 0, Rẻ nhưng rủi ro 1
+- **Kết luận:** Biên an toàn rất hẹp. Đa số ngân hàng lớn và vừa đều đang giao dịch trên giá trị hợp lý RIM. Không tìm thấy cơ hội hấp dẫn từ định giá thuần túy.
+
+## 2. Luận điểm chính
+
+- 60.9% số ngân hàng trong rổ bị định giá cao, với các gap âm sâu nhất thuộc về các ngân hàng có rủi ro tín dụng/dilution cao (NVB -89%, EIB -66%, BVB -61%).
+- Gap trung vị -13.8% và gap trim mean -15.5% cho thấy toàn bộ nhóm đang premium so với giá trị hợp lý, không chỉ do outlier.
+- Gap vốn hóa (-21.7%) càng nặng hơn, nghĩa là các ngân hàng vốn hóa lớn (VCB, LPB, BID) bị định giá cao hơn mức trung bình.
+- Điểm định giá tương đối peer labels (-8.7%) nhưng riêng lẻ: VCB, LPB, BID, HDB đều ở trạng thái "Relatively Expensive" so với peer.
+- Chỉ có 1 mã rẻ (NAB), nhưng bị gắn mác "Rẻ nhưng rủi ro" (risk score 51.9, CAR dilution và collateral risk trung bình-cao).
+
+## 3. Kiểm tra chéo
+
+- **Định giá tương đối (peer labels):** 8/10 mã trong watchlist có "Relatively Cheap" hoặc "Slightly Cheap" - tức vẫn rẻ hơn peer, nhưng fair value gap vẫn âm hoặc rất thấp - cần thận trọng vì peer tự thân đang đắt.
+- **Xác nhận giá (market confirmation):** 
+  - 4 mã Neutral Confirmation, 3 mã "Fair, Weak Price Action" (ACB, CTG, SSB), 1 mã "Fair Value, Market Agrees" (TPB).
+  - **Tín hiệu giá YẾU:** ACB (confirmation 9.1), CTG (12.7), HDB (20.7), SSB (21.8) — thị trường không ủng hộ giá hiện tại, rủi ro điều chỉnh.
+  - **Tín hiệu giá TỐT:** ABB (99.5), KLB (94.8), OCB (94.1) - nhưng lưu ý KLB/OCB đang Overvalued/Fair, không phải cheap.
+
+## 4. Tín hiệu theo mã
+
+### ✅ Đáng theo dõi trong nhóm hợp lý/rẻ
+
+| Mã | Valuation Gap | Risk Score | Xác nhận giá | Nhận xét |
+|---|---|---|---|---|
+| **NAB** | +51.7% (Rẻ rõ rệt) | 51.9 (Cao) | 87.96 (Mạnh) | Rẻ nhưng rủi ro: CAR dilution, collateral risk 50. **Cần kiểm tra khả năng tăng vốn và chất lượng tài sản trước khi vào. Vị thế nhỏ, beta thấp.** |
+| **KLB** | +24.9% (Hợp lý) | 42.6 (Trung bình) | 94.76 (Neutral) | Gap dương, xác nhận tốt. Rủi ro trung bình, nhưng vẫn là Fair Value, không phải bargain. |
+| **VAB** | +20.1% (Hợp lý) | 50.45 (Cao) | 89.08 (Neutral) | Gap dương, nhưng risk score cao hơn KLB. Chỉ nên xem xét nếu chấp nhận rủi ro cao hơn. |
+| **TPB** | +2.8% (Hợp lý) | 44.68 (Trung bình) | 74.03 (Market Agrees) | Giá đang được thị trường xác nhận tốt nhất trong nhóm Fair Value. Dòng tiền khá (volume ratio 1.25). |
+
+### ⚠️ Rủi ro / Cảnh báo cần tránh
+
+| Mã | Gap | Risk Score | Cảnh báo |
+|---|---|---|---|
+| **NVB** | -89.0% | 68.3 (Cao nhất) | CAR thiếu, NPL 8.63%, Provision Coverage 14.75%. Định giá quá đắt so với rủi ro. Cổ phiếu rủi ro phá sản. |
+| **EIB** | -66.0% | 58.4 (Cao) | ROE thấp 7%, CAR 12%, NPL 2.86%. Gap âm sâu, nhưng risk cao. |
+| **BVB** | -61.4% | 63.5 (Cao) | Collateral risk 85, ROE 5%. Rất rủi ro. |
+| **VPB** | -35.5% | 60.5 (Cao) | Credit cycle score 80 (xấu nhất), NPL 3.33%. Đắt và rủi ro. |
+| **ACB** | +8.8% | 33.8 (Thấp) | Confirmation 9.1% (yếu nhất). Giá đang giảm -5.5% trong 60 ngày, volume thấp. Dù định giá ổn, thị trường chưa tin. |
+
+## 5. Rủi ro dữ liệu và bước tiếp theo
+
+### ⚠️ Data Quality
+
+- **BAB, SGB:** Confidence 90% (Low) — thiếu giá thị trường, beta mặc định. Không dùng tín hiệu.
+- **NVB:** Confidence 95% (Medium) — CAR missing, capital dilution risk dùng giả định. NPL rất cao (8.63%) không được reflect đủ.
+
+### ⚠️ Rủi ro tiềm ẩn chưa được xử lý
+
+- **Credit cycle score cao:** VPB (80), SGB (62.5), OCB (60), NVB (55), BVB (55). Các ngân hàng này dễ bị tổn thương nếu chu kỳ tín dụng xấu đi.
+- **Provision Coverage thấp:** NVB (14.75%), SGB (36.36%), EIB (43.89%) — rủi ro nợ xấu tăng khi không có bộ đệm dự phòng.
+- **Collateral risk cao:** BVB (85), NVB (85) — tài sản thế chấp kém chất lượng.
+
+### ✅ Bước tiếp theo cho AI CIO
+
+1. **Không mua mới** cho đến khi có tín hiệu định giá rộng cải thiện (điểm breadth > -50% hoặc ít nhất > -25%).
+2. **Nếu phải giữ hoặc vào:** chỉ xem xét TPB (xác nhận tốt, risk thấp) hoặc KLB (gap dương, confirmation cao) với tỷ trọng rất nhỏ.
+3. **Cảnh báo thoát:** ACB, CTG, SSB đang có "Weak Price Action" — thị trường không ủng hộ, nguy cơ giảm tiếp.
+4. **Theo dõi đặc biệt:** NAB (rẻ nhưng rủi ro) — cần kiểm tra báo cáo tài chính mới nhất về CAR và NPL.
+5. **Tránh xa:** NVB, EIB, BVB, VPB — dù gap âm sâu, risk quá cao, xác nhận giá kém hoặc không có.

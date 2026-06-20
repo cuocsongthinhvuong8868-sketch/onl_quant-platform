@@ -1,0 +1,39 @@
+## 1. Observations
+
+- **MA20 (45.9%):** Mức trung bình, hoàn toàn không nóng (overbought >80%) cũng không lạnh (oversold <20%)
+- **MA60 (31.5%):** Thấp, phản ánh xu hướng trung hạn suy yếu rõ rệt
+- **MA125 (26.8%):** Thấp, chu kỳ kinh doanh nửa năm đang trong pha co hẹp
+- **MA252 (28.7%):** Thấp, xác nhận thị trường đang trong vùng Bear regime rõ rệt
+
+## 2. Structural Health
+
+Bốn đường MA **đồng thuận giảm** (từ 45.9% → 31.5% → 26.8% → 28.7%), không có divergence. Mô hình khớp hoàn hảo với **Bear Confirmed**: MA20 < 30%? Không hẳn, nhưng MA252 (28.7%) < 40% kết hợp MA60 (31.5%) và MA125 (26.8%) đều dưới 40% → cấu trúc suy yếu kéo dài. Đây là tín hiệu yếu mang tính hệ thống, không phải rũ bỏ nhất thời.
+
+## 3. Money Flow Leadership
+
+- **Top MA20**: Áp đảo bởi nhóm **Manufacturing & Commodities** (AAA, ABS, ANV, APF) và **Energy/Logistics** (ACV, ADS, AGR). Banks và Brokers vắng bóng → dòng tiền ngắn hạn chọn cyclical, không phải defensive.
+- **Top MA252**: Trùng lặp đáng kể với MA20 (ABB, ADS, APF) + nhóm **Banking/Insurance** (BFC, BIC, BID). Điều này cho thấy chỉ một số mã đầu ngành vẫn trụ vững dài hạn.
+- **Smart money**: Không ưu tiên defensive thuần túy; đang phân hóa giữa dài hạn (Banks) và ngắn hạn (Commodities). Đây là cấu trúc **chọn lọc cao**, không phải dòng chảy rộng khắp.
+
+## 4. Verdict
+
+- **Strategy: Defensive cash-up**. Thị trường Bear Confirmed, không có divergence, không có tín hiệu đảo chiều. Không nên trend-following vì MA20 không đủ mạnh, cũng không nên mean-reversion vì xu hướng chính đang xuống.
+- **Đòn bẩy: 0% margin**. MA252 (28.7%) quá thấp, không đáp ứng điều kiện margin.
+- Kết luận: **Giữ tiền mặt, chờ xác nhận cấu trúc đáy.** Không có lý do để hành động.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 45.9,
+  "ma60_pct": 31.5,
+  "ma125_pct": 26.8,
+  "ma252_pct": 28.7,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

@@ -1,0 +1,29 @@
+## 1. Scenario Assessment
+Kịch bản baseline Trung lập với K=1.0 và CoE=14% là ngưỡng đánh giá chuẩn cho ngành ngân hàng Việt Nam. Với stress test bằng 0 (không tác động BVPS/PB), mặt bằng Alpha của nhóm bank được cung cấp hoàn toàn âm, ngoại trừ SHB ghi nhận +0.9%. Điều này cho thấy phần lớn ngành đang đốt vốn cổ đông (Alpha<0) dù P/B không quá đắt ở một số mã. Đây là tín hiệu **tiêu cực về tạo giá trị bền vững** ở scenario neutral.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +0.9%)**: Dẫn đầu duy nhất Alpha dương nhờ P/B rẻ (0.95x) + ROE ~17.5% + σROE rất thấp (1.9%). Payout thấp (8.6%) giúp ROE retention cao. **Phân loại: Fortress rõ ràng** – hội tụ đủ giá rẻ, chất lượng và ổn định, đây là “của hiếm” giữa rừng bank đốt vốn.
+- **ACB (Alpha -0.6%)**: ROE rất cao (23%) nhưng P/B 1.2x + σROE 2.7% không quá thấp. Kết quả Alpha vẫn âm nhẹ. **Phân loại: Gần Fortress nhưng chưa tới** – cần P/B thấp hơn hoặc CoE mềm hơn để bật dương.
+- **SSB (Alpha -1.3%)**: Tuy P/B 1.05x rẻ và σROE 2.2% ổn, nhưng ROE chỉ 15.6% + Payout 0% (không cổ tức tiền mặt) làm giảm hấp dẫn. **Phân loại: Cheap Trap nhẹ** – rẻ nhưng chất lượng sinh lời chưa đủ bù chi phí vốn.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.1%)**: **Premium Burn điển hình** – P/B gần 3x nhưng ROE 21% không đủ bù risk penalty (σROE cao 3.8%). Payout 21% không cứu được.
+- **EIB (Alpha -11.6%)**: **Premium Burn** kết hợp ROE yếu (10%) + P/B 1.53x quá cao so với chất lượng. Cần định giá lại mạnh.
+- **VPB (Alpha -10.2%)**: **Growth Trap** – ROE 14% không quá tệ nhưng σROE 4.7% là rủi ro biến động cao nhất nhóm. Risk penalty ăn mòn hoàn toàn lợi thế từ P/B 1.25x tưởng rẻ.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress)** (~65% bank allocation): **SHB**
+- **Tactical** (~25%): **ACB** (đợi giá về vùng P/B <1.1 hoặc có thể tham gia với tỷ trọng nhỏ), **SSB** (dành cho nhà đầu tư chấp nhận chờ đợi cải thiện ROE)
+- **Cấm mua / Underweight**: **LPB, EIB, VPB** – cả 3 đều đang phá hủy giá trị nghiêm trọng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

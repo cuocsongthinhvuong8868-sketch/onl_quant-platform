@@ -1,0 +1,37 @@
+## 1. Observations
+
+- **Spread_Z ở -1.48σ**: Spread hàng ngày thấp hơn đáng kể so với trung bình 60 ngày, cho thấy mức độ phân tán cross-sectional đang thu hẹp.
+- **DPI 41.7%**: Ở ngưỡng trung bình-thấp, không xác nhận sự tồn tại của một dispersion regime kéo dài.
+- **Avg Pairwise Correlation 0.008**: Gần bằng 0, cho thấy sự phân hóa cực mạnh giữa các cổ phiếu—hầu như không có đồng chuyển động nào.
+- **CS Skewness & Kurtosis: N/A**: Dữ liệu bị thiếu, hạn chế khả năng đánh giá mức độ bất thường của đuôi phân phối.
+
+## 2. Structural State
+
+DPI ở mức thấp (41.7%) kết hợp với Spread_Z âm (-1.48σ) cho thấy thị trường **không đang ở trạng thái stressed**. Dispersion hàng ngày thấp hơn mức trung bình, và sự thu hẹp này không phải là một regime kéo dài (DPI thấp). Khả năng cao là đây chỉ là một sự kiện co cụm cục bộ trong một phiên hoặc chuỗi vài phiên, chứ không phải một sự thay đổi cấu trúc.
+
+## 3. Cross-Check & Tail Direction
+
+Do CS Skewness và Kurtosis không có sẵn, chúng ta không thể xác định chính xác hướng của tail (đuôi trái/phải) hay mức độ xuất hiện của các outlier. Tuy nhiên, dựa trên Spread thấp (6.38%) và Spread_Z âm, có thể suy luận rằng mức độ "bùng nổ" tại các tail không đáng kể trong phiên này. Thị trường đang vận hành trong một biên độ phân tán hẹp, không có dấu hiệu của các cú sốc cá biệt.
+
+## 4. Regime Mapping
+
+Đối chiếu với 2D Regime Map: **DPI thấp + Corr thấp (gần 0)**.
+Đây chính xác là ô **Healthy Stock-Picking Environment**.
+
+- **DPI thấp + Corr thấp**: Môi trường lý tưởng cho chiến lược chọn cổ phiếu dựa trên phân tích cơ bản hoặc kỹ thuật riêng lẻ. Các cổ phiếu vận động độc lập, beta thấp.
+- **Risk lớn nhất cho Portfolio Manager**: **Concentration risk**. Với tương quan gần bằng 0, một danh mục tập trung quá mức vào một vài cổ phiếu sẽ có rủi ro riêng (idiosyncratic risk) rất cao. Sự thiếu vắng đồng chuyển động cũng có thể báo hiệu sự thiếu vắng của một động lực thị trường chung, khiến việc tìm kiếm tín hiệu vĩ mô trở nên khó khăn.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "18/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.48,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "low"
+}
+```

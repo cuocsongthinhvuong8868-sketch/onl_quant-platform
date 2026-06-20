@@ -1,0 +1,47 @@
+## 1. Observations
+
+- **Historical VaR 95%** ghi nhận mức lỗ -1.65%, sâu hơn Parametric VaR (-1.44%) khoảng 0.21%, cho thấy phân phối lợi nhuận có đuôi dày hơn so với giả định Gaussian.
+- **EVT VaR 99%** đạt -3.69%, tức mức lỗ kỳ vọng xảy ra 1 lần trong 100 ngày là rất lớn, vượt xa ước tính phân phối chuẩn.
+- **ξ (shape parameter)** đạt **+0.345**, rơi vào vùng **fat tail** (>0.30), xác nhận đuôi phân phối cực dày.
+- **Hill index** đồng thuận với ξ ở mức **+0.447**, cùng dấu và cùng hướng magnitude, tín hiệu robust.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.345** thuộc bracket **> 0.30 → FAT TAIL**. Điều này có nghĩa là rủi ro cực đoan (mất mát large negative) xuất hiện với tần suất không thể mô hình hóa bằng phân phối Gaussian.
+- **Hill index (0.447)** và **ξ (0.345)** cùng dương, cùng cường độ tương đương (không khác biệt quá lớn), nên tín hiệu "fat tail" được **xác nhận robust**. Không có dấu hiệu threshold sensitivity hay divergence.
+- **ES − VaR Spread = -1.37%**, lớn hơn σ₃₀ (0.78%) với biên độ rộng → **xác nhận thêm fat tail empirically** : mức tổn thất kỳ vọng (CVaR) vượt xa so với VaR, điển hình của đuôi rất dày.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** ước tính theo công thức (μ + z·σ), giả sử μ ≈ 0 (không đáng kể so với phương sai ngắn hạn). Với σ₃₀ = 0.78%, z₀.₀₁ = -2.33:
+  \[
+  \text{Gaussian VaR 99%} \approx -2.33 \times 0.78\% \approx -1.82\%
+  \]
+- **EVT VaR 99%** thực tế là **-3.69%**.
+- **Gap** = |(-3.69%) – (-1.82%)| = **1.87 percentage points**, **vượt xa ngưỡng 1pp**.
+- **Kết luận**: Gaussian model **bị broken hoàn toàn** trong việc dự báo rủi ro ở quantile 99%. Không nên dùng mô hình phân phối chuẩn để allocation capital hay sizing position.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.345 > 0.30, khuyến nghị:
+
+- **Tránh hoàn toàn các chiến lược momentum** (trend-following, buy dips) vì rủi ro giảm mạnh không báo trước.
+- **Mua puts ITM** (in-the-money) thay vì OTM, vì xác suất xảy ra mức giảm >3-5% là rõ rệt, cần bảo vệ danh mục ngay lập tức.
+- **Short futures hedge** để phòng ngừa systematic tail risk, đặc biệt khi thị trường đang ở vùng valuation cao hoặc bất ổn macro.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "17/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.87,
+  "hedge_action": "buy_puts_itm_short_futures",
+  "confidence": "high"
+}
+```

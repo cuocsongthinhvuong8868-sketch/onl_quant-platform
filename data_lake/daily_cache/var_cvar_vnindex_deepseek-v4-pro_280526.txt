@@ -1,0 +1,49 @@
+## 1. Observations
+
+- **Historical VaR 95%**: -1.64%, sâu hơn Parametric VaR 95% (-1.16%) khoảng 0.48pp, phản ánh phân phối lợi nhuận không chuẩn.
+- **EVT VaR 99%**: -3.66%, tương ứng với sự kiện 1/100 ngày giao dịch.
+- **ξ (GPD shape)**: +0.346, vượt ngưỡng 0.30, báo hiệu đuôi cực dày (fat tail).
+- **Hill index**: +0.471, cùng dấu dương với ξ, nhưng chênh lệch magnitude ~0.125 — vẫn đủ gần để coi là robust signal.
+
+## 2. Tail Thickness Diagnosis
+
+- **ξ = 0.346** thuộc bracket **FAT TAIL** (> 0.30). Điều này có nghĩa Gaussian model underestimate rủi ro đuôi một cách nghiêm trọng, và ES có thể không hội tụ ổn định.
+- **Hill index (0.471)** cùng hướng (dương) và magnitude tương đương với ξ → **cross‑check confirm**. Chênh lệch ~0.125 là chấp nhận được trong thực tế với threshold 10%, không làm giảm độ tin cậy.
+- **ES − VaR spread = -1.36%**, lớn hơn **σ₃₀ = 0.82%**. Theo quy tắc emprical spread > σ₃₀ → fat tail được xác nhận thêm.
+
+**Kết luận:** Cả ba tín hiệu (ξ bracket, Hill đồng thuận, spread vượt σ₃₀) đều chỉ về cùng một trạng thái: thị trường đang có đuôi phân phối rất dày.
+
+## 3. Gaussian Gap
+
+- **Gaussian VaR 99%** = μ + z₀.₀₁·σ, với z₀.₀₁ = -2.33 (theo chuẩn). Giả định μ ≈ 0 (vì σ₃₀ đo lường biến động ngắn, kỳ vọng lợi nhuận gần 0):  
+  *Gaussian VaR 99% ≈ 0 + (-2.33 × 0.82%) = **-1.91%**.*
+- **EVT VaR 99% = -3.66%**.
+- **Gaussian gap** = |-3.66%| - |-1.91%| = **1.75pp**.
+
+Gap > 1pp → Gaussian model **hoàn toàn broken** cho risk capital allocation. Sử dụng σ-based VaR 99% sẽ chỉ đo được chưa đến 60% rủi ro thực tế ở quantile 1%.
+
+## 4. Verdict — Hedging Implications
+
+Với ξ = 0.346 > 0.30:
+- **KHẨN CẤP:** Tránh mọi chiến lược momentum (buy dips, trend following). Những chiến lược này dễ bị "cắt lỗ" trong các sự kiện đuôi.
+- **Hành động khuyến nghị:**
+  - Mua **puts ITM** (in‑the‑money) với strike ~90‑95% giá spot, vì puts OTM có thể bị mispricing bởi Gaussian assumption, và với ξ > 0.30, puts ITM có delta bảo vệ gần 1:1.
+  - **Short futures hedge:** Vào vị thế short với duration ≤ 7 ngày để tránh contango bleed, tăng dần nếu σ₃₀ giãn rộng trên 1.2%.
+  - Giảm leverage tổng thể xuống 30‑50% (theo mức dưới cùng của khuyến nghị).
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "28/05/2026",
+  "evt_var_99_pct": -3.66,
+  "evt_es_99_pct": -6.11,
+  "xi": 0.346,
+  "hill": 0.471,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.75,
+  "hedge_action": "buy_puts_itm|short_futures",
+  "confidence": "high"
+}
+```

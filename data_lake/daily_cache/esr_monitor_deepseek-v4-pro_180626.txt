@@ -1,0 +1,40 @@
+# ESR MONITOR — 18/06/2026
+
+## 1. Observations
+- **SSI**: 66.0% — nằm trong vùng WARNING, chưa chạm CRITICAL nhưng đã vượt ngưỡng 0.50
+- **Market State**: EUPHORIC RISK — HMM khẳng định uptrend nhưng kèm stress cao
+- **Top 3 Pillar Drivers**: S_LIQ (36%), S_VAL (32%), S_COR (17%) — Pillar Mode downside
+- **EVR PC1**: 38.3% — concentration tương đối thấp so với lịch sử
+
+## 2. Risk Decomposition
+**S_LIQ** chiếm trọng số cao nhất (36%) — volume giao dịch đang khô cạn so với 1Y norm. Khi volume suy giảm trong khi VN30 vẫn dao động gần vùng đỉnh gần nhất, đây là tín hiệu thanh khoản rút dần — không còn lực cầu mới để hỗ trợ giá.
+
+**S_VAL** (32%) phản ánh valuation tension dai dẳng: lợi nhuận 252d của VN30 vẫn đang thấp hơn kỳ vọng so với lãi suất tiền gửi. Điều này tạo áp lực định giá kéo chỉ số về vùng hấp dẫn hơn.
+
+**S_COR** (17%) — correlation đo bằng EVR PC1 ở mức 38.3%, tức hệ thống chưa đồng pha hoàn toàn nhưng đang hội tụ dần. S_COR + S_LIQ đồng thời cao là signature của bull-trap: herding yếu đi trong khi thanh khoản khô cạn.
+
+## 3. Cross-Check
+- **Price vs SSI divergence**: VN30 gần đây test vùng đỉnh nhưng không breakout khỏi MA125, trong khi SSI đã chạm WARNING (66%). Không có đỉnh mới, nhưng stress đi ngang ở vùng cao là đủ nguy hiểm — thị trường mất đà tăng.
+- **HMM vs SSI**: Khớp. EUPHORIC RISK = stress cao + uptrend yếu dần. Không có lệch pha.
+
+## 4. Verdict
+**Cash weight đề xuất: 45%**  
+Lý do: SSI chưa đạt CRITICAL, nhưng top driver (S_LIQ + S_VAL) đều báo hiệu suy yếu nội tại. Đây không phải lúc exit hoàn toàn nhưng cần giảm đáng kể exposure.
+
+**Hedge action**: SHORT VN30F1M (hedge danh mục) hoặc REDUCE BETA đối với cổ phiếu riêng lẻ. Không khuyến nghị put nếu chi phí cao.
+
+**NO ACTIONABLE SIGNAL** không được trigger — các pillar có hướng đồng thuận: thanh khoản suy yếu + valuation tension = chờ breakdown.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 66,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

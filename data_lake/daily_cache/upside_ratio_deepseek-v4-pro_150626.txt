@@ -1,0 +1,31 @@
+## 1. Observations
+- **Lực cầu**: Current (18.35%) >> Mu dài hạn (13.51%), phi = +0.196 → Momentum mua rõ rệt, đà tích cực đang tự duy trì.
+- **Lực cung**: Current (6.12%) << Mu dài hạn (13.67%), phi = +0.214 → Momentum bán cũng có đà, nhưng ở mức thấp hơn trung bình lịch sử → áp lực bán đang yếu.
+- Cả hai chiều đều có |Phi| > 0.10 → không có random walk, tín hiệu momentum rõ ràng cho cả cung và cầu.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền: TÍCH LŨY (Accumulation)**. Cầu cao hơn mu, cung thấp hơn mu → dòng tiền đang chủ động gom hàng, áp lực bán thấp bất thường so với lịch sử.
+- **Momentum winner**: Cung (|Phi| = 0.214) nhỉnh hơn cầu (|Phi| = 0.196) một chút, nghĩa là đà bán có độ dai cao hơn nếu so với tương quan hiện tại. Nhưng vì cung đang ở mức rất thấp, momentum này chưa đủ mạnh để lật ngược thế trận. **Nghiêng về Demand giữ lợi thế tổng thể.**
+
+## 3. Stress-Test Read
+- P95 Downside = 26.66%: Nếu panic xảy ra, biên độ giảm kỳ vọng tail rất rộng (~27% số mã giảm >2%).
+- **Asymmetry**: P95 Downside (26.66%) > P95 Upside (23.44%). Tail risk bên bán dày hơn ~3.2 điểm phần trăm → thị trường tuy đang tích lũy nhưng ẩn chứa rủi ro bất đối xứng nghiêng về phía giảm sâu nếu có shock.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân: 40%**.
+- **Strategy: RÌNH BẮT ĐÁY (Bottom-fishing) + Phòng thủ nhẹ**. Không mua đuổi vì tail risk bên bán dày hơn; nên chờ nhịp điều chỉnh nhẹ để gia tăng.
+- **Confidence: Medium** — tín hiệu tích lũy rõ nhưng không thể loại trừ kịch bản panic nếu momentum cung bất ngờ tăng tốc.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 26.66,
+  "p95_upside_pct": 23.44,
+  "deployment_pct": 40,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```

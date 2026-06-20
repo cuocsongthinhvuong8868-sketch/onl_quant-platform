@@ -1,0 +1,34 @@
+## 1. Observations
+- MA20 (26.3%): **Low** – xấp xỉ oversold threshold (20%). Xung lực ngắn hạn cực yếu, chỉ 1/4 rổ còn trụ trên đường trung bình 1 tháng.
+- MA60 (32.3%): **Low** – dưới mức 40%, phản ảnh đà điều chỉnh trung hạn vẫn chiếm ưu thế.
+- MA125 (25.1%): **Very Low** – chỉ 1/4 mã giữ được chu kỳ nửa năm, cho thấy sự suy yếu lan rộng về mặt cấu trúc thời gian.
+- MA252 (31.9%): **Low** – dưới 40%, xác nhận môi trường dài hạn đang trong vùng suy yếu, chưa có tín hiệu chuyển pha.
+
+## 2. Structural Health
+Cả 4 horizon đều đồng loạt ở vùng thấp (26%–32%), không hề có divergence. Bối cảnh này khớp hoàn hảo với pattern **Bear Confirmed**: MA20 < 30% + MA252 < 40%. Không có bẫy, không có phân kỳ – thị trường đang trong trạng thái suy yếu đồng thuận trên mọi khung thời gian. Cơ hội giao dịch thuận xu hướng là rất thấp.
+
+## 3. Money Flow Leadership
+- **Top MA20 (ngắn hạn)** nổi bật nhóm dầu khí (BSR, PVT, PLX), chứng khoán (VIX, HCM), ngân hàng (STB, VCB, BID), và FPT/GEX. Đây là các cổ phiếu vốn hóa lớn và mang tính “bám trụ” hơn là đầu cơ.
+- **Top MA252 (dài hạn leader)** có sự chồng chéo rõ: BSR, PVT, STB góp mặt ở cả 2 danh sách. Dòng tiền thông minh đang tập trung vào **Energy + Banks + Real Estate (NVL, VRE, VHM)** – các ngành defensive và cyclical vừa phải. Không có Brokers hay Steel đầu cơ mạnh.
+- **Overlap giữa ngắn và dài hạn** khá tích cực (BSR, PVT, STB) cho thấy nhóm này đang là nơi trú ẩn, song khối lượng giao dịch không đủ mạnh để kéo breadth tổng thể.
+
+## 4. Verdict
+**Strategy: Defensive cash-up** – không nên trend-following vì không có xu hướng tăng, cũng chưa đủ oversold để mean-revert (MA20 chưa chạm 20% ngưỡng quá bán).  
+**Đòn bẩy: 0% margin** – tuyệt đối không sử dụng margin khi MA252 < 40% và không có bất kỳ divergence hỗ trợ.  
+Do các chỉ báo đồng thuận yếu (không divergence giữa MA20 và MA252), không cần đưa ra cảnh báo "WAIT FOR CONFIRMATION". Trạng thái Bear Confirmed yêu cầu nhà đầu tư giữ tỷ trọng tiền mặt cao và chờ tín hiệu hồi phục rõ ràng hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 26.3,
+  "ma60_pct": 32.3,
+  "ma125_pct": 25.1,
+  "ma252_pct": 31.9,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

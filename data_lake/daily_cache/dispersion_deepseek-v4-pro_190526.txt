@@ -1,0 +1,39 @@
+## 1. Observations
+
+- **Spread_Z = +1.06σ**: Độ phân tán có dấu hiệu kéo căng nhẹ so với trung bình 60 phiên, nhưng chưa đến ngưỡng báo động đỏ (+2σ).
+- **DPI = 46.7%**: Dưới ngưỡng 70%, xác nhận đây là biến động phân tán mang tính tạm thời, chưa hình thành regime kéo dài.
+- **Avg Pairwise Correlation = 0.076**: Ở mức rất thấp, gần như không có đồng thuận giữa các cổ phiếu; môi trường phân hoá cực mạnh.
+- **Skewness & Kurtosis: N/A**: Thiếu dữ liệu để đánh giá hình dạng đuôi phân phối, cần thận trọng khi suy diễn về hướng tail.
+
+## 2. Structural State
+
+- **Trạng thái: Stressed nhẹ, không phải regime bền vững.**
+- Spread_Z > +1σ cho thấy thị trường đang chịu một lực kéo căng dispersion nhất thời. Tuy nhiên DPI chỉ 46.7% khẳng định đây là **stress cục bộ** (transient shock), không phải regime persistent. Cấu trúc chưa chuyển sang trạng thái đuôi dài bền vững; hệ thống vẫn có khả năng "co lại" về baseline dispersion trong vài phiên tới.
+
+## 3. Cross-Check & Tail Direction
+
+- **Không có dữ liệu Skewness/Kurtosis**: Đây là hạn chế lớn nhất của snapshot này. Không thể xác định hướng tail (cổ phiếu tăng quá mức hay giảm quá mức đang chi phối) cũng như không thể đánh giá mức độ fat-tail.
+- **Giả định an toàn**: Với Spread dương (+11.52%) và DPI trung bình, tail-driven dispersion đang tồn tại nhưng không rõ tail nào chi phối. Cần bổ sung dữ liệu skew hoặc kiểm tra top/bottom decile để xác định.
+
+## 4. Regime Mapping
+
+- **Đối chiếu 2D Map: DPI thấp (46.7%) × Corr thấp (0.076) → Ô "Healthy Stock-Picking".**
+- Đây là môi trường lý tưởng cho active stock-picking: phân hoá cực mạnh, không bầy đàn, và dispersion không kéo dài đến mức báo động.
+- **Risk lớn nhất cho Portfolio Manager**: **Concentration risk.** Vì tương quan gần bằng 0, danh mục chỉ nắm vài cổ phiếu sẽ chịu biến động rất lớn theo idiosyncratic risk. Lợi nhuận phụ thuộc hoàn toàn vào kỹ năng chọn stock; không có "tide" nào nâng đỡ tất cả thuyền. Ngoài ra, thiếu skewness/kurtosis làm tăng tail risk không lường trước – một outlier âm cực lớn có thể xảy ra mà không được cảnh báo.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "19/05/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": 1.06,
+  "dpi_pct": 46.7,
+  "avg_corr": 0.076,
+  "tail_skew_direction": "symmetric",
+  "confidence": "low"
+}
+```
+
+> **Ghi chú**: Confidence thấp do thiếu dữ liệu Skewness/Kurtosis. Suy diễn về hướng tail chỉ mang tính phỏng đoán. Đề nghị bổ sung bộ EOD đầy đủ hoặc kiểm tra nhanh phân phối decile.
