@@ -1,0 +1,42 @@
+## 1. Observations
+- **Historical VaR 95% (3Y rolling)** ghi nhận mức -1.65%, phản ánh đuôi thực nghiệm ngắn hạn vẫn khá “mỏng” so với các cực đoan tiềm tàng.
+- **EVT VaR 99% (1/100 days)** đạt -3.69%, sâu hơn đáng kể so với VaR thông thường, cho thấy sự tập trung tổn thất hiếm gặp mà mô hình phân phối chuẩn bỏ qua.
+- **ξ (GPD shape)** ở mức +0.345, vượt ngưỡng 0.30 – thuộc chế độ **FAT TAIL**, báo hiệu tổn thất đuôi không hội tụ ổn định.
+- **Hill index** chéo xác nhận đạt +0.447, hoàn toàn cùng dấu và tương đồng về độ lớn với ξ, củng cố độ tin cậy của tín hiệu.
+
+## 2. Tail Thickness Diagnosis
+- **ξ = 0.345** nằm vững trong vùng **FAT TAIL** (ξ > 0.30). Đây là phân khúc cực kỳ nguy hiểm: expected shortfall (ES) có thể không hội tụ, mô hình Gaussian mất khả năng ước lượng rủi ro.
+- **Hill index = +0.447** (> 0.30) đồng thuận với ξ, không có divergence; cặp tham số này tạo ra một tín hiệu mạnh mẽ và nhất quán.
+- **ES – VaR spread** = -1.37% (tính từ Historical VaR 95%) so với σ₃₀ = 0.83%: spread > σ. Sự chênh lệch này khẳng định thực nghiệm đuôi dày, ES vượt xa VaR quá mức bình thường – đúng với đặc trưng fat tail.
+
+## 3. Gaussian Gap
+Tính toán **Gaussian VaR 99%** (dùng μ từ parametric VaR 95%):
+- μ ≈ -1.47% + 1.645×0.83% ≈ -0.10%
+- Gaussian VaR 99% = μ − 2.33σ ≈ -0.10% − 2.33×0.83% ≈ -2.04%
+
+**EVT VaR 99% = -3.69%**  
+→ Chênh lệch **Gap = 3.69% − 2.04% = 1.65 điểm phần trăm** (>> 1pp). Gaussian ước lượng thiếu hụt hơn 1.6% trong ngày tồi tệ, tức đánh giá thấp rủi ro đuôi một cách hệ thống. Mô hình chuẩn không thể dùng cho phân bổ vốn rủi ro.
+
+## 4. Verdict – Hedging Implications
+ξ = 0.345 > 0.30 → hành động phòng hộ mạnh mẽ:  
+- **Tránh chiến lược momentum** – đuôi dày có thể xóa sạch lợi nhuận tức thời.  
+- **Mua puts ITM** (in-the-money) để bảo vệ danh mục trước drawdown sâu và đột ngột.  
+- **Short hợp đồng tương lai** để hedge trực tiếp cho vị thế chỉ số, giảm thiểu rủi ro khi thị trường giảm mạnh.  
+
+Độ tin cậy cao dựa trên sự đồng thuận giữa ξ, Hill, và chênh lệch ES–VaR. Không dựa vào VaR Gaussian để cấp vốn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "12/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.65,
+  "hedge_action": "buy_puts_itm,short_futures",
+  "confidence": "high"
+}
+```

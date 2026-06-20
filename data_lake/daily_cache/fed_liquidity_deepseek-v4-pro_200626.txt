@@ -1,0 +1,53 @@
+## 1. Mechanical Decomposition
+
+Tuần 2026-06-10, **Net Liquidity tăng +63.2 tỷ USD**, được dẫn dắt chủ yếu từ bảng cân đối Fed (WALCL) mở rộng. Chi tiết:
+
+- **WALCL (Fed assets)**: 6,725.4 tỷ USD – dấu hiệu Fed đang tiếp tục mua tài sản ròng, bơm thanh khoản vào hệ thống ngân hàng.
+- **TGA (tài khoản kho bạc tại Fed)**: 828.1 tỷ USD, cao vừa phải. Treasury đang xả tiền ra nền kinh tế nhiều hơn tích lũy, góp phần nhỏ vào bơm thanh khoản.
+- **RRP (Reverse Repo)**: chỉ còn 387 triệu USD, gần như bằng 0. Hệ thống không còn room để “park” tiền tạm thời; tiền từ RRP đã hoàn toàn quay về T-bills và repo thị trường.  
+→ **Động lực chính của tuần**: Fed mở rộng bảng cân đối (QE), kết hợp kho bạc chi tiêu nhẹ, đẩy thanh khoản lên mức 5,896.9 tỷ USD.
+
+## 2. Cycle Positioning
+
+- **Pha thanh khoản**: Chúng ta đang trong **chu kỳ QE giai đoạn cuối (QE_late)**. RRP đã cạn kiệt (< 100 tỷ USD) – mỗi đồng mở rộng bảng cân đối đều trực tiếp bơm vào thanh khoản thị trường, không bị hấp thụ bởi reverse repo.
+- TGA ở mức 828 tỷ USD, chưa có dấu hiệu tích lũy đột biến; Treasury đang xả ròng nhẹ, hỗ trợ thêm.
+- **So sánh lịch sử**:  
+  - Đỉnh thanh khoản ròng năm 2022 khoảng ~6.5 nghìn tỷ USD (WALCL ~8.9T, RRP ~2.4T).  
+  - Đáy 2024 vào khoảng ~3.0 nghìn tỷ USD khi QT mạnh.  
+  - Hiện tại 5.9 nghìn tỷ USD – thanh khoản đã phục hồi gần 90% từ đáy, song vẫn dưới đỉnh lịch sử. Xu hướng mở rộng đang rõ ràng.
+
+## 3. Signal Strength
+
+- **Tín hiệu**: **ADD** (Impulse EMA(4) = +17.3 tỷ USD, Z-score = +1.11, thỏa cả 2 điều kiện EMA > 0 và Z ≥ +1σ).  
+- **Độ mạnh**: Z-score ở ngưỡng cận biên (+1.11σ), không cực đoan (>2σ). Đây là tín hiệu mạnh vừa phải, đáng tin cậy trong bối cảnh QE cuối chu kỳ.
+- **Nhất quán**: Impulse tuần (+63.2 tỷ USD) và EMA(4) cùng chiều với tín hiệu, không có phân kỳ.
+
+## 4. Cross-Asset Spillover (1-4 tuần tới)
+
+- **US Equities (SPX/NDX)**: **Positive bias** rõ rệt trong 1-4 tuần. Thanh khoản dồi dào, RRP về 0 khiến lượng tiền mới bơm thẳng vào tài sản rủi ro, củng cố tâm lý risk-on.
+- **DXY**: Xu hướng suy yếu khi Fed mở rộng bảng cân đối, ảnh hưởng ngược đến USD.  
+- **Gold & Crypto**: Vàng hưởng lợi từ đồng USD yếu hơn và lãi suất thực kỳ vọng giảm; tiền mã hóa có xung lực tích cực do dòng vốn đầu cơ.  
+- **VN-Index**: Với độ trễ 4-8 tuần, thanh khoản Fed đi qua kênh DXY → EM FX → dòng vốn ngoại, tạo **bias tích cực**. Tương quan lịch sử 0.25-0.35 ủng hộ kịch bản VN-Index tăng nhẹ trong 1-2 tháng tới.
+
+## 5. Risk Factors (tín hiệu có thể bị nhiễu)
+
+- **RRP gần 0**: Khi không còn đệm, tín hiệu CUT (nếu xuất hiện) sẽ yếu, nhưng ADD hiện tại vẫn đáng tin cậy vì nó phản ánh dòng tiền bơm thực.
+- **Mùa thuế tháng 6**: TGA có thể tăng đột biến (doanh nghiệp nộp thuế ước tính quý), tạo cú sốc hút thanh khoản tạm thời – gây nhiễu vài tuần.
+- **Fed pivot bất ngờ**: Nếu lạm phát bùng lại, Fed có thể dừng mở bảng cân đối sớm, đảo chiều tín hiệu.
+- **Yếu tố địa chính trị** có thể đánh bại hiệu ứng thanh khoản trong ngắn hạn.
+
+## 6. KẾT LUẬN
+
+Regime hiện tại là **QE_late**, thanh khoản bùng nổ (ADD) với xung lực đủ mạnh. Risk assets như US equities, crypto và VN-Index được hưởng lợi 2-4 tuần tới, nhưng cần cảnh giác nhiễu từ mùa thuế tháng 6 và nguy cơ lạm phát quay trở lại.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5896.9,
+  "signal": "ADD",
+  "z_score": 1.11,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,42 @@
+# Vietnam News Sentiment Brief – AI CIO Decision Layer
+**Generated:** 2026-06-15T20:22:44+07:00 | **Input:** rule‑based news monitor only
+
+## 1. Regime hiện tại & hướng thay đổi
+- **1d: strong_risk_on** (composite +0.4228)
+- **7d: risk_on** (+0.3143)
+- **30d: risk_on** (+0.2131)
+
+→ Xu hướng **tăng tốc rõ rệt**: composite tăng dần từ 30d qua 7d đến 1d, trạng thái 1d đã lên mức “strong” – tâm lý thị trường đang ấm lên nhanh.
+
+## 2. Kênh kéo risk‑on/risk‑off mạnh nhất
+- **Kéo risk‑on**:  
+  `monetary_policy` (+2.000 – dẫn đầu tuyệt đối), `earnings` (+1.528), `credit_stress` (+1.143), `real_estate_collateral` (+0.547).  
+  → Chính sách tiền tệ hỗ trợ, kỳ vọng lợi nhuận cao, áp lực tín dụng hạ nhiệt.
+- **Kéo risk‑off**:  
+  `commodity` (-0.789), `liquidity` (-0.245).  
+  → Lo ngại thanh khoản bị hút ròng và giá hàng hóa yếu.
+
+## 3. Tóm tắt drivers quan trọng (từ dữ liệu, không bịa thêm)
+
+**Tác động tích cực**  
+- **Tỷ giá trung tâm 15/06 tăng 10đ lên 25.165** – điểm +1.412 (kênh `fx_external`), thể hiện ổn định tỷ giá.  
+- **Lợi suất TPCP đi ngang 15/06** – điểm +0.229 (kênh `credit_stress`), tín hiệu thanh khoản trái phiếu ổn.  
+- **Hà Nội: Nghị quyết kinh tế đêm + đầu tư 3.562 tỷ xây nhà ở cho thuê** – điểm +0.168/+0.191 (kênh `growth`, `real_estate_collateral`), động lực nội địa.  
+- **Dấu ấn Tuần hàng Việt Nam tại AEON Nhật** – điểm +0.167 (kênh `growth`), xuất khẩu/hàng Việt lên ngôi.
+
+**Tác động tiêu cực**  
+- **NHNN hút ròng 22.122 tỷ đồng qua OMO (15/06)** – điểm -0.663 (kênh `liquidity`), thắt chặt ngắn hạn.  
+- **DXY giảm mạnh 0.5% (15/06)** – điểm -0.628 (kênh `fx_external`), dù thường có lợi nhưng nguồn tin phản ánh tiêu cực (có thể đi kèm lo ngại suy thoái toàn cầu).  
+- **Giá dầu giảm, hàng hóa yếu (giá vàng SJC, quặng sắt, PVC Trung Quốc chạm đáy)** – điểm từ -0.5 đến -0.7 (kênh `commodity`), gợi ý nhu cầu toàn cầu hạ nhiệt.
+
+## 4. Kết luận cho AI CIO: tác động lên macro & market‑internal tools
+- **Hỗ trợ (supports)** vị thế risk‑on trên tài sản Việt Nam: chính sách tiền tệ vững, kỳ vọng lợi nhuận, tín dụng ổn. Mức composite tăng nhanh cho thấy tâm lý đang dẫn dắt với cường độ cao.  
+- **Xung đột (conflict)** nhẹ ở góc thanh khoản: NHNN hút ròng qua OMO có thể báo hiệu định hướng trung lập hơn, cần theo dõi sát nếu lặp lại.  
+- **Trung tính (neutral)** đối với macro layer: dữ liệu không đưa ra tín hiệu mạnh về lạm phát hay đầu tư công (điểm 0), chỉ có kênh `commodity` âm nhưng mang yếu tố ngoại biên.
+
+→ **Hành động khuyến nghị**: giữ thiên hướng risk‑on, nhưng giảm đòn bẩy ở các vị thế nhạy thanh khoản; theo dõi diễn biến OMO và giá hàng hóa toàn cầu như chỉ báo đảo chiều sớm.
+
+## 5. Caveat (cảnh báo nguồn & nhiễu)
+- **Phủ nguồn**: 1d có 308 tin (63% mozyfin, 37% WiData) – thiếu các tổ chức tài chính lớn, có thể thiên lệch về một hệ sinh thái tin.  
+- **Độ trễ**: `generated_at` ngay 20:22 ngày 15/06/2026, không có stale feed.  
+- **Nhiễu tiêu đề**: một số tin Fortune mang tính giật gân (chính trị Mỹ, Ý) có thể gây nhiễu điểm `growth`, cần lọc bỏ trong phân tích chuyên sâu.

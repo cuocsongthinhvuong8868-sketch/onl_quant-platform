@@ -1,0 +1,35 @@
+## 1. Observations
+- SSI: 65.9% — chạm ngưỡng WARNING, rủi ro hệ thống tích lũy đáng kể.
+- Market State: EUPHORIC RISK (high stress + uptrend), nhưng giá đóng cửa dưới MA125 — dấu hiệu phân kỳ.
+- Top driver: S_LIQ (36%) vượt trội, tiếp theo là S_VAL (32%), S_COR (17%).
+- PCA concentration (PC1 EVR): 38.3% — tương quan hệ thống chưa quá cao nhưng đang góp phần.
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ là trụ cột dẫn dắt với trọng số 36%. Chỉ báo này đo lường **Volume Dry-Up** — khối lượng giao dịch toàn thị trường thu hẹp mạnh so với trung bình 1 năm. Dấu hiệu này cho thấy thanh khoản đang teo tóp, dòng tiền rút lui khỏi chỉ số dù giá có thể vẫn duy trì mức cao gần đây, làm tăng rủi ro sụt giảm đột ngột khi áp lực bán thực sự xuất hiện.  
+
+S_VAL (32%) phản ánh căng thẳng định giá — VN30 đã có mức sinh lời 252 ngày vượt xa lãi suất tiền gửi, tạo mặt bằng giá “no đủ” và dễ bị điều chỉnh khi kỳ vọng đảo chiều. S_COR (17%) ghi nhận mối tương quan hệ thống PC1 ở mức 38.3%, hàm ý các cổ phiếu di chuyển đồng pha nhiều hơn, làm giảm lợi ích phân tán trong danh mục. Tổ hợp S_LIQ + S_VAL tạo áp lực: thị trường khô thanh khoản nhưng vẫn neo ở định giá cao, dễ trở thành bẫy tăng giá (bull-trap).
+
+## 3. Cross-Check
+- Phân kỳ rõ rệt: VN30 đóng cửa dưới MA125 nhưng mô hình HMM vẫn gán trạng thái EUPHORIC RISK (uptrend + high stress). MA125 thường là đường xu hướng trung hạn; phá vỡ xuống dưới có thể báo hiệu chấm dứt uptrend. Nếu giá duy trì dưới MA125 vài phiên tới, HMM có khả năng chuyển sang ACTIVE_STRESS (high stress + downtrend). Đây là tín hiệu cảnh báo sớm.
+- SSI 65.9% phù hợp với chế độ WARNING, không lệch với mức độ căng thẳng hiện hữu.
+
+## 4. Verdict
+Rủi ro hệ thống ở ngưỡng WARNING, dẫn dắt bởi hiện tượng khô thanh khoản nghiêm trọng. Với giá phá vỡ MA125 và trạng thái EUPHORIC RISK có dấu hiệu phân kỳ, xác suất bẫy tăng giá đang cao. Quan điểm bảo thủ: ưu tiên bảo toàn vốn.  
+
+- Cash weight đề xuất: **60%**.  
+- Hedge action: giảm beta danh mục, thêm phòng hộ bằng quyền chọn mua put hoặc vị thế short VN30F1M với quy mô giới hạn. Không hành động trung lập (fully invested) ở giai đoạn này là không phù hợp.  
+- Không tồn tại mâu thuẫn giữa các trụ cột; S_LIQ và S_VAL cùng củng cố luận điểm phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

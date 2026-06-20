@@ -1,0 +1,34 @@
+## 1. Observations
+- Risk Score 49.1/100 – nằm trong vùng NEUTRAL (40–60), tăng nhẹ +1.0 so với phiên trước.
+- EGARCH Vol (chuẩn hóa) 4.4%, giảm –1.6% – dưới mức báo động, không có dấu hiệu biến động cực đoan.
+- Rolling Skewness 0.00 – phân phối lợi nhuận cân đối, không lệch đuôi âm hay dương.
+- Downside Correlation 11.5% (thấp), Upside Correlation 29.0% (trung bình thấp) – thị trường phân hóa, thiếu lan tỏa đồng pha khi tăng/giảm.
+
+## 2. Interpretation
+Dữ liệu hiện tại xác nhận pha **NEUTRAL / STOCK PICKING**: rủi ro hệ thống không cao, biến động giảm về mức trung bình, và mối tương quan thấp cho thấy các cổ phiếu diễn biến độc lập. Môi trường này ủng hộ việc tìm kiếm alpha qua chọn lọc cổ phiếu thay vì đặt cược vào beta chỉ số.
+
+## 3. Cross-Check
+- **Score ↔ EGARCH Vol**: Score trung tính (49.1) đi cùng vol 4.4% và đang giảm – không có divergence. Cả hai đều chỉ ra trạng thái ổn định.
+- **Skewness ↔ Correlation**: Skewness cân bằng và tương quan giảm thấp hơn tương quan tăng (11.5% vs 29.0%) – nhất quán với môi trường phân hóa, không có dấu hiệu đám đông bán tháo hay mua đuổi cực đoan. Không tồn tại divergence đáng kể.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.8 (trên thang 0–1.0). Không yêu cầu hành động phòng thủ hay tấn công quyết liệt.
+- **Hành động**: Giữ danh mục ở mức beta trung tính, tập trung vào stock picking. Trên dữ liệu hiện tại, không có tín hiệu đủ mạnh để chuyển sang trạng thái phòng thủ (beta thấp) hoặc tấn công (beta cao). NO ACTIONABLE SIGNAL về mặt điều chỉnh phòng thủ/tấn công hệ thống.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "12/06/2026",
+  "regime": "NEUTRAL",
+  "score": 49.1,
+  "confidence": "medium",
+  "beta_target": 0.8,
+  "key_signals": [
+    "Score 49.1 – phân vùng NEUTRAL",
+    "EGARCH vol 4.4% và giảm, không cực đoan",
+    "Skewness 0.00, không lệch đuôi",
+    "Tương quan giảm thấp (11.5%) và tăng trung bình thấp (29%) – phân hóa rõ"
+  ]
+}
+```
