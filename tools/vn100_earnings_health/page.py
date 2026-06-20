@@ -21,8 +21,6 @@ from tools.vn100_earnings_health.quant.config import CORE_COLUMNS, DISPLAY_CORE_
 from tools.vn100_earnings_health.quant.pipeline import run_and_write
 
 
-HANDBOOK_PATH = ROOT_DIR / "docs" / "vn100_earnings_health_handbook.txt"
-
 CORE_LABELS = {column: DISPLAY_CORE_NAMES.get(column, column) for column in CORE_COLUMNS}
 CORE_LABELS["leverage_stress_score"] = "Leverage Stress"
 CORE_LABELS["corporate_health_score"] = "Corporate Health"
@@ -605,24 +603,11 @@ def _period_options(data: dict) -> list[str]:
 def render() -> None:
     data = load_outputs()
     summary = data["summary"]
-    col_title, col_doc = st.columns([5, 1])
-    with col_title:
-        st.title("VN100 Corporate Health Monitor")
-        st.caption(
-            "Bottom-up financial statement monitor for VN100: growth quality, cash conversion, "
-            "working-capital stress, leverage stress, sector diffusion, and matrix diagnostics."
-        )
-    with col_doc:
-        st.write("")
-        if HANDBOOK_PATH.exists():
-            st.download_button(
-                "Tải Spec",
-                data=HANDBOOK_PATH.read_text(encoding="utf-8"),
-                file_name="vn100_corporate_health_monitor_spec.md",
-                mime="text/markdown; charset=utf-8",
-                width="stretch",
-                key="vn100_download_spec",
-            )
+    st.title("VN100 Corporate Health Monitor")
+    st.caption(
+        "Bottom-up financial statement monitor for VN100: growth quality, cash conversion, "
+        "working-capital stress, leverage stress, sector diffusion, and matrix diagnostics."
+    )
 
     with st.sidebar:
         st.header("VN100 Corporate Health")
