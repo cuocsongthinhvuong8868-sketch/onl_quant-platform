@@ -2,7 +2,7 @@ import csv
 import json
 import os
 import re
-from datetime import date, timedelta
+from datetime import date, datetime, timedelta
 from pathlib import Path
 from typing import Any
 import pandas as pd
@@ -269,6 +269,7 @@ from tools.va_res.report import snapshot as vares_snapshot
 from tools.var_cvar_vnindex.report import snapshot as var_cvar_snapshot
 # Import Humility/Falsification audit context
 from tools.humility_falsification.page import get_humility_falsification_context
+from shared.ai_cio_scoring import derive_metric_implied_scores, regime_from_score, score_tool_packet
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
@@ -298,6 +299,36 @@ def get_telegram_summary_path(provider_key: str, target_date: date | None = None
     return DATA_LAKE / "daily_cache" / f"{TELEGRAM_SUMMARY_PREFIX}_{provider_key}_{date_key}.txt"
 
 
+def get_ai_cio_context_path(provider_key: str, target_date: date | None = None) -> Path:
+    date_key = (target_date or date.today()).strftime("%d%m%y")
+    return DATA_LAKE / "daily_cache" / f"ai_cio_context_{provider_key}_{date_key}.json"
+
+
+def _read_ai_cio_context_for_summary(provider_key: str, target_date: date) -> str:
+    """Read a compact structured context block for Telegram summarization."""
+    path = get_ai_cio_context_path(provider_key, target_date)
+    if not path.exists():
+        return "STRUCTURED_CONTEXT_UNAVAILABLE"
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except Exception as exc:
+        return f"STRUCTURED_CONTEXT_ERROR: {exc}"
+
+    decision_state = payload.get("decision_state") or {}
+    tool_scores = decision_state.get("tool_scores") or []
+    compact = {
+        "metric_implied_score": decision_state.get("metric_implied_score"),
+        "metric_implied_regime": decision_state.get("metric_implied_regime"),
+        "metric_implied_subscores": decision_state.get("metric_implied_subscores"),
+        "tool_score_count": decision_state.get("tool_score_count"),
+        "tool_scores": tool_scores[:8],
+        "hard_constraints": decision_state.get("hard_constraints"),
+        "score_band_reason": decision_state.get("score_band_reason"),
+        "previous_cio_diagnostic": decision_state.get("previous_cio_diagnostic"),
+    }
+    return json.dumps(compact, ensure_ascii=False, indent=2, default=str)
+
+
 def summarize_executive_report_for_telegram(
     api_key: str,
     report_text: str,
@@ -317,11 +348,15 @@ def summarize_executive_report_for_telegram(
     model = cfg["api_model"]
     temperature = min(float(cfg.get("temperature", 0.5)), 0.3)
     score_val, regime_val = parse_score_regime(report_text)
+    structured_context = _read_ai_cio_context_for_summary(provider_key, target_date)
 
     system_prompt = (
         "You are a portfolio risk chief writing a concise Vietnamese Telegram brief. "
         "Compress the AI CIO report into an action-oriented daily decision note. "
         "Use only facts in the report. Do not add prices or new tickers. "
+        "When STRUCTURED DECISION CONTEXT is available, use metric_implied_score, "
+        "tool_scores, hard_constraints, and score_band_reason as the authoritative "
+        "source for the Overlay line and key drivers. "
         "If the report contains section 5.5 LLM Overlay, explicitly summarize the "
         "metric-implied score, overlay adjustment, and final CIO score in one line. "
         "Keep the output under 2300 Vietnamese characters. Plain text only; no Markdown tables, no JSON."
@@ -330,6 +365,9 @@ def summarize_executive_report_for_telegram(
 REPORT DATE: {target_date.strftime('%d/%m/%Y')}
 PARSED SCORE: {score_val}
 PARSED REGIME: {regime_val}
+
+STRUCTURED DECISION CONTEXT:
+{structured_context}
 
 Write exactly this structure:
 AI CIO DAILY BRIEF - DD/MM/YYYY
@@ -406,6 +444,80 @@ def postprocess_executive_summary_report(report_text: str, provider_key: str) ->
         clean_text = clean_text.rstrip() + f"\n\nfinal score & regime : {score_val} ; regime : {regime_val}\n"
 
     return clean_text, sidecar_path
+
+
+def _score_band_for_regime(regime: str) -> tuple[int, int] | None:
+    normalized = _clean_regime_value(regime).upper()
+    if normalized == "CAPITULATION":
+        return 0, 7
+    if normalized == "EXTREME CRISIS":
+        return 8, 14
+    if normalized == "PRE-CRASH / PANIC":
+        return 15, 29
+    if normalized == "FEAR / DISTRIBUTION":
+        return 30, 44
+    if normalized == "NEUTRAL / STOCK-PICKING":
+        return 45, 59
+    if normalized == "UPTREND / EXPANSION":
+        return 60, 74
+    if normalized == "BULL CONFIRMED":
+        return 75, 89
+    if normalized == "EXTREME GREED / TOP WARNING":
+        return 90, 100
+    return None
+
+
+def _annotate_final_score_drift(report_text: str, decision_state: dict[str, Any] | None) -> str:
+    """Flag large subjective overlay drift without overriding the model's final score."""
+    if not decision_state:
+        return report_text
+
+    baseline_raw = decision_state.get("metric_implied_score")
+    baseline_regime = _clean_regime_value(str(decision_state.get("metric_implied_regime") or ""))
+    try:
+        baseline = int(round(float(baseline_raw)))
+    except Exception:
+        return report_text
+    if not baseline_regime:
+        baseline_regime = regime_from_score(baseline)
+
+    score_val, regime_val = parse_score_regime(report_text)
+    try:
+        final_score = int(round(float(score_val)))
+    except Exception:
+        return report_text
+    final_regime = _clean_regime_value(str(regime_val or ""))
+    score_regime = regime_from_score(final_score)
+    drift = final_score - baseline
+    drift_alert_points = int(decision_state.get("drift_alert_points") or 8)
+    baseline_band = _score_band_for_regime(baseline_regime)
+    final_in_baseline_band = baseline_band[0] <= final_score <= baseline_band[1] if baseline_band else True
+
+    flags: list[str] = []
+    if abs(drift) >= drift_alert_points:
+        flags.append(f"large overlay drift {drift:+d} points versus metric_implied_score={baseline}")
+    if not final_in_baseline_band:
+        flags.append(f"final score moved outside metric-implied band {baseline_regime}")
+    if final_regime not in ("", "N/A") and final_regime != score_regime:
+        flags.append(f"reported regime {final_regime} differs from score-matrix regime {score_regime}")
+    if not flags:
+        return report_text
+
+    note = (
+        "\n\n**Final Score Drift Audit**: Model final score is preserved, but review required: "
+        + "; ".join(flags)
+        + "."
+    )
+    final_pattern = re.compile(
+        r"final\s+score\s*&\s*regime\s*[:=]\s*[-+]?\d+(?:\.\d+)?"
+        r"\s*;\s*regime\s*[:=]\s*[^\n`]+",
+        re.IGNORECASE,
+    )
+    matches = list(final_pattern.finditer(report_text))
+    if not matches or "Final Score Drift Audit" in report_text:
+        return report_text
+    last = matches[-1]
+    return f"{report_text[:last.start()].rstrip()}{note}\n\n{report_text[last.start():]}"
 
 
 def _extract_falsification_payload(text: str) -> tuple[dict[str, Any] | None, tuple[int, int] | None]:
@@ -612,36 +724,189 @@ def _has_final_score_line(text: str) -> bool:
         )
     )
 
-def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> str:
-    """Đọc tối đa n_past báo cáo executive_summary gần nhất.
-    Quét lùi tối đa 25 ngày lịch để bỏ qua ngày nghỉ/không có cache.
-    Trả về chuỗi context sẵn sàng chèn vào prompt, rỗng nếu không tìm thấy."""
+
+def _clean_context_line(value: Any) -> str:
+    text = re.sub(r"\s+", " ", str(value or "")).strip()
+    return text.replace("**", "").replace("`", "")
+
+
+def _compact_text(text: str, max_chars: int = 1400) -> str:
+    """Keep a bounded evidence excerpt instead of feeding raw reports forward."""
+    if not text:
+        return ""
+    lines = [_clean_context_line(line) for line in str(text).splitlines()]
+    lines = [line for line in lines if line]
+    if not lines:
+        return ""
+
+    priority_terms = (
+        "score", "regime", "risk", "tail", "ssi", "var", "cvar", "evt", "xi",
+        "breadth", "vnibor", "liquidity", "stress", "allocation", "cash",
+        "equity", "hedge", "falsification", "watch", "falsified", "confidence",
+        "macro", "market", "alpha", "valuation", "cqs", "pc1",
+    )
+    selected: list[str] = []
+    for line in lines:
+        lower = line.lower()
+        if any(term in lower for term in priority_terms):
+            selected.append(line)
+        if len(selected) >= 10:
+            break
+    if len(selected) < 4:
+        selected.extend(line for line in lines[:8] if line not in selected)
+
+    compact = "\n".join(f"- {line}" for line in selected)
+    if len(compact) <= max_chars:
+        return compact
+    return compact[: max_chars - 80].rstrip() + "\n- [trimmed: raw report omitted]"
+
+
+def _infer_evidence_bias(text: str) -> str:
+    lower = str(text or "").lower()
+    bearish_terms = (
+        "bearish", "risk-off", "stress", "critical", "crisis", "panic",
+        "distribution", "pre-crash", "elevated", "extreme", "warning",
+        "headwind", "tightening", "cash 100", "avoid",
+    )
+    bullish_terms = (
+        "bullish", "risk-on", "uptrend", "expansion", "calm", "manageable",
+        "recovery", "easing", "tailwind", "improving", "undervalued",
+        "positive", "accumulation",
+    )
+    bearish = sum(lower.count(term) for term in bearish_terms)
+    bullish = sum(lower.count(term) for term in bullish_terms)
+    if bearish >= bullish + 2:
+        return "bearish"
+    if bullish >= bearish + 2:
+        return "bullish"
+    return "neutral_or_mixed"
+
+
+def _extract_first_number(patterns: list[str], text: str) -> float | None:
+    for pattern in patterns:
+        match = re.search(pattern, text, flags=re.IGNORECASE)
+        if not match:
+            continue
+        try:
+            return float(match.group(1).replace(",", ""))
+        except Exception:
+            continue
+    return None
+
+
+def _build_evidence_packet(
+    tool_id: str,
+    report_text: str,
+    layer: str,
+    date_label: str | None = None,
+    max_excerpt_chars: int = 1400,
+) -> dict[str, Any]:
+    """Convert a verbose child report into a bounded evidence packet for AI CIO."""
+    text = str(report_text or "").strip()
+    score_val, regime_val = parse_score_regime(text)
+    packet: dict[str, Any] = {
+        "tool": tool_id,
+        "layer": layer,
+        "date": date_label or "N/A",
+        "bias": _infer_evidence_bias(text),
+        "score": None if score_val == "N/A" else score_val,
+        "regime": None if regime_val == "N/A" else regime_val,
+        "key_metrics": {},
+        "evidence_excerpt": _compact_text(text, max_chars=max_excerpt_chars),
+    }
+
+    metric_patterns = {
+        "ssi_pct": [r"\bSSI\b[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "evt_xi": [r"\bxi\b[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"Tail Index.*?([-+]?\d+(?:\.\d+)?)"],
+        "breadth_ma20_pct": [r"MA20[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "cqs_percentile": [r"\bCQS\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "vnibor_on": [r"Overnight[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+    }
+    for metric, patterns in metric_patterns.items():
+        value = _extract_first_number(patterns, text)
+        if value is not None:
+            packet["key_metrics"][metric] = value
+    adapter_score = score_tool_packet(tool_id, packet["key_metrics"])
+    if adapter_score:
+        packet["adapter_score"] = adapter_score
+        packet["bias"] = adapter_score["tool_bias"]
+    return packet
+
+
+def _format_json_context(title: str, payload: Any) -> str:
+    body = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
+    return f"=== {title} ===\n```json\n{body}\n```"
+
+
+def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = 7) -> list[dict[str, Any]]:
+    """Read compact history from CSV/cache instead of injecting raw old reports."""
+    rows: list[dict[str, Any]] = []
+    if CSV_HISTORY_PATH.exists():
+        try:
+            with CSV_HISTORY_PATH.open("r", encoding="utf-8", newline="") as f:
+                for row in csv.DictReader(f):
+                    raw_date = row.get("ddmmyyyy", "")
+                    try:
+                        row_date = datetime.strptime(raw_date, "%d%m%Y").date()
+                    except Exception:
+                        continue
+                    if row_date >= date.today():
+                        continue
+                    rows.append(
+                        {
+                            "date": row_date.isoformat(),
+                            "score": row.get("score", "N/A"),
+                            "regime": row.get("regime", "N/A"),
+                            "source": row.get("source", ""),
+                            "provider": row.get("provider", ""),
+                        }
+                    )
+        except Exception:
+            rows = []
+
+    rows = sorted(rows, key=lambda item: item["date"], reverse=True)
+    provider_rows = [row for row in rows if row.get("provider") in ("", provider_key)]
+    selected = (provider_rows or rows)[:n_past]
+    if len(selected) >= n_past:
+        return selected
+
+    seen_dates = {row["date"] for row in selected}
     cache_dir = DATA_LAKE / "daily_cache"
-    found = []
     for days_back in range(1, 26):
-        if len(found) >= n_past:
+        if len(selected) >= n_past:
             break
         target_date = date.today() - timedelta(days=days_back)
+        if target_date.isoformat() in seen_dates:
+            continue
         date_str = target_date.strftime('%d%m%y')
         path = cache_dir / f"executive_summary_{provider_key}_{date_str}.txt"
         if not path.exists():
-            # Fallback sang bất kỳ model/provider nào khác có sẵn báo cáo cho ngày này
             alt_paths = list(cache_dir.glob(f"executive_summary_*_{date_str}.txt"))
             if alt_paths:
                 path = alt_paths[0]
         if path.exists():
-            with open(path, "r", encoding="utf-8") as f:
-                content = f.read().strip()
-            label = f"T-{len(found)+1} ({target_date.strftime('%d/%m/%Y')})"
-            found.append((label, content))
+            content = path.read_text(encoding="utf-8").strip()
+            score_val, regime_val = parse_score_regime(content)
+            selected.append(
+                {
+                    "date": target_date.isoformat(),
+                    "score": score_val,
+                    "regime": regime_val,
+                    "source": "cache",
+                    "provider": provider_key,
+                    "brief": _compact_text(content, max_chars=500),
+                }
+            )
+            seen_dates.add(target_date.isoformat())
+    return selected[:n_past]
 
-    if not found:
+
+def _read_recent_summaries(provider_key: str = "kimi-2.6", n_past: int = 5) -> str:
+    """Backward-compatible compact history context; no raw historical reports."""
+    ledger = _read_recent_summary_ledger(provider_key=provider_key, n_past=n_past)
+    if not ledger:
         return ""
-
-    blocks = []
-    for label, content in found:
-        blocks.append(f"=== BÁO CÁO {label} ===\n{content}")
-    return "\n\n".join(blocks)
+    return json.dumps(ledger, ensure_ascii=False, indent=2, default=str)
 
 def _build_comprehensive_metrics_table(df_stocks, provider_key: str = "kimi-2.6", n_past: int = 7) -> str:
     """Xây dựng bảng số liệu chuỗi thời gian định lượng toàn diện cho n_past phiên gần nhất,
@@ -824,6 +1089,7 @@ def run_historical_trend_analyst(client, provider_key: str = "kimi-2.6", model: 
         metrics_table = "*Không có dữ liệu chuỗi thời gian định lượng toàn diện từ tools*"
 
     full_prompt = prompt_template.replace("{historical_reports_raw}", raw_history_text)\
+                                 .replace("{historical_ledger}", raw_history_text)\
                                  .replace("{historical_metrics_table}", metrics_table)
 
     parts = full_prompt.split("# INPUT DATA")
@@ -1955,6 +2221,167 @@ def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[
     return _get_vn100_corporate_health_context(provider_key)
 
 
+def _empty_consensus_buckets() -> dict[str, list[dict[str, Any]]]:
+    return {"bullish": [], "bearish": [], "neutral_or_mixed": []}
+
+
+def _build_consensus_map(current_packets: list[dict[str, Any]], tool_scores: list[dict[str, Any]]) -> dict[str, Any]:
+    """Separate deterministic adapter consensus from provider-dependent prose interpretation."""
+    hard = _empty_consensus_buckets()
+    soft = _empty_consensus_buckets()
+    scored_tools = {str(item.get("tool") or "") for item in tool_scores}
+
+    for item in tool_scores:
+        bias = item.get("tool_bias") if item.get("tool_bias") in hard else "neutral_or_mixed"
+        hard[bias].append(
+            {
+                "tool": item.get("tool"),
+                "tool_score": item.get("tool_score"),
+                "tool_regime": item.get("tool_regime"),
+                "reason": item.get("score_reason"),
+            }
+        )
+
+    for packet in current_packets:
+        tool = str(packet.get("tool") or "")
+        if tool in scored_tools:
+            continue
+        bias = packet.get("bias") if packet.get("bias") in soft else "neutral_or_mixed"
+        soft[bias].append(
+            {
+                "tool": tool,
+                "source": "excerpt_inference",
+                "confidence": "soft",
+                "score": packet.get("score"),
+                "regime": packet.get("regime"),
+            }
+        )
+
+    return {
+        "hard_adapter_consensus": hard,
+        "soft_interpretive_consensus": soft,
+        "usage_rule": (
+            "Report hard_adapter_consensus as the stable cross-model consensus. "
+            "Report soft_interpretive_consensus separately as provider-dependent interpretation; "
+            "do not mix soft bullish/no-action labels into hard consensus counts."
+        ),
+    }
+
+
+def _build_decision_state(
+    evidence_packets: list[dict[str, Any]],
+    history_ledger: list[dict[str, Any]],
+    report_date: str,
+    data_date: str,
+) -> dict[str, Any]:
+    """Build a compact deterministic state so the final LLM explains decisions instead of re-reading prose."""
+    current_packets = [packet for packet in evidence_packets if packet.get("layer") != "history"]
+    bias_counts = {
+        "bullish": sum(1 for packet in current_packets if packet.get("bias") == "bullish"),
+        "bearish": sum(1 for packet in current_packets if packet.get("bias") == "bearish"),
+        "neutral_or_mixed": sum(1 for packet in current_packets if packet.get("bias") == "neutral_or_mixed"),
+    }
+    hard_constraints: list[str] = []
+    metric_values: dict[str, Any] = {}
+    tool_scores: list[dict[str, Any]] = []
+    for packet in current_packets:
+        adapter_score = packet.get("adapter_score")
+        if not isinstance(adapter_score, dict):
+            adapter_score = score_tool_packet(str(packet.get("tool") or ""), packet.get("key_metrics") or {})
+        if isinstance(adapter_score, dict):
+            tool_scores.append({"tool": packet.get("tool"), **adapter_score})
+        for key, value in (packet.get("key_metrics") or {}).items():
+            metric_values[f"{packet.get('tool')}.{key}"] = value
+            if key == "ssi_pct" and value >= 70:
+                hard_constraints.append(f"ESR SSI elevated at {value:.1f}%")
+            if key == "evt_xi" and value >= 0.25:
+                hard_constraints.append(f"EVT xi elevated at {value:.3f}")
+            if key == "breadth_ma20_pct" and value < 45:
+                hard_constraints.append(f"Breadth MA20 weak at {value:.1f}%")
+            if key == "cqs_percentile" and value >= 80:
+                hard_constraints.append(f"Global FCI CQS high at {value:.1f}")
+
+    consensus_map = _build_consensus_map(current_packets, tool_scores)
+    metric_implied = derive_metric_implied_scores(metric_values, bias_counts, tool_scores=tool_scores)
+    previous = history_ledger[0] if history_ledger else {}
+    score_delta = None
+    try:
+        if previous.get("score") not in (None, "N/A", ""):
+            score_delta = round(float(metric_implied["metric_implied_score"]) - float(previous["score"]), 1)
+    except Exception:
+        score_delta = None
+
+    return {
+        "report_date": report_date,
+        "data_date": data_date,
+        "bias_counts": bias_counts,
+        "consensus_map": consensus_map,
+        "hard_constraints": sorted(set(hard_constraints)),
+        "metric_values": metric_values,
+        "tool_scores": tool_scores,
+        "metric_implied_subscores": {
+            "macro_risk_score": metric_implied["macro_risk_score"],
+            "market_internal_score": metric_implied["market_internal_score"],
+            "tail_risk_score": metric_implied["tail_risk_score"],
+        },
+        "metric_implied_score": metric_implied["metric_implied_score"],
+        "metric_implied_regime": metric_implied["metric_implied_regime"],
+        "tool_score_count": metric_implied.get("tool_score_count", len(tool_scores)),
+        "score_band_reason": metric_implied["score_band_reason"],
+        "previous_cio_diagnostic": {
+            "date": previous.get("date"),
+            "regime": previous.get("regime"),
+            "score_delta_from_metric_implied": score_delta,
+            "use_rule": "Diagnostic only. Do not anchor final score to prior CIO score.",
+        } if previous else None,
+        "writer_rules": [
+            "Do not copy historical prose; use history only for deltas.",
+            "Use evidence packets as the source of truth; omit raw child-report narration.",
+            "In Tool Consensus, separate hard_adapter_consensus from soft_interpretive_consensus.",
+            "Use metric_implied_score/regime as the baseline score before any LLM overlay.",
+            "Do not place final score in 8-14 solely because recent history was 11-13.",
+            "Hard constraints dominate LLM overlay and allocation.",
+            "If evidence is missing, mark it DATA INSUFFICIENT instead of filling gaps.",
+        ],
+    }
+
+
+def _build_ai_cio_structured_context(
+    data_note: str,
+    historical_block: str,
+    evidence_packets: list[dict[str, Any]],
+    decision_state: dict[str, Any],
+) -> str:
+    sections = [
+        f"=== REPORT METADATA ===\n{data_note}",
+        historical_block,
+        _format_json_context("DECISION STATE - DETERMINISTIC PRECHECK", decision_state),
+        _format_json_context("EVIDENCE PACKETS - BOUNDED CHILD TOOL OUTPUTS", evidence_packets),
+    ]
+    return "\n\n".join(section for section in sections if section)
+
+
+def _write_ai_cio_context_sidecar(
+    provider_key: str,
+    decision_state: dict[str, Any],
+    evidence_packets: list[dict[str, Any]],
+    history_ledger: list[dict[str, Any]],
+) -> Path:
+    """Persist the compact context sent to the final AI CIO prompt for audit/debug."""
+    today_str = date.today().strftime('%d%m%y')
+    path = DATA_LAKE / "daily_cache" / f"ai_cio_context_{provider_key}_{today_str}.json"
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "provider": provider_key,
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "decision_state": decision_state,
+        "history_ledger": history_ledger,
+        "evidence_packets": evidence_packets,
+    }
+    path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
+    return path
+
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
@@ -1991,7 +2418,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
-    historical_context = _read_recent_summaries(provider_key, n_past=7)
+    history_ledger = _read_recent_summary_ledger(provider_key, n_past=7)
+    historical_context = json.dumps(history_ledger, ensure_ascii=False, indent=2, default=str) if history_ledger else ""
     if historical_context:
         print(f"[Trend Analyst] Generating 7-day historical trend summary via Sub AI CIO...")
         trend_summary = run_historical_trend_analyst(
@@ -2013,39 +2441,46 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
     vn100_label, vn100_rep = _get_vn100_corporate_health_context(provider_key)
 
-    macro_section = (
-        "=== BÁO CÁO PHÂN TÍCH VĨ MÔ GẦN NHẤT (MACRO LAYER) ===\n\n"
-        f"=== A. FED LIQUIDITY MONITOR (Ngày báo cáo: {fed_date}) ===\n{fed_rep}\n\n"
-        f"=== B. GLOBAL FINANCIAL CONDITIONS (Ngày báo cáo: {gfcm_date}) ===\n{gfcm_rep}\n\n"
-        f"=== B2. US MARGIN DEBT / M2 OVERLAY (Kỳ dữ liệu: {margin_m2_date}) ===\n{margin_m2_rep}\n\n"
-        f"=== C. VNIBOR MONITOR (Ngày báo cáo: {vnibor_date}) ===\n{vnibor_rep}\n\n"
-        f"=== D. LIQUIDITY TRANSMISSION - LTMM (Ngày báo cáo: {ltmm_date}) ===\n{ltmm_rep}\n\n"
+    evidence_packets = [
+        _build_evidence_packet("historical_trend", trend_summary if historical_context else historical_block, "history", max_excerpt_chars=900),
+        _build_evidence_packet("fed_liquidity", fed_rep, "macro", fed_date, max_excerpt_chars=900),
+        _build_evidence_packet("global_financial_conditions", gfcm_rep, "macro", gfcm_date, max_excerpt_chars=900),
+        _build_evidence_packet("margin_m2_overlay", margin_m2_rep, "macro", margin_m2_date, max_excerpt_chars=700),
+        _build_evidence_packet("vnibor", vnibor_rep, "macro", vnibor_date, max_excerpt_chars=1000),
+        _build_evidence_packet("ltmm", ltmm_rep, "macro", ltmm_date, max_excerpt_chars=700),
+        _build_evidence_packet("vn100_corporate_health", vn100_rep, "fundamental", vn100_label, max_excerpt_chars=1200),
+        _build_evidence_packet("humility_falsification", humility_context, "audit", max_excerpt_chars=900),
+        _build_evidence_packet("fear_greed", r1, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("manipulation", r2, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("dispersion", r3, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("upside_ratio", r4, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("bank_valuation", r5, "current_tool", data_date, max_excerpt_chars=900),
+        _build_evidence_packet("market_breadth", r6, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("esr_monitor", r7, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("va_res", r8, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("var_cvar_vnindex", r9, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("sentiment_factor_news", r10, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("risk_adjusted_growth", r11, "current_tool", data_date, max_excerpt_chars=900),
+    ]
+    decision_state = _build_decision_state(
+        evidence_packets=evidence_packets,
+        history_ledger=history_ledger,
+        report_date=report_date,
+        data_date=data_date,
     )
-
-    fundamental_section = (
-        "=== BÁO CÁO FUNDAMENTAL BOTTOM-UP - VN100 CORPORATE HEALTH ===\n\n"
-        f"=== VN100 CORPORATE HEALTH MONITOR (Kỳ dữ liệu: {vn100_label}) ===\n{vn100_rep}\n\n"
+    all_reports = _build_ai_cio_structured_context(
+        data_note=data_note,
+        historical_block=historical_block,
+        evidence_packets=evidence_packets,
+        decision_state=decision_state,
     )
-
-    all_reports = (
-        f"=== {data_note} ===\n\n"
-        f"{historical_block}\n\n"
-        f"{macro_section}"
-        f"{fundamental_section}"
-        f"=== HUMILITY & FALSIFICATION MONITOR (T vs PRIOR AI CIO THESIS) ===\n{humility_context}\n\n"
-        f"=== BÁO CÁO HIỆN TẠI (T) ===\n\n"
-        f"=== 1. FEAR & GREED ===\n{r1}\n\n"
-        f"=== 2. MANIPULATION ===\n{r2}\n\n"
-        f"=== 3. DISPERSION ===\n{r3}\n\n"
-        f"=== 4. UPSIDE RATIO ===\n{r4}\n\n"
-        f"=== 5. BANK VALUATION ===\n{r5}\n\n"
-        f"=== 6. MARKET BREADTH ===\n{r6}\n\n"
-        f"=== 7. ESR MONITOR ===\n{r7}\n\n"
-        f"=== 8. VARES ENGINE ===\n{r8}\n\n"
-        f"=== 9. VAR-CVAR VNINDEX ===\n{r9}\n\n"
-        f"=== 10. SENTIMENT FACTOR FROM NEWS ===\n{r10}\n\n"
-        f"=== 11. RISK-ADJUSTED GROWTH ===\n{r11}"
+    context_sidecar_path = _write_ai_cio_context_sidecar(
+        provider_key=provider_key,
+        decision_state=decision_state,
+        evidence_packets=evidence_packets,
+        history_ledger=history_ledger,
     )
+    print(f"[AI CIO] Structured context sidecar: {context_sidecar_path}")
 
     with open(str(ROOT_DIR / "promt" / "executive_summary_promt.md"), "r", encoding="utf-8") as f:
         master_prompt = f.read()
@@ -2058,6 +2493,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     raw_final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
     final_res, humility_rules_path = postprocess_executive_summary_report(raw_final_res, provider_key)
+    final_res = _annotate_final_score_drift(final_res, decision_state)
     if humility_rules_path:
         print(f"[Humility] Saved rules JSON: {humility_rules_path}")
     _write_cache("executive_summary", final_res, provider_key)

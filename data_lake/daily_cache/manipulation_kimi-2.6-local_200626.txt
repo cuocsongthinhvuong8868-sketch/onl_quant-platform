@@ -1,18 +1,19 @@
  ## 1. Observations
-- **OLS Slope 0.253 at 16.7th percentile** — rất thấp, VIN đang kéo F1 với đòn bẩy yếu nhất 20% lịch sử
-- **Correlation 0.627 at 57.3th percentile** — trung bình, mối liên hệ VIN-F1 vẫn tồn tại nhưng không mạnh
-- **Regime: ANCHORING** (ΔCorr = +0.25 > +0.15, ΔSlope = -0.53 < -0.15) — MM giữ giá F1 qua VIN nhưng không có động lực đẩy
+- OLS Slope 0.25 tại percentile **16.7th** (🟢 rất thấp): beta VIN→F1 suy yếu mạnh, mỗi đơn vị composite chỉ kéo 0.25 điểm futures
+- Correlation 0.63 tại percentile **57.3th** (🟡 trung bình): mối liên hệ vẫn tồn tại nhưng không ràng buộc chặt
+- Regime **ANCHORING** (ΔCorr=+0.25, ΔSlope=-0.53): MM giữ mặt nạ tương quan nhưng không đẩy giá thật
 
 ## 2. Microstructure Read
-VIN đang **giảm quyền chi phối**. Slope thấp + corr trung bình = MM dùng 3 cổ VIN làm "neo" giữ F1 không rơi, nhưng không đủ lực tạo breakout. Không phải decoupling hoàn toàn (corr vẫn dương), nhưng độ nhạy giá VIN→F1 đã suy giảm đáng kể. Nếu slope percentile < 20th kéo dài, market sẽ tìm driver khác (Bank/Chứng/Thép).
+VIN đang **mất vai trò dẫn dắt tuyệt đối**. Slope <20th cho thấy market đã "rời" VIN về mặt động lực giá — F1 không còn nhạy với biến động cổ phiếu Vingroup. Tuy nhiên correlation vẫn ở vùng trung bình, nghĩa là VIN được dùng làm **neo giá (anchor)** để giữ F1 trong range, không phải để breakout. Đây là pattern quản lý index phổ biến khi dòng tiền ngoại/lớn chưa vào.
 
 ## 3. Event Study Interpretation
-**ANCHORING = trap cho intraday long.** Corr giữ nhưng slope âm nghĩa là mỗi đợt VIC tăng 1% chỉ kéo F1 ~0.25% — risk/reward xấu cho đu theo VIN. Overnight: không nên giữ long qua đêm vì neo có thể bị tháo bất cứ lúc nào MM giảm support. Chỉ short nếu VIN break down rõ.
+ANCHORING = **không nên overnight**. Slope âm momentum (-0.53) cho thấy lực đẩy đang cạn; correlation dương momentum (+0.25) chỉ là bề mặt. Intraday: fade các nhịp F1 hướng về phía VIN move (VIN lên → F1 phản ứng yếu → short F1 mean-reversion). Overnight: gap risk cao nếu MM tháo neo.
 
 ## 4. Verdict
-- **Trade plan: NO TRADE** — ANCHORING không cho edge đủ rõ; long thì slope yếu, short thì corr vẫn giữ F1 chưa rơi
-- **Leading indicator:** theo dõi VIC 205.50 × (1 − 2%) ≈ **201.40** (≈ 201,400 VND) — nếu thủng, anchoring tan → short F1; hoặc slope percentile bounce > 25th thì xem lại
-- **Stop-loss reference:** N/A do no trade; nếu ép entry thì VN30F1M stop trên 1,985 (intraday resistance tự định nghĩa từ structure)
+- **Trade plan: Spread VIN-vs-Bank** — long VIN (VIC/VHM/VRE) / short F1 hoặc đối trọng Bank (CTG, TCB, VCB)
+- Rationale: slope quá thấp, F1 "đắt" so với composite VIN. Nếu VIN bật tăng, F1 sẽ underperform; nếu VIN giảm, F1 giữ giá nhờ anchor → spread thu lợi nhuận từ convergence
+- **Leading indicator:** CTG/TCB (Bank) và VN30F1M basis; nếu Bank outperformance mạnh → ANCHORING chuyển DECOUPLING
+- **Stop-loss:** VIC stop-loss tại 205.50 × (1 − 2.5%) ≈ **200.35**; VHM tại 145.30 × (1 − 2.5%) ≈ **141.67**; hoặc F1 basis âm sâu hơn -15 điểm
 
 ## 5. Structured Tail
 ```json
@@ -22,7 +23,7 @@ VIN đang **giảm quyền chi phối**. Slope thấp + corr trung bình = MM d�
   "regime": "ANCHORING",
   "slope_percentile": 16.7,
   "corr_percentile": 57.3,
-  "trade_signal": "no_trade",
-  "confidence": "low"
+  "trade_signal": "spread",
+  "confidence": "medium"
 }
 ```

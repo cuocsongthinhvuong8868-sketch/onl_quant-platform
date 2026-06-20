@@ -1,18 +1,27 @@
 ## 1. Observations
-- SSI: 65.8% – ngưỡng WARNING (tích lũy rủi ro ngầm)
-- Market state: EUPHORIC RISK (stress cao + trend tăng)
-- Top 3 pillar driver: S_LIQ 36%, S_VAL 32%, S_COR 17%
-- VN30 đóng cửa dưới MA125 – tiềm ẩn phân kỳ với nhãn EUPHORIC RISK
+- SSI: **65.8%** → WARNING (tích lũy rủi ro ngầm dưới bề mặt)
+- Market State (4‑state): **EUPHORIC RISK** (high stress + uptrend)
+- Top pillar drivers: #1 S_LIQ (36%), #2 S_VAL (32%), #3 S_COR (17%)
+- PCA concentration (EVR PC1): 38.3% – dấu hiệu đồng pha hệ thống cao
 
 ## 2. Risk Decomposition (Bóc tách)
-S_LIQ (volume dry‑up) đang dẫn dắt với trọng số 36% – khối lượng giao dịch co hẹp nghiêm trọng so với trung bình 1Y, điển hình cho một thị trường “mỏng” và mong manh. S_VAL (valuation tension) đóng góp 32%, phản ánh mức sinh lời 252 ngày của VN30 đã cao vượt xa lãi suất tiền gửi; định giá căng kết hợp thanh khoản khô cạn là cấu trúc rủi ro của bull‑trap. S_COR (systemic correlation) 17% với EVR PC1 = 38.3% không quá khắc nghiệt nhưng vẫn cho thấy sự đồng pha đáng kể trên diện rộng trong các phiên giảm, khuếch đại áp lực bán khi thị trường quay đầu. Cả ba pillar đều hướng về kịch bản stress: volume cạn, định giá quá cao, và sự đồng pha tăng.
+**S_LIQ dẫn dắt (36%)** – volume khô cạn đáng kể so với định mức 1 năm (norm).  
+Trên các phiên giảm, tổng dollar volume bị thu hẹp mạnh, phản ánh thanh khoản teo tóp khiến lực cầu hấp thụ yếu; đây là tín hiệu bẫy tăng giá cổ điển khi dòng tiền rút lui mà giá vẫn giữ trend.
+
+**S_VAL (32%)** – định giá căng thẳng: lợi nhuận 252 ngày của VN30 vượt xa lãi suất huy động, chỉ báo thị trường đang “đắt” tương đối, dễ bị điều chỉnh mạnh nếu kỳ vọng thay đổi.
+
+**S_COR (17%)** – tương quan hệ thống cao (PC1 = 38.3%), cho thấy các cổ phiếu di chuyển cùng hướng, bào mòn lợi ích đa dạng hóa. Kết hợp với S_LIQ cao tạo thành chữ kỹ “herding + dry‑up” – môi trường dễ tổn thương trước một cú sốc giảm điểm lan truyền.
 
 ## 3. Cross‑Check
-HMM dán nhãn EUPHORIC RISK dựa trên tiêu chí stress cao + uptrend, nhưng thực tế VN30 đang đóng cửa dưới MA125 – một đường xu hướng dài. Sự lệch pha này là flag quan trọng: xu hướng tăng có thể đã gãy và thị trường đang chuyển dần sang trạng thái ACTIVE_STRESS (stress cao + downtrend). Việc bám vào nhãn EUPHORIC RISK mà không nhận ra sự suy yếu của giá sẽ khiến đánh giá rủi ro bị trễ.
+- **Phân kỳ giá – SSI**: VN30 đóng cửa dưới MA125 (1963.57), trong khi HMM gán nhãn EUPHORIC RISK (uptrend). Giá chưa lập đỉnh mới; việc model cho rằng uptrend trong bối cảnh price action yếu hơn có thể là phân loại sai – tăng thêm rủi ro bẫy tăng.
+- **Regime khớp?** SSI 65.8% nằm trong WARNING, nhưng HMM nội suy ra UPTREND → không mâu thuẫn nếu uptrend chỉ dựa trên tín hiệu ngắn hạn. Tuy nhiên, vị trí dưới MA125 là cảnh báo “bull trap” rõ nét, cần theo dõi sát.
 
 ## 4. Verdict
-Với SSI WARNING cùng cấu trúc volume khô cạn và định giá căng, mức tiền mặt bảo vệ nên được nâng lên **40% danh mục**. Hedge action: **giảm beta** tổng thể – ưu tiên cắt giảm những vị thế có hệ số beta cao, không dùng margin. Short VN30F1M có thể được cân nhắc cho phần hedging bổ sung nếu cần, nhưng mua put hiện chưa cần thiết khi SSI chưa vào CRITICAL. Không có mâu thuẫn giữa các pillar driver nên tín hiệu là có thể hành động, dù đặt mức độ tin cậy trung bình do giá chưa xác nhận downtrend rõ rệt.
+- **Cash weight đề xuất:** 40% danh mục (nâng tỷ trọng tiền mặt để giảm rủi ro hệ thống).
+- **Hedge action:** Giảm beta – hạ tỷ trọng các vị thế có hệ số beta cao; chưa khuyến nghị short thẳng VN30F1M do còn yếu tố uptrend và tiềm ẩn whipsaw. Nếu S_LIQ tiếp tục xấu đi, có thể cân nhắc mua put bảo vệ.
+- Lý do: Top driver S_LIQ & S_COR đi cùng cho thấy thanh khoản cạn kiệt kết hợp đồng pha cao – dấu hiệu thị trường dễ vỡ. Mức WARNING biện minh cho việc phòng thủ nhưng chưa đến mức cắt giảm hoàn toàn.
 
+## 5. Structured Tail
 ```json
 {
   "tool": "esr_monitor",

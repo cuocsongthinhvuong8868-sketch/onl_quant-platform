@@ -1,0 +1,159 @@
+### 📊 EXECUTIVE BOTTOM LINE
+
+- **Ngày báo cáo (Date)**: 20/06/2026
+- **Điểm số tổng hợp (Composite Score)**: 14/100
+  * *Tách biệt 3 nguồn rủi ro*: [Macro Risk: 25/100 | Market Internal: 20/100 | Tail Risk: 8/100]
+- **Trạng thái vĩ mô (Regime)**: PRE-CRASH / PANIC
+- **Mức rủi ro đuôi (Tail Risk)**: Extreme
+- **Cảnh báo cực đoan (Extreme Drivers Warning)**: EVT ξ = 0.345 vượt ngưỡng 0.30 (fat tail regime); ESR SSI = 65.8% trong vùng WARNING; CQS percentile 80th kích hoạt fear cap; VNIBOR ON = 4.03% với 20D trend "liquidity squeeze / stress building" (12/20 phiên STRESS/WARNING); Breadth MA20 = 39.8% dưới ngưỡng 45%.
+- *Tóm lược*: Toàn bộ cấu trúc rủi ro hệ thống duy trì ở trạng thái cực đoan. Thanh khoản toàn cầu bị hút qua TGA cao (880.7 tỷ USD) và QT còn sót; thanh khoản nội địa VNIBOR căng kéo dài 20 phiên. Nội tại thị trường yếu với breadth thu hẹp, upside nén sâu, và rủi ro đuôi EVT không định giá lại. F&G tăng lên 58.5 là nhiễu ngắn hạn — vĩ mô cứng phủ quét.
+
+---
+
+### 0. Macro Analysis Layer (Lớp Phân tích Vĩ mô)
+
+**Fed Liquidity**: Tuần 17/06, Net Liquidity giảm 48 tỷ USD về 5,848.9 tỷ USD. WTREGEN (TGA 880.7 tỷ USD) là cấu phần chủ đạo hút thanh khoản — Treasury đang tích lũy tiền từ banking system. RRP đã cạn hoàn toàn (6.8 tỷ USD), không còn buffer bù đắp QT. Đây là **QT_active ở giai đoạn cuối với mechanical drag giảm nhưng TGA hoarding tạo headwind**. Không có dấu hiệu emergency liquidity (WALCL không tăng bất thường), nên đánh giá: **organic drain, không phải stress systemic từ Fed repo**, nhưng hướng là tightening.
+
+**Global Financial Conditions**: DXY 100% (HIGH), CCC OAS 80% (HIGH, 9.39% approaching deep distress), CQS 98% (HIGH dispersion extreme) — tạo thành "kép" USD strength + deep junk stress. HY/IG/EM OAS đồng loạt LOW: credit repricing **confined ở tier yếu nhất**, chưa lan rộng. OVX 51.54 (>50) báo oil shock marginal. MOVE 65.4 calm, VVIX 88.4 calm — derivatives stress chưa kích hoạt. 2s10s +0.27% post-inversion steepening. **Tổng hợp**: GFCM adapter score 55 (NEUTRAL/STOCK-PICKING) vì CQS percentile 6.76 không vào stress zone theo threshold adapter, nhưng CQS raw percentile 98% và CCC OAS 80% là red flags thực chất. **Conflict nội tại**: adapter threshold "CQS not in stress zone" vs raw credit dispersion extreme — hard metrics về credit stress bị đánh giá thấp bởi scoring heuristic.
+
+**VNIBOR 20-session trend**: ON = 4.03%, Z-Score = -1.06 (snapshot "EASY"), nhưng **trend label: "liquidity squeeze / stress building"**. 20D breakdown: TIGHT 15 phiên, EASY 3, ELEVATED 1, NORMAL 1; STRESS 10 phiên, WARNING 2, NEUTRAL 8. ON MA5 slope/session = -0.155% (âm, nghĩa là ON đang hạ từ đỉnh nhưng vẫn ở vùng cao). **12/20 phiên STRESS/WARNING**. Curve 1W-ON không có số liệu đảo ngược rõ trong excerpt nhưng regime counts cho thấy tightening áp đảo. **Đánh giá**: snapshot phiên hiện tại "EASY" là nhiễu; trend 20 phiên xác nhận thanh khoản nội địa đang trong **liquidity squeeze kéo dài**.
+
+**LTMM**: FLI = -0.33 (neutral, quality 0.68 usable) — không thắt chặt rõ rệt từ OMO/tín phiếu. FX offshore stress = -0.96 (easy, HIGH quality) — tỷ giá offshore không tạo lực hút thanh khoản. Tuy nhiên, **kênh truyền dẫn Fed → VNIBOR đang "blind transmission"**: Fed Liquidity và VNIBOR đều có khoảng trống data opacity, LTMM không nhận được tín hiệu easing rõ từ upstream. Không có nghẽn truyền dẫn cấp tính, nhưng cũng không có tailwind.
+
+**US Margin Debt/M2 overlay** (data 2026-04-30, monthly/lagged): 5Y z-score 2.29σ, regime ELEVATED_LEVERAGE. Không nằm trong GFCM PCA/PC1. **Overlay interpretation**: speculative leverage đang ở mức cao theo lịch sử 5 năm. Trong bối cảnh Global FCI có DXY firm + CCC OAS approaching distress, đây là **amplifier risk**: nếu credit stress lan từ CCC sang HY/IG, deleveraging có thể khuếch đại shock. Tuy nhiên, data tháng 4, lag 2 tháng; không dùng để override hard rules.
+
+**`💡 Diễn giải bình dân`**: Fed đang "rút ống thở" dần qua QT + Treasury tích tiền (TGA cao), nhưng chưa đến mức cấp cứu. Ở VN, lãi suất liên ngân hàng (VNIBOR) đã căng suốt 20 phiên, dù hôm nay có hạ nhẹ vẫn như "người chạy marathon thở hổn hển". DXY mạnh + nợ xấu Mỹ (CCC) rít lên tạo thành gọng kìm: vốn ngoại khó chảy vào EM, còn nội địa thì thanh khoản bị siết. Đòn bẩy margin (Margin/M2) cao như ngọn nến cháy gần bình xăng — chưa cháy nhưng rất dễ bắt lửa nếu credit giật mình.
+
+---
+
+### 0.5 Fundamental Corporate Health Layer (VN100 Corporate Health)
+
+VN100 Health Score: 50.5; Market-cap weighted: 53.3; Gap +2.8. Regime: **Mixed / Divergent**. Verdict: **Accounting Recovery / Low Cash Confirmation**. Confidence: High. Cash-confirmed Recovery: Weak. Systemic Stress: Contained.
+
+**Chẩn đoán nhanh**: Doanh thu và lợi nhuận phục hồi rộng (accounting recovery), nhưng **dòng tiền (CFO) và healthy growth chưa xác nhận**. Đây là pattern "lợi nhuận trên giấy" — doanh nghiệp báo lãi nhưng chưa tạo dòng tiền thực. Working capital stress và leverage stress không có số liệu chi tiết trong excerpt, nhưng "Low Cash Confirmation" cho thấy rủi ro thanh khoản doanh nghiệp chưa giải quyết. Sector diffusion không rõ từ excerpt.
+
+**So với market-internal consensus**: VN100 Corporate Health (50.5, Mixed/Divergent, Accounting Recovery) **conflict trực tiếp** với Market Breadth "bear_confirmed", ESR "EUPHORIC_RISK", và Tail Risk "extreme". Corporate health không hỗ trợ giải ngân mạnh, cũng không xác nhận "mọi thứ đang tốt lên". Nó cho thấy **phân kỳ giữa price action yếu và fundamental chưa xuống đáy**: doanh nghiệp không khủng hoảng toàn diện, nhưng recovery chưa được dòng tiền xác nhận. **Không dùng để pick ticker; dùng để giải thích tại sao market không thể capitulate sâu: corporate health chưa đủ yếu để tạo đái cơ bản rõ ràng.**
+
+---
+
+### 1. Trend Momentum (T-7 → T-1 → T)
+
+**Regime continuity**: CRISIS/PRE-CRASH duy trì 7 phiên liên tiếp (T-7 đến T-1), score 11→13 cực kỳ hẹp. T-1 score 13 là đỉnh chuỗi nhưng **không đủ thoát regime**.
+
+**T-1 → T delta**: F&G tiếp tục tăng 56.0→58.5 (greed building), nhưng Breadth MA20 đảo chiều giảm 44.5%→39.8% (thu hẹp 2 phiên liên tiếp từ đỉnh 48.9% ở T-2). **Phân kỳ tiêu cực F&G vs Breadth**: tâm lý cải thiện nhưng độ rộng thực sự co lại — classic bear market rally concentration.
+
+**Humility & Falsification**: 5/6 rule INTACT, 1 FALSIFIED:
+- Vingroup Slope Percentile: FALSIFIED (26.7th → 3.33rd, -23.4th). Rủi ro riêng lẻ Vingroup coupling đã hạ nhiệt mạnh.
+- Các rule INTACT: VNIBOR STRESS/WARNING 14→12 sessions (vẫn >5), Breadth MA20 29.2%→39.8% (vẫn <45%), SSI 65.9%→65.8% (vẫn >55%), EVT ξ 0.345 bất biến (vẫn >0.25), CQS 100th→98.4th percentile (vẫn >80th).
+
+**Ý nghĩa**: Thesis "Vingroup coupling = systemic risk" bị falsified — đây là rủi ro riêng lẻ giảm, không đổi bias hệ thống. Các hard constraints macro, market internal, tail risk **toàn bộ intact**. Không có đảo chiều xu hướng; chỉ có **Vingroup decoupling** làm giảm một dimension của systemic stress.
+
+---
+
+### 2. Tool Consensus
+
+| Category | Tools |
+|:---|:---|
+| **Bullish** | *(none)* |
+| **Bearish** | VNIBOR (35, FEAR/DISTRIBUTION), Market Breadth (35, FEAR/DISTRIBUTION), ESR Monitor (35, FEAR/DISTRIBUTION), Var-CVaR VNINDEX (18, PRE-CRASH/PANIC), Margin/M2 overlay (ELEVATED_LEVERAGE), Risk-Adjusted Growth (bearish — toàn ngành bank đốt vốn, chỉ SHB Alpha dương 1.2%), Upside Ratio (bearish — upside breadth nén sâu, downside surprise dày hơn), Fear & Greed (bearish — score 58.5 near greed nhưng adapter không override hard constraints), Historical Trend (bearish) |
+| **Neutral / No-action** | Global Financial Conditions (55, NEUTRAL/STOCK-PICKING — **conflict nội tại** vì CQS raw 98% HIGH nhưng adapter threshold cho là "not in stress zone"), Manipulation (ANCHORING — quản lý index, không directional), Dispersion (không stressed, spread âm = đồng thuận hóa cross-section, không tail-driven), Sentiment Factor News (7d strong_risk_on, 1d neutral — **fast-moving overlay, vetoed by macro hard**) |
+| **Conflicts** | **Global FCI adapter score 55 (NEUTRAL) vs raw credit metrics extreme (DXY 100%, CCC OAS 80%, CQS 98%)**: adapter heuristic "CQS not in stress zone" mâu thuẫn với credit dispersion thực tế. **F&G 58.5 (greed building) vs Market Breadth bear_confirmed vs Regime CRISIS/PRE-CRASH**: news sentiment 7d risk_on bị vĩ mô cứng veto. **VaRES Stress 0% vs Complacency 4.63% vs EVT ξ 0.345**: stress index yo-yo, complacency pre-crash, EVT fat tail bất biến — "false calm" |
+
+**VN100 Corporate Health overlay**: Mixed/Divergent, Accounting Recovery/Low Cash Confirmation — **neutral-to-slightly-supportive** vs price-based bearish consensus, nhưng không đủ mạnh để override. Giải thích divergence: price action discounting future cash flow weakness trước khi accounting earnings confirm; hoặc market pricing in liquidity risk premium mà corporate health chưa reflect.
+
+**News Sentiment overlay**: 7d strong_risk_on (+0.431), 30d risk_on (+0.3155), 1d neutral do FX external + liquidity. **Vetoed by macro hard**: VNIBOR 20D squeeze, Fed liquidity drain, CQS 80th. Đây là **bear market rally sentiment** trong xu hướng giảm vĩ mô — nhịp hồi ngắn hạn, không đảo chiều.
+
+---
+
+### 3. Tail Risk Audit
+
+- **EVT ξ = +0.345 > 0.30**: Fat tail regime, Hill confirm ≈0.45 cùng dấu/order. ES 99% = -6.15%, chưa hội tụ hoàn toàn. **Extreme tail risk, bất biến 7 phiên** — "frozen tail risk pricing".
+- **ESR SSI = 65.8%**: Vùng WARNING (0.50–0.80), tích lũy rủi ro ngầm. Market State: EUPHORIC_RISK (high stress + uptrend filter chưa gãy hoàn toàn) — **late-stage euphoria, price lagging stress accumulation**. VN30 dưới MA125, PCA PC1 = 38.3% herding vừa phải.
+- **VaRES**: VN30 Stress Index 0.00% (không contagion real-time), Complacency 4.63% (xa 80% nhưng **cao nhất chuỗi 7 phiên, pattern pre-crash**). 0/30 mã thủng VaR 95% — phân phối "bình thường" theo nghĩa thống kê nhưng complacency tăng trong regime khủng hoảng = Minsky dynamics.
+- **Verdict**: **Extreme**. Tail risk không giảm; bị che giấu bởi complacency và bất biến của mô hình. ξ > 0.30 kích hoạt **cap equity ≤ 15%** theo matrix (PRE-CRASH/PANIC với ξ > 0.20 cap 15%; ξ > 0.30 là hard constraint mạnh hơn).
+
+---
+
+### 4. Macro Regime
+
+**PRE-CRASH / PANIC**
+
+Justification: (1) Hard metrics cluster ở vùng cực đoan: EVT ξ 0.345, SSI 65.8%, CQS 80th percentile, VNIBOR ON 4.03% với 20D squeeze trend, Breadth MA20 39.8%. (2) Fed liquidity drain qua TGA hoarding + QT còn sót, không có organic tailwind. (3) VN100 Corporate Health Mixed/Divergent — không hỗ trợ capitulation nhưng cũng không hỗ trợ recovery; "accounting recovery without cash confirmation" là nền tảng yếu cho bất kỳ rally bền vững. (4) Tool consensus: 8/11 bearish, 3 neutral, 0 bullish; bearish tools bao gồm cả market breadth, tail risk, và bank sector fundamentals. (5) Historical momentum: 7 phiên CRISIS/PRE-CRASH liên tiếp, score không thoát vùng 11-13, T-1 nhích lên 13 nhưng T breadth giảm — **không xác nhận đảo chiều**.
+
+---
+
+### 5. Risk/Reward Score & Sub-Score Details
+
+| Sub-Score | Value | Justification |
+|:---|:---|:---|
+| **Macro Risk Score** | 25/100 | Fed Net Liquidity drain (-48B USD, TGA 880.7B hoarding), QT_active cuối giai đoạn, RRP cạn. Global: DXY firm 100% + CCC OAS 80% approaching distress tạo "kép" headwind; EM OAS tight (1%) không cushion. VNIBOR 20D trend "liquidity squeeze / stress building" với 12/20 phiên STRESS/WARNING, ON MA5 slope -0.155% — thanh khoản nội địa căng kéo dài. LTMM FLI neutral, FX offshore easy — không nghẽn cấp tính nhưng không tailwind. Margin/M2 z-score 2.29σ overlay: leverage crowding amplifier nếu credit giật mình. Tổng hợp: macro không phải crisis systemic nhưng là **persistent headwind, liquidity transmission opaque**. |
+| **Market Internal Score** | 20/100 | Breadth MA20 39.8% < 45% (FEAR cap), đảo chiều giảm từ đỉnh 48.9% T-2. Upside Breadth nén sâu 5.65% vs mu 13.09%, downside surprise dày hơn (P95_Dn 26.50% > P95_Up 23.10%). Dispersion: DPI 43.3% thấp, Spread_Z -0.79σ âm — đồng thuận hóa cross-section không tail-driven nhưng cũng không breadth expansion. Manipulation: ANCHORING regime, Vingroup slope <20th percentile (decoupled), correlation dương nhưng slope âm — quản lý index, không breakout. Bank Valuation: toàn ngành vượt ngưỡng -50% margin of safety, median gap -15.2%, cap-weighted -21.5%; VCB -41.9%, LPB -47.6%, BID -25.6% — **định giá tương đối rẻ nhưng không có margin of safety tuyệt đối**. Risk-Adjusted Growth: toàn ngành bank đốt vốn, chỉ SHB Alpha 1.2% (Fortress), còn lại âm hoặc trap. VN100 Corporate Health 50.5 Mixed/Divergent — không hỗ trợ giải ngân. |
+| **Tail Risk Score** | 8/100 | EVT ξ 0.345 > 0.30 (fat tail, ES 99% -6.15%, chưa hội tụ). ESR SSI 65.8% WARNING zone, EUPHORIC_RISK state — late-stage euphoria + stress accumulation. VaRES: Stress 0% (no real-time contagion) nhưng Complacency 4.63% pattern pre-crash, yo-yo stress 0%→6.7%→0% = unstable equilibrium. Historical: ξ bất biến 7 phiên = "frozen tail risk pricing". |
+
+**Composite Score = 14/100** (bottlenecked by Tail Risk 8, pulled down by Market Internal 20; Macro 25 là "tốt nhất" trong 3 nhưng vẫn ở vùng nguy hiểm). Δ vs T-1: metric_implied 27 vs historical score 13, nhưng **không anchor vào historical 11-13**. Hard constraints dominate: EVT ξ > 0.30, SSI > 65%, CQS ≥ 80, Breadth < 45%, VNIBOR ON ≥ 4% — tất cả kéo score về PRE-CRASH/PANIC band (15-29), và tail-risk cap further restricts equity.
+
+**Top tail risk 5-20 phiên**: (1) VNIBOR liquidity squeeze leo thang → interbank stress → margin call cascade; (2) CCC OAS breach 10% → HY contagion → EM outflow; (3) TGA xả bất ngờ hoặc debt ceiling trigger → volatility spike; (4) VN100 accounting recovery không được CFO xác nhận → earnings revision down; (5) ξ convergence failure → ES 99% thực tế sâu hơn -6.15%.
+
+---
+
+### 5.5 LLM Overlay (Chủ quan có kiểm soát)
+
+- **Metric-implied score/regime**: 27/100, PRE-CRASH / PANIC (từ DECISION STATE metric_implied_score).
+- **Overlay adjustment**: **negative, -13 points**.
+- **Final CIO score after overlay**: **14/100**.
+- **Lý do overlay**: 
+  - (1) **VNIBOR snapshot "EASY" vs 20D trend "liquidity squeeze"**: adapter score 35 dựa trên ON ≥ 4% là đúng, nhưng trend 20 phiên với 12 STRESS/WARNING sessions cho thấy squeeze **structural, không transitory**. Snapshot dễ gây false calm.
+  - (2) **Global FCI adapter 55 (NEUTRAL) mâu thuẫn raw credit metrics**: DXY 100% + CCC OAS 80% + CQS 98% là stress thực; adapter heuristic "CQS not in stress zone" là false negative. LLM override xuống.
+  - (3) **F&G 58.5 và News 7d risk_on**: fast-moving sentiment overlay, vetoed by macro hard. Không tăng score vì sentiment.
+  - (4) **VN100 Corporate Health "Accounting Recovery / Low Cash Confirmation"**: không đủ positive để offset market internal weakness. Recovery chưa confirmed = không thể dùng làm catalyst.
+  - (5) **Breadth MA20 đảo chiều giảm từ 48.9%**: falsifies thesis recovery T-2. Negative momentum.
+  - (6) **Vingroup coupling FALSIFIED**: giảm một dimension stress, nhưng systemic constraints (VNIBOR, EVT, SSI, CQS) intact — không đủ để nâng score.
+- **Ranh giới kỷ luật**: Không override EVT ξ > 0.30 (cap equity ≤ 15%), không override Breadth < 45% (FEAR cap), không override CQS ≥ 80 (FEAR cap), không override VNIBOR STRESS/WARNING > 5 sessions. Overlay chỉ tinh chỉnh trong band PRE-CRASH/PANIC, không phá vỡ hard constraints.
+
+---
+
+### 6. Executive Order
+
+| Asset Class | Allocation | Details |
+|:---|:---|:---|
+| **Cash** | **85% — 95%** | Base range PRE-CRASH/PANIC (5-15% equity). Tail-risk cap ξ > 0.30 + SSI > 0.7 → **cap equity tối đa 15%**. Không nằm ở EXTREME CRISIS (8-14đ) nên **KHÔNG được short phái sinh**. |
+| **Equity** | **5% — 15%** | **Không vượt 15%**. Chỉ giải ngân nếu có conviction idiosyncratic cực cao. |
+| **Short Hedge (VN30F1M)** | **0%** | **CẤM**. Chỉ được short ở vùng EXTREME CRISIS (8-14đ). Score 14 nằm ở boundary PRE-CRASH/PANIC, không phải EXTREME CRISIS. |
+| **Margin** | **0%** | Tuyệt đối không dùng margin khi ξ > 0.30. |
+
+**Core stocks list (nếu giải ngân tối đa 15%)**:
+- **SHB**: Thỏa mãn cả 2 điều kiện — (i) Bank Valuation: P/B 0.94 rẻ nhất nhóm, gap âm nhưng không phải value trap; (ii) Risk-Adjusted Growth: Alpha 1.2%, σROE 1.9% thấp nhất, Fortress classification. **Tuy nhiên**: toàn ngành bank định giá tương đối rẻ nhưng không có margin of safety tuyệt đối; SHB là "least bad" không phải "good". Chỉ xem xét nếu giải ngân tối thiểu.
+- **Không có mã nào khác đủ điều kiện**: LPB Premium Burn (P/B 3.04, bubble), VPB Growth Trap (σROE 4.7% cao nhất), ACB/SSB Alpha âm.
+
+**Avoid list**:
+- **VaRES Top Crash**: Không có list cụ thể trong excerpt, nhưng principle — tránh mã trong VaRES Module B breach.
+- **Bank Overvalued/Value Trap**: LPB (Premium Burn), VPB (Growth Trap).
+- **Economic Alpha âm lớn**: ACB, SSB, các mã Risk-Adjusted Growth âm.
+- **Vingroup complex**: Vingroup coupling FALSIFIED nhưng slope <20th, correlation ANCHORING — không directional, không dùng làm safe haven.
+
+---
+
+### 7. Confidence Note
+
+**Final confidence: MEDIUM**
+
+Lý do: (1) **Data gap không nghiêm trọng**: Fed Liquidity, Global FCI, VNIBOR ON/Regime trong historical có N/A nhưng current packets có đủ dữ liệu để inference (VNIBOR ON 4.03, trend 20D, LTMM FLI). (2) **Conflict giải thích được**: F&G vs Breadth là phân kỳ sentiment/structure trong bear market rally; Global FCI adapter vs raw credit là heuristic threshold issue, không phải data conflict không giải thích được. (3) **VN100 valid company count**: không có số liệu cụ thể nhưng Health Score 50.5 với market-cap weighted 53.3 cho thấy coverage đại diện; không hạ confidence vì thiếu vài mã. (4) **Rủi ro riêng lẻ (Vingroup) giảm trong khi systemic intact**: bình thường, không hạ confidence. (5) **Price-Fundamental divergence**: Market Internal bearish vs VN100 Mixed/Divergent — giải thích được là price discounting liquidity risk premium trước fundamental confirmation.
+
+Confidence không HIGH vì: (1) VaRES Stress yo-yo pattern và complacency pre-crash tạo Knightian uncertainty; (2) EVT ξ bất biến 7 phiên đặt câu hỏi về model convergence; (3) Global FCI adapter heuristic có thể underestimate credit stress.
+
+---
+
+### 8. Model Humility Box ("Điều gì sẽ làm báo cáo này sai?")
+
+Báo cáo này sai nếu:
+
+1. **VNIBOR 20D trend chuyển sang easing rõ rệt**: ON MA5 20D change âm sâu, số phiên STRESS/WARNING giảm xuống dưới 5, curve 1W-ON không còn đảo ngược. Hiện tại: 12 sessions STRESS/WARNING, trend "liquidity squeeze / stress building".
+2. **Breadth MA20 phục hồi bền vững trên 45%**: Không chỉ spike đơn phiên mà duy trì >45% 3-5 phiên liên tiếp, kèm upside breadth expansion (Upside Breadth > mu). Hiện tại: 39.8%, giảm từ đỉnh 48.9%.
+3. **ESR SSI quay đầu xuống dưới 55%**: Giảm từ 65.8% xuống <55%, market state thoát EUPHORIC_RISK. Hiện tại: 65.8%, intact.
+4. **EVT ξ giảm sâu dưới 0.25**: Fat tail regime kết thúc, tail risk repricing. Hiện tại: 0.345, bất biến 7 phiên.
+5. **Vingroup Slope Percentile hồi phục trên 70th**: Coupling quay lại, rủi ro riêng lẻ tái xuất. Hiện tại: 3.33rd, FALSIFIED.
+6. **CQS Percentile giảm dưới 80th**: Credit dispersion stress hạ nhiệt. Hiện tại: 98.4th, intact.
+
+---
+
+final score & regime : 14 ; regime : PRE-CRASH / PANIC

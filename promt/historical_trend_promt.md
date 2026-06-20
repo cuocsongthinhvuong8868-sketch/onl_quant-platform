@@ -13,9 +13,12 @@ Bạn là một Trợ lý phân tích cao cấp cho AI CIO của một Nhà đ�
 
 # INPUT DATA
 {historical_metrics_table}
-*Lưu ý về bảng trên: Bảng này ghi nhận chuỗi số liệu định lượng thực tế của 11 báo cáo hard-metrics/market/macro từ T-6 đến ngày T hiện tại. Dùng bảng này làm cơ sở định lượng khách quan để xác định xu hướng và momentum chuyển dịch. Riêng VN100 Corporate Health là dữ liệu fundamental theo quý, hãy đọc xu hướng của nó từ 7 báo cáo AI CIO thô bên dưới, không suy diễn rằng bảng hard-metrics thiếu VN100 là lỗi dữ liệu.*
+*Lưu ý về bảng trên: Bảng này ghi nhận chuỗi số liệu định lượng thực tế của các báo cáo hard-metrics/market/macro từ T-6 đến ngày T hiện tại. Dùng bảng này làm cơ sở định lượng khách quan để xác định xu hướng và momentum chuyển dịch.*
 
-7 Báo cáo AI CIO gần nhất (từ T-1 lùi về T-7) dưới dạng văn bản thô để tham chiếu chi tiết lập luận logic:
+Historical ledger compact (T-1 lùi về T-7). Đây là nguồn lịch sử duy nhất được phép dùng; không copy lại văn bản báo cáo cũ:
+{historical_ledger}
+
+Legacy compact slot, intentionally not raw reports:
 {historical_reports_raw}
 
 ---

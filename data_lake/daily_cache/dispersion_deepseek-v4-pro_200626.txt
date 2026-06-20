@@ -1,23 +1,24 @@
 ## 1. Observations
-- Spread annualized 9.48%, Z-score -0.79σ → phân tán hiện tại thấp hơn trung bình 60 phiên, cấu trúc không bị kéo căng.
-- DPI 43.3% (< 70%) → chưa có dấu hiệu phân tán dai dẳng (regime), chỉ là dao động bình thường.
-- Tương quan trung bình Ledoit-Wolf 0.008 ≈ 0 → thị trường phân hoá cực mạnh, môi trường “stock-picking” rõ rệt.
-- Cross-Sectional Skewness & Kurtosis không có dữ liệu → không quan sát được hướng đuôi hay fat-tail.
+- **Spread_Z = –0.79σ**: độ phân tán cross‑sectional đang thấp hơn trung bình 60 phiên, không có dấu hiệu bị kéo căng.
+- **DPI = 43.3%**: chưa hình thành regime phân tán kéo dài (ngưỡng cảnh báo > 70%), nghĩa là cấu trúc dispersion không mang tính “sự cố regime”.
+- **Tương quan bình quân (Ledoit‑Wolf) = 0.008**: gần như bằng 0, cho thấy thị trường đang phân hóa rất sâu – cổ phiếu di chuyển độc lập, không theo bầy đàn.
+- **CS Skewness & Kurtosis**: không có dữ liệu; không thể đánh giá hướng đuôi hay độ dày đuôi.
 
 ## 2. Structural State
-Thị trường đang ở trạng thái **bình thường**, không stress. Spread_Z âm cho thấy phân tán đang thu hẹp dưới mức trung bình 60 ngày, DPI trung bình (43.3%) xác nhận không có sự gia tăng bền vững của phân tán. Đây **không** phải stress cục bộ (vì không có Spread_Z cao đột biến) cũng không phải regime kéo dài (DPI < 70%). Cấu trúc hiện tại thiên về giai đoạn ổn định với độ phân hoá cao.
+Thị trường ở trạng thái **bình thường**, không bị stress cấu trúc.  
+Spread_Z âm nhẹ (–0.79σ) cho thấy mức phân tán hiện tại thậm chí còn thấp hơn lịch sử gần đây, trong khi DPI thấp khẳng định không có chế độ dispersion cố hữu. Stress không xuất hiện dưới dạng cục bộ (Spread_Z không cao) cũng không phải regime kéo dài (DPI < 70%).
 
-## 3. Cross-Check & Tail Direction
-Do thiếu dữ liệu Skewness và Kurtosis, không thể kiểm tra đuôi phân phối. Không có dấu hiệu đuôi trái (sập cá biệt) hay đuôi phải (cú đẩy điên rồ). Mô hình normal tạm thời vẫn áp dụng được trong điều kiện phân tán thấp và tương quan gần 0, nhưng lưu ý rằng khi số liệu quay trở lại, nếu Kurt > 5 sẽ thay đổi đánh giá hoàn toàn.
+## 3. Cross‑Check & Tail Direction
+Do thiếu Skewness và Kurtosis, không thể xác định đuôi nào đang gãy hoặc có outlier mỡ. Với cấu hình tương quan thấp và phân tán khiêm tốn, khả năng xảy ra cú sốc bất đối xứng từ một nhóm cổ phiếu cực đoan thấp hơn thông thường. Tạm giả định đuôi phân bố ở trạng thái **cân đối (symmetric)** cho đến khi có thêm dữ kiện.
 
 ## 4. Regime Mapping
-Đối chiếu bản đồ 2D (DPI × Corr):
-- DPI 43.3% (thấp) + Correlation 0.008 (thấp) rơi vào ô **Healthy Stock-Picking**.
-Đây là môi trường mà rủi ro đặc thù (idiosyncratic) chiếm ưu thế, khả năng đa dạng hoá cao. Rủi ro lớn nhất cho Portfolio Manager:
-- **Rủi ro tập trung danh mục (concentration risk)** nếu nắm giữ quá ít cổ phiếu, vì phân hoá mạnh có thể khiến một số cổ phiếu sụt giảm mạnh trong khi thị trường chung ít biến động.
-- Không có rủi ro đám đông (herding) hay cạn thanh khoản hệ thống lúc này.
+Theo bản đồ 2D (DPI × Correlation):  
+- DPI thấp (43.3%)  
+- Correlation cực thấp (0.008)  
 
-Tuy nhiên, PM nên theo dõi DPI và Corr: nếu DPI đột ngột tăng kèm Corr tăng, thị trường có thể chuyển sang Trending hoặc Capitulation, đòi hỏi điều chỉnh chiến lược nhanh.
+Trạng thái hiện tại rơi vào ô **Healthy Stock‑Picking** – môi trường phân hóa lành mạnh, lý tưởng cho việc chọn cổ phiếu dựa trên yếu tố riêng lẻ.
+
+**Rủi ro lớn nhất với PM**: rủi ro đặc thù cổ phiếu (idiosyncratic risk) chiếm ưu thế. Tương quan gần như bằng 0 giúp đa dạng hóa danh mục rất hiệu quả, nhưng cũng đồng nghĩa lợi nhuận/toàn thua phụ thuộc nặng vào kỹ năng chọn mã. Không có rủi ro co giật bầy đàn (herding crash) hay khô thanh khoản diện rộng; rủi ro tập trung (concentration risk) chỉ xuất hiện nếu PM cố tình tập trung vị thế vào một yếu tố đơn lẻ.
 
 ## 5. Structured Tail
 ```json

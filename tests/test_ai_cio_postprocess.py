@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from datetime import date, timedelta
 
 from shared.ai_cio import parse_score_regime, postprocess_executive_summary_report
 
@@ -80,3 +81,236 @@ def test_postprocess_strips_truncated_humility_json_and_restores_final_line(tmp_
     assert path == tmp_path / "data_lake" / "daily_cache" / "ai_cio_humility_rules_deepseek-v4-pro_050626.json"
     assert '"falsification_rules"' not in clean
     assert clean.strip().endswith("final score & regime : 11 ; regime : CRISIS / PRE-CRASH")
+
+
+def test_recent_summaries_uses_compact_ledger_not_raw_reports(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    data_lake = tmp_path / "data_lake"
+    data_lake.mkdir()
+    history_path = data_lake / "Ai_cio_report.csv"
+    yesterday = date.today() - timedelta(days=1)
+    history_path.write_text(
+        "ddmmyyyy,score,regime,source,provider\n"
+        f"{yesterday.strftime('%d%m%Y')},42,FEAR / DISTRIBUTION,auto,deepseek-v4-pro\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", data_lake)
+    monkeypatch.setattr(ai_cio, "CSV_HISTORY_PATH", history_path)
+
+    context = ai_cio._read_recent_summaries("deepseek-v4-pro", n_past=7)
+    payload = json.loads(context)
+
+    assert payload == [
+        {
+            "date": yesterday.isoformat(),
+            "score": "42",
+            "regime": "FEAR / DISTRIBUTION",
+            "source": "auto",
+            "provider": "deepseek-v4-pro",
+        }
+    ]
+    assert "EXECUTIVE BOTTOM LINE" not in context
+
+
+def test_evidence_packet_compacts_verbose_report_and_extracts_metrics():
+    import shared.ai_cio as ai_cio
+
+    verbose = "\n".join(
+        [
+            "Systemic Stress Index (SSI): 82.5%",
+            "Tail Index xi: 0.31",
+            "Breadth MA20: 28.4%",
+            "Global FCI CQS: 84.0",
+            "final score & regime : 22 ; regime : PRE-CRASH / PANIC",
+        ]
+        + [f"unimportant filler line {idx}" for idx in range(80)]
+    )
+
+    packet = ai_cio._build_evidence_packet("risk_test", verbose, "current_tool", max_excerpt_chars=300)
+
+    assert packet["tool"] == "risk_test"
+    assert packet["score"] == "22"
+    assert packet["regime"] == "PRE-CRASH / PANIC"
+    assert packet["key_metrics"]["ssi_pct"] == 82.5
+    assert packet["key_metrics"]["evt_xi"] == 0.31
+    assert len(packet["evidence_excerpt"]) <= 300
+
+
+def test_write_ai_cio_context_sidecar(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    path = ai_cio._write_ai_cio_context_sidecar(
+        provider_key="test-provider",
+        decision_state={"report_date": "20/06/2026", "hard_constraints": ["Breadth MA20 weak"]},
+        evidence_packets=[{"tool": "market_breadth", "bias": "bearish"}],
+        history_ledger=[{"date": "2026-06-19", "score": "42"}],
+    )
+
+    payload = json.loads(path.read_text(encoding="utf-8"))
+    assert path.name.startswith("ai_cio_context_test-provider_")
+    assert payload["provider"] == "test-provider"
+    assert payload["decision_state"]["hard_constraints"] == ["Breadth MA20 weak"]
+    assert payload["evidence_packets"][0]["tool"] == "market_breadth"
+
+
+def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    data_lake = tmp_path / "data_lake"
+    cache_dir = data_lake / "daily_cache"
+    cache_dir.mkdir(parents=True)
+    target_date = date.today()
+    context_path = cache_dir / f"ai_cio_context_deepseek-v4-pro_{target_date.strftime('%d%m%y')}.json"
+    context_path.write_text(
+        json.dumps(
+            {
+                "decision_state": {
+                    "metric_implied_score": 27,
+                    "metric_implied_regime": "PRE-CRASH / PANIC",
+                    "metric_implied_subscores": {"tail_risk_score": 18},
+                    "tool_score_count": 2,
+                    "tool_scores": [
+                        {"tool": "var_cvar_vnindex", "tool_score": 18, "tool_regime": "CRISIS / PRE-CRASH"},
+                        {"tool": "market_breadth", "tool_score": 35, "tool_regime": "FEAR / DISTRIBUTION"},
+                    ],
+                    "hard_constraints": ["EVT xi elevated at 0.345"],
+                    "score_band_reason": "Tail risk caps score in PRE-CRASH band.",
+                    "previous_cio_diagnostic": {"score_delta_from_metric_implied": 14},
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", data_lake)
+
+    context = ai_cio._read_ai_cio_context_for_summary("deepseek-v4-pro", target_date)
+    payload = json.loads(context)
+
+    assert payload["metric_implied_score"] == 27
+    assert payload["metric_implied_regime"] == "PRE-CRASH / PANIC"
+    assert payload["tool_score_count"] == 2
+    assert payload["tool_scores"][0]["tool"] == "var_cvar_vnindex"
+    assert payload["hard_constraints"] == ["EVT xi elevated at 0.345"]
+
+
+def test_decision_state_metric_score_resists_prior_score_anchoring():
+    import shared.ai_cio as ai_cio
+
+    packets = [
+        {
+            "tool": "market_breadth",
+            "layer": "current_tool",
+            "bias": "neutral_or_mixed",
+            "key_metrics": {"breadth_ma20_pct": 39.8},
+        },
+        {
+            "tool": "esr_monitor",
+            "layer": "current_tool",
+            "bias": "bearish",
+            "key_metrics": {"ssi_pct": 65.8},
+        },
+        {
+            "tool": "var_cvar_vnindex",
+            "layer": "current_tool",
+            "bias": "neutral_or_mixed",
+            "key_metrics": {"evt_xi": 0.345},
+        },
+        {
+            "tool": "sentiment_factor_news",
+            "layer": "current_tool",
+            "bias": "bullish",
+            "key_metrics": {},
+        },
+    ]
+    history = [{"date": "2026-06-18", "score": "13", "regime": "CRISIS / PRE-CRASH"}]
+
+    state = ai_cio._build_decision_state(packets, history, "20/06/2026", "19/06/2026")
+
+    assert state["metric_implied_regime"] == "PRE-CRASH / PANIC"
+    assert 15 <= state["metric_implied_score"] <= 29
+    assert state["tool_score_count"] == 3
+    assert {item["tool"] for item in state["tool_scores"]} == {
+        "market_breadth",
+        "esr_monitor",
+        "var_cvar_vnindex",
+    }
+    hard_bearish = state["consensus_map"]["hard_adapter_consensus"]["bearish"]
+    soft_bullish = state["consensus_map"]["soft_interpretive_consensus"]["bullish"]
+    assert {item["tool"] for item in hard_bearish} == {
+        "market_breadth",
+        "esr_monitor",
+        "var_cvar_vnindex",
+    }
+    assert [item["tool"] for item in soft_bullish] == ["sentiment_factor_news"]
+    assert state["previous_cio_diagnostic"]["score_delta_from_metric_implied"] is not None
+    assert "Diagnostic only" in state["previous_cio_diagnostic"]["use_rule"]
+
+
+def test_final_score_drift_audit_flags_large_llm_overlay_without_overriding():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 5.5 LLM Overlay\n"
+        "- Metric-implied score/regime: 27/100, PRE-CRASH / PANIC\n"
+        "- Overlay adjustment: negative, -13 points\n"
+        "- Final CIO score after overlay: 14/100\n\n"
+        "final score & regime : 14 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "metric_implied_score": 27,
+        "metric_implied_regime": "PRE-CRASH / PANIC",
+    }
+
+    audited = ai_cio._annotate_final_score_drift(report, decision_state)
+
+    assert "Final Score Drift Audit" in audited
+    assert "large overlay drift -13 points" in audited
+    assert audited.strip().endswith("final score & regime : 14 ; regime : PRE-CRASH / PANIC")
+    assert ai_cio.parse_score_regime(audited) == ("14", "PRE-CRASH / PANIC")
+
+
+def test_final_score_drift_audit_allows_small_same_band_overlay():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "- Metric-implied score/regime: 27/100, PRE-CRASH / PANIC\n"
+        "- Overlay adjustment: negative, -3 points\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "metric_implied_score": 27,
+        "metric_implied_regime": "PRE-CRASH / PANIC",
+    }
+
+    audited = ai_cio._annotate_final_score_drift(report, decision_state)
+
+    assert "Final Score Drift Audit" not in audited
+    assert ai_cio.parse_score_regime(audited) == ("24", "PRE-CRASH / PANIC")
+
+
+def test_tool_score_adapters_are_deterministic():
+    from shared.ai_cio_scoring import derive_metric_implied_scores, score_tool_packet
+
+    breadth = score_tool_packet("market_breadth", {"breadth_ma20_pct": 39.8})
+    esr = score_tool_packet("esr_monitor", {"ssi_pct": 65.8})
+    tail = score_tool_packet("var_cvar_vnindex", {"evt_xi": 0.345})
+
+    assert breadth["tool_score"] == 35
+    assert esr["tool_score"] == 35
+    assert tail["tool_score"] == 18
+
+    aggregate = derive_metric_implied_scores(
+        {
+            "market_breadth.breadth_ma20_pct": 39.8,
+            "esr_monitor.ssi_pct": 65.8,
+            "var_cvar_vnindex.evt_xi": 0.345,
+        },
+        {"bullish": 0, "bearish": 1, "neutral_or_mixed": 2},
+        tool_scores=[{"tool": "market_breadth", **breadth}, {"tool": "esr_monitor", **esr}, {"tool": "var_cvar_vnindex", **tail}],
+    )
+
+    assert aggregate["metric_implied_regime"] == "PRE-CRASH / PANIC"
+    assert 15 <= aggregate["metric_implied_score"] <= 29

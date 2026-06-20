@@ -1,0 +1,38 @@
+## 1. Scenario Assessment
+
+K=1.0 + CoE=14% là baseline chuẩn cho ngân hàng VN, không khắc nghiệt. Tuy nhiên, **toàn ngành đang đốt vốn**: ngay cả top 1 SHB cũng chỉ Alpha 1.2%, ACB/SSB âm. Điều này cho thấy mặt bằng P/B chưa đủ rẻ hoặc ROE retention chưa đủ mạnh để vượt CoE 14%. Không phải scenario khắc nghiệt, mà là **ngành định giá tương đối đắt so với khả năng sinh lời bền vững**.
+
+## 2. Top Alpha Decomposition
+
+| Mã | Driver chính | Phân loại |
+|---|---|---|
+| **SHB** | P/B 0.94 rẻ nhất nhóm + σROE 1.9% thấp nhất → Risk Penalty minimal. ROE 17.5% khá, payout 8.6% giữ lại nhiều. | **Fortress** |
+| **ACB** | ROE 23.0% cao nhất nhưng P/B 1.21 và σROE 2.7% ăn mòn. Payout 15.9% vừa phải. | **Growth Trap** (ROE cao, P/B không đủ rẻ) |
+| **SSB** | P/B 1.05 rẻ + σROE 2.2% thấp, nhưng ROE 15.6% thấp nhất top 3, payout 0% → compounding tối đa. | **Cheap-but-not-trap** (biên an toàn mỏng) |
+
+## 3. Value Traps Warning
+
+- **LPB — Premium Burn nặng**: P/B 3.04 cực đắt, dù ROE 21.1% cao thì (ROE×retention)/P/B không bù nổi CoE 14% + Risk Penalty. Định giá bubble.
+- **EIB — Cheap Trap**: P/B 1.50 tưởng rẻ nhưng ROE 10.0% quá thấp, σROE 3.8% cao → double kill. Không đủ lợi nhuận để tái đầu tư.
+- **VPB — Growth Trap**: ROE 14.1% bình thường, σROE 4.7% cao nhất nhóm, payout 24.6% cao → retention thấp + biến động lớn. Risk Penalty ăn sạch return.
+
+## 4. Portfolio Construction
+
+- **Core Holding (60-70%)**: SHB duy nhất — Fortress thực sự với Alpha > 0.
+- **Tactical (20-30%)**: SSB — P/B rẻ, σ thấp, biên an toàn mỏng nên tỷ trọng hạn chế. ACB không đủ điều kiện (Alpha âm).
+- **Cấm mua / Underweight**: LPB, EIB, VPB rõ ràng. LPB đặc biệt nguy hiểm vì P/B 3.04 trong khi ngành không tạo Alpha.
+
+→ **Không "AVOID SECTOR" hoàn toàn** vì SHB còn Alpha dương, nhưng tỷ trọng ngành bank nên thấp hơn benchmark.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

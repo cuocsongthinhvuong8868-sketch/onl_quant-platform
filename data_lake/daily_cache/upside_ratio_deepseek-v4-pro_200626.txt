@@ -1,16 +1,18 @@
 ## 1. Observations
-- **Upside Breadth**: Hiện tại 5.65% cách xa Mu 13.09% (chênh –7.44 điểm %), lực cầu đang bị nén mạnh dưới trung bình dài hạn.
-- **Downside Breadth**: 7.29% so với Mu 13.55% (chênh –6.26 điểm %), áp lực bán cũng thấp hơn hẳn mức thường lệ.
-- **Chế độ tự tương quan**: Cả hai chiều đều có Phi > 0.10 (0.198 và 0.228) → **Momentum song hành**, nhưng quán tính bên cung lớn hơn.
+- **Lực cầu nén mạnh**: Current Upside Breadth 5.65% cách xa Mu 13.09% (–7.44 pp), phản ánh dòng tiền mua cực kỳ co hẹp.
+- **Lực cung cũng nén**: Downside Breadth 7.29% vs Mu 13.55% (–6.26 pp), áp lực bán cũng ở vùng thấp dị thường.
+- **Cả hai chiều duy trì momentum**: Phi cầu = +0.198, Phi cung = +0.228, đều > +0.10 → xu hướng hiện tại có quán tính tiếp diễn, không có tín hiệu đảo chiều.
 
 ## 2. Supply-Demand Dynamics
-Cùng lúc Up nén (5.65% << 13.09%) và Down nén (7.29% << 13.55%) xác nhận trạng thái **zombification**: thanh khoản cạn, thị trường èo uột, cả phe mua lẫn phe bán đều co cụm dưới mức trung bình. So sánh |Phi| cho thấy **bên cung nắm momentum thực sự** (0.228 so với 0.198), tức đà bán tự duy trì mạnh hơn đà mua.
+- Dòng tiền đang rơi vào trạng thái **zombification**: cả Upside lẫn Downside Breadth đều bị nén xa về dưới trung bình dài hạn. Thanh khoản toàn thị trường cạn kiệt, cả phe mua lẫn phe bán đều chưa dám hành động quyết liệt.
+- Bên cung giữ momentum thực sự mạnh hơn: |Phi_dn| = 0.228 > |Phi_up| = 0.198. Đà lan tỏa của nhóm giảm >2% đang dai dẳng hơn đà lan tỏa của nhóm tăng >2%, dù cả hai cùng mang quán tính dương.
 
 ## 3. Stress-Test Read
-P95 Downside = **26.42%** – nếu thị trường gãy, tỉ lệ mã giảm mạnh có thể bùng lên mức cao, biên độ panic rộng. Đối chiếu với P95 Upside 23.01%, đuôi rủi ro phía dưới **dày hơn hẳn** (26.42 > 23.01), phản ánh bất cân xứng nghiêng về kịch bản giảm sâu thay vì bùng nổ mua.
+- Kịch bản bất lợi nhất (P95 Downside) = 26.83% mã giảm mạnh sau 19 phiên. Nếu thị trường gãy, biên độ bán tháo lan rộng có thể vượt ¼ số mã.
+- Đuôi rủi ro bất đối xứng: P95 Downside (26.83%) > P95 Upside (23.32%). Tail risk phía cung dày hơn phía cầu, xác nhận thiên kiến giảm giá vẫn còn đè nặng hơn cơ hội bùng nổ mua.
 
 ## 4. Verdict
-Tỉ trọng giải ngân đề xuất: **20%**. Momentum bán mạnh + zombie + tail risk dày → giữ phòng thủ. Chiến lược là **rình bắt đáy**: duy trì tiền mặt, chờ tín hiệu hấp thụ cung hoặc đảo chiều momentum rõ nét trước khi tăng tỉ trọng. Không mua đuổi khi lực cầu còn mỏng.
+Đề xuất tỷ trọng giải ngân: **20%**. Môi trường zombification với momentum cung trội hơn và đuôi rủi ro giảm dày khuyến nghị chiến lược **phòng thủ**. Không nên đuổi mua trong bối cảnh thanh khoản mỏng, cũng chưa có tín hiệu đáy rõ ràng để bắt đáy an toàn. Giữ tiền mặt cao chờ xác nhận phá vỡ biên độ nén hiện tại.
 
 ## 5. Structured Tail
 ```json
@@ -18,10 +20,10 @@ Tỉ trọng giải ngân đề xuất: **20%**. Momentum bán mạnh + zombie +
   "tool": "upside_ratio",
   "regime": "zombification",
   "momentum_winner": "supply",
-  "p95_downside_pct": 26.42,
-  "p95_upside_pct": 23.01,
+  "p95_downside_pct": 26.83,
+  "p95_upside_pct": 23.32,
   "deployment_pct": 20,
-  "strategy": "bottom_fishing",
+  "strategy": "defensive",
   "confidence": "medium"
 }
 ```

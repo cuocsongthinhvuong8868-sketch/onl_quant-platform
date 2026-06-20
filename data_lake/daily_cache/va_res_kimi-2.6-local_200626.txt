@@ -1,0 +1,35 @@
+## 1. Observations
+
+- **VN30 Stress Index: 0.00%** (dưới ngưỡng 40%), **0/30 mã thủng VaR 95%** — không có sự cố rủi ro tail đang lây lan trong blue-chip
+- **Complacency Index: 4.63%** (xa ngưỡng 80%), **5 mã mispriced** — thị trường không ở regime ngủ quên, nhưng điều này không đồng nghĩa ổn định
+- **Top 3 mispriced: OCB, VHM, VND** — spread bị nén tương đối so với toàn thị trường, tiềm ẩn định giá sai rủi ro
+
+## 2. Contagion Assessment (Module B)
+
+Stress Index 0.00% cho thấy **không có contagion real-time** trong VN30. Zero breach VaR 95% xác nhận phân phối returns nằm trong confidence band — không có tail event đang diễn ra. Đây là trạng thái spread "bình thường" theo nghĩa thống kê: rủi ro idiosyncratic chưa chuyển thành systematic. Tuy nhiên, zero breach cũng có thể phản ánh **volatility regime thấp** — điều kiện cần nhưng không đủ để kết luận an toàn.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+
+Complacency 4.63%: thị trường **KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa** thị trường ổn định, vận hành bình thường, hoặc không có áp lực bán.
+
+Kết hợp Module B (Stress 0%): hai khả năng probabilistic cao nhất là (a) **uptrend mạnh với spread giãn tự nhiên**, hoặc (b) **giai đoạn hồi phục sau stress với vol chưa kịp nén lại**. Không có bằng chứng của hoảng loạn (Stress sẽ cao), nhưng cũng không loại trừ **bull trap** nếu vol tiếp tục compress mà giá đi ngang.
+
+## 4. Stock-Level Risk Calls
+
+- **Module B — Top 3 Crash**: Không có. Không phát sinh tín hiệu bán/giảm tỷ trọng từ contagion.
+- **Module C — Top 3 Mispriced**: OCB, VHM, VND. Spread bị nén chặt nhất trong nhóm 5 mã mispriced. **Cảnh báo tiềm ẩn**: nếu thị trường chuyển regime, các mã này có khả năng **gap-down hoặc break volatility cao hơn** do risk premium bị định giá thấp. Không khuyến nghị short đơn thuần, nhưng **không nên thêm mới** — đặc biệt nếu VHM/OCB thủng MA20 trên D1 với volume bất thường.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.0,
+  "breach_count": 0,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VHM", "VND"],
+  "confidence": "medium"
+}
+```

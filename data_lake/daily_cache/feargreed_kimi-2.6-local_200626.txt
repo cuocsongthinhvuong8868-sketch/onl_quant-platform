@@ -1,0 +1,29 @@
+## 1. Observations
+- Risk Score 58.5 (+1.2): nằm trong band 40-60, gần upper bound NEUTRAL
+- EGARCH Vol 17.1% (-1.2%): giảm, dưới mức trung bình stress; không phát tín hiệu fear
+- Rolling Skewness 0.20: dương nhẹ, không đủ mạnh để xác nhận greed sâu
+- Upside Correlation 29.8% vs Downside 9.5%: spread 20.3%, chasing beta ở chiều tăng
+
+## 2. Interpretation
+Dữ liệu hiện tại phản ánh pha NEUTRAL phân hoá đang nghiêng về greed nhẹ — upside correlation cao cho thấy đám đông tập trung long beta khi thị trường lên, nhưng skewness chưa đủ dương để xác nhận extreme greed.
+
+## 3. Cross-Check
+- **Score vs EGARCH-vol**: Divergence nhẹ. Score tăng (+1.2) trong khi vol giảm (-1.2%) → consistent với greed building, không phải fear-driven rally
+- **Skewness vs Correlation**: Partial divergence. Skewness 0.20 (dương yếu) vs Upside Correlation 29.8% (mạnh) → upside correlation chạy trước skewness; flag: crowd positioning có thể crowded hơn what skewness implies
+
+## 4. Verdict
+- **Beta target: 0.65**
+- Tăng tỷ trọng stock picking giảm beta; ưu tiên alpha idiosyncratic qua beta directional. Hedge 30-35% exposure bằng cash hoặc phái sinh nếu upside correlation vượt 35%. Không all-in long vì spread correlation/skewness báo hiệu phân kỳ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "19/06/2026",
+  "regime": "NEUTRAL",
+  "score": 58.5,
+  "confidence": "medium",
+  "beta_target": 0.65,
+  "key_signals": ["upside correlation 29.8% >> downside 9.5%: chasing beta detected", "score 58.5 near upper neutral bound with declining vol", "skewness 0.20 lagging upside correlation: partial divergence"]
+}
+```

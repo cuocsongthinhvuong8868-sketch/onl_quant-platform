@@ -1,0 +1,72 @@
+## 1. Mechanical Decomposition
+
+Tuần 2026-06-17, Net Liquidity giảm 48 tỷ USD (impulse âm mạnh), đưa tổng về 5,848.9 tỷ USD. Phân rã cơ chế:
+
+- **WALCL (6,736.4 tỷ USD)**: Fed balance sheet vẫn trong xu hướng QT — tài sản giảm dần, hút thanh khoản khỏi hệ thống.
+- **WTREGEN (880.7 tỷ USD)**: TGA ở mức cao, Treasury đang **tích lũy** tiền từ banking system → **hút thanh khoản** mạnh. Đây là cấu phần chủ đạo gây áp lực lên Net Liquidity tuần này.
+- **RRPONTSYD (6.8 tỷ USD)**: Reverse Repo đã **gần như cạn kiệt** (< 10 tỷ USD), không còn đệm hút thanh khoản. Tiền từ RRP đã chảy về T-bills/repo từ lâu, nên cấu phần này giờ đóng vai trò yếu.
+
+→ **TGA accumulation là driver chính** của impulse âm tuần này, không phải QT từ WALCL.
+
+---
+
+## 2. Cycle Positioning
+
+- **Regime: QT_active**, nhưng ở giai đoạn cuối. QT trên balance sheet vẫn chạy, nhưng RRP đã cạn nên "mechanical drag" từ Fed liquidity giảm đáng kể so với 2022-2023.
+- **RRP**: Đã cạn hoàn toàn (6.8 tỷ USD << 100 tỷ USD ngưỡng). Điều này có nghĩa: **không còn buffer để tiền chảy ra từ RRP bù đắp QT** — mọi điều chỉnh liquidity giờ phụ thuộc trực tiếp WALCL vs TGA.
+- **TGA**: 880.7 tỷ USD là mức tương đối cao. Treasury đang **hoard cash**, có thể chuẩn bị cho chi tiêu cấu trúc hoặc debt ceiling buffer. Nếu TGA xả → liquidity bơm ngược lại.
+- **So sánh lịch sử**: Net Liquidity hiện tại ~5,849 tỷ USD, thấp hơn đỉnh 2022 (~8,500 tỷ USD) khoảng 31%, nhưng cao hơn đáy 2024 (~5,200 tỷ USD) khoảng 12%. Vị trí: **trung bình thấp, không extreme**.
+
+---
+
+## 3. Signal Strength
+
+| Metric | Giá trị | Diễn giải |
+|--------|---------|-----------|
+| Signal | **HOLD** | Vùng trung tính |
+| Z-Score | -0.69 | **Không extreme**, cách -1σ còn 0.31 điểm |
+| Impulse_EMA(4) | -8,810 triệu USD | Âm nhẹ, không đủ mạnh để trigger CUT |
+
+- Z-Score chưa chạm -1σ → **không đủ điều kiện CUT**. Đây là vùng "noise" hơn "signal".
+- Impulse_EMA âm nhẹ, khớp với HOLD (không phải ADD). Tuy nhiên, impulse tuần (-48 tỷ) rất mạnh — nếu lặp lại 1-2 tuần nữa, EMA sẽ xuống dưới -1σ và trigger CUT.
+
+→ **Signal yếu, dễ flip**. Không có edge rõ ràng.
+
+---
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+| Asset | Bias | Mechanism |
+|-------|------|-----------|
+| **SPX/NDX** | Neutral/slight negative | Liquidity không bùng nổ, nhưng cũng không collapse. TGA cao là headwind ngắn hạn. |
+| **DXY** | Slight positive | Liquidity thắt chặt nhẹ + TGA hoarding → USD funding stress → DXY bid |
+| **Gold** | Neutral | Real yields và DXY không extreme, gold range-bound |
+| **Crypto (BTC/ETH)** | Neutral/negative | Risk-on assets nhạy liquidity; impulse âm là headwind nhẹ |
+| **VN-Index (lag 4-8 tuần)** | **Neutral** | Fed liquidity không là catalyst mạnh. Correlation 0.25-0.35 với lag dài, nên impact lan tỏa chậm và yếu. Thêm vào đó, VN-Index còn phụ thuộc nhiều yếu tố nội tại (room tín dụng, FDI thực, chính sách). |
+
+---
+
+## 5. Risk Factors (signal có thể sai vì)
+
+1. **RRP gần zero**: CUT signal dựa trên liquidity rút mạnh sẽ yếu đi vì không còn "mechanical sink" để đo. QT thuần túy từ WALCL có impact nhỏ hơn nhiều so với 2023.
+2. **TGA spike do tax season**: Tháng 6 là corporate tax deadline → TGA tích lũy có thể **tạm thời**, không cấu trúc. Nếu Treasury xả TGA sau mid-June → liquidity bơm ngược, signal flip sang ADD.
+3. **Fed facility đặc biệt**: BTFP-style hoặc repo facility mới có thể đột ngột inject liquidity, làm HOLD → ADD nhanh chóng.
+4. **Debt ceiling dynamics**: TGA cao có thể là buffer cho political showdown; nếu nâng ceiling → TGA xả mạnh.
+
+---
+
+## 6. KẾT LUẬN
+
+Regime: **QT_active late-stage**, liquidity trung tính-thiên hẹp, không extreme. Outlook 2-4 tuần: **risk assets không có tailwind từ Fed liquidity**, bias slight negative cho US equities và crypto; VN-Index không nhận catalyst dương rõ ràng qua kênh này. Monitor TGA trajectory — nếu xả, signal có thể flip nhanh.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5848.883,
+  "signal": "HOLD",
+  "z_score": -0.69,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "low"
+}
+```

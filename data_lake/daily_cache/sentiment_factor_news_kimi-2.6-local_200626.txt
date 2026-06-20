@@ -1,0 +1,58 @@
+## 1. Regime News Sentiment
+
+| Window | Regime | Macro Composite | Thay đổi |
+|--------|--------|-----------------|----------|
+| 1d | **neutral** | -0.1375 | Lệch xuống từ 7d/30d |
+| 7d | **strong_risk_on** | +0.4310 | Đỉnh sentiment gần hạn |
+| 30d | **risk_on** | +0.3155 | Trend tích cực trung hạn |
+
+**Hướng thay đổi:** Đà risk-on 7d-30d đang **giảm nhịp** trong ngắn hạn. 1d quay neutral do áp lực FX và liquidity.
+
+---
+
+## 2. Channel Kéo Mạnh Nhất
+
+| Risk-on | Score | Risk-off | Score |
+|---------|-------|----------|-------|
+| monetary_policy (7d, 30d) | +2.000 / +1.875 | **fx_external** (1d) | **-2.000** |
+| credit_stress (1d) | +1.724 | **liquidity** (1d) | **-1.045** |
+| earnings (1d) | +1.256 | commodity (7d, 30d) | -0.070 / -0.090 |
+
+**Pivot:** FX external và liquidity là 2 channel đang kéo sentiment xuống trong 1d, lấn át credit_stress tích cực.
+
+---
+
+## 3. Drivers Quan Trọng (từ input)
+
+**Positive:**
+- Lợi suất TPCP Mỹ 1Y tăng 14 bps → credit_stress +0.459
+- Bộ Tài chính ưu đãi thuế xăng E10 → growth +0.168
+- Dự kiến tăng tỷ lệ vốn ngắn hạn cho vay trung dài hạn từ 30% lên 40% → growth +0.168
+- ECB tăng 25 bps deposit rate → monetary_policy +1.529 (7d/30d)
+
+**Negative:**
+- Tỷ giá trung tâm 25,173, **giảm 2** → fx_external -0.721 (đảo chiều từ chuỗi tăng)
+- NHNN **hút ròng 4,000 tỷ** qua OMO → liquidity -0.209
+- Giá heo hơi thấp nhất 1 tháng: 65,000 đ/kg → commodity -1.269 (7d/30d)
+- Quặng sắt Trung Quốc đáy 6 tháng → commodity -1.017
+
+---
+
+## 4. Kết Luận Tác Động lên AI CIO
+
+| Layer | Assessment |
+|-------|------------|
+| **Macro layer** | **Conflicts** — 7d/30d risk-on nhưng 1d neutral với FX yếu và liquidity thắt chặt. Macro composite 1d âm, không xác nhận đà tích cực. |
+| **Market-internal** | **Supports** — credit_stress và earnings vẫn green; ECB hawkish = dòng vốn EM hấp dẫn hơn. |
+| **Tổng hợp** | **Neutral** — sentiment overlay khuyến nghị **không tăng tỷ trọng** ở thời điểm này, chờ 1-2 phiên xác nhận FX/liquidity ổn định. |
+
+---
+
+## 5. Caveat
+
+| Yếu tố | Mô tả |
+|--------|-------|
+| **Source coverage** | 1d nặng widata (111/120), mozyfin chỉ 9 → thiếu đa dạng nguồn địa phương trong ngắn hạn |
+| **Stale feed** | Generated 2026-06-18T18:13:08+07:00 — cách hiện tại ~2 ngày; OMO và tỷ giá có thể đã thay đổi |
+| **Headline noise** | Tỷ giá "giảm 2" bị score -0.721 mạnh hơn chuỗi tăng +10 trước đó — risk of **mean-reversion bias** trong scoring model |
+| **Commodity split** | Than cốc tăng vs. quặng sắt/heo hơi/PVC giảm — không đồng nhất, khó gộp thành single commodity view |

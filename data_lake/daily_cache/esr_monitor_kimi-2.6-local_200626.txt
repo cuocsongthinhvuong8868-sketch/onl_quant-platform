@@ -1,0 +1,42 @@
+## 1. Observations
+- SSI = 65.8%, thuộc vùng **WARNING** (0.50–0.80), tích lũy rủi ro ngầm
+- Market State: **EUPHORIC_RISK** (high stress + uptrend filter) — HMM regime khớp 4-state
+- Top 3 pillar: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- VN30 dưới MA125, PCA concentration PC1 = 38.3% — herding vừa phải
+
+## 2. Risk Decomposition (Bóc tách)
+
+**S_LIQ dẫn dắt (36%)**: Volume khô cạn vs 1Y norm — thanh khoản MA20 thấp hơn đáng kể so với MA252. Đây là signature của **distribution silen**t: giá không gãy mạnh nhưng dòng tiền rút dần, đỉnh hình thành trong thin volume.
+
+**S_VAL (32%)**: Valuation tension — spread giữa 252d return VN30 và deposit rate đang căng. Mức risk premium bị nén, phản ánh kỳ vọng lạc quan không được định giá hỗ trợ.
+
+**S_COR (17%)**: Systemic correlation tăng → herding behavior manh nha. Kết hợp S_LIQ + S_COR tạo thành **bull-trap signature**: thị trường đồng thuận giả (correlation cao) trên nền thanh khoản teo tóp.
+
+## 3. Cross-Check
+
+**Divergence flag**: VN30 dưới MA125 nhưng HMM vẫn xếp EUPHORIC_RISK (uptrend filter chưa gãy hoàn toàn). Đây là **late-stage euphoria** — price action lagging nhưng stress đã accumulate.
+
+**HMM × SSI consistency**: Khớp. SSI 65.8% > threshold 0.534, HMM xác nhận high-stress regime. Không có regime mismatch cần flag.
+
+**Pillar mode = downside**: Chỉ tính phiên giảm → S_LIQ, S_VAL đang phản ánh stress thực, không bị phiên tăng che lấp.
+
+## 4. Verdict
+
+- **Cash target: 40%** — nâng từ baseline 20% lên 40%, lock-in phần lợi nhuận trước khi stress chuyển CRITICAL
+- **Hedge action: reduce_beta + mua put VN30** — không short futures outright vì EUPHORIC_RISK chưa chuyển ACTIVE_STRESS, trend chưa gãy hoàn toàn; put hedge tail risk
+- Không mâu thuẫn pillar: S_LIQ + S_VAL + S_COR cùng hướng warning → actionable
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.8,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "buy_puts",
+  "confidence": "medium"
+}
+```

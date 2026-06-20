@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread_Z = -0.79σ: dưới trung bình 60 ngày, không có áp lực tail-driven
+- DPI = 43.3%: thấp hơn ngưỡng 70%, dispersion không có tính kiên định
+- Avg Pairwise Correlation = 0.008: gần zero, phân hoá cực đại giữa các cổ phiếu
+- CS Skewness & Kurtosis: N/A — không đủ dữ liệu để xác nhận hướng tail
+
+## 2. Structural State
+DPI thấp (43.3%) kết hợp Spread_Z âm (-0.79σ) cho thấy thị trường **không stressed**. Spread âm (CSAD > CSSD) cho biết dispersion đến từ biến động đồng đều cross-section chứ không phải outliers. Stress chưa hình thành — cả cục bộ lẫn persistent đều không kích hoạt.
+
+## 3. Cross-Check & Tail Direction
+Thiếu Skewness và Kurtosis, không thể xác nhận tail direction. Tuy nhiên, Spread_Z âm gợi ý **không có tail đang gãy** ở cả hai phía. Dispersion "bình thường" — không fat-tail, không cần chuyển sang phân phối leptokurtic.
+
+## 4. Regime Mapping
+DPI thấp × Corr thấp → **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho long/short equity: idiosyncratic risk chi phối, beta market gần zero. Risk lớn nhất cho PM không phải herding crash hay capitulation, mà là **concentration risk** — tưởng đa dạng hoá nhưng correlation thấp giả tạo che giấu exposure sector đơn lẻ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "19/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.79,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

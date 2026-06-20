@@ -1,0 +1,57 @@
+## 1. Observations
+
+- **Historical VaR 95% (-1.65%)** sâu hơn Parametric VaR (-1.48%) 17 bps, báo hiệu Gaussian đang underestimate ngay cả ở quantile 95%.
+- **EVT VaR 99% (-3.69%)** gấp ~2.5x Historical VaR 95%, cho thấy đuôi phân phối decay chậm hơn exponential — đặc trưng power-law tail.
+- **ξ = +0.345** vượt ngưỡng 0.30, đưa VNINDEX vào **fat tail regime**; ES 99% (-6.15%) có thể chưa hội tụ hoàn toàn do tail chưa đủ "gọn".
+- **Hill = +0.447** cùng dấu và cùng magnitude với ξ (gap ~0.10), tạo **robust signal** — không phải artifact của threshold selection.
+
+## 2. Tail Thickness Diagnosis
+
+| Metric | Value | Interpretation |
+|--------|-------|--------------|
+| ξ bracket | **> 0.30** | **FAT TAIL** |
+| Hill confirm | ξ ≈ 0.35, Hill ≈ 0.45 | Cùng dấu, cùng order → **high confidence** |
+| ES − VaR spread | −1.37% vs σ₃₀ = 0.80% | **Spread > σ₃₀** → fat tail corroborated empirically |
+
+ξ = 0.345 nằm trong vùng mà Gaussian assumption bị phá vỡ nghiêm trọng. Hill cao hơn ξ một chút nhưng cùng chiều, cho thấy tail thickness consistent across estimation methods. ES − VaR spread lớn hơn cả σ₃₀ là bằng chứng độc lập: conditional expectation của loss vượt VaR không chỉ "nặng" mà còn "khó dự báo".
+
+## 3. Gaussian Gap
+
+Gaussian VaR 99% = μ + z₀.₀₁·σ ≈ 0 − 2.33 × 0.80% = **−1.86%**
+
+| Model | VaR 99% |
+|-------|---------|
+| Gaussian | −1.86% |
+| EVT POT/GPD | **−3.69%** |
+
+**Gaussian gap = 3.69% − 1.86% = 1.83 percentage points**
+
+> 1.83 pp >> 1 pp threshold → **Gaussian model broken**
+
+Gaussian VaR 99% chỉ bằng **nửa** EVT VaR 99%. Risk capital dựa trên Gaussian sẽ thiếu hụt ~50% buffer cho 1/100-event. CVaR 95% Gaussian (−3.02%) thậm chí còn không cover được EVT VaR 99%.
+
+## 4. Verdict — Hedging Implications
+
+**ξ = 0.345 > 0.30 → FAT TAIL regime**
+
+- **Avoid momentum strategies**: crash risk asymmetric, tail events có thể cascade nhanh hơn mean-reversion.
+- **Mua puts ITM**: OTM puts cheap theo Gaussian nhưng expensive theo EVT; ITM cung cấp gamma + vốn bảo vệ thực sự khi gap-down.
+- **Short futures hedge**: delta hedge cứng cho core equity exposure, đặc biệt nếu liquidity dries up trong tail event (puts OTM có thể bid-ask spread explode).
+- **Leverage**: giảm tối đa, hoặc structure position với hard stop trước khi VaR 99% trigger.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "19/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.83,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

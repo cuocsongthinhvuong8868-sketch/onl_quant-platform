@@ -1,6 +1,6 @@
 {
   "report_date": "2026-06-20",
-  "composite_score": 24,
+  "composite_score": 14,
   "regime": "PRE-CRASH / PANIC",
   "falsification_rules": [
     {
@@ -10,7 +10,7 @@
       "threshold_value": 5,
       "current_value": 12,
       "unit": "sessions",
-      "description": "Số phiên STRESS/WARNING 20D giảm dưới 5"
+      "description": "VNIBOR liquidity squeeze ends if stress sessions drop below 5"
     },
     {
       "model": "Market Breadth",
@@ -19,7 +19,7 @@
       "threshold_value": 45,
       "current_value": 39.8,
       "unit": "%",
-      "description": "Tỷ lệ mã trên MA20 vượt 45%"
+      "description": "Market breadth recovery confirmed if MA20 sustains above 45%"
     },
     {
       "model": "ESR Monitor",
@@ -28,7 +28,7 @@
       "threshold_value": 55,
       "current_value": 65.8,
       "unit": "%",
-      "description": "SSI giảm dưới 55%"
+      "description": "Systemic stress eases if SSI falls below 55%"
     },
     {
       "model": "Tail Risk (EVT)",
@@ -37,7 +37,7 @@
       "threshold_value": 0.25,
       "current_value": 0.345,
       "unit": "",
-      "description": "Hệ số đuôi EVT xuống dưới 0.25"
+      "description": "Fat tail regime ends if EVT xi drops below 0.25"
     },
     {
       "model": "Manipulation / Coupling",
@@ -46,7 +46,7 @@
       "threshold_value": 70,
       "current_value": 3.333,
       "unit": "th pct",
-      "description": "Coupling Vingroup duy trì ở mức thấp (đã đạt nhưng để đảo chiều nếu tăng lên trên 70)"
+      "description": "Vingroup coupling risk remains decoupled if slope stays below 70th pct"
     },
     {
       "model": "Global Financial Conditions",
@@ -55,10 +55,10 @@
       "threshold_value": 80,
       "current_value": 98.4,
       "unit": "th pct",
-      "description": "Phân vị CQS giảm dưới 80"
+      "description": "Credit stress eases if CQS percentile falls below 80th"
     }
   ],
-  "provider_key": "deepseek-v4-pro",
+  "provider_key": "kimi-2.6-local",
   "saved_at": "2026-06-20",
   "source": "ai_cio_executive_summary"
 }
