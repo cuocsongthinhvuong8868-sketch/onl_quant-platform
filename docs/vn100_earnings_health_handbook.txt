@@ -1,306 +1,1347 @@
-# VN100 Earnings Health Monitor Handbook
+# VN100 Corporate Health Monitor — Spec.md
 
-Ngày cập nhật: 2026-06-03
-Mã hóa: UTF-8
+## 1. Mô tả ý tưởng
 
-Tài liệu này tóm tắt methodology và cách đọc kết quả của VN100 Earnings Health Monitor.
+### 1.1. Mục tiêu hệ thống
 
-## 1. Mục đích
+`VN100 Corporate Health Monitor` là một hệ thống định lượng nhằm đánh giá tổng quan sức khỏe tài chính của 100 doanh nghiệp đại diện cho khu vực kinh tế thực Việt Nam thông qua dữ liệu báo cáo tài chính theo quý/năm.
 
-VN100 Earnings Health Monitor đo sức khỏe lợi nhuận của nhóm VN100 dựa trên báo cáo tài chính quý.
+Mục tiêu không chỉ là đo từng chỉ tiêu riêng lẻ như doanh thu, lợi nhuận hay dòng tiền, mà là kiểm tra xem các chỉ tiêu đó có đang vận hành đồng bộ hay không.
 
-Framework trả lời các câu hỏi chính:
+Nói cách khác, hệ thống cần trả lời các câu hỏi:
 
-- Lợi nhuận đang cải thiện hay suy yếu?
-- Sự cải thiện có diễn ra trên diện rộng hay chỉ tập trung ở một vài nhóm?
-- Lợi nhuận có ổn định hay biến động mạnh?
-- Cross-section có bị phân hóa hay không?
-- Chu kỳ hiện tại là chu kỳ chung của thị trường hay là cú sốc một ngành?
+```text
+1. Doanh nghiệp có đang tăng trưởng thật hay chỉ tăng trưởng kế toán?
+2. Doanh thu tăng có kéo theo lợi nhuận gộp, EBIT, LNST và dòng tiền không?
+3. Lợi nhuận có được xác nhận bằng dòng tiền hoạt động không?
+4. Doanh nghiệp có đang tăng trưởng bằng vốn tự thân hay bằng nợ vay?
+5. Vốn lưu động có đang hút tiền khỏi doanh nghiệp không?
+6. Sức khỏe có lan rộng trong toàn VN100 hay chỉ tập trung ở vài nhóm ngành?
+7. Sector nào đang dẫn dắt sức khỏe doanh nghiệp, sector nào đang tạo stress?
+```
 
-Đây là fundamental monitor, không phải mô hình dự báo giá cổ phiếu.
+Framework này xem VN100 như một mẫu đại diện cho nền kinh tế niêm yết Việt Nam. Do đó, output cuối cùng không chỉ là điểm số từng doanh nghiệp, mà là một dashboard tổng hợp về:
 
-## 2. Nguyên tắc cốt lõi
+```text
+Corporate Health
+Earnings Quality
+Cash Conversion
+Working Capital Stress
+Leverage Stress
+Sector Diffusion
+VN100 Breadth
+```
 
-### Không dùng market cap
+---
 
-Model không dùng giá cổ phiếu, vốn hóa, free-float hay outstanding shares trong score chính.
+### 1.2. Nguyên lý cốt lõi
 
-Lý do: giá cổ phiếu biến động hằng ngày, trong khi báo cáo tài chính là dữ liệu theo quý. Dùng market cap sẽ trộn nhiễu thị trường vào tín hiệu kế toán.
+Một doanh nghiệp khỏe không chỉ là doanh nghiệp có doanh thu hoặc lợi nhuận tăng.
 
-### Equal-weighted universe
+Một doanh nghiệp khỏe phải có chuỗi truyền dẫn tài chính tương đối thông suốt:
 
-VN100 score đại diện cho sức khỏe trung bình của doanh nghiệp VN100, không phải riêng các công ty lớn nhất.
+```text
+Revenue Growth
+→ Gross Profit Growth
+→ EBIT Growth
+→ LNST Growth
+→ CFO Growth
+→ FCF Stability
+→ Balance Sheet Resilience
+```
 
-### Geometric mean sau khi normalize
+Nếu chuỗi này đồng pha, tăng trưởng có chất lượng.
 
-Raw metric được xử lý theo pipeline:
-
-raw metric -> winsorize -> percentile health [0,1] -> clip [0.01,0.99] -> geometric mean -> score [-1,+1]
-
-Geometric mean phạt các component yếu mạnh hơn arithmetic mean. Vì vậy score tổng chỉ cao khi nhiều thành phần cùng tốt.
-
-## 3. Dữ liệu đầu vào
-
-Nguồn dữ liệu:
-
-- File JSON hoặc Excel báo cáo tài chính theo ticker.
-- Universe: config/vn100_universe.csv.
-- Sector: lấy từ vnstock và mapping về các nhóm methodology.
-
-Parser cần tìm được tối thiểu:
-
-- npat: lợi nhuận sau thuế.
-- equity: vốn chủ sở hữu.
-- period: quý.
-- ticker, sector, source_file.
-
-Nếu ticker không parse được, xem file:
-
-vn100_parse_log.csv
-
-File này chỉ hiện ticker failed và đường dẫn file cần sửa.
-
-## 4. Ticker-level metrics
-
-### NPAT TTM
-
-npat_ttm = tổng NPAT 4 quý gần nhất
-
-Dùng TTM để giảm nhiễu mùa vụ.
-
-### Equity lag 4Q
-
-equity_lag4 = equity của cùng kỳ năm trước
-
-Dùng equity lag 4Q để đo earnings improvement trên nền vốn đã có trước đó.
-
-### Momentum raw
-
-momentum_raw = delta_npat_ttm / equity_lag4
-
-Ý nghĩa: lợi nhuận TTM tăng hoặc giảm bao nhiêu so với vốn chủ sở hữu năm trước.
-
-### Profitability raw
-
-roe_ttm = npat_ttm / average_equity
-
-Ý nghĩa: mức sinh lời hiện tại của doanh nghiệp.
-
-### Stability raw
-
-stability_raw = rolling std(delta_earnings_to_equity, 12 quarters)
-
-Stability window đang dùng 12Q. Giá trị raw càng thấp thì lợi nhuận càng ổn định.
-
-## 5. Component scores
-
-Tất cả component score được map về thang:
-
--1 = rất xấu
- 0 = trung tính
-+1 = rất tốt
-
-### Momentum Score
-
-Đo tốc độ cải thiện lợi nhuận của universe.
-
-Cách đọc nhanh:
-
-- > 0: earnings momentum đang cải thiện.
-- < 0: earnings momentum đang suy yếu.
-
-### Breadth Score
-
-Đo tỷ lệ ticker có momentum dương.
-
-breadth_raw = positive_ticker_count / valid_ticker_count
-
-Cách đọc nhanh:
-
-- Cao: nhiều doanh nghiệp cùng cải thiện.
-- Thấp: recovery hẹp hoặc suy yếu diện rộng.
-
-### Stability Score
-
-Đo tính ổn định của earnings improvement trong cửa sổ 12Q.
-
-Cách đọc nhanh:
-
-- Cao: chu kỳ lợi nhuận ổn định.
-- Thấp: lợi nhuận biến động, dễ nhiễu hoặc chưa bền.
-
-### Profitability Score
-
-Đo mức ROE TTM hiện tại sau khi normalize theo lịch sử/cross-section.
-
-Cách đọc nhanh:
-
-- Cao: nền lợi nhuận tốt.
-- Thấp: ROE yếu hoặc chưa phục hồi.
-
-### CSAD Quality Score
-
-CSAD đo độ phân tán cross-section của ticker health/momentum.
-
-csad_raw được giữ lại để diagnostic, nhưng score chính dùng smoothed quality:
-
-csad_quality = 0.65 * EMA_4Q(csad_quality_raw) + 0.35 * csad_quality_raw
-
-Lý do: raw CSAD rất nhạy với outlier, nên blend giúp giảm nhiễu nhưng vẫn không quá trễ.
-
-Cách đọc nhanh:
-
-- CSAD quality cao: tín hiệu đồng đều hơn, ít phân hóa.
-- CSAD quality thấp: fundamental bị phân hóa, có thể do một vài sector/ticker kéo.
-
-## 6. VN100 Composite Score
-
-VN100 score là weighted geometric mean của component scores sau khi map về [0,1].
-
-Weights hiện tại:
-
-- Momentum: 30%
-- Breadth: 25%
-- Profitability Quality: 20%
-- Stability: 15%
-- CSAD Quality: 10%
-
-Sau đó score được map về [-1,+1].
-
-## 7. Regime
-
-Regime dựa trên vn100_score:
-
-- score < -0.50: Earnings Stress
-- -0.50 đến -0.15: Weak
-- -0.15 đến +0.15: Neutral
-- +0.15 đến +0.50: Recovery
-- > +0.50: Expansion
-
-Cách đọc:
-
-- Earnings Stress: lợi nhuận suy yếu mạnh.
-- Weak: chu kỳ còn yếu.
-- Neutral: đang chuyển tiếp, chưa có tín hiệu rõ.
-- Recovery: earnings đang phục hồi.
-- Expansion: chu kỳ lợi nhuận mạnh và có chất lượng.
-
-## 8. Broadness label
-
-Broadness kết hợp breadth_raw và csad_percentile.
-
-- high breadth + low CSAD: broad-based expansion
-- high breadth + high CSAD: uneven recovery
-- low breadth + high CSAD: narrow leadership / one-sector shock
-- low breadth + low CSAD: broad-based weakness
-- otherwise: mixed / transition
-
-Lưu ý:
-
-- broad-based expansion: tín hiệu tốt hơn vì nhiều ticker cùng cải thiện và ít phân hóa.
-- uneven recovery: breadth tốt nhưng phân hóa cao, cần xem sector map.
-- narrow leadership / one-sector shock: có thể chỉ một nhóm kéo score.
-
-## 9. Sector Map
-
-Sector Map dùng để xem component nào đang kéo hoặc đè score.
-
-Cần đọc:
-
-- Sector composite score.
-- Sector momentum.
-- Sector breadth.
-- Sector stability.
-- Sector profitability.
-- Sector CSAD quality.
-
-Nếu VN100 score tốt nhưng chỉ 1-2 sector tốt, nên cẩn thận với kết luận broad recovery.
-
-## 10. PCA Validation
-
-PCA không được dùng để thay VN100 score chính.
-
-PCA là diagnostic để xem có common factor hay không:
-
-- pca_factor_score: common factor score thay thế/đối chiếu.
-- pc1_explained_variance: PC1 giải thích bao nhiêu biến động sector.
-- corr_ew_composite_pc1: PCA có đồng pha với equal-weight composite không.
-- dominant_sector_loadings: sector nào đóng góp lớn vào PC1.
-
-Cách đọc:
-
-- PC1 explained variance cao: có common cycle rõ.
-- PCA factor mạnh hơn VN100 score: tín hiệu common factor nhạy hơn, nhưng có thể bị chi phối bởi sector loading.
-- One-sector shock flag: cần xem sector map trước khi kết luận chu kỳ chung.
-
-## 11. Coverage
-
-Coverage có hai lớp:
-
-- Raw parse coverage: số ticker có data parse được.
-- Score coverage: số ticker đủ điều kiện tính score tại kỳ mới nhất.
+Nếu chuỗi này bị đứt ở một đoạn nào đó, đoạn đứt chính là nơi hệ thống cần phát hiện và gắn cờ.
 
 Ví dụ:
 
-parsed tickers = 100/100
-valid_ticker_count = 97
-coverage_ratio = 97%
+```text
+Revenue tăng nhưng Gross Profit không tăng
+=> vấn đề nằm ở giá vốn hoặc biên lợi nhuận gộp.
 
-Điều này có nghĩa là dữ liệu đã có cho 100 ticker, nhưng kỳ mới nhất chỉ 97 ticker đủ trường để tính score.
+LNST tăng nhưng CFO giảm
+=> lợi nhuận kế toán chưa chuyển thành tiền.
 
-Nếu coverage thấp:
+Revenue tăng nhưng phải thu và tồn kho tăng nhanh hơn
+=> vốn lưu động đang hút tiền.
 
-- Kiểm tra vn100_parse_log.csv.
-- Kiểm tra data_quality_flag trong outputs/ticker_metrics.csv.
-- Không nên đọc regime quá mạnh nếu coverage dưới ngưỡng methodology.
+EBIT tăng nhưng chi phí lãi vay tăng nhanh hơn
+=> tăng trưởng bị ăn mòn bởi đòn bẩy tài chính.
 
-## 12. Cách đọc dashboard
+CFO yếu nhưng nợ vay tăng
+=> doanh nghiệp có thể đang tài trợ tăng trưởng bằng nợ.
+```
 
-### Overview
+---
 
-Đọc theo thứ tự:
+### 1.3. Vai trò của correlation
 
-1. Coverage.
-2. VN100 Score.
-3. Regime.
-4. Broadness.
-5. Sector heatmap.
+Correlation không phải là metric sức khỏe trực tiếp.
 
-### Component Trends
+Correlation là lớp kiểm định tính nhất quán nội tại giữa các lõi tài chính.
 
-Dùng để biết score tổng thay đổi do component nào:
+Metric đơn lẻ trả lời:
 
-- Momentum tăng nhưng Profitability thấp: recovery mới bắt đầu.
-- Breadth cao nhưng Stability thấp: nhiều ticker cải thiện nhưng chưa bền.
-- Profitability cao nhưng Momentum thấp: nền lợi nhuận tốt nhưng đang chậm lại.
+```text
+Cái gì đang tăng hoặc giảm?
+```
 
-### Breadth & CSAD
+Correlation trả lời:
 
-Dùng để phân biệt recovery rộng hay hẹp:
+```text
+Các thành phần tài chính có đang đi cùng nhau theo một câu chuyện hợp lý không?
+```
 
-- Breadth cao + CSAD quality cao: tốt.
-- Breadth cao + CSAD quality thấp: recovery phân hóa.
-- Breadth thấp + CSAD quality thấp: rủi ro shock hẹp.
+Vì vậy, correlation nằm trong:
 
-### PCA Validation
+```text
+Internal Consistency Layer
+```
 
-Dùng để kiểm tra chu kỳ chung:
+Nó có nhiệm vụ phát hiện:
 
-- PCA factor cùng chiều VN100 score: tín hiệu chung đang rõ.
-- PCA factor lệch mạnh với VN100 score: xem lại sector loadings.
+```text
+1. Healthy Synchronization
+   Các biến tài chính tốt cùng cải thiện.
 
-## 13. Lưu ý sử dụng
+2. Accounting Growth Divergence
+   Lợi nhuận tăng nhưng dòng tiền không theo.
 
-Model này là monitor fundamental, không phải tín hiệu mua bán ngắn hạn.
+3. Working Capital Absorption
+   Doanh thu tăng nhưng tiền bị hút vào phải thu, tồn kho hoặc khoản phải trả.
 
-Không nên đọc một con số riêng lẻ. Nên đọc theo cụm:
+4. Leverage-Funded Growth
+   Tăng trưởng được tài trợ bằng nợ vay thay vì dòng tiền nội sinh.
 
-VN100 Score + Regime + Broadness + Component Trends + Sector Map + PCA
+5. Sector Concentration
+   Sức khỏe chỉ tập trung ở một vài sector thay vì lan rộng toàn VN100.
+```
 
-Kết luận mạnh chỉ nên đưa ra khi:
+---
 
-- Coverage cao.
-- Breadth ủng hộ.
-- CSAD không quá phân hóa.
-- Sector map không bị một ngành chi phối.
-- PCA không cảnh báo one-sector shock.
+### 1.4. Vì sao cần matrix?
+
+Do hệ thống có nhiều lõi tài chính khác nhau, cần một lớp matrix để kết nối các lõi này.
+
+Matrix không thay thế các lõi riêng lẻ. Matrix là bản đồ cho biết:
+
+```text
+Growth có được Cashflow xác nhận không?
+Profitability có bị Working Capital phủ định không?
+Balance Sheet đang hỗ trợ hay làm suy yếu Growth?
+Sector nào đang đồng pha với toàn VN100?
+```
+
+Matrix layer là `coherence engine` — bộ máy kiểm định tính nhất quán giữa các lõi.
+
+Không nên dùng một ma trận correlation khổng lồ vì dễ nhiễu và khó ra quyết định. Thay vào đó, hệ thống dùng 3 loại matrix chính:
+
+```text
+1. Core Consistency Matrix
+2. Transmission Matrix
+3. Sector Diffusion Matrix
+```
+
+---
+
+## 2. Thiết kế UI
+
+### 2.1. Tổng quan kiến trúc UI
+
+Dashboard nên có 5 tầng chính:
+
+```text
+1. VN100 Health Overview
+2. Core Health Breakdown
+3. Matrix & Correlation Diagnostics
+4. Sector Diffusion Map
+5. Company Drilldown
+```
+
+UI cần phục vụ 2 mục tiêu:
+
+```text
+1. Nhìn nhanh sức khỏe tổng thể VN100.
+2. Đào sâu để biết stress đến từ metric nào, sector nào, doanh nghiệp nào.
+```
+
+---
+
+### 2.2. Trang 1 — VN100 Health Overview
+
+#### Mục tiêu
+
+Cho biết toàn bộ VN100 đang khỏe lên, yếu đi, hay phân hóa.
+
+#### Thành phần UI
+
+```text
+1. VN100 Corporate Health Score
+2. Health Regime Badge
+3. Breadth Indicators
+4. Trend Chart
+5. Top Positive Contributors
+6. Top Negative Contributors
+```
+
+#### Health Regime Badge
+
+Có thể chia regime thành:
+
+```text
+Strong Expansion
+Healthy Recovery
+Mixed / Divergent
+Weakening
+Stress
+```
+
+#### KPI cards
+
+```text
+VN100 Health Score
+Revenue Breadth
+Profit Breadth
+CFO Breadth
+Healthy Growth Breadth
+Working Capital Stress Index
+Leverage Stress Index
+Sector Diffusion Score
+```
+
+#### Ví dụ interpretation
+
+```text
+VN100 Health Score: 62/100
+Regime: Mixed Recovery
+Revenue Breadth: 68%
+Profit Breadth: 54%
+CFO Breadth: 41%
+Healthy Growth Breadth: 32%
+
+Interpretation:
+Doanh thu đang phục hồi rộng hơn lợi nhuận và dòng tiền.
+Chất lượng phục hồi chưa cao vì CFO breadth còn thấp.
+```
+
+---
+
+### 2.3. Trang 2 — Core Health Breakdown
+
+#### Mục tiêu
+
+Hiển thị điểm số theo từng lõi tài chính.
+
+#### Core modules
+
+```text
+1. Growth Momentum
+2. Profitability Quality
+3. Cash Conversion
+4. Working Capital Stress
+5. Balance Sheet Resilience
+6. Capital Allocation
+7. Sector Diffusion
+```
+
+#### UI layout gợi ý
+
+```text
+Core Score Panel
+- Growth Momentum: 71
+- Profitability Quality: 58
+- Cash Conversion: 43
+- Working Capital Stress: 67
+- Balance Sheet Resilience: 55
+- Capital Allocation: 49
+- Sector Diffusion: 52
+```
+
+Lưu ý:
+
+```text
+Working Capital Stress và Leverage Stress là chỉ số nghịch.
+Score càng cao có thể biểu thị stress càng cao.
+Cần thống nhất convention trong UI:
+- Health Score: cao là tốt.
+- Stress Score: cao là xấu.
+```
+
+Khuyến nghị:
+
+```text
+Dùng hai nhóm màu hoặc label:
+Health Core: High = Good
+Stress Core: High = Bad
+```
+
+---
+
+### 2.4. Trang 3 — Matrix & Correlation Diagnostics
+
+Đây là phần trung tâm của hệ thống.
+
+#### 2.4.1. Core Consistency Matrix
+
+Matrix này kiểm tra các lõi lớn có xác nhận nhau hay không.
+
+```text
+                 Growth   Profit   Cashflow   WC Stress   Leverage   Capex
+Growth              1        x         x          x           x         x
+Profit              x        1         x          x           x         x
+Cashflow            x        x         1          x           x         x
+WC Stress           x        x         x          1           x         x
+Leverage            x        x         x          x           1         x
+Capex               x        x         x          x           x         1
+```
+
+Các cặp quan trọng:
+
+```text
+Growth ↔ Profit
+Profit ↔ Cashflow
+Growth ↔ Working Capital Stress
+Cashflow ↔ Leverage
+Growth ↔ Capex
+Profit ↔ Leverage
+```
+
+UI nên hiển thị:
+
+```text
+Correlation value
+Direction
+Diagnostic label
+Severity
+```
+
+Ví dụ:
+
+```text
+Profit ↔ Cashflow correlation: -0.42
+Label: Earnings Quality Divergence
+Severity: High
+```
+
+---
+
+#### 2.4.2. Transmission Matrix
+
+Matrix này kiểm tra chuỗi truyền dẫn tài chính.
+
+```text
+Revenue
+→ Gross Profit
+→ EBIT
+→ LNST
+→ CFO
+→ FCF
+→ Equity / Balance Sheet
+```
+
+Các đoạn truyền dẫn:
+
+| Transmission Link | Ý nghĩa | Signal tốt | Signal xấu |
+|---|---|---|---|
+| Revenue → Gross Profit | Chất lượng doanh thu | GP đi cùng Revenue | Revenue tăng, GP không tăng |
+| Gross Profit → EBIT | Kiểm soát chi phí vận hành | EBIT đi cùng GP | SG&A ăn hết lợi nhuận |
+| EBIT → LNST | Chi phí tài chính/thuế | LNST đi cùng EBIT | LNST lệch EBIT |
+| LNST → CFO | Chất lượng lợi nhuận | CFO xác nhận LNST | LNST tăng, CFO giảm |
+| CFO → FCF | Tiền sau đầu tư | FCF không quá xấu | CAPEX hút hết tiền |
+| FCF → Equity | Tăng trưởng bền vững | FCF hỗ trợ equity | Phải vay nợ/phát hành |
+
+UI nên thể hiện dạng flow:
+
+```text
+Revenue [+]
+   ↓ confirmed
+Gross Profit [+]
+   ↓ confirmed
+EBIT [+]
+   ↓ weak
+LNST [+]
+   ↓ broken
+CFO [-]
+   ↓ broken
+FCF [-]
+```
+
+Điểm quan trọng: transmission matrix dễ đọc hơn một ma trận correlation 20x20.
+
+---
+
+#### 2.4.3. Sector Diffusion Matrix
+
+Matrix dạng:
+
+```text
+Sector x Core
+```
+
+Ví dụ:
+
+| Sector | Growth | Profit | Cashflow | WC Stress | Leverage | Health |
+|---|---:|---:|---:|---:|---:|---:|
+| Banks | Strong | Strong | N/A | N/A | Neutral | Strong |
+| Real Estate | Weak | Weak | Weak | High | High | Stress |
+| Retail | Strong | Strong | Strong | Low | Low | Strong |
+| Materials | Weak | Weak | Mixed | Medium | Medium | Weak |
+| Industrials | Mixed | Mixed | Weak | High | Medium | Mixed |
+
+Mục tiêu:
+
+```text
+1. Tránh ảo giác aggregate.
+2. Biết sức khỏe đến từ sector nào.
+3. Biết stress nằm ở sector nào.
+4. Phân biệt recovery rộng hay recovery hẹp.
+```
+
+Ví dụ:
+
+```text
+VN100 LNST tăng 18%, nhưng 70% đóng góp đến từ banks.
+=> Sức khỏe tổng thể cải thiện nhưng diffusion yếu.
+```
+
+---
+
+### 2.5. Trang 4 — Breadth & Diffusion
+
+#### Mục tiêu
+
+Đo mức độ lan rộng của sức khỏe tài chính.
+
+#### Breadth indicators
+
+```text
+Revenue Breadth
+= % doanh nghiệp có Revenue YoY > 0
+
+Profit Breadth
+= % doanh nghiệp có LNST YoY > 0
+
+CFO Breadth
+= % doanh nghiệp có CFO YoY > 0
+
+Margin Breadth
+= % doanh nghiệp có EBIT Margin cải thiện
+
+Healthy Growth Breadth
+= % doanh nghiệp thỏa đồng thời:
+  Revenue YoY > 0
+  LNST YoY > 0
+  CFO > 0
+  CFO / LNST > threshold
+  Leverage không xấu đi nghiêm trọng
+```
+
+#### UI components
+
+```text
+Breadth trend chart
+Sector breadth heatmap
+Healthy vs Unhealthy Growth distribution
+Top improving sectors
+Top deteriorating sectors
+```
+
+---
+
+### 2.6. Trang 5 — Company Drilldown
+
+#### Mục tiêu
+
+Cho phép người dùng chọn từng ticker để xem chẩn đoán chi tiết.
+
+#### Thông tin cần hiển thị
+
+```text
+1. Company Health Score
+2. Core Scores
+3. Transmission Chain
+4. Metric Trend
+5. Diagnostic Flags
+6. Sector-relative Percentile
+7. Historical Z-score
+```
+
+#### Ví dụ output ticker-level
+
+```text
+Ticker: XYZ
+Health Score: 48/100
+Regime: Mixed / Divergent
+
+Main Flags:
+- Revenue tăng nhưng CFO giảm.
+- Receivables tăng nhanh hơn Revenue.
+- Interest expense tăng nhanh hơn EBIT.
+- Working Capital Stress cao.
+
+Interpretation:
+Doanh nghiệp đang tăng trưởng kế toán nhưng chất lượng dòng tiền yếu.
+```
+
+---
+
+## 3. Quantitative Methodology
+
+### 3.1. Universe
+
+Universe mặc định:
+
+```text
+VN100 tickers
+```
+
+Yêu cầu:
+
+```text
+1. Danh sách ticker phải có thể cập nhật động.
+2. Có thể dùng file tickers_100.csv làm universe đầu vào.
+3. Cho phép phân loại ticker theo sector.
+4. Tách nhóm financials và non-financials.
+```
+
+Nhóm cần xử lý riêng:
+
+```text
+Banks
+Securities
+Insurance
+Real Estate
+Non-financial Corporates
+```
+
+---
+
+### 3.2. Data Input
+
+Dữ liệu đầu vào lấy từ báo cáo tài chính theo quý/năm.
+
+Nguồn file:
+
+```text
+BCTC_json/
+```
+
+Hệ thống cần đọc động các định dạng:
+
+```text
+JSON
+Excel
+CSV nếu có
+```
+
+Yêu cầu cho loader:
+
+```text
+1. Đọc toàn bộ file trong folder BCTC_json.
+2. Tự nhận diện ticker, kỳ báo cáo, loại báo cáo.
+3. Chuẩn hóa tên khoản mục.
+4. Xử lý thiếu dữ liệu.
+5. Mapping khoản mục khác tên nhưng cùng ý nghĩa.
+6. Cho phép thêm dictionary mapping thủ công.
+```
+
+Ví dụ mapping:
+
+```text
+Doanh thu thuần
+Net revenue
+Revenue
+Sales
+
+Lợi nhuận sau thuế
+Profit after tax
+Net income
+LNST
+
+Lưu chuyển tiền thuần từ hoạt động kinh doanh
+CFO
+Operating cash flow
+Cash flow from operations
+```
+
+---
+
+### 3.3. Metric Groups
+
+#### 3.3.1. Growth Momentum
+
+```text
+Revenue Growth YoY
+Gross Profit Growth YoY
+EBIT Growth YoY
+EBITDA Growth YoY nếu có
+LNST Growth YoY
+TTM Revenue Growth
+TTM LNST Growth
+```
+
+#### 3.3.2. Profitability Quality
+
+```text
+Gross Margin
+EBIT Margin
+EBITDA Margin
+Net Margin
+ROA
+ROE
+ROIC nếu đủ dữ liệu
+```
+
+#### 3.3.3. Cash Conversion
+
+```text
+CFO
+FCF = CFO - CAPEX
+CFO / LNST
+FCF / LNST
+CFO Margin = CFO / Revenue
+Accrual Ratio = (LNST - CFO) / Total Assets
+```
+
+#### 3.3.4. Working Capital Stress
+
+```text
+Receivables / Revenue
+Inventory / Revenue
+Payables / COGS
+Receivables Growth - Revenue Growth
+Inventory Growth - Revenue Growth
+Cash Conversion Cycle nếu đủ dữ liệu
+```
+
+#### 3.3.5. Balance Sheet Resilience
+
+```text
+Debt / Equity
+Net Debt / EBITDA
+Interest Coverage = EBIT / Interest Expense
+Cash / Short-term Debt
+Current Ratio
+Quick Ratio
+Equity Growth
+```
+
+#### 3.3.6. Capital Allocation
+
+```text
+CAPEX / Revenue
+CAPEX / Depreciation
+Asset Growth
+Fixed Asset Growth
+FCF after CAPEX
+Dividend Payout nếu có
+Share Issuance / Dilution nếu có
+```
+
+---
+
+### 3.4. Sector-Specific Metrics
+
+#### 3.4.1. Non-financial Corporates
+
+Dùng đầy đủ các nhóm:
+
+```text
+Revenue
+Gross Profit
+EBIT
+LNST
+CFO
+FCF
+Inventory
+Receivables
+Debt
+Interest Expense
+CAPEX
+ROA / ROE / ROIC
+```
+
+#### 3.4.2. Banks
+
+Không dùng framework doanh thu - tồn kho - CFO như doanh nghiệp thông thường.
+
+Metrics riêng:
+
+```text
+Net Interest Income
+NIM
+Credit Growth
+Deposit Growth
+CASA
+NPL Ratio
+Loan Loss Reserve / NPL
+Provision Expense
+CIR
+ROA
+ROE
+CAR nếu có
+Loan / Deposit Ratio
+```
+
+#### 3.4.3. Securities Companies
+
+Metrics riêng:
+
+```text
+Brokerage Revenue
+Margin Lending Balance
+Proprietary Trading Gain/Loss
+FVTPL Assets
+IB Revenue
+Debt / Equity
+ROE
+Financial Asset Growth
+```
+
+#### 3.4.4. Real Estate
+
+Metrics bổ sung:
+
+```text
+Inventory
+Customer Advances
+Presales nếu có
+Revenue Backlog nếu có
+Short-term Debt
+Interest Capitalized
+CFO
+Project Progress nếu có
+```
+
+---
+
+### 3.5. Normalization
+
+Không correlation raw data trực tiếp.
+
+Cần chuẩn hóa trước khi tính score và matrix.
+
+Các dạng normalization:
+
+```text
+YoY Growth
+QoQ Growth
+TTM Growth
+Rolling 4Q Sum
+Company Historical Z-score
+Sector Percentile Rank
+Winsorization
+```
+
+Khuyến nghị:
+
+```text
+1. Dùng YoY để tránh seasonality.
+2. Dùng TTM cho những khoản mục biến động mạnh.
+3. Dùng sector percentile để so sánh cùng ngành.
+4. Winsorize outlier tại 5% và 95% hoặc 1% và 99%.
+```
+
+---
+
+### 3.6. Core Scores
+
+Mỗi lõi được tính thành score từ 0 đến 100.
+
+#### 3.6.1. Growth Score
+
+Input:
+
+```text
+Revenue Growth
+Gross Profit Growth
+EBIT Growth
+LNST Growth
+```
+
+Gợi ý:
+
+```text
+Growth Score =
+average percentile rank của các growth metrics trong sector
+```
+
+#### 3.6.2. Profitability Score
+
+Input:
+
+```text
+Gross Margin
+EBIT Margin
+Net Margin
+ROA
+ROE
+ROIC
+```
+
+Gợi ý:
+
+```text
+Profitability Score =
+average percentile rank của margin và return metrics trong sector
+```
+
+#### 3.6.3. Cash Conversion Score
+
+Input:
+
+```text
+CFO / LNST
+FCF / LNST
+CFO Margin
+Accrual Ratio
+```
+
+Gợi ý:
+
+```text
+Cash Conversion Score =
+positive score for CFO/LNST, FCF/LNST, CFO Margin
+negative score for high Accrual Ratio
+```
+
+#### 3.6.4. Working Capital Stress Score
+
+Input:
+
+```text
+Receivables Growth - Revenue Growth
+Inventory Growth - Revenue Growth
+Receivables / Revenue
+Inventory / Revenue
+```
+
+Gợi ý:
+
+```text
+Working Capital Stress Score =
+higher score means higher stress
+```
+
+#### 3.6.5. Balance Sheet Resilience Score
+
+Input:
+
+```text
+Debt / Equity
+Net Debt / EBITDA
+Interest Coverage
+Cash / Short-term Debt
+Current Ratio
+Quick Ratio
+```
+
+Gợi ý:
+
+```text
+Balance Sheet Resilience Score =
+positive score for liquidity and coverage
+negative score for leverage
+```
+
+---
+
+### 3.7. Correlation & Matrix Layer
+
+#### 3.7.1. Vị trí trong architecture
+
+```text
+Raw Data
+→ Normalized Metrics
+→ Core Scores
+→ Correlation & Matrix Layer
+→ Diagnostic Flags
+→ Corporate Health Composite
+→ UI Dashboard
+```
+
+Correlation layer không phải output cuối cùng. Nó là lớp chẩn đoán.
+
+---
+
+#### 3.7.2. Core Consistency Matrix
+
+Input:
+
+```text
+Growth Score
+Profitability Score
+Cash Conversion Score
+Working Capital Stress Score
+Balance Sheet Resilience Score
+Capital Allocation Score
+```
+
+Tính rolling correlation giữa các core scores.
+
+Khuyến nghị rolling window:
+
+```text
+8 quarters
+12 quarters
+16 quarters
+```
+
+Default:
+
+```text
+12 quarters
+```
+
+Các cặp ưu tiên:
+
+```text
+Growth ↔ Profitability
+Profitability ↔ Cash Conversion
+Growth ↔ Working Capital Stress
+Cash Conversion ↔ Balance Sheet Resilience
+Growth ↔ Capital Allocation
+Profitability ↔ Balance Sheet Resilience
+```
+
+---
+
+#### 3.7.3. Transmission Matrix
+
+Transmission matrix không chỉ dùng correlation, mà kết hợp:
+
+```text
+Correlation
+Divergence Spread
+Confirmation Rule
+```
+
+Các link:
+
+```text
+Revenue → Gross Profit
+Gross Profit → EBIT
+EBIT → LNST
+LNST → CFO
+CFO → FCF
+FCF → Equity / Balance Sheet
+```
+
+Ví dụ rules:
+
+```text
+Revenue → Gross Profit is confirmed if:
+Revenue Growth > 0
+AND Gross Profit Growth > 0
+AND Gross Margin stable or improving
+
+LNST → CFO is confirmed if:
+LNST Growth > 0
+AND CFO > 0
+AND CFO / LNST > threshold
+
+CFO → FCF is confirmed if:
+CFO > 0
+AND FCF not severely negative
+AND CAPEX / CFO not excessive
+
+CFO ↔ Debt stress if:
+CFO weak or negative
+AND Debt Growth high
+```
+
+---
+
+#### 3.7.4. Sector Diffusion Matrix
+
+Matrix dạng:
+
+```text
+Sector x Core
+```
+
+Mỗi sector có các score:
+
+```text
+Sector Growth Score
+Sector Profitability Score
+Sector Cash Conversion Score
+Sector Working Capital Stress
+Sector Leverage Stress
+Sector Health Score
+```
+
+Cách tính:
+
+```text
+Sector Core Score =
+equal-weighted average của company core scores trong sector
+```
+
+Hoặc:
+
+```text
+Median sector score
+```
+
+Khuyến nghị:
+
+```text
+Default dùng equal-weighted average.
+Song song hiển thị median để tránh outlier.
+```
+
+---
+
+### 3.8. Diagnostic Flags
+
+Hệ thống cần tạo các cờ chẩn đoán tự động.
+
+#### 3.8.1. Healthy Growth
+
+```text
+Revenue Growth > 0
+LNST Growth > 0
+CFO > 0
+CFO / LNST > threshold
+Working Capital Stress not high
+Leverage Stress not high
+```
+
+#### 3.8.2. Accounting Profit Risk
+
+```text
+LNST Growth > 0
+AND CFO Growth < 0
+OR CFO / LNST < threshold
+OR Accrual Ratio high
+```
+
+#### 3.8.3. Working Capital Absorption
+
+```text
+Revenue Growth > 0
+AND Receivables Growth - Revenue Growth > threshold
+OR Inventory Growth - Revenue Growth > threshold
+AND CFO Growth weak or negative
+```
+
+#### 3.8.4. Leverage-Funded Growth
+
+```text
+Revenue Growth > 0
+AND Debt Growth > Revenue Growth
+AND CFO weak
+OR Interest Expense Growth > EBIT Growth
+```
+
+#### 3.8.5. Margin Compression
+
+```text
+Revenue Growth > 0
+AND Gross Margin declining
+OR EBIT Margin declining
+```
+
+#### 3.8.6. Sector Concentration Risk
+
+```text
+VN100 aggregate profit growth positive
+BUT Healthy Growth Breadth low
+OR top sectors contribute excessive share of growth
+```
+
+---
+
+### 3.9. Corporate Health Composite
+
+Composite score cuối cùng không nên chỉ là trung bình của các metric.
+
+Nên kết hợp:
+
+```text
+1. Core Health Scores
+2. Matrix Consistency
+3. Breadth
+4. Sector Diffusion
+5. Stress Penalty
+```
+
+Gợi ý công thức:
+
+```text
+Corporate Health Score =
+0.25 * Growth Score
++ 0.20 * Profitability Score
++ 0.20 * Cash Conversion Score
++ 0.15 * Balance Sheet Resilience Score
++ 0.10 * Capital Allocation Score
++ 0.10 * Breadth / Diffusion Score
+- 0.15 * Working Capital Stress Penalty
+- 0.15 * Leverage Stress Penalty
++ 0.10 * Matrix Consistency Bonus
+```
+
+Lưu ý:
+
+```text
+Trọng số ban đầu có thể equal-weight hoặc expert-weight.
+Sau đó backtest với chu kỳ lợi nhuận VN100, VNINDEX, PMI, tín dụng, lãi suất và chu kỳ margin market.
+```
+
+---
+
+### 3.10. Breadth & Diffusion Methodology
+
+#### Revenue Breadth
+
+```text
+Revenue Breadth =
+Number of companies with Revenue YoY > 0
+/ Number of valid companies
+```
+
+#### Profit Breadth
+
+```text
+Profit Breadth =
+Number of companies with LNST YoY > 0
+/ Number of valid companies
+```
+
+#### CFO Breadth
+
+```text
+CFO Breadth =
+Number of companies with CFO YoY > 0
+/ Number of valid companies
+```
+
+#### Healthy Growth Breadth
+
+```text
+Healthy Growth Breadth =
+Number of companies satisfying Healthy Growth rule
+/ Number of valid companies
+```
+
+#### Sector Diffusion Score
+
+```text
+Sector Diffusion Score =
+Number of sectors with positive sector health trend
+/ Number of valid sectors
+```
+
+---
+
+### 3.11. Aggregation Rules
+
+Có hai loại aggregation cần giữ riêng:
+
+```text
+1. Equal-weighted aggregation
+2. Market-cap weighted aggregation
+```
+
+Khuyến nghị mặc định:
+
+```text
+Dùng equal-weighted để đo sức khỏe nền kinh tế niêm yết.
+Dùng market-cap weighted như một view phụ để đo tác động lên chỉ số.
+```
+
+Lý do:
+
+```text
+Market-cap weighted dễ bị banks và vài mã lớn chi phối.
+Equal-weighted phản ánh độ lan rộng tốt hơn.
+```
+
+---
+
+### 3.12. Output Data Schema
+
+#### Company-level output
+
+```json
+{
+  "ticker": "XYZ",
+  "period": "2025Q4",
+  "sector": "Retail",
+  "growth_score": 72,
+  "profitability_score": 65,
+  "cash_conversion_score": 48,
+  "working_capital_stress_score": 61,
+  "balance_sheet_resilience_score": 55,
+  "capital_allocation_score": 50,
+  "matrix_consistency_score": 44,
+  "corporate_health_score": 57,
+  "diagnostic_flags": [
+    "Accounting Profit Risk",
+    "Working Capital Absorption"
+  ]
+}
+```
+
+#### Sector-level output
+
+```json
+{
+  "sector": "Retail",
+  "period": "2025Q4",
+  "sector_health_score": 64,
+  "sector_growth_score": 71,
+  "sector_profitability_score": 66,
+  "sector_cash_conversion_score": 58,
+  "sector_working_capital_stress": 42,
+  "sector_leverage_stress": 39,
+  "sector_diffusion_label": "Broad Improvement"
+}
+```
+
+#### VN100-level output
+
+```json
+{
+  "period": "2025Q4",
+  "vn100_health_score": 59,
+  "regime": "Mixed Recovery",
+  "revenue_breadth": 0.68,
+  "profit_breadth": 0.54,
+  "cfo_breadth": 0.41,
+  "healthy_growth_breadth": 0.32,
+  "sector_diffusion_score": 0.50,
+  "main_diagnosis": [
+    "Revenue recovery is broader than cashflow recovery",
+    "Earnings quality remains weak",
+    "Recovery is concentrated in banks and selected consumer sectors"
+  ]
+}
+```
+
+---
+
+### 3.13. Suggested Technical Architecture
+
+```text
+project_root/
+│
+├── BCTC_json/
+│   ├── raw financial statement files
+│
+├── data/
+│   ├── tickers_100.csv
+│   ├── sector_mapping.csv
+│   ├── financial_item_mapping.yaml
+│
+├── src/
+│   ├── loader.py
+│   ├── normalizer.py
+│   ├── metrics.py
+│   ├── scoring.py
+│   ├── correlation_matrix.py
+│   ├── transmission_matrix.py
+│   ├── sector_diffusion.py
+│   ├── diagnostics.py
+│   ├── composite.py
+│   └── app.py
+│
+├── outputs/
+│   ├── company_scores.parquet
+│   ├── sector_scores.parquet
+│   ├── vn100_scores.parquet
+│   └── diagnostic_flags.json
+│
+└── spec.md
+```
+
+---
+
+### 3.14. Implementation Priorities
+
+#### Phase 1 — MVP
+
+```text
+1. Load VN100 financial data.
+2. Normalize Revenue, LNST, CFO, Debt, Inventory, Receivables.
+3. Calculate YoY growth and TTM growth.
+4. Build core scores:
+   - Growth
+   - Cash Conversion
+   - Working Capital Stress
+   - Balance Sheet
+5. Build simple VN100 aggregate dashboard.
+```
+
+#### Phase 2 — Matrix Layer
+
+```text
+1. Add Core Consistency Matrix.
+2. Add Transmission Matrix.
+3. Add Diagnostic Flags.
+4. Add Company Drilldown.
+```
+
+#### Phase 3 — Sector & Breadth
+
+```text
+1. Add sector mapping.
+2. Add Sector Diffusion Matrix.
+3. Add Breadth indicators.
+4. Add sector heatmap.
+```
+
+#### Phase 4 — Advanced Quant
+
+```text
+1. Rolling correlation.
+2. PCA / factor decomposition.
+3. Regime classification.
+4. Backtest against VNINDEX, VN100, PMI, credit growth, rates.
+5. Add alert system.
+```
+
+---
+
+## 4. Final Concept Summary
+
+`VN100 Corporate Health Monitor` không phải là dashboard báo cáo tài chính thông thường.
+
+Nó là một hệ thống kiểm định sức khỏe doanh nghiệp theo ba tầng:
+
+```text
+1. Individual Metrics
+   Đo từng chỉ tiêu tài chính.
+
+2. Internal Coherence
+   Dùng correlation và matrix để kiểm tra các lõi có xác nhận nhau không.
+
+3. Macro Diffusion
+   Kiểm tra sức khỏe đó có lan rộng trong VN100 và các sector hay không.
+```
+
+Nguyên tắc thiết kế quan trọng nhất:
+
+```text
+Growth alone is not health.
+Profit alone is not health.
+Cashflow alone is not health.
+
+True corporate health requires synchronized growth,
+profitability, cash conversion, working-capital discipline,
+and balance-sheet resilience.
+```
+
+Dịch ra:
+
+```text
+Tăng trưởng riêng lẻ không phải là sức khỏe.
+Lợi nhuận riêng lẻ không phải là sức khỏe.
+Dòng tiền riêng lẻ cũng chưa đủ.
+
+Sức khỏe doanh nghiệp thực sự phải là sự đồng pha giữa tăng trưởng,
+lợi nhuận, chuyển hóa dòng tiền, kỷ luật vốn lưu động
+và sức chịu đựng của bảng cân đối.
+```

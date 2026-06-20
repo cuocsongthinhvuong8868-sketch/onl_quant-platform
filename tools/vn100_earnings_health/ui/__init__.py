@@ -1,1 +1,1 @@
-"""UI helpers for VN100 Earnings Health Monitor."""
+"""UI helpers for VN100 Corporate Health Monitor."""

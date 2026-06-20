@@ -1,338 +1,244 @@
-from __future__ import annotations
-
-import os
+import json
+import re
+from dataclasses import dataclass
 from pathlib import Path
-from typing import Any
+from typing import Iterable
 
+import numpy as np
 import pandas as pd
 
-from config import DATA_LAKE, ROOT_DIR
+from .config import CANONICAL_MAPPINGS, FINANCIAL_SECTORS, RAW_JSON_DIR
 
 
-LOCAL_OUTPUT_DIR = Path("/Users/macos/Desktop/vn100_earning-health_monitor/outputs")
-FALLBACK_OUTPUT_DIR = DATA_LAKE / "vn100_earnings_health" / "outputs"
-
-TABLES = {
-    "vn100": "vn100_composite",
-    "sectors": "sector_scores",
-    "tickers": "ticker_metrics",
-    "csad": "csad_breadth",
-    "pca": "pca_validation",
-    "parse_log": "parse_log",
-    "failed_parse_log": "failed_parse_log",
-}
+@dataclass(frozen=True)
+class LoadedData:
+    metadata: pd.DataFrame
+    statement_long: pd.DataFrame
+    canonical: pd.DataFrame
 
 
-def _has_outputs(path: Path) -> bool:
-    return (path / "vn100_composite.csv").exists() or (path / "vn100_composite.parquet").exists()
+def normalize_key(value: str) -> str:
+    text = (value or "").split("\n")[0].strip().lower()
+    text = re.sub(r"\s*\(before\s+\d{4}\)\s*", " ", text)
+    text = text.replace("’", "'").replace("“", '"').replace("”", '"')
+    text = re.sub(r"[^a-z0-9]+", " ", text)
+    return re.sub(r"\s+", " ", text).strip()
 
 
-def resolve_output_dir() -> Path:
-    """Resolve VN100 output folder.
-
-    Priority:
-    1. VN100_EARNINGS_HEALTH_OUTPUT_DIR env var
-    2. Local standalone VN100 project on this Mac
-    3. Frozen fallback copied into platform data_lake
-    """
-    env_dir = os.getenv("VN100_EARNINGS_HEALTH_OUTPUT_DIR", "").strip()
-    candidates = [Path(env_dir)] if env_dir else []
-    candidates.extend([LOCAL_OUTPUT_DIR, FALLBACK_OUTPUT_DIR])
-    for candidate in candidates:
-        if candidate and _has_outputs(candidate):
-            return candidate
-    return FALLBACK_OUTPUT_DIR
+def clean_label(value: str) -> str:
+    return (value or "").split("\n")[0].strip()
 
 
-def _read_csv(path: Path) -> pd.DataFrame:
-    df = pd.read_csv(path)
-    if "period_end_date" in df.columns:
-        df["period_end_date"] = pd.to_datetime(df["period_end_date"], errors="coerce")
-    return df
+def parse_period(value: str) -> tuple[str | None, int | None, int | None, int | None]:
+    match = re.search(r"Q([1-4])\s*(20\d{2})", str(value or ""), flags=re.I)
+    if not match:
+        return None, None, None, None
+    quarter = int(match.group(1))
+    year = int(match.group(2))
+    return f"{year}Q{quarter}", year, quarter, year * 4 + quarter
 
 
-def read_table(name: str, output_dir: Path | None = None) -> pd.DataFrame:
-    output_dir = output_dir or resolve_output_dir()
-    csv_path = output_dir / f"{name}.csv"
-    parquet_path = output_dir / f"{name}.parquet"
-    if csv_path.exists():
-        return _read_csv(csv_path)
-    if parquet_path.exists():
-        return pd.read_parquet(parquet_path)
-    return pd.DataFrame()
-
-
-def load_outputs(output_dir: Path | None = None) -> dict[str, pd.DataFrame | Path]:
-    output_dir = output_dir or resolve_output_dir()
-    outputs: dict[str, pd.DataFrame | Path] = {"output_dir": output_dir}
-    for key, file_stem in TABLES.items():
-        outputs[key] = read_table(file_stem, output_dir)
-    return outputs
-
-
-def load_universe_tickers(output_dir: Path | None = None, outputs: dict[str, Any] | None = None) -> list[str]:
-    output_dir = output_dir or resolve_output_dir()
-    candidates = [
-        output_dir.parent / "config" / "vn100_universe.csv",
-        LOCAL_OUTPUT_DIR.parent / "config" / "vn100_universe.csv",
-        DATA_LAKE / "vn100_earnings_health" / "vn100_universe.csv",
-        ROOT_DIR / "vn100_universe.csv",
-    ]
-    for path in candidates:
-        if path.exists():
-            universe = pd.read_csv(path)
-            if "ticker" in universe.columns:
-                return sorted(universe["ticker"].dropna().astype(str).str.upper().unique().tolist())
-
-    if outputs:
-        tickers = outputs.get("tickers")
-        if isinstance(tickers, pd.DataFrame) and "ticker" in tickers.columns:
-            return sorted(tickers["ticker"].dropna().astype(str).str.upper().unique().tolist())
-    return []
-
-
-def latest_valid(df: pd.DataFrame, score_col: str) -> pd.Series | None:
-    if df.empty or score_col not in df.columns:
-        return None
-    valid = df.dropna(subset=[score_col])
-    if valid.empty:
-        return None
-    return valid.iloc[-1]
-
-
-def latest_period_rows(df: pd.DataFrame, period: str) -> pd.DataFrame:
-    if df.empty or "period" not in df.columns:
-        return pd.DataFrame()
-    return df[df["period"].astype(str) == str(period)].copy()
-
-
-def fmt_num(value: Any, digits: int = 3, signed: bool = False) -> str:
-    if value is None or pd.isna(value):
-        return "N/A"
+def parse_number(value) -> float:
+    if value is None:
+        return np.nan
+    if isinstance(value, (int, float)):
+        return float(value)
+    text = str(value).strip()
+    if not text or text in {"-", "--", "N/A", "nan", "None"}:
+        return np.nan
+    negative = text.startswith("(") and text.endswith(")")
+    text = text.strip("()")
+    text = text.replace(",", "").replace("%", "").replace("\u00a0", "")
+    text = re.sub(r"[^0-9.\-]", "", text)
+    if text in {"", "-", "."}:
+        return np.nan
     try:
-        number = float(value)
-    except (TypeError, ValueError):
-        return str(value)
-    sign = "+" if signed else ""
-    return f"{number:{sign}.{digits}f}"
+        number = float(text)
+    except ValueError:
+        return np.nan
+    return -number if negative else number
 
 
-def fmt_pct(value: Any, digits: int = 1) -> str:
-    if value is None or pd.isna(value):
-        return "N/A"
+def classify_segment(sector: str) -> str:
+    if sector == "Banks":
+        return "Banks"
+    if sector == "Financial Services":
+        return "Securities"
+    if sector == "Insurance":
+        return "Insurance"
+    if sector == "Real Estate":
+        return "Real Estate"
+    if sector in FINANCIAL_SECTORS:
+        return "Financials"
+    return "Non-financial"
+
+
+def extract_metadata(payload: dict) -> dict:
+    ticker = payload.get("ticker")
+    sector = "Unknown"
+    sub_sector_id = None
+    company_name = None
+    market_cap = np.nan
+    shares_outstanding = np.nan
+    exchange = None
+    matched_profile = {}
+
+    raw_recent = (
+        payload.get("loginStatus", {})
+        .get("lsData", {})
+        .get("recent-companies", "[]")
+    )
     try:
-        return f"{float(value) * 100:.{digits}f}%"
-    except (TypeError, ValueError):
-        return str(value)
+        recent_companies = json.loads(raw_recent)
+    except Exception:
+        recent_companies = []
 
+    for company in recent_companies:
+        if company.get("symbol") == ticker:
+            matched_profile = company
+            break
 
-def _format_cell(value: Any) -> str:
-    if value is None or pd.isna(value):
-        return "N/A"
-    if isinstance(value, pd.Timestamp):
-        return value.strftime("%Y-%m-%d")
-    if isinstance(value, float):
-        return f"{value:+.3f}" if value < 0 else f"{value:.3f}"
-    return str(value)
+    if matched_profile:
+        sector = (matched_profile.get("sector") or {}).get("name") or sector
+        sub_sector_id = matched_profile.get("sub_sector_id")
+        company_name = matched_profile.get("name") or matched_profile.get("short_name")
+        market_cap = parse_number(matched_profile.get("market_cap"))
+        shares_outstanding = parse_number(matched_profile.get("shares_outstanding"))
+        exchange = matched_profile.get("exchange_id")
 
-
-def frame_to_markdown(df: pd.DataFrame, max_rows: int | None = None) -> str:
-    if df.empty:
-        return "N/A"
-    if max_rows is not None:
-        df = df.head(max_rows)
-
-    columns = list(df.columns)
-    rows = [
-        "| " + " | ".join(str(col) for col in columns) + " |",
-        "| " + " | ".join("---" for _ in columns) + " |",
-    ]
-    for _, row in df.iterrows():
-        values = [_format_cell(row[col]).replace("|", "/") for col in columns]
-        rows.append("| " + " | ".join(values) + " |")
-    return "\n" + "\n".join(rows)
-
-
-def four_quarter_change(df: pd.DataFrame, column: str) -> str:
-    if df.empty or column not in df.columns:
-        return "N/A"
-    valid = df.dropna(subset=[column])
-    if len(valid) < 5:
-        return "N/A"
-    return fmt_num(float(valid.iloc[-1][column]) - float(valid.iloc[-5][column]), signed=True)
-
-
-def _parsed_tickers(parse_log: pd.DataFrame) -> set[str]:
-    if parse_log.empty or "ticker_detected" not in parse_log.columns:
-        return set()
-    if "parse_status" in parse_log.columns:
-        parse_log = parse_log[parse_log["parse_status"].astype(str).str.lower() == "ok"]
-    return set(parse_log["ticker_detected"].dropna().astype(str).str.upper())
-
-
-def _failed_tickers(failed_parse_log: pd.DataFrame, parse_log: pd.DataFrame) -> list[str]:
-    failed: set[str] = set()
-    if not failed_parse_log.empty and "ticker" in failed_parse_log.columns:
-        failed.update(failed_parse_log["ticker"].dropna().astype(str).str.upper())
-    if not parse_log.empty and {"ticker_detected", "parse_status"}.issubset(parse_log.columns):
-        bad = parse_log[parse_log["parse_status"].astype(str).str.lower().isin(["error", "failed"])]
-        failed.update(bad["ticker_detected"].dropna().astype(str).str.upper())
-    return sorted(failed)
-
-
-def _period_end_display(value: Any) -> str:
-    if isinstance(value, pd.Timestamp):
-        return value.strftime("%Y-%m-%d")
-    if value is None or pd.isna(value):
-        return "N/A"
-    return str(value)
-
-
-def prepare_ai_payload(outputs: dict[str, Any]) -> dict[str, str]:
-    vn100: pd.DataFrame = outputs.get("vn100", pd.DataFrame())
-    sectors: pd.DataFrame = outputs.get("sectors", pd.DataFrame())
-    tickers: pd.DataFrame = outputs.get("tickers", pd.DataFrame())
-    csad: pd.DataFrame = outputs.get("csad", pd.DataFrame())
-    pca: pd.DataFrame = outputs.get("pca", pd.DataFrame())
-    parse_log: pd.DataFrame = outputs.get("parse_log", pd.DataFrame())
-    failed_parse_log: pd.DataFrame = outputs.get("failed_parse_log", pd.DataFrame())
-    output_dir: Path = outputs.get("output_dir", resolve_output_dir())
-
-    latest = latest_valid(vn100, "vn100_score")
-    if latest is None:
-        raise ValueError("Không có dòng VN100 score hợp lệ để build AI payload.")
-
-    period = str(latest["period"])
-    latest_csad = latest_period_rows(csad, period)
-    latest_csad_row = latest_csad.iloc[-1] if not latest_csad.empty else pd.Series(dtype=object)
-    latest_sectors = latest_period_rows(sectors, period)
-    latest_tickers = latest_period_rows(tickers, period)
-
-    universe = load_universe_tickers(output_dir, outputs)
-    parsed = _parsed_tickers(parse_log)
-    if not parsed and not tickers.empty and "ticker" in tickers.columns:
-        parsed = set(tickers["ticker"].dropna().astype(str).str.upper())
-    scored_latest = set()
-    valid_score_latest = set()
-    if not latest_tickers.empty and "ticker" in latest_tickers.columns:
-        scored_latest = set(latest_tickers["ticker"].dropna().astype(str).str.upper())
-        if "ticker_health_score" in latest_tickers.columns:
-            valid_rows = latest_tickers.dropna(subset=["ticker_health_score"])
-            valid_score_latest = set(valid_rows["ticker"].dropna().astype(str).str.upper())
-        else:
-            valid_score_latest = scored_latest
-    missing_score = sorted(set(universe) - valid_score_latest) if universe else sorted(scored_latest - valid_score_latest)
-    failed = _failed_tickers(failed_parse_log, parse_log)
-
-    latest_pca = pd.Series(dtype=object)
-    if not pca.empty:
-        pca_for_period = latest_period_rows(pca, period)
-        latest_pca = pca_for_period.iloc[-1] if not pca_for_period.empty else pca.iloc[-1]
-
-    vn100_5q = vn100.dropna(subset=["vn100_score"]).tail(5).copy()
-    component_cols = [
-        "period",
-        "momentum_score",
-        "breadth_score",
-        "stability_score",
-        "profitability_score",
-        "csad_quality_score",
-    ]
-    component_5q = vn100_5q[[c for c in component_cols if c in vn100_5q.columns]].copy()
-    vn100_trend_cols = ["period", "vn100_score", "regime", "broadness_label", "coverage_ratio"]
-    vn100_trend = vn100_5q[[c for c in vn100_trend_cols if c in vn100_5q.columns]].copy()
-
-    csad_5q = csad[csad["period"].astype(str).isin(vn100_5q["period"].astype(str))].copy() if not csad.empty else pd.DataFrame()
-    csad_cols = [
-        "period",
-        "breadth_raw",
-        "breadth_score",
-        "csad_raw",
-        "csad_quality_raw_score",
-        "csad_quality_ema_score",
-        "csad_quality_score",
-        "positive_ticker_count",
-        "negative_ticker_count",
-    ]
-    csad_5q = csad_5q[[c for c in csad_cols if c in csad_5q.columns]].tail(5)
-
-    top_sector = pd.DataFrame()
-    bottom_sector = pd.DataFrame()
-    sector_breadth = pd.DataFrame()
-    if not latest_sectors.empty:
-        sector_cols = [
-            "sector",
-            "sector_composite_score",
-            "sector_momentum_score",
-            "sector_breadth_score",
-            "sector_stability_score",
-            "sector_profitability_score",
-            "sector_csad_quality_score",
-            "valid_ticker_count",
-            "coverage_ratio",
-        ]
-        current = latest_sectors[[c for c in sector_cols if c in latest_sectors.columns]].copy()
-        current = current.sort_values("sector_composite_score", ascending=False)
-        top_sector = current.head(5)
-        bottom_sector = current.tail(5).sort_values("sector_composite_score")
-        sector_breadth = current[["sector", "sector_breadth_score", "valid_ticker_count", "coverage_ratio"]]
-
-    loadings = "N/A"
-    if not latest_pca.empty:
-        loading_parts = []
-        for i in range(1, 4):
-            sector_name = latest_pca.get(f"dominant_sector_{i}", "N/A")
-            loading = latest_pca.get(f"dominant_sector_{i}_loading", None)
-            loading_parts.append(f"{sector_name} ({fmt_num(loading, signed=True)})")
-        loadings = ", ".join(loading_parts)
-
-    payload = {
-        "period": period,
-        "period_end_date": _period_end_display(latest.get("period_end_date")),
-        "parsed_ticker_count": str(len(parsed)),
-        "universe_ticker_count": str(len(universe) or len(parsed)),
-        "valid_ticker_count": str(int(latest.get("valid_ticker_count", len(latest_tickers)))),
-        "coverage_ratio": fmt_num(latest.get("coverage_ratio"), digits=3),
-        "failed_parse_tickers": ", ".join(failed) if failed else "None",
-        "missing_score_tickers": ", ".join(missing_score) if missing_score else "None",
-        "vn100_score": fmt_num(latest.get("vn100_score"), digits=6),
-        "regime": str(latest.get("regime", "N/A")),
-        "broadness_label": str(latest.get("broadness_label", "N/A")),
-        "momentum_score": fmt_num(latest.get("momentum_score"), signed=True),
-        "breadth_score": fmt_num(latest.get("breadth_score"), signed=True),
-        "stability_score": fmt_num(latest.get("stability_score"), signed=True),
-        "profitability_score": fmt_num(latest.get("profitability_score"), signed=True),
-        "csad_quality_score": fmt_num(latest.get("csad_quality_score"), signed=True),
-        "breadth_raw": fmt_num(latest_csad_row.get("breadth_raw"), digits=3),
-        "positive_ticker_count": str(int(latest_csad_row.get("positive_ticker_count", 0))) if not latest_csad_row.empty else "N/A",
-        "negative_ticker_count": str(int(latest_csad_row.get("negative_ticker_count", 0))) if not latest_csad_row.empty else "N/A",
-        "csad_raw": fmt_num(latest_csad_row.get("csad_raw"), digits=6),
-        "csad_quality_raw_score": fmt_num(latest_csad_row.get("csad_quality_raw_score"), signed=True),
-        "csad_quality_ema_score": fmt_num(latest_csad_row.get("csad_quality_ema_score"), signed=True),
-        "vn100_5q_trend_table": frame_to_markdown(vn100_trend),
-        "component_5q_trend_table": frame_to_markdown(component_5q),
-        "breadth_csad_5q_trend_table": frame_to_markdown(csad_5q),
-        "vn100_score_4q_change": four_quarter_change(vn100, "vn100_score"),
-        "momentum_4q_change": four_quarter_change(vn100, "momentum_score"),
-        "breadth_4q_change": four_quarter_change(vn100, "breadth_score"),
-        "stability_4q_change": four_quarter_change(vn100, "stability_score"),
-        "profitability_4q_change": four_quarter_change(vn100, "profitability_score"),
-        "csad_quality_4q_change": four_quarter_change(vn100, "csad_quality_score"),
-        "top_sector_table": frame_to_markdown(top_sector),
-        "bottom_sector_table": frame_to_markdown(bottom_sector),
-        "sector_breadth_table": frame_to_markdown(sector_breadth),
-        "pca_factor_score": fmt_num(latest_pca.get("pca_factor_score") if not latest_pca.empty else None, signed=True),
-        "pc1_explained_variance": fmt_pct(latest_pca.get("pc1_explained_variance") if not latest_pca.empty else None),
-        "corr_ew_composite_pc1": fmt_num(latest_pca.get("corr_ew_composite_pc1") if not latest_pca.empty else None),
-        "common_factor_label": str(latest_pca.get("common_factor_label", "N/A")) if not latest_pca.empty else "N/A",
-        "one_factor_shock_flag": str(latest_pca.get("one_factor_shock_flag", "N/A")) if not latest_pca.empty else "N/A",
-        "dominant_sector_loadings": loadings,
+    return {
+        "ticker": ticker,
+        "company_name": company_name or ticker,
+        "sector": sector,
+        "segment": classify_segment(sector),
+        "sub_sector_id": sub_sector_id,
+        "market_cap": market_cap,
+        "shares_outstanding": shares_outstanding,
+        "exchange": exchange,
+        "source_url": payload.get("url"),
+        "source_timestamp": payload.get("timestamp"),
     }
-    return payload
 
 
-def fill_prompt_template(template: str, payload: dict[str, str]) -> str:
-    prompt = template
-    for key, value in payload.items():
-        prompt = prompt.replace(f"[{key}]", str(value))
-    return prompt
+def iter_json_files(raw_dir: Path = RAW_JSON_DIR) -> Iterable[Path]:
+    return sorted(raw_dir.glob("*_financial_report.json"))
+
+
+def load_statement_rows(path: Path) -> tuple[dict, list[dict]]:
+    payload = json.loads(path.read_text())
+    metadata = extract_metadata(payload)
+    rows: list[dict] = []
+
+    for statement, table in (payload.get("financialData") or {}).items():
+        table_rows = table.get("tableRows") or []
+        if not table_rows:
+            continue
+        header = table_rows[0]
+        periods = [parse_period(period) for period in header[1:]]
+
+        for raw_row in table_rows[1:]:
+            if not raw_row:
+                continue
+            label = clean_label(raw_row[0])
+            if not label:
+                continue
+            item_key = normalize_key(label)
+            for idx, raw_value in enumerate(raw_row[1:]):
+                if idx >= len(periods):
+                    break
+                period, year, quarter, period_order = periods[idx]
+                if period is None:
+                    continue
+                rows.append(
+                    {
+                        "ticker": metadata["ticker"],
+                        "statement": statement,
+                        "item_label": label,
+                        "item_key": item_key,
+                        "period": period,
+                        "year": year,
+                        "quarter": quarter,
+                        "period_order": period_order,
+                        "value": parse_number(raw_value),
+                    }
+                )
+    return metadata, rows
+
+
+def build_canonical_financials(
+    statement_long: pd.DataFrame, metadata: pd.DataFrame
+) -> pd.DataFrame:
+    base_cols = ["ticker", "period", "year", "quarter", "period_order"]
+    period_index = statement_long[base_cols].drop_duplicates()
+    canonical = period_index.sort_values(["ticker", "period_order"]).reset_index(drop=True)
+
+    for metric, candidates in CANONICAL_MAPPINGS.items():
+        pieces = []
+        for rank, (statement, label) in enumerate(candidates):
+            key = normalize_key(label)
+            match = statement_long[
+                (statement_long["statement"] == statement)
+                & (statement_long["item_key"] == key)
+            ][base_cols + ["value"]].copy()
+            if match.empty:
+                continue
+            match["source_rank"] = rank
+            pieces.append(match)
+
+        if not pieces:
+            canonical[metric] = np.nan
+            continue
+
+        matches = pd.concat(pieces, ignore_index=True)
+        matches = matches.sort_values(base_cols + ["source_rank"])
+        matches = matches.drop_duplicates(["ticker", "period"], keep="first")
+        canonical = canonical.merge(
+            matches[["ticker", "period", "value"]],
+            on=["ticker", "period"],
+            how="left",
+        ).rename(columns={"value": metric})
+
+    canonical = canonical.merge(
+        metadata[
+            [
+                "ticker",
+                "company_name",
+                "sector",
+                "segment",
+                "sub_sector_id",
+                "market_cap",
+                "shares_outstanding",
+                "exchange",
+            ]
+        ],
+        on="ticker",
+        how="left",
+    )
+    canonical["total_debt"] = canonical[["short_term_debt", "long_term_debt"]].sum(
+        axis=1, min_count=1
+    )
+    canonical["net_debt"] = canonical["total_debt"] - canonical["cash"]
+    return canonical.sort_values(["ticker", "period_order"]).reset_index(drop=True)
+
+
+def load_all(raw_dir: Path = RAW_JSON_DIR) -> LoadedData:
+    metadata_rows: list[dict] = []
+    statement_rows: list[dict] = []
+    files = list(iter_json_files(raw_dir))
+    if not files:
+        raise FileNotFoundError(f"No financial JSON files found in {raw_dir}")
+
+    for path in files:
+        metadata, rows = load_statement_rows(path)
+        metadata_rows.append(metadata)
+        statement_rows.extend(rows)
+
+    metadata_df = pd.DataFrame(metadata_rows).sort_values("ticker").reset_index(drop=True)
+    statement_long = pd.DataFrame(statement_rows)
+    statement_long = statement_long.merge(
+        metadata_df[["ticker", "sector", "segment"]],
+        on="ticker",
+        how="left",
+    )
+    canonical = build_canonical_financials(statement_long, metadata_df)
+    return LoadedData(metadata=metadata_df, statement_long=statement_long, canonical=canonical)

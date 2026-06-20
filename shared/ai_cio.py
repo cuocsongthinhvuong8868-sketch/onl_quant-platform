@@ -847,6 +847,10 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
         if path.exists():
             path.unlink()
             print(f"[Cache Clear] Deleted: {path.name}")
+    cache_dir = DATA_LAKE / "daily_cache"
+    for path in cache_dir.glob(f"vn100_earnings_health_{provider_key}_*.txt"):
+        path.unlink()
+        print(f"[Cache Clear] Deleted: {path.name}")
     sidecar_path = _get_humility_rules_path(provider_key)
     if sidecar_path.exists():
         sidecar_path.unlink()
@@ -1817,64 +1821,114 @@ def _get_latest_vn100_ai_report(provider_key: str = "kimi-2.6") -> tuple[str, st
 def _build_vn100_structured_snapshot() -> tuple[str, str]:
     """Build deterministic VN100 context so AI CIO can use the tool even without VN100 AI cache."""
     try:
-        from tools.vn100_earnings_health.quant.loader import load_outputs, prepare_ai_payload
+        from tools.vn100_earnings_health.quant.ai_analysis import prepare_ai_payload
+        from tools.vn100_earnings_health.quant.config import OUTPUT_DIR
+        from tools.vn100_earnings_health.quant.pipeline import run_and_write
 
-        payload = prepare_ai_payload(load_outputs())
+        if not (OUTPUT_DIR / "company_scores.parquet").exists():
+            run_and_write()
+        outputs = {
+            "company": pd.read_parquet(OUTPUT_DIR / "company_scores.parquet"),
+            "sector": pd.read_parquet(OUTPUT_DIR / "sector_scores.parquet"),
+            "vn100": pd.read_parquet(OUTPUT_DIR / "vn100_scores.parquet"),
+            "core_matrix": pd.read_parquet(OUTPUT_DIR / "core_consistency_matrix.parquet"),
+            "transmission": pd.read_parquet(OUTPUT_DIR / "transmission_matrix.parquet"),
+            "pca": pd.read_parquet(OUTPUT_DIR / "pca_factor.parquet"),
+            "pca_loadings": pd.read_parquet(OUTPUT_DIR / "pca_loadings.parquet"),
+            "alerts": pd.read_parquet(OUTPUT_DIR / "alerts.parquet"),
+            "metadata": pd.read_parquet(OUTPUT_DIR / "ticker_metadata.parquet"),
+        }
+        payload = prepare_ai_payload(outputs, mode="YoY")
     except Exception as e:
-        return "N/A", f"DATA INSUFFICIENT: Không build được VN100 Earnings Health snapshot ({e})"
+        return "N/A", f"DATA INSUFFICIENT: Không build được VN100 Corporate Health snapshot ({e})"
 
-    label = f"{payload.get('period', 'N/A')} / {payload.get('period_end_date', 'N/A')}"
+    universe_count = "N/A"
+    try:
+        universe_count = str(int(outputs["metadata"]["ticker"].nunique()))
+    except Exception:
+        pass
+
+    label = f"{payload.get('period', 'N/A')} / YoY"
     snapshot = f"""
-=== VN100 STRUCTURED SNAPSHOT ===
+=== VN100 CORPORATE HEALTH STRUCTURED SNAPSHOT ===
+- Mode: {payload.get('mode', 'YoY')}
 - Period: {payload.get('period', 'N/A')}
-- Period end date: {payload.get('period_end_date', 'N/A')}
-- Parsed tickers: {payload.get('parsed_ticker_count', 'N/A')} / {payload.get('universe_ticker_count', 'N/A')}
-- Valid ticker count: {payload.get('valid_ticker_count', 'N/A')}
-- Coverage ratio: {payload.get('coverage_ratio', 'N/A')}
-- Failed parse tickers: {payload.get('failed_parse_tickers', 'N/A')}
-- Missing score tickers: {payload.get('missing_score_tickers', 'N/A')}
-
-VN100 Composite:
-- VN100 Score: {payload.get('vn100_score', 'N/A')}
+- Valid company count: {payload.get('valid_company_count', 'N/A')} / {universe_count}
+- VN100 Health Score: {payload.get('vn100_health_score', 'N/A')}
+- Market-cap weighted Health Score: {payload.get('vn100_health_score_market_cap_weighted', 'N/A')}
+- Market-cap Health Gap: {payload.get('market_cap_health_gap', 'N/A')}
 - Regime: {payload.get('regime', 'N/A')}
-- Broadness: {payload.get('broadness_label', 'N/A')}
 
-Component Scores:
-- Momentum: {payload.get('momentum_score', 'N/A')}
-- Breadth: {payload.get('breadth_score', 'N/A')}
-- Stability 12Q: {payload.get('stability_score', 'N/A')}
-- Profitability: {payload.get('profitability_score', 'N/A')}
-- CSAD Quality blended: {payload.get('csad_quality_score', 'N/A')}
+Rule-based verdict anchor:
+- Verdict: {payload.get('final_verdict', 'N/A')}
+- Macro Read: {payload.get('final_macro_read', 'N/A')}
+- Confidence: {payload.get('final_confidence', 'N/A')}
+- Analytical Stance: {payload.get('final_stance', 'N/A')}
+- Accounting Recovery: {payload.get('accounting_recovery_read', 'N/A')}
+- Cash-confirmed Recovery: {payload.get('cash_confirmed_recovery_read', 'N/A')}
+- Sector Diffusion: {payload.get('sector_diffusion_read', 'N/A')}
+- Systemic Stress: {payload.get('systemic_stress_read', 'N/A')}
 
-5-quarter context:
-- VN100 5Q trend table: {payload.get('vn100_5q_trend_table', 'N/A')}
-- Component 5Q trend table: {payload.get('component_5q_trend_table', 'N/A')}
-- Breadth/CSAD 5Q trend table: {payload.get('breadth_csad_5q_trend_table', 'N/A')}
+Breadth and stress:
+- Revenue Breadth: {payload.get('revenue_breadth', 'N/A')}
+- Profit Breadth: {payload.get('profit_breadth', 'N/A')}
+- CFO Breadth: {payload.get('cfo_breadth', 'N/A')}
+- Healthy Growth Breadth: {payload.get('healthy_growth_breadth', 'N/A')}
+- Working Capital Stress Index: {payload.get('working_capital_stress_index', 'N/A')}
+- Leverage Stress Index: {payload.get('leverage_stress_index', 'N/A')}
+- Sector Diffusion Score: {payload.get('sector_diffusion_score', 'N/A')}
+- Positive Sector Count: {payload.get('positive_sector_count', 'N/A')} / {payload.get('valid_sector_count', 'N/A')}
 
-Trend summary:
-- VN100 Score 4Q change: {payload.get('vn100_score_4q_change', 'N/A')}
-- Momentum 4Q change: {payload.get('momentum_4q_change', 'N/A')}
-- Breadth 4Q change: {payload.get('breadth_4q_change', 'N/A')}
-- Stability 4Q change: {payload.get('stability_4q_change', 'N/A')}
-- Profitability 4Q change: {payload.get('profitability_4q_change', 'N/A')}
-- CSAD Quality 4Q change: {payload.get('csad_quality_4q_change', 'N/A')}
+Sector leadership and big-cap check:
+- Sector Leadership: {payload.get('sector_leadership_read', 'N/A')}
+- Big-cap Read: {payload.get('big_cap_read', 'N/A')}
+- Top-sector Market-cap Share: {payload.get('top_sector_market_cap_share', 'N/A')}
+- Positive-sector Market-cap Share: {payload.get('positive_sector_market_cap_share', 'N/A')}
 
-Sector Map:
-- Top sectors by composite: {payload.get('top_sector_table', 'N/A')}
-- Bottom sectors by composite: {payload.get('bottom_sector_table', 'N/A')}
+Evidence:
+{payload.get('final_evidence', 'N/A')}
 
-PCA Validation:
-- PCA factor score: {payload.get('pca_factor_score', 'N/A')}
-- PC1 explained variance: {payload.get('pc1_explained_variance', 'N/A')}
-- Corr EW vs PC1: {payload.get('corr_ew_composite_pc1', 'N/A')}
-- Common factor label: {payload.get('common_factor_label', 'N/A')}
-- One-sector shock flag: {payload.get('one_factor_shock_flag', 'N/A')}
-- Dominant sector loadings: {payload.get('dominant_sector_loadings', 'N/A')}
+Built-in diagnosis:
+{payload.get('main_diagnosis', 'N/A')}
+
+VN100 trend:
+{payload.get('vn100_trend_table', 'N/A')}
+
+Sector scores:
+{payload.get('sector_table', 'N/A')}
+
+Top companies:
+{payload.get('top_company_table', 'N/A')}
+
+Bottom companies:
+{payload.get('bottom_company_table', 'N/A')}
+
+Improving companies:
+{payload.get('improving_company_table', 'N/A')}
+
+Deteriorating companies:
+{payload.get('deteriorating_company_table', 'N/A')}
+
+Matrix diagnostics:
+{payload.get('matrix_diagnostics_table', 'N/A')}
+
+Transmission weak/broken links:
+{payload.get('transmission_breakdown_table', 'N/A')}
+
+Alerts:
+{payload.get('alerts_table', 'N/A')}
+
+PCA validation:
+- PCA common health factor: {payload.get('pca_common_health_factor', 'N/A')}
+- PCA explained variance: {payload.get('pca_explained_variance', 'N/A')}
+
+Watch next:
+{payload.get('watch_next', 'N/A')}
 """.strip()
     return label, snapshot
 
 
-def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+def _get_vn100_corporate_health_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
     """Combine current structured VN100 data with optional cached AI interpretation."""
     snapshot_label, snapshot = _build_vn100_structured_snapshot()
     ai_date, ai_report = _get_latest_vn100_ai_report(provider_key)
@@ -1893,6 +1947,11 @@ def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[
     return snapshot_label, context
 
 
+def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Backward-compatible alias for the VN100 Corporate Health context."""
+    return _get_vn100_corporate_health_context(provider_key)
+
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
@@ -1900,7 +1959,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     model = cfg["api_model"]
     temperature = cfg.get("temperature", 1.0)
     
-    # Nếu force=True → xoá toàn bộ cache của 10 tool con và executive_summary
+    # Nếu force=True → xoá cache AI text của các báo cáo con và executive_summary
     # để buộc gọi lại API từ đầu
     if force:
         _clear_all_tool_caches(provider_key)
@@ -1949,7 +2008,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     margin_m2_date, margin_m2_rep = _build_margin_m2_structured_snapshot()
     vnibor_date, vnibor_rep = _get_vnibor_context(provider_key)
     ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
-    vn100_label, vn100_rep = _get_vn100_earnings_health_context(provider_key)
+    vn100_label, vn100_rep = _get_vn100_corporate_health_context(provider_key)
 
     macro_section = (
         "=== BÁO CÁO PHÂN TÍCH VĨ MÔ GẦN NHẤT (MACRO LAYER) ===\n\n"
@@ -1961,8 +2020,8 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     )
 
     fundamental_section = (
-        "=== BÁO CÁO FUNDAMENTAL BOTTOM-UP - VN100 EARNINGS HEALTH ===\n\n"
-        f"=== VN100 EARNINGS HEALTH MONITOR (Kỳ dữ liệu: {vn100_label}) ===\n{vn100_rep}\n\n"
+        "=== BÁO CÁO FUNDAMENTAL BOTTOM-UP - VN100 CORPORATE HEALTH ===\n\n"
+        f"=== VN100 CORPORATE HEALTH MONITOR (Kỳ dữ liệu: {vn100_label}) ===\n{vn100_rep}\n\n"
     )
 
     all_reports = (

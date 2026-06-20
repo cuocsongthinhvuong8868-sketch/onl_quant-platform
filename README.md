@@ -28,7 +28,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 | 4 | **VNIBOR Monitor** | Lãi suất liên ngân hàng qua đêm và các kỳ hạn ngắn · Phân loại trạng thái thanh khoản |
 | 5 | **Bank Valuation** | Định giá bottom-up nhóm ngân hàng: Adjusted Book Value, Sustainable ROE, Residual Income, stress fair P/B và regime từ valuation breadth |
 | 6 | **Liquidity Transmission (LTMM)** | Theo dõi kênh truyền dẫn thanh khoản: Thượng nguồn → Lớp ma sát → Hạ nguồn |
-| 7 | **VN100 Earnings Health** | Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + PCA validation |
+| 7 | **VN100 Corporate Health** | Bottom-up VN100 financial statement monitor: growth quality, cash conversion, working-capital stress, leverage stress, sector diffusion và matrix diagnostics |
 
 ---
 
@@ -194,6 +194,7 @@ python command/update_vnibor.py
 python command/update_sector_data.py
 python command/update_risk_adjusted_growth_statistics.py
 python command/update_factor_examination.py
+python command/update_vn100_corporate_health.py
 ```
 
 ### 6. Chạy ứng dụng
@@ -322,7 +323,7 @@ Dự án bao gồm các tài liệu hướng dẫn chi tiết:
 | `docs/GFCM-handbook.md` | Global Financial Conditions Monitor |
 | `docs/factor_examination_handbook.md` | Portfolio Factor Examination methodology |
 | `docs/pairs_trading_handbook.md` | Pairs Trading Research Lab guide |
-| `docs/vn100_earnings_health_handbook.txt` | VN100 Earnings Health framework |
+| `docs/vn100_earnings_health_handbook.txt` | VN100 Corporate Health Monitor spec |
 | `docs/backtest_proposal.md` | Backtest strategy proposal |
 
 ---

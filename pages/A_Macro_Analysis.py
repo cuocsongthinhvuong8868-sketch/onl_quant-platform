@@ -57,8 +57,8 @@ TOOLS = [
     },
     {
         "id": "vn100_earnings_health",
-        "name": "🇻🇳 VN100 Earnings Health",
-        "desc": "Fundamental earnings monitor VN100: Momentum + Breadth + Stability 12Q + Profitability + CSAD blend + PCA validation",
+        "name": "🇻🇳 VN100 Corporate Health",
+        "desc": "Bottom-up VN100 financial statement monitor: growth quality, cash conversion, working-capital stress, leverage stress, sector diffusion và matrix diagnostics",
         "page_module": "tools.vn100_earnings_health.page",
         "render_func": "render",
     },

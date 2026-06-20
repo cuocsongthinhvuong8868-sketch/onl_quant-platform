@@ -1,1 +1,1 @@
-"""Quant helpers for VN100 Earnings Health Monitor."""
+"""Quant helpers for VN100 Corporate Health Monitor."""

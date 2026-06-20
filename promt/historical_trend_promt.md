@@ -13,7 +13,7 @@ Bạn là một Trợ lý phân tích cao cấp cho AI CIO của một Nhà đ�
 
 # INPUT DATA
 {historical_metrics_table}
-*Lưu ý về bảng trên: Bảng này ghi nhận chuỗi số liệu định lượng thực tế của toàn bộ 11 tools con định lượng và vĩ mô (bao gồm cả Risk-Adjusted Growth) từ T-6 đến ngày T hiện tại. Dùng bảng này làm cơ sở định lượng khách quan để xác định xu hướng và momentum chuyển dịch.*
+*Lưu ý về bảng trên: Bảng này ghi nhận chuỗi số liệu định lượng thực tế của 11 báo cáo hard-metrics/market/macro từ T-6 đến ngày T hiện tại. Dùng bảng này làm cơ sở định lượng khách quan để xác định xu hướng và momentum chuyển dịch. Riêng VN100 Corporate Health là dữ liệu fundamental theo quý, hãy đọc xu hướng của nó từ 7 báo cáo AI CIO thô bên dưới, không suy diễn rằng bảng hard-metrics thiếu VN100 là lỗi dữ liệu.*
 
 7 Báo cáo AI CIO gần nhất (từ T-1 lùi về T-7) dưới dạng văn bản thô để tham chiếu chi tiết lập luận logic:
 {historical_reports_raw}
@@ -34,9 +34,9 @@ Vui lòng trình bày báo cáo theo đúng cấu trúc dưới đây, không th
 - Tóm tắt xu hướng của thanh khoản vĩ mô: Fed Net Liquidity, VNIBOR, và kênh truyền dẫn LTMM trong tuần qua.
 - Trấn áp hay gia tăng căng thẳng? (Ví dụ: *VNIBOR có xu hướng thắt chặt liên tục với ON MA5 tăng từ 3.2% lên 4.5%, số phiên cảnh báo đạt 5/7 phiên; Fed Liquidity bơm ròng tự nhiên nhờ TGA giảm, nhưng nghẽn truyền dẫn khiến LTMM vẫn ghi nhận áp lực...*).
 
-#### 3. Nội tại Thị trường & Sức khỏe Lợi nhuận (Market Internal & Fundamental Shift)
+#### 3. Nội tại Thị trường & Sức khỏe Doanh nghiệp (Market Internal & Corporate Health Shift)
 - Xu hướng của độ rộng phục hồi (>MA20), Dispersion, và động lượng Upside Ratio.
-- Sức khỏe lợi nhuận bottom-up từ VN100 Earnings Health diễn tiến thế nào qua các phiên? (Cải thiện rộng hay chỉ tập trung ở vài nhóm ngành đầu kéo?).
+- Sức khỏe doanh nghiệp bottom-up từ VN100 Corporate Health diễn tiến thế nào qua các phiên? (Cải thiện rộng, được dòng tiền xác nhận, hay chỉ tập trung ở vài nhóm ngành đầu kéo?).
 - Xu hướng biến động của Economic Alpha từ Risk-Adjusted Growth trong tuần qua: ngân hàng nào liên tục dẫn đầu về tạo giá trị thặng dư (Alpha dương) và có thay đổi nào trong xếp hạng Fortress/Traps của nhóm ngân hàng không?
 
 #### 4. Tích tụ Rủi ro Đuôi (Tail Risk Accumulation)

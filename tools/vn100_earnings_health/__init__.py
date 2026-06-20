@@ -1,1 +1,1 @@
-"""VN100 Earnings Health Monitor tool."""
+"""VN100 Corporate Health Monitor tool."""
