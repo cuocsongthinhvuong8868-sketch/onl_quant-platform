@@ -17,9 +17,166 @@ from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
 AI_CIO_HISTORY_PROVIDER = "deepseek-v4-pro"
+AI_CIO_METRICS_VERSION = "1.0"
+AI_CIO_HISTORY_WINDOW = 30
+AI_CIO_METRICS_DIRNAME = "ai_cio_metrics"
 HUMILITY_RULES_PREFIX = "ai_cio_humility_rules"
 TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
+TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
+    "fed_liquidity": {
+        "domain": "global_liquidity",
+        "horizon": "4-12_weeks",
+        "primary_metric": "net_liquidity_impulse",
+        "score_direction": "Higher is safer / more supportive.",
+        "limits": "Liquidity quality matters; emergency balance-sheet expansion is not automatically bullish.",
+        "authority": "Use structured metrics and adapter/decision_state when present; do not relabel from prose alone.",
+    },
+    "global_financial_conditions": {
+        "domain": "external_credit_and_macro_stress",
+        "horizon": "4-12_weeks",
+        "primary_metric": "cqs_percentile",
+        "score_direction": "Higher CQS percentile is worse for risk assets.",
+        "limits": "Do not offset high credit stress with short-term news sentiment.",
+        "authority": "Adapter score/regime/bias are authoritative when available.",
+    },
+    "margin_m2_overlay": {
+        "domain": "speculative_leverage_overlay",
+        "horizon": "monthly_lagged",
+        "primary_metric": "margin_debt_to_m2_zscore",
+        "score_direction": "Higher leverage crowding is worse when other stress tools are weak.",
+        "limits": "Monthly overlay only; never a standalone regime switch.",
+        "authority": "Use as amplification/discount context, not as a hard score driver unless adapter exists.",
+    },
+    "vnibor": {
+        "domain": "domestic_funding_liquidity",
+        "horizon": "1-4_weeks",
+        "primary_metric": "overnight_rate_and_20_session_stress",
+        "score_direction": "Higher/stickier funding stress is worse.",
+        "limits": "Single-day easing does not neutralize a stressed 20-session trend.",
+        "authority": "Adapter score/regime/bias are authoritative when available.",
+    },
+    "ltmm": {
+        "domain": "liquidity_transmission",
+        "horizon": "1-8_weeks",
+        "primary_metric": "upstream_downstream_transmission_state",
+        "score_direction": "Cleaner transmission is safer.",
+        "limits": "Treat as transmission context, not a standalone crash signal.",
+        "authority": "Use structured state if present; otherwise cite as soft interpretation.",
+    },
+    "vn100_corporate_health": {
+        "domain": "bottom_up_fundamental_health",
+        "horizon": "quarterly",
+        "primary_metric": "vn100_health_score_and_breadth",
+        "score_direction": "Higher health score and breadth are safer.",
+        "limits": "Not a short-term timing tool; can diverge from price-based internals.",
+        "authority": "Use as confidence and internal-quality overlay, not as a direct market-timing override.",
+    },
+    "humility_falsification": {
+        "domain": "thesis_audit",
+        "horizon": "current_vs_prior_rules",
+        "primary_metric": "triggered_falsification_rules",
+        "score_direction": "Fewer active falsification triggers preserve thesis confidence.",
+        "limits": "Does not create a new thesis; it audits the previous one.",
+        "authority": "If WATCH/FALSIFIED, discuss explicitly in trend and confidence.",
+    },
+    "fear_greed": {
+        "domain": "sentiment_and_positioning",
+        "horizon": "days_to_weeks",
+        "primary_metric": "risk_score",
+        "score_direction": "Higher score is safer / more risk-on, unless extreme greed is flagged.",
+        "limits": "Sentiment is secondary to hard liquidity, breadth, and tail-risk constraints.",
+        "authority": "Use adapter score if available; otherwise treat as soft sentiment evidence.",
+    },
+    "manipulation": {
+        "domain": "index_coupling_and_concentration",
+        "horizon": "days_to_weeks",
+        "primary_metric": "vingroup_slope_percentile",
+        "score_direction": "Higher coupling/concentration stress is worse.",
+        "limits": "Mostly idiosyncratic/system-structure risk; do not overrule broad systemic tools alone.",
+        "authority": "Use as concentration risk overlay unless adapter provides a hard score.",
+    },
+    "dispersion": {
+        "domain": "market_structure_and_participation_quality",
+        "horizon": "days_to_weeks",
+        "primary_metric": "dispersion_pressure_index",
+        "score_direction": "Health depends on whether dispersion confirms or undermines index moves.",
+        "limits": "Low dispersion can mean idle/compressed risk, not automatically bullish.",
+        "authority": "Use as soft market-internal evidence unless adapter provides a hard score.",
+    },
+    "upside_ratio": {
+        "domain": "upside_participation",
+        "horizon": "days_to_weeks",
+        "primary_metric": "upside_participation_ratio",
+        "score_direction": "Higher sustained upside participation is safer.",
+        "limits": "Zombie rallies without breadth confirmation should not lift regime materially.",
+        "authority": "Use as internal participation evidence; do not overrule breadth/tail caps.",
+    },
+    "bank_valuation": {
+        "domain": "sector_valuation",
+        "horizon": "weeks_to_months",
+        "primary_metric": "valuation_gap_and_quality_flags",
+        "score_direction": "Undervalued plus quality confirmation is supportive.",
+        "limits": "Cheap banks are not buy signals when market regime forbids equity risk.",
+        "authority": "Use only with Risk-Adjusted Growth for stock selection.",
+    },
+    "market_breadth": {
+        "domain": "market_internal_participation",
+        "horizon": "days_to_weeks",
+        "primary_metric": "breadth_ma20_pct",
+        "score_direction": "Higher breadth is safer / healthier.",
+        "limits": "Weak breadth caps bullish interpretation even if news or valuation is supportive.",
+        "authority": "Adapter score/regime/bias are authoritative.",
+    },
+    "esr_monitor": {
+        "domain": "systemic_stress",
+        "horizon": "days_to_weeks",
+        "primary_metric": "ssi_pct",
+        "score_direction": "Higher SSI is worse.",
+        "limits": "Tail-risk override dominates allocation; do not soften with valuation alone.",
+        "authority": "Adapter score/regime/bias are authoritative.",
+    },
+    "va_res": {
+        "domain": "contagion_and_complacency",
+        "horizon": "days_to_weeks",
+        "primary_metric": "contagion_complacency_modules",
+        "score_direction": "Higher contagion/complacency stress is worse.",
+        "limits": "Use for tail-risk color and avoid list; not a standalone composite score.",
+        "authority": "Use as tail-risk evidence; adapter wins if present.",
+    },
+    "var_cvar_vnindex": {
+        "domain": "left_tail_risk",
+        "horizon": "days_to_weeks",
+        "primary_metric": "evt_xi",
+        "score_direction": "Higher EVT xi is worse.",
+        "limits": "A high xi is a hard tail-risk warning even if realized volatility is quiet.",
+        "authority": "Adapter score/regime/bias are authoritative.",
+    },
+    "sentiment_factor_news": {
+        "domain": "news_sentiment",
+        "horizon": "1-3_days",
+        "primary_metric": "news_sentiment_factor",
+        "score_direction": "More positive news is supportive only at short horizon.",
+        "limits": "Short-term noise; cannot veto macro, funding, breadth, or tail-risk stress.",
+        "authority": "Use as soft overlay unless hard adapter exists.",
+    },
+    "risk_adjusted_growth": {
+        "domain": "bank_growth_quality",
+        "horizon": "weeks_to_months",
+        "primary_metric": "economic_alpha",
+        "score_direction": "Higher economic alpha is better for stock selection.",
+        "limits": "Stock-picking tool only; cannot override low AI CIO allocation regime.",
+        "authority": "Use with Bank Valuation for bank picks; not a market-regime override.",
+    },
+    "pvgo": {
+        "domain": "valuation_expectation_risk",
+        "horizon": "medium_term",
+        "primary_metric": "pvgo_pct",
+        "score_direction": "Higher PVGO means more embedded growth expectation risk.",
+        "limits": "Not a crash timing signal; amplifies risk when breadth/liquidity/tail risk are weak.",
+        "authority": "Adapter score/regime/bias are authoritative; do not relabel from raw PVGO pct.",
+    },
+}
 HUMILITY_DEFAULT_RULES = [
     {
         "model": "VNIBOR Monitor",
@@ -325,6 +482,17 @@ def _read_ai_cio_context_for_summary(provider_key: str, target_date: date) -> st
         return f"STRUCTURED_CONTEXT_ERROR: {exc}"
 
     decision_state = payload.get("decision_state") or {}
+    metrics_snapshot = payload.get("metrics_snapshot") or {}
+    metrics_snapshot_path = payload.get("metrics_snapshot_path")
+    if not metrics_snapshot:
+        candidate_path = _get_ai_cio_metrics_snapshot_path(target_date)
+        if candidate_path.exists():
+            try:
+                metrics_snapshot = json.loads(candidate_path.read_text(encoding="utf-8"))
+                metrics_snapshot_path = str(candidate_path)
+            except Exception:
+                metrics_snapshot = {}
+    snapshot_history = metrics_snapshot.get("history") if isinstance(metrics_snapshot, dict) else {}
     tool_scores = decision_state.get("tool_scores") or []
     compact = {
         "metric_implied_score": decision_state.get("metric_implied_score"),
@@ -335,6 +503,8 @@ def _read_ai_cio_context_for_summary(provider_key: str, target_date: date) -> st
         "hard_constraints": decision_state.get("hard_constraints"),
         "score_band_reason": decision_state.get("score_band_reason"),
         "previous_cio_diagnostic": decision_state.get("previous_cio_diagnostic"),
+        "history_rolling_summary": (snapshot_history or {}).get("rolling_summary"),
+        "metrics_snapshot_path": metrics_snapshot_path,
     }
     return json.dumps(compact, ensure_ascii=False, indent=2, default=str)
 
@@ -851,7 +1021,264 @@ def _format_json_context(title: str, payload: Any) -> str:
     return f"=== {title} ===\n```json\n{body}\n```"
 
 
-def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = 7) -> list[dict[str, Any]]:
+def _safe_float(value: Any) -> float | None:
+    try:
+        if value in (None, "", "N/A"):
+            return None
+        return float(value)
+    except Exception:
+        return None
+
+
+def _round_or_none(value: float | None, digits: int = 1) -> float | None:
+    if value is None:
+        return None
+    return round(value, digits)
+
+
+def _average(values: list[float]) -> float | None:
+    if not values:
+        return None
+    return sum(values) / len(values)
+
+
+def _parse_ledger_date(row: dict[str, Any]) -> date | None:
+    raw = str(row.get("date") or row.get("ddmmyyyy") or "")
+    for fmt in ("%Y-%m-%d", "%d%m%Y", "%d/%m/%Y"):
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except Exception:
+            continue
+    return None
+
+
+def _history_row_sort_key(row: dict[str, Any]) -> str:
+    parsed = _parse_ledger_date(row)
+    return parsed.isoformat() if parsed else str(row.get("date") or "")
+
+
+def _build_history_rollup(
+    history_ledger: list[dict[str, Any]],
+    current_score: Any = None,
+    current_regime: str | None = None,
+    current_date_label: str | None = None,
+) -> dict[str, Any]:
+    """Build compact deterministic history stats for AI CIO; no LLM trend summarizer needed."""
+
+    rows = sorted(history_ledger or [], key=_history_row_sort_key)
+    compact_history: list[dict[str, Any]] = []
+    for row in rows[-AI_CIO_HISTORY_WINDOW:]:
+        score = _safe_float(row.get("score"))
+        compact_history.append(
+            {
+                "date": row.get("date"),
+                "score": None if score is None else int(round(score)),
+                "regime": row.get("regime", "N/A"),
+                "source": row.get("source", ""),
+                "provider": row.get("provider", ""),
+            }
+        )
+
+    series = list(compact_history)
+    current_numeric = _safe_float(current_score)
+    if current_numeric is not None:
+        series.append(
+            {
+                "date": current_date_label or date.today().isoformat(),
+                "score": int(round(current_numeric)),
+                "regime": current_regime or regime_from_score(current_numeric),
+                "source": "current_metric_implied",
+                "provider": "deterministic_adapter",
+            }
+        )
+
+    scores = [float(item["score"]) for item in series if item.get("score") is not None]
+    previous_score = None
+    if current_numeric is not None and compact_history:
+        previous_score = compact_history[-1].get("score")
+    elif len(scores) >= 2:
+        previous_score = scores[-2]
+
+    def score_change(back: int) -> float | None:
+        if not scores:
+            return None
+        reference_index = len(scores) - 1 - back
+        if reference_index < 0:
+            return None
+        return scores[-1] - scores[reference_index]
+
+    def consecutive_below(threshold: float) -> int:
+        count = 0
+        for item in reversed(series):
+            score = _safe_float(item.get("score"))
+            if score is None or score >= threshold:
+                break
+            count += 1
+        return count
+
+    regime_streak = 0
+    current_regime_value = str(series[-1].get("regime") or "") if series else ""
+    for item in reversed(series):
+        if str(item.get("regime") or "") != current_regime_value:
+            break
+        regime_streak += 1
+
+    scores_20 = scores[-20:]
+    rolling_summary = {
+        "history_count": len(compact_history),
+        "current_baseline_score": None if current_numeric is None else int(round(current_numeric)),
+        "current_baseline_regime": current_regime or (regime_from_score(current_numeric) if current_numeric is not None else None),
+        "latest_prior_score": previous_score,
+        "score_avg_5d": _round_or_none(_average(scores[-5:])),
+        "score_avg_10d": _round_or_none(_average(scores[-10:])),
+        "score_avg_20d": _round_or_none(_average(scores_20)),
+        "score_change_1d": _round_or_none(score_change(1)),
+        "score_change_5d": _round_or_none(score_change(5)),
+        "score_change_10d": _round_or_none(score_change(10)),
+        "days_below_30": consecutive_below(30),
+        "days_below_15": consecutive_below(15),
+        "current_regime_streak": regime_streak,
+        "min_20d": None if not scores_20 else int(round(min(scores_20))),
+        "max_20d": None if not scores_20 else int(round(max(scores_20))),
+        "usage_rule": "Use for persistence/delta only. Do not anchor the final score to history.",
+    }
+    return {
+        "window_size": AI_CIO_HISTORY_WINDOW,
+        "history_window": compact_history,
+        "rolling_summary": rolling_summary,
+    }
+
+
+def _methodology_card_for_tool(tool_id: str) -> dict[str, Any]:
+    tool = str(tool_id or "")
+    card = TOOL_METHODOLOGY_CARDS.get(tool)
+    if card is None:
+        card = {
+            "domain": "unspecified",
+            "horizon": "unspecified",
+            "primary_metric": "see_tool_packet",
+            "score_direction": "Use adapter score if present.",
+            "limits": "If structured metrics are missing, mark DATA INSUFFICIENT.",
+            "authority": "Adapter score/regime/bias are authoritative when available.",
+        }
+    return {"tool": tool, **card}
+
+
+def _build_methodology_cards(evidence_packets: list[dict[str, Any]]) -> list[dict[str, Any]]:
+    seen: set[str] = set()
+    cards: list[dict[str, Any]] = []
+    for packet in evidence_packets:
+        tool = str(packet.get("tool") or "")
+        if not tool or tool in seen or packet.get("layer") == "history":
+            continue
+        seen.add(tool)
+        cards.append(_methodology_card_for_tool(tool))
+    return cards
+
+
+def _build_tool_metrics_snapshot(evidence_packets: list[dict[str, Any]]) -> dict[str, Any]:
+    tools: dict[str, Any] = {}
+    for packet in evidence_packets:
+        if packet.get("layer") == "history":
+            continue
+        tool = str(packet.get("tool") or "")
+        if not tool:
+            continue
+        metrics = packet.get("key_metrics") or {}
+        adapter_score = packet.get("adapter_score")
+        if not isinstance(adapter_score, dict):
+            adapter_score = score_tool_packet(tool, metrics)
+        tools[tool] = {
+            "tool": tool,
+            "layer": packet.get("layer"),
+            "as_of": packet.get("date"),
+            "bias": packet.get("bias"),
+            "report_score": packet.get("score"),
+            "report_regime": packet.get("regime"),
+            "key_metrics": metrics,
+            "adapter_available": isinstance(adapter_score, dict),
+            "tool_score": adapter_score.get("tool_score") if isinstance(adapter_score, dict) else None,
+            "tool_regime": adapter_score.get("tool_regime") if isinstance(adapter_score, dict) else None,
+            "tool_bias": adapter_score.get("tool_bias") if isinstance(adapter_score, dict) else None,
+            "score_reason": adapter_score.get("score_reason") if isinstance(adapter_score, dict) else None,
+            "data_quality": "structured_adapter" if isinstance(adapter_score, dict) else "soft_excerpt_only",
+        }
+    return tools
+
+
+def _build_ai_cio_metrics_snapshot(
+    provider_key: str,
+    report_date: str,
+    data_date: str,
+    decision_state: dict[str, Any],
+    evidence_packets: list[dict[str, Any]],
+    history_ledger: list[dict[str, Any]],
+) -> dict[str, Any]:
+    """Single deterministic metrics payload used by AI CIO and persisted for audit."""
+
+    history = _build_history_rollup(
+        history_ledger=history_ledger,
+        current_score=decision_state.get("metric_implied_score"),
+        current_regime=decision_state.get("metric_implied_regime"),
+        current_date_label=date.today().isoformat(),
+    )
+    methodology_cards = _build_methodology_cards(evidence_packets)
+    return {
+        "metrics_version": AI_CIO_METRICS_VERSION,
+        "provider": provider_key,
+        "generated_at": datetime.now().isoformat(timespec="seconds"),
+        "report_date": report_date,
+        "data_date": data_date,
+        "authority_rules": [
+            "This JSON is deterministic and generated by code before final LLM synthesis.",
+            "Adapter tool_score/tool_regime/tool_bias are authoritative when present.",
+            "LLM may explain or lightly overlay, but must not relabel adapter outputs from prose.",
+            "History is for persistence/delta only; it must not anchor today's final score.",
+            "Human report excerpts are supporting evidence, not the scoring source of truth.",
+        ],
+        "score_anchor": {
+            "metric_implied_score": decision_state.get("metric_implied_score"),
+            "metric_implied_regime": decision_state.get("metric_implied_regime"),
+            "metric_implied_subscores": decision_state.get("metric_implied_subscores"),
+            "score_band_reason": decision_state.get("score_band_reason"),
+            "hard_constraints": decision_state.get("hard_constraints"),
+        },
+        "consensus": decision_state.get("consensus_map"),
+        "tools": _build_tool_metrics_snapshot(evidence_packets),
+        "history": history,
+        "methodology_cards": methodology_cards,
+    }
+
+
+def _get_ai_cio_metrics_snapshot_path(target_date: date | None = None) -> Path:
+    date_key = (target_date or date.today()).strftime("%d%m%y")
+    return DATA_LAKE / AI_CIO_METRICS_DIRNAME / f"metrics_{date_key}.json"
+
+
+def _write_ai_cio_metrics_snapshot(snapshot: dict[str, Any], target_date: date | None = None) -> Path:
+    path = _get_ai_cio_metrics_snapshot_path(target_date)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    payload = json.dumps(snapshot, ensure_ascii=False, indent=2, default=str)
+    path.write_text(payload, encoding="utf-8")
+    latest_path = path.parent / "latest.json"
+    latest_path.write_text(payload, encoding="utf-8")
+    return path
+
+
+def _compact_metrics_snapshot_for_prompt(snapshot: dict[str, Any]) -> dict[str, Any]:
+    return {
+        "metrics_version": snapshot.get("metrics_version"),
+        "report_date": snapshot.get("report_date"),
+        "data_date": snapshot.get("data_date"),
+        "authority_rules": snapshot.get("authority_rules"),
+        "score_anchor": snapshot.get("score_anchor"),
+        "consensus": snapshot.get("consensus"),
+        "tools": snapshot.get("tools"),
+        "history": snapshot.get("history"),
+    }
+
+
+def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = AI_CIO_HISTORY_WINDOW) -> list[dict[str, Any]]:
     """Read compact history from CSV/cache instead of injecting raw old reports."""
     rows: list[dict[str, Any]] = []
     if CSV_HISTORY_PATH.exists():
@@ -885,7 +1312,7 @@ def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = 7)
 
     seen_dates = {row["date"] for row in selected}
     cache_dir = DATA_LAKE / "daily_cache"
-    for days_back in range(1, 26):
+    for days_back in range(1, max(31, n_past * 2) + 1):
         if len(selected) >= n_past:
             break
         target_date = date.today() - timedelta(days=days_back)
@@ -2366,9 +2793,18 @@ def _build_ai_cio_structured_context(
     historical_block: str,
     evidence_packets: list[dict[str, Any]],
     decision_state: dict[str, Any],
+    metrics_snapshot: dict[str, Any] | None = None,
 ) -> str:
     sections = [
         f"=== REPORT METADATA ===\n{data_note}",
+        _format_json_context(
+            "DAILY METRICS SNAPSHOT - AUTHORITATIVE STRUCTURED INPUT",
+            _compact_metrics_snapshot_for_prompt(metrics_snapshot),
+        ) if metrics_snapshot else "",
+        _format_json_context(
+            "COMPACT TOOL METHODOLOGY CARDS - INTERPRETATION ONLY",
+            metrics_snapshot.get("methodology_cards", []),
+        ) if metrics_snapshot else "",
         historical_block,
         _format_json_context("DECISION STATE - DETERMINISTIC PRECHECK", decision_state),
         _format_json_context("EVIDENCE PACKETS - BOUNDED CHILD TOOL OUTPUTS", evidence_packets),
@@ -2381,6 +2817,8 @@ def _write_ai_cio_context_sidecar(
     decision_state: dict[str, Any],
     evidence_packets: list[dict[str, Any]],
     history_ledger: list[dict[str, Any]],
+    metrics_snapshot: dict[str, Any] | None = None,
+    metrics_snapshot_path: str | None = None,
 ) -> Path:
     """Persist the compact context sent to the final AI CIO prompt for audit/debug."""
     today_str = date.today().strftime('%d%m%y')
@@ -2392,6 +2830,8 @@ def _write_ai_cio_context_sidecar(
         "decision_state": decision_state,
         "history_ledger": history_ledger,
         "evidence_packets": evidence_packets,
+        "metrics_snapshot_path": metrics_snapshot_path,
+        "metrics_snapshot": metrics_snapshot,
     }
     path.write_text(json.dumps(payload, ensure_ascii=False, indent=2, default=str), encoding="utf-8")
     return path
@@ -2434,20 +2874,15 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
-    history_ledger = _read_recent_summary_ledger(provider_key, n_past=7)
+    history_ledger = _read_recent_summary_ledger(provider_key, n_past=AI_CIO_HISTORY_WINDOW)
     historical_context = json.dumps(history_ledger, ensure_ascii=False, indent=2, default=str) if history_ledger else ""
     if historical_context:
-        print(f"[Trend Analyst] Generating 7-day historical trend summary via Sub AI CIO...")
-        trend_summary = run_historical_trend_analyst(
-            client, provider_key=provider_key, model=model,
-            raw_history_text=historical_context, force=force
-        )
         historical_block = (
-            "=== BẢN TÓM TẮT XU HƯỚNG LỊCH SỬ (T-1 ĐẾN T-7 — DO SUB AI CIO TÓM TẮT) ===\n"
-            + trend_summary
+            "=== AI CIO HISTORY LEDGER (UP TO 30 COMPACT ROWS; DETERMINISTIC, NO SUB-AI) ===\n"
+            + historical_context
         )
     else:
-        historical_block = "=== BẢN TÓM TẮT XU HƯỚNG LỊCH SỬ: Không có cache T-1 đến T-7 ==="
+        historical_block = "=== AI CIO HISTORY LEDGER: NO PRIOR HISTORY AVAILABLE ==="
 
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
     fed_date, fed_rep = _get_fed_liquidity_context(provider_key)
@@ -2458,7 +2893,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     vn100_label, vn100_rep = _get_vn100_corporate_health_context(provider_key)
 
     evidence_packets = [
-        _build_evidence_packet("historical_trend", trend_summary if historical_context else historical_block, "history", max_excerpt_chars=900),
+        _build_evidence_packet("historical_trend", historical_block, "history", max_excerpt_chars=900),
         _build_evidence_packet("fed_liquidity", fed_rep, "macro", fed_date, max_excerpt_chars=900),
         _build_evidence_packet("global_financial_conditions", gfcm_rep, "macro", gfcm_date, max_excerpt_chars=900),
         _build_evidence_packet("margin_m2_overlay", margin_m2_rep, "macro", margin_m2_date, max_excerpt_chars=700),
@@ -2485,17 +2920,30 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         report_date=report_date,
         data_date=data_date,
     )
+    metrics_snapshot = _build_ai_cio_metrics_snapshot(
+        provider_key=provider_key,
+        report_date=report_date,
+        data_date=data_date,
+        decision_state=decision_state,
+        evidence_packets=evidence_packets,
+        history_ledger=history_ledger,
+    )
+    metrics_snapshot_path = _write_ai_cio_metrics_snapshot(metrics_snapshot)
+    print(f"[AI CIO] Metrics snapshot: {metrics_snapshot_path}")
     all_reports = _build_ai_cio_structured_context(
         data_note=data_note,
         historical_block=historical_block,
         evidence_packets=evidence_packets,
         decision_state=decision_state,
+        metrics_snapshot=metrics_snapshot,
     )
     context_sidecar_path = _write_ai_cio_context_sidecar(
         provider_key=provider_key,
         decision_state=decision_state,
         evidence_packets=evidence_packets,
         history_ledger=history_ledger,
+        metrics_snapshot=metrics_snapshot,
+        metrics_snapshot_path=str(metrics_snapshot_path),
     )
     print(f"[AI CIO] Structured context sidecar: {context_sidecar_path}")
 

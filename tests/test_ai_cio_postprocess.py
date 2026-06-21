@@ -172,11 +172,14 @@ def test_write_ai_cio_context_sidecar(tmp_path, monkeypatch):
     import shared.ai_cio as ai_cio
 
     monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    metrics_snapshot = {"metrics_version": "1.0", "tools": {"market_breadth": {"tool_score": 35}}}
     path = ai_cio._write_ai_cio_context_sidecar(
         provider_key="test-provider",
         decision_state={"report_date": "20/06/2026", "hard_constraints": ["Breadth MA20 weak"]},
         evidence_packets=[{"tool": "market_breadth", "bias": "bearish"}],
         history_ledger=[{"date": "2026-06-19", "score": "42"}],
+        metrics_snapshot=metrics_snapshot,
+        metrics_snapshot_path="data_lake/ai_cio_metrics/metrics_200626.json",
     )
 
     payload = json.loads(path.read_text(encoding="utf-8"))
@@ -184,6 +187,60 @@ def test_write_ai_cio_context_sidecar(tmp_path, monkeypatch):
     assert payload["provider"] == "test-provider"
     assert payload["decision_state"]["hard_constraints"] == ["Breadth MA20 weak"]
     assert payload["evidence_packets"][0]["tool"] == "market_breadth"
+    assert payload["metrics_snapshot_path"].endswith("metrics_200626.json")
+    assert payload["metrics_snapshot"]["tools"]["market_breadth"]["tool_score"] == 35
+
+
+def test_ai_cio_metrics_snapshot_contains_adapter_history_and_methodology(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    packets = [
+        {
+            "tool": "market_breadth",
+            "layer": "current_tool",
+            "bias": "neutral_or_mixed",
+            "date": "19/06/2026",
+            "key_metrics": {"breadth_ma20_pct": 39.8},
+        },
+        {
+            "tool": "pvgo",
+            "layer": "valuation",
+            "bias": "neutral_or_mixed",
+            "date": "19/06/2026",
+            "key_metrics": {"pvgo_pct": 46.9, "pe": 14.2, "coe_pct": 14.0},
+        },
+    ]
+    history = [
+        {"date": "2026-06-16", "score": "11", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
+        {"date": "2026-06-17", "score": "11", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
+        {"date": "2026-06-18", "score": "13", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
+    ]
+    state = ai_cio._build_decision_state(packets, history, "20/06/2026", "19/06/2026")
+
+    snapshot = ai_cio._build_ai_cio_metrics_snapshot(
+        provider_key="deepseek-v4-pro",
+        report_date="20/06/2026",
+        data_date="19/06/2026",
+        decision_state=state,
+        evidence_packets=packets,
+        history_ledger=history,
+    )
+
+    assert snapshot["metrics_version"] == "1.0"
+    assert snapshot["tools"]["market_breadth"]["tool_score"] == 35
+    assert snapshot["tools"]["pvgo"]["tool_score"] == 42
+    assert snapshot["tools"]["pvgo"]["tool_regime"] == "PVGO ELEVATED EXPECTATION RISK"
+    assert snapshot["history"]["window_size"] == ai_cio.AI_CIO_HISTORY_WINDOW
+    assert snapshot["history"]["rolling_summary"]["history_count"] == 3
+    assert snapshot["history"]["rolling_summary"]["current_baseline_score"] == state["metric_implied_score"]
+    assert any(card["tool"] == "pvgo" and "Adapter" in card["authority"] for card in snapshot["methodology_cards"])
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    path = ai_cio._write_ai_cio_metrics_snapshot(snapshot)
+    latest = path.parent / "latest.json"
+    assert path.name.startswith("metrics_")
+    assert latest.exists()
+    assert json.loads(latest.read_text(encoding="utf-8"))["tools"]["pvgo"]["tool_score"] == 42
 
 
 def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch):
@@ -215,6 +272,23 @@ def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch)
         ),
         encoding="utf-8",
     )
+    metrics_dir = data_lake / "ai_cio_metrics"
+    metrics_dir.mkdir(parents=True)
+    metrics_path = metrics_dir / f"metrics_{target_date.strftime('%d%m%y')}.json"
+    metrics_path.write_text(
+        json.dumps(
+            {
+                "history": {
+                    "rolling_summary": {
+                        "score_avg_5d": 18.4,
+                        "days_below_30": 8,
+                    }
+                }
+            },
+            ensure_ascii=False,
+        ),
+        encoding="utf-8",
+    )
     monkeypatch.setattr(ai_cio, "DATA_LAKE", data_lake)
 
     context = ai_cio._read_ai_cio_context_for_summary("deepseek-v4-pro", target_date)
@@ -225,6 +299,8 @@ def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch)
     assert payload["tool_score_count"] == 2
     assert payload["tool_scores"][0]["tool"] == "var_cvar_vnindex"
     assert payload["hard_constraints"] == ["EVT xi elevated at 0.345"]
+    assert payload["history_rolling_summary"]["days_below_30"] == 8
+    assert payload["metrics_snapshot_path"].endswith(metrics_path.name)
 
 
 def test_decision_state_metric_score_resists_prior_score_anchoring():
