@@ -1,0 +1,54 @@
+## 1. Observations
+
+- **Historical VaR 95% (-1.65%)** sâu hơn Parametric VaR (-1.48%) 17 bps, báo hiệu phân phối đuôi phải dày hơn Gaussian
+- **EVT VaR 99% (-3.69%)** cho thấy sự kiện 1/100-day có thể thổi bay ~4.6σ, xa hơn đáng kể so với quy ước Gaussian
+- **ξ = +0.345** vượt ngưỡng 0.30, rơi vào **FAT TAIL** — đuôi cực đoan, ES 99% có thể không hội tụ nếu mẫu mở rộng
+- **Hill = +0.447** cùng dấu dương, magnitude lớn hơn ξ ~29%, signal robust về tail dày phía trái
+
+## 2. Tail Thickness Diagnosis
+
+| Chỉ số | Kết quả |
+|--------|---------|
+| ξ bracket | **FAT TAIL** (>0.30) |
+| Hill cross-check | **Confirm** — cùng dấu, cùng bracket fat tail |
+| ES−VaR spread | **−1.37% > σ₃₀ (0.80%)** → fat tail corroborated empirically |
+
+Cả ba tín hiệu (ξ, Hill, spread) đồng thuận: phân phối returns VNINDEX có đuôi trái dày đặc, không phải outlier đơn lẻ. Độ dày này mang tính cấu trúc, không thể giải thích bằng volatility clustering đơn thuần.
+
+## 3. Gaussian Gap
+
+**Gaussian VaR 99%** = μ − 2.33·σ₃₀ ≈ −2.33 × 0.80% = **−1.86%** (giả sử μ ≈ 0)
+
+| So sánh | Giá trị |
+|---------|---------|
+| EVT VaR 99% | −3.69% |
+| Gaussian VaR 99% | −1.86% |
+| **Gap** | **1.83 pp** |
+
+Gap 1.83 pp >> 1 pp threshold → **Gaussian model broken**. VaR parametric dựa trên σ đang underestimate tail risk ở mức độ nghiêm trọng. Không dùng Gaussian cho risk capital allocation ở quantile 99%+.
+
+## 4. Verdict — Hedging Implications
+
+**ξ = 0.345 > 0.30**: Regime FAT TAIL
+
+- **Avoid momentum strategies** — crash risk không phản ánh trong recent σ
+- **Mua puts ITM** (delta 60-70) thay vì OTM — tail quá dày, OTM gamma không đủ payoff khi gap-down
+- **Short futures hedge** nếu portfolio beta > 0.8 — basis risk chấp nhận được so với tail risk unhedged
+- **Không dùng VaR 95% làm hard limit** — ES 99% (−6.15%) mới gần sát thực tế
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "19/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.83,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

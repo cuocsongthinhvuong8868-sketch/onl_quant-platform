@@ -14,7 +14,7 @@ try:
 except ImportError:
     AI_PROVIDER_MAP = {
         "kimi-2.6": {"display": "Kimi 2.6", "api_model": "kimi-k2.6", "base_url": "https://api.moonshot.ai/v1"},
-        "deepseek-v4-pro": {"display": "DeepSeek V4 Pro", "api_model": "deepseek-chat", "base_url": "https://api.deepseek.com/v1"},
+        "deepseek-v4-pro": {"display": "DeepSeek V4 Pro", "api_model": "deepseek-v4-pro", "base_url": "https://api.deepseek.com/v1"},
     }
 
 VN30_TICKERS = ['ACB', 'BCM', 'BID', 'BVH', 'CTG', 'FPT', 'GAS', 'GVR', 'HDB', 'HPG', 'MBB', 'MSN', 'MWG', 'PLX', 'POW', 'SAB', 'SHB', 'SSB', 'SSI', 'STB', 'TCB', 'TPB', 'VCB', 'VHM', 'VIB', 'VIC', 'VJC', 'VNM', 'VPB', 'VRE']

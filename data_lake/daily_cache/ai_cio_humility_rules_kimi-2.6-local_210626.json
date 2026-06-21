@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-21",
+  "composite_score": 14,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 12,
+      "unit": "sessions",
+      "description": "VNIBOR trend chuyển từ liquidity squeeze sang easing"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 39.8,
+      "unit": "%",
+      "description": "Breadth phục hồi bền vững trên ngưỡng 45%"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.8,
+      "unit": "%",
+      "description": "SSI giảm xuống dưới ngưỡng WARNING"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Fat tail dissolves, extreme event probability normalizes"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 3.33,
+      "unit": "th pct",
+      "description": "Vingroup coupling remains decoupled (idiosyncratic risk contained)"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 98.4,
+      "unit": "th pct",
+      "description": "Deep junk credit distress eases below systemic threshold"
+    }
+  ],
+  "provider_key": "kimi-2.6-local",
+  "saved_at": "2026-06-21",
+  "source": "ai_cio_executive_summary"
+}

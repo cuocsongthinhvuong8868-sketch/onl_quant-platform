@@ -1,0 +1,47 @@
+# 1. Trạng thái tâm lý tin tức (news sentiment regime)
+
+- **1d**: risk_on → Macro composite = +0.173 (yếu hơn)
+- **7d**: strong_risk_on → +0.512 (rất mạnh)
+- **30d**: strong_risk_on → +0.350 (mạnh)
+- **Hướng lệch**: Cửa sổ 1d hạ nhiệt rõ rệt so với xu hướng tích cực mạnh của 7d/30d. Dấu hiệu động lượng tích cực đang chững lại, đáng theo dõi.
+
+# 2. Kênh dẫn dắt risk-on / risk-off mạnh nhất
+
+**Risk-on:**
+- `monetary_policy`: +2.00 (7d & 30d) – dẫn dắt chính.
+- `credit_stress`: +1.420 (7d), +0.708 (30d) – tín hiệu ổn định hệ thống.
+- `earnings`: +1.403 (1d) – mạnh cục bộ nhưng không có driver cụ thể.
+
+**Risk-off:**
+- `commodity`: -0.229 (7d), -0.110 (30d) – kéo giảm từ hàng hóa Trung Quốc.
+- `liquidity`: -0.136 (7d), -0.065 (30d) – phản ánh động thái hút ròng của NHNN.
+
+# 3. Các driver quan trọng (chỉ từ dữ liệu có sẵn)
+
+**Tích cực (kéo risk-on):**
+- ECB tăng lãi suất tiền gửi 25 bps lên 2.65% (tháng 06/2026) → monetary_policy +1.529.
+- Tỷ giá trung tâm tăng liên tiếp 15-17/06 (25,165 → 25,175) → fx_external +1.4+.
+- Lãi suất ON ngày 16/06 tăng 33 bps lên 3.85% → monetary_policy +0.821.
+- Lợi suất trái phiếu chính phủ đi ngang phiên 19/06 → credit_stress +0.231 (rủi ro tín dụng thấp).
+- Giá than cốc Trung Quốc lập đỉnh 1 năm → commodity +1.273 (dù kênh commodity tổng thể âm).
+
+**Tiêu cực (kéo risk-off):**
+- Giá heo hơi giảm đáy 1 tháng về 65,000 đ/kg (16/06) → commodity -1.269.
+- Quặng sắt Trung Quốc đáy 6 tháng (737.11 CNY/tấn) → commodity -1.017.
+- Nhựa PVC Trung Quốc thủng đáy tháng (4,450 CNY/tấn) → commodity -0.812.
+- NHNN hút ròng 18,000 tỷ qua OMO phiên 16/06 → liquidity -0.684.
+- Tỷ giá trung tâm lùi nhẹ 18/06 (-2) → fx_external -0.721 (tín hiệu yếu thoáng qua).
+
+# 4. Đánh giá tác động đến AI CIO
+
+- **Hỗ trợ** lớp vĩ mô: Tâm lý thị trường vẫn ủng hộ rủi ro thông qua kênh tiền tệ trong nước và tín hiệu thanh ổn định lợi suất. ECB tăng lãi suất có thể phản ánh môi trường toàn cầu bớt căng thẳng hơn.
+- **Xung đột nhẹ**: Giá hàng hóa Trung Quốc giảm sâu cảnh báo nhu cầu bên ngoài yếu; NHNN hút ròng có thể thít chặt thanh khoản nội địa, trái ngược tín hiệu nới lỏng từ tỷ giá trung tâm tăng.
+- **Neutral**: Cửa sổ 1d yếu dần (composite +0.173, không có driver tiêu cực) cho thấy dư địa tăng rủi ro đã thu hẹp. Thị trường vẫn “mua” nhưng cần thận trọng.
+
+=> **Hành động CIO**: Duy trì vị thế rủi ro hiện tại dựa trên tín hiệu 7d/30d tích cực mạnh, nhưng cân nhắc giảm đà mở rộng thêm; theo dõi sát các chỉ báo hàng hóa (commodity) và thanh khoản OMO – nếu diễn biến tiêu cực kéo dài, sentiment có thể đảo chiều.
+
+# 5. Caveat (lưu ý)
+
+- **Nguồn tin 1d**: Chỉ có WiData, thiếu MoZYFin – phủ sóng hẹp, dễ nhiễu.
+- **Dữ liệu không cũ**: Generated at 21/06/2026 17:35 – cập nhật trong ngày, không trễ lớn.
+- **Nhiễu tiêu đề**: Nhiều driver là biến động giá ngắn hạn (ECB, tỷ giá, hàng hóa); cần tránh phản ứng quá mức với tin lẻ, đặc biệt là cách gán sentiment cho chúng (ví dụ ECB tăng lãi suất được coi là rất tích cực – cần kiểm chứng chéo).

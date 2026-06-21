@@ -1,0 +1,69 @@
+ ## 1. Mechanical Decomposition
+
+Tuần 2026-06-17, Net Liquidity giảm $48B, đưa xuống $5,848.9B. Phân rã cơ chế:
+
+- **WALCL ($6,736.4B)**: Fed balance sheet tiếp tục QT passive — Treasury/MBS runoff hút thanh khoản ra khỏi hệ thống. Đây là lực hút cấu trúc.
+- **TGA ($880.7B)**: Treasury đang **tích lũy** tiền — mức này cao hơn operational target thông thường (~$500-700B), rút tiền từ banking system. TGA tăng = hút thanh khoản.
+- **RRP ($6.8B)**: Gần như **cạn kiệt** — chỉ còn $6.8B, dưới ngưỡng $100B. Kênh này không còn buffer; tiền đã chảy ra repo/T-bills từ 2024.
+
+**Driver chính**: TGA tích lũy + QT runoff đè lên, trong khi RRP không còn van xả để bù đắp.
+
+---
+
+## 2. Cycle Positioning
+
+- **Regime**: QT active — Fed đang thu hẹp bảng cân đối, không phải QE.
+- **RRP**: Đã cạn (<$10B). Điều này có nghĩa là một trong những công cụ tự động bơm thanh khoản khi QT diễn ra đã vô hiệu. Bất kỳ đợt hút nào từ TGA hoặc WALCL sẽ truyền thẳng vào banking reserves.
+- **TGA**: Đang ở vùng cao ($880B). Nếu Treasury bắt đầu chi cho maturing debt hoặc fiscal operations, TGA giảm sẽ bơm ngược liquidity.
+- **Historical context**: Net Liquidity đỉnh 2022 ~$8.5T; đáy 2024 ~$5.5T. Hiện tại $5.85T gần đáy 2024, nhưng không phải extreme.
+
+---
+
+## 3. Signal Strength
+
+| Metric | Value | Assessment |
+|--------|-------|------------|
+| Signal | **HOLD** | Trung tính |
+| Z-Score | -0.69 | Không extreme, cách -1σ còn 0.31 điểm |
+| Impulse_EMA(4) | -$8.8B | Nhẹ âm, không đồng bộ với impulse tuần -$48B |
+
+**Đánh giá**: Signal HOLD hợp lý. Impulse_EMA chưa phá xuống đủ sâu để trigger CUT; Z-Score chưa chạm -1σ. Tuy nhiên, impulse tuần -$48B là warning shot — nếu lặp lại 2-3 tuần, EMA sẽ lật CUT.
+
+---
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+| Asset | Bias | Mechanism |
+|-------|------|-----------|
+| **SPX/NDX** | Neutral-slight negative | Liquidity không bùng nổ, QT vẫn chạy. Earnings + AI capex là driver riêng. |
+| **DXY** | Slight positive | Reserves thắt chặt hỗ trợ USD funding conditions; DXY firm nếu TGA không xả. |
+| **Gold** | Neutral | Real yields + DXY là driver chính; liquidity không đủ lỏng để push gold breakout. |
+| **Crypto** | Negative | BTC/ETH sensitive với global liquidity; QT + TGA high = headwind. |
+| **VN-Index (lag 4-8W)** | **Neutral-slight negative** | Fed liquidity không expand → DXY không weaken → EM FX không rally → FDI/foreign flows không boost. Correlation 0.25-0.35 vẫn positive nhưng coefficient nhỏ, impact chậm và noisy. |
+
+---
+
+## 5. Risk Factors (signal có thể sai)
+
+1. **RRP near-zero**: Không còn buffer. Nếu TGA bất ngờ xả (debt ceiling, spending spike), liquidity bùng nổ nhanh — CUT signal sẽ false.
+2. **TGA seasonality**: Tháng 6 là tax season; TGA có thể spike rồi xả vào tháng 7. Noise ngắn hạn.
+3. **Fed facility đặc biệt**: Standing Repo Facility (SRF) hoặc emergency lending có thể inject liquidity ngoài WALCL — không capture trong metric này.
+4. **Fiscal dominance**: Treasury issuance pattern thay đổi (more T-bills = more bank reserves absorption).
+
+---
+
+## 6. KẾT LUẬN
+
+QT active với RRP cạn, TGA cao, và impulse âm nhẹ tạo **regime thắt chặt thanh khoản có kiểm soát**. Không phải liquidity crisis, nhưng không có tailwind cho risk assets. Outlook 2-4 tuần: **risk-neutral, prefer quality/short-duration, underweight EM equity including Vietnam** cho đến khi TGA xả hoặc Fed pivot signal rõ ràng.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5848.883,
+  "signal": "HOLD",
+  "z_score": -0.69,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

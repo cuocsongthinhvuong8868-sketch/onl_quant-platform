@@ -22,7 +22,7 @@ except ImportError:
         },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
-            "api_model": "deepseek-chat",
+            "api_model": "deepseek-v4-pro",
             "base_url": "https://api.deepseek.com/v1",
         },
     }

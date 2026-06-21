@@ -1,0 +1,29 @@
+## 1. Observations
+- Spread Z-score = –0.79σ, nằm dưới mặt bằng 60 ngày, không ghi nhận hiện tượng căng cấu trúc dispersion.
+- DPI = 43.3%, dưới ngưỡng 70% → dispersion chưa chuyển thành regime kéo dài.
+- Avg Pairwise Correlation = 0.008 (≈ 0), xác nhận trạng thái phân hoá cực đại giữa các cổ phiếu.
+- Cross-Sectional Skewness và Kurtosis không có dữ liệu (N/A), không đánh giá được hướng lệch đuôi.
+
+## 2. Structural State
+Thị trường đang trong trạng thái **bình thường, không bị stress**. Mức Spread tuy dương (9.48% annualized) nhưng Z-score âm nhẹ cho thấy spread hiện tại thấp hơn trung bình lịch sử gần đây, không có outlier kéo căng. DPI thấp hơn 70% phủ nhận giả thuyết về một regime dispersion bền vững. Không có tín hiệu stress cục bộ hay toàn thị trường từ bộ chỉ báo cấu trúc.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu skewness/kurtosis, không thể xác minh tail direction hay sự hiện diện của fat-tail. Tuy nhiên, với correlation toàn thị trường tiến sát 0, rủi ro đuôi (nếu phát sinh) nhiều khả năng mang tính **idiosyncratic hơn là hệ thống**. Khả năng xảy ra sập đồng loạt do bầy đàn là rất thấp, vì các cổ phiếu vận động rất độc lập.
+
+## 4. Regime Mapping
+Soi lên 2D Regime Map (DPI × Corr), với DPI thấp và Correlation gần 0, bức tranh hiện tại khớp hoàn toàn với ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn lọc cổ phiếu dựa trên phân tích cơ bản riêng lẻ, rủi ro phân bổ được kiểm soát tốt nhờ tương quan thấp.  
+Rủi ro lớn nhất đối với người quản lý danh mục lúc này **không phải là herding crash hay khô thanh khoản hệ thống**, mà là **concentration risk**: cấu trúc phân hoá cao có thể khuyến khích đặt cược tập trung vào một vài ý tưởng riêng lẻ, khiến danh mục dễ tổn thương trước cú sốc đặc thù của chính những cổ phiếu đó. Việc quên mất nguyên tắc phân tán trong môi trường tưởng như an toàn chính là cái bẫy cần cảnh giác.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "19/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.79,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

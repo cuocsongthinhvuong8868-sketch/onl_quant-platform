@@ -1,0 +1,28 @@
+## 1. Observations
+- Lực cầu 5.65% thấp hơn 7.44 điểm % so với mu 13.09% → bị nén mạnh dưới trung bình dài hạn.
+- Lực cung 7.29% thấp hơn 6.26 điểm % so với mu 13.55% → cũng bị nén, ít mã giảm sâu.
+- Phi cầu 0.198 (momentum mua) và Phi cung 0.228 (momentum bán) đều > 0.10, đà bán trội hơn một chút.
+
+## 2. Supply-Demand Dynamics
+Cả upside và downside breadth đều dưới mu dài hạn, tạo trạng thái **zombification** (thanh khoản cạn, biến động hẹp). Dòng tiền không nghiêng hẳn bên nào, nhưng so sánh |Phi| cho thấy phe cung (0.228) giữ momentum thực sự mạnh hơn phe cầu (0.198), ngụ ý áp lực bán tiềm ẩn vẫn còn nếu thị trường chuyển động.
+
+## 3. Stress-Test Read
+P95 Downside 26.88% cho thấy nếu kịch bản panic xảy ra, biên độ giảm mở rộng đáng kể. P95 Upside 23.32% thấp hơn, asymmetry nghiêng về downside risk – tail dày hơn ở phía bán tháo.
+
+## 4. Verdict
+Tỷ trọng giải ngân đề xuất: **20%**.  
+Strategy: **Phòng thủ** – duy trì tiền mặt cao, hạn chế mở mới, chờ xác nhận đảo chiều từ breadth hoặc Phi. Không “NO ACTIONABLE” vì cả hai chiều đều có momentum > 0.10, nhưng thị trường zombie không mang lại cơ hội rõ ràng, ưu tiên bảo toàn vốn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.88,
+  "p95_upside_pct": 23.32,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

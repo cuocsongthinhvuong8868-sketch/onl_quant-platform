@@ -1,0 +1,35 @@
+## 1. Observations
+- SSI: 65.8% — chạm vùng WARNING (0.50–0.80), rủi ro hệ thống đang tích lũy ngầm
+- Market State (HMM): `EUPHORIC RISK` (high stress + uptrend), nhưng VN30 hiện nằm dưới MA125
+- Top 3 pillar driver: `S_LIQ (36%)`, `S_VAL (32%)`, `S_COR (17%)`
+- PCA Concentration: EVR PC1 = 38.3%, tương quan hệ thống vượt ngưỡng trung bình
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ (36%)** là driver chính — volume khô cạn nghiêm trọng so với chuẩn 1 năm (dollar volume MA20 thấp hơn hẳn MA252). Hiện tượng thanh khoản teo tóp, thị trường mất động lực giao dịch dù giá vẫn chưa sập mạnh.  
+**S_VAL (32%)** xếp ngay sau: chênh lệch lợi nhuận 252 ngày của VN30 so với lãi suất tiền gửi neo ở mức cao, phản ánh định giá vẫn kéo căng so với mặt bằng lãi suất — sức ép co giãn mạnh nếu dòng tiền đảo chiều.  
+**S_COR (17%)** cùng với PC1 = 38.3% cho thấy các cổ phiếu đang di chuyển đồng pha cao — dấu hiệu herding, hỗ trợ cho kịch bản bull-trap khi dòng tiền rút nhanh sẽ kéo cả rổ xuống đồng loạt.  
+
+Tổ hợp **S_LIQ + S_COR** cao là signature kinh điển của bull-trap: thị trường mỏng, tương quan lớn, dễ vỡ. Thêm S_VAL căng càng làm tăng độ nhạy với các cú sốc nhỏ.
+
+## 3. Cross-Check
+- Phân kỳ rõ nét giữa HMM regime `EUPHORIC RISK` (hàm ý uptrend) và vị trí giá thực tế của VN30 đang nằm dưới MA125. MA125 thường là bộ lọc xu hướng dài — giá kẹt dưới đường này báo hiệu đà tăng của HMM đã suy yếu, có thể regime đang trễ hoặc sai nhãn.
+- SSI ở WARNING chứ chưa CRITICAL, nhưng khi kết hợp với tín hiệu phá vỡ MA125, rủi ro chuyển sang trạng thái `ACTIVE_STRESS` (high stress + downtrend) trong ít phiên tới là không thấp. Không còn bẫy tăng giá điển hình, mà chính xác hơn là pha chuyển từ phân phối sang sụt giảm thanh khoản.
+
+## 4. Verdict
+Tỷ trọng tiền mặt đề xuất: **80%** danh mục.  
+Hành động phòng ngừa: **Chủ động giảm beta danh mục xuống dưới 0.5 qua short VN30F1M hoặc mua put** — không đơn thuần hạ margin, mà phải lập hàng rào bảo vệ do thanh khoản khô đột ngột có thể khiến các lệnh bán giao ngay bị trượt giá mạnh.  
+Trạng thái hiện tại có đủ cơ sở để giảm ngay rủi ro danh mục, tuy chưa phải kịch bản crash trong 1‑2 phiên.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.8,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 80,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

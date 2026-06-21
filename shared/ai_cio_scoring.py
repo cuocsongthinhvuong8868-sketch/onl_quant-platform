@@ -142,23 +142,40 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
             return None
         if pvgo >= 65:
             score = 25
+            regime = "PVGO EXTREME EXPECTATION RISK"
+            bias = "bearish"
             reason = f"PVGO extreme expectations ({pvgo:.1f}%)"
         elif pvgo >= 50:
             score = 35
+            regime = "PVGO VERY HIGH EXPECTATION RISK"
+            bias = "bearish"
             reason = f"PVGO very high expectations ({pvgo:.1f}%)"
         elif pvgo >= 35:
-            score = 45
+            score = 42
+            regime = "PVGO ELEVATED EXPECTATION RISK"
+            bias = "bearish"
             reason = f"PVGO elevated expectations ({pvgo:.1f}%)"
         elif pvgo >= 20:
             score = 55
+            regime = "PVGO NORMAL / FAIR EXPECTATIONS"
+            bias = "neutral_or_mixed"
             reason = f"PVGO fair expectations ({pvgo:.1f}%)"
         elif pvgo >= 0:
             score = 65
+            regime = "PVGO LOW EXPECTATIONS"
+            bias = "bullish"
             reason = f"PVGO low expectations ({pvgo:.1f}%)"
         else:
             score = 68
+            regime = "PVGO BELOW STEADY-STATE VALUE"
+            bias = "bullish"
             reason = f"PVGO below steady-state value ({pvgo:.1f}%)"
-        return _tool_score(tool, score, reason)
+        return {
+            "tool_score": _bounded(score),
+            "tool_regime": regime,
+            "tool_bias": bias,
+            "score_reason": reason,
+        }
 
     return None
 
@@ -253,7 +270,7 @@ def derive_metric_implied_scores(
             internal_score = min(internal_score, 42.0)
             internal_reasons.append(f"PVGO very high expectations ({max_pvgo:.1f}%)")
         elif max_pvgo >= 35:
-            internal_score = min(internal_score, 48.0)
+            internal_score = min(internal_score, 45.0)
             internal_reasons.append(f"PVGO elevated expectations ({max_pvgo:.1f}%)")
         elif max_pvgo < 20:
             internal_score = max(internal_score, 58.0)

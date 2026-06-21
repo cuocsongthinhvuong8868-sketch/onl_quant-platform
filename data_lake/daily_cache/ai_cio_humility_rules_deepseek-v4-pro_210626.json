@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-21",
+  "composite_score": 24,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 12,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa đã nới lỏng."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 39.8,
+      "unit": "%",
+      "description": "Tỷ lệ mã vượt MA20 vượt 45% phủ định chế độ phân phối/yếu."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.8,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% báo hiệu áp lực hệ thống hạ nhiệt."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Chỉ số đuôi giảm dưới 0.25 thì rủi ro đuôi mập được kiểm soát."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 3.333,
+      "unit": "th pct",
+      "description": "Phân vị đã rất thấp, nhưng nếu vượt 70 trở lại sẽ tái lập rủi ro coupling."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 98.4,
+      "unit": "th pct",
+      "description": "CQS xuống dưới phân vị 80 báo hiệu căng thẳng tín dụng toàn cầu dịu bớt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-21",
+  "source": "ai_cio_executive_summary"
+}

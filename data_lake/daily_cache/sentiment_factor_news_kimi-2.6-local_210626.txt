@@ -1,0 +1,62 @@
+ ## 1. Regime News Sentiment
+
+| Window | Regime | Macro Composite | Hướng |
+|--------|--------|-----------------|-------|
+| 1d | risk_on | +0.1730 | Tích cực, nhưng yếu hơn 7d/30d |
+| 7d | strong_risk_on | +0.5116 | Rất tích cực |
+| 7→1d | **Suy yếu** | Giảm ~66% | Pullback sentiment ngắn hạn |
+
+**Nhận xét:** 7d và 30d đồng thuận strong_risk_on, nhưng 1d chỉ còn risk_on thuần — sentiment đang hạ nhiệt nhẹ, không phải đảo chiều.
+
+---
+
+## 2. Channel Kéo Sentiment Mạnh Nhất
+
+| Risk-ON | Score | Risk-OFF | Score |
+|---------|-------|----------|-------|
+| monetary_policy | +2.000 | commodity | -0.229 (7d), -0.110 (30d) |
+| credit_stress | +1.420 (7d) / +0.708 (30d) | liquidity | -0.136 (7d), -0.065 (30d) |
+| earnings | +1.347 (7d) / +0.600 (30d) | banking_system | -0.080 (30d) |
+| fx_external | +1.432, +1.412 (top drivers) | | |
+
+**Điểm mấu chốt:** monetary_policy và credit_stress là động lực chính. Commodity là channel tiêu cực duy nhất có trọng lượng đáng kể.
+
+---
+
+## 3. Top Drivers (từ input, không bịa)
+
+**Positive:**
+- ECB tăng 25 bps deposit rate → 2.65% (score +1.529) — hawkish ECB nhưng market đọc là confidence vào growth
+- Tỷ giá trung tâm tăng dần 25,155 → 25,175 (+1.432, +1.412) — VND ổn/mild yếu, hỗ trợ xuất khẩu
+- Lợi suất TPCP đi ngang phiên 19/06 (+0.231) — credit stress không leo thang
+- Lãi suất ON tăng 33 bps lên 3.85% (+0.821) — thanh khoản chặt nhưng kiểm soát được
+
+**Negative:**
+- Giá heo hơi thấp nhất 1 tháng: 65,000 đ/kg (-1.269) — áp lực CPI/ nông nghiệp
+- Quặng sắt Trung Quốc đáy 6 tháng (-1.017) — tín hiệu demand TQ yếu
+- Nhựa PVC thủng đáy tháng, gần đáy 10 năm (-0.812, -0.689) — suy yếu sản xuất
+- NHNN hút ròng 18,000 tỷ OMO (-0.684) — liquidity tightening chủ động
+
+---
+
+## 4. Tác Động lên AI CIO
+
+| Layer | Đánh giá | Ghi chú |
+|-------|----------|---------|
+| **Supports** nếu macro layer đang long growth/credit | monetary_policy + credit_stress mạnh nhất 30 ngày | Đồng thuận với view VN recovery |
+| **Conflicts** nếu macro layer đang defensive trước TQ slowdown | commodity drivers (quặng sắt, PVC) phản ánh demand TQ yếu | Cần check exposure hàng hóa công nghiệp |
+| **Neutral** nếu dùng market-internal (price/volume) | News sentiment là soft overlay; 1d pullback nhẹ chưa đủ override | Chờ confirm từ flow thực |
+
+**Khuyến nghị:** Duy trì risk-on nhưng giảm size nếu 1d tiếp tục suy yếu xuống neutral. Watch liquidity channel — OMO hút ròng có thể tiếp diễn.
+
+---
+
+## 5. Caveats
+
+| Vấn đề | Mô tả |
+|--------|-------|
+| **Source coverage** | Widata chiếm 99/99 (1d), mozyfin chiếm 72% (7d) — phụ thuộc nguồn đơn lẻ, bias không rõ |
+| **Stale feed** | Generated 17:35 ngày 21/06 — khá mới, nhưng 1d window chỉ có 99 tin, có thể thiếu phiên chiều/tối |
+| **Headline noise** | Tỷ giá "tăng" được score positive nhưng thực chất là VND yếu hơn USD — model interpretation cần verify |
+| **Commodity lag** | Giá heo hơi, quặng sắt, PVC là high-frequency noise; chưa chắc phản ánh trend thực |
+| **ECB vs VN** | ECB hike là external driver, transmission đến VN không trực tiếp — overweight monetary_policy cần discount |

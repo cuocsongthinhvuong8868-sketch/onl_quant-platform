@@ -1,0 +1,41 @@
+## 1. Observations
+
+- SSI 65.8% → **WARNING** (tích lũy rủi ro ngầm, ngưỡng 50-80%)
+- Market State: **EUPHORIC_RISK** — high stress + uptrend filter = bull trap risk
+- Top 3 drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%)
+- VN30 dưới MA125, PCA EVR 38.3% — correlation chưa extreme nhưng đang tăng
+
+## 2. Risk Decomposition (Bóc tách)
+
+**S_LIQ dẫn dắt (36%)** — volume khô cạn vs 1Y norm. Đây là signature nguy hiểm: thanh khoản co lại trong khi giá vẫn giữ đỉnh/đi ngang, tức là "thin market" dễ bị đẩy giá bởi lệnh lớn, nhưng cũng dễ gãy khi có selling pressure thực sự.
+
+**S_VAL (32%)** — valuation tension cao: 252d return VN30 đang vượt xa deposit rate, tức risk premium bị nén. Nhà đầu tư đang chấp nhận lợi tức thấp hơn lãi suất tiền gửi — điều này chỉ bền vững nếu momentum tiếp tục.
+
+**S_COR (17%)** — systemic correlation chưa extreme nhưng ở mức 38.3% EVR cho thấy 30 mã đang bắt đầu "nhảy" cùng nhịp. Kết hợp S_LIQ + S_COR → **herding trong thin market = bull-trap signature cổ điển**.
+
+## 3. Cross-Check
+
+- **Divergence rõ**: VN30 dưới MA125 (downtrend filter) nhưng HMM regime lại là EUPHORIC_RISK (high stress + uptrend). Đây là **mâu thuẫn giữa price action và regime model** — uptrend filter có thể lagging, hoặc đang bắt sóng hồi ngắn trong downtrend lớn hơn.
+- **HMM vs SSI khớp**: Cả hai đều flag high stress. Không có lệch pha giữa SSI WARNING và EUPHORIC_RISK — cả hai đều đang cảnh báo cùng chiều.
+- **Pillar mode = downside**: Chỉ tính phiên giảm → S_LIQ và S_VAL đang bị amplify, tức stress "thật" hơn nếu dùng full-sample.
+
+## 4. Verdict
+
+- **Cash target: 50-60%** — giữa WARNING và mâu thuẫn regime/trend filter, không nên full risk
+- **Hedge action: giảm beta** — ưu tiên giảm exposure cổ phiếu high-beta, tăng cash; chưa short futures vì chưa CRITICAL và regime chưa ACTIVE_STRESS
+- Không mua put vì SSI chưa >80% và cost hedge cao trong thin market
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.8,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 55,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,38 @@
+## 1. Observations
+- Historical VaR 95% (phân vị 5% trên 3 năm cuốn chiếu) ở mức -1.65%, cho thấy tổn thất điển hình trong các biến động xấu là tương đối khiêm tốn.
+- EVT VaR 99% (sự kiện 1/100 ngày) rơi vào -3.69%, cao gấp hơn hai lần VaR lịch sử 95%, hé lộ mức tổn thất cực đoan sâu hơn đáng kể.
+- Tham số hình dạng GPD ξ = +0.345, phân loại trực tiếp vào nhóm “đuôi mập” (fat tail), cảnh báo rủi ro cực đoan vượt xa phân phối chuẩn.
+- Chỉ số Hill cross-check = +0.447, cùng chiều và cùng vùng béo với ξ, xác nhận tín hiệu đuôi dày, dù có khác biệt nhẹ về độ lớn.
+
+## 2. Tail Thickness Diagnosis
+Với ξ = 0.345 > 0.30, thị trường rơi vào chế độ **đuôi mập** – mô hình Gaussian sẽ đánh giá thấp trầm trọng các tổn thất đuôi. Chỉ số Hill đo được 0.447 củng cố kết luận này, dù chênh lệch ~0.1 so với ξ cho thấy độ nhạy ngưỡng, giảm chút ít độ tin cậy nhưng không phủ nhận bản chất đuôi mập.  
+Chỉ báo ES‑VaR spread (tính từ Historical VaR 95% và ES 95%) bằng 1.37%, lớn hơn rõ rệt so với σ₃₀ (0.80%), thoả mãn điều kiện xác nhận đuôi mập từ thực nghiệm. Như vậy, cả ba công cụ đều đồng thuận: đuôi phân phối tổn thất của VNINDEX hiện đặc biệt dày, ẩn chứa rủi ro “thiên nga đen”.
+
+## 3. Gaussian Gap
+Từ dữ liệu Parametric VaR 95% (μ + z·σ) = -1.48% và σ₃₀ = 0.80%, suy ra giá trị trung bình μ ≈ -0.164%/ngày.  
+Gaussian VaR 99% = μ – 2.326·σ ≈ -2.02%.  
+EVT VaR 99% hiện đo được -3.69%.  
+Chênh lệch **1.67 điểm phần trăm** (EVT sâu hơn Gaussian) vượt xa ngưỡng 1pp – một hồi chuông cảnh báo mạnh mẽ: mô hình phân phối chuẩn hoàn toàn không phù hợp để phân bổ vốn rủi ro, vì nó đánh giá thấp hơn 80% mức tổn thất cực đoan thực tế.
+
+## 4. Verdict — Hedging Implications
+Trong chế độ ξ > 0.30, nhà quản trị rủi ro cần hành động quyết liệt:  
+- Ngừng ngay các chiến lược dựa trên momentum, vì đuôi mập khiến các đợt sụt giảm lớn thường xuyên hơn kỳ vọng.  
+- Mua quyền chọn bán **in‑the‑money** (puts ITM) để bảo vệ danh mục khi thị trường rơi mạnh.  
+- Hedging bổ trợ bằng cách bán hợp đồng tương lai (short futures) để hạn chế thiệt hại không tuyến tính.  
+Độ tin cậy ở mức **trung bình** do chênh lệch giữa ξ và Hill, tuy nhiên bằng chứng tổng thể từ EVT, thực nghiệm và chênh lệch ES‑VaR đều đồng vị – đuôi đang cực kỳ rủi ro. Cần giám sát liên tục và giảm đòn bẩy mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "19/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.67,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "medium"
+}
+```

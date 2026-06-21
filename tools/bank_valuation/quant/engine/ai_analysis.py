@@ -12,7 +12,7 @@ from tools.bank_valuation.quant.engine.market_regime import calculate_bank_valua
 AI_PROVIDER_MAP = {
     "deepseek-v4-pro": {
         "display": "DeepSeek V4 Pro",
-        "api_model": "deepseek-chat",
+        "api_model": "deepseek-v4-pro",
         "base_url": "https://api.deepseek.com/v1",
         "temperature": 0.5,
     },

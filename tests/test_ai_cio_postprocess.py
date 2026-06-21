@@ -113,6 +113,37 @@ def test_recent_summaries_uses_compact_ledger_not_raw_reports(tmp_path, monkeypa
     assert "EXECUTIVE BOTTOM LINE" not in context
 
 
+def test_history_csv_only_accepts_deepseek_provider(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    history_path = tmp_path / "Ai_cio_report.csv"
+    monkeypatch.setattr(ai_cio, "CSV_HISTORY_PATH", history_path)
+
+    assert not ai_cio.upsert_history_csv(
+        "55",
+        "NEUTRAL",
+        source="manual",
+    )
+    assert not history_path.exists()
+
+    assert not ai_cio.upsert_history_csv(
+        "42",
+        "FEAR / DISTRIBUTION",
+        source="manual",
+        provider="kimi-2.6-local",
+    )
+    assert not history_path.exists()
+
+    assert ai_cio.upsert_history_csv(
+        "24",
+        "PRE-CRASH / PANIC",
+        source="manual",
+        provider="deepseek-v4-pro",
+    )
+    assert "deepseek-v4-pro" in history_path.read_text(encoding="utf-8")
+    assert "kimi-2.6-local" not in history_path.read_text(encoding="utf-8")
+
+
 def test_evidence_packet_compacts_verbose_report_and_extracts_metrics():
     import shared.ai_cio as ai_cio
 

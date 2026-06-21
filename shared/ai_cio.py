@@ -16,6 +16,7 @@ from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 # Cũ chỉ có 3 cột — auto-migrate khi đọc.
 CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
+AI_CIO_HISTORY_PROVIDER = "deepseek-v4-pro"
 HUMILITY_RULES_PREFIX = "ai_cio_humility_rules"
 TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
@@ -178,6 +179,13 @@ def upsert_history_csv(
 
     Trả True nếu ghi thành công, False nếu score/regime invalid.
     """
+    if provider != AI_CIO_HISTORY_PROVIDER:
+        print(
+            f"[CSV] Skip history upsert: provider={provider} is not "
+            f"{AI_CIO_HISTORY_PROVIDER}."
+        )
+        return False
+
     if not score_val or score_val == "N/A":
         return False
 
@@ -235,7 +243,7 @@ except ImportError:
         },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
-            "api_model": "deepseek-chat",
+            "api_model": "deepseek-v4-pro",
             "base_url": "https://api.deepseek.com/v1",
         },
     }

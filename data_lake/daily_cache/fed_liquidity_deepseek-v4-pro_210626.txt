@@ -1,0 +1,47 @@
+## 1. Mechanical Decomposition  
+Tuần này, Net Liquidity giảm -48.0 tỷ USD, chạm mức 5,848.9 tỷ USD. Dữ liệu không cung cấp biến động từng cấu phần, nhưng có thể suy luận cơ chế:
+
+- **RRP** chỉ còn 6.8 tỷ USD, gần như cạn kiệt → không thể hút thêm hoặc bơm trở lại đáng kể. Vùng đệm thanh khoản cuối cùng đã biến mất.
+- **TGA** ở 880.7 tỷ USD, cao hơn nhiều mục tiêu thông thường (~600-700 tỷ) → nhiều khả năng Kho bạc Hoa Kỳ đang tích lũy tiền mặt (hút thanh khoản). Đợt thu thuế doanh nghiệp quý 15/06 có thể là động lực chính.
+- **WALCL** (bảng cân đối Fed) có thể tiếp tục giảm nhẹ do chương trình QT đang chạy nền, nhưng đà rút không còn mạnh.
+
+Như vậy, cú sốc âm tuần này chủ yếu đến từ mùa thuế làm TGA tăng đột biến, **hút tạm thời** thanh khoản khỏi hệ thống ngân hàng.
+
+## 2. Cycle Positioning  
+Liquidity đang trong giai đoạn **hậu QT cận biên**:  
+- RRP < 10 tỷ USD đánh dấu chấm dứt hoàn toàn kỷ nguyên “liquidity dư thừa” hậu COVID. Giờ đây, bất kỳ biến động thanh khoản nào cũng phụ thuộc vào thay đổi của TGA và tốc độ giảm tài sản của Fed.  
+- So với đỉnh QE 2021–2022 (~6.5 nghìn tỷ) và đáy 2024 (~5.4–5.5 nghìn tỷ), mức 5.85 nghìn tỷ hiện tại là vùng trung tính, thấp hơn đỉnh nhưng cao hơn đáy, không còn dư dả để đẩy mạnh risk-on.  
+- TGA cao hơn bình thường cho thấy Treasury đang hút tiền, nhưng nếu đây là yếu tố mùa vụ, dòng tiền có thể sớm quay lại khi chi tiêu chính phủ tăng lên.
+
+Tổng thể, đây là **môi trường liquidity phẳng, dễ bị nhiễu bởi dòng vận động TGA ngắn hạn**.
+
+## 3. Signal Strength  
+- Tín hiệu hiện tại: **HOLD** – Impulse EMA(4) âm (-8.8 tỷ) nhưng Z-Score 52 tuần chỉ -0.69σ, không đủ ngưỡng kích hoạt CUT (yêu cầu ≤ -1σ).  
+- Z-Score ở vùng cận biên, xa mức cực đoan → tín hiệu yếu, không mang tính bùng nổ hay suy thoái hệ thống.  
+- Impulse EMA âm phản ánh áp lực rút nhẹ, nhưng chưa đủ để chuyển chế độ rủi ro. Tín hiệu đáng tin cậy ở mức trung bình.
+
+## 4. Cross-Asset Spillover (1-4 tuần)  
+- **US equities (SPX/NDX)**: Trung tính, thiên về đi ngang. Không có tailwind liquidity mạnh, nhưng cũng không có cú sốc siết chặt. Thị trường sẽ nhạy cảm hơn với dữ liệu vĩ mô.  
+- **DXY**: Có thể giữ ổn định hoặc nhích nhẹ nếu thanh khoản USD tiếp tục co cục bộ; vàng chịu áp lực nhẹ.  
+- **Crypto**: Biến động cùng nhịp risk asset, trung tính đến hơi tiêu cực nếu DXY tăng.  
+- **VN-Index (lag 4-8 tuần)**: Với tín hiệu HOLD và liquidity không bơm thêm, tác động lan tỏa là **trung tính**. Không có động lực ngoại hối rõ ràng để hút dòng vốn nước ngoài mạnh, nhưng cũng không rủi ro dừng đột ngột. Cần theo dõi nếu TGA xả mạnh sau mùa thuế.
+
+## 5. Risk Factors (signal có thể sai vì)  
+- **RRP về 0** khiến tín hiệu CUT trở nên ít nguy hiểm hơn; giảm thanh khoản từ RRP không còn dư địa, do đó nếu TGA hút, đó chỉ là tạm thời.  
+- **Yếu tố mùa vụ thuế (tháng 6)** có thể là nguyên nhân chính khiến TGA tăng, tạo nhiễu cho tín hiệu. Khi Kho bạc giải ngân trở lại, liquidity sẽ bật tăng, đảo ngược tín hiệu âm ngắn hạn.  
+- **Fed không có động thái khẩn cấp**; QT vẫn đều đặn nhưng tốc độ chậm.
+
+## 6. KẾT LUẬN  
+Chế độ thanh khoản hiện tại là **trung tính hậu QT**, với vùng đệm RRP cạn kiệt hoàn toàn. Triển vọng 2-4 tuần cho tài sản rủi ro: **thiên về đi ngang, ít biến động từ liquidity**, trừ khi đợt xả TGA sau thuế tạo cú bơm nhẹ tạm thời.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5848.9,
+  "signal": "HOLD",
+  "z_score": -0.69,
+  "regime": "neutral",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

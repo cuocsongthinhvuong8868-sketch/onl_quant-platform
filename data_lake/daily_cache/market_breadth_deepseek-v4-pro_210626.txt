@@ -1,0 +1,31 @@
+## 1. Observations
+- MA20: 39.8% – dưới ngưỡng trung tính, chưa đạt quá mua cũng chưa rơi quá bán.
+- MA60: 30.1% – mức thấp, xác nhận số mã hồi phục qua bình quân quý rất ít ỏi.
+- MA125: 25.9% – rất thấp, xu hướng trung‑dài đang yếu trầm trọng.
+- MA252: 28.5% – nằm sâu dưới 40%, báo hiệu chế độ suy yếu dài hạn (bear regime).
+
+## 2. Structural Health
+Bốn đường trung bình không đồng thuận: MA20 giảm dần đến MA125 nhưng MA252 nhỉnh hơn MA125 một chút, tạo nét phân kỳ mờ. MA252 thấp hơn 40% đáp ứng tiêu chí Bear Confirmed, nhưng MA20 chưa xuống dưới 30% nên không khớp mẫu. Cấu trúc hiện tại khớp với **Divergence** — ngắn hạn nhỉnh lên chút ít trong khi nền tảng dài hạn tiếp tục lún sâu, thể hiện trạng thái bất ổn.
+
+## 3. Money Flow Leadership
+- Dẫn dắt khối lượng MA20 thuộc nhiều nhóm: ngân hàng (ABB), chứng khoán (ABS, AGR), hạ tầng (ACV), nhựa (AAA, APH), thủy sản (ANV, APF) – không ngành nào thực sự thống trị.
+- Dẫn dắt MA252 có sự trùng lặp với MA20 ở ABB, ADS, APF; bổ sung thêm ngân hàng (BID), chứng khoán (ASP), năng lượng (BSR) và phân bón (BFC).
+- Dòng tiền thông minh nghiêng về nhóm tài chính (ngân hàng, chứng khoán) xen lẫn năng lượng và nông nghiệp, pha trộn giữa phòng thủ và đầu cơ; tổng thể thuộc **mixed**.
+
+## 4. Verdict
+Phân kỳ giữa MA20 và MA252 cùng mặt bằng breadth toàn diện yếu buộc nhà giao dịch **chờ xác nhận (WAIT FOR CONFIRMATION)**. Chiến lược phù hợp là **phòng thủ, ưu tiên nắm giữ tiền mặt (defensive cash‑up)**, không giải ngân đòn bẩy. Margin đề xuất: **0%**.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 39.8,
+  "ma60_pct": 30.1,
+  "ma125_pct": 25.9,
+  "ma252_pct": 28.5,
+  "regime": "divergence",
+  "leadership_sector": "mixed",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```

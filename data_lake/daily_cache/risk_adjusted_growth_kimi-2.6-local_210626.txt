@@ -1,0 +1,44 @@
+## 1. Scenario Assessment
+
+K=1.0 + CoE=14% là baseline chuẩn cho ngân hàng VN, không khắc nghiệt. Tuy nhiên, **mặt bằng ngành đang đốt vốn**: chỉ 1/6 mẫu có Alpha dương (SHB 1.2%), còn lại đều âm — kể cả Top 3. Điều này cho thấy P/B market chưa đủ rẻ để bù đắp risk premium 14%. Stress test BVPS flat + P/B penalty 0% chưa áp dụng, nếu có thêm shock thì Alpha càng âm sâu.
+
+## 2. Top Alpha Decomposition
+
+| Mã | Profile | Driver chính |
+|---|---|---|
+| **SHB** | **Fortress** | P/B 0.94 rẻ nhất nhóm + σROE 1.9% thấp nhất + payout 8.6% giữ lại compounding. ROE 17.5% vừa đủ tạo Disciplined Return ~15.2%, vượt CoE 14% |
+| **ACB** | Growth Trap | ROE 23% cao nhưng σ 2.7% + P/B 1.21 đắt hơn SHB → Risk Penalty ăn mòn, Alpha -0.8% |
+| **SSB** | Cheap Trap | P/B 1.05 rẻ, ROE 15.6% thấp nhất Top 3, payout 0% không đủ cứu → Alpha -1.3% |
+
+SHB là **duy nhất** tạo giá trị thặng dư. ACB và SSB vẫn đốt vốn dù rank cao.
+
+## 3. Value Traps Warning
+
+| Mã | Nguyên nhân chính | Profile |
+|---|---|---|
+| **LPB** | P/B 3.04 **ảo tưởng premium** — ROE 21.1% không đủ bù đắp định giá đắt gấp 3 lần sổ sách + σ 3.8% | Premium Burn |
+| **EIB** | ROE 10% **quá thấp**, dù P/B 1.50 và payout 4.9% thấp cũng không cứu nổi | Cheap Trap |
+| **VPB** | σROE 4.7% **cao nhất nhóm** → Risk Penalty lớn nhất, P/B 1.22 không rẻ đủ, payout 24.6% cắt compounding | Growth Trap |
+
+LPB đặc biệt nguy hiểm: P/B 3.04 trong khi sector median ~1.0-1.2, là **premium burn** rõ ràng.
+
+## 4. Portfolio Construction
+
+- **Core Holding (60-70%)**: **SHB** — duy nhất Fortress, Alpha > 0
+- **Tactical (20-30%)**: **Không có** — ACB/SSB đều Alpha âm, không đủ tiêu chuẩn tactical
+- **Cấm mua / underweight**: **LPB, EIB, VPB** — Alpha âm sâu; thêm **ACB, SSB** nếu conservative
+
+**Khuyến nghị**: Giảm tỷ trọng sector bank, chỉ giữ SHB nếu bắt buộc allocate. Cả Top + Bottom đều dominated by Alpha âm → sector không tạo value ở baseline này.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "ACB", "SSB"],
+  "sector_view": "avoid",
+  "confidence": "medium"
+}
+```

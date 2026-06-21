@@ -1,0 +1,33 @@
+## 1. Observations
+- Stress Index (VN30): 0.00%, không vọt ngưỡng cảnh báo 40%.
+- Số mã thủng VaR 95%: 0/30, không có điểm vỡ.
+- Complacency Index toàn thị trường: 4.63%, thấp xa so với ngưỡng nguy hiểm 80%.
+- Số mã bị định giá sai biên độ (mispriced): 5, dẫn đầu bởi OCB, VHM, VND.
+
+## 2. Contagion Assessment (Module B)  
+VN30 Stress = 0% cho thấy không có hiện tượng lây lan cấp tính trong phiên. Hành vi đổ vỡ đồng loạt không được ghi nhận, các vị thế lớn chưa bị ép margin đồng loạt. Với 0/30 mã thủng VaR 95%, rủi ro hệ thống phát sinh từ tác động dây chuyền gần như không tồn tại trong ngày 19/06/2026.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT  
+Complacency 4.63% kết luận duy nhất: **thị trường không ở trạng thái “ngủ quên”** – biên lợi nhuận rủi ro (spread) không bị nén trên diện rộng đến mức phản ánh sự mất cảnh giác tập thể.  
+
+Tuy nhiên, điều này **không hề** đồng nghĩa thị trường ổn định hay vận hành bình thường. Thị trường có thể đang trong uptrend mạnh, downtrend, hoặc đi ngang nhưng spread vẫn giãn đủ – mọi kịch bản đều tương thích với Complacency thấp. Kết hợp với Stress Index = 0%, ta không thấy dấu hiệu hoảng loạn hay lây lan đang diễn real-time, nhưng cũng chưa đủ cơ sở để khẳng định trạng thái “an toàn”.  
+
+Điểm đáng chú ý: 5 mã mispriced (OCB, VHM, VND…) cho thấy có những cổ phiếu riêng lẻ đang có spread bị nén cực đoan. Rủi ro ở đây là các mã này có thể sụt giảm mạnh, khó kiểm soát khi xuất hiện tin tức bất lợi vì giá chưa chiết khấu đúng mức bất định.
+
+## 4. Stock-Level Risk Calls  
+- **Từ Module B (Top 3 Crash):** Không có mã nào thủng VaR, do đó không phát sinh tín hiệu bán khẩn cấp.  
+- **Từ Module C (Top 3 Mispriced):** OCB, VHM, VND đứng đầu danh sách mispriced. Cảnh báo: các cổ phiếu này tiềm ẩn rủi ro điều chỉnh đột ngột khi sự kiện bất ngờ xuất hiện, vì biên bù rủi ro đã bị nén quá mức. Nếu đang nắm giữ tỷ trọng cao, cân nhắc giảm bớt khi các tín hiệu kỹ thuật xấu đi (ví dụ thủng MA20/MA50 trên khung ngày). Không nên xem đây là điểm mua mới.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VHM", "VND"],
+  "confidence": "medium"
+}
+```

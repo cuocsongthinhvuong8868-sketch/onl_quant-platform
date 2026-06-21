@@ -1,0 +1,584 @@
+{
+  "provider": "deepseek-v4-pro",
+  "generated_at": "2026-06-21T19:58:22",
+  "decision_state": {
+    "report_date": "21/06/2026",
+    "data_date": "19/06/2026",
+    "bias_counts": {
+      "bullish": 1,
+      "bearish": 15,
+      "neutral_or_mixed": 3
+    },
+    "consensus_map": {
+      "hard_adapter_consensus": {
+        "bullish": [],
+        "bearish": [
+          {
+            "tool": "global_financial_conditions",
+            "tool_score": 20,
+            "tool_regime": "PRE-CRASH / PANIC",
+            "reason": "CQS >=85 (98.0)"
+          },
+          {
+            "tool": "vnibor",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "VNIBOR ON >=4% (4.03%)"
+          },
+          {
+            "tool": "market_breadth",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "Breadth MA20 <45% (39.8%)"
+          },
+          {
+            "tool": "esr_monitor",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "SSI >=65% (65.8%)"
+          },
+          {
+            "tool": "var_cvar_vnindex",
+            "tool_score": 18,
+            "tool_regime": "PRE-CRASH / PANIC",
+            "reason": "EVT xi >=0.30 (0.345)"
+          },
+          {
+            "tool": "pvgo",
+            "tool_score": 42,
+            "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+            "reason": "PVGO elevated expectations (46.9%)"
+          }
+        ],
+        "neutral_or_mixed": []
+      },
+      "soft_interpretive_consensus": {
+        "bullish": [
+          {
+            "tool": "fed_liquidity",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "bearish": [
+          {
+            "tool": "margin_m2_overlay",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "ltmm",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "vn100_corporate_health",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "humility_falsification",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "dispersion",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "upside_ratio",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "va_res",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "sentiment_factor_news",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "risk_adjusted_growth",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "neutral_or_mixed": [
+          {
+            "tool": "fear_greed",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "manipulation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "bank_valuation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ]
+      },
+      "usage_rule": "Report hard_adapter_consensus as the stable cross-model consensus. Report soft_interpretive_consensus separately as provider-dependent interpretation; do not mix soft bullish/no-action labels into hard consensus counts."
+    },
+    "hard_constraints": [
+      "Breadth MA20 weak at 39.8%",
+      "EVT xi elevated at 0.250",
+      "EVT xi elevated at 0.345",
+      "Global FCI CQS high at 80.0",
+      "Global FCI CQS high at 98.0"
+    ],
+    "metric_values": {
+      "global_financial_conditions.cqs_percentile": 98.0,
+      "vnibor.vnibor_on": 4.03,
+      "humility_falsification.ssi_pct": 55.0,
+      "humility_falsification.evt_xi": 0.25,
+      "humility_falsification.breadth_ma20_pct": 45.0,
+      "humility_falsification.cqs_percentile": 80.0,
+      "market_breadth.breadth_ma20_pct": 39.8,
+      "esr_monitor.ssi_pct": 65.8,
+      "var_cvar_vnindex.evt_xi": 0.345,
+      "pvgo.pvgo_pct": 46.93,
+      "pvgo.pe": 13.46,
+      "pvgo.coe_pct": 14.0
+    },
+    "tool_scores": [
+      {
+        "tool": "global_financial_conditions",
+        "tool_score": 20,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "CQS >=85 (98.0)"
+      },
+      {
+        "tool": "vnibor",
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "VNIBOR ON >=4% (4.03%)"
+      },
+      {
+        "tool": "market_breadth",
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (39.8%)"
+      },
+      {
+        "tool": "esr_monitor",
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "SSI >=65% (65.8%)"
+      },
+      {
+        "tool": "var_cvar_vnindex",
+        "tool_score": 18,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "EVT xi >=0.30 (0.345)"
+      },
+      {
+        "tool": "pvgo",
+        "tool_score": 42,
+        "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+        "tool_bias": "bearish",
+        "score_reason": "PVGO elevated expectations (46.9%)"
+      }
+    ],
+    "metric_implied_subscores": {
+      "macro_risk_score": 15,
+      "market_internal_score": 30,
+      "tail_risk_score": 18
+    },
+    "metric_implied_score": 24,
+    "metric_implied_regime": "PRE-CRASH / PANIC",
+    "tool_score_count": 6,
+    "score_band_reason": {
+      "macro": [
+        "CQS >=85 (98.0)",
+        "VNIBOR ON >=4% (4.03%)",
+        "broad bearish evidence balance"
+      ],
+      "market_internal": [
+        "Breadth MA20 <45% (39.8%)",
+        "current-tool consensus skewed bearish",
+        "PVGO elevated expectations (46.9%)"
+      ],
+      "tail": [
+        "EVT xi >=0.30 (0.345)",
+        "SSI >=65% (65.8%)"
+      ],
+      "caps": [
+        "PRE-CRASH cap: EVT xi >=0.30",
+        "FEAR cap: Breadth MA20 <45%",
+        "FEAR cap: CQS >=80"
+      ]
+    },
+    "previous_cio_diagnostic": {
+      "date": "2026-06-18",
+      "regime": "CRISIS / PRE-CRASH",
+      "score_delta_from_metric_implied": 11.0,
+      "use_rule": "Diagnostic only. Do not anchor final score to prior CIO score."
+    },
+    "writer_rules": [
+      "Do not copy historical prose; use history only for deltas.",
+      "Use evidence packets as the source of truth; omit raw child-report narration.",
+      "In Tool Consensus, separate hard_adapter_consensus from soft_interpretive_consensus.",
+      "Use metric_implied_score/regime as the baseline score before any LLM overlay.",
+      "Do not place final score in 8-14 solely because recent history was 11-13.",
+      "Hard constraints dominate LLM overlay and allocation.",
+      "If evidence is missing, mark it DATA INSUFFICIENT instead of filling gaps."
+    ]
+  },
+  "history_ledger": [
+    {
+      "date": "2026-06-18",
+      "score": "13",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-17",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-16",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-15",
+      "score": "11",
+      "regime": "CRISIS/PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-14",
+      "score": "11",
+      "regime": "CRISIS/PRE-CRASH",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-12",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-11",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    }
+  ],
+  "evidence_packets": [
+    {
+      "tool": "historical_trend",
+      "layer": "history",
+      "date": "N/A",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ssi_pct": 0.0,
+        "breadth_ma20_pct": 27.8,
+        "cqs_percentile": 1.0
+      },
+      "evidence_excerpt": "- #### 1. Biến thiên Điểm số & Macro Regime (Score & Regime Evolution)\n- Trong toàn bộ chuỗi 7 phiên từ T-7 (11/06) đến T-1 (18/06), Composite Score của hệ thống duy trì ở vùng đáy khủng hoảng, dao động từ 11 đến 13 trên thang điểm (thấp hơn ngưỡng trung tính rất xa). Regime liên tục được dán nhãn “CRISIS / PRE-CRASH”, không có một phiên nào thoát khỏi trạng thái này. Điều đó cho thấy bức tranh vĩ mô nền tảng vẫn chưa thoát khỏi tình trạng cảnh báo đỏ. Mức tăng nhẹ 2 điểm vào phiên T-1 (18/06) – từ 11 lên 13 – là tín hiệu vi cải thiện đơn độc, chưa đủ thuyết phục để hình thành một pha chuyển đổi chế độ. Không có dữ liệu nào cho thấy các yếu tố quyết định như tài khóa, tiền tệ hay xếp hạng tín nhiệm quốc gia đã thay đổi; do đó khả năng cao đây chỉ là nhiễu tạm thời trong bối cảnh khủng hoảng dai dẳng, hoặc phả\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (27.8%)"
+      }
+    },
+    {
+      "tool": "fed_liquidity",
+      "layer": "macro",
+      "date": "21/06/2026",
+      "bias": "bullish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Tuần này, Net Liquidity giảm -48.0 tỷ USD, chạm mức 5,848.9 tỷ USD. Dữ liệu không cung cấp biến động từng cấu phần, nhưng có thể suy luận cơ chế:\n- Liquidity đang trong giai đoạn hậu QT cận biên:\n- - RRP < 10 tỷ USD đánh dấu chấm dứt hoàn toàn kỷ nguyên “liquidity dư thừa” hậu COVID. Giờ đây, bất kỳ biến động thanh khoản nào cũng phụ thuộc vào thay đổi của TGA và tốc độ giảm tài sản của Fed.\n- - So với đỉnh QE 2021–2022 (~6.5 nghìn tỷ) và đáy 2024 (~5.4–5.5 nghìn tỷ), mức 5.85 nghìn tỷ hiện tại là vùng trung tính, thấp hơn đỉnh nhưng cao hơn đáy, không còn dư dả để đẩy mạnh risk-on.\n- Tổng thể, đây là môi trường liquidity phẳng, dễ bị nhiễu bởi dòng vận động TGA ngắn hạn.\n- - Tín hiệu hiện tại: HOLD – Impulse EMA(4) âm (-8.8 tỷ) nhưng Z-Score 52 tuần chỉ -0.69σ, không đủ ngưỡng kích hoạt CUT (yêu cầu ≤ -1σ)\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "global_financial_conditions",
+      "layer": "macro",
+      "date": "21/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "cqs_percentile": 98.0
+      },
+      "evidence_excerpt": "- *Macro Overlay:* DXY (100.81) lập đỉnh 1 năm (phân vị 100%) – sức mạnh USD cực đoan; đường cong lợi suất 2s10s (+0.27%) gần như phẳng nhất trong năm (phân vị 0%), treo lơ lửng báo hiệu nguy cơ suy thoái. Credit Quality Spread (CCC – HY) bung rộng lên 6.76% (phân vị 98%), xác nhận phân hóa chất lượng tín dụng cực lớn.\n- PC1 (yếu tố căng thẳng tổng hợp từ 6 chỉ báo lõi: VIX, MOVE, SKEW, HY, CCC, IG) đã được làm mượt EMA(5) hiện ở mức -0.26σ, tương ứng phân vị 46% trong 1 năm – rơi vào chế độ CALM (yên bình). Mức này phản ánh điều kiện tài chính tổng thể không căng thẳng, dù còn gần trung vị. Tuy nhiên, “driver” – chỉ báo dẫn dắt sự lệch pha nhất – được gắn nhãn CCC_CREDIT_DRIVEN, xác nhận rằng duy nhất CCC OAS (phân vị 80%) đang là điểm bất ổn, trong khi 5 chỉ báo còn lại ở vùng an toàn.\n- PC2 (+0.68σ) captur\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 20,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "CQS >=85 (98.0)"
+      }
+    },
+    {
+      "tool": "margin_m2_overlay",
+      "layer": "macro",
+      "date": "2026-04-30",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Margin/M2 5Y z-score: 2.29σ\n- - Signal regime: ELEVATED_LEVERAGE\n- - Not included in Global FCI PCA, PC1, PC1 percentile, or GFCM hard regime.\n- - Use it to interpret whether Global FCI stress is amplified by crowded leverage."
+    },
+    {
+      "tool": "vnibor",
+      "layer": "macro",
+      "date": "2026-06-17",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "vnibor_on": 4.03
+      },
+      "evidence_excerpt": "- === VNIBOR STRUCTURED SNAPSHOT + 20D TREND ===\n- - ON Z-Score: -1.0598141509519974\n- - Regime: EASY\n- 20-session trend:\n- - Trend label: liquidity squeeze / stress building\n- - ON MA5 slope/session: -0.155%\n- - STRESS/WARNING days: 12\n- - Regime counts: TIGHT: 15, EASY: 3, ELEVATED: 1, NORMAL: 1\n- - Signal counts: STRESS: 10, NEUTRAL: 8, WARNING: 2\n- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "VNIBOR ON >=4% (4.03%)"
+      }
+    },
+    {
+      "tool": "ltmm",
+      "layer": "macro",
+      "date": "18/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- # BẢN TIN THANH KHOẢN VĨ MÔ – LTMM MACRO STATE\n- ## 1. Phân tích Thượng nguồn (Funding Liquidity - FLI)\n- FLI hiện tại: -0.33 (neutral, quality_score 0.68 – usable)\n- Trạng thái Funding Liquidity Index ở mức trung tính, không cho thấy áp lực thắt chặt hay dư thừa rõ rệt từ phía cung tiền thượng nguồn. Điểm số âm nhẹ phản ánh một môi trường thanh khoản cơ bản ổn định, không có dấu hiệu SBV đang hút ròng mạnh qua OMO hay tín phiếu.\n- - FX offshore stress footprint: -0.96 (easy, HIGH quality) – Áp lực tỷ giá offshore đang ở trạng thái dễ chịu, không tạo ra lực hút thanh khoản từ hệ thống nội địa.\n- Vector FRI – Cá\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "vn100_corporate_health",
+      "layer": "fundamental",
+      "date": "2026Q1 / YoY",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - VN100 Health Score: 50.5\n- - Market-cap weighted Health Score: 53.3\n- - Market-cap Health Gap: +2.8\n- - Regime: Mixed / Divergent\n- - Verdict: Accounting Recovery / Low Cash Confirmation\n- - Macro Read: Doanh thu và lợi nhuận phục hồi rộng, nhưng dòng tiền và healthy growth chưa xác nhận nên chưa thể gọi là phục hồi khỏe.\n- - Confidence: High\n- - Cash-confirmed Recovery: Weak\n- - Systemic Stress: Contained\n- Breadth and stress:"
+    },
+    {
+      "tool": "humility_falsification",
+      "layer": "audit",
+      "date": "N/A",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ssi_pct": 55.0,
+        "evt_xi": 0.25,
+        "breadth_ma20_pct": 45.0,
+        "cqs_percentile": 80.0
+      },
+      "evidence_excerpt": "- - Thesis status: WATCH\n- - Cache: HIT (C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\humility_falsification_deepseek-v4-pro_190626.json)\n- | VNIBOR Monitor | STRESS/WARNING sessions (20D) | < 5 sessions | 12.0 sessions | 12.0 sessions | 0 sessions | Intact | 2026-06-17 |\n- | Market Breadth | Breadth MA20 | > 45.0% | 45.9% | 39.8% | -6.135% | Intact | 2026-06-19 |\n- | ESR Monitor | Systemic Stress Index (SSI) | < 55.0% | 66.0% | 65.8% | -0.19% | Intact | 2026-06-19 |\n- | Tail Risk (EVT) | Tail Index (xi) | < 0.25 | 0.345 | 0.345 | +0 | Intact | 2026-06-19 |\n- | Manipulation / Coupling | Vingroup Slope Percentile | < 70.0 th pct | 1.667 th pct | 3.333 th pct | +1.666 th pct | FALSIFIED | 2026-06-19 |\n- | Global Financial Conditions | CQS Percentile | < 80.0 th pct | 96.0 th pct | 98.4 th pct | +2.413 th pct | Intact | 2026-06-18 |"
+    },
+    {
+      "tool": "fear_greed",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Risk Score 58.5, nằm sát ngưỡng trên của vùng NEUTRAL (40–60), Δ +1.2.\n- - Score vs EGARCH Vol: Score tăng nhẹ đi kèm vol giảm → nhất quán với trạng thái trung tính đang dịch chuyển dần về phía ít biến động hơn.\n- Beta đề xuất 0.55–0.65 (trung tính – hơi nghiêng long). Trên dữ liệu hiện tại, xác suất cao thị trường tiếp tục phân hóa và chưa cần hành động phòng thủ quyết liệt hay tấn công mạnh. Hành động cụ thể: duy trì danh mục đa dạng, ưu tiên chọn cổ phiếu có câu chuyện riêng và upside correlation ở mức vừa phải để giảm rủi ro đám đông khi tăng điểm; tránh tăng đòn bẩy tổng thể vì Score chưa xác nhận greed.\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "manipulation",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Bộ ba VIC/VHM/VRE hiện đang đóng vai trò \"giữ giá\" hơn là \"dẫn dắt\". Với Slope ở phân vị cực thấp (16.7), dòng tiền lớn không thực sự cố gắng đẩy giá nhóm này để kéo chỉ số. Thay vào đó, các hoạt động của Market Maker có thể chỉ đủ sức giữ mức tham chiếu. Thị trường đã bắt đầu \"rời\" nhóm VIN về mặt dẫn dắt xu hướng (không đạt tiêu chí Coupling), dồn sự chú ý sang các nhóm ngành khác như Ngân hàng hay Chứng khoán.\n- ## 5. Structured Tail\n- \"regime\": \"ANCHORING\",\n- \"confidence\": \"medium\""
+    },
+    {
+      "tool": "dispersion",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Spread Z-score = –0.79σ, nằm dưới mặt bằng 60 ngày, không ghi nhận hiện tượng căng cấu trúc dispersion.\n- - DPI = 43.3%, dưới ngưỡng 70% → dispersion chưa chuyển thành regime kéo dài.\n- Thị trường đang trong trạng thái bình thường, không bị stress. Mức Spread tuy dương (9.48% annualized) nhưng Z-score âm nhẹ cho thấy spread hiện tại thấp hơn trung bình lịch sử gần đây, không có outlier kéo căng. DPI thấp hơn 70% phủ nhận giả thuyết về một regime dispersion bền vững. Không có tín hiệu stress cục bộ hay toàn thị trường từ bộ chỉ báo cấu trúc.\n- ## 3. Cross-Check & Tail Direction\n- Do thiếu dữ liệu skewness/kurt\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "upside_ratio",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Cả upside và downside breadth đều dưới mu dài hạn, tạo trạng thái zombification (thanh khoản cạn, biến động hẹp). Dòng tiền không nghiêng hẳn bên nào, nhưng so sánh |Phi| cho thấy phe cung (0.228) giữ momentum thực sự mạnh hơn phe cầu (0.198), ngụ ý áp lực bán tiềm ẩn vẫn còn nếu thị trường chuyển động.\n- ## 3. Stress-Test Read\n- P95 Downside 26.88% cho thấy nếu kịch bản panic xảy ra, biên độ giảm mở rộng đáng kể. P95 Upside 23.32% thấp hơn, asymmetry nghiêng về downside risk – tail dày hơn ở phía bán tháo.\n- Strategy: Phòng thủ – duy trì tiền mặt cao, hạn chế mở mới, chờ xác nhận đảo chiều từ breadth hoặc Phi.\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "bank_valuation",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Xác nhận từ hành động giá: Trong nhóm fair/undervalued, có 4 mã thuộc dạng “Fair, Weak Price Action”, 3 mã “Neutral Confirmation”, chỉ 2 mã “Undervalued, Price Confirmed” (NAB, KLB) và 1 mã “Fair Value, Market Agrees” (TPB). Phần lớn các mã chưa được thị trường xác nhận hỗ trợ tăng giá.\n- - Đáng theo dõi (nhưng cần thận trọng): NAB và KLB – rẻ nhưng rủi ro, có xác nhận giá mạnh mẽ (market confirmation lần lượt 83.6 và 75.6). Tuy nhiên risk score ở mức trung bình-cao (51.9 và 42.6), cần đánh giá kỹ khả năng sinh lời bền vững và cấu trúc vốn trước khi xem xét giải ngân.\n- - Rủi ro/value‑trap nổi bật: NVB (-88.9%, risk 68.3, dữ liệu thiếu CAR), EIB (-65.6%, risk 58.4), BVB (-61.8%, risk 63.5), VPB (-34.3%, risk 60.5). Nhóm này vừa định giá cao vừa đi kèm rủi ro tín dụng/dữ liệu lớn, cần tránh hoặc giảm tỷ tr\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "market_breadth",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "breadth_ma20_pct": 39.8
+      },
+      "evidence_excerpt": "- - MA252: 28.5% – nằm sâu dưới 40%, báo hiệu chế độ suy yếu dài hạn (bear regime).\n- Phân kỳ giữa MA20 và MA252 cùng mặt bằng breadth toàn diện yếu buộc nhà giao dịch chờ xác nhận (WAIT FOR CONFIRMATION). Chiến lược phù hợp là phòng thủ, ưu tiên nắm giữ tiền mặt (defensive cash‑up), không giải ngân đòn bẩy. Margin đề xuất: 0%.\n- \"tool\": \"market_breadth\",\n- \"regime\": \"divergence\",\n- \"confidence\": \"medium\"",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (39.8%)"
+      }
+    },
+    {
+      "tool": "esr_monitor",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ssi_pct": 65.8
+      },
+      "evidence_excerpt": "- - SSI: 65.8% — chạm vùng WARNING (0.50–0.80), rủi ro hệ thống đang tích lũy ngầm\n- - Market State (HMM): EUPHORIC RISK (high stress + uptrend), nhưng VN30 hiện nằm dưới MA125\n- - PCA Concentration: EVR PC1 = 38.3%, tương quan hệ thống vượt ngưỡng trung bình\n- ## 2. Risk Decomposition (Bóc tách)\n- S_COR (17%) cùng với PC1 = 38.3% cho thấy các cổ phiếu đang di chuyển đồng pha cao — dấu hiệu herding, hỗ trợ cho kịch bản bull-trap khi dòng tiền rút nhanh sẽ kéo cả rổ xuống đồng loạt.\n- - Phân kỳ rõ nét giữa HMM regime EUPHORIC RISK (hàm ý uptrend) và vị trí giá thực tế của VN30 đang nằm dưới MA125. MA125 thường là\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "SSI >=65% (65.8%)"
+      }
+    },
+    {
+      "tool": "va_res",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Stress Index (VN30): 0.00%, không vọt ngưỡng cảnh báo 40%.\n- - Số mã thủng VaR 95%: 0/30, không có điểm vỡ.\n- VN30 Stress = 0% cho thấy không có hiện tượng lây lan cấp tính trong phiên. Hành vi đổ vỡ đồng loạt không được ghi nhận, các vị thế lớn chưa bị ép margin đồng loạt. Với 0/30 mã thủng VaR 95%, rủi ro hệ thống phát sinh từ tác động dây chuyền gần như không tồn tại trong ngày 19/06/2026.\n- Tuy nhiên, điều này không hề đồng nghĩa thị trường ổn định hay vận hành bình thường. Thị trường có thể đang trong uptrend mạnh, downtrend, hoặc đi ngang nhưng spread vẫn giãn đủ – mọi kịch bản đều tương thích với Compl\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "var_cvar_vnindex",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "evt_xi": 0.345
+      },
+      "evidence_excerpt": "- - Historical VaR 95% (phân vị 5% trên 3 năm cuốn chiếu) ở mức -1.65%, cho thấy tổn thất điển hình trong các biến động xấu là tương đối khiêm tốn.\n- - EVT VaR 99% (sự kiện 1/100 ngày) rơi vào -3.69%, cao gấp hơn hai lần VaR lịch sử 95%, hé lộ mức tổn thất cực đoan sâu hơn đáng kể.\n- - Tham số hình dạng GPD ξ = +0.345, phân loại trực tiếp vào nhóm “đuôi mập” (fat tail), cảnh báo rủi ro cực đoan vượt xa phân phối chuẩn.\n- ## 2. Tail Thickness Diagnosis\n- Với ξ = 0.345 > 0.30, thị trường rơi vào chế độ đuôi mập – mô hình Gaussian sẽ đánh giá thấp trầm trọng các tổn thất đuôi. Chỉ số Hill đo được 0.447 củng cố kết l\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 18,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "EVT xi >=0.30 (0.345)"
+      }
+    },
+    {
+      "tool": "sentiment_factor_news",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- # 1. Trạng thái tâm lý tin tức (news sentiment regime)\n- - 1d: risk_on → Macro composite = +0.173 (yếu hơn)\n- - 7d: strong_risk_on → +0.512 (rất mạnh)\n- - 30d: strong_risk_on → +0.350 (mạnh)\n- # 2. Kênh dẫn dắt risk-on / risk-off mạnh nhất\n- Risk-on:\n- - credit_stress: +1.420 (7d), +0.708 (30d) – tín hiệu ổn định hệ thống.\n- Risk-off:\n- - liquidity: -0.136 (7d), -0.065 (30d) – phản ánh động thái hút ròng của NHNN.\n- Tích cực (kéo risk-on):"
+    },
+    {
+      "tool": "risk_adjusted_growth",
+      "layer": "current_tool",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Kịch bản trung lập (K = 1.0, CoE = 14%, stress test không kích hoạt) là baseline khá cân bằng cho ngành ngân hàng Việt Nam. Tuy nhiên, mặt bằng Alpha hiện tại rất tiêu cực: chỉ duy nhất SHB có Alpha dương (+1.2%), còn lại toàn bộ các mã trong Top 3 và Bottom 3 đều âm. Điều này cho thấy phần lớn ngành đang đốt vốn cổ đông dù hệ số phạt rủi ro không hề khắc nghiệt. Nhà đầu tư cần thận trọng, tập trung vào số ít ngân hàng thực sự tạo giá trị.\n- ## 2. Top Alpha Decomposition\n- | Mã | Alpha | P/B | ROE | σ(ROE) | Payout | Phân loại |\n- - ACB: ROE cao nhưng P/B trên 1, payout khá lớn và σ(ROE) 2.7% ăn mòn phần thưởng; Alpha chỉ âm nhẹ nhưng dễ tổn thương khi rủi ro tăng. Mẫu hình Growth Trap.\n- | Mã | Alpha | P/B | ROE | σ(ROE) | Bẫy chính |\n- | VPB | –10.0% | 1.22 | 14.1% | 4.7% | Risk Penalty vô hiệu hóa lợi nh\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "pvgo",
+      "layer": "valuation",
+      "date": "19/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "pvgo_pct": 46.93,
+        "pe": 13.46,
+        "coe_pct": 14.0
+      },
+      "evidence_excerpt": "- === PVGO VALUATION STRUCTURED SNAPSHOT ===\n- - PVGO z-score: -1.39\n- - Negative/low PVGO means the market embeds low growth expectations, potentially supportive if earnings quality holds.\n- - Elevated/very high/extreme PVGO means valuation depends heavily on growth expectations; treat as expectation-risk overlay for AI CIO allocation and confidence.",
+      "adapter_score": {
+        "tool_score": 42,
+        "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+        "tool_bias": "bearish",
+        "score_reason": "PVGO elevated expectations (46.9%)"
+      }
+    }
+  ]
+}

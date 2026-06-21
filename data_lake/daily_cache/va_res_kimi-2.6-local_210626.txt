@@ -1,0 +1,34 @@
+## 1. Observations
+- VN30 Stress Index: **0.00%** (0/30 mã thủng VaR 95%), không có breach nào cần báo cáo
+- Complacency Index: **4.63%**, 5 mã mispriced toàn thị trường, top 3 nén nhất: OCB, VHM, VND
+- **Không có overlap** giữa stress real-time và mispricing: đây là 2 kênh rủi ro độc lập
+
+## 2. Contagion Assessment (Module B)
+Stress 0% = **không có lây lan real-time** trong VN30. Không mã nào thủng VaR 95%, nghĩa là phân phối returns nằm trong kỳ vọng statistical — chưa có tail event. Đây **không phải** "thị trường an toàn", chỉ là "chưa có đám cháy lây lan". Top 3 crash không tồn tại → không đánh giá được tính systemic/cá biệt.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency **4.63% ≪ 80%** → thị trường **KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa** thị trường ổn định, bình thường, hay không có áp lực bán.
+
+Kết hợp với Stress Index = 0%, có 2 khả năng probabilistic:
+- **Scenario A (higher prob):** Uptrend mạnh — spread giãn tự nhiên do vol tăng, không nén
+- **Scenario B:** Hoảng loạn vừa qua, spread đang giãn nở từ mức cực đoan
+
+Không có dữ liệu để phân biệt A/B; cần thêm context price action & volume.
+
+## 4. Stock-Level Risk Calls
+- **Module B (Crash):** Không có breach → không có stock call
+- **Module C (Mispriced):** OCB, VHM, VND — spread bị nén chặt nhất trong nhóm 5 mã. **Cảnh báo:** nếu thị trường xuất hiện shock, 3 mã này có khả năng repricing mạnh do risk premium bị định giá thấp. Không bán khống chỉ dựa trên complacency thấp, nhưng **không nên mới mở long** trên các ticker này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VHM", "VND"],
+  "confidence": "medium"
+}
+```
