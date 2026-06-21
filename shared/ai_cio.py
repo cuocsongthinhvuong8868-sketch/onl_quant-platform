@@ -257,6 +257,8 @@ from tools.bank_valuation.quant.engine.ai_analysis import build_bank_valuation_a
 from tools.bank_valuation.quant.pipeline import run_bank_valuation_pipeline
 # Import logic Sentiment Factor From News
 from tools.sentiment_factor_news.report import build_sentiment_factor_news_ai_prompt
+# Import logic PVGO Valuation
+from tools.pvgo.report import build_ai_cio_context as build_pvgo_ai_cio_context
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
@@ -821,6 +823,9 @@ def _build_evidence_packet(
         "breadth_ma20_pct": [r"MA20[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "cqs_percentile": [r"\bCQS\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
         "vnibor_on": [r"Overnight[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "pvgo_pct": [r"\bPVGO\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "pe": [r"\bP/E\b\s*:\s*([-+]?\d+(?:\.\d+)?)x"],
+        "coe_pct": [r"\bCOE assumption\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
     }
     for metric, patterns in metric_patterns.items():
         value = _extract_first_number(patterns, text)
@@ -2300,6 +2305,8 @@ def _build_decision_state(
                 hard_constraints.append(f"Breadth MA20 weak at {value:.1f}%")
             if key == "cqs_percentile" and value >= 80:
                 hard_constraints.append(f"Global FCI CQS high at {value:.1f}")
+            if key == "pvgo_pct" and value >= 50:
+                hard_constraints.append(f"PVGO expectation risk high at {value:.1f}%")
 
     consensus_map = _build_consensus_map(current_packets, tool_scores)
     metric_implied = derive_metric_implied_scores(metric_values, bias_counts, tool_scores=tool_scores)
@@ -2412,6 +2419,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     r10 = run_sentiment_factor_news(client, provider_key, model)
     r11 = run_risk_adjusted_growth(client, df_stocks, provider_key, model)
+    pvgo_context = build_pvgo_ai_cio_context(coe_pct=14.0)
     humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)
@@ -2461,6 +2469,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         _build_evidence_packet("var_cvar_vnindex", r9, "current_tool", data_date, max_excerpt_chars=700),
         _build_evidence_packet("sentiment_factor_news", r10, "current_tool", data_date, max_excerpt_chars=700),
         _build_evidence_packet("risk_adjusted_growth", r11, "current_tool", data_date, max_excerpt_chars=900),
+        _build_evidence_packet("pvgo", pvgo_context, "valuation", data_date, max_excerpt_chars=700),
     ]
     decision_state = _build_decision_state(
         evidence_packets=evidence_packets,

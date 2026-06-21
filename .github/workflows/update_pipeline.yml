@@ -1,4 +1,4 @@
-name: Quant Data Auto-Update Pipeline
+name: Quant Data + PVGO Auto-Update Pipeline
 
 on:
   workflow_dispatch:
@@ -75,6 +75,9 @@ jobs:
 
       - name: Pre-warm Factor Examination pkl
         run: python command/update_factor_examination.py
+
+      - name: Run update_pvgo_valuation.py
+        run: python command/update_pvgo_valuation.py
 
       - name: Run update_vnibor.py
         run: python command/update_vnibor.py

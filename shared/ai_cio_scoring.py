@@ -136,6 +136,30 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
             reason = f"VNIBOR ON contained ({overnight:.2f}%)"
         return _tool_score(tool, score, reason)
 
+    if tool == "pvgo":
+        pvgo = _as_float(metrics.get("pvgo_pct"))
+        if pvgo is None:
+            return None
+        if pvgo >= 65:
+            score = 25
+            reason = f"PVGO extreme expectations ({pvgo:.1f}%)"
+        elif pvgo >= 50:
+            score = 35
+            reason = f"PVGO very high expectations ({pvgo:.1f}%)"
+        elif pvgo >= 35:
+            score = 45
+            reason = f"PVGO elevated expectations ({pvgo:.1f}%)"
+        elif pvgo >= 20:
+            score = 55
+            reason = f"PVGO fair expectations ({pvgo:.1f}%)"
+        elif pvgo >= 0:
+            score = 65
+            reason = f"PVGO low expectations ({pvgo:.1f}%)"
+        else:
+            score = 68
+            reason = f"PVGO below steady-state value ({pvgo:.1f}%)"
+        return _tool_score(tool, score, reason)
+
     return None
 
 
@@ -171,12 +195,14 @@ def derive_metric_implied_scores(
     breadth_values = values_for(".breadth_ma20_pct")
     ssi_values = values_for(".ssi_pct")
     xi_values = values_for(".evt_xi")
+    pvgo_values = values_for(".pvgo_pct")
 
     max_cqs = max(cqs_values) if cqs_values else None
     max_vnibor = max(vnibor_values) if vnibor_values else None
     min_breadth = min(breadth_values) if breadth_values else None
     max_ssi = max(ssi_values) if ssi_values else None
     max_xi = max(xi_values) if xi_values else None
+    max_pvgo = max(pvgo_values) if pvgo_values else None
 
     macro_score = 50.0
     macro_reasons: list[str] = []
@@ -219,6 +245,19 @@ def derive_metric_implied_scores(
     if bias_counts.get("bearish", 0) >= bias_counts.get("bullish", 0) + 7:
         internal_score = max(0.0, internal_score - 5.0)
         internal_reasons.append("current-tool consensus skewed bearish")
+    if max_pvgo is not None:
+        if max_pvgo >= 65:
+            internal_score = min(internal_score, 35.0)
+            internal_reasons.append(f"PVGO extreme expectations ({max_pvgo:.1f}%)")
+        elif max_pvgo >= 50:
+            internal_score = min(internal_score, 42.0)
+            internal_reasons.append(f"PVGO very high expectations ({max_pvgo:.1f}%)")
+        elif max_pvgo >= 35:
+            internal_score = min(internal_score, 48.0)
+            internal_reasons.append(f"PVGO elevated expectations ({max_pvgo:.1f}%)")
+        elif max_pvgo < 20:
+            internal_score = max(internal_score, 58.0)
+            internal_reasons.append(f"PVGO low embedded expectations ({max_pvgo:.1f}%)")
 
     tail_score = 50.0
     tail_reasons: list[str] = []

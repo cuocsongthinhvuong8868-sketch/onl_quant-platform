@@ -1,0 +1,30 @@
+## 1. Observations
+- Risk Score 58.5/100: trong bucket 40-60, cận trên, Δ +1.2 điểm
+- EGARCH Vol 17.1%: giảm 1.2%, dưới mức trung bình stress gần đây
+- Rolling Skewness 0.20: dương nhẹ, không extreme
+- Downside Corr 9.5% vs Upside Corr 29.8%: spread 20.3%, up-corr gấp ~3.1x down-corr
+
+## 2. Interpretation
+Dữ liệu hiện tại mapping vào pha NEUTRAL cận GREED: phân hoá đang mờ dần, đám đông bắt đầu cluster ở chiều long nhưng chưa đạt ngưỡng crowded. Vol compression + skew dương = xác suất cao market đang discount upside tương đối đồng thuận.
+
+## 3. Cross-Check
+- **Score vs EGARCH**: Score tăng (+1.2) + vol giảm (-1.2%) → **consistent**, vol compression đẩy score lên
+- **Skewness vs Correlation**: Skew dương (0.20) + up-corr cao (29.8%) → **consistent** cả hai flag cùng chiều long-bias
+- **Divergence flag**: Down-corr thấp (9.5%) trong khi up-corr cao → asymmetry rõ, tail-risk down chưa được price; đây là lệch so với "fear" pattern nhưng consistent với "greed" transition
+
+## 4. Verdict
+- **Beta target: 0.55-0.65** (giảm từ neutral 1.0, chưa cut sâu)
+- **Hành động**: (1) Trim beta qua nhóm high-up-corr (VN30, bank, chứng khoán); (2) Rotate sang low-correlation relative value; (3) Không short outright vì chưa có trigger vol spike hay skew flip
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "19/06/2026",
+  "regime": "NEUTRAL",
+  "score": 58.5,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": ["vol compression -1.2% with score rising into upper neutral", "up-corr 29.8% >> down-corr 9.5%: long asymmetry building", "skew +0.20 consistent with greed transition but not extreme"]
+}
+```

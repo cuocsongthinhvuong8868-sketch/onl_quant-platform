@@ -28,6 +28,13 @@ TOOLS = [
         "render_func": "render",
     },
     {
+        "id": "pvgo",
+        "name": "PVGO Valuation Model",
+        "desc": "Present Value of Growth Opportunities cho VN-Index: P/E, COE, steady-state value và growth expectations.",
+        "page_module": "tools.pvgo.page",
+        "render_func": "render",
+    },
+    {
         "id": "upside_ratio",
         "name": "🧬 Upside/Downside Ratio",
         "desc": "Hybrid MC Bidirectional Breadth Model — Phân tích Cung-Cầu với Monte Carlo ensemble",

@@ -1,0 +1,35 @@
+## 1. Observations
+
+- **Lực cầu nén sâu**: 5.65% vs μ 13.09% (delta -7.44pp), dưới trung bình dài hạn gần 1 độ lệch chuẩn — cầu yếu bất thường.
+- **Lực cung nén nhẹ hơn**: 7.29% vs μ 13.55% (delta -6.26pp), nhưng áp đảo cầu tuyệt đối (7.29% > 5.65%).
+- **Cả hai chiều Momentum regime**: Φ_up = 0.198, Φ_dn = 0.228, đều vượt ngưỡng +0.10 — đà tiếp diễn ở cả hai phía, không random walk.
+
+## 2. Supply-Demand Dynamics
+
+- **Trạng thái**: **Zombification** — cả up và down đều nén dưới μ, thanh khoản cạn, không có phe nào chi phối rõ ràng. Tuy nhiên, cung áp đảo cầu (7.29% > 5.65%), tạo skew âm nhẹ.
+- **Momentum winner**: **Supply** — |Φ_dn| = 0.228 > |Φ_up| = 0.198, đà bán mạnh hơn đà mua 15% tương đối. Cung không chỉ đông hơn mà còn có xu hướng tự củng cố mạnh hơn.
+
+## 3. Stress-Test Read
+
+- P95 Downside 26.37%: nếu trigger panic, ~1/4 mã sàn cùng lúc — thanh khoản sẽ evaporate, spread blowout.
+- **Asymmetry rõ**: P95_Dn (26.37%) > P95_Up (23.47%), chênh 2.9pp. Tail risk cung dày hơn cầu; downside convexity đắt hơn upside. Kịch bản "gãy" có xác suất mass cao hơn "bùng nổ" ở đuôi phân phối.
+
+## 4. Verdict
+
+- **Tỷ trọng giải ngân**: **0%**
+- **Strategy**: **phòng thủ** — zombification + supply momentum dominance = không có edge để rình bắt đáy. Chờ Φ_dn mean-revert hoặc up/down diverge rõ (accumulation signal) mới tái đánh giá. Không chase vì cầu yếu và momentum bên mua kém.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.37,
+  "p95_upside_pct": 23.47,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```

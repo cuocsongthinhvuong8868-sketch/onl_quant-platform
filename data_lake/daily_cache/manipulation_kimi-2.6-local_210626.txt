@@ -1,0 +1,28 @@
+ ## 1. Observations
+- **OLS Slope 0.25 tại percentile 16.7th** 🟢: Slope rất thấp, VIN composite chỉ tác động 0.25 điểm F1 mỗi 1% đổi giá — độ nhạy giảm mạnh, gần vùng extreme decoupling
+- **Correlation 0.63 tại percentile 57.3th** 🟡: Corr ở giữa băng, không chặt nhưng vẫn có nghĩa — VIN chưa hoàn toàn mất liên kết
+- **Regime ANCHORING** (ΔCorr=+0.25, ΔSlope=-0.53): Corr được giữ nhân tạo, slope sụt giảm — đúng pattern MM dùng VIN "neo" giá F1 nhưng không có lực đẩy thực
+
+## 2. Microstructure Read
+VIN đang **giảm quyền chi phối**. Slope <20th cho thấy market maker chỉ dùng khối VIN để **giữ mức giá F1**, không dùng để **dẫn dắt xu hướng**. Đây không phải decoupling hoàn toàn (corr vẫn ổn), nhưng là **chi phối yếu, neo giá nông**. Nếu slope tiếp tục giảm dưới 10th, VIN sẽ mất vai trò leader.
+
+## 3. Event Study Interpretation
+**ANCHORING = trap cho breakout giả**. Intraday: F1 có thể bị kéo lên khi VIC/VHM được gom nhẹ, nhưng động lượng không bền — **không nên đu theo breakout**. Overnight: Rủi ro gap ngược cao nếu MM thả neo. Không giữ vị thế qua đêm vì slope đang ở vùng yếu, bất kỳ tin tức nào cũng phá vỡ anchor.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** — ANCHORING không cho edge rõ ràng; long/short F1 đều dính trap
+- **Spread VIN-vs-Bank** nếu muốn làm: Long Bank/Short VIN (VIC stop-loss dưới 205.50 × 0.98 ≈ 199.39, tức ~199,400; VHM dưới 145.30 × 0.98 ≈ 142.39, tức ~142,400)
+- **Leading indicator**: Theo dõi **CTG, TCB, VCB** (Bank) và **SSI, VND** (Chứng) — nếu nhóm này dẫn dắt khi VIN anchor, đó là xác nhận decoupling thực sự
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "19/06/2026",
+  "regime": "ANCHORING",
+  "slope_percentile": 16.7,
+  "corr_percentile": 57.3,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```
