@@ -5,6 +5,7 @@ from types import SimpleNamespace
 import pandas as pd
 import streamlit as st
 
+from tools.sentiment_factor_news import config
 from tools.sentiment_factor_news.report import (
     FEED_DIR,
     load_channel_scores,
@@ -169,8 +170,20 @@ def render():
     st.sidebar.divider()
     st.sidebar.subheader("Ingestion")
     source = st.sidebar.selectbox("Fetch source", ["all", "mozyfin", "widata"], key="sentiment_fetch_source")
-    limit_mozyfin = st.sidebar.number_input("Mozyfin limit", min_value=1, max_value=10000, value=100, step=25)
-    limit_widata = st.sidebar.number_input("WiData limit", min_value=1, max_value=1000, value=50, step=25)
+    limit_mozyfin = st.sidebar.number_input(
+        "Mozyfin limit",
+        min_value=1,
+        max_value=10000,
+        value=config.FETCH_LIMIT_MOZYFIN,
+        step=100,
+    )
+    limit_widata = st.sidebar.number_input(
+        "WiData limit",
+        min_value=1,
+        max_value=5000,
+        value=config.FETCH_LIMIT_WIDATA,
+        step=100,
+    )
     if st.sidebar.button("Run ingestion", use_container_width=True, key="sentiment_run_ingestion"):
         with st.spinner("Fetching and processing sentiment feed..."):
             try:

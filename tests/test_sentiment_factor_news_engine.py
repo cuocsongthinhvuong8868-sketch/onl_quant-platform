@@ -1,7 +1,47 @@
+import importlib
+
 from tools.sentiment_factor_news.core.classifier import classify_and_tag_item
 from tools.sentiment_factor_news.core.normalizer import normalize_mozyfin, normalize_widata
 from tools.sentiment_factor_news.core.scorer import score_item
 from tools.sentiment_factor_news.report import snapshot
+from tools.sentiment_factor_news import config
+from tools.sentiment_factor_news.connectors import mozyfin_connector
+
+
+def test_default_fetch_limits_match_daily_ingestion_target(monkeypatch):
+    monkeypatch.delenv("FETCH_LIMIT_MOZYFIN", raising=False)
+    monkeypatch.delenv("FETCH_LIMIT_WIDATA", raising=False)
+
+    reloaded = importlib.reload(config)
+
+    assert reloaded.FETCH_LIMIT_MOZYFIN == 1000
+    assert reloaded.FETCH_LIMIT_WIDATA == 500
+
+
+def test_mozyfin_connector_skips_without_access_token(monkeypatch):
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
+
+    assert mozyfin_connector.fetch_mozyfin_news(limit=10) == []
+
+
+def test_mozyfin_connector_authorization_header(monkeypatch):
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "abc123")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
+
+    headers = mozyfin_connector._build_headers()
+
+    assert headers["Authorization"] == "Bearer abc123"
+
+
+def test_mozyfin_connector_api_key_header(monkeypatch):
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "key123")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_AUTH_HEADER", "x-api-key")
+
+    headers = mozyfin_connector._build_headers()
+
+    assert headers["x-api-key"] == "key123"
 
 
 def test_mozyfin_banking_news_scores_positive():

@@ -238,6 +238,9 @@ VNSTOCK_API_KEY = "your_vnstock_api_key"
 FRED_API_KEY = "your_fred_api_key"              # Tùy chọn: cho Fed Liquidity data
 GITHUB_TOKEN = "your_github_token"              # Tùy chọn: cho GitHub Sync feature
 LOGIN_PASSWORD = "your_login_password"          # Required for public Streamlit Cloud login
+WIDATA_SIGN_TOKEN = "your_widata_sign_token"     # Required for WiData signal ingestion
+MOZYFIN_ACCESS_TOKEN = "your_mozyfin_bearer"     # Required for Mozyfin news ingestion, if provided as a Bearer token
+MOZYFIN_API_KEY = "your_mozyfin_api_key"         # Alternative to MOZYFIN_ACCESS_TOKEN
 
 # Optional: API key shortcuts (4 số) cho AI CIO
 # Người dùng có thể gõ shortcut thay vì paste full API key
