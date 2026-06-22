@@ -1,0 +1,39 @@
+# Tail Risk Assessment for VNINDEX — 22/06/2026
+
+## 1. Observations
+- **Historical VaR 95%** ở mức –1.65%, sâu hơn chút so với Parametric VaR 95% (–1.48%), cho thấy phân phối thực tế có đuôi trái nặng hơn kỳ vọng Gaussian.
+- **EVT VaR 99%** (POT/GPD) ước tính mức lỗ –3.69% cho sự kiện 1/100 ngày, vượt xa ước lượng Gaussian (xấp xỉ –2.07%), báo hiệu rủi ro đuôi bị định giá thấp nghiêm trọng.
+- **Hệ số đuôi GPD** ξ = +0.345, vượt ngưỡng 0.30 → nằm trong vùng FAT TAIL, đặc trưng bởi xác suất sụt giảm cực đoan cao hơn nhiều lần so với mô hình chuẩn.
+- **Hill index** = +0.447, cùng dấu dương và cùng cấp độ, củng cố tín hiệu đuôi dày; không có sự phân kỳ đáng ngờ.
+
+## 2. Tail Thickness Diagnosis
+- ξ = 0.345 rơi vào bracket **FAT TAIL** (ξ > 0.30). Khi vượt 0.30, phân phối có nguy cơ mất hội tụ của ES (moment bậc cao phân kỳ), đồng nghĩa rủi ro cực đoan có thể lớn hơn bất kỳ ước lượng EVT nào. Thị trường hiện tại vận hành trong chế độ đuôi cực dày.
+- **Hill (0.447) cross‑check**: Cùng dấu dương và giá trị sai khác không quá lớn so với ξ (~0.10) → không có sự nhạy cảm ngưỡng bất thường, tín hiệu được xác nhận bởi hai phương pháp độc lập → độ tin cậy cao.
+- **ES – VaR spread 95%** = –1.37% vượt xa σ₃₀ (0.86%), corroborate thêm rằng loss ngoài VaR trung bình lớn gấp 1.6 lần sigma hàng ngày, xác nhận sự hiện diện của đuôi dày bằng chứng thực nghiệm.
+
+## 3. Gaussian Gap
+- Gaussian VaR 99% suy từ các tham số (μ ≈ –0.065%, σ = 0.86%): μ – 2.326σ ≈ **–2.07%**.
+- EVT VaR 99% = **–3.69%**.
+- Gap = **1.62 điểm phần trăm** (>1 pp) → Gaussian underestimates rủi ro cực đoan hàng ngày gần gấp đôi. Mô hình normal không đủ tin cậy để phân bổ vốn rủi ro hay đặt ngưỡng cảnh báo.
+
+## 4. Verdict — Hedging Implications
+Với ξ > 0.30, khuyến nghị **tránh hoàn toàn các chiến lược momentum** vì có thể chịu tổn thất leo thang khi thị trường giảm nhanh. Thay vào đó:
+- **Mua put options ITM** (in‑the‑money) để bảo vệ danh mục trước những cú sốc rơi tự do, vì OTM có thể không kịp bù đắp khi drawdown vượt xa VaR 99%.
+- **Short futures** để giảm net exposure, hạn chế rủi ro thanh lý bắt buộc.
+- Giảm đòn bẩy tối thiểu 50% so với mức hiện tại để phòng ngừa sự kiện đuôi có biên độ vượt ngoài khả năng hấp thụ của tài khoản.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "22/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.62,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "high"
+}
+```

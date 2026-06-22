@@ -1,0 +1,30 @@
+## 1. Observations
+- **Spread_Z = –1.74σ** – mức nén dispersion cực thấp so với trung bình 60 phiên, dù spread tuyệt đối vẫn dương (4.69%).
+- **DPI = 43.3%** – dưới ngưỡng 70%, không có chế độ phân tán kéo dài; thị trường không nằm trong trạng thái “stress regime”.
+- **Avg Pairwise Correlation (Ledoit-Wolf) = 0.008** – tương quan gần bằng 0, phản ánh sự phân hóa mạnh mẽ giữa các cổ phiếu, môi trường lý tưởng cho stock-picking.
+- **Skewness & Kurtosis N/A** – thiếu dữ liệu để đánh giá trực tiếp hướng đuôi và độ béo của phân phối.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **bình thường – co cụm (compression)**, không stress.  
+Spread_Z âm sâu cho thấy mức độ phân tán đang bị nén xuống dưới đáng kể so với quá khứ gần, trong khi DPI thấp xác nhận đây không phải là một pha regime dispersion lây lan. Không có tín hiệu “cục bộ” hay “regime persistent” của stress; các chỉ báo đồng thuận cho thấy cấu trúc thị trường đang trong giai đoạn tĩnh lặng với độ phân hóa cao.
+
+## 3. Cross-Check & Tail Direction
+Do Skewness và Kurtosis không có sẵn, không thể xác định liệu đuôi trái hay đuôi phải đang bị gãy. Tuy nhiên, với Spread_Z âm và DPI thấp, nhiều khả năng phân phối cross-sectional hiện tại khá cân xứng, biến động outlier không chiếm ưu thế. Nếu có tail risk, nó chưa lộ diện trong bộ chỉ báo dispersion – mô hình đuôi béo (fat-tail) chưa có bằng chứng để áp dụng.
+
+## 4. Regime Mapping
+Theo bản đồ 2D (DPI × Correlation), với DPI thấp (43.3%) và tương quan cực thấp (0.008), thị trường đang nằm ở ô **Healthy Stock‑Picking**. Đây là chế độ mà các yếu tố đặc thù cổ phiếu chi phối, biến động danh mục phân tán tốt, không có lực kéo đồng pha.  
+**Rủi ro lớn nhất cho Portfolio Manager:** sự dịch chuyển đột ngột sang chế độ “bầy đàn” (herding crash) nếu một cú sốc vĩ mô kích hoạt tương quan tăng vọt lên gần 1. Môi trường tương quan thấp hiện tại dễ tạo tâm lý chủ quan; khi sang chế độ capitulation, toàn bộ lợi thế phân hóa bị xóa sổ trong thời gian ngắn, gây tổn thất đồng loạt bất chấp chọn cổ phiếu tốt.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "22/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.74,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

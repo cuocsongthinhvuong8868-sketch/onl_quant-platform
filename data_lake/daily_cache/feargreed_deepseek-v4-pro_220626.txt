@@ -1,0 +1,31 @@
+## 1. Observations
+- Risk Score 58.1/100 nằm sát ngưỡng trên của vùng NEUTRAL (40–60), Δ phiên trước -0.3 – gần như đi ngang.
+- EGARCH Vol chuẩn hóa 14.7%, giảm -2.4 pp – biến động hạ nhiệt rõ rệt, tiến gần đặc trưng của pha GREED.
+- Rolling Skewness 0.08 – dương nhưng quá nhỏ, chưa đạt mức báo hiệu FOMO mạnh (>0.3).
+- Downside Correlation chuẩn hóa 7.1% so với Upside Correlation 30.0% – tương quan tăng mạnh gấp hơn 4 lần tương quan giảm, cổ phiếu đồng pha khi đi lên, phân hoá khi điều chỉnh.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường ở pha NEUTRAL/STOCK PICKING phân hoá cao. Tuy nhiên, cấu trúc tương quan và biến động cho thấy pha này có xu hướng nghiêng về GREED với xác suất cao, nhưng chưa xác nhận đầy đủ vì skewness còn yếu và score vẫn dưới 60. Đây là môi trường chọn cổ phiếu, ít rủi ro hệ thống.
+
+## 3. Cross-Check
+- Divergence nhẹ giữa Score (NEUTRAL, 58.1) và EGARCH Vol (đang giảm sâu về vùng thấp điển hình của GREED). Nếu vài phiên tới vol tiếp tục giảm mà score vượt 60, tín hiệu chuyển pha GREED sẽ mạnh lên.
+- Skewness hơi dương + Upside Correlation >> Downside Correlation → nhất quán, không có mâu thuẫn. Downside Correlation cực thấp củng cố tính chất stock-picking: rủi ro giảm ít lan toả.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.8** – giảm nhẹ so với beta 1.0 của chỉ số, phản ánh sự thận trọng khi các chỉ báo tiến gần vùng biên GREED nhưng chưa đủ mạnh để phòng thủ quyết liệt. Hành động: ưu tiên nắm giữ cổ phiếu phòng thủ có downside correlation thấp kết hợp chốt lời từng phần các vị thế beta cao, tránh mua đuổi khi tương quan tăng đang đồng pha. Không có tín hiệu hành động cực đoan (NO ACTIONABLE SIGNAL cho việc giảm sâu hay gia tăng đột biến rủi ro).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "22/06/2026",
+  "regime": "NEUTRAL",
+  "score": 58.1,
+  "confidence": "medium",
+  "beta_target": 0.8,
+  "key_signals": [
+    "EGARCH Vol giảm -2.4pp còn 14.7%, tiến gần ngưỡng thấp của GREED",
+    "Upside Correlation 30.0% gấp >4 lần Downside Correlation 7.1%"
+  ]
+}
+```

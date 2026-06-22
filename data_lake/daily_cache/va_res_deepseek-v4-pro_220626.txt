@@ -1,0 +1,31 @@
+## 1. Observations
+- Stress Index VN30: **0.00%** – không có mã nào trong rổ thủng VaR 95%, tín hiệu contagion bằng 0.
+- Breach count: **0 / 30** – không ghi nhận cú sập cá biệt hay lan truyền nào.
+- Complacency Index: **5.56%** – cực thấp, thị trường **không** ở trạng thái “ngủ quên”.
+- Mispriced count: **6 mã** (spread bị nén bất thường), top 3: OCB, VRE, VHM.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress = 0% đồng nghĩa **không có lây lan rủi ro real-time**. Cả 30 thành phần đều nằm trong giới hạn VaR 95% ngày, không có breach nào để làm đầu sóng systemic. Đây là trạng thái kỹ thuật sạch, không ghi nhận sự kiện đuôi béo có tính truyền nhiễm.  
+Do không có top 3 crash, kết luận duy nhất là chưa xuất hiện áp lực bán tháo đồng bộ trong nhóm blue-chip.
+
+## 3. Complacency Assessment (Module C)
+Complacency chỉ 5.56% – **thị trường không ở regime ngủ quên**. Điều này **không đồng nghĩa** thị trường ổn định hay vận hành bình thường. Mức thấp chỉ bác bỏ kịch bản “phân phối đỉnh” hoặc “sideways mất cảnh giác” điển hình, chứ không loại trừ được các chế độ rủi ro khác (hoảng loạn, uptrend mạnh, v.v.).  
+Kết hợp với Stress = 0%, bức tranh hiện tại có vẻ không mang tính báo động: không có dấu hiệu cấu trúc bù rủi ro bị nén trên diện rộng, cũng không có dấu hiệu phát nổ ngầm. Tuy nhiên, 6 mã mispriced (dẫn đầu là OCB, VRE, VHM) cho thấy một số cổ phiếu đang có spread giao dịch bất thường (quá hẹp), dễ tổn thương nếu biến động quay trở lại.
+
+## 4. Stock-Level Risk Calls
+- **Module B:** Không có breach ⇒ không có khuyến nghị bán/giảm tỷ trọng đi kèm.
+- **Module C (mispriced):** OCB, VRE, VHM đang có spread bị nén. Đây là tín hiệu cảnh báo **tiềm ẩn**, không phải lệnh giảm tỷ trọng ngay. Nếu nhà đầu tư đang nắm giữ, cân nhắc thiết lập mức dừng lỗ mềm dựa trên % thủng MA20/MA50 khung D1 để phòng khi vol tăng đột biến.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VRE", "VHM"],
+  "confidence": "medium"
+}
+```

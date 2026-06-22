@@ -1,0 +1,264 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-06-22T12:11:25",
+  "t_data_date": "2026-06-22",
+  "target_report_date": "2026-06-21",
+  "report_match": "exact",
+  "report_path": "C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\executive_summary_deepseek-v4-pro_210626.txt",
+  "report_mtime": "report:2026-06-21T19:59:59|sidecar:2026-06-21T19:59:59",
+  "parsed": {
+    "report_date": "2026-06-21",
+    "composite_score": 24.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 12.0,
+        "unit": "sessions",
+        "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa đã nới lỏng."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 39.8,
+        "unit": "%",
+        "description": "Tỷ lệ mã vượt MA20 vượt 45% phủ định chế độ phân phối/yếu."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 65.8,
+        "unit": "%",
+        "description": "SSI xuống dưới 55% báo hiệu áp lực hệ thống hạ nhiệt."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "Tail Index (xi)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.345,
+        "unit": "",
+        "description": "Chỉ số đuôi giảm dưới 0.25 thì rủi ro đuôi mập được kiểm soát."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 3.333,
+        "unit": "th pct",
+        "description": "Phân vị đã rất thấp, nhưng nếu vượt 70 trở lại sẽ tái lập rủi ro coupling."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 98.4,
+        "unit": "th pct",
+        "description": "CQS xuống dưới phân vị 80 báo hiệu căng thẳng tín dụng toàn cầu dịu bớt."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-06-21",
+      "composite_score": 24,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 12,
+          "unit": "sessions",
+          "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa đã nới lỏng."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 39.8,
+          "unit": "%",
+          "description": "Tỷ lệ mã vượt MA20 vượt 45% phủ định chế độ phân phối/yếu."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 65.8,
+          "unit": "%",
+          "description": "SSI xuống dưới 55% báo hiệu áp lực hệ thống hạ nhiệt."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "Tail Index (xi)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.345,
+          "unit": "",
+          "description": "Chỉ số đuôi giảm dưới 0.25 thì rủi ro đuôi mập được kiểm soát."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 3.333,
+          "unit": "th pct",
+          "description": "Phân vị đã rất thấp, nhưng nếu vượt 70 trở lại sẽ tái lập rủi ro coupling."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 98.4,
+          "unit": "th pct",
+          "description": "CQS xuống dưới phân vị 80 báo hiệu căng thẳng tín dụng toàn cầu dịu bớt."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-06-21",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "12.0 sessions",
+      "T actual": 11.0,
+      "T actual display": "11.0 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "Intact",
+      "Data date": "2026-06-18",
+      "Description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa đã nới lỏng.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "39.8%",
+      "T actual": 33.1764705882353,
+      "T actual display": "33.2%",
+      "Delta": -6.6235294117647,
+      "Delta display": "-6.624%",
+      "Status": "Intact",
+      "Data date": "2026-06-22",
+      "Description": "Tỷ lệ mã vượt MA20 vượt 45% phủ định chế độ phân phối/yếu.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "65.8%",
+      "T actual": 65.68796266205946,
+      "T actual display": "65.7%",
+      "Delta": -0.11203733794053505,
+      "Delta display": "-0.112%",
+      "Status": "Intact",
+      "Data date": "2026-06-22",
+      "Description": "SSI xuống dưới 55% báo hiệu áp lực hệ thống hạ nhiệt.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "Tail Index (xi)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.345",
+      "T actual": 0.3454435282173134,
+      "T actual display": "0.345",
+      "Delta": 0.00044352821731341585,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-06-22",
+      "Description": "Chỉ số đuôi giảm dưới 0.25 thì rủi ro đuôi mập được kiểm soát.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "3.333 th pct",
+      "T actual": 1.6666666666666667,
+      "T actual display": "1.667 th pct",
+      "Delta": -1.6663333333333334,
+      "Delta display": "-1.666 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-22",
+      "Description": "Phân vị đã rất thấp, nhưng nếu vượt 70 trở lại sẽ tái lập rủi ro coupling.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "98.4 th pct",
+      "T actual": 98.41269841269839,
+      "T actual display": "98.4 th pct",
+      "Delta": 0.012698412698384232,
+      "Delta display": "+0.013 th pct",
+      "Status": "Intact",
+      "Data date": "2026-06-18",
+      "Description": "CQS xuống dưới phân vị 80 báo hiệu căng thẳng tín dụng toàn cầu dịu bớt.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 11,
+      "date": "2026-06-18",
+      "error": ""
+    },
+    "breadth": {
+      "value": 33.1764705882353,
+      "date": "2026-06-22",
+      "error": ""
+    },
+    "ssi": {
+      "value": 65.68796266205946,
+      "date": "2026-06-22",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-06-22",
+      "error": ""
+    },
+    "coupling": {
+      "value": 1.6666666666666667,
+      "date": "2026-06-22",
+      "error": ""
+    },
+    "gfc": {
+      "value": 98.41269841269839,
+      "date": "2026-06-18",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}

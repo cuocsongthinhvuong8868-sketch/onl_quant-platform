@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-22",
+  "composite_score": 27,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 11,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING giảm mạnh dưới 5 cho thấy thanh khoản VNIBOR hạ nhiệt bền vững, phủ định kịch bản squeeze."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 33.2,
+      "unit": "%",
+      "description": "Tỷ lệ mã >MA20 vượt 45% xác nhận dòng tiền lan toả, đảo ngược phân phối/bear."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.7,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% giải toả áp lực bull-trap và stress hệ thống, mở đường cho phân bổ lại."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "ξ rơi dưới 0.25 đưa đuôi phân phối về vùng an toàn, loại bỏ override tail-risk cap cứng."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Phân vị coupling tăng trở lại >70th cảnh báo rủi ro thao túng nhóm Vingroup tái xuất hiện, đe doạ ổn định chỉ số."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 6.76,
+      "unit": "th pct",
+      "description": "CQS toàn cầu vượt 80th sẽ đẩy môi trường vào khủng hoảng tín dụng lan rộng, xác nhận đảo chiều từ pre-crash sang crisis."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-22",
+  "source": "ai_cio_executive_summary"
+}

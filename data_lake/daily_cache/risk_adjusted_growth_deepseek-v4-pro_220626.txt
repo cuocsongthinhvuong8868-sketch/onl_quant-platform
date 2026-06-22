@@ -1,0 +1,33 @@
+## 1. Scenario Assessment
+Kịch bản sử dụng tham số trung lập (K = 1.0, CoE = 14%) – tiêu chuẩn cho ngành ngân hàng Việt Nam. Với chỉ duy nhất 1/6 cổ phiếu được phân tích có Alpha dương (SHB ở mức +1.3%), bức tranh chung cho thấy ngành đang “đốt vốn” cổ đông. Các mã còn lại đều ghi nhận Alpha âm, phản ánh khả năng sinh lời trên vốn (Disciplined Return) không bù đắp nổi chi phí vốn, ngay cả khi không có cú sốc định giá (stress test = 0). Mặt bằng này khá khắc nghiệt, nhấn mạnh vai trò then chốt của việc chọn lọc cổ phiếu thay vì đầu tư dàn trải.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +1.3%, P/B 0.93, ROE 17.5%, σROE 1.9%)** – Đây là **Fortress** duy nhất. Alpha dương được thúc đẩy bởi cả ba yếu tố: định giá rẻ (P/B < 1), ROE khá cao đi kèm biến động cực thấp (σROE 1.9%), và tỷ lệ chi trả cổ tức thấp (8.6%) giúp giữ lại phần lớn lợi nhuận để tái đầu tư. Phép tính Disciplined Return vượt trội so với CoE, cho thấy giá trị thặng dư bền vững.
+- **ACB (Alpha -0.7%, P/B 1.21, ROE 23.0%, σROE 2.7%)** – Mặc dù sở hữu ROE cao nhất nhóm, ACB vẫn rơi vào **Growth Trap** nhẹ. P/B trên 1 và rủi ro biến động (σROE 2.7%) cao hơn SHB khiến risk penalty (K × σ) ăn mòn phần thưởng từ ROE. Alpha âm (-0.7%) cho thấy định giá hiện tại chưa đủ hấp dẫn để bù đắp chi phí vốn.
+- **SSB (Alpha -1.3%, P/B 1.05, ROE 15.6%, σROE 2.2%)** – Dù giữ lại 100% lợi nhuận (payout 0%), ROE trung bình và P/B quanh 1 không tạo đủ lực kéo để vượt ngưỡng CoE. Đây là dạng **Cheap Trap**: định giá không đắt nhưng chất lượng lợi nhuận chưa đủ mạnh, dễ trở thành “bẫy giá rẻ” nếu kỳ vọng tăng trưởng không hiện thực hóa.
+
+## 3. Value Traps Warning
+Ba mã âm sâu nhất bộc lộ rõ rủi ro:
+
+- **LPB (Alpha -12.3%)** – **Premium Burn** điển hình: P/B 3.08 quá đắt so với mức ROE 21.1% nhưng biến động cao (σ 3.8%). Khoản phạt rủi ro lớn “nuốt trọn” lợi nhuận giữ lại, phản ánh định giá ảo tưởng.
+- **EIB (Alpha -11.4%)** – Kết hợp ROE thấp (10.0%) và σROE cao (3.8%) trên nền P/B 1.49, doanh nghiệp rơi vào bẫy **Giá trị suy giảm**. Không có dư địa cải thiện Alpha trừ phi cải thiện mạnh hiệu quả sinh lời.
+- **VPB (Alpha -10.0%)** – ROE 14.1% gần ngưỡng CoE nhưng biến động lớn nhất nhóm (σ 4.7%) khiến risk penalty vượt xa phần bù. P/B 1.22 chưa đủ rẻ để giảm nhẹ gánh nặng.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress)** – Dành 60–70% tỷ trọng ngân hàng cho **SHB**: cổ phiếu duy nhất tạo Alpha dương, phòng thủ tốt với biến động thấp và định giá rẻ.
+- **Tactical** – Không có mã “cheap-but-not-trap” thực sự trong kịch bản này. ACB và SSB đều có Alpha âm, chỉ nên cân nhắc khi CoE hạ hoặc P/B điều chỉnh sâu hơn.
+- **Cấm mua/Underweight** – **LPB, EIB, VPB** (Premium Burn / Deteriorating). Nắm giữ các cổ phiếu này đồng nghĩa chấp nhận “đốt vốn” với xác suất cao.
+
+Do tổng thể ngành (dựa trên nhóm mẫu) phần lớn có Alpha < 0, nhà đầu tư nên giữ quan điểm thận trọng, không phân bổ quá mức vào lĩnh vực ngân hàng cho đến khi thị trường định giá lại hấp dẫn hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "ACB", "SSB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

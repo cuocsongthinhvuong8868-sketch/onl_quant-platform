@@ -1,0 +1,34 @@
+## 1. Observations
+- SSI: 65.7% — vùng WARNING (tích lũy rủi ro ngầm).
+- Market State: EUPHORIC RISK (xu hướng tăng + stress hệ thống cao).
+- Top Pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
+- Pillar Mode: downside ― tín hiệu từ các phiên giảm.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ** dẫn dắt (36%): Đây là chỉ số Volume Dry-Up ― thanh khoản khô cạn so với trung bình 1 năm. Dòng tiền tham gia thị trường mỏng dần trong khi giá vẫn neo cao, phản ánh lực cầu rời rạc và thiếu bền vững.
+- **S_COR** (EVR PC1 38.3%, pillar weight 17%): Tương quan hệ thống cao trong 30 mã VN30. Nhà đầu tư đang đồng loạt nắm giữ các vị thế giống nhau (herding), khiến thị trường dễ tổn thương nếu có cú sốc bán.
+- **S_VAL** (32%): Định giá căng, chênh lệch giữa lợi nhuận 252 ngày của VN30 và lãi suất tiền gửi ở mức cao. Áp lực định giá tạo tiền đề cho điều chỉnh.
+- Tổ hợp S_LIQ + S_COR là “chữ ký bull-trap”: giá tăng trên nền thanh khoản teo tóp, liên kết mạnh → một khi đảo chiều, bán tháo có tính đồng thuận cao.
+
+## 3. Cross-Check
+- **Phân kỳ giá – SSI**: VN30 đóng trên MA125 (xu hướng tăng trung hạn), nhưng SSI đã vào WARNING (65.7%). Giá đỉnh mới đi cùng stress ngầm tích lũy → đặc điểm bull trap kinh điển.
+- **HMM regime EUPHORIC RISK** hoàn toàn khớp với SSI level (high stress + uptrend). Không có sai lệch giữa hai tín hiệu, củng cố cảnh báo thận trọng.
+
+## 4. Verdict
+- **Tiền mặt đề xuất**: 35% danh mục. Nâng tỷ trọng phòng thủ để giảm rủi ro hệ thống, không sử dụng margin.
+- **Hedge action**: Giảm beta danh mục (reduce_beta) — hạ tỷ trọng các cổ phiếu nhạy với chỉ số, chốt lời từng phần các vị thế đã tăng tốt. Chưa đủ cơ sở để short hợp đồng tương lai hay mua put khi SSI chưa chạm CRITICAL; chỉ giảm rủi ro thay vì đánh cược chiều giảm.
+- Các pillar driver đồng thuận về phía downside, không có mâu thuẫn → TÍN HIỆU CÓ THỂ HÀNH ĐỘNG.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.7,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,30 @@
+## 1. Observations
+- **Cầu (Upside Breadth)** hiện tại 5.41%, thấp hơn mu dài hạn 13.00% tới 7.59 điểm phần trăm, đồng thời Phi = 0.203 > +0.10 xác nhận **momentum tăng yếu**.
+- **Cung (Downside Breadth)** hiện tại 8.24%, thấp hơn mu dài hạn 13.55% khoảng 5.31 điểm phần trăm, với Phi = 0.234 > +0.10 xác nhận **momentum giảm** duy trì.
+- Cả hai chỉ báo breadth cùng bị nén dưới trung bình dài hạn (up << mu AND down << mu) → tín hiệu **zombification** (thanh khoản cạn kiệt hai chiều).
+
+## 2. Supply-Demand Dynamics
+Thị trường đang ở trạng thái **zombification**: dòng tiền co hẹp cả bên mua lẫn bên bán, giao dịch trầm lắng, không bên nào bứt phá rõ rệt.  
+**Bên cung giữ momentum thực sự** vì |Phi_down| = 0.234 lớn hơn |Phi_up| = 0.203, cho thấy đà giảm giá có quán tính mạnh hơn đà hồi phục.
+
+## 3. Stress-Test Read
+- **P95 Downside = 26.70%**: kịch bản bán tháo có thể đẩy số mã giảm >-2% lên mức rất cao nếu rủi ro hệ thống kích hoạt.
+- Bất đối xứng tail: P95 Downside (26.70%) > P95 Upside (23.63%), **phần đuôi rủi ro phía cung (panic sell) dày hơn** khoảng 3 điểm phần trăm, phản ánh xác suất biến động tiêu cực cực đoan cao hơn tích cực.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 20%** – ưu tiên bảo toàn vốn, chỉ nắm giữ tỷ lệ nhỏ các vị thế phòng thủ.
+- **Chiến lược: phòng thủ** (defensive). Thị trường zombie, momentum cung mạnh hơn nên chưa thích hợp “rình bắt đáy” hay “mua đuổi”. Không đủ tín hiệu đảo chiều, rủi ro tiếp tục xói mòn giá hiện hữu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 26.70,
+  "p95_upside_pct": 23.63,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
