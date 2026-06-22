@@ -48,9 +48,10 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: liquidity transmission.
 - Horizon: 1-8 weeks.
-- Primary signal: upstream-to-downstream transmission state.
-- Interpretation: weak transmission reduces the value of upstream liquidity support.
+- Primary signal: upstream-to-downstream transmission state across FLI, MLI, TE, FRI bottlenecks, and FIRE / near-FIRE triggers.
+- Interpretation: FLI is only upstream funding supply. If FLI is neutral/easy while MLI tightens, TE breaks down, or FRI bottlenecks fire, treat the system as transmission blockage rather than macro relief.
 - Limit: not a standalone crash signal.
+- AI CIO rule: never summarize LTMM by FLI alone; mention the dominant downstream bottleneck and trigger state when LTMM is material.
 
 ## VN100 Corporate Health
 
@@ -164,3 +165,12 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 - Interpretation: elevated PVGO means the market is pricing higher embedded future growth expectations.
 - Limit: PVGO is not a crash timing signal. It amplifies risk when breadth, liquidity, or tail risk are already weak.
 - Authority: the PVGO adapter score/regime/bias are authoritative; the LLM must not relabel from raw PVGO percentage.
+
+## ABM Market Simulator
+
+- Domain: margin cascade and forced-selling stress.
+- Horizon: days to weeks.
+- Primary signal: distance to cascade, panic ratio, average leverage, and cascade vulnerability.
+- Interpretation: narrow cascade distance plus elevated panic ratio caps bullish conclusions.
+- Limit: ABM is an early-warning stress diagnostic, not an exact crash-timing model.
+- Authority: the ABM adapter score/regime/bias are authoritative when CSV metrics are available.

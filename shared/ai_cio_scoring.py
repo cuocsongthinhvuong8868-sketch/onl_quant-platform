@@ -136,6 +136,82 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
             reason = f"VNIBOR ON contained ({overnight:.2f}%)"
         return _tool_score(tool, score, reason)
 
+    if tool == "ltmm":
+        fli = _as_float(metrics.get("ltmm_fli"))
+        mli = _as_float(metrics.get("ltmm_mli"))
+        te = _as_float(metrics.get("ltmm_te"))
+        fri_collateral = _as_float(metrics.get("ltmm_fri_collateral"))
+        fire_count = _as_float(metrics.get("ltmm_fire_trigger_count"))
+        transmission_breakdown = _as_float(metrics.get("ltmm_transmission_breakdown_fire"))
+        if (
+            fli is None
+            and mli is None
+            and te is None
+            and fri_collateral is None
+            and fire_count is None
+            and transmission_breakdown is None
+        ):
+            return None
+
+        score = 55.0
+        reasons: list[str] = []
+        regime = "LTMM TRANSMISSION NORMAL"
+        bias = "neutral_or_mixed"
+
+        if transmission_breakdown is not None and transmission_breakdown >= 1:
+            score = min(score, 30.0)
+            regime = "LTMM TRANSMISSION BREAKDOWN"
+            bias = "bearish"
+            reasons.append("transmission_breakdown trigger FIRE")
+        elif fire_count is not None and fire_count >= 1:
+            score = min(score, 35.0)
+            regime = "LTMM FIRE TRIGGER ACTIVE"
+            bias = "bearish"
+            reasons.append(f"FIRE trigger count >=1 ({fire_count:.0f})")
+
+        if fire_count is not None and fire_count >= 2:
+            score = min(score, 25.0)
+            regime = "LTMM MULTI-TRIGGER STRESS"
+            bias = "bearish"
+            reasons.append(f"FIRE trigger count >=2 ({fire_count:.0f})")
+
+        if mli is not None:
+            if mli >= 1.0:
+                score = min(score, 25.0)
+                regime = "LTMM MARKET LIQUIDITY STRESS"
+                bias = "bearish"
+                reasons.append(f"MLI >=1.0 ({mli:+.3f})")
+            elif mli >= 0.75:
+                score = min(score, 35.0)
+                bias = "bearish"
+                reasons.append(f"MLI tightening ({mli:+.3f})")
+
+        if te is not None and te <= -1.0:
+            score = min(score, 30.0)
+            regime = "LTMM TRANSMISSION BREAKDOWN"
+            bias = "bearish"
+            reasons.append(f"TE breakdown ({te:+.3f})")
+
+        if fri_collateral is not None and fri_collateral >= 0.75:
+            score = min(score, 38.0)
+            if score < 45:
+                bias = "bearish"
+            reasons.append(f"FRI_collateral bottleneck ({fri_collateral:+.3f})")
+
+        if fli is not None and mli is not None and (mli - fli) >= 0.75:
+            score = min(score, 38.0)
+            if score < 45:
+                bias = "bearish"
+            reasons.append(f"downstream MLI materially tighter than upstream FLI ({mli - fli:+.3f})")
+
+        score_int = _bounded(score)
+        return {
+            "tool_score": score_int,
+            "tool_regime": regime if score_int < 45 else regime_from_score(score_int),
+            "tool_bias": bias if score_int < 45 else bias_from_score(score_int),
+            "score_reason": "; ".join(reasons) if reasons else "LTMM metrics not in stress zone",
+        }
+
     if tool == "pvgo":
         pvgo = _as_float(metrics.get("pvgo_pct"))
         if pvgo is None:
@@ -177,6 +253,69 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
             "score_reason": reason,
         }
 
+    if tool == "abm_simulator":
+        distance = _as_float(metrics.get("distance_to_cascade_pct"))
+        panic = _as_float(metrics.get("panic_ratio_pct"))
+        leverage = _as_float(metrics.get("abm_avg_leverage_ratio"))
+        vulnerability = _as_float(metrics.get("cascade_vulnerability"))
+        if distance is None and panic is None and leverage is None and vulnerability is None:
+            return None
+
+        score = 55.0
+        reasons: list[str] = []
+        regime = "ABM MANAGEABLE CASCADE RISK"
+        bias = "neutral_or_mixed"
+
+        if distance is not None:
+            if distance <= 2:
+                score = min(score, 12.0)
+                regime = "ABM CASCADE WARNING"
+                bias = "bearish"
+                reasons.append(f"Distance to cascade <=2% ({distance:.2f}%)")
+            elif distance <= 5:
+                score = min(score, 25.0)
+                regime = "ABM LEVERAGE STRESS"
+                bias = "bearish"
+                reasons.append(f"Distance to cascade <=5% ({distance:.2f}%)")
+            elif distance <= 10:
+                score = min(score, 38.0)
+                regime = "ABM MARGIN BUILDUP"
+                bias = "bearish"
+                reasons.append(f"Distance to cascade <=10% ({distance:.2f}%)")
+            else:
+                reasons.append(f"Distance to cascade contained ({distance:.2f}%)")
+
+        if panic is not None:
+            if panic >= 50:
+                score = min(score, 18.0)
+                regime = "ABM FORCED-SELLING STRESS"
+                bias = "bearish"
+                reasons.append(f"Panic ratio >=50% ({panic:.2f}%)")
+            elif panic >= 30:
+                score = min(score, 30.0)
+                bias = "bearish"
+                reasons.append(f"Panic ratio >=30% ({panic:.2f}%)")
+            elif panic >= 15:
+                score = min(score, 42.0)
+                reasons.append(f"Panic ratio elevated ({panic:.2f}%)")
+
+        if leverage is not None and leverage >= 2.5:
+            score = min(score, 42.0)
+            reasons.append(f"Avg leverage >=2.5x ({leverage:.2f}x)")
+
+        if vulnerability is not None and vulnerability >= 0.65:
+            score = min(score, 35.0)
+            bias = "bearish"
+            reasons.append(f"Cascade vulnerability high ({vulnerability:.2f})")
+
+        score_int = _bounded(score)
+        return {
+            "tool_score": score_int,
+            "tool_regime": regime if score_int < 45 else regime_from_score(score_int),
+            "tool_bias": bias if score_int < 45 else bias_from_score(score_int),
+            "score_reason": "; ".join(reasons) if reasons else "ABM cascade metrics not in stress zone",
+        }
+
     return None
 
 
@@ -213,6 +352,15 @@ def derive_metric_implied_scores(
     ssi_values = values_for(".ssi_pct")
     xi_values = values_for(".evt_xi")
     pvgo_values = values_for(".pvgo_pct")
+    abm_distance_values = values_for(".distance_to_cascade_pct")
+    abm_panic_values = values_for(".panic_ratio_pct")
+    abm_vulnerability_values = values_for(".cascade_vulnerability")
+    ltmm_fli_values = values_for(".ltmm_fli")
+    ltmm_mli_values = values_for(".ltmm_mli")
+    ltmm_te_values = values_for(".ltmm_te")
+    ltmm_fri_values = values_for(".ltmm_fri_collateral")
+    ltmm_fire_values = values_for(".ltmm_fire_trigger_count")
+    ltmm_breakdown_values = values_for(".ltmm_transmission_breakdown_fire")
 
     max_cqs = max(cqs_values) if cqs_values else None
     max_vnibor = max(vnibor_values) if vnibor_values else None
@@ -220,6 +368,15 @@ def derive_metric_implied_scores(
     max_ssi = max(ssi_values) if ssi_values else None
     max_xi = max(xi_values) if xi_values else None
     max_pvgo = max(pvgo_values) if pvgo_values else None
+    min_abm_distance = min(abm_distance_values) if abm_distance_values else None
+    max_abm_panic = max(abm_panic_values) if abm_panic_values else None
+    max_abm_vulnerability = max(abm_vulnerability_values) if abm_vulnerability_values else None
+    min_ltmm_fli = min(ltmm_fli_values) if ltmm_fli_values else None
+    max_ltmm_mli = max(ltmm_mli_values) if ltmm_mli_values else None
+    min_ltmm_te = min(ltmm_te_values) if ltmm_te_values else None
+    max_ltmm_fri = max(ltmm_fri_values) if ltmm_fri_values else None
+    max_ltmm_fire = max(ltmm_fire_values) if ltmm_fire_values else None
+    max_ltmm_breakdown = max(ltmm_breakdown_values) if ltmm_breakdown_values else None
 
     macro_score = 50.0
     macro_reasons: list[str] = []
@@ -240,6 +397,33 @@ def derive_metric_implied_scores(
         elif max_vnibor >= 4:
             macro_score = min(macro_score, 35.0)
             macro_reasons.append(f"VNIBOR ON >=4% ({max_vnibor:.2f}%)")
+    if max_ltmm_breakdown is not None and max_ltmm_breakdown >= 1:
+        macro_score = min(macro_score, 30.0)
+        macro_reasons.append("LTMM transmission_breakdown trigger FIRE")
+    elif max_ltmm_fire is not None and max_ltmm_fire >= 1:
+        macro_score = min(macro_score, 35.0)
+        macro_reasons.append(f"LTMM FIRE trigger count >=1 ({max_ltmm_fire:.0f})")
+    if max_ltmm_fire is not None and max_ltmm_fire >= 2:
+        macro_score = min(macro_score, 25.0)
+        macro_reasons.append(f"LTMM FIRE trigger count >=2 ({max_ltmm_fire:.0f})")
+    if max_ltmm_mli is not None:
+        if max_ltmm_mli >= 1.0:
+            macro_score = min(macro_score, 25.0)
+            macro_reasons.append(f"LTMM MLI >=1.0 ({max_ltmm_mli:+.3f})")
+        elif max_ltmm_mli >= 0.75:
+            macro_score = min(macro_score, 35.0)
+            macro_reasons.append(f"LTMM MLI tightening ({max_ltmm_mli:+.3f})")
+    if min_ltmm_te is not None and min_ltmm_te <= -1.0:
+        macro_score = min(macro_score, 30.0)
+        macro_reasons.append(f"LTMM TE breakdown ({min_ltmm_te:+.3f})")
+    if max_ltmm_fri is not None and max_ltmm_fri >= 0.75:
+        macro_score = min(macro_score, 40.0)
+        macro_reasons.append(f"LTMM FRI_collateral bottleneck ({max_ltmm_fri:+.3f})")
+    if min_ltmm_fli is not None and max_ltmm_mli is not None and (max_ltmm_mli - min_ltmm_fli) >= 0.75:
+        macro_score = min(macro_score, 38.0)
+        macro_reasons.append(
+            f"LTMM downstream MLI materially tighter than upstream FLI ({max_ltmm_mli - min_ltmm_fli:+.3f})"
+        )
     if bias_counts.get("bearish", 0) >= bias_counts.get("bullish", 0) + 5:
         macro_score = max(0.0, macro_score - 5.0)
         macro_reasons.append("broad bearish evidence balance")
@@ -298,6 +482,29 @@ def derive_metric_implied_scores(
         elif max_ssi >= 55:
             tail_score = min(tail_score, 42.0)
             tail_reasons.append(f"SSI >=55% ({max_ssi:.1f}%)")
+    if min_abm_distance is not None:
+        if min_abm_distance <= 2:
+            tail_score = min(tail_score, 12.0)
+            tail_reasons.append(f"ABM distance to cascade <=2% ({min_abm_distance:.2f}%)")
+        elif min_abm_distance <= 5:
+            tail_score = min(tail_score, 25.0)
+            tail_reasons.append(f"ABM distance to cascade <=5% ({min_abm_distance:.2f}%)")
+        elif min_abm_distance <= 10:
+            tail_score = min(tail_score, 38.0)
+            tail_reasons.append(f"ABM distance to cascade <=10% ({min_abm_distance:.2f}%)")
+    if max_abm_panic is not None:
+        if max_abm_panic >= 50:
+            tail_score = min(tail_score, 18.0)
+            tail_reasons.append(f"ABM panic ratio >=50% ({max_abm_panic:.1f}%)")
+        elif max_abm_panic >= 30:
+            tail_score = min(tail_score, 30.0)
+            tail_reasons.append(f"ABM panic ratio >=30% ({max_abm_panic:.1f}%)")
+        elif max_abm_panic >= 15:
+            tail_score = min(tail_score, 42.0)
+            tail_reasons.append(f"ABM panic ratio >=15% ({max_abm_panic:.1f}%)")
+    if max_abm_vulnerability is not None and max_abm_vulnerability >= 0.65:
+        tail_score = min(tail_score, 35.0)
+        tail_reasons.append(f"ABM cascade vulnerability high ({max_abm_vulnerability:.2f})")
 
     weighted = 0.35 * macro_score + 0.35 * internal_score + 0.30 * tail_score
     if tool_scores:
@@ -322,6 +529,25 @@ def derive_metric_implied_scores(
     if max_cqs is not None and max_cqs >= 80:
         weighted = min(weighted, 44.0)
         caps.append("FEAR cap: CQS >=80")
+    if (
+        max_ltmm_breakdown is not None
+        and max_ltmm_breakdown >= 1
+        and max_ltmm_mli is not None
+        and max_ltmm_mli >= 0.75
+    ):
+        weighted = min(weighted, 44.0)
+        caps.append("FEAR cap: LTMM transmission breakdown and MLI tightening")
+    if min_abm_distance is not None and min_abm_distance <= 5:
+        weighted = min(weighted, 44.0)
+        caps.append("FEAR cap: ABM distance to cascade <=5%")
+    if (
+        min_abm_distance is not None
+        and min_abm_distance <= 2
+        and max_abm_panic is not None
+        and max_abm_panic >= 30
+    ):
+        weighted = min(weighted, 29.0)
+        caps.append("PRE-CRASH cap: ABM distance <=2% and panic ratio >=30%")
 
     score = _bounded(weighted)
     return {

@@ -237,6 +237,7 @@ Trong Streamlit Cloud, vào **Settings → Secrets**, thêm:
 VNSTOCK_API_KEY = "your_vnstock_api_key"
 FRED_API_KEY = "your_fred_api_key"              # Tùy chọn: cho Fed Liquidity data
 GITHUB_TOKEN = "your_github_token"              # Tùy chọn: cho GitHub Sync feature
+LOGIN_PASSWORD = "your_login_password"          # Required for public Streamlit Cloud login
 
 # Optional: API key shortcuts (4 số) cho AI CIO
 # Người dùng có thể gõ shortcut thay vì paste full API key

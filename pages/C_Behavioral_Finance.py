@@ -83,6 +83,13 @@ TOOLS = [
         "page_module": "tools.var_cvar_vnindex.page",
         "render_func": "show",
     },
+    {
+        "id": "abm_simulator",
+        "name": "ABM Market Simulator",
+        "desc": "Agent-based monitor for leverage stress, panic ratio, forced-selling amplification and margin cascade distance.",
+        "page_module": "tools.abm_simulator.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────

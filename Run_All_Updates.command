@@ -22,7 +22,7 @@ if ! command -v "$PY_BIN" >/dev/null 2>&1; then
   exit 1
 fi
 
-echo "[1/4] Running python -m command.update_data ..."
+echo "[1/5] Running python -m command.update_data ..."
 "$PY_BIN" -m command.update_data
 if [ $? -ne 0 ]; then
   echo "[ERROR] command.update_data failed."
@@ -33,7 +33,7 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "[2/4] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ..."
+echo "[2/5] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ..."
 if [ -d "/Users/macos/Desktop/bctc-scrape/Statistics/json" ] && [ -d "/Users/macos/Desktop/bctc-scrape/BCTC/json" ]; then
   "$PY_BIN" -m command.update_risk_adjusted_growth_statistics
   if [ $? -ne 0 ]; then
@@ -48,7 +48,7 @@ else
 fi
 
 echo
-echo "[3/4] Running python -m command.update_pvgo_valuation ..."
+echo "[3/5] Running python -m command.update_pvgo_valuation ..."
 "$PY_BIN" -m command.update_pvgo_valuation
 if [ $? -ne 0 ]; then
   echo "[ERROR] command.update_pvgo_valuation failed."
@@ -59,10 +59,21 @@ if [ $? -ne 0 ]; then
 fi
 
 echo
-echo "[4/4] Running python -m command.update_vnibor ..."
+echo "[4/5] Running python -m command.update_vnibor ..."
 "$PY_BIN" -m command.update_vnibor
 if [ $? -ne 0 ]; then
   echo "[ERROR] command.update_vnibor failed."
+  echo
+  read -n 1 -s -r -p "Press any key to close..."
+  echo
+  exit 1
+fi
+
+echo
+echo "[5/5] Syncing ABM data from LTMM if available ..."
+"$PY_BIN" -m command.update_abm_data
+if [ $? -ne 0 ]; then
+  echo "[ERROR] command.update_abm_data failed."
   echo
   read -n 1 -s -r -p "Press any key to close..."
   echo

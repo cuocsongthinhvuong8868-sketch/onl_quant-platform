@@ -3,6 +3,7 @@ from __future__ import annotations
 import os
 from html import escape
 from typing import Any
+from urllib.parse import urlparse
 
 import streamlit as st
 
@@ -133,11 +134,107 @@ div[data-testid="stMetric"] [data-testid="stMetricDelta"] > div {
 """
 
 
+LOCAL_HOSTS = {"localhost", "127.0.0.1", "::1", "0.0.0.0"}
+STREAMLIT_CLOUD_HOST_SUFFIXES = (".streamlit.app", ".streamlitapp.com")
+
+
+def _env_flag(name: str) -> bool | None:
+    value = os.getenv(name)
+    if value is None:
+        return None
+    normalized = value.strip().lower()
+    if normalized in {"1", "true", "yes", "y", "on", "required", "always"}:
+        return True
+    if normalized in {"0", "false", "no", "n", "off", "disabled", "never"}:
+        return False
+    return None
+
+
+def _get_request_host() -> str:
+    """Return the current browser request host when Streamlit exposes it."""
+    host = ""
+    try:
+        context = getattr(st, "context", None)
+        if context is None:
+            return ""
+
+        url = str(getattr(context, "url", "") or "")
+        if url:
+            parsed = urlparse(url)
+            host = parsed.hostname or ""
+
+        if not host:
+            headers = getattr(context, "headers", None)
+            raw_host = ""
+            if headers is not None:
+                for key in ("host", "Host", "x-forwarded-host", "X-Forwarded-Host"):
+                    try:
+                        raw_host = str(headers.get(key) or "")
+                    except Exception:
+                        raw_host = ""
+                    if raw_host:
+                        break
+            if raw_host:
+                host = raw_host.split(",", 1)[0].strip()
+                if host.startswith("[") and "]" in host:
+                    host = host[1:host.index("]")]
+                else:
+                    host = host.split(":", 1)[0]
+
+        if not host:
+            host = str(getattr(context, "ip_address", "") or "")
+    except Exception:
+        return ""
+    return host.strip().lower()
+
+
+def _is_streamlit_cloud_env() -> bool:
+    for key in (
+        "STREAMLIT_SHARING_MODE",
+        "STREAMLIT_RUNTIME_ENV",
+        "STREAMLIT_CLOUD",
+        "STREAMLIT_COMMUNITY_CLOUD",
+        "IS_STREAMLIT_CLOUD",
+    ):
+        value = os.getenv(key, "").strip().lower()
+        if value and any(term in value for term in ("cloud", "sharing", "community", "streamlit")):
+            return True
+    return False
+
+
+def _requires_login() -> bool:
+    """
+    Auth policy:
+    - localhost / loopback: no login.
+    - Streamlit Community Cloud: login required.
+    - unknown or public host: login required by default.
+
+    Optional override:
+    - QUANT_PLATFORM_REQUIRE_LOGIN=true/false
+    """
+    override = _env_flag("QUANT_PLATFORM_REQUIRE_LOGIN")
+    if override is not None:
+        return override
+
+    host = _get_request_host()
+    if host in LOCAL_HOSTS:
+        return False
+    if host.endswith(STREAMLIT_CLOUD_HOST_SUFFIXES) or _is_streamlit_cloud_env():
+        return True
+    return True
+
+
 def check_password() -> None:
     """
     Kiểm tra mật khẩu đăng nhập của người dùng.
     Nếu chưa đăng nhập, hiển thị form đăng nhập và dừng thực thi script.
     """
+    if not _requires_login():
+        st.session_state["authenticated"] = True
+        st.session_state["auth_mode"] = "local_bypass"
+        return
+
+    st.session_state["auth_mode"] = "password_required"
     configured_password = None
 
     # Thử lấy từ streamlit secrets

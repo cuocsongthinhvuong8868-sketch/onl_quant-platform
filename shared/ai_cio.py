@@ -176,6 +176,14 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "limits": "Not a crash timing signal; amplifies risk when breadth/liquidity/tail risk are weak.",
         "authority": "Adapter score/regime/bias are authoritative; do not relabel from raw PVGO pct.",
     },
+    "abm_simulator": {
+        "domain": "margin_cascade_and_forced_selling",
+        "horizon": "days_to_weeks",
+        "primary_metric": "distance_to_cascade_pct_and_panic_ratio_pct",
+        "score_direction": "Lower distance to cascade and higher panic ratio are worse.",
+        "limits": "Early-warning stress diagnostic, not an exact crash-timing model.",
+        "authority": "Adapter score/regime/bias are authoritative when ABM CSV metrics are available.",
+    },
 }
 HUMILITY_DEFAULT_RULES = [
     {
@@ -923,7 +931,9 @@ def _compact_text(text: str, max_chars: int = 1400) -> str:
         "score", "regime", "risk", "tail", "ssi", "var", "cvar", "evt", "xi",
         "breadth", "vnibor", "liquidity", "stress", "allocation", "cash",
         "equity", "hedge", "falsification", "watch", "falsified", "confidence",
-        "macro", "market", "alpha", "valuation", "cqs", "pc1",
+        "macro", "market", "alpha", "valuation", "cqs", "pc1", "ltmm",
+        "fli", "mli", "fri", "transmission", "bottleneck", "trigger",
+        "overlay",
     )
     selected: list[str] = []
     for line in lines:
@@ -1004,6 +1014,17 @@ def _build_evidence_packet(
         "pvgo_pct": [r"\bPVGO\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
         "pe": [r"\bP/E\b\s*:\s*([-+]?\d+(?:\.\d+)?)x"],
         "coe_pct": [r"\bCOE assumption\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "distance_to_cascade_pct": [r"Distance to Cascade[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "panic_ratio_pct": [r"(?:Simulated\s+)?Panic Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "abm_avg_leverage_ratio": [r"Avg Leverage Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)x?"],
+        "cascade_vulnerability": [r"Cascade Vulnerability[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "abm_stress_confidence_pct": [r"Stress Confidence[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "ltmm_fli": [r"LTMM\s+FLI\s*:\s*([-+]?\d+(?:\.\d+)?)"],
+        "ltmm_mli": [r"LTMM\s+MLI\s*:\s*([-+]?\d+(?:\.\d+)?)"],
+        "ltmm_te": [r"LTMM\s+TE\s*:\s*([-+]?\d+(?:\.\d+)?)"],
+        "ltmm_fri_collateral": [r"LTMM\s+FRI_collateral\s*:\s*([-+]?\d+(?:\.\d+)?)"],
+        "ltmm_fire_trigger_count": [r"LTMM\s+Fire\s+Trigger\s+Count\s*:\s*(\d+)"],
+        "ltmm_transmission_breakdown_fire": [r"(?:LTMM\s+)?transmission_breakdown\s+FIRE\s*:\s*(\d+)"],
     }
     for metric, patterns in metric_patterns.items():
         value = _extract_first_number(patterns, text)
@@ -2220,6 +2241,207 @@ def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -
         return "N/A", f"Lỗi đọc file: {e}"
 
 
+def _parse_report_date_label(date_label: str | None) -> date | None:
+    raw = str(date_label or "").strip()
+    for fmt in ("%d/%m/%Y", "%Y-%m-%d", "%d%m%Y", "%d%m%y"):
+        try:
+            return datetime.strptime(raw, fmt).date()
+        except Exception:
+            continue
+    return None
+
+
+def _find_ltmm_source_json(date_label: str | None = None) -> Path | None:
+    source_dir = DATA_LAKE / "data_LTMM" / "sourse_raw"
+    parsed = _parse_report_date_label(date_label)
+    if parsed:
+        candidate = source_dir / f"{parsed.strftime('%d%m%Y')}.json"
+        if candidate.exists():
+            return candidate
+    files = sorted(source_dir.glob("*.json"), key=lambda p: p.stat().st_mtime, reverse=True)
+    return files[0] if files else None
+
+
+def _df_first_row(df: pd.DataFrame, column: str, value: str) -> pd.Series | None:
+    if df.empty or column not in df.columns:
+        return None
+    rows = df.loc[df[column].astype(str).eq(value)]
+    if rows.empty:
+        return None
+    return rows.iloc[0]
+
+
+def _series_float(row: pd.Series | None, key: str) -> float | None:
+    if row is None or key not in row.index:
+        return None
+    try:
+        value = row[key]
+        if pd.isna(value):
+            return None
+        return float(value)
+    except Exception:
+        return None
+
+
+def _series_text(row: pd.Series | None, key: str, default: str = "N/A") -> str:
+    if row is None or key not in row.index:
+        return default
+    value = row[key]
+    if pd.isna(value):
+        return default
+    return str(value)
+
+
+def _fmt_ltmm_number(value: Any, digits: int = 3) -> str:
+    try:
+        if value is None or pd.isna(value):
+            return "N/A"
+        return f"{float(value):+.{digits}f}"
+    except Exception:
+        return "N/A"
+
+
+def _format_ltmm_rows(df: pd.DataFrame, cols: list[str], limit: int = 8) -> str:
+    if df.empty:
+        return "N/A"
+    keep = [col for col in cols if col in df.columns]
+    if not keep:
+        return "N/A"
+    view = df[keep].head(limit).copy()
+    for col in view.columns:
+        if pd.api.types.is_numeric_dtype(view[col]):
+            view[col] = view[col].map(lambda v: _fmt_ltmm_number(v) if pd.notna(v) else "N/A")
+    return view.to_markdown(index=False)
+
+
+def _build_ltmm_structured_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Build LTMM context that preserves FLI, FRI, MLI and trigger details for AI CIO."""
+    report_date, raw_report = _get_latest_report_for_macro("ltmm", provider_key)
+    source_path = _find_ltmm_source_json(report_date)
+    if source_path is None:
+        return report_date, raw_report
+
+    try:
+        payload = json.loads(source_path.read_text(encoding="utf-8"))
+        latest = pd.DataFrame(payload.get("latest_indices") or [])
+        bottlenecks = pd.DataFrame(payload.get("bottlenecks") or [])
+        overlays = pd.DataFrame(payload.get("overlays") or [])
+        triggers = pd.DataFrame(payload.get("triggers") or [])
+    except Exception as exc:
+        return report_date, (
+            f"DATA INSUFFICIENT: Could not parse LTMM source JSON ({exc}).\n\n"
+            f"=== RAW LTMM ANALYST REPORT ===\n{raw_report}"
+        )
+
+    fli = _df_first_row(latest, "index_name", "FLI")
+    mli = _df_first_row(latest, "index_name", "MLI")
+    te = _df_first_row(latest, "index_name", "TE")
+    fri_collateral = _df_first_row(latest, "index_name", "FRI_collateral")
+    fli_value = _series_float(fli, "index_value")
+    mli_value = _series_float(mli, "index_value")
+    te_value = _series_float(te, "index_value")
+    fri_collateral_value = _series_float(fri_collateral, "index_value")
+
+    fire_triggers = pd.DataFrame()
+    near_fire = pd.DataFrame()
+    transmission_breakdown_fire = 0
+    if not triggers.empty and "signal_state" in triggers.columns:
+        fire_triggers = triggers.loc[triggers["signal_state"].astype(str).str.upper().eq("FIRE")].copy()
+        if "trigger_id" in fire_triggers.columns:
+            transmission_breakdown_fire = int(
+                fire_triggers["trigger_id"].astype(str).eq("transmission_breakdown").any()
+            )
+        if {"fresh_conditions_met", "fresh_conditions_total"}.issubset(triggers.columns):
+            near_fire = triggers.loc[
+                ~triggers.index.isin(fire_triggers.index)
+                & (pd.to_numeric(triggers["fresh_conditions_total"], errors="coerce") > 0)
+                & (
+                    pd.to_numeric(triggers["fresh_conditions_met"], errors="coerce")
+                    >= pd.to_numeric(triggers["fresh_conditions_total"], errors="coerce") - 1
+                )
+            ].copy()
+
+    top_bottlenecks = pd.DataFrame()
+    if not bottlenecks.empty and "stress_score" in bottlenecks.columns:
+        top_bottlenecks = bottlenecks.copy()
+        top_bottlenecks["stress_score"] = pd.to_numeric(top_bottlenecks["stress_score"], errors="coerce")
+        top_bottlenecks = top_bottlenecks.sort_values("stress_score", ascending=False)
+
+    key_overlays = pd.DataFrame()
+    if not overlays.empty and "overlay" in overlays.columns:
+        overlay_names = {
+            "FX offshore stress footprint",
+            "Interbank line tightness proxy",
+            "Equity-rate wedge",
+            "VN30F basis pressure",
+            "Fund system cash posture",
+            "Foreign flow 5d pressure",
+            "Margin call wave footprint",
+        }
+        key_overlays = overlays.loc[overlays["overlay"].astype(str).isin(overlay_names)].copy()
+        if "stress_score" in key_overlays.columns:
+            key_overlays["stress_score"] = pd.to_numeric(key_overlays["stress_score"], errors="coerce")
+            key_overlays = key_overlays.sort_values("stress_score", ascending=False)
+
+    parsed_source_date = _parse_report_date_label(source_path.stem)
+    source_date_label = parsed_source_date.strftime("%d/%m/%Y") if parsed_source_date else source_path.stem
+    date_label = report_date if report_date != "N/A" else source_date_label
+    fli_state = _series_text(fli, "state")
+    mli_state = _series_text(mli, "state")
+    te_state = _series_text(te, "state")
+    fri_state = _series_text(fri_collateral, "state")
+
+    divergence = "N/A"
+    if fli_value is not None and mli_value is not None:
+        divergence = (
+            f"FLI {fli_state} ({_fmt_ltmm_number(fli_value)}) -> "
+            f"MLI {mli_state} ({_fmt_ltmm_number(mli_value)})"
+        )
+        if mli_value - fli_value >= 0.75:
+            divergence += " | downstream materially tighter than upstream"
+        elif abs(mli_value - fli_value) >= 0.5:
+            divergence += " | meaningful transmission gap"
+        else:
+            divergence += " | no large upstream/downstream spread"
+
+    snapshot = f"""
+=== LTMM STRUCTURED SNAPSHOT - LIQUIDITY TRANSMISSION ===
+- Report date: {date_label}
+- Source JSON: {source_path.name}
+- LTMM FLI: {_fmt_ltmm_number(fli_value)} | state: {fli_state} | quality: {_series_float(fli, 'quality_score')}
+- LTMM MLI: {_fmt_ltmm_number(mli_value)} | state: {mli_state} | quality: {_series_float(mli, 'quality_score')}
+- LTMM TE: {_fmt_ltmm_number(te_value)} | state: {te_state} | quality: {_series_float(te, 'quality_score')}
+- LTMM FRI_collateral: {_fmt_ltmm_number(fri_collateral_value)} | state: {fri_state} | quality: {_series_text(fri_collateral, 'quality_state')}
+- LTMM divergence: {divergence}
+- LTMM Fire Trigger Count: {len(fire_triggers)}
+- LTMM transmission_breakdown FIRE: {transmission_breakdown_fire}
+
+Top bottlenecks by stress score:
+{_format_ltmm_rows(top_bottlenecks, ['constraint', 'layer', 'stress_score', 'state', 'quality', 'observation_date'], limit=8)}
+
+Key hard-gap / overlay footprints:
+{_format_ltmm_rows(key_overlays, ['overlay', 'node', 'stress_score', 'state', 'quality_flag', 'observation_date'], limit=8)}
+
+FIRE triggers:
+{_format_ltmm_rows(fire_triggers, ['trigger_id', 'signal_state', 'fresh_conditions_met', 'fresh_conditions_total', 'conditions_excluded'], limit=8)}
+
+Near-fire triggers:
+{_format_ltmm_rows(near_fire, ['trigger_id', 'signal_state', 'fresh_conditions_met', 'fresh_conditions_total', 'conditions_excluded'], limit=8)}
+
+Interpretation rule:
+- Do not summarize LTMM as FLI alone. FLI is upstream funding supply.
+- The AI CIO must jointly read FLI, MLI, TE, FRI bottlenecks, and FIRE/near-fire triggers.
+- If FLI is neutral but MLI tightens or TE is breakdown, treat this as transmission blockage, not macro relief.
+""".strip()
+
+    if raw_report and not raw_report.startswith("*Ch"):
+        snapshot += (
+            "\n\n=== LTMM ANALYST REPORT - SUPPORTING PROSE ===\n"
+            + _compact_text(raw_report, max_chars=2200)
+        )
+    return date_label, snapshot
+
+
 def _get_fed_liquidity_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
     """Read the latest Fed Liquidity child AI report."""
     return _get_latest_report_for_macro("fed_liquidity", provider_key)
@@ -2661,6 +2883,111 @@ def _get_vn100_earnings_health_context(provider_key: str = "kimi-2.6") -> tuple[
     return _get_vn100_corporate_health_context(provider_key)
 
 
+def _build_abm_structured_snapshot() -> tuple[str, str]:
+    """Build deterministic ABM stress snapshot for AI CIO tail-risk evidence."""
+    try:
+        paths = {
+            "state": DATA_LAKE / "abm_behavioral_state.csv",
+            "stress": DATA_LAKE / "abm_stress_test.csv",
+            "alert": DATA_LAKE / "abm_alert.csv",
+            "latent": DATA_LAKE / "abm_latent_state.csv",
+            "validation": DATA_LAKE / "abm_validation.csv",
+        }
+        required = ("state", "stress", "alert")
+        missing = [name for name in required if not paths[name].exists()]
+        if missing:
+            missing_files = ", ".join(paths[name].name for name in missing)
+            return "N/A", f"DATA INSUFFICIENT: Missing ABM files: {missing_files}"
+
+        state_df = pd.read_csv(paths["state"])
+        stress_df = pd.read_csv(paths["stress"])
+        alert_df = pd.read_csv(paths["alert"])
+        if state_df.empty or stress_df.empty or alert_df.empty:
+            return "N/A", "DATA INSUFFICIENT: ABM files are empty"
+
+        latest_state = state_df.iloc[-1].to_dict()
+        latest_stress = stress_df.iloc[-1].to_dict()
+        latest_alert = alert_df.iloc[-1].to_dict()
+        latest_latent: dict[str, Any] = {}
+        latest_validation: dict[str, Any] = {}
+        if paths["latent"].exists():
+            latent_df = pd.read_csv(paths["latent"])
+            if not latent_df.empty:
+                latest_latent = latent_df.iloc[-1].to_dict()
+        if paths["validation"].exists():
+            validation_df = pd.read_csv(paths["validation"])
+            if not validation_df.empty:
+                latest_validation = validation_df.iloc[-1].to_dict()
+
+        as_of_date = str(latest_alert.get("as_of_date") or latest_state.get("as_of_date") or "N/A")
+    except Exception as e:
+        return "N/A", f"DATA INSUFFICIENT: Error reading ABM data ({e})"
+
+    def pct(value: Any, digits: int = 2) -> str:
+        try:
+            if value is None or pd.isna(value):
+                return "N/A"
+            return f"{float(value) * 100.0:.{digits}f}%"
+        except Exception:
+            return "N/A"
+
+    def num(value: Any, digits: int = 2) -> str:
+        try:
+            if value is None or pd.isna(value):
+                return "N/A"
+            return f"{float(value):.{digits}f}"
+        except Exception:
+            return "N/A"
+
+    snapshot = f"""
+=== ABM MARKET SIMULATION & MARGIN CASCADE STRESS MONITOR ===
+Current snapshot:
+- Date: {as_of_date}
+- Regime Flag: {latest_alert.get('regime_flag', 'N/A')}
+- Distance to Cascade: {pct(latest_alert.get('distance_to_cascade'))}
+- Simulated Panic Ratio: {pct(latest_stress.get('panic_ratio'))}
+- Exogenous Drawdown: {pct(latest_stress.get('dd_exogenous'))}
+- Endogenous Drawdown: {pct(latest_stress.get('dd_endogenous'))}
+- Total Drawdown under shock: {pct(latest_stress.get('dd_total'))}
+- Margin Call Events: {latest_stress.get('margin_call_events', latest_stress.get('margin_calls', 'N/A'))}
+- Simulation Runs: {latest_stress.get('simulation_runs', 'N/A')}
+- Stress Confidence: {pct(latest_alert.get('stress_confidence', latest_stress.get('stress_confidence')))}
+- Input Quality Score: {pct(latest_alert.get('input_quality_score', latest_state.get('input_quality_score')))}
+- Methodology Version: {latest_alert.get('methodology_version', 'N/A')}
+
+Agent population and leverage:
+- Fundamental Investors: {pct(latest_state.get('pct_fundamental'))}
+- Momentum Traders: {pct(latest_state.get('pct_momentum'))}
+- Foreign Institutional: {pct(latest_state.get('pct_foreign'))}
+- Leveraged Speculators: {pct(latest_state.get('pct_leveraged'))}
+- Noise Traders: {pct(latest_state.get('pct_noise'))}
+- Avg Leverage Ratio: {num(latest_state.get('avg_leverage_ratio'))}x
+
+Latent margin state:
+- Market Liquidity Index (MLI): {num(latest_state.get('mli'))}
+- Liquidity Stress: {num(latest_state.get('liquidity_stress'))}
+- Valuation Gap: {pct(latest_state.get('valuation_gap'))}
+- Trend Z-score: {num(latest_state.get('trend_z'))}
+- Breadth Z-score: {num(latest_state.get('breadth_z'))}
+- Foreign Flow Z-score: {num(latest_state.get('foreign_flow_z'))}
+- Margin Pressure Z-score: {num(latest_state.get('margin_pressure_z'))}
+- Margin Leverage Level: {num(latest_state.get('margin_leverage_level', latest_latent.get('margin_leverage_level')))}
+- Margin Call Trigger Pressure: {num(latest_state.get('margin_call_trigger_pressure', latest_latent.get('margin_call_trigger_pressure')))}
+- Cascade Vulnerability: {num(latest_state.get('cascade_vulnerability', latest_latent.get('cascade_vulnerability')))}
+- Latent Confidence Score: {num(latest_state.get('latent_confidence_score', latest_latent.get('latent_confidence_score')))}
+- Validation Status: {latest_latent.get('validation_status', latest_validation.get('validation_status', 'N/A'))}
+- Validation Quality: {pct(latest_state.get('validation_quality', latest_latent.get('validation_quality')))}
+- Validation AUC: {num(latest_validation.get('auc'))}
+- Top Decile Event Lift: {num(latest_validation.get('lift_top_decile'))}
+
+Usage discipline:
+- ABM is an early-warning dashboard for leverage/crowding stress and forced-selling amplification.
+- Treat narrow cascade distance plus elevated panic ratio as a tail-risk cap on bullish conclusions.
+- Do not interpret ABM as exact crash timing.
+""".strip()
+    return as_of_date, snapshot
+
+
 def _empty_consensus_buckets() -> dict[str, list[dict[str, Any]]]:
     return {"bullish": [], "bearish": [], "neutral_or_mixed": []}
 
@@ -2889,8 +3216,9 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     gfcm_date, gfcm_rep = _get_gfcm_context(provider_key)
     margin_m2_date, margin_m2_rep = _build_margin_m2_structured_snapshot()
     vnibor_date, vnibor_rep = _get_vnibor_context(provider_key)
-    ltmm_date, ltmm_rep = _get_latest_report_for_macro("ltmm", provider_key)
+    ltmm_date, ltmm_rep = _build_ltmm_structured_context(provider_key)
     vn100_label, vn100_rep = _get_vn100_corporate_health_context(provider_key)
+    abm_date, abm_rep = _build_abm_structured_snapshot()
 
     evidence_packets = [
         _build_evidence_packet("historical_trend", historical_block, "history", max_excerpt_chars=900),
@@ -2898,7 +3226,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         _build_evidence_packet("global_financial_conditions", gfcm_rep, "macro", gfcm_date, max_excerpt_chars=900),
         _build_evidence_packet("margin_m2_overlay", margin_m2_rep, "macro", margin_m2_date, max_excerpt_chars=700),
         _build_evidence_packet("vnibor", vnibor_rep, "macro", vnibor_date, max_excerpt_chars=1000),
-        _build_evidence_packet("ltmm", ltmm_rep, "macro", ltmm_date, max_excerpt_chars=700),
+        _build_evidence_packet("ltmm", ltmm_rep, "macro", ltmm_date, max_excerpt_chars=2400),
         _build_evidence_packet("vn100_corporate_health", vn100_rep, "fundamental", vn100_label, max_excerpt_chars=1200),
         _build_evidence_packet("humility_falsification", humility_context, "audit", max_excerpt_chars=900),
         _build_evidence_packet("fear_greed", r1, "current_tool", data_date, max_excerpt_chars=700),
@@ -2910,6 +3238,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         _build_evidence_packet("esr_monitor", r7, "current_tool", data_date, max_excerpt_chars=700),
         _build_evidence_packet("va_res", r8, "current_tool", data_date, max_excerpt_chars=700),
         _build_evidence_packet("var_cvar_vnindex", r9, "current_tool", data_date, max_excerpt_chars=700),
+        _build_evidence_packet("abm_simulator", abm_rep, "tail_risk", abm_date, max_excerpt_chars=900),
         _build_evidence_packet("sentiment_factor_news", r10, "current_tool", data_date, max_excerpt_chars=700),
         _build_evidence_packet("risk_adjusted_growth", r11, "current_tool", data_date, max_excerpt_chars=900),
         _build_evidence_packet("pvgo", pvgo_context, "valuation", data_date, max_excerpt_chars=700),

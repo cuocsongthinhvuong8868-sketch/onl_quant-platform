@@ -7,7 +7,7 @@ echo Folder: %cd%
 echo ======================================
 
 echo.
-echo [1/4] Running python -m command.update_data ...
+echo [1/5] Running python -m command.update_data ...
 python -m command.update_data
 if errorlevel 1 (
   echo [ERROR] command.update_data failed.
@@ -15,7 +15,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [2/4] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ...
+echo [2/5] Refreshing Risk-Adjusted Growth bank JSON feeds if local scrape exists ...
 if exist "%USERPROFILE%\Desktop\bctc-scrape\Statistics\json" if exist "%USERPROFILE%\Desktop\bctc-scrape\BCTC\json" (
   python -m command.update_risk_adjusted_growth_statistics --source-dir "%USERPROFILE%\Desktop\bctc-scrape\Statistics\json" --financial-report-source-dir "%USERPROFILE%\Desktop\bctc-scrape\BCTC\json"
   if errorlevel 1 (
@@ -27,7 +27,7 @@ if exist "%USERPROFILE%\Desktop\bctc-scrape\Statistics\json" if exist "%USERPROF
 )
 
 echo.
-echo [3/4] Running python -m command.update_pvgo_valuation ...
+echo [3/5] Running python -m command.update_pvgo_valuation ...
 python -m command.update_pvgo_valuation
 if errorlevel 1 (
   echo [ERROR] command.update_pvgo_valuation failed.
@@ -35,10 +35,18 @@ if errorlevel 1 (
 )
 
 echo.
-echo [4/4] Running python -m command.update_vnibor ...
+echo [4/5] Running python -m command.update_vnibor ...
 python -m command.update_vnibor
 if errorlevel 1 (
   echo [ERROR] command.update_vnibor failed.
+  goto :end
+)
+
+echo.
+echo [5/5] Syncing ABM data from LTMM if available ...
+python -m command.update_abm_data
+if errorlevel 1 (
+  echo [ERROR] command.update_abm_data failed.
   goto :end
 )
 
