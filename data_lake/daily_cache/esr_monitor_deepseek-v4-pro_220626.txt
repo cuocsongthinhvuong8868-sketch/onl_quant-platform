@@ -1,25 +1,22 @@
 ## 1. Observations
-- SSI: 65.7% — vùng WARNING (tích lũy rủi ro ngầm).
-- Market State: EUPHORIC RISK (xu hướng tăng + stress hệ thống cao).
-- Top Pillar drivers: S_LIQ (36%), S_VAL (32%), S_COR (17%).
-- Pillar Mode: downside ― tín hiệu từ các phiên giảm.
+- SSI: 65.7% — mức WARNING, tích lũy rủi ro ngầm rõ rệt  
+- Market state: EUPHORIC RISK (uptrend + stress cao) — tín hiệu bull‑trap  
+- Top 3 drivers phía downside: S_LIQ (36%), S_VAL (32%), S_COR (17%)  
+- PCA PC1 EVR: 38.3% — tương quan hệ thống đáng kể  
 
-## 2. Risk Decomposition (Bóc tách)
-- **S_LIQ** dẫn dắt (36%): Đây là chỉ số Volume Dry-Up ― thanh khoản khô cạn so với trung bình 1 năm. Dòng tiền tham gia thị trường mỏng dần trong khi giá vẫn neo cao, phản ánh lực cầu rời rạc và thiếu bền vững.
-- **S_COR** (EVR PC1 38.3%, pillar weight 17%): Tương quan hệ thống cao trong 30 mã VN30. Nhà đầu tư đang đồng loạt nắm giữ các vị thế giống nhau (herding), khiến thị trường dễ tổn thương nếu có cú sốc bán.
-- **S_VAL** (32%): Định giá căng, chênh lệch giữa lợi nhuận 252 ngày của VN30 và lãi suất tiền gửi ở mức cao. Áp lực định giá tạo tiền đề cho điều chỉnh.
-- Tổ hợp S_LIQ + S_COR là “chữ ký bull-trap”: giá tăng trên nền thanh khoản teo tóp, liên kết mạnh → một khi đảo chiều, bán tháo có tính đồng thuận cao.
+## 2. Risk Decomposition
+S_LIQ dẫn dắt với trọng số cao nhất. Chỉ số này đo lường volume khô cạn: −log(MA20/MA252) tổng dollar volume. Giá trị cao cho thấy thanh khoản sụt giảm mạnh so với định mức trung bình 1 năm, thường xuất hiện ở cuối giai đoạn tăng nóng khi dòng tiền lớn rút lui nhưng giá vẫn neo cao.  
+
+S_VAL đứng thứ hai, phản ánh căng thẳng định giá: lợi nhuận 1 năm của VN30 trừ lãi suất tiền gửi. Khi khoảng cách này lớn, thị trường đang được định giá quá lạc quan so với chi phí vốn, dễ dẫn đến điều chỉnh nếu kỳ vọng thay đổi.  
+
+S_COR ở mức 17% với PC1 EVR 38.3% xác nhận các cổ phiếu đang di chuyển đồng pha, hệ quả của hành vi herding trong giai đoạn hưng phấn. Tổ hợp S_LIQ + S_VAL + S_COR tạo thành chữ ký “bull‑trap” cổ điển: định giá căng, thanh khoản yếu dần, tương quan cao — khi thị trường quay đầu, áp lực bán sẽ lan rộng và trầm trọng hơn do thiếu vắng người mua.
 
 ## 3. Cross-Check
-- **Phân kỳ giá – SSI**: VN30 đóng trên MA125 (xu hướng tăng trung hạn), nhưng SSI đã vào WARNING (65.7%). Giá đỉnh mới đi cùng stress ngầm tích lũy → đặc điểm bull trap kinh điển.
-- **HMM regime EUPHORIC RISK** hoàn toàn khớp với SSI level (high stress + uptrend). Không có sai lệch giữa hai tín hiệu, củng cố cảnh báo thận trọng.
+Giá VN30 đóng cửa trên MA125, duy trì xu hướng tăng, nhưng SSI đã vào vùng WARNING. Sự phân kỳ này là dấu hiệu cổ điển: giá tiếp tục tạo đỉnh mới trong khi các chỉ báo rủi ro ngầm đồng loạt gia tăng. HMM regime EUPHORIC RISK hoàn toàn khớp với mức SSI hiện tại — không có xung đột giữa các tầng phân tích. Không phát hiện tín hiệu nhiễu, tuy nhiên cần cảnh giác với xác suất false positive thấp.
 
 ## 4. Verdict
-- **Tiền mặt đề xuất**: 35% danh mục. Nâng tỷ trọng phòng thủ để giảm rủi ro hệ thống, không sử dụng margin.
-- **Hedge action**: Giảm beta danh mục (reduce_beta) — hạ tỷ trọng các cổ phiếu nhạy với chỉ số, chốt lời từng phần các vị thế đã tăng tốt. Chưa đủ cơ sở để short hợp đồng tương lai hay mua put khi SSI chưa chạm CRITICAL; chỉ giảm rủi ro thay vì đánh cược chiều giảm.
-- Các pillar driver đồng thuận về phía downside, không có mâu thuẫn → TÍN HIỆU CÓ THỂ HÀNH ĐỘNG.
+Với bull‑trap signature rõ ràng từ ba trụ cột đầu, khuyến nghị tăng tỷ trọng tiền mặt lên **40%** danh mục. Hành động phòng hộ: **giảm beta** bằng cách cắt giảm các vị thế có độ nhạy cao với VN30, tránh sử dụng đòn bẩy. Mua put hay short hợp đồng VN30F1M cũng là phương án khả thi nếu có công cụ sẵn sàng, nhưng ưu tiên reduce‑beta để bảo toàn vốn. Không có mâu thuẫn giữa các driver, do đó không phải là “NO ACTIONABLE SIGNAL”.  
 
-## 5. Structured Tail
 ```json
 {
   "tool": "esr_monitor",
@@ -27,7 +24,7 @@
   "regime": "WARNING",
   "market_state": "EUPHORIC_RISK",
   "top_driver": "S_LIQ",
-  "cash_target_pct": 35,
+  "cash_target_pct": 40,
   "hedge_action": "reduce_beta",
   "confidence": "medium"
 }

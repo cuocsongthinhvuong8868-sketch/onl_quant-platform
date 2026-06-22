@@ -1,19 +1,19 @@
 ## 1. Observations
-- **Spread_Z = –1.74σ** – mức nén dispersion cực thấp so với trung bình 60 phiên, dù spread tuyệt đối vẫn dương (4.69%).
-- **DPI = 43.3%** – dưới ngưỡng 70%, không có chế độ phân tán kéo dài; thị trường không nằm trong trạng thái “stress regime”.
-- **Avg Pairwise Correlation (Ledoit-Wolf) = 0.008** – tương quan gần bằng 0, phản ánh sự phân hóa mạnh mẽ giữa các cổ phiếu, môi trường lý tưởng cho stock-picking.
-- **Skewness & Kurtosis N/A** – thiếu dữ liệu để đánh giá trực tiếp hướng đuôi và độ béo của phân phối.
+- Spread_Z ở mức –1.35σ: chênh lệch CSSD–CSAD thấp hơn rõ rệt so với trung bình 60 ngày, báo hiệu giai đoạn co cụm (compression) mạnh về dispersion.
+- DPI = 43.3% (< 70%): chưa hình thành regime dispersion kéo dài; sự kiện hôm nay không cho thấy tính dai dẳng của stress.
+- Hệ số tương quan bình quân ≈ 0.008, tiến sát 0: các cổ phiếu gần như không di chuyển cùng nhịp.
+- Dữ liệu Skewness và Kurtosis không sẵn có, hạn chế đánh giá trực tiếp về fat‑tail.
 
 ## 2. Structural State
-Thị trường đang ở trạng thái **bình thường – co cụm (compression)**, không stress.  
-Spread_Z âm sâu cho thấy mức độ phân tán đang bị nén xuống dưới đáng kể so với quá khứ gần, trong khi DPI thấp xác nhận đây không phải là một pha regime dispersion lây lan. Không có tín hiệu “cục bộ” hay “regime persistent” của stress; các chỉ báo đồng thuận cho thấy cấu trúc thị trường đang trong giai đoạn tĩnh lặng với độ phân hóa cao.
+Thị trường không rơi vào trạng thái căng thẳng (stress). DPI thấp kết hợp với Spread_Z âm sâu cho thấy đây là một pha “co rút dispersion trong trạng thái bình lặng” chứ không phải một cú sốc cục bộ hay kéo dài. Dispersion thấp hơn trung vị lịch sử phản ánh môi trường ít cá biệt hóa, không có nhóm cổ phiếu nào lệch xa mặt bằng chung.
 
-## 3. Cross-Check & Tail Direction
-Do Skewness và Kurtosis không có sẵn, không thể xác định liệu đuôi trái hay đuôi phải đang bị gãy. Tuy nhiên, với Spread_Z âm và DPI thấp, nhiều khả năng phân phối cross-sectional hiện tại khá cân xứng, biến động outlier không chiếm ưu thế. Nếu có tail risk, nó chưa lộ diện trong bộ chỉ báo dispersion – mô hình đuôi béo (fat-tail) chưa có bằng chứng để áp dụng.
+## 3. Cross‑Check & Tail Direction
+Không có Skewness để xác định đuôi nào bị gãy. Tuy nhiên, với Correlation rất thấp nhưng Spread_Z âm, mô hình này gợi ý rằng biến động giá đang phân bố đồng đều và nhỏ (low dispersion, low correlation), thường thấy ở pha “sideways calm”. Fat-tail không thể kiểm chứng do thiếu Kurtosis; nếu thị trường đột ngột chuyển pha, những cú giật mạnh có thể xuất hiện mà không có dấu hiệu báo trước từ các chỉ báo hiện tại.
 
 ## 4. Regime Mapping
-Theo bản đồ 2D (DPI × Correlation), với DPI thấp (43.3%) và tương quan cực thấp (0.008), thị trường đang nằm ở ô **Healthy Stock‑Picking**. Đây là chế độ mà các yếu tố đặc thù cổ phiếu chi phối, biến động danh mục phân tán tốt, không có lực kéo đồng pha.  
-**Rủi ro lớn nhất cho Portfolio Manager:** sự dịch chuyển đột ngột sang chế độ “bầy đàn” (herding crash) nếu một cú sốc vĩ mô kích hoạt tương quan tăng vọt lên gần 1. Môi trường tương quan thấp hiện tại dễ tạo tâm lý chủ quan; khi sang chế độ capitulation, toàn bộ lợi thế phân hóa bị xóa sổ trong thời gian ngắn, gây tổn thất đồng loạt bất chấp chọn cổ phiếu tốt.
+Trên bản đồ 2D (DPI × Corr), DPI thấp (43.3%) và Corr gần 0 (0.008) đưa thị trường vào ô **Healthy Stock‑Picking**. Đây là môi trường cổ phiếu phân hóa nhưng không thái quá, cho phép nhà quản lý danh mục tìm kiếm alpha qua chọn lọc mã. Tuy nhiên, do Spread thực tế đang bị nén mạnh (Z âm sâu), cơ hội từ chênh lệch lợi suất thấp hơn bình thường – chi phí cơ hội cao nếu giữ vị thế trung lập.
+
+Rủi ro lớn nhất cho Portfolio Manager lúc này là **hiệu ứng Whipsaw nếu thị trường bất ngờ chuyển sang regime Trending hoặc Capitulation**. Sự đồng thuận hiện tại rất mong manh; một cú thay đổi tương quan (Corr tăng vọt) có thể lập tức biến môi trường phân hóa thành bầy đàn, kéo theo những vị thế long/short đơn lẻ bị cuốn phăng khi dispersion bung trở lại.
 
 ## 5. Structured Tail
 ```json
@@ -21,7 +21,7 @@ Theo bản đồ 2D (DPI × Correlation), với DPI thấp (43.3%) và tương q
   "tool": "dispersion",
   "date": "22/06/2026",
   "regime": "STOCK_PICKING",
-  "spread_z": -1.74,
+  "spread_z": -1.35,
   "dpi_pct": 43.3,
   "avg_corr": 0.008,
   "tail_skew_direction": "symmetric",

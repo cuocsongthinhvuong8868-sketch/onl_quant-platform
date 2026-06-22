@@ -10,16 +10,16 @@
       "threshold_value": 5,
       "current_value": 11,
       "unit": "sessions",
-      "description": "Số phiên STRESS/WARNING giảm mạnh dưới 5 cho thấy thanh khoản VNIBOR hạ nhiệt bền vững, phủ định kịch bản squeeze."
+      "description": "VNIBOR squeeze kết thúc rõ rệt khi số phiên stress dưới 5 trong 20 phiên"
     },
     {
       "model": "Market Breadth",
       "metric": "Breadth MA20",
       "threshold_operator": ">",
       "threshold_value": 45,
-      "current_value": 33.2,
+      "current_value": 35.8,
       "unit": "%",
-      "description": "Tỷ lệ mã >MA20 vượt 45% xác nhận dòng tiền lan toả, đảo ngược phân phối/bear."
+      "description": "Độ rộng thị trường hồi phục trên 45% sẽ bác bỏ chế độ phân phối/bear"
     },
     {
       "model": "ESR Monitor",
@@ -28,7 +28,7 @@
       "threshold_value": 55,
       "current_value": 65.7,
       "unit": "%",
-      "description": "SSI giảm dưới 55% giải toả áp lực bull-trap và stress hệ thống, mở đường cho phân bổ lại."
+      "description": "Chỉ số stress hệ thống giảm dưới 55% cho thấy rủi ro đã tái hấp thụ"
     },
     {
       "model": "Tail Risk (EVT)",
@@ -37,7 +37,7 @@
       "threshold_value": 0.25,
       "current_value": 0.345,
       "unit": "",
-      "description": "ξ rơi dưới 0.25 đưa đuôi phân phối về vùng an toàn, loại bỏ override tail-risk cap cứng."
+      "description": "Đuôi béo giảm dưới 0.25 sẽ xóa bỏ cảnh báo fat‑tail"
     },
     {
       "model": "Manipulation / Coupling",
@@ -46,16 +46,16 @@
       "threshold_value": 70,
       "current_value": 1.667,
       "unit": "th pct",
-      "description": "Phân vị coupling tăng trở lại >70th cảnh báo rủi ro thao túng nhóm Vingroup tái xuất hiện, đe doạ ổn định chỉ số."
+      "description": "Rủi ro coupling nhóm Vingroup đã giảm – điều kiện falsified đang góp phần dịu bớt bearish cục bộ"
     },
     {
       "model": "Global Financial Conditions",
       "metric": "CQS Percentile",
       "threshold_operator": "<",
       "threshold_value": 80,
-      "current_value": 6.76,
+      "current_value": 4.0,
       "unit": "th pct",
-      "description": "CQS toàn cầu vượt 80th sẽ đẩy môi trường vào khủng hoảng tín dụng lan rộng, xác nhận đảo chiều từ pre-crash sang crisis."
+      "description": "Nếu CQS vọt lên >80th pct thì thêm stress toàn cầu – nhưng hiện dưới ngưỡng, không phải risk-on"
     }
   ],
   "provider_key": "deepseek-v4-pro",

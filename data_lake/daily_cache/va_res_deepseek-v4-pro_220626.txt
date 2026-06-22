@@ -1,31 +1,28 @@
-## 1. Observations
-- Stress Index VN30: **0.00%** – không có mã nào trong rổ thủng VaR 95%, tín hiệu contagion bằng 0.
-- Breach count: **0 / 30** – không ghi nhận cú sập cá biệt hay lan truyền nào.
-- Complacency Index: **5.56%** – cực thấp, thị trường **không** ở trạng thái “ngủ quên”.
-- Mispriced count: **6 mã** (spread bị nén bất thường), top 3: OCB, VRE, VHM.
+## 1. Observations  
+- Stress Index 0.00% – không ghi nhận mã VN30 nào thủng VaR 95%, không có lan truyền rủi ro đuôi xảy ra trong phiên.  
+- Breach count 0/30 – toàn bộ rổ VN30 vận hành trong biên VaR, không có sự cố cá biệt sâu.  
+- Complacency Index 6.48% – mức rất thấp, thị trường không ở trạng thái ngủ quên (complacent). Ghi nhận 7 mã mispriced, nổi bật OCB, VRE, VHM có spread bị nén chặt nhất.
 
-## 2. Contagion Assessment (Module B)
-VN30 Stress = 0% đồng nghĩa **không có lây lan rủi ro real-time**. Cả 30 thành phần đều nằm trong giới hạn VaR 95% ngày, không có breach nào để làm đầu sóng systemic. Đây là trạng thái kỹ thuật sạch, không ghi nhận sự kiện đuôi béo có tính truyền nhiễm.  
-Do không có top 3 crash, kết luận duy nhất là chưa xuất hiện áp lực bán tháo đồng bộ trong nhóm blue-chip.
+## 2. Contagion Assessment (Module B)  
+Stress Index 0.00%, dưới xa ngưỡng cảnh báo 40%. Hiện tại không có cú sốc nào đang lan rộng trong rổ VN30. Việc không có mã nào thủng VaR 95% cho thấy rủi ro đuôi real-time rất thấp, không có đầu sóng systemic. Yếu tố lây lan tạm thời vắng mặt – điều này không đảm bảo an toàn tuyệt đối, mà chỉ phản ánh thị trường chưa trải qua sự kiện cực đoan trong phiên.
 
-## 3. Complacency Assessment (Module C)
-Complacency chỉ 5.56% – **thị trường không ở regime ngủ quên**. Điều này **không đồng nghĩa** thị trường ổn định hay vận hành bình thường. Mức thấp chỉ bác bỏ kịch bản “phân phối đỉnh” hoặc “sideways mất cảnh giác” điển hình, chứ không loại trừ được các chế độ rủi ro khác (hoảng loạn, uptrend mạnh, v.v.).  
-Kết hợp với Stress = 0%, bức tranh hiện tại có vẻ không mang tính báo động: không có dấu hiệu cấu trúc bù rủi ro bị nén trên diện rộng, cũng không có dấu hiệu phát nổ ngầm. Tuy nhiên, 6 mã mispriced (dẫn đầu là OCB, VRE, VHM) cho thấy một số cổ phiếu đang có spread giao dịch bất thường (quá hẹp), dễ tổn thương nếu biến động quay trở lại.
+## 3. Complacency Assessment (Module C)  
+Complacency 6.48% là quá thấp so với ngưỡng nguy hiểm 80%. Điều này có nghĩa **thị trường KHÔNG đang ở regime ngủ quên**, không bị nén cấu trúc bù rủi ro trên diện rộng. Tuy nhiên, **KHÔNG** thể suy diễn thành “thị trường ổn định” hay “vận hành bình thường”. Một thị trường đang trong uptrend mạnh, hoảng loạn hoặc sụp đổ đều tự nhiên có Complacency thấp vì spread không bị bóp méo. Với Stress Index = 0%, có thể hiện tại thị trường đang trong một pha có tính biến động hợp lý, không cực đoan ở cả hai chiều, nhưng xác suất vẫn tồn tại các trạng thái khác không thể loại trừ bằng chỉ số Complacency thấp. Bảy mã mispriced, dù ít, là những điểm nén cục bộ đáng lưu ý nếu thị trường đảo chiều.
 
-## 4. Stock-Level Risk Calls
-- **Module B:** Không có breach ⇒ không có khuyến nghị bán/giảm tỷ trọng đi kèm.
-- **Module C (mispriced):** OCB, VRE, VHM đang có spread bị nén. Đây là tín hiệu cảnh báo **tiềm ẩn**, không phải lệnh giảm tỷ trọng ngay. Nếu nhà đầu tư đang nắm giữ, cân nhắc thiết lập mức dừng lỗ mềm dựa trên % thủng MA20/MA50 khung D1 để phòng khi vol tăng đột biến.
+## 4. Stock-Level Risk Calls  
+- **Module B**: Không có mã breach nên không phát tín hiệu bán/giảm tỷ trọng do rủi ro đuôi real-time.  
+- **Module C (cảnh báo tiềm ẩn)**: OCB, VRE, VHM có spread nén chặt nhất, dễ bị tổn thương nếu thị trường bước vào điều chỉnh. Khi những mã này phá vỡ các điểm kỹ thuật (ví dụ thủng MA20 hoặc MA50 trên khung D1 với thanh khoản xác nhận), rủi ro giãn spread đột ngột sẽ tăng mạnh. Nhà đầu tư nên đặt stop-loss động theo tỷ lệ % từ giá hiện tại thay vì neo vào mức giá tuyệt đối.
 
-## 5. Structured Tail
+## 5. Structured Tail  
 ```json
 {
   "tool": "va_res",
   "stress_index_pct": 0.00,
   "breach_count": 0,
-  "complacency_pct": 5.56,
-  "mispriced_count": 6,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
   "regime": "spread_normal",
   "watchlist_short": ["OCB", "VRE", "VHM"],
-  "confidence": "medium"
+  "confidence": "high"
 }
 ```

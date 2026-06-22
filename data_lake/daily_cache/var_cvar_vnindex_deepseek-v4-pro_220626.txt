@@ -1,26 +1,22 @@
-# Tail Risk Assessment for VNINDEX — 22/06/2026
-
 ## 1. Observations
-- **Historical VaR 95%** ở mức –1.65%, sâu hơn chút so với Parametric VaR 95% (–1.48%), cho thấy phân phối thực tế có đuôi trái nặng hơn kỳ vọng Gaussian.
-- **EVT VaR 99%** (POT/GPD) ước tính mức lỗ –3.69% cho sự kiện 1/100 ngày, vượt xa ước lượng Gaussian (xấp xỉ –2.07%), báo hiệu rủi ro đuôi bị định giá thấp nghiêm trọng.
-- **Hệ số đuôi GPD** ξ = +0.345, vượt ngưỡng 0.30 → nằm trong vùng FAT TAIL, đặc trưng bởi xác suất sụt giảm cực đoan cao hơn nhiều lần so với mô hình chuẩn.
-- **Hill index** = +0.447, cùng dấu dương và cùng cấp độ, củng cố tín hiệu đuôi dày; không có sự phân kỳ đáng ngờ.
+- **Historical VaR 95%** ghi nhận -1.65%, phản ánh mức tổn thất trong quá khứ ở điều kiện thị trường “bình thường”.
+- **EVT VaR 99%** ước tính -3.69%, vượt xa các ngưỡng VaR thông thường, chỉ báo một đuôi phân phối rất dày.
+- **Hệ số đuôi GPD ξ = +0.345** – nằm sâu trong vùng **fat tail** (>0.30), nơi rủi ro cực đoan chi phối và ES có nguy cơ không hội tụ.
+- **Hill index = +0.447** – cùng dấu và độ lớn tương đương (chênh ~0.1), xác nhận tín hiệu fat tail, dù gợi ý một chút nhạy cảm với ngưỡng.
 
 ## 2. Tail Thickness Diagnosis
-- ξ = 0.345 rơi vào bracket **FAT TAIL** (ξ > 0.30). Khi vượt 0.30, phân phối có nguy cơ mất hội tụ của ES (moment bậc cao phân kỳ), đồng nghĩa rủi ro cực đoan có thể lớn hơn bất kỳ ước lượng EVT nào. Thị trường hiện tại vận hành trong chế độ đuôi cực dày.
-- **Hill (0.447) cross‑check**: Cùng dấu dương và giá trị sai khác không quá lớn so với ξ (~0.10) → không có sự nhạy cảm ngưỡng bất thường, tín hiệu được xác nhận bởi hai phương pháp độc lập → độ tin cậy cao.
-- **ES – VaR spread 95%** = –1.37% vượt xa σ₃₀ (0.86%), corroborate thêm rằng loss ngoài VaR trung bình lớn gấp 1.6 lần sigma hàng ngày, xác nhận sự hiện diện của đuôi dày bằng chứng thực nghiệm.
+- ξ = 0.345 trực tiếp xếp loại **fat tail**, Gaussian hoàn toàn không đủ để nắm bắt rủi ro đuôi.
+- Hill cross‑check (0.447) củng cố kết luận; mặc dù cao hơn nhẹ, cả hai đều vượt ngưỡng 0.3 và chỉ sai khác trong biên độ chấp nhận được, tín hiệu vẫn **robust**.
+- Chênh lệch ES − VaR (1.37%) lớn hơn hẳn σ₃₀ (0.86%), một bằng chứng thực nghiệm mạnh mẽ cho phân phối đuôi dày, vượt ra ngoài khung Gaussian.
 
 ## 3. Gaussian Gap
-- Gaussian VaR 99% suy từ các tham số (μ ≈ –0.065%, σ = 0.86%): μ – 2.326σ ≈ **–2.07%**.
-- EVT VaR 99% = **–3.69%**.
-- Gap = **1.62 điểm phần trăm** (>1 pp) → Gaussian underestimates rủi ro cực đoan hàng ngày gần gấp đôi. Mô hình normal không đủ tin cậy để phân bổ vốn rủi ro hay đặt ngưỡng cảnh báo.
+- Với σ = 0.86% và μ suy ra từ VaR 95% (~ -0.07%), **Gaussian VaR 99%** ≈ μ − 2.33σ = **-2.07%**.
+- EVT VaR 99% = -3.69% → khoảng cách **1.62 điểm phần trăm** (>1pp).  
+  Gaussian đánh giá thấp tổn thất cực đoan tới hơn 1.6%, mô hình phân phối chuẩn **không thể dùng cho phân bổ vốn rủi ro** hay định cỡ vị thế trong bối cảnh thị trường này.
 
 ## 4. Verdict — Hedging Implications
-Với ξ > 0.30, khuyến nghị **tránh hoàn toàn các chiến lược momentum** vì có thể chịu tổn thất leo thang khi thị trường giảm nhanh. Thay vào đó:
-- **Mua put options ITM** (in‑the‑money) để bảo vệ danh mục trước những cú sốc rơi tự do, vì OTM có thể không kịp bù đắp khi drawdown vượt xa VaR 99%.
-- **Short futures** để giảm net exposure, hạn chế rủi ro thanh lý bắt buộc.
-- Giảm đòn bẩy tối thiểu 50% so với mức hiện tại để phòng ngừa sự kiện đuôi có biên độ vượt ngoài khả năng hấp thụ của tài khoản.
+ξ > 0.30 → **tránh hoàn toàn các chiến lược momentum**, giảm mạnh đòn bẩy.  
+Hành động phòng hộ: **mua quyền chọn bán ITM** (bảo vệ sát giá hiện tại) và **bán khống hợp đồng tương lai** chỉ số. Các công cụ dựa trên σ (stop‑loss, position sizing Gaussian) không còn đáng tin cậy; phải chuyển sang ước lượng rủi ro dựa trên EVT.
 
 ## 5. Structured Tail
 ```json
@@ -33,7 +29,7 @@ Với ξ > 0.30, khuyến nghị **tránh hoàn toàn các chiến lược momen
   "hill": 0.447,
   "tail_regime": "fat",
   "gaussian_gap_pp": 1.62,
-  "hedge_action": "buy_puts_itm",
+  "hedge_action": "buy_puts_itm, short_futures",
   "confidence": "high"
 }
 ```

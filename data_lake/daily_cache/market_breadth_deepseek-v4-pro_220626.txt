@@ -1,35 +1,33 @@
 ## 1. Observations
-- MA20: 33.2% — ngưỡng thấp (low), không còn động lượng đầu cơ ngắn hạn đáng kể.
-- MA60: 29.4% — thấp, chưa có tín hiệu điều chỉnh kết thúc, xác nhận suy yếu trung hạn.
-- MA125: 24.5% — rất thấp, sức mạnh chu kỳ 6 tháng gần như biến mất.
-- MA252: 28.5% — thấp dưới 40%, secular trend trong vùng bearish yếu.
+- MA20: 35.8% – thấp (vùng <40% cho thấy xung lực ngắn hạn suy yếu rõ).
+- MA60: 30.1% – thấp, xác nhận chưa thoát khỏi điều chỉnh trung hạn.
+- MA125: 25.9% – rất thấp, sức mạnh chu kỳ nửa năm gần như biến mất.
+- MA252: 29.2% – thấp, chỉ ~1/3 số mã giữ được xu hướng năm; thị trường nghiêng hẳn về Bear.
 
 ## 2. Structural Health
-Cả 4 đường MA đồng loạt co hẹp dưới 34%, tạo thành **đồng thuận tiêu cực** — không có divergence mà là suy yếu lan tỏa.  
-Pattern khớp **Bear Confirmed**: MA20 < 30% và MA252 < 40%, xác nhận thị trường đang trong pha secular weakness, không chỉ là rũ bỏ tạm thời. Không có dấu hiệu Bull Trap hay Bear Trap.
+Cả bốn đường MA đồng loạt dưới 40%, không có divergence. MA20 tuy chưa giảm dưới 30% nhưng tiến sát ngưỡng Bear Confirmed, trong khi MA252 rất thấp (29.2%). Tổ hợp này khớp với mẫu hình **Bear Confirmed** ở ngưỡng mở rộng: phần lớn cổ phiếu đánh mất động lực dài hạn, breakout thất bại trên mọi khung thời gian. Cấu trúc thị trường đang trong downtrend có hệ thống, không phải dạng rũ bỏ tạm thời.
 
 ## 3. Money Flow Leadership
-- **Top volume MA20**: Danh sách phân mảnh, thiếu vắng các trụ Banking lớn. Xuất hiện APG (BĐS), BCA (TC), ACV (hạ tầng) — dòng tiền ngắn hạn mang tính cơ hội đơn lẻ, không hình thành nhóm ngành dẫn dắt rõ rệt.
-- **Top volume MA252**: Có overlap (ABB, BCA, APF, ADS, BCA). Điểm đáng chú ý là sự góp mặt của **BID** — trụ Banking quốc doanh — cho thấy smart money dài hạn neo vào defensive.
-- Dòng tiền ưu tiên **defensive** (BID, BCA) hơn là aggressive; thiếu vắng hoàn toàn Brokers/Steel trong top dài hạn. Chất lượng leadership thấp, thiếu breadth.
+- Top volume MA20 ngắn hạn tập trung vào nhóm Tài chính (ABB – ngân hàng, ADS, AGR, APG, ASP – chứng khoán), cùng vài mã sản xuất (AAA, ANV).
+- Top volume MA252 dài hạn có nhiều ông lớn ngân hàng (BID, ABB, BCA) và vật liệu (BMP, BMS), xen kẽ dịch vụ tài chính (ADS, APF, ASP). Overlap ngắn‑dài hạn ở ABB, ADS, ASP cho thấy dòng tiền dài đang bám trụ ở những cổ phiếu tài chính phòng thủ.
+- Dòng tiền thông minh ưu tiên **defensive** (ngân hàng) hơn là các nhóm đầu cơ như thép hay chứng khoán nhỏ. Sự thiếu vắng các mã tăng trưởng nhạy chu kỳ củng cố tâm lý phòng ngừa rủi ro.
 
 ## 4. Verdict
-- **Strategy: Defensive cash-up** — không phải môi trường cho trend-following hay mean-reversion T+.
-- **Đòn bẩy: 0% margin** — MA252 chỉ 28.5%, không đủ điều kiện nới margin. Giữ tiền mặt là vị thế chủ đạo.
-- Trạng thái Bear Confirmed yêu cầu bảo toàn vốn, chờ breadth cải thiện rõ ràng trước khi giải ngân trở lại.
+- **Strategy**: Defensive cash‑up – ưu tiên bảo toàn vốn, giữ tỷ trọng tiền mặt cao, hạn chế mở mới.
+- **Đòn bẩy đề xuất**: 0% margin. Không đủ điều kiện dùng margin (MA252 < 70%, breadth toàn diện kém).
+- Không có divergence trái chiều giữa MA20 và MA252 nên **không cần WAIT FOR CONFIRMATION**; tín hiệu đã rõ ràng là thoái lui.
 
-## 5. Structured Tail
 ```json
 {
   "tool": "market_breadth",
-  "ma20_pct": 33.2,
-  "ma60_pct": 29.4,
-  "ma125_pct": 24.5,
-  "ma252_pct": 28.5,
+  "ma20_pct": 35.8,
+  "ma60_pct": 30.1,
+  "ma125_pct": 25.9,
+  "ma252_pct": 29.2,
   "regime": "bear_confirmed",
   "leadership_sector": "defensive",
   "strategy": "defensive",
   "margin_pct": 0,
-  "confidence": "high"
+  "confidence": "medium"
 }
 ```
