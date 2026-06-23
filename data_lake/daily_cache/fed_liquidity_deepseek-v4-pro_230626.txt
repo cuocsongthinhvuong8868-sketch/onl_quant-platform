@@ -1,0 +1,42 @@
+## 1. Phân Tích Cơ Chế (Mechanical Decomposition)
+
+Trong tuần 17/6/2026, Net Liquidity (NL) ghi nhận 5,848,883 triệu USD — sụt giảm 48,005 triệu USD so với tuần trước đó. Với quy mô RRP chỉ còn 6,828 triệu (gần như cạn kiệt), biến động của NL không đến từ repo ngược. Phân rã thành phần cho thấy nguyên nhân chính nằm ở **TGA (Treasury General Account)** tăng mạnh, hút thanh khoản khỏi hệ thống ngân hàng, hoặc/và WALCL (Fed Balance Sheet) tiếp tục giảm nhẹ theo lộ trình thu hẹp định lượng (QT). Trong bối cảnh RRP đã ở mức sàn, mọi thay đổi WALCL hay TGA đều truyền thẳng vào NL mà không còn buffer.
+
+## 2. Định Vị Chu Kỳ (Cycle Positioning)
+
+NL hiện tại 5.85 nghìn tỷ USD thấp hơn đáng kể so với đỉnh QE 2021–2022 (quanh 6.4–6.6 nghìn tỷ), nhưng vẫn trên vùng đáy QT 2024 (ước tính ~5.4 nghìn tỷ) — xác lập một pha **trung tính sau QT sâu**. RRP đã cạn dưới ngưỡng 100 tỷ USD, không còn khả năng bơm thanh khoản chủ động như giai đoạn 2023–2024. TGA ở mức 880 tỷ, cao hơn mục tiêu trung bình, phản ánh Treasury đang tích lũy (hút), có thể do yếu tố thuế quý (cuối tháng 6). Như vậy, hệ thống đang ở chế độ “QT thụ động + TGA biến động”, thiếu vắng cú hích tăng NL.
+
+## 3. Cường Độ Tín Hiệu (Signal Strength)
+
+Tín hiệu tuần này là **HOLD** — không đủ điều kiện ADD (EMA > 0 và Z ≥ +1σ) hay CUT (EMA < 0 và Z ≤ –1σ). Z‑Score –0.69 nằm trong vùng trung tính, chưa đạt ngưỡng rủi ro –1σ. Dù Impulse EMA(4) ở mức –8,810 triệu USD (âm nhẹ), nhưng giá trị tuyệt đối nhỏ, không tạo sức ép rủi ro rõ rệt. Ta có thể xem đây là cảnh báo sớm về xu hướng giảm thanh khoản nhẹ, nhưng chưa đủ để chuyển sang trạng thái phòng thủ (CUT). Độ mạnh của tín hiệu là thấp—cận biên, không extreme.
+
+## 4. Lan Tỏa Liên Thị Trường (Cross-Asset Spillover)
+
+Với NL trung tính và Impulse EMA âm nhẹ, bias ngắn hạn (1–4 tuần) cho các tài sản rủi ro như sau:
+- **SPX/NDX**: Không có động lực bơm mới; thị trường có thể đi ngang hoặc chịu áp lực giảm nhẹ do thanh khoản hơi thắt.
+- **DXY**: Triển vọng ổn định, hơi có lợi cho USD khi TGA hút thanh khoản, nhưng không đủ mạnh để tạo xu hướng.
+- **Gold & Crypto**: Thiếu vắng yếu tố bơm tiền, giá vàng và crypto khó bứt phá; giao dịch trong biên độ, hơi chịu sức ép nếu DXY nhích lên.
+- **VN-Index**: Với độ trễ 4–8 tuần, correlation dương nhẹ (0.25–0.35) cho thấy nếu NL tiếp tục suy yếu, VN-Index có thể bị ảnh hưởng tiêu cực nhẹ, nhưng hiện tại chưa đáng kể. Bias là **trung tính, hơi nghiêng tiêu cực**.
+
+## 5. Yếu Tố Rủi Ro Khiến Tín Hiệu Có Thể Sai
+
+- **RRP về zero**: Khi RRP cạn, tín hiệu CUT (nếu xảy ra sau này) sẽ bớt đáng tin cậy vì không còn dòng tiền từ MMF chảy ra để bù đắp QT. Tuy nhiên, hiện tại ta đang HOLD, rủi ro này chưa ảnh hưởng.
+- **TGA nhiễu thuế quý**: Tháng 6 là kỳ thanh toán thuế ước tính quý, khiến TGA dễ tăng đột biến rồi giảm khi Treasury bắt đầu chi tiêu. Biến động tuần này có thể chỉ là *noise*, và NL sẽ hồi phục sau đó.
+- **Fed QT đều đặn**: Nếu WALCL giảm nhanh hơn trong bối cảnh TGA vẫn cao, NL có thể tụt xuống nhanh, biến HOLD thành CUT trong vài tuần tới.
+- **Công cụ khẩn cấp**: Chưa có dấu hiệu Fed buyback hoặc facility mới.
+
+## 6. Kết Luận
+
+Chế độ thanh khoản hiện tại là **trung tính (neutral)** với một nhịp giảm nhẹ mang tính kỹ thuật, phần lớn do TGA tích lũy cuối quý. Trong 2–4 tuần tới, thị trường thiếu động lực bùng nổ (risk-on) nhưng cũng chưa rơi vào vùng nguy hiểm (risk-off) — kịch bản đi ngang là chính, có thiên hướng giảm nhẹ nếu TGA không sớm giải phóng. Cần theo dõi sát Impulse EMA và Z‑score để phát hiện sớm chuyển pha.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5848.883,
+  "signal": "HOLD",
+  "z_score": -0.69,
+  "regime": "neutral",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

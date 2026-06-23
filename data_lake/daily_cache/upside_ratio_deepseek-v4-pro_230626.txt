@@ -1,0 +1,30 @@
+## 1. Observations
+- **Lệch pha phân phối rõ nét**: Lực cầu hiện tại (6.59%) thấp hơn đáng kể so với Mu dài hạn (13.05%). Lực cung hiện tại (17.41%) cao hơn hẳn Mu dài hạn (13.42%). Cấu trúc "up << mu & down >> mu" xác nhận trạng thái Phân phối (Distribution).
+- **Cả hai chiều đều trong chế độ Momentum**: Phi của cầu (0.198) và cung (0.204) đều > 0.10, báo hiệu xu hướng hiện tại có quán tính tiếp diễn thay vì đảo chiều.
+- **Chênh lệch sức mạnh mong manh**: Cung (17.41%) đang áp đảo cầu (6.59%) về giá trị tuyệt đối, nhưng mức độ tự tương quan (Phi) gần như tương đương, cho thấy đà bán không vượt trội hoàn toàn về mặt động lượng so với nỗ lực bắt đáy.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền**: Phân phối (Distribution). Dòng tiền thông minh đang rút ra trong bối cảnh cung mở rộng trên mức trung bình và cầu co hẹp dưới mức trung bình dài hạn.
+- **Bên giữ momentum thực sự: Cung (Supply)**. Mặc dù chênh lệch nhỏ, |Phi_dn| (0.204) > |Phi_up| (0.198) cho thấy quán tính của đà bán hơi mạnh hơn, khiến xác suất duy trì trạng thái bán tháo cao hơn một chút so với xác suất bùng nổ mua.
+
+## 3. Stress-Test Read
+- **Biên độ Panic**: P95 Downside = 25.73%. Trong kịch bản xấu nhất (T+19), thị trường có thể đối mặt với một phiên mà hơn 1/4 số mã giảm mạnh trên 2%, phản ánh rủi ro thanh lý dây chuyền rất thực tế.
+- **Bất đối xứng rủi ro**: P95 Downside (25.73%) > P95 Upside (23.23%). Đuôi rủi ro phía bên trái (tail risk) dày hơn, thể hiện xác suất xảy ra sự kiện cực đoan theo chiều giảm sâu cao hơn so với chiều tăng bùng nổ.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 15%**.
+- **Chiến lược: Phòng thủ (Defensive)**. Phân phối kèm momentum bán mạnh là tín hiệu rủi ro cao. Chỉ nên duy trì tỷ trọng rất nhỏ cho danh mục sẵn có, ưu tiên bảo tồn vốn. Không giải ngân mới cho tới khi ít nhất một chiều chuyển sang Mean-reversion (Phi < -0.10) hoặc cấu trúc dịch chuyển từ "Distribution" sang "Accumulation". Đây không phải vùng bắt đáy an toàn dù giá có thể hấp dẫn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 25.73,
+  "p95_upside_pct": 23.23,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```

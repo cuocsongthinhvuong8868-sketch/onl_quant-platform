@@ -1,0 +1,29 @@
+## 1. Observations
+- OLS slope ở mức 0.24, percentile 13.8th (cực thấp) → VN30F1M gần như không phản ứng về biên độ với biến động composite VIC/VHM/VRE, mất độ nhạy nghiêm trọng.
+- Correlation 0.61 với percentile 53.2th (tầm trung) → chiều hướng liên kết vẫn tồn tại nhưng yếu, không thể dùng VIN làm tín hiệu dẫn hướng chính.
+- Event study từ 27/03/2026: Regime ANCHORING (ΔCorr = +0.15, ΔSlope = -0.65) → tương quan được giữ nhưng độ dốc sụp mạnh, phù hợp với việc MM neo giá VIN nhưng không đẩy được chỉ số.
+
+## 2. Microstructure Read
+- Vai trò chi phối của VIC/VHM/VRE lên VN30F1M hiện tại suy giảm đáng kể. Slope percentile < 20th cho thấy thị trường đã “rời” khỏi VIN về mặt định lượng: một nhịp tăng mạnh ở VIC (ví dụ lên 240k) cũng rất ít điểm số dịch chuyển cho F1.
+- Correlation không ở mức cực đoan (<80th) nên không có dấu hiệu can thiệp nhân tạo; chỉ là VIN mất quyền dẫn dắt. Dòng tiền có khả năng đang xoay sang Bank/Chứng khoán để tạo sóng chỉ số.
+
+## 3. Event Study Interpretation
+- ANCHORING báo hiệu tương quan còn nguyên (do cấu trúc rổ VN30 hoặc dòng vốn thụ động) nhưng hệ số góc giảm sâu. Trong phiên intraday, mọi tín hiệu từ VIN đều bị “giảm độ khuếch đại”, không đạt edge để giao dịch. Qua đêm rủi ro cao vì gap VIN không còn dự báo chính xác gap F1. Với tình huống này, nếu giữ vị thế dựa vào VIN, xác suất thua lỗ do slipage tăng.
+
+## 4. Verdict
+- Trade plan: **NO TRADE**. Mô hình không cung cấp tín hiệu đủ tin cậy từ VIN; slope quá thấp triệt tiêu lợi thế tracking.
+- Leading indicator cần chuyển hướng theo dõi: nhóm Bank (BID, CTG, VPB) hoặc Chứng khoán (SSI, VND) để đọc nhịp F1. Nếu ép vào lệnh (vd. long theo dòng Bank) thì cần stop-loss chặt: tham chiếu giá F1 hiện tại 1,991.40, cắt lỗ nếu mất 0.5-1% (∼1,981 - 1,971). Tuyệt đối không dùng VIC/VHM làm trigger.
+- Stop-loss reference: Mọi mức thoát lệnh phải tính từ giá INPUT hiện tại. Ví dụ nếu long F1, stop tại 1,991.40 × 0.99 = 1,971.49.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "23/06/2026",
+  "regime": "ANCHORING",
+  "slope_percentile": 13.8,
+  "corr_percentile": 53.2,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

@@ -1,0 +1,31 @@
+## 1. Observations
+- Stress Index (VN30): 3.33% – thấp xa mức cảnh báo (40%)
+- Số mã thủng VaR 95%: 1/30 – duy nhất GAS
+- Complacency Index (toàn thị trường): 4.63% – rất thấp so với ngưỡng nguy hiểm (80%)
+- Số mã định giá sai (spread nén): 5, nổi bật OCB, VHM, VND
+
+## 2. Contagion Assessment (Module B)
+- VN30 stress đang ở vùng an toàn (3.33%), không có dấu hiệu lây lan hệ thống real-time. Rủi ro đuôi dày trên rổ VN30 được kiểm soát.
+- GAS là breach duy nhất – mang tính cá biệt, chưa hình thành đầu sóng lan tỏa. Cần theo dõi thêm nếu GAS kéo thêm các mã cùng nhóm ngành năng lượng vi phạm VaR trong các phiên tiếp theo.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- Complacency 4.63%: thị trường **không** rơi vào trạng thái “ngủ quên” (spread bị nén, định giá sai rủi ro trên diện rộng). Điều này **không** đồng nghĩa với ổn định hay bình thường – chỉ đơn giản là hiện tại không có dấu hiệu của chế độ phân phối đỉnh hoặc tích lũy kéo dài.
+- Với Stress Index thấp đồng thời, bối cảnh hiện tại là rủi ro lây lan thấp, không có căng thẳng hệ thống cấp tính. Tuy nhiên, có 5 mã bị định giá sai (spread nén), cho thấy một vài khu vực cục bộ đang hấp thụ rủi ro kém hiệu quả. Nhà đầu tư không nên diễn giải mức Complacency thấp là tín hiệu “an toàn để lơ là”.
+
+## 4. Stock-Level Risk Calls
+- **GAS (Module B – thủng VaR)**: Sự cố cá biệt. Khuyến nghị giảm tỷ trọng hoặc thắt chặt dừng lỗ (ví dụ: trailing stop <1.5% từ giá hiện tại, hoặc đóng vị thế nếu thủng MA20 trên khung D1).
+- **OCB, VHM, VND (Module C – mispriced)**: Spread bị nén bất thường – tiềm ẩn điều chỉnh khi thị trường thức tỉnh. Cảnh giác khi nắm giữ vị thế lớn, ưu tiên quản trị rủi ro qua khẩu vị và không chủ quan vì thị trường chung có vẻ yên tĩnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["GAS", "OCB", "VHM", "VND"],
+  "confidence": "medium"
+}
+```

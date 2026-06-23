@@ -1,0 +1,28 @@
+## 1. Observations
+- Risk Score 57.7/100 nằm trong vùng NEUTRAL (40–60), cận trên.
+- EGARCH Vol chuẩn hóa 6.3%, giảm mạnh –15.9% so phiên trước, ở mức thấp lịch sử.
+- Rolling Skewness 0.03, gần zero, không thể hiện đuôi dày âm hay dương đáng kể.
+- Downside Correlation chuẩn hóa 2.4% (rất thấp), Upside Correlation chuẩn hóa 30.2% (cao gấp ~12.6 lần).
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha NEUTRAL / STOCK PICKING với thiên hướng nhẹ về GREED. Biến động thấp và tiếp tục thu hẹp, độ lệch phân phối trung tính, cùng tương quan tăng điểm cao hơn hẳn tương quan giảm điểm cho thấy áp lực bán hệ thống gần như không có, cơ hội chọn cổ phiếu chiếm ưu thế.
+
+## 3. Cross-Check
+Điểm số 57.7 nhất quán với bức tranh vol thấp, down-corr thấp. Tuy nhiên, vol giảm mạnh (–15.9%) chỉ đi cùng Score giảm nhẹ –1.7, tạo divergence nhỏ: vol giảm thường đẩy Score tăng, nhưng up-corr 30.2% chưa đủ cao để kích hoạt GREED. Các tín hiệu chưa mâu thuẫn gay gắt, song cần lưu ý nếu vol tiếp tục giảm mà Score không cải thiện, thị trường có thể thiếu động lực tăng tiếp.
+
+## 4. Verdict
+Beta đề xuất cho danh mục VN-Index: **0.6**. Môi trường hiện tại thiên về phân hóa, vì vậy ưu tiên chiến lược chọn lọc cổ phiếu thay vì đặt cược vào chỉ số. Không có tín hiệu hành động phòng thủ hay tấn công quyết liệt.  
+**NO ACTIONABLE SIGNAL**: Các thành phần rủi ro chưa đồng thuận đủ để chuyển pha rõ rệt; giữ vị thế trung tính, tập trung vào cổ phiếu tương quan thấp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "23/06/2026",
+  "regime": "NEUTRAL",
+  "score": 57.7,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": ["vol thấp và giảm mạnh –15.9%", "down-corr rất thấp 2.4%", "up-corr cao hơn cho thấy phân hóa dương"]
+}
+```

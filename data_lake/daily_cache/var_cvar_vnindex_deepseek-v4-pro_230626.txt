@@ -1,0 +1,38 @@
+## 1. Observations
+- Historical VaR 95% là –1.65%, sâu hơn so với Parametric VaR 95% (–1.48%), cho thấy đuôi trái lịch sử dày hơn giả định phân phối chuẩn.
+- EVT VaR 99% = –3.69%, gấp hơn 2.2 lần mức VaR 95% lịch sử, phản ánh rủi ro cực đoan leo thang mạnh ở các phân vị xa.
+- Hệ số ξ GPD = +0.345 – vượt ngưỡng 0.30, xác nhận đuôi “fat” với khả năng ES phân kỳ (các khoản lỗ cực lớn có thể không hội tụ).
+- Hill index = +0.447, tương đồng về dấu và độ lớn với ξ, củng cố tín hiệu đuôi dày vượt Gaussian, không phải nhiễu ngưỡng.
+
+## 2. Tail Thickness Diagnosis
+ξ = 0.345 thuộc nhóm **FAT TAIL** (>0.30). Đây là vùng mà mô hình bình thường ước lượng thiếu trầm trọng các tổn thất đuôi.  
+Hill index (+0.447) cùng hướng và không quá xa (chênh ~0.1) => tín hiệu robust, không diverge.  
+ES – VaR spread (95%) = 1.37 điểm phần trăm, lớn hơn hẳn σ₃₀ (0.87%) – đúng dấu hiệu empirical corroborate cho fat tail: trung bình tổn thất khi vượt ngưỡng VaR cao gấp 1.5 lần biến động ngầm định, xác nhận phân phối đuôi cực nặng.
+
+## 3. Gaussian Gap
+Gaussian VaR 99% ≈ μ + z₀.₀₁·σ.  
+Với μ ≈ –0.05% (suy từ VaR 95%), σ = 0.87%, z₀.₀₁ = –2.33 ⇒ VaR 99% ≈ –2.08%.  
+EVT VaR 99% = –3.69% ⇒ **Gap = 1.61 điểm phần trăm** (> 1pp), chứng tỏ mô hình chuẩn under-estimate rủi ro đuôi một cách hệ thống. Không nên dùng Gaussian VaR 99% cho phân bổ vốn rủi ro.
+
+## 4. Verdict – Hedging Implications
+Với ξ > 0.30:
+- Gaussian hoàn toàn không phù hợp; chiến lược dựa trên σ thông thường (ví dụ stop-loss, volatility targeting) sẽ gặp rủi ro “gãy đuôi”.
+- **Tránh** các chiến lược momentum hoặc short-gamma (bán quyền chọn OTM) vì dễ bị lỗ lớn khi đuôi trái kích hoạt.
+- Hành động phòng hộ: **mua puts ITM** để được bảo vệ gần vùng giá hiện tại; kết hợp **short futures hedge** để giảm delta tổng, hạn chế thiệt hại khi đuôi dày gây trượt giá mạnh.
+- Kể cả khi không giao dịch phái sinh, cần giảm đòn bẩy ít nhất 50%, tăng tỷ trọng tiền mặt/phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "23/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.61,
+  "hedge_action": "buy_puts_itm,short_futures",
+  "confidence": "high"
+}
+```

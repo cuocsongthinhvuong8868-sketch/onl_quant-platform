@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-23",
+  "composite_score": 20,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 11,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING dưới 5 báo hiệu thanh khoản hạ nguồn đã hạ nhiệt, làm yếu luận điểm bearish."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 29.9,
+      "unit": "%",
+      "description": "Độ rộng vượt 45% chứng tỏ thị trường nội tại phục hồi bền vững, phủ định trạng thái phân phối."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.5,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% chỉ báo căng thẳng hệ thống hạ xuống mức an toàn."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "Tail Index (xi)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.345,
+      "unit": "",
+      "description": "Đuôi béo giảm dưới 0.25 tức rủi ro cực đoan đã được kiểm soát."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Coupling giảm xuống phân vị thấp càng củng cố rằng index không còn phụ thuộc vào nhóm VIN."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 100.0,
+      "unit": "th pct",
+      "description": "CQS percentile dưới 80th đồng nghĩa stress tín dụng toàn cầu hạ nhiệt, giảm áp lực vĩ mô lên VN."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-23",
+  "source": "ai_cio_executive_summary"
+}

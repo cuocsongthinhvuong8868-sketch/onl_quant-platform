@@ -1,0 +1,30 @@
+## 1. Observations
+- Spread_Z ở mức –0.61σ, phản ánh dispersion hiện tại thấp hơn trung bình 60 phiên gần nhất.
+- DPI đạt 41.7%, dưới ngưỡng 70% — chưa hình thành chế độ phân tán kéo dài.
+- Tương quan trung bình cặp cổ phiếu (Ledoit-Wolf) chỉ 0.008, tiệm cận 0 — phân hóa mạnh, không có dấu hiệu đồng pha.
+- Dữ liệu cross-sectional skewness và kurtosis không khả dụng (N/A) — không thể xác nhận hướng đuôi phân phối.
+
+## 2. Structural State
+Với Spread_Z âm và DPI trung bình thấp, thị trường đang ở trạng thái **bình thường**, không chịu áp lực dispersion cục bộ hay regime stress dai dẳng. Không có tín hiệu căng giãn cấu trúc vượt quá +1σ, cũng không có sự kiện outlier lặp lại liên tục. Thị trường vận hành trong điều kiện phân hóa tự nhiên, ít bị chi phối bởi các chuyển động đồng loạt.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu CS Skewness và Kurtosis, không thể đánh giá đuôi bất đối xứng hay độ dày của phân phối. Trong trường hợp có dữ liệu, nếu Skew < –1 sẽ cảnh báo cú sập cá biệt, hoặc > +1 là pha đẩy giá điên rồ. Kurtosis > 5 sẽ phủ nhận giả định phân phối chuẩn. Hiện tại không đủ thông tin để kết luận, tuy nhiên Spread dương (10.13%) kết hợp Z-score âm gợi ý tail không quá cực đoan, dispersion chủ yếu từ các chuyển động bình thường quanh trung vị ngành.
+
+## 4. Regime Mapping
+Đối chiếu lên bản đồ 2D (DPI × Correlation):
+- DPI thấp + Correlation thấp → **Healthy Stock-Picking**.
+Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu, các mã di chuyển độc lập và rủi ro hệ thống thấp. Rủi ro lớn nhất cho Portfolio Manager là **chuyển đổi chế độ đột ngột**: nếu một cú sốc vĩ mô xảy ra, tương quan có thể nhanh chóng nhảy lên 1 (herding crash) nhưng với bức tranh hiện tại, xác suất này chưa cao. Liquidity dry-up hay concentration risk cũng chưa hiện hữu nhờ phân hóa sâu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "23/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.61,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```
