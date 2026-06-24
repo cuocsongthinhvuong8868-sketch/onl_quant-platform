@@ -10,16 +10,16 @@
       "threshold_value": 5,
       "current_value": 11,
       "unit": "sessions",
-      "description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5 – tín hiệu hạ nhiệt thanh khoản nội địa bền vững."
+      "description": "Số phiên STRESS/WARNING giảm xuống dưới 5"
     },
     {
       "model": "Market Breadth",
       "metric": "Breadth MA20",
       "threshold_operator": ">",
       "threshold_value": 45,
-      "current_value": 28.0,
+      "current_value": 29.4,
       "unit": "%",
-      "description": "Tỷ lệ mã trên MA20 vượt 45% – xác nhận độ rộng phục hồi, bác bỏ trạng thái bear confirmed."
+      "description": "Tỷ lệ mã trên MA20 vượt 45%"
     },
     {
       "model": "ESR Monitor",
@@ -28,7 +28,7 @@
       "threshold_value": 55,
       "current_value": 65.4,
       "unit": "%",
-      "description": "SSI xuống dưới 55% – rủi ro hệ thống giảm đáng kể, bác bỏ luận điểm bull trap."
+      "description": "SSI giảm xuống dưới 55%"
     },
     {
       "model": "Tail Risk (EVT)",
@@ -37,16 +37,16 @@
       "threshold_value": 0.25,
       "current_value": 0.374,
       "unit": "",
-      "description": "Tham số đuôi xi_max < 0.25 – đuôi phân phối quay về vùng mỏng, loại bỏ lo ngại fat-tail cực đoan."
+      "description": "EVT xi max toàn dải ngưỡng thấp hơn 0.25"
     },
     {
       "model": "Manipulation / Coupling",
       "metric": "Vingroup Slope Percentile",
       "threshold_operator": "<",
       "threshold_value": 70,
-      "current_value": 1.667,
+      "current_value": 13.4,
       "unit": "th pct",
-      "description": "Phân vị dẫn dắt của nhóm Vingroup tăng trở lại trên 70th – tín hiệu tập trung rủi ro quay lại, có thể làm sai luận điểm phân mảnh an toàn."
+      "description": "Vingroup slope percentile dưới 70th"
     },
     {
       "model": "Global Financial Conditions",
@@ -55,7 +55,7 @@
       "threshold_value": 80,
       "current_value": 99.8,
       "unit": "th pct",
-      "description": "CQS tín dụng giảm xuống dưới 80th percentile – stress tín dụng toàn cầu hạ nhiệt rõ rệt, bác bỏ luận điểm macro thắt chặt cực đoan."
+      "description": "CQS Percentile giảm xuống dưới 80th"
     }
   ],
   "provider_key": "deepseek-v4-pro",

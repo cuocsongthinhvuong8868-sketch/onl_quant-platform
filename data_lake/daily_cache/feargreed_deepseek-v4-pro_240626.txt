@@ -1,20 +1,18 @@
 <!-- ai-cio-cache-version: pca_point_in_time_v1 -->
 ## 1. Observations
-- Risk Score 54.2 (vùng NEUTRAL 40–60), Δ–3.7, vẫn trên ngưỡng chuyển FEAR.
-- EGARCH Vol chuẩn hóa 29.0% (Δ +14.3%), vượt xa mức điển hình của chế độ NEUTRAL (~20–25%).
-- Rolling Skewness –0.03, gần như trung tính, không xác nhận đuôi trái kéo dài.
-- Downside Correlation 2.8%, Upside Correlation 32.3%: bất đối xứng mạnh – phân hóa khi giảm, đồng thuận khi tăng.
+- Risk Score 54.3/100, nằm trong vùng NEUTRAL (40–60), giảm 3.6 điểm so với phiên trước.
+- EGARCH Vol chuẩn hóa 29.0%, tăng mạnh +14.3% – vượt xa mức trung vị lịch sử (~25%).
+- Rolling Skewness -0.03, gần bằng 0, không có dấu hiệu đuôi trái dày.
+- Downside Correlation 2.4% rất thấp, trong khi Upside Correlation 32.3% cao hơn 13 lần.
 
 ## 2. Interpretation
-Trên dữ liệu hiện tại, thị trường nằm trong pha NEUTRAL / STOCK PICKING với mức phân hóa cao. Biến động tăng mạnh báo hiệu xác suất dao động lớn gia tăng, nhưng chưa có bằng chứng của đám đông bán tháo (down‑corr thấp, skew không âm sâu). Rủi ro hệ thống ở mức trung bình, chưa đủ điều kiện xếp lại sang FEAR.
+Trên dữ liệu hiện tại, thị trường vẫn trong pha NEUTRAL / STOCK PICKING với mức độ phân hóa cao. Biến động tăng đột biến nhưng không kèm skew âm sâu hay tương quan giảm đồng pha, cho thấy rủi ro chủ yếu mang tính đặc thù cổ phiếu, không phải rủi ro hệ thống lan tỏa.
 
 ## 3. Cross-Check
-- **Divergence**: Score 54.2 (NEUTRAL) mâu thuẫn với EGARCH vol cao 29.0%. Đây là flag đáng lưu ý: thị trường biến động mạnh nhưng không đồng loạt giảm, phản ánh phân hóa dao động hơn là sợ hãi lan rộng. Tín hiệu cảnh báo sớm, nhưng chưa đủ để thay đổi regime.
-- **Skew vs Correlation**: Skew –0.03 nhất quán với bất đối xứng up‑corr >> down‑corr. Không có mâu thuẫn nội tại ở cặp chỉ báo này.
+Có divergence đáng chú ý: EGARCH Vol tăng vọt (+14.3%) lên 29.0% – tín hiệu cảnh báo căng thẳng – trong khi Score vẫn trung tính, Skew gần zero và Downside Correlation cực thấp. Thông thường, vol cao đi kèm skew âm và down-corr cao, nhưng ở đây cấu trúc tương quan/skew vẫn lành mạnh. Sự lệch pha này cho thấy vol tăng có thể do biến động idiosynchratic hoặc sự kiện riêng lẻ, không phải đám đông bán tháo đồng bộ. Do đó, các thành phần không xác nhận lẫn nhau → flag phân kỳ.
 
 ## 4. Verdict
-- Beta exposure đề xuất: **0.5**. Giảm nhẹ so với trung lập (0.7–1.0) dựa trên xác suất cao biến động mở rộng, nhưng chưa chuyển sang phòng thủ toàn diện vì thiếu xác nhận từ skew và down‑corr.
-- Hành động cụ thể: giảm tỷ trọng các vị thế beta cao, ưu tiên cổ phiếu có downside correlation thấp. Không thoát toàn bộ thị trường; duy trì stock picking trong môi trường phân hóa.
+Do hệ thống tín hiệu mâu thuẫn (vol báo động nhưng cấu trúc tương quan/skew trung tính), không có khuyến nghị hành động rõ ràng ở cấp danh mục VN-Index. Beta exposure đề xuất: 0.80 – duy trì tham gia thị trường nhưng giảm nhẹ đòn bẩy so với neutral để phản ánh rủi ro biến động tăng. Không thực hiện phòng thủ hay tấn công quyết liệt; tiếp tục theo dõi nếu skewness giảm sâu thêm hoặc downside correlation tăng.
 
 ## 5. Structured Tail
 ```json
@@ -22,15 +20,18 @@ Trên dữ liệu hiện tại, thị trường nằm trong pha NEUTRAL / STOCK 
   "tool": "fear_greed",
   "date": "24/06/2026",
   "regime": "NEUTRAL",
-  "score": 54.2,
+  "score": 54.3,
   "confidence": "medium",
-  "beta_target": 0.5,
-  "key_signals": ["EGARCH vol 29.0% (+14.3% Δ) – cao đột biến", "Downside Correlation 2.8% vs Upside Correlation 32.3% – phân hóa mạnh", "Skewness -0.03 – thị trường chưa bất định tiêu cực"]
+  "beta_target": 0.80,
+  "key_signals": [
+    "EGARCH vol tăng +14.3% lên 29.0%, vượt trung vị lịch sử",
+    "Upside correlation 32.3% >> Downside correlation 2.4% – phân hóa mạnh khi tăng"
+  ]
 }
 ```
 
 === AI CIO STRUCTURED METRICS: fear_greed_methodology ===
-- FearGreed Risk Score: 54.2
+- FearGreed Risk Score: 54.3
 - PCA Method: expanding_point_in_time
 - PCA Full-History Fit: 0
 - PCA Refit Every Sessions: 21

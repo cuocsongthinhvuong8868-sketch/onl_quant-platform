@@ -1,30 +1,33 @@
 <!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
-## 1. Observations  
-- Cả hai chiều cung–cầu đều ở vùng thấp bất thường so với trung bình dài hạn: Lực cầu hiện 5.65% (Mu 13.08%), lực cung hiện 7.53% (Mu 13.01%) – cùng bị nén mạnh.  
-- Hệ số tự hồi quy Phi cả hai phía đều dương trên 0.10: cầu có Phi = 0.200 (đà mua), cung có Phi = 0.227 (đà bán) – xác nhận chế độ momentum kép.  
-- Phân phối đuôi T+19 bất cân xứng: đuôi giảm P95 = 25.50% dày hơn đuôi tăng P95 = 23.32%, tín hiệu rủi ro biến động tiêu cực vượt trội.
+## 1. Observations
+- Chỉ số lực cầu hiện tại (8.94%) thấp hơn đáng kể so với trung bình dài hạn (13.11%) → dòng tiền mua chủ động suy yếu.
+- Chỉ số lực cung hiện tại (7.53%) cũng thấp hơn hẳn trung bình dài hạn (13.01%) → áp lực bán mạnh cũng hạn chế.
+- Cả hai phía đều trong chế độ momentum (Phi cầu = 0.198, Phi cung = 0.227) → xu hướng yếu hiện tại có quán tính tiếp diễn.
 
-## 2. Supply-Demand Dynamics  
-- Trạng thái dòng tiền là **zombification**: cả hai chỉ số breadth đều nén sâu dưới mức trung bình, tiêu biểu cho thanh khoản cạn và thị trường “vô hồn”.  
-- Lực cung đang nắm momentum thực sự mạnh hơn nhẹ (|Phi_dn| = 0.227 > |Phi_up| = 0.200). Điều này cho thấy xu hướng bán ra có sức ỳ lớn hơn, dù cả hai bên vẫn duy trì động lượng.
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại là **zombification**: cả lực cầu và lực cung đều bị nén dưới mức trung bình dài hạn, cho thấy thị trường trầm lắng, thanh khoản cạn kiệt. Không bên nào thực sự áp đảo.
 
-## 3. Stress-Test Read  
-- Kịch bản bi quan P95: nếu thị trường gãy, tỷ lệ mã giảm < -2% có thể lên đến 25.50% mỗi phiên, phản ánh biên độ panic lớn.  
-- Bất cân xứng: đuôi rủi ro giảm (25.50%) dày hơn đuôi tăng (23.32%), xác nhận tail risk nghiêng về phía nguy cơ bán tháo mạnh hơn là bùng nổ mua.
+So sánh |Phi| cho thấy **phe cung giữ momentum thực sự** (0.227 > 0.198). Đà bán có quán tính mạnh hơn đà mua, đồng nghĩa nếu thị trường biến động, xác suất lan tỏa từ một nhịp bán sẽ cao hơn từ một nhịp mua.
 
-## 4. Verdict  
-- Tỷ trọng giải ngân đề xuất: **15%**.  
-- Chiến lược: **phòng thủ** – giữ tiền mặt chủ đạo, hạn chế mua thêm khi cả hai bên đều nén và đuôi rủi ro tiêu cực dày. Không rình bắt đáy lúc zombie vì thiếu tín hiệu bùng nổ cầu, cũng không mua đuổi vì sức cung vẫn có động lượng dai dẳng hơn. Hành động NO ACTIONABLE không áp dụng vì Phi lớn hơn ngưỡng nhiễu.
+## 3. Stress-Test Read
+- P95 Downside = 25.50%: Trong 5% kịch bản xấu nhất, tỷ lệ mã giảm mạnh có thể vọt lên 25.5%, báo hiệu một đợt panic sell tiềm ẩn.
+- Bất đối xứng đuôi: P95 Downside (25.50%) vượt P95 Upside (23.42%). Tail risk phía giảm dày hơn, xác nhận rủi ro bán tháo nhỉnh hơn cơ hội bùng nổ mua.
 
-## 5. Structured Tail  
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 25%**  
+  Duy trì tỷ trọng thấp trong môi trường zombie với momentum bán nhỉnh hơn.
+- **Chiến lược: Phòng thủ**  
+  Chưa đủ tín hiệu để bắt đáy (chưa mean-reversion) hay mua đuổi (lực cầu yếu). Ưu tiên bảo toàn vốn, chờ xác nhận dòng tiền cải thiện.
+
+## 5. Structured Tail
 ```json
 {
   "tool": "upside_ratio",
   "regime": "zombification",
   "momentum_winner": "supply",
   "p95_downside_pct": 25.50,
-  "p95_upside_pct": 23.32,
-  "deployment_pct": 15,
+  "p95_upside_pct": 23.42,
+  "deployment_pct": 25,
   "strategy": "defensive",
   "confidence": "medium"
 }

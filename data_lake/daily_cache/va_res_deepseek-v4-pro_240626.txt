@@ -1,20 +1,19 @@
 ## 1. Observations
-- Stress Index: 0.00% – không mã nào trong VN30 thủng VaR 95%, không có áp lực lây lan real-time
-- Số mã breached: 0/30 – thị trường không ghi nhận cú sốc đột biến
-- Complacency Index: 4.63% – rất thấp so với ngưỡng nguy hiểm 80%
-- Số mã mispriced: 5, top 3 bị nén spread: OCB, VRE, VHM
+- Stress Index VN30: 0.00% (dưới xa ngưỡng cảnh báo 40%).  
+- Số mã thủng VaR 95%: 0/30, không ghi nhận breach nào.  
+- Complacency Index toàn thị trường: 4.63% (thấp hơn hẳn ngưỡng nguy hiểm 80%), 5 mã bị định giá sai, dẫn đầu về mức nén spread: OCB, VRE, VHM.
 
 ## 2. Contagion Assessment (Module B)
-Hệ số VN30 Stress 0.00% cho thấy **không có rủi ro lây lan hệ thống đang diễn ra** trong phiên 24/06/2026. Không mã nào xuyên thủng VaR 95%, loại trừ khả năng đầu sóng systemic từ top vốn hóa. Đây là trạng thái cực kỳ yên tĩnh về mặt biến động bất thường – không có điểm gãy nào xuất hiện. Top 3 breach không có dữ liệu, vì vậy không thể đánh giá sự cố cá biệt.
+Stress 0.00% khẳng định **không có hiện tượng lây lan rủi ro real-time**. Việc không một mã nào trong rổ VN30 xuyên thủng VaR 95% cho thấy thị trường chưa chịu áp lực bán tháo hệ thống, cũng không tồn tại sự cố cá biệt đáng kể nào có khả năng kích hoạt hiệu ứng domino. Giai đoạn hiện tại không xuất hiện đầu sóng systemic.
 
 ## 3. Complacency Assessment (Module C)
-Complacency 4.63% **chỉ có nghĩa thị trường KHÔNG rơi vào chế độ “ngủ quên”** – tức spread không bị nén trên diện rộng, cấu trúc bù rủi ro chưa bị bóp méo tập thể. 
+Complacency 4.63% chỉ ra thị trường **không rơi vào chế độ “ngủ quên”** – tức không phải distribution top hay accumulation/sideways với biến động cực thấp, spread bị nén trên diện rộng. Tuy nhiên, **mức thấp này không được diễn giải là “thị trường ổn định” hay “vận hành bình thường”**. Thị trường có thể đang trong một xu hướng tăng mạnh (spread giãn tự nhiên) hoặc bất kỳ chế độ nào khác ngoài complacency.  
 
-Điều này **không đồng nghĩa** thị trường ổn định hay không có áp lực bán. Thị trường có thể đang trong uptrend mạnh, hoảng loạn, hoặc biến động hai chiều mạnh – tất cả đều có complacency thấp tự nhiên do spread giãn rộng. Kết hợp với Stress Index = 0%, tạm thời chưa có dấu hiệu đổ vỡ hay bất ổn hệ thống. Tuy nhiên, cần theo dõi sát 5 mã mispriced vì chúng có thể mang mầm mống định giá sai cục bộ, dù chưa lan toả.
+Cần đối chiếu thêm với volume và hành động giá để kết luận chế độ, nhưng tín hiệu từ Stress 0% cho thấy không có áp lực bán lan tỏa thời điểm này. Lưu ý: complacency thấp không loại trừ khả năng xảy ra biến động bất ngờ – nó đơn giản là cấu trúc bù rủi ro hiện chưa bị bóp méo trên quy mô lớn.
 
 ## 4. Stock-Level Risk Calls
-- **Module B (crash)**: Không có mã breach nào → không đưa ra lệnh cắt giảm khẩn cấp cụ thể.  
-- **Module C (mispriced)**: OCB, VRE, VHM bị nén spread chặt nhất. Dù complacency chung thấp, các mã này tiềm ẩn rủi ro điều chỉnh nếu spread bất ngờ giãn. Khuyến nghị giám sát chặt, cân nhắc giảm tỷ trọng dần khi xuất hiện tín hiệu kỹ thuật (ví dụ thủng MA20/MA50 trên D1 với thanh khoản tăng đột biến). **Không sử dụng mức giá tuyệt đối**.
+- **Module B**: Không có mã breach ⇒ không phát sinh khuyến nghị bán/giảm tỷ trọng tức thời.  
+- **Module C**: Bộ ba OCB, VRE, VHM có spread bị nén cục bộ, phản ánh rủi ro bị định giá thấp hơn so với lịch sử. Dù Complacency toàn thị trường thấp, những mã này vẫn tiềm ẩn điều chỉnh mạnh khi điều kiện thị trường đảo chiều hoặc biến động mở rộng. Khuyến nghị giám sát chủ động, sử dụng trailing stop linh hoạt (ví dụ: cắt giảm nếu giảm 5-7% từ đỉnh gần nhất hoặc thủng MA20 ngày) thay vì giữ trạng thái tĩnh.
 
 ## 5. Structured Tail
 ```json

@@ -1,22 +1,22 @@
 ## 1. Observations
-- Spread Z-score ở mức –0.54σ (10.47% annualized), nằm dưới trung bình 60 phiên, cho thấy độ phân tán chéo (cross‑sectional dispersion) đang co hẹp nhẹ, không có dấu hiệu căng bất thường.
-- DPI chỉ đạt 41.7% (<70%), xác nhận chế độ phân tán hiện tại không dai dẳng – không phải stress regime kéo dài mà chỉ là dao động ngắn hạn.
-- Hệ số tương quan bình quân Ledoit‑Wolf ở 0.006, sát 0 → thị trường phân hóa rất mạnh, chứng khoán vận động theo yếu tố riêng lẻ thay vì macro chung.
-- Độ bất đối xứng (skewness) và độ nhọn (kurtosis) không có dữ liệu (N/A), tạm thời chưa thể khoanh vùng tail nào đang “gãy”.
+- Spread_Z ở mức –0.45σ, nằm dưới trung bình 60 phiên, cho thấy độ phân tán hiện tại không cao.
+- DPI = 41.7% (<70%) – chế độ phân tán không mang tính kéo dài, thị trường không bị áp lực cấu trúc liên tục.
+- Tương quan cặp trung bình (Ledoit-Wolf) chỉ 0.006, tiệm cận 0, phản ánh sự phân hóa rất mạnh giữa các cổ phiếu.
+- Cross-Sectional Skewness và Kurtosis không khả dụng, thiếu thông tin về hình dạng đuôi phân phối.
 
 ## 2. Structural State
-Với DPI thấp và Spread Z âm không sâu, thị trường đang ở trạng thái bình thường, không chịu áp lực cấu trúc. Không tồn tại đồng thời hiện tượng căng phân tán (spread cao) và tính dai dẳng (DPI cao) → không phải regime stress hoảng loạn hay phân phối đỉnh. Đây là môi trường ổn định, biên độ biến động phân hóa chưa bị kéo giãn quá mức so với quá khứ gần.
+DPI và Spread_Z cùng ở mức thấp/trung bình, không cho thấy bất kỳ áp lực hệ thống nào. Spread_Z âm nhẹ (dưới trung bình 0.45σ) cũng loại bỏ kịch bản stress cục bộ (thường đi kèm Spread_Z cao nhưng DPI thấp). Toàn bộ cấu trúc đang ở trạng thái bình thường, không stress, thiên về phân hóa lành mạnh.
 
-## 3. Cross‑Check & Tail Direction
-Do thiếu dữ liệu skewness & kurtosis, không thể kết luận đuôi phân phối đang nghiêng về phía giảm mạnh (negative skew) hay tăng điên rồ (positive skew). Mô hình chuẩn gặp hạn chế ở đây; risk‑manager cần bổ sung dữ liệu để xác nhận xem có fat‑tail outliers đáng kể hay không. Tạm thời, giả định đuôi cân xứng trong đánh giá sơ bộ.
+## 3. Cross-Check & Tail Direction
+Việc thiếu dữ liệu Skewness/Kurtosis khiến ta không thể kết luận chiều đuôi nào đang bị gãy. Tuy nhiên, với tương quan tiệm cận 0, rủi ro đuôi hệ thống được giảm nhẹ; các cú sốc cục bộ (nếu có) khó lan rộng thành sự kiện capitulation. Mô hình tail-risk chỉ đáng lo ngại nếu Kurt > 5, nhưng ở đây không có dấu hiệu đó. Giả định hợp lý là phân phối hồi quy đối xứng và không fat-tail bất thường trong phiên.
 
 ## 4. Regime Mapping
-Đối chiếu bản đồ 2D (DPI × Correlation):  
-- DPI thấp (41.7% < 70%)  
-- Correlation rất thấp (≈0)  
+Đối chiếu bản đồ 2D: **DPI thấp (41.7%) + Corr thấp (0.006)** → **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu (stock-picking): các mã vận động độc lập, ít bị cuốn theo xu hướng chỉ số. Dispersion không kéo dài cũng giúp tín hiệu alpha không bị nhiễu bởi các outlier lặp đi lặp lại.
 
-→ Thị trường rơi vào ô **Healthy Stock‑Picking**. Đây là môi trường lý tưởng cho chiến lược chọn lọc cổ phiếu: các mã vận động gần như độc lập, cơ hội tìm kiếm alpha từ kỹ năng stock‑picking cao.  
-Rủi ro lớn nhất cho Portfolio Manager là **rủi ro tập trung danh mục (concentration risk)**: nếu vị thế quá lớn ở một cổ phiếu riêng lẻ, biến cố đặc thù của mã đó có thể gây tổn thất đáng kể, dù thị trường không có hoảng loạn hệ thống. Rủi ro thanh khoản cạn (liquidity dry‑up) hay sụp đổ do bầy đàn (herding crash) ở mức thấp trong bối cảnh phân hóa mạnh.
+**Rủi ro lớn nhất cho Portfolio Manager:**  
+- Concentration risk – do tương quan rất thấp, lợi ích đa dạng hóa cao; nếu danh mục quá tập trung vào một vài cổ phiếu, nhà đầu tư bỏ lỡ khả năng triệt tiêu rủi ro phi hệ thống.  
+- Những chiến lược dựa dẫm vào beta (xu hướng chỉ số) sẽ kém hiệu quả, cần chú trọng chọn lọc cổ phiếu riêng lẻ.  
+- Không có dấu hiệu liquidity dry-up hay herding crash trong bối cảnh này.
 
 ## 5. Structured Tail
 ```json
@@ -24,7 +24,7 @@ Rủi ro lớn nhất cho Portfolio Manager là **rủi ro tập trung danh mụ
   "tool": "dispersion",
   "date": "24/06/2026",
   "regime": "STOCK_PICKING",
-  "spread_z": -0.54,
+  "spread_z": -0.45,
   "dpi_pct": 41.7,
   "avg_corr": 0.006,
   "tail_skew_direction": "symmetric",
