@@ -6,7 +6,7 @@ from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.page_layout import render_signal_card, tone_for_signal
 from tools.upside_ratio.quant.metrics import build_breadth_series, compute_actual_breadth
-from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
+from tools.upside_ratio.quant.engine import DEFAULT_MC_SEED, run_hybrid_ensemble_mc
 from tools.upside_ratio.ui.sidebar import render_sidebar
 from tools.upside_ratio.ui.charts import render_history_chart, render_projection_tabs, render_diagnostics
 try:
@@ -34,7 +34,10 @@ logging.basicConfig(
 
 def render():
     st.title("🧬 Hybrid MC Bidirectional Breadth Model")
-    st.caption("Upside/Downside breadth ratio với Hybrid Monte Carlo ensemble")
+    st.caption(
+        f"Upside/Downside breadth ratio với Hybrid Monte Carlo ensemble "
+        f"(deterministic seeds {DEFAULT_MC_SEED}/{DEFAULT_MC_SEED + 1})"
+    )
 
     try:
         df_close = load_close_prices()
@@ -59,6 +62,7 @@ def render():
         "downside_y": params["downside_y"],
         "lookback_days": params["lookback_days"],
         "sim_days": params["sim_days"],
+        "mc_seed": DEFAULT_MC_SEED,
         "backtest_date": str(params["backtest_date"]) if params["backtest_date"] else None,
     }
 
@@ -83,10 +87,16 @@ def render():
                     backtest_date=params["backtest_date"],
                 )
                 up_tuple = run_hybrid_ensemble_mc(
-                    data["raw_upside"], days_to_sim=params["sim_days"], num_sims=3000
+                    data["raw_upside"],
+                    days_to_sim=params["sim_days"],
+                    num_sims=3000,
+                    seed=DEFAULT_MC_SEED,
                 )
                 dn_tuple = run_hybrid_ensemble_mc(
-                    data["raw_downside"], days_to_sim=params["sim_days"], num_sims=3000
+                    data["raw_downside"],
+                    days_to_sim=params["sim_days"],
+                    num_sims=3000,
+                    seed=DEFAULT_MC_SEED + 1,
                 )
             except (ValueError, RuntimeError) as e:
                 st.error(f"Lỗi mô hình: {e}")

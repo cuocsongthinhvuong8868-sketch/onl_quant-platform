@@ -80,7 +80,7 @@ def render():
         st.title("🌐 Global Financial Conditions Monitor")
         st.caption(
             "11 indicators · Vol (VIX/MOVE/SKEW/OVX/VVIX) + Credit (HY/CCC/IG/EM OAS) + Macro (2s10s/DXY) · "
-            "Static PCA 6-core composite · Regime via PC1 percentile rank 1Y"
+            "Expanding point-in-time PCA 6-core · Regime via PC1 percentile rank 1Y"
         )
     with col_handbook:
         st.write("")  # spacer để align với title

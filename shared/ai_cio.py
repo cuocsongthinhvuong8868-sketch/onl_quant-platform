@@ -17,12 +17,20 @@ from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
 AI_CIO_HISTORY_PROVIDER = "deepseek-v4-pro"
-AI_CIO_METRICS_VERSION = "1.0"
+AI_CIO_METRICS_VERSION = "2.0"
 AI_CIO_HISTORY_WINDOW = 30
 AI_CIO_METRICS_DIRNAME = "ai_cio_metrics"
 HUMILITY_RULES_PREFIX = "ai_cio_humility_rules"
 TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
+AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
+AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
+    "feargreed": "pca_point_in_time_v1",
+    "global_financial_conditions": "pca_point_in_time_v1",
+    "upside_ratio": "deterministic_mc_seed_v1",
+    "var_cvar_vnindex": "evt_threshold_sensitivity_v1",
+    "executive_summary": "ai_cio_methodology_v2",
+}
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
         "domain": "global_liquidity",
@@ -35,9 +43,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "global_financial_conditions": {
         "domain": "external_credit_and_macro_stress",
         "horizon": "4-12_weeks",
-        "primary_metric": "cqs_percentile",
+        "primary_metric": "cqs_percentile_and_point_in_time_pc1",
         "score_direction": "Higher CQS percentile is worse for risk assets.",
-        "limits": "Do not offset high credit stress with short-term news sentiment.",
+        "limits": "PCA is expanding point-in-time with periodic refits; no full-history PCA backfit or look-ahead revision. Do not offset high credit stress with short-term news sentiment.",
         "authority": "Adapter score/regime/bias are authoritative when available.",
     },
     "margin_m2_overlay": {
@@ -83,9 +91,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fear_greed": {
         "domain": "sentiment_and_positioning",
         "horizon": "days_to_weeks",
-        "primary_metric": "risk_score",
+        "primary_metric": "risk_score_from_point_in_time_pca_factors",
         "score_direction": "Higher score is safer / more risk-on, unless extreme greed is flagged.",
-        "limits": "Sentiment is secondary to hard liquidity, breadth, and tail-risk constraints.",
+        "limits": "Factor PCA is expanding point-in-time; sentiment is secondary to hard liquidity, breadth, and tail-risk constraints.",
         "authority": "Use adapter score if available; otherwise treat as soft sentiment evidence.",
     },
     "manipulation": {
@@ -109,7 +117,7 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "horizon": "days_to_weeks",
         "primary_metric": "upside_participation_ratio",
         "score_direction": "Higher sustained upside participation is safer.",
-        "limits": "Zombie rallies without breadth confirmation should not lift regime materially.",
+        "limits": "Monte Carlo projections are deterministic/reproducible with fixed seeds and are scenario diagnostics, not independent allocation authority. Zombie rallies without breadth confirmation should not lift regime materially.",
         "authority": "Use as internal participation evidence; do not overrule breadth/tail caps.",
     },
     "bank_valuation": {
@@ -147,9 +155,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "var_cvar_vnindex": {
         "domain": "left_tail_risk",
         "horizon": "days_to_weeks",
-        "primary_metric": "evt_xi",
+        "primary_metric": "evt_xi_with_threshold_sensitivity",
         "score_direction": "Higher EVT xi is worse.",
-        "limits": "A high xi is a hard tail-risk warning even if realized volatility is quiet.",
+        "limits": "EVT threshold sensitivity is a robustness/confidence diagnostic, not a second bearish vote. A single high xi only becomes a hard cap when elevated/fat-tail classification is robust across thresholds.",
         "authority": "Adapter score/regime/bias are authoritative.",
     },
     "sentiment_factor_news": {
@@ -212,11 +220,11 @@ HUMILITY_DEFAULT_RULES = [
     },
     {
         "model": "Tail Risk (EVT)",
-        "metric": "Tail Index (xi)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
         "threshold_operator": "<",
         "threshold_value": 0.25,
         "unit": "",
-        "description": "Left-tail risk normalizes when the EVT tail index falls below 0.25.",
+        "description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25.",
     },
     {
         "model": "Manipulation / Coupling",
@@ -418,7 +426,7 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 from tools.fear_greed.quant.metrics import calculate_quant_metrics
 from tools.fear_greed.quant.scoring import calculate_risk_score
 from tools.upside_ratio.quant.metrics import build_breadth_series
-from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
+from tools.upside_ratio.quant.engine import DEFAULT_MC_SEED, run_hybrid_ensemble_mc
 # Import logic Manipulation
 from tools.manipulation.quant.engine import prepare_data as prep_mani, compute_metrics as comp_mani, classify_regime
 # Import logic Dispersion
@@ -450,18 +458,58 @@ def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
     return DATA_LAKE / "daily_cache" / f"{tool_name}_{provider_key}_{today_str}.txt"
 
-def _read_cache(tool_name: str, provider_key: str = "kimi-2.6") -> str:
-    path = _get_cache_path(tool_name, provider_key)
+
+def _cache_version_for_tool(tool_name: str) -> str | None:
+    return AI_CIO_TOOL_CACHE_VERSIONS.get(str(tool_name or ""))
+
+
+def _encode_cache_content(tool_name: str, content: str) -> str:
+    version = _cache_version_for_tool(tool_name)
+    text = str(content or "")
+    if not version:
+        return text
+    marker = f"<!-- {AI_CIO_CACHE_VERSION_HEADER}: {version} -->\n"
+    if text.startswith(marker):
+        return text
+    return marker + text
+
+
+def _decode_cache_content(tool_name: str, content: str) -> str | None:
+    text = str(content or "")
+    expected = _cache_version_for_tool(tool_name)
+    if not expected:
+        return text
+    match = re.match(
+        rf"^\s*<!--\s*{re.escape(AI_CIO_CACHE_VERSION_HEADER)}\s*:\s*([^>]+?)\s*-->\s*",
+        text,
+        flags=re.IGNORECASE,
+    )
+    if not match:
+        return None
+    if match.group(1).strip() != expected:
+        return None
+    return text[match.end():].lstrip("\r\n")
+
+
+def _read_cache_file(path: Path, tool_name: str) -> str | None:
     if path.exists():
         with open(path, "r", encoding="utf-8") as f:
-            return f.read()
+            return _decode_cache_content(tool_name, f.read())
     return None
+
+
+def _read_cache(tool_name: str, provider_key: str = "kimi-2.6") -> str | None:
+    path = _get_cache_path(tool_name, provider_key)
+    if path.exists():
+        return _read_cache_file(path, tool_name)
+    return None
+
 
 def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
     path = _get_cache_path(tool_name, provider_key)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
-        f.write(content)
+        f.write(_encode_cache_content(tool_name, content))
 
 
 def _get_humility_rules_path(provider_key: str, target_date: date | None = None) -> Path:
@@ -1008,8 +1056,18 @@ def _build_evidence_packet(
     metric_patterns = {
         "ssi_pct": [r"\bSSI\b[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "evt_xi": [r"\bxi\b[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"Tail Index.*?([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi_min": [r"EVT\s+Xi\s+Min[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_min\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi_max": [r"EVT\s+Xi\s+Max[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_max\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi_range": [r"EVT\s+Xi\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_range\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "evt_var99_range_pp": [r"EVT\s+VaR99\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*pp"],
+        "evt_es99_range_pp": [r"EVT\s+ES99\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*pp"],
+        "evt_threshold_stable": [r"EVT\s+Threshold\s+Stable[^0-9]*(0|1)"],
         "breadth_ma20_pct": [r"MA20[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "cqs_percentile": [r"\bCQS\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "cqs_percentile": [
+            r"\bCQS\s+Percentile\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+            r"\bCQS\b[^\n]*?percentile[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+            r"\bCQS\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+        ],
         "vnibor_on": [r"Overnight[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "pvgo_pct": [r"\bPVGO\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
         "pe": [r"\bP/E\b\s*:\s*([-+]?\d+(?:\.\d+)?)x"],
@@ -1041,6 +1099,18 @@ def _build_evidence_packet(
 def _format_json_context(title: str, payload: Any) -> str:
     body = json.dumps(payload, ensure_ascii=False, indent=2, default=str)
     return f"=== {title} ===\n```json\n{body}\n```"
+
+
+def _append_structured_footer(report_text: str, title: str, lines: list[str]) -> str:
+    clean_lines = [str(line).strip() for line in lines if str(line).strip()]
+    if not clean_lines:
+        return str(report_text or "")
+    return (
+        str(report_text or "").rstrip()
+        + f"\n\n=== AI CIO STRUCTURED METRICS: {title} ===\n"
+        + "\n".join(f"- {line}" for line in clean_lines)
+        + "\n"
+    )
 
 
 def _safe_float(value: Any) -> float | None:
@@ -1423,8 +1493,9 @@ def _build_comprehensive_metrics_table(df_stocks, provider_key: str = "kimi-2.6"
         df_fed = pd.read_csv(fed_path, parse_dates=["DATE"]).set_index("DATE").sort_index()
         
         # 9. Global FCI
+        from tools.global_financial_conditions.quant.metrics import load_cached_gfcm
         gfcm_path = DATA_LAKE / "global_financial_conditions_cache.csv"
-        df_gfcm = pd.read_csv(gfcm_path, parse_dates=["DATE"]).set_index("DATE").sort_index()
+        df_gfcm = load_cached_gfcm(gfcm_path)
         
         # 10. VNIBOR
         from tools.vnibor.quant.metrics import load_vnibor_data, process_vnibor_logic
@@ -1630,6 +1701,16 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res = _append_structured_footer(
+        res,
+        "fear_greed_methodology",
+        [
+            f"FearGreed Risk Score: {score:.1f}",
+            "PCA Method: expanding_point_in_time",
+            "PCA Full-History Fit: 0",
+            "PCA Refit Every Sessions: 21",
+        ],
+    )
     _write_cache("feargreed", res, provider_key)
     return res
 
@@ -1760,8 +1841,12 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     if cached: return cached
     
     data = build_breadth_series(df_stocks, upside_x=2.0, downside_y=-2.0, lookback_days=90)
-    up_tuple = run_hybrid_ensemble_mc(data["raw_upside"], days_to_sim=20, num_sims=5000)
-    dn_tuple = run_hybrid_ensemble_mc(data["raw_downside"], days_to_sim=20, num_sims=5000)
+    up_tuple = run_hybrid_ensemble_mc(
+        data["raw_upside"], days_to_sim=20, num_sims=5000, seed=DEFAULT_MC_SEED
+    )
+    dn_tuple = run_hybrid_ensemble_mc(
+        data["raw_downside"], days_to_sim=20, num_sims=5000, seed=DEFAULT_MC_SEED + 1
+    )
     
     p5_up, p25_up, p50_up, p75_up, p95_up, phi_up, mu_up, _, _ = up_tuple
     p5_dn, p25_dn, p50_dn, p75_dn, p95_dn, phi_dn, mu_dn, _, _ = dn_tuple
@@ -1797,6 +1882,17 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res = _append_structured_footer(
+        res,
+        "upside_ratio_methodology",
+        [
+            f"MC Seed Upside: {DEFAULT_MC_SEED}",
+            f"MC Seed Downside: {DEFAULT_MC_SEED + 1}",
+            "MC Simulations Per Side: 5000",
+            "MC Deterministic: 1",
+            "MC Interpretation: scenario_diagnostic_not_allocation_authority",
+        ],
+    )
     _write_cache("upside_ratio", res, provider_key)
     return res
 
@@ -2121,10 +2217,32 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
             .replace("[EVT Xi]", f"{snap['evt_xi']:+.3f} ({xi_label})")\
             .replace("[Hill Index]", f"{snap['hill_index']:+.3f}")\
             .replace("[EVT N Exceed]", str(snap['evt_n_exceed']))
+        if snap.get("evt_sensitivity_available"):
+            stable_flag = 1 if snap.get("evt_sensitivity_stable") else 0
+            full_prompt = full_prompt\
+                .replace("[EVT Xi Min]", f"{snap['evt_sensitivity_xi_min']:+.3f}")\
+                .replace("[EVT Xi Max]", f"{snap['evt_sensitivity_xi_max']:+.3f}")\
+                .replace("[EVT Xi Range]", f"{snap['evt_sensitivity_xi_range']:.3f}")\
+                .replace("[EVT VaR99 Range]", f"{abs(snap['evt_sensitivity_var99_range'])*100:.2f}pp")\
+                .replace("[EVT ES99 Range]", f"{abs(snap['evt_sensitivity_es99_range'])*100:.2f}pp")\
+                .replace("[EVT Threshold Stable]", str(stable_flag))\
+                .replace("[EVT Sensitivity Status]", str(snap.get("evt_sensitivity_status", "threshold_sensitive")))
+        else:
+            for placeholder in [
+                "[EVT Xi Min]", "[EVT Xi Max]", "[EVT Xi Range]",
+                "[EVT VaR99 Range]", "[EVT ES99 Range]",
+                "[EVT Threshold Stable]", "[EVT Sensitivity Status]",
+            ]:
+                full_prompt = full_prompt.replace(placeholder, "N/A")
     else:
         # Data < 756 ngày — bỏ EVT fields, AI prompt vẫn chạy với classic metrics
-        for placeholder in ["[EVT VaR 99%]", "[EVT VaR 99.5%]", "[EVT ES 99%]",
-                            "[EVT Xi]", "[Hill Index]", "[EVT N Exceed]"]:
+        for placeholder in [
+            "[EVT VaR 99%]", "[EVT VaR 99.5%]", "[EVT ES 99%]",
+            "[EVT Xi]", "[Hill Index]", "[EVT N Exceed]",
+            "[EVT Xi Min]", "[EVT Xi Max]", "[EVT Xi Range]",
+            "[EVT VaR99 Range]", "[EVT ES99 Range]",
+            "[EVT Threshold Stable]", "[EVT Sensitivity Status]",
+        ]:
             full_prompt = full_prompt.replace(placeholder, "N/A (cần ≥ 756 phiên)")
 
     parts = full_prompt.split("# INPUT DATA")
@@ -2132,6 +2250,27 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
     res = call_ai(client, sys_p, usr_p, model=model)
+    footer_lines = ["EVT Method: POT_GPD_threshold_sensitivity_5_15pct"]
+    if snap.get("evt_available"):
+        footer_lines.extend(
+            [
+                f"EVT Xi: {snap['evt_xi']:+.3f}",
+                f"EVT Hill: {snap['hill_index']:+.3f}",
+            ]
+        )
+    if snap.get("evt_sensitivity_available"):
+        footer_lines.extend(
+            [
+                f"EVT Xi Min: {snap['evt_sensitivity_xi_min']:+.3f}",
+                f"EVT Xi Max: {snap['evt_sensitivity_xi_max']:+.3f}",
+                f"EVT Xi Range: {snap['evt_sensitivity_xi_range']:.3f}",
+                f"EVT VaR99 Range: {abs(snap['evt_sensitivity_var99_range'])*100:.2f}pp",
+                f"EVT ES99 Range: {abs(snap['evt_sensitivity_es99_range'])*100:.2f}pp",
+                f"EVT Threshold Stable: {1 if snap.get('evt_sensitivity_stable') else 0}",
+                f"EVT Sensitivity Status: {snap.get('evt_sensitivity_status', 'threshold_sensitive')}",
+            ]
+        )
+    res = _append_structured_footer(res, "var_cvar_vnindex_methodology", footer_lines)
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
 
@@ -2223,23 +2362,26 @@ def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -
             return (date(1970, 1, 1), p.stat().st_mtime)
             
     files = sorted(files, key=file_sort_key, reverse=True)
-    latest_file = files[0]
-    
-    # Phân tích ngày từ tên file để hiển thị
-    date_str = "N/A"
-    parsed_date = _parse_date_from_filename(latest_file.stem)
-    if parsed_date:
-        date_str = parsed_date.strftime('%d/%m/%Y')
-    else:
-        mtime = datetime_mod.datetime.fromtimestamp(latest_file.stat().st_mtime)
-        date_str = mtime.strftime('%d/%m/%Y')
-            
-    try:
-        with open(latest_file, "r", encoding="utf-8") as f:
-            content = f.read().strip()
-        return date_str, content
-    except Exception as e:
-        return "N/A", f"Lỗi đọc file: {e}"
+    for candidate_file in files:
+        date_str = "N/A"
+        parsed_date = _parse_date_from_filename(candidate_file.stem)
+        if parsed_date:
+            date_str = parsed_date.strftime('%d/%m/%Y')
+        else:
+            mtime = datetime_mod.datetime.fromtimestamp(candidate_file.stat().st_mtime)
+            date_str = mtime.strftime('%d/%m/%Y')
+
+        try:
+            content = _read_cache_file(candidate_file, tool_id)
+            if content is not None:
+                return date_str, content.strip()
+        except Exception as e:
+            return "N/A", f"Lỗi đọc file: {e}"
+
+    version = _cache_version_for_tool(tool_id)
+    if version:
+        return "N/A", f"*No current-methodology report found for cache version {version}*"
+    return "N/A", "*Chưa có báo cáo phân tích*"
 
 
 def _parse_report_date_label(date_label: str | None) -> date | None:
@@ -2592,6 +2734,17 @@ def run_global_financial_conditions_child_report(
         user_prompt,
         model=model or cfg["api_model"],
         temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    result = _append_structured_footer(
+        result,
+        "global_financial_conditions_methodology",
+        [
+            f"CQS Percentile: {summary['cqs_pct']*100:.1f}",
+            f"PC1 Percentile: {summary['pc1_pct']*100:.1f}",
+            "PCA Method: expanding_point_in_time",
+            "PCA Full-History Fit: 0",
+            "PCA Refit Every Sessions: 21",
+        ],
     )
     _write_cache("global_financial_conditions", result, provider_key)
     return result
@@ -3099,8 +3252,6 @@ def _build_decision_state(
             metric_values[f"{packet.get('tool')}.{key}"] = value
             if key == "ssi_pct" and value >= 70:
                 hard_constraints.append(f"ESR SSI elevated at {value:.1f}%")
-            if key == "evt_xi" and value >= 0.25:
-                hard_constraints.append(f"EVT xi elevated at {value:.3f}")
             if key == "breadth_ma20_pct" and value < 45:
                 hard_constraints.append(f"Breadth MA20 weak at {value:.1f}%")
             if key == "cqs_percentile" and value >= 80:
@@ -3111,6 +3262,23 @@ def _build_decision_state(
                 hard_constraints.append(f"ABM early-warning RED at {value:.1f}/100")
             elif key == "abm_early_warning_score" and value >= 60:
                 hard_constraints.append(f"ABM early-warning ORANGE at {value:.1f}/100")
+
+    evt_xi = _safe_float(metric_values.get("var_cvar_vnindex.evt_xi"))
+    evt_xi_min = _safe_float(metric_values.get("var_cvar_vnindex.evt_xi_min"))
+    evt_xi_range = _safe_float(metric_values.get("var_cvar_vnindex.evt_xi_range"))
+    if evt_xi is not None:
+        if evt_xi_min is None:
+            if evt_xi >= 0.25:
+                hard_constraints.append(f"EVT xi elevated at {evt_xi:.3f} (legacy single-threshold)")
+        elif evt_xi >= 0.30 and evt_xi_min >= 0.30:
+            hard_constraints.append(f"EVT fat-tail robust across thresholds: xi={evt_xi:.3f}, xi_min={evt_xi_min:.3f}")
+        elif evt_xi >= 0.25 and evt_xi_min >= 0.25:
+            hard_constraints.append(f"EVT elevated tail robust across thresholds: xi={evt_xi:.3f}, xi_min={evt_xi_min:.3f}")
+        elif evt_xi >= 0.30:
+            suffix = f", xi_range={evt_xi_range:.3f}" if evt_xi_range is not None else ""
+            hard_constraints.append(
+                f"EVT xi threshold-sensitive: base xi={evt_xi:.3f}, xi_min={evt_xi_min:.3f}{suffix}; no standalone hard cap"
+            )
 
     consensus_map = _build_consensus_map(current_packets, tool_scores)
     metric_implied = derive_metric_implied_scores(metric_values, bias_counts, tool_scores=tool_scores)

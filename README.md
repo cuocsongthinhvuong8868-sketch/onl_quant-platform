@@ -23,7 +23,7 @@ Platform được tổ chức thành **3 nhánh phân tích chính**:
 | # | Công cụ | Mô tả |
 |---|---------|-------|
 | 1 | **Fed Liquidity Monitor** | Net Liquidity (WALCL − TGA − RRP) + Impulse EMA + Z-Score 52W → Tín hiệu ADD/CUT/HOLD |
-| 2 | **Global Financial Conditions** | VIX + MOVE + HY OAS + CCC OAS · Static PCA composite · Regime via PC1 percentile rank 3Y |
+| 2 | **Global Financial Conditions** | VIX + MOVE + HY OAS + CCC OAS · Expanding point-in-time PCA · Regime via PC1 percentile rank 1Y |
 | 3 | **Humility & Falsification Monitor** | Đối chiếu điều kiện falsification của AI CIO T-1 với dữ liệu T |
 | 4 | **VNIBOR Monitor** | Lãi suất liên ngân hàng qua đêm và các kỳ hạn ngắn · Phân loại trạng thái thanh khoản |
 | 5 | **Bank Valuation** | Định giá bottom-up nhóm ngân hàng: Adjusted Book Value, Sustainable ROE, Residual Income, stress fair P/B và regime từ valuation breadth |

@@ -591,9 +591,10 @@ def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
         ticket = generate_order_ticket(
             t1=t1, t2=t2, side=side,
             beta=chosen_row["β"],
-            price1=float(prices[t1].iloc[-1]),
-            price2=float(prices[t2].iloc[-1]),
-            capital=params["capital"],
+            # Price data và sidebar capital đều ở nghìn VND; ticket schema lưu VND.
+            price1=float(prices[t1].iloc[-1]) * 1_000,
+            price2=float(prices[t2].iloc[-1]) * 1_000,
+            capital=params["capital"] * 1_000,
             z_at_entry=chosen_row["z_now"],
             half_life=chosen_row["half_life"],
             stop_z=params["z_stop"],

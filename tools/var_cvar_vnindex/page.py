@@ -1,10 +1,10 @@
 import streamlit as st
 import pandas as pd
-import numpy as np
 import os
 from datetime import date
 from shared.data_loader import load_custom
 from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
+from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
 from tools.var_cvar_vnindex.ui.sidebar import render_sidebar
 from tools.var_cvar_vnindex.ui.charts import plot_var_cvar, plot_evt_tail_risk
 
@@ -56,6 +56,9 @@ def show():
         with st.spinner("Đang tính toán VaR, CVaR & ES cho VNINDEX..."):
             df_metrics = calculate_var_cvar_metrics(vni_series)
             st.session_state.var_cvar_metrics = df_metrics
+            st.session_state.var_cvar_evt_sensitivity = evt_threshold_sensitivity(
+                df_metrics["return"]
+            )
 
     # ── Hiển thị ──
     if "var_cvar_metrics" in st.session_state:
@@ -81,6 +84,61 @@ def show():
                         "fit phân phối chỉ vào top 10% losses → extrapolate VaR/ES tới quantile 99%, 99.5%, 99.9% "
                         "với độ tin cậy cao hơn Gaussian. ξ (xi) > 0.15 báo hiệu **heavy tail**; > 0.30 = **fat tail**."
                     )
+                    sensitivity = st.session_state.get("var_cvar_evt_sensitivity")
+                    if sensitivity is None:
+                        sensitivity = evt_threshold_sensitivity(df_metrics["return"])
+                        st.session_state.var_cvar_evt_sensitivity = sensitivity
+
+                    with st.expander("🧪 EVT threshold sensitivity", expanded=True):
+                        valid_sensitivity = sensitivity[sensitivity["status"] == "ok"].copy()
+                        if valid_sensitivity.empty:
+                            st.warning("Không đủ exceedances để chạy threshold sensitivity.")
+                        else:
+                            display_columns = [
+                                "threshold_pct", "n_exceed", "xi",
+                                "evt_var_99", "evt_es_99",
+                                "evt_var_995", "evt_es_995",
+                            ]
+                            display = valid_sensitivity[display_columns].copy()
+                            display["threshold_pct"] *= 100
+                            for col in ["evt_var_99", "evt_es_99", "evt_var_995", "evt_es_995"]:
+                                display[col] *= 100
+                            st.dataframe(
+                                display.rename(columns={
+                                    "threshold_pct": "Tail sample (%)",
+                                    "n_exceed": "# Exceed",
+                                    "xi": "ξ",
+                                    "evt_var_99": "VaR 99 (%)",
+                                    "evt_es_99": "ES 99 (%)",
+                                    "evt_var_995": "VaR 99.5 (%)",
+                                    "evt_es_995": "ES 99.5 (%)",
+                                }).style.format({
+                                    "Tail sample (%)": "{:.1f}",
+                                    "ξ": "{:+.3f}",
+                                    "VaR 99 (%)": "{:.2f}",
+                                    "ES 99 (%)": "{:.2f}",
+                                    "VaR 99.5 (%)": "{:.2f}",
+                                    "ES 99.5 (%)": "{:.2f}",
+                                }),
+                                use_container_width=True,
+                                hide_index=True,
+                            )
+                            xi_range = valid_sensitivity["xi"].max() - valid_sensitivity["xi"].min()
+                            var99_range = (
+                                valid_sensitivity["evt_var_99"].max()
+                                - valid_sensitivity["evt_var_99"].min()
+                            )
+                            es99_range = (
+                                valid_sensitivity["evt_es_99"].max()
+                                - valid_sensitivity["evt_es_99"].min()
+                            )
+                            st.caption(
+                                f"Độ nhạy trên tail sample 5%-15%: "
+                                f"Δξ={xi_range:.3f}, "
+                                f"range VaR99={abs(var99_range)*100:.2f} điểm %, "
+                                f"range ES99={abs(es99_range)*100:.2f} điểm %. "
+                                "Range lớn cho thấy kết quả phụ thuộc mạnh vào threshold và cần thận trọng."
+                            )
                 else:
                     st.info("ℹ️ EVT cần ≥ 3 năm data (756 phiên). Quay lại sau khi backfill xong.")
         else:

@@ -41,6 +41,7 @@ DEFAULT_MIN_EXCEEDANCES = 30        # cần ≥ 30 exceedances để MLE ổn đ
 DEFAULT_ROLLING_WINDOW = 756        # 3 năm trading days
 DEFAULT_REFIT_EVERY = 21            # ~1 tháng giữa các lần refit (industry standard cho monthly risk reports)
 DEFAULT_QUANTILES = (0.95, 0.99, 0.995)
+DEFAULT_SENSITIVITY_THRESHOLDS = (0.05, 0.075, 0.10, 0.125, 0.15)
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -193,6 +194,79 @@ def fit_evt_window(losses_window: np.ndarray,
         'n_exceed': len(exceedances),
         'hill': hill_estimator(losses_clean),
     }
+
+
+def evt_threshold_sensitivity(
+    returns: pd.Series,
+    thresholds: Tuple[float, ...] = DEFAULT_SENSITIVITY_THRESHOLDS,
+    window: int = DEFAULT_ROLLING_WINDOW,
+    quantiles: Tuple[float, ...] = (0.99, 0.995),
+) -> pd.DataFrame:
+    """Fit EVT trên nhiều POT thresholds cho cửa sổ mới nhất.
+
+    Đây là robustness test cho lựa chọn threshold, không phải backtest coverage.
+    Một model đáng tin hơn khi ``xi``, VaR và ES không đổi quá mạnh trong vùng
+    threshold hợp lý 5%-15% tail losses.
+    """
+    clean_returns = pd.Series(returns).replace([np.inf, -np.inf], np.nan).dropna()
+    if window < 1:
+        raise ValueError("window phải >= 1")
+    if not thresholds:
+        raise ValueError("thresholds không được rỗng")
+    if any(not 0 < value < 0.5 for value in thresholds):
+        raise ValueError("Mỗi threshold phải nằm trong (0, 0.5)")
+
+    losses = -clean_returns.tail(window).to_numpy(dtype=np.float64, copy=False)
+    rows: list[dict] = []
+
+    for threshold_pct in thresholds:
+        params = fit_evt_window(losses, threshold_pct=float(threshold_pct))
+        row = {
+            "threshold_pct": float(threshold_pct),
+            "threshold_quantile": float(1.0 - threshold_pct),
+            "status": "ok" if params is not None else "insufficient_or_unstable",
+        }
+        if params is None:
+            rows.append(row)
+            continue
+
+        row.update({
+            "threshold": float(params["threshold"]),
+            "n_total": int(params["n_total"]),
+            "n_exceed": int(params["n_exceed"]),
+            "xi": float(params["xi"]),
+            "beta": float(params["beta"]),
+            "hill_index": float(params["hill"]),
+        })
+        for quantile in quantiles:
+            suffix = _quantile_suffix(quantile)
+            row[f"evt_var_{suffix}"] = -evt_var(
+                quantile,
+                params["threshold"],
+                params["xi"],
+                params["beta"],
+                params["n_total"],
+                params["n_exceed"],
+            )
+            row[f"evt_es_{suffix}"] = -evt_es(
+                quantile,
+                params["threshold"],
+                params["xi"],
+                params["beta"],
+                params["n_total"],
+                params["n_exceed"],
+            )
+        rows.append(row)
+
+    return pd.DataFrame(rows).sort_values("threshold_pct").reset_index(drop=True)
+
+
+def _quantile_suffix(quantile: float) -> str:
+    """Map 0.99 -> '99', 0.995 -> '995'."""
+    scaled_100 = quantile * 100
+    if np.isclose(scaled_100, round(scaled_100)):
+        return str(int(round(scaled_100)))
+    return str(int(round(quantile * 1000)))
 
 
 # ──────────────────────────────────────────────────────────────────────────

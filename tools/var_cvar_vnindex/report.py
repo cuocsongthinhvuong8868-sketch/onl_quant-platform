@@ -1,5 +1,6 @@
 import pandas as pd
 from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
+from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
 
 
 def _empty_snapshot(err: str = "") -> dict:
@@ -18,6 +19,18 @@ def _empty_snapshot(err: str = "") -> dict:
         "evt_xi": 0.0, "evt_beta": 0.0, "evt_threshold": 0.0,
         "evt_n_exceed": 0, "hill_index": 0.0,
         "evt_available": False,
+        "evt_sensitivity_available": False,
+        "evt_sensitivity_xi_min": 0.0,
+        "evt_sensitivity_xi_max": 0.0,
+        "evt_sensitivity_xi_range": 0.0,
+        "evt_sensitivity_var99_min": 0.0,
+        "evt_sensitivity_var99_max": 0.0,
+        "evt_sensitivity_var99_range": 0.0,
+        "evt_sensitivity_es99_min": 0.0,
+        "evt_sensitivity_es99_max": 0.0,
+        "evt_sensitivity_es99_range": 0.0,
+        "evt_sensitivity_stable": False,
+        "evt_sensitivity_status": "unavailable",
         "status": "error" if err else "ok",
         "error": err,
     }
@@ -75,5 +88,32 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
             "hill_index": float(latest['hill_index']),
             "evt_available": True,
         })
+        sensitivity = evt_threshold_sensitivity(df_metrics["return"])
+        valid = sensitivity[sensitivity["status"] == "ok"]
+        if not valid.empty:
+            xi_min = float(valid["xi"].min())
+            xi_max = float(valid["xi"].max())
+            var99_min = float(valid["evt_var_99"].min())
+            var99_max = float(valid["evt_var_99"].max())
+            es99_min = float(valid["evt_es_99"].min())
+            es99_max = float(valid["evt_es_99"].max())
+            xi_range = xi_max - xi_min
+            var99_range = var99_max - var99_min
+            es99_range = es99_max - es99_min
+            stable = xi_range <= 0.10 and abs(var99_range) <= 0.01 and abs(es99_range) <= 0.015
+            snap.update({
+                "evt_sensitivity_available": True,
+                "evt_sensitivity_xi_min": xi_min,
+                "evt_sensitivity_xi_max": xi_max,
+                "evt_sensitivity_xi_range": xi_range,
+                "evt_sensitivity_var99_min": var99_min,
+                "evt_sensitivity_var99_max": var99_max,
+                "evt_sensitivity_var99_range": var99_range,
+                "evt_sensitivity_es99_min": es99_min,
+                "evt_sensitivity_es99_max": es99_max,
+                "evt_sensitivity_es99_range": es99_range,
+                "evt_sensitivity_stable": stable,
+                "evt_sensitivity_status": "stable" if stable else "threshold_sensitive",
+            })
 
     return snap

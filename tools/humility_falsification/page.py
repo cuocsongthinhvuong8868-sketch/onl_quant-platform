@@ -53,11 +53,11 @@ DEFAULT_RULES: list[dict[str, Any]] = [
     },
     {
         "model": "Tail Risk (EVT)",
-        "metric": "Tail Index (xi)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
         "threshold_operator": "<",
         "threshold_value": 0.25,
         "unit": "",
-        "description": "Left-tail risk normalizes when the EVT tail index falls below 0.25.",
+        "description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25.",
     },
     {
         "model": "Manipulation / Coupling",
@@ -658,6 +658,7 @@ def _compute_current_metrics_uncached() -> dict[str, dict[str, Any]]:
     metrics["breadth"] = _current_breadth(df_close)
     metrics["ssi"] = _current_esr_ssi(df_close)
     metrics["evt"] = _current_evt_tail_index()
+    metrics["evt_xi_max"] = _current_evt_sensitivity_upper()
     metrics["coupling"] = _current_vingroup_coupling(df_close)
     metrics["gfc"] = _current_gfc_cqs()
     return metrics
@@ -739,6 +740,26 @@ def _current_evt_tail_index() -> dict[str, Any]:
         return _metric(error=str(exc))
 
 
+def _current_evt_sensitivity_upper() -> dict[str, Any]:
+    try:
+        from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
+        from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
+
+        df_vnindex = load_custom("vnindex_cache.csv")
+        series = _first_numeric_series(df_vnindex, preferred=("VNINDEX", "close", "Close"))
+        metrics = calculate_var_cvar_metrics(series, include_evt=False)
+        sensitivity = evt_threshold_sensitivity(metrics["return"])
+        valid = sensitivity[sensitivity["status"] == "ok"]
+        if valid.empty:
+            return _metric(error="EVT threshold sensitivity khong co fit hop le.")
+        return _metric(
+            value=float(valid["xi"].max()),
+            data_date=_last_index_date(metrics["return"].dropna()),
+        )
+    except Exception as exc:  # pragma: no cover - displayed in Streamlit
+        return _metric(error=str(exc))
+
+
 def _current_vingroup_coupling(df_close: pd.DataFrame | None) -> dict[str, Any]:
     try:
         if df_close is None or df_close.empty:
@@ -803,6 +824,10 @@ def _metric_key(rule: dict[str, Any]) -> str:
         return "breadth"
     if re.search(r"\bssi\b", haystack) or "esr" in haystack or "systemic" in haystack:
         return "ssi"
+    if ("xi max" in haystack or "xi_max" in haystack or "sensitivity upper" in haystack) and (
+        "evt" in haystack or "tail" in haystack
+    ):
+        return "evt_xi_max"
     if "evt" in haystack or "tail" in haystack or "xi" in haystack or "ξ" in haystack:
         return "evt"
     if "vingroup" in haystack or "coupling" in haystack or "slope" in haystack:

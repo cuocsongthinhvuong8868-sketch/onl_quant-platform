@@ -45,6 +45,10 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 > để giảm regime flicker. PC1_raw + PC1_5d giúp đánh giá momentum gần
 > nhất khi cần (raw cao đột biến + smooth chưa kịp adapt = early warning).
 
+## PCA methodology control
+- PCA is expanding point-in-time with periodic refits. Historical factor values are not produced by fitting PCA on the full future-inclusive history.
+- Do not describe PC1 history as retrospectively revised by the latest sample.
+
 ## Regime & Driver
 - Regime: [Regime]   (STRESS / ELEVATED / CALM)
 - Driver: [Driver]   (EQUITY_DRIVEN / RATES_DRIVEN / SKEW_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / IG_CREDIT_DRIVEN / BROAD_STRESS / NO_STRESS)

@@ -43,10 +43,21 @@ def _read_latest_cache(cache_name: str, provider_key: str) -> tuple[str, str]:
             "Prompt export did not call the LLM to regenerate it.",
         )
 
-    latest = sorted(files, key=_file_sort_key, reverse=True)[0]
-    parsed = ai_cio._parse_date_from_filename(latest.stem)
-    date_label = parsed.strftime("%d/%m/%Y") if parsed else "N/A"
-    return date_label, latest.read_text(encoding="utf-8").strip()
+    for latest in sorted(files, key=_file_sort_key, reverse=True):
+        content = ai_cio._read_cache_file(latest, cache_name)
+        if content is None:
+            continue
+        parsed = ai_cio._parse_date_from_filename(latest.stem)
+        date_label = parsed.strftime("%d/%m/%Y") if parsed else "N/A"
+        return date_label, content.strip()
+
+    version = ai_cio._cache_version_for_tool(cache_name)
+    version_note = f" current cache version {version}" if version else ""
+    return (
+        "N/A",
+        f"DATA INSUFFICIENT: No cached report found for {cache_name} / provider={provider_key}"
+        f" matching{version_note}. Prompt export did not call the LLM to regenerate it.",
+    )
 
 
 def _build_current_tool_packets(provider_key: str, data_date: str) -> list[dict[str, Any]]:

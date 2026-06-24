@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations  
+- Cả hai chiều cung–cầu đều ở vùng thấp bất thường so với trung bình dài hạn: Lực cầu hiện 5.65% (Mu 13.08%), lực cung hiện 7.53% (Mu 13.01%) – cùng bị nén mạnh.  
+- Hệ số tự hồi quy Phi cả hai phía đều dương trên 0.10: cầu có Phi = 0.200 (đà mua), cung có Phi = 0.227 (đà bán) – xác nhận chế độ momentum kép.  
+- Phân phối đuôi T+19 bất cân xứng: đuôi giảm P95 = 25.50% dày hơn đuôi tăng P95 = 23.32%, tín hiệu rủi ro biến động tiêu cực vượt trội.
+
+## 2. Supply-Demand Dynamics  
+- Trạng thái dòng tiền là **zombification**: cả hai chỉ số breadth đều nén sâu dưới mức trung bình, tiêu biểu cho thanh khoản cạn và thị trường “vô hồn”.  
+- Lực cung đang nắm momentum thực sự mạnh hơn nhẹ (|Phi_dn| = 0.227 > |Phi_up| = 0.200). Điều này cho thấy xu hướng bán ra có sức ỳ lớn hơn, dù cả hai bên vẫn duy trì động lượng.
+
+## 3. Stress-Test Read  
+- Kịch bản bi quan P95: nếu thị trường gãy, tỷ lệ mã giảm < -2% có thể lên đến 25.50% mỗi phiên, phản ánh biên độ panic lớn.  
+- Bất cân xứng: đuôi rủi ro giảm (25.50%) dày hơn đuôi tăng (23.32%), xác nhận tail risk nghiêng về phía nguy cơ bán tháo mạnh hơn là bùng nổ mua.
+
+## 4. Verdict  
+- Tỷ trọng giải ngân đề xuất: **15%**.  
+- Chiến lược: **phòng thủ** – giữ tiền mặt chủ đạo, hạn chế mua thêm khi cả hai bên đều nén và đuôi rủi ro tiêu cực dày. Không rình bắt đáy lúc zombie vì thiếu tín hiệu bùng nổ cầu, cũng không mua đuổi vì sức cung vẫn có động lượng dai dẳng hơn. Hành động NO ACTIONABLE không áp dụng vì Phi lớn hơn ngưỡng nhiễu.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 25.50,
+  "p95_upside_pct": 23.32,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

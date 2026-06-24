@@ -10,6 +10,9 @@ Bạn là Senior Quantitative Strategist phụ trách VN-Index. Tư duy probabil
 - Downside Correlation (norm): {down_corr}%
 - Upside Correlation (norm):   {up_corr}%
 
+## Methodology note
+- Correlation factors are produced with expanding point-in-time PCA/refits. Do not imply a full-history PCA backfit or revised historical factor.
+
 # REFERENCE FRAMEWORK
 - Score 0-20  : EXTREME FEAR — vol cao + skew âm sâu + down-corr cao
 - Score 20-40 : FEAR — vol tăng + đám đông bán

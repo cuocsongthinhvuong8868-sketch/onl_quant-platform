@@ -177,7 +177,7 @@ Sau khi xác định Regime, Driver chỉ ra **stress đến từ đâu** trong 
 2. **MOVE Yahoo coverage** bắt đầu ~2003 — không backtest pre-2003.
 3. **PC1 5d change dùng raw**, không phải smoothed → có thể spike đột biến trong khi Regime chưa kịp chuyển (early warning hữu ích).
 4. **EMA(5) lag**: regime trigger lag ~3 ngày so với raw — chấp nhận được vì avoid noise-driven false transitions.
-5. **PCA static**: fit 1 lần trên toàn bộ history, không adapt. Trong regime change cấu trúc lớn (như post-COVID), loadings có thể stale → cần refit định kỳ (manual rerun updater).
+5. **PCA point-in-time**: expanding-window, refit mỗi 21 phiên và chỉ dùng dữ liệu trước ngày dự báo. Historical PC1/PC2 không bị revision khi append dữ liệu tương lai; loadings vẫn có thể thay đổi theo từng refit và cần theo dõi stability.
 6. **VN spillover lag 4-8 tuần là empirical**, không phải hard rule. Khi crisis lớn (LTCM 1998, GFC 2008, COVID 2020), lag có thể ngắn xuống còn 1-2 tuần.
 7. **AI prompt KHÔNG inject vào executive summary aggregator** (`shared/ai_cio.py`) — GFCM là macro tool đứng riêng, theo precedent Fed Liquidity.
 

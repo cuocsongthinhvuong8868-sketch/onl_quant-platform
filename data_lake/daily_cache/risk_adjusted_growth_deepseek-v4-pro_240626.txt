@@ -1,0 +1,37 @@
+## 1. Scenario Assessment
+
+Bộ tham số hiện tại (K = 1.0, CoE = 14%, BVPS không suy giảm, không penalty P/B) là khá tiêu chuẩn cho thị trường ngân hàng Việt. Mặt bằng chung cho thấy phần lớn ngân hàng **đang đốt vốn cổ đông** – chỉ duy nhất SHB tạo ra Alpha dương (1.3%), còn lại toàn âm, thậm chí có mã trên –10%. Điều này báo hiệu suy yếu về khả năng sinh lời vượt chi phí vốn, ngay cả trong kịch bản trung lập.
+
+## 2. Top Alpha Decomposition
+
+**SHB** – Alpha dương duy nhất, là **Fortress** điển hình. Driver chính: P/B cực rẻ (0.93) kết hợp chất lượng lợi nhuận cao (ROE 17.5%, σ chỉ 1.9%) và payout thấp (8.6%) giúp tái đầu tư hiệu quả. Disciplined Return = (0.175×0.914)/0.93 – 0.019 ≈ 15.3%, vượt CoE 14% một cách chắc chắn.
+
+**ACB** và **SSB** – Alpha lần lượt –0.9% và –1.5%. Nguyên nhân không phải do yếu kém chất lượng (cả hai ROE cao, σ thấp) mà do định giá P/B chưa đủ hấp dẫn so với mặt bằng lợi nhuận. ACB (P/B 1.22, ROE 23%, σ 2.7%) không phải bẫy, nhưng spread thặng dư quá mỏng. SSB (P/B 1.06, ROE 15.6%, σ 2.2%) gần như fair value, Risk Penalty ăn mòn hoàn toàn phần ROE cao hơn CoE. Cả hai thuộc nhóm “chất lượng nhưng định giá không hỗ trợ alpha”, tạm xếp **quan sát**, không phải Fortress hay Trap.
+
+## 3. Value Traps Warning
+
+Ba mã âm sâu nhất đều là những cái bẫy giá trị hoặc rủi ro đáng kể:
+
+- **LPB** (Alpha –13.0%): P/B ảo tưởng 3.5 lần, dù ROE 21.1% nhưng σ 3.8% cao và payout lớn khiến lợi nhuận giữ lại không đủ bù đắp. Đây là **Premium Burn** điển hình.
+- **EIB** (Alpha –11.4%): ROE chỉ 10%, thấp hơn hẳn CoE, lại thêm σ cao (3.8%) và P/B 1.48 không rẻ. Bẫy giá trị thuần túy.
+- **VPB** (Alpha –10.2%): ROE 14.1% sát CoE nhưng σ 4.7% – biến động lợi nhuận cao khiến Risk Penalty ăn sâu, biến cổ phiếu thành **Growth Trap**.
+
+## 4. Portfolio Construction
+
+- **Core Holding** (Fortress): **SHB** – nên chiếm 60-70% phân bổ ngành ngân hàng (nếu có).
+- **Tactical**: Không có mã cheap-but-not-trap rõ ràng. Có thể xem xét nắm giữ rất nhẹ ACB/SSB nếu kỳ vọng P/B điều chỉnh, nhưng hiện tại alpha âm, không khuyến khích.
+- **Cấm mua / underweight**: LPB, EIB, VPB – ba mã này đốt vốn mạnh, tránh hoàn toàn.
+- **Lưu ý**: Dù SHB có alpha dương, phần còn lại của sector quá yếu. Nếu không chọn lọc kỹ, rất dễ rơi vào bẫy.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

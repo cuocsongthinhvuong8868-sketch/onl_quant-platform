@@ -32,7 +32,7 @@ Pipeline:
   2. process_gfcm_logic(df_raw) -> DataFrame với:
        * Per-series rolling z-score & percentile rank 252d (1Y)
        * Credit Quality Spread (CCC − HY) + percentile
-       * Static PCA 6-series (PC1 = stress, PC2 = divergence)
+       * Expanding point-in-time PCA 6-series (PC1 = stress, PC2 = divergence)
        * PC1 rolling percentile 1Y
        * Regime classification (STRESS / ELEVATED / CALM)
        * Driver flag (EQUITY / RATES / SKEW / HY_CREDIT / CCC_CREDIT / IG_CREDIT / BROAD_STRESS / NO_STRESS)
@@ -123,13 +123,17 @@ OUTPUT_COLUMNS = (
 )
 
 
-def load_cached_gfcm(path) -> pd.DataFrame:
+def load_cached_gfcm(path, recompute_analytics: bool = True) -> pd.DataFrame:
     """
     Read a saved GFCM cache and normalize DATE defensively.
 
     CSV cache files can be edited or merged outside the updater. If conflict
     markers or other invalid rows enter the file, pandas may leave DATE as
     strings even with parse_dates, which later breaks .strftime() callers.
+
+    Mặc định analytics được tính lại từ raw columns để cache cũ từng tạo bằng
+    full-history static PCA không tiếp tục rò rỉ vào UI/AI sau khi code đổi sang
+    point-in-time PCA.
     """
     df = pd.read_csv(path)
     if "DATE" not in df.columns:
@@ -150,6 +154,11 @@ def load_cached_gfcm(path) -> pd.DataFrame:
     for col in numeric_cols:
         if col in df.columns:
             df[col] = pd.to_numeric(df[col], errors="coerce")
+    if recompute_analytics:
+        missing_raw = [column for column in RAW_COLUMNS if column not in df.columns]
+        if missing_raw:
+            raise ValueError(f"GFCM cache thiếu raw columns để recompute: {missing_raw}")
+        df, _ = process_gfcm_logic(df[RAW_COLUMNS])
     return df
 
 
@@ -282,9 +291,17 @@ def _rolling_pct_rank(s: pd.Series, window: int) -> pd.Series:
 # PCA
 # ────────────────────────────────────────────────────────────────────────────
 
-def fit_static_pca(df_z: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+def fit_expanding_pca(
+    df_z: pd.DataFrame,
+    min_pca_samples: int = 60,
+    refit_every: int = 21,
+) -> tuple[pd.DataFrame, dict]:
     """
-    Fit PCA 1 lần trên toàn bộ z-score history 6 cột PCA core → project mọi ngày.
+    Expanding point-in-time PCA trên 6 z-score core.
+
+    Tại refit point t, model chỉ fit trên [0, t), rồi project tối đa
+    ``refit_every`` phiên kế tiếp. Vì vậy append dữ liệu tương lai không làm
+    revision PC1/PC2 lịch sử.
 
     Sign convention: force PC1 loading trên VIX_z dương → PC1 cao = stress.
     PC2 sign convention: force loading trên HY_z dương → PC2 cao = credit-tilt.
@@ -300,7 +317,9 @@ def fit_static_pca(df_z: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     meta  : dict {
         "loadings": pd.DataFrame (rows=6 series, cols=[PC1, PC2]),
         "explained_variance_ratio": [pc1_var, pc2_var],
-        "n_samples_fit": int,
+        "n_samples_fit": int (latest refit),
+        "pca_method": "expanding_point_in_time",
+        "refit_every": int,
         "pc1_interpretation": str,
         "pc2_interpretation": str,
     }
@@ -315,7 +334,11 @@ def fit_static_pca(df_z: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
     z_cols = [f"{_LABEL[c]}_z" for c in PCA_COLUMNS]
     df_clean = df_z[z_cols].dropna()
 
-    min_pca_samples = 60
+    if min_pca_samples < 2:
+        raise ValueError("min_pca_samples phải >= 2")
+    if refit_every < 1:
+        raise ValueError("refit_every phải >= 1")
+
     if len(df_clean) < min_pca_samples:
         return (
             pd.DataFrame(index=df_z.index, columns=["PC1", "PC2"], dtype=float),
@@ -323,50 +346,87 @@ def fit_static_pca(df_z: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
                 "loadings": None,
                 "explained_variance_ratio": [],
                 "n_samples_fit": len(df_clean),
+                "pca_method": "expanding_point_in_time",
+                "refit_every": refit_every,
                 "pc1_interpretation": "Insufficient data",
                 "pc2_interpretation": "Insufficient data",
             },
         )
 
-    pca = PCA(n_components=2)
-    pcs = pca.fit_transform(df_clean.values)
-    components = pca.components_.copy()
-
     vix_idx = z_cols.index("VIX_z")
-    if components[0, vix_idx] < 0:
-        pcs[:, 0] *= -1
-        components[0] *= -1
-
     hy_idx = z_cols.index("HY_z")
-    if components[1, hy_idx] < 0:
-        pcs[:, 1] *= -1
-        components[1] *= -1
-
-    df_pc_clean = pd.DataFrame(pcs, index=df_clean.index, columns=["PC1", "PC2"])
-    df_pc = df_pc_clean.reindex(df_z.index)
-
-    loadings_df = pd.DataFrame(
-        components.T,
-        index=z_cols,
+    df_pc_clean = pd.DataFrame(
+        np.nan,
+        index=df_clean.index,
         columns=["PC1", "PC2"],
+        dtype=float,
     )
+    latest_components = None
+    latest_evr: list[float] = []
+    latest_train_size = 0
 
-    pc2_load = loadings_df["PC2"]
-    vol_avg = (pc2_load["VIX_z"] + pc2_load["MOVE_z"] + pc2_load["SKEW_z"]) / 3
-    credit_avg = (pc2_load["HY_z"] + pc2_load["CCC_z"] + pc2_load["IG_z"]) / 3
-    if credit_avg > vol_avg:
-        pc2_interp = "PC2 cao = credit-driven; PC2 thấp = vol-driven"
+    for start in range(min_pca_samples, len(df_clean), refit_every):
+        train = df_clean.iloc[:start]
+        end = min(start + refit_every, len(df_clean))
+        prediction = df_clean.iloc[start:end]
+
+        pca = PCA(n_components=2)
+        pca.fit(train.values)
+        components = pca.components_.copy()
+        signs = np.ones(2, dtype=float)
+        if components[0, vix_idx] < 0:
+            signs[0] = -1.0
+            components[0] *= -1
+        if components[1, hy_idx] < 0:
+            signs[1] = -1.0
+            components[1] *= -1
+
+        projected = pca.transform(prediction.values) * signs
+        df_pc_clean.iloc[start:end] = projected
+        latest_components = components
+        latest_evr = pca.explained_variance_ratio_.tolist()
+        latest_train_size = len(train)
+
+    df_pc = df_pc_clean.reindex(df_z.index)
+    loadings_df = None
+    if latest_components is not None:
+        loadings_df = pd.DataFrame(
+            latest_components.T,
+            index=z_cols,
+            columns=["PC1", "PC2"],
+        )
+
+    if loadings_df is None:
+        pc2_interp = "Insufficient data"
     else:
-        pc2_interp = "PC2 cao = vol-driven; PC2 thấp = credit-driven"
+        pc2_load = loadings_df["PC2"]
+        vol_avg = (pc2_load["VIX_z"] + pc2_load["MOVE_z"] + pc2_load["SKEW_z"]) / 3
+        credit_avg = (pc2_load["HY_z"] + pc2_load["CCC_z"] + pc2_load["IG_z"]) / 3
+        if credit_avg > vol_avg:
+            pc2_interp = "PC2 cao = credit-driven; PC2 thấp = vol-driven"
+        else:
+            pc2_interp = "PC2 cao = vol-driven; PC2 thấp = credit-driven"
 
     meta = {
         "loadings": loadings_df,
-        "explained_variance_ratio": pca.explained_variance_ratio_.tolist(),
-        "n_samples_fit": len(df_clean),
+        "explained_variance_ratio": latest_evr,
+        "n_samples_fit": latest_train_size,
+        "pca_method": "expanding_point_in_time",
+        "refit_every": refit_every,
+        "first_prediction_date": (
+            str(df_clean.index[min_pca_samples])
+            if len(df_clean) > min_pca_samples
+            else None
+        ),
         "pc1_interpretation": "PC1 cao = financial conditions tighten (stress)",
         "pc2_interpretation": pc2_interp,
     }
     return df_pc, meta
+
+
+def fit_static_pca(df_z: pd.DataFrame) -> tuple[pd.DataFrame, dict]:
+    """Backward-compatible alias; implementation is now point-in-time."""
+    return fit_expanding_pca(df_z)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -440,7 +500,7 @@ def process_gfcm_logic(
     df["CQS_pct"] = _rolling_pct_rank(df["Credit_Quality_Spread"], window)
 
     pca_z_cols = [f"{_LABEL[c]}_z" for c in PCA_COLUMNS]
-    df_pc, meta = fit_static_pca(df[pca_z_cols])
+    df_pc, meta = fit_expanding_pca(df[pca_z_cols])
     df["PC1"] = df_pc["PC1"]
     df["PC2"] = df_pc["PC2"]
 

@@ -77,7 +77,7 @@ command/
 | 8 | C | VaRES | `va_res` | Cornish-Fisher + Self-baseline Complacency | Executive summary |
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | Executive summary |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | Standalone (AI tab trên page) |
-| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, **static PCA**, regime via PC1 percentile 3Y | Standalone (AI tab trên page) |
+| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, **expanding point-in-time PCA**, regime via PC1 percentile 1Y | Standalone (AI tab trên page) |
 | 12 | A | **Bank Valuation** | `bank_valuation` | Bottom-up bank valuation + valuation breadth regime proxy | Standalone |
 | 13 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
 | 14 | B | **Factor Examination** | `factor_examination` | 10 cross-section factor, sector-neutral ICB, portfolio examination | Standalone |
@@ -233,7 +233,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 **Global Financial Conditions Monitor (GFCM) v1** — shipped PR #6 (merged):
 - `tools/global_financial_conditions/` 9 files, ~1399 LOC
 - 4 indicators: VIX (FRED `VIXCLS`), MOVE (Yahoo `^MOVE`), HY OAS (FRED `BAMLH0A0HYM2`), CCC OAS (FRED `BAMLH0A3HYC`) + derived Credit Quality Spread (CCC − HY)
-- **Static PCA** trên rolling z-score 252d (1Y — FRED ICE BofA chỉ cấp ~3Y history): PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
+- **Expanding point-in-time PCA** trên rolling z-score 252d, refit 21 phiên và chỉ dùng dữ liệu quá khứ: PC1 = stress factor (VIX-anchored sign), PC2 = divergence (HY-anchored)
 - Regime via PC1 rolling percentile 1Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
 - Driver flag: EQUITY_DRIVEN / RATES_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / BROAD_STRESS (≥3/4 ≥80pct) / NO_STRESS
 - 2-tab page: **📊 Level** (4-panel raw + mean overlay) / **🧠 Analytics** (PC1+regime band, percentile small multiples, PC2-vs-PC1 scatter, CQS chart, AI section)

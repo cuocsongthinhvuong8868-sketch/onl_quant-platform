@@ -24,8 +24,9 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: external credit and macro stress.
 - Horizon: 4-12 weeks.
-- Primary signal: CQS percentile and global stress components.
+- Primary signal: CQS percentile and expanding point-in-time PCA stress components.
 - Interpretation: high CQS percentile is a macro headwind.
+- Methodology control: PCA is fit on expanding information sets with periodic refits; it is not fit once on the full future-inclusive history.
 - Limit: short-term news sentiment must not offset hard credit stress.
 
 ## US Margin Debt / M2 Overlay
@@ -74,6 +75,7 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 - Domain: sentiment and positioning.
 - Horizon: days to weeks.
 - Primary signal: risk score and sentiment regime.
+- Methodology control: correlation factors use expanding point-in-time PCA/refits, so historical signals are not backfilled with future loadings.
 - Interpretation: supportive when risk appetite is healthy, cautionary when extremes are unstable.
 - Limit: secondary to liquidity, breadth, and tail-risk constraints.
 
@@ -98,6 +100,7 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 - Domain: upside participation.
 - Horizon: days to weeks.
 - Primary signal: upside participation ratio and breadth confirmation.
+- Methodology control: Monte Carlo uses fixed seeds for reproducibility; P95 paths are scenario diagnostics rather than independent allocation signals.
 - Interpretation: sustained upside participation supports risk-on.
 - Limit: zombie rallies without breadth confirmation should not lift regime materially.
 
@@ -137,9 +140,16 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: left-tail risk.
 - Horizon: days to weeks.
-- Primary signal: EVT tail index xi, VaR, CVaR, and expected shortfall.
-- Interpretation: high xi is a hard warning even when realized volatility is quiet.
-- Limit: do not offset high xi with sentiment alone.
+- Primary signal: EVT tail index xi, VaR, CVaR, expected shortfall, and threshold sensitivity over 5%-15% POT thresholds.
+- Interpretation: threshold sensitivity measures robustness/confidence and is not a second bearish vote.
+- Hard-cap rule: a fat-tail hard cap requires robust evidence across thresholds (normally central xi >= 0.30 and xi_min >= 0.30). A central high xi with low xi_min or wide xi range is a warning, not a standalone hard cap.
+- Limit: do not offset robust high tail risk with sentiment alone.
+
+## Pairs Trading
+
+- Domain: relative-value execution research.
+- Methodology control: order-ticket notionals are sized by the estimated hedge-ratio beta rather than split 50/50.
+- AI CIO scope: excluded from regime consensus and asset allocation unless a dedicated structured packet is explicitly supplied.
 
 ## Sentiment Factor From News
 

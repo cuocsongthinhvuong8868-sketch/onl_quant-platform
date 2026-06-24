@@ -265,6 +265,8 @@ Vào **Tab 5**:
 **Position sizing**:
 - Tối đa 5% NAV / pair
 - Tối đa 25% NAV / cluster (tránh concentrated cluster risk)
+- Gross capital được chia theo hedge ratio: `notional_leg2 ≈ |β| × notional_leg1`
+- Quantity được làm tròn xuống theo board lot; ticket hiển thị realized hedge ratio và rounding error
 - Hedge ratio β đúng theo ticket (sai β = không market-neutral)
 
 ---
@@ -281,7 +283,9 @@ JSON download từ Tab 5:
     {"ticker": "VCB", "side": "SELL", "quantity": 300, "limit_price": 92500},
     {"ticker": "CTG", "side": "BUY",  "quantity": 1100, "limit_price": 34200}
   ],
-  "hedge_ratio": 0.27,
+  "hedge_ratio_beta": 0.27,
+  "realized_notional_hedge_ratio": 0.271,
+  "hedge_ratio_error_pct": 0.0037,
   "z_at_entry": 2.14,
   "expected_half_life_days": 12,
   "stop_z": 3.0,
@@ -290,7 +294,8 @@ JSON download từ Tab 5:
 }
 ```
 
-**Quantity** đã làm tròn về bội số 100 (lot size HOSE). **Margin** tính theo tỷ lệ 50% + 2× cushion cho swing intra-day.
+**Quantity** được sizing theo beta rồi làm tròn xuống về bội số 100 (lot size HOSE).
+**Margin** tính trên gross notional theo tỷ lệ 50% + 2× cushion cho swing intra-day.
 
 ⚠️ **App không tự đặt lệnh** — bạn phải copy số liệu sang web broker thủ công. Đây là design choice (xem §13.5 spec — pairs signal orthogonal AI CIO).
 

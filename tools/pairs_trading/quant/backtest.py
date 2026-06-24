@@ -140,18 +140,27 @@ def generate_order_ticket(
     P2 layer. VN-specific:
       - Quantity rounded to multiples of lot_size (100)
       - Margin = margin_rate × notional
-      - hedge_ratio = β (từ EG step 1)
+      - Leg-2 notional / leg-1 notional ≈ |β| (từ EG step 1)
       - Tick rounding skip (broker auto-snap)
 
     Returns dict (JSON-safe).
     """
     if side not in (-1, +1):
         raise ValueError(f"side phải +1 hoặc -1, got {side}")
+    if not np.isfinite(beta) or beta <= 0:
+        raise ValueError(f"beta phải là số dương hữu hạn cho long/short ticket, got {beta}")
+    if price1 <= 0 or price2 <= 0 or capital <= 0:
+        raise ValueError("price1, price2 và capital phải > 0")
+    if lot_size <= 0:
+        raise ValueError("lot_size phải > 0")
 
-    # 50/50 capital split per leg (theoretical), rounded by lot
-    cap_per_leg = capital * 0.5
-    qty1 = int(round(cap_per_leg / price1 / lot_size) * lot_size)
-    qty2 = int(round(cap_per_leg / price2 / lot_size) * lot_size)
+    # Hedge-neutral sizing theo spread log(P1) - beta*log(P2):
+    #   notional_leg2 ≈ beta * notional_leg1
+    # và gross notional hai leg không vượt capital trước rounding.
+    leg1_target_notional = capital / (1.0 + abs(beta))
+    leg2_target_notional = capital - leg1_target_notional
+    qty1 = int(np.floor(leg1_target_notional / price1 / lot_size) * lot_size)
+    qty2 = int(np.floor(leg2_target_notional / price2 / lot_size) * lot_size)
     if qty1 <= 0 or qty2 <= 0:
         raise ValueError(f"Capital {capital} quá nhỏ cho lot size {lot_size} của {t1}/{t2}")
 
@@ -160,8 +169,12 @@ def generate_order_ticket(
     else:
         leg1_side, leg2_side = "SELL", "BUY"
 
-    notional = qty1 * price1 + qty2 * price2
-    margin_req = notional * margin_rate
+    leg1_notional = qty1 * price1
+    leg2_notional = qty2 * price2
+    gross_notional = leg1_notional + leg2_notional
+    realized_beta = leg2_notional / leg1_notional
+    hedge_error_pct = (realized_beta / abs(beta)) - 1.0
+    margin_req = gross_notional * margin_rate
     margin_cushion = margin_req * 2.0  # spec §13.4 #1: capital cushion ≥ 2× initial margin
 
     ticket: dict = {
@@ -172,13 +185,18 @@ def generate_order_ticket(
             {"ticker": t2, "side": leg2_side, "quantity": qty2, "limit_price": float(price2)},
         ],
         "hedge_ratio_beta": float(beta),
+        "realized_notional_hedge_ratio": float(realized_beta),
+        "hedge_ratio_error_pct": float(hedge_error_pct),
+        "leg1_notional_vnd": float(leg1_notional),
+        "leg2_notional_vnd": float(leg2_notional),
         "z_at_entry": float(z_at_entry),
         "expected_half_life_days": float(half_life),
         "stop_z": float(stop_z),
-        "notional_vnd": float(notional),
+        "notional_vnd": float(gross_notional),
         "margin_required_vnd": float(margin_req),
         "margin_cushion_2x_vnd": float(margin_cushion),
         "notes": (
+            "Leg notionals are sized to the Engle-Granger beta subject to board-lot rounding. "
             "Assumes foreign_room > 5% (verify manually). "
             "Lunch break 11:30-13:00 ICT — orders may queue. "
             "Cointegration re-test mỗi 60 phiên — kiểm tra last refit trước khi vào lệnh."

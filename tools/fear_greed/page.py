@@ -51,7 +51,7 @@ def render():
     st.caption(f"📅 Dữ liệu cuối cùng: {df_stocks.index.max().strftime('%d/%m/%Y')}")
 
     data_date = df_stocks.index.max().strftime("%Y-%m-%d")
-    key = {"cache_version": 2, "window_size": window_size}
+    key = {"cache_version": 3, "window_size": window_size, "pca_method": "point_in_time"}
     cached = load_daily_cache("fear_greed", key, data_date=data_date)
     if cached is not None:
         scored_df = cached["scored_df"]

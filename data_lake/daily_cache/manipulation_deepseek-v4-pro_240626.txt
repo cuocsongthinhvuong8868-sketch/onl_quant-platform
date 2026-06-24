@@ -1,0 +1,27 @@
+## 1. Observations
+- OLS Slope ở percentile rất thấp (13.4th), chỉ 0.23 – nhóm VIC/VHM/VRE mất sức kéo chỉ số.
+- Correlation giữ lỏng (54.1th, 0.61) – liên kết vẫn còn nhưng không chặt.
+- Event Study xác nhận trạng thái **ANCHORING** (ΔCorr +0.22 ▸ tăng, ΔSlope -0.47 ▸ giảm mạnh) – nhà tạo lập dùng VIN neo giá nhưng không tạo được xu hướng.
+
+## 2. Microstructure Read
+VIC/VHM/VRE lúc này đóng vai trò **neo**, không dẫn dắt. Correlation duy trì nhưng slope cực yếu cho thấy mỗi biến động của nhóm VIN chỉ gây phản ứng nhỏ trên VN30F1M. Đây là dấu hiệu thị trường đã chuyển sự chú ý sang nhóm khác (Bank, Thép), còn VIN chỉ được dùng để giữ mặt bằng chỉ số, tránh rơi mạnh. Cả hai percentile không vượt 80th – không có can thiệp bất thường, nhưng slope quá thấp khiến VIN mất giá trị dự báo.
+
+## 3. Event Study Interpretation
+ANCHORING nói lên rằng MM giữ tương quan dương nhờ mua/bán đối ứng ở nhóm VIN khi chỉ số biến động, nhưng không tạo được đà đẩy (slope suy yếu). Cho intraday: dễ xuất hiện false breakout, dao động giằng co, không phù hợp giao dịch đuổi theo VIN. Overnight: thiếu tín hiệu rõ ràng, không nên giữ vị thế qua đêm. Với các tham số hiện tại, hành động an toàn là đứng ngoài.
+
+## 4. Verdict
+**NO TRADE** – hệ thống không cho xác suất lợi thế đủ cao.  
+**Leading indicator cần theo dõi:** chuyển focus sang nhóm Ngân hàng (BID, CTG, VPB) và HPG – nơi đang chi phối thực sự VN30F1M. Nếu cố ép, có thể cân nhắc short nhẹ khi Bank suy yếu nhưng rủi ro lớn; tạm thời nên chờ tín hiệu rõ từ các nhóm này.  
+**Stop-loss:** không áp dụng vì không mở vị thế.
+
+```json
+{
+  "tool": "manipulation",
+  "date": "24/06/2026",
+  "regime": "ANCHORING",
+  "slope_percentile": 13.4,
+  "corr_percentile": 54.1,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

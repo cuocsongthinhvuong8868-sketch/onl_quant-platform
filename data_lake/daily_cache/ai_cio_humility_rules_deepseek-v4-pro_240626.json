@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-24",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 11,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5 – tín hiệu hạ nhiệt thanh khoản nội địa bền vững."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 28.0,
+      "unit": "%",
+      "description": "Tỷ lệ mã trên MA20 vượt 45% – xác nhận độ rộng phục hồi, bác bỏ trạng thái bear confirmed."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.4,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% – rủi ro hệ thống giảm đáng kể, bác bỏ luận điểm bull trap."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.374,
+      "unit": "",
+      "description": "Tham số đuôi xi_max < 0.25 – đuôi phân phối quay về vùng mỏng, loại bỏ lo ngại fat-tail cực đoan."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Phân vị dẫn dắt của nhóm Vingroup tăng trở lại trên 70th – tín hiệu tập trung rủi ro quay lại, có thể làm sai luận điểm phân mảnh an toàn."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.8,
+      "unit": "th pct",
+      "description": "CQS tín dụng giảm xuống dưới 80th percentile – stress tín dụng toàn cầu hạ nhiệt rõ rệt, bác bỏ luận điểm macro thắt chặt cực đoan."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-24",
+  "source": "ai_cio_executive_summary"
+}

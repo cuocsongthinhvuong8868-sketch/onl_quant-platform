@@ -1,0 +1,34 @@
+## 1. Observations
+- **SSI: 65.4%** → vùng **WARNING** (tích lũy rủi ro ngầm)  
+- **Market State** (HMM): **EUPHORIC RISK** – tăng điểm trong môi trường stress cao  
+- **Top 3 Pillar Drivers (downside mode):**  
+  - S_LIQ: 36%  
+  - S_VAL: 32%  
+  - S_COR: 17%  
+- VN30 đóng cửa trên MA125, duy trì xu hướng tăng
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ là driver chính, phản ánh **volume khô cạn** so với định mức 1 năm (MA20/MA252 dollar volume giảm). Dòng tiền đang co hẹp rõ rệt – tín hiệu thanh khoản hệ thống suy yếu.  
+S_VAL ở mức rất cao cho thấy **căng thẳng định giá**: lợi nhuận 252 ngày của VN30 đã vượt xa lãi suất tiền gửi, tạo khoảng cách rủi ro.  
+S_COR ở 17% (top 3) báo hiệu **tương quan hệ thống bắt đầu tăng** – các cổ phiếu di chuyển đồng pha hơn trong các phiên giảm.  
+Tổ hợp S_LIQ + S_VAL + S_COR cao → **chữ ký bẫy tăng giá (bull trap)**: nhà đầu tư đang định giá quá lạc quan trong khi dòng tiền thực sự rút khỏi thị trường, tương quan cao khiến rủi ro sụt giảm đồng loạt tăng.
+
+## 3. Cross-Check
+- **Phân kỳ giá–SSI**: VN30 giữ vững trên MA125 (kỹ thuật tích cực), nhưng SSI đã vào WARNING, cảnh báo rủi ro ngầm đang hình thành phía sau đà tăng. Đây là dấu hiệu kinh điển của **bull trap**.  
+- **HMM vs SSI**: Không lệch pha – EUPHORIC RISK (HMM) khớp với mức stress WARNING. Không có mâu thuẫn đáng kể, càng củng cố nhận định rủi ro.
+
+## 4. Verdict
+Với SSI 65.4% và cả ba trụ cột đồng thuận phát tín hiệu stress, **tỷ trọng tiền mặt nên nâng lên 60% danh mục**. Hành động phòng ngừa: **giảm beta** – ưu tiên giảm các vị thế có độ nhạy cao với chỉ số; có thể kết hợp bán hợp đồng tương lai VN30F1M nếu cần chủ động hedge. Không khuyến nghị đòn bẩy trong bối cảnh này. Dù chưa đến mức CRITICAL, nhưng rủi ro (S_LIQ, S_VAL) đang ở ngưỡng đáng lo ngại, xứng đáng hành động thận trọng sớm.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.4,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

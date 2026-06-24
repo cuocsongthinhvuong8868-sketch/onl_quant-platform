@@ -20,6 +20,15 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
 - Hill index (cross-check): [Hill Index]
 - # exceedances (top 10% losses, 3Y window): [EVT N Exceed]
 
+## EVT threshold sensitivity — robustness test, not a second signal
+- Xi min across 5%-15% POT thresholds: [EVT Xi Min]
+- Xi max across 5%-15% POT thresholds: [EVT Xi Max]
+- Xi range across thresholds: [EVT Xi Range]
+- EVT VaR99 range across thresholds: [EVT VaR99 Range]
+- EVT ES99 range across thresholds: [EVT ES99 Range]
+- Threshold stable flag (1=stable, 0=threshold-sensitive): [EVT Threshold Stable]
+- Sensitivity status: [EVT Sensitivity Status]
+
 # REFERENCE
 
 ## ξ (xi) — tail shape interpretation
@@ -66,12 +75,21 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
   "evt_es_99_pct": <value>,
   "xi": <value>,
   "hill": <value>,
+  "xi_min": <value>,
+  "xi_max": <value>,
+  "xi_range": <value>,
+  "threshold_stable": <0|1>,
   "tail_regime": "<near_gaussian|heavy|fat|pathological>",
   "gaussian_gap_pp": <value>,
   "hedge_action": "<none|reduce_leverage|buy_puts_otm|buy_puts_itm|short_futures>",
   "confidence": "<low|medium|high>"
 }
 ```
+
+# EVT SENSITIVITY RULES
+- EVT threshold sensitivity is a confidence/robustness diagnostic. Do not double-count it as an extra bearish signal.
+- If xi is fat-tail only at some thresholds, write "threshold-sensitive fat-tail warning" instead of "robust fat-tail".
+- If VaR99 range is tight but xi range is wide, report tail magnitude as stable but tail-shape classification as uncertain.
 
 # RULES
 - KHÔNG dự báo điểm số VNINDEX

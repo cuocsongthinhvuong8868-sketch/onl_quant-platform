@@ -42,6 +42,64 @@ def _bounded(score: float) -> int:
     return int(round(max(0.0, min(100.0, score))))
 
 
+def _evt_sensitivity_state(metrics: dict[str, Any], xi: float | None) -> dict[str, Any]:
+    """Classify EVT threshold sensitivity as confidence/robustness, not a new signal."""
+
+    xi_min = _as_float(metrics.get("evt_xi_min"))
+    xi_max = _as_float(metrics.get("evt_xi_max"))
+    xi_range = _as_float(metrics.get("evt_xi_range"))
+    stable_raw = metrics.get("evt_threshold_stable")
+    stable = None
+    if isinstance(stable_raw, bool):
+        stable = stable_raw
+    elif stable_raw is not None:
+        stable_text = str(stable_raw).strip().lower()
+        if stable_text in {"1", "true", "yes", "stable"}:
+            stable = True
+        elif stable_text in {"0", "false", "no", "threshold_sensitive", "sensitive"}:
+            stable = False
+
+    if xi_min is None and xi_max is None and xi_range is None:
+        return {
+            "available": False,
+            "xi_min": xi_min,
+            "xi_max": xi_max,
+            "xi_range": xi_range,
+            "stable": stable,
+            "robust_fat": xi is not None and xi >= 0.30,
+            "robust_elevated": xi is not None and xi >= 0.25,
+            "threshold_sensitive_fat": False,
+        }
+
+    if xi_min is None and xi_max is not None and xi_range is not None:
+        xi_min = xi_max - xi_range
+    if xi_max is None and xi_min is not None and xi_range is not None:
+        xi_max = xi_min + xi_range
+    if xi_range is None and xi_min is not None and xi_max is not None:
+        xi_range = xi_max - xi_min
+    if stable is None and xi_range is not None:
+        stable = xi_range <= 0.10
+
+    robust_fat = xi is not None and xi >= 0.30 and xi_min is not None and xi_min >= 0.30
+    robust_elevated = xi is not None and xi >= 0.25 and xi_min is not None and xi_min >= 0.25
+    threshold_sensitive_fat = (
+        xi is not None
+        and xi >= 0.30
+        and not robust_fat
+        and ((xi_min is not None and xi_min < 0.30) or (stable is False))
+    )
+    return {
+        "available": True,
+        "xi_min": xi_min,
+        "xi_max": xi_max,
+        "xi_range": xi_range,
+        "stable": stable,
+        "robust_fat": robust_fat,
+        "robust_elevated": robust_elevated,
+        "threshold_sensitive_fat": threshold_sensitive_fat,
+    }
+
+
 def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] | None:
     """Return a deterministic per-tool score when enough metrics are available."""
     tool = str(tool_id or "")
@@ -86,18 +144,56 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
         xi = _as_float(metrics.get("evt_xi"))
         if xi is None:
             return None
-        if xi >= 0.40:
+        sensitivity = _evt_sensitivity_state(metrics, xi)
+        if not sensitivity["available"]:
+            if xi >= 0.40:
+                score = 12
+                reason = f"EVT xi >=0.40 ({xi:.3f})"
+            elif xi >= 0.30:
+                score = 18
+                reason = f"EVT xi >=0.30 ({xi:.3f})"
+            elif xi >= 0.25:
+                score = 28
+                reason = f"EVT xi >=0.25 ({xi:.3f})"
+            else:
+                score = 55
+                reason = f"EVT xi below fat-tail threshold ({xi:.3f})"
+        elif sensitivity["robust_fat"] and xi >= 0.40:
             score = 12
-            reason = f"EVT xi >=0.40 ({xi:.3f})"
-        elif xi >= 0.30:
+            reason = (
+                f"EVT xi >=0.40 ({xi:.3f}) and xi_min across thresholds "
+                f">=0.30 ({sensitivity['xi_min']:.3f})"
+            )
+        elif sensitivity["robust_fat"]:
             score = 18
-            reason = f"EVT xi >=0.30 ({xi:.3f})"
-        elif xi >= 0.25:
+            reason = (
+                f"EVT fat-tail robust across thresholds: xi={xi:.3f}, "
+                f"xi_min={sensitivity['xi_min']:.3f}"
+            )
+        elif sensitivity["robust_elevated"]:
             score = 28
-            reason = f"EVT xi >=0.25 ({xi:.3f})"
+            reason = (
+                f"EVT elevated tail robust but not fat across thresholds: xi={xi:.3f}, "
+                f"xi_min={sensitivity['xi_min']:.3f}"
+            )
+        elif sensitivity["threshold_sensitive_fat"]:
+            score = 35
+            xi_min = sensitivity["xi_min"]
+            xi_range = sensitivity["xi_range"]
+            reason = f"EVT central xi fat but threshold-sensitive: xi={xi:.3f}"
+            if xi_min is not None:
+                reason += f", xi_min={xi_min:.3f}"
+            if xi_range is not None:
+                reason += f", xi_range={xi_range:.3f}"
+        elif xi < 0.25 and sensitivity.get("xi_max") is not None and sensitivity["xi_max"] >= 0.30:
+            score = 42
+            reason = (
+                f"EVT upper sensitivity reaches fat-tail zone but base xi is below 0.25: "
+                f"xi={xi:.3f}, xi_max={sensitivity['xi_max']:.3f}"
+            )
         else:
             score = 55
-            reason = f"EVT xi below fat-tail threshold ({xi:.3f})"
+            reason = f"EVT xi below robust fat-tail threshold ({xi:.3f})"
         return _tool_score(tool, score, reason)
 
     if tool == "global_financial_conditions":
@@ -375,6 +471,10 @@ def derive_metric_implied_scores(
     breadth_values = values_for(".breadth_ma20_pct")
     ssi_values = values_for(".ssi_pct")
     xi_values = values_for(".evt_xi")
+    xi_min_values = values_for(".evt_xi_min")
+    xi_max_values = values_for(".evt_xi_max")
+    xi_range_values = values_for(".evt_xi_range")
+    evt_threshold_stable_values = values_for(".evt_threshold_stable")
     pvgo_values = values_for(".pvgo_pct")
     abm_early_warning_values = values_for(".abm_early_warning_score")
     abm_distance_values = values_for(".distance_to_cascade_pct")
@@ -392,6 +492,21 @@ def derive_metric_implied_scores(
     min_breadth = min(breadth_values) if breadth_values else None
     max_ssi = max(ssi_values) if ssi_values else None
     max_xi = max(xi_values) if xi_values else None
+    min_xi_sensitivity = min(xi_min_values) if xi_min_values else None
+    max_xi_sensitivity = max(xi_max_values) if xi_max_values else None
+    max_xi_range = max(xi_range_values) if xi_range_values else None
+    evt_threshold_stable = None
+    if evt_threshold_stable_values:
+        evt_threshold_stable = 1.0 if all(value >= 0.5 for value in evt_threshold_stable_values) else 0.0
+    evt_sensitivity = _evt_sensitivity_state(
+        {
+            "evt_xi_min": min_xi_sensitivity,
+            "evt_xi_max": max_xi_sensitivity,
+            "evt_xi_range": max_xi_range,
+            "evt_threshold_stable": evt_threshold_stable,
+        },
+        max_xi,
+    )
     max_pvgo = max(pvgo_values) if pvgo_values else None
     max_abm_early_warning = max(abm_early_warning_values) if abm_early_warning_values else None
     min_abm_distance = min(abm_distance_values) if abm_distance_values else None
@@ -489,15 +604,39 @@ def derive_metric_implied_scores(
     tail_score = 50.0
     tail_reasons: list[str] = []
     if max_xi is not None:
-        if max_xi >= 0.40:
+        if not evt_sensitivity["available"]:
+            if max_xi >= 0.40:
+                tail_score = min(tail_score, 12.0)
+                tail_reasons.append(f"EVT xi >=0.40 ({max_xi:.3f})")
+            elif max_xi >= 0.30:
+                tail_score = min(tail_score, 18.0)
+                tail_reasons.append(f"EVT xi >=0.30 ({max_xi:.3f})")
+            elif max_xi >= 0.25:
+                tail_score = min(tail_score, 28.0)
+                tail_reasons.append(f"EVT xi >=0.25 ({max_xi:.3f})")
+        elif evt_sensitivity["robust_fat"] and max_xi >= 0.40:
             tail_score = min(tail_score, 12.0)
-            tail_reasons.append(f"EVT xi >=0.40 ({max_xi:.3f})")
-        elif max_xi >= 0.30:
+            tail_reasons.append(
+                f"EVT fat tail robust across thresholds: xi={max_xi:.3f}, xi_min={evt_sensitivity['xi_min']:.3f}"
+            )
+        elif evt_sensitivity["robust_fat"]:
             tail_score = min(tail_score, 18.0)
-            tail_reasons.append(f"EVT xi >=0.30 ({max_xi:.3f})")
-        elif max_xi >= 0.25:
+            tail_reasons.append(
+                f"EVT fat tail robust across thresholds: xi={max_xi:.3f}, xi_min={evt_sensitivity['xi_min']:.3f}"
+            )
+        elif evt_sensitivity["robust_elevated"]:
             tail_score = min(tail_score, 28.0)
-            tail_reasons.append(f"EVT xi >=0.25 ({max_xi:.3f})")
+            tail_reasons.append(
+                f"EVT elevated tail robust across thresholds: xi={max_xi:.3f}, xi_min={evt_sensitivity['xi_min']:.3f}"
+            )
+        elif evt_sensitivity["threshold_sensitive_fat"]:
+            tail_score = min(tail_score, 35.0)
+            reason = f"EVT xi threshold-sensitive: xi={max_xi:.3f}"
+            if evt_sensitivity["xi_min"] is not None:
+                reason += f", xi_min={evt_sensitivity['xi_min']:.3f}"
+            if evt_sensitivity["xi_range"] is not None:
+                reason += f", xi_range={evt_sensitivity['xi_range']:.3f}"
+            tail_reasons.append(reason)
     if max_ssi is not None:
         if max_ssi >= 80:
             tail_score = min(tail_score, 18.0)
@@ -553,12 +692,14 @@ def derive_metric_implied_scores(
             weighted = 0.7 * weighted + 0.3 * (sum(numeric_scores) / len(numeric_scores))
 
     caps: list[str] = []
-    if max_xi is not None and max_xi >= 0.30 and max_ssi is not None and max_ssi >= 80:
+    if evt_sensitivity["robust_fat"] and max_ssi is not None and max_ssi >= 80:
         weighted = min(weighted, 14.0)
-        caps.append("EXTREME CRISIS cap: EVT xi >=0.30 and SSI >=80%")
-    elif max_xi is not None and max_xi >= 0.30:
+        caps.append("EXTREME CRISIS cap: EVT xi robustly >=0.30 across thresholds and SSI >=80%")
+    elif evt_sensitivity["robust_fat"]:
         weighted = min(weighted, 29.0)
-        caps.append("PRE-CRASH cap: EVT xi >=0.30")
+        caps.append("PRE-CRASH cap: EVT xi robustly >=0.30 across thresholds")
+    elif evt_sensitivity["threshold_sensitive_fat"]:
+        caps.append("No EVT hard cap: central xi >=0.30 is threshold-sensitive")
     if min_breadth is not None and min_breadth < 45:
         weighted = min(weighted, 44.0)
         caps.append("FEAR cap: Breadth MA20 <45%")

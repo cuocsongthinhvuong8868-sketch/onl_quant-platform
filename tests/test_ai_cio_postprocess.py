@@ -226,7 +226,7 @@ def test_ai_cio_metrics_snapshot_contains_adapter_history_and_methodology(tmp_pa
         history_ledger=history,
     )
 
-    assert snapshot["metrics_version"] == "1.0"
+    assert snapshot["metrics_version"] == "2.0"
     assert snapshot["tools"]["market_breadth"]["tool_score"] == 35
     assert snapshot["tools"]["pvgo"]["tool_score"] == 42
     assert snapshot["tools"]["pvgo"]["tool_regime"] == "PVGO ELEVATED EXPECTATION RISK"
@@ -421,3 +421,99 @@ def test_tool_score_adapters_are_deterministic():
 
     assert aggregate["metric_implied_regime"] == "PRE-CRASH / PANIC"
     assert 15 <= aggregate["metric_implied_score"] <= 29
+
+
+def test_evt_threshold_sensitive_xi_does_not_trigger_standalone_precrash_cap():
+    from shared.ai_cio_scoring import derive_metric_implied_scores, score_tool_packet
+
+    metrics = {
+        "evt_xi": 0.345,
+        "evt_xi_min": 0.168,
+        "evt_xi_max": 0.374,
+        "evt_xi_range": 0.206,
+        "evt_threshold_stable": 0,
+    }
+    tail = score_tool_packet("var_cvar_vnindex", metrics)
+
+    assert tail["tool_score"] == 35
+    assert "threshold-sensitive" in tail["score_reason"]
+
+    aggregate = derive_metric_implied_scores(
+        {f"var_cvar_vnindex.{key}": value for key, value in metrics.items()},
+        {"bullish": 0, "bearish": 1, "neutral_or_mixed": 0},
+        tool_scores=[{"tool": "var_cvar_vnindex", **tail}],
+    )
+
+    assert not any("PRE-CRASH cap: EVT" in reason for reason in aggregate["score_band_reason"]["caps"])
+    assert any("No EVT hard cap" in reason for reason in aggregate["score_band_reason"]["caps"])
+
+
+def test_evt_robust_fat_tail_preserves_precrash_cap():
+    from shared.ai_cio_scoring import derive_metric_implied_scores, score_tool_packet
+
+    metrics = {
+        "evt_xi": 0.345,
+        "evt_xi_min": 0.312,
+        "evt_xi_max": 0.374,
+        "evt_xi_range": 0.062,
+        "evt_threshold_stable": 1,
+    }
+    tail = score_tool_packet("var_cvar_vnindex", metrics)
+
+    assert tail["tool_score"] == 18
+    aggregate = derive_metric_implied_scores(
+        {f"var_cvar_vnindex.{key}": value for key, value in metrics.items()},
+        {"bullish": 0, "bearish": 1, "neutral_or_mixed": 0},
+        tool_scores=[{"tool": "var_cvar_vnindex", **tail}],
+    )
+
+    assert aggregate["metric_implied_score"] <= 29
+    assert any("robustly >=0.30" in reason for reason in aggregate["score_band_reason"]["caps"])
+
+
+def test_evidence_packet_extracts_evt_sensitivity_metrics():
+    import shared.ai_cio as ai_cio
+
+    report = """
+    EVT Xi: +0.345
+    EVT Xi Min: +0.168
+    EVT Xi Max: +0.374
+    EVT Xi Range: 0.206
+    EVT VaR99 Range: 0.11pp
+    EVT ES99 Range: 0.70pp
+    EVT Threshold Stable: 0
+    """
+
+    packet = ai_cio._build_evidence_packet("var_cvar_vnindex", report, "current_tool")
+
+    assert packet["key_metrics"]["evt_xi"] == 0.345
+    assert packet["key_metrics"]["evt_xi_min"] == 0.168
+    assert packet["key_metrics"]["evt_xi_max"] == 0.374
+    assert packet["key_metrics"]["evt_xi_range"] == 0.206
+    assert packet["key_metrics"]["evt_threshold_stable"] == 0
+    assert packet["adapter_score"]["tool_score"] == 35
+
+
+def test_methodology_versioned_cache_rejects_legacy_content(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    path = ai_cio._get_cache_path("var_cvar_vnindex", "test-provider")
+    path.parent.mkdir(parents=True)
+    path.write_text("legacy report without methodology marker", encoding="utf-8")
+
+    assert ai_cio._read_cache("var_cvar_vnindex", "test-provider") is None
+
+    ai_cio._write_cache("var_cvar_vnindex", "current report", "test-provider")
+    raw = path.read_text(encoding="utf-8")
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["var_cvar_vnindex"] in raw
+    assert ai_cio._read_cache("var_cvar_vnindex", "test-provider") == "current report"
+
+
+def test_humility_evt_default_uses_sensitivity_upper_bound():
+    from tools.humility_falsification import page
+
+    rule = next(item for item in page.DEFAULT_RULES if item["model"] == "Tail Risk (EVT)")
+
+    assert "Xi Max" in rule["metric"]
+    assert page._metric_key(rule) == "evt_xi_max"

@@ -16,7 +16,7 @@ def calculate_quant_metrics(df_stocks: pd.DataFrame, window_size: int) -> pd.Dat
     Các giai đoạn
     -------------
     1. Tính daily returns
-    2. PCA Market Factor (loại bias vốn hóa)
+    2. Expanding point-in-time PCA Market Factor (loại bias vốn hóa và look-ahead)
     3. EGARCH(1,1,1) Skewed-T conditional volatility
     4. Rolling Kelly Skewness
     5. Directional correlation (downside / upside)
@@ -36,11 +36,14 @@ def calculate_quant_metrics(df_stocks: pd.DataFrame, window_size: int) -> pd.Dat
     ------
     RuntimeError : từ fit_egarch nếu model không hội tụ
     """
-    stocks_ret = df_stocks.pct_change().dropna(how="all")
+    stocks_ret = df_stocks.pct_change(fill_method=None).dropna(how="all")
     logger.info("Pipeline metrics — %d ngày × %d mã", *stocks_ret.shape)
 
     # 1 — Market Factor
-    mf = extract_market_factor_pca(stocks_ret)
+    mf = extract_market_factor_pca(stocks_ret).dropna()
+    if mf.empty:
+        raise RuntimeError("Không đủ dữ liệu cho point-in-time PCA Market Factor.")
+    stocks_ret = stocks_ret.loc[mf.index]
 
     # 2 — Conditional Volatility
     egarch_vol = fit_egarch(mf)

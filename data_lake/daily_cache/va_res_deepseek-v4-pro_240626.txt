@@ -1,0 +1,31 @@
+## 1. Observations
+- Stress Index: 0.00% – không mã nào trong VN30 thủng VaR 95%, không có áp lực lây lan real-time
+- Số mã breached: 0/30 – thị trường không ghi nhận cú sốc đột biến
+- Complacency Index: 4.63% – rất thấp so với ngưỡng nguy hiểm 80%
+- Số mã mispriced: 5, top 3 bị nén spread: OCB, VRE, VHM
+
+## 2. Contagion Assessment (Module B)
+Hệ số VN30 Stress 0.00% cho thấy **không có rủi ro lây lan hệ thống đang diễn ra** trong phiên 24/06/2026. Không mã nào xuyên thủng VaR 95%, loại trừ khả năng đầu sóng systemic từ top vốn hóa. Đây là trạng thái cực kỳ yên tĩnh về mặt biến động bất thường – không có điểm gãy nào xuất hiện. Top 3 breach không có dữ liệu, vì vậy không thể đánh giá sự cố cá biệt.
+
+## 3. Complacency Assessment (Module C)
+Complacency 4.63% **chỉ có nghĩa thị trường KHÔNG rơi vào chế độ “ngủ quên”** – tức spread không bị nén trên diện rộng, cấu trúc bù rủi ro chưa bị bóp méo tập thể. 
+
+Điều này **không đồng nghĩa** thị trường ổn định hay không có áp lực bán. Thị trường có thể đang trong uptrend mạnh, hoảng loạn, hoặc biến động hai chiều mạnh – tất cả đều có complacency thấp tự nhiên do spread giãn rộng. Kết hợp với Stress Index = 0%, tạm thời chưa có dấu hiệu đổ vỡ hay bất ổn hệ thống. Tuy nhiên, cần theo dõi sát 5 mã mispriced vì chúng có thể mang mầm mống định giá sai cục bộ, dù chưa lan toả.
+
+## 4. Stock-Level Risk Calls
+- **Module B (crash)**: Không có mã breach nào → không đưa ra lệnh cắt giảm khẩn cấp cụ thể.  
+- **Module C (mispriced)**: OCB, VRE, VHM bị nén spread chặt nhất. Dù complacency chung thấp, các mã này tiềm ẩn rủi ro điều chỉnh nếu spread bất ngờ giãn. Khuyến nghị giám sát chặt, cân nhắc giảm tỷ trọng dần khi xuất hiện tín hiệu kỹ thuật (ví dụ thủng MA20/MA50 trên D1 với thanh khoản tăng đột biến). **Không sử dụng mức giá tuyệt đối**.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 4.63,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["OCB", "VRE", "VHM"],
+  "confidence": "medium"
+}
+```

@@ -2,12 +2,26 @@ import numpy as np
 import pandas as pd
 from statsmodels.tsa.ar_model import AutoReg
 
+DEFAULT_MC_SEED = 42
 
-def run_hybrid_ensemble_mc(raw_ratio_series: pd.Series, days_to_sim: int = 20, num_sims: int = 3000):
-    """Hybrid ensemble Monte Carlo for bounded breadth ratios [0, 100]."""
+
+def run_hybrid_ensemble_mc(
+    raw_ratio_series: pd.Series,
+    days_to_sim: int = 20,
+    num_sims: int = 3000,
+    seed: int | None = DEFAULT_MC_SEED,
+):
+    """Hybrid ensemble Monte Carlo for bounded breadth ratios [0, 100].
+
+    ``seed`` mặc định cố định để cùng input/parameters tạo cùng output. Truyền
+    ``None`` chỉ khi chủ động muốn một simulation ngẫu nhiên không tái lập.
+    """
     if len(raw_ratio_series) < 30:
         raise ValueError("Không đủ dữ liệu để chạy mô hình (cần tối thiểu 30 điểm).")
+    if days_to_sim < 1 or num_sims < 1:
+        raise ValueError("days_to_sim và num_sims phải >= 1")
 
+    rng = np.random.default_rng(seed)
     p_raw = np.clip(raw_ratio_series.values, 0.1, 99.9) / 100.0
     last_p = p_raw[-1]
 
@@ -19,9 +33,11 @@ def run_hybrid_ensemble_mc(raw_ratio_series: pd.Series, days_to_sim: int = 20, n
     resid_emp = model_ar.resid
 
     sim_y = np.zeros((days_to_sim, num_sims))
-    sim_y[0, :] = c_emp + phi_emp * y[-1] + np.random.choice(resid_emp, size=num_sims, replace=True)
+    sim_y[0, :] = c_emp + phi_emp * y[-1] + rng.choice(resid_emp, size=num_sims, replace=True)
     for t in range(1, days_to_sim):
-        sim_y[t, :] = c_emp + phi_emp * sim_y[t - 1, :] + np.random.choice(resid_emp, size=num_sims, replace=True)
+        sim_y[t, :] = c_emp + phi_emp * sim_y[t - 1, :] + rng.choice(
+            resid_emp, size=num_sims, replace=True
+        )
     sim_p_emp = 1.0 / (1.0 + np.exp(-sim_y))
 
     # Engine 2: Beta AR approximation
@@ -42,7 +58,7 @@ def run_hybrid_ensemble_mc(raw_ratio_series: pd.Series, days_to_sim: int = 20, n
         mean_t = np.clip(mean_t, 0.001, 0.999)
         kappa = mean_t * (1.0 - mean_t) / (sigma_beta ** 2) - 1.0
         kappa = np.maximum(kappa, 0.5)
-        sim_p_beta[t, :] = np.random.beta(mean_t * kappa, (1.0 - mean_t) * kappa)
+        sim_p_beta[t, :] = rng.beta(mean_t * kappa, (1.0 - mean_t) * kappa)
 
     pooled_sim_p = np.hstack((sim_p_emp, sim_p_beta)) * 100.0
     total_sims = num_sims * 2
