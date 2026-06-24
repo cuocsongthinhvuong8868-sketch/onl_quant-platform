@@ -254,17 +254,39 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
         }
 
     if tool == "abm_simulator":
+        early_warning = _as_float(metrics.get("abm_early_warning_score"))
         distance = _as_float(metrics.get("distance_to_cascade_pct"))
         panic = _as_float(metrics.get("panic_ratio_pct"))
         leverage = _as_float(metrics.get("abm_avg_leverage_ratio"))
         vulnerability = _as_float(metrics.get("cascade_vulnerability"))
-        if distance is None and panic is None and leverage is None and vulnerability is None:
+        if early_warning is None and distance is None and panic is None and leverage is None and vulnerability is None:
             return None
 
-        score = 55.0
+        score = 58.0
         reasons: list[str] = []
-        regime = "ABM MANAGEABLE CASCADE RISK"
+        regime = "ABM GREEN EARLY WARNING"
         bias = "neutral_or_mixed"
+
+        if early_warning is not None:
+            if early_warning >= 75:
+                score = min(score, 15.0)
+                regime = "ABM RED EARLY WARNING / CASCADE RISK"
+                bias = "bearish"
+                reasons.append(f"Early-warning score >=75 ({early_warning:.1f}/100)")
+            elif early_warning >= 60:
+                score = min(score, 25.0)
+                regime = "ABM ORANGE EARLY WARNING / STRESS RISING"
+                bias = "bearish"
+                reasons.append(f"Early-warning score >=60 ({early_warning:.1f}/100)")
+            elif early_warning >= 45:
+                score = min(score, 42.0)
+                regime = "ABM YELLOW EARLY WARNING / FRAGILITY WATCH"
+                bias = "bearish"
+                reasons.append(f"Early-warning score >=45 ({early_warning:.1f}/100)")
+            else:
+                score = min(score, 60.0)
+                regime = "ABM GREEN EARLY WARNING"
+                reasons.append(f"Early-warning score below yellow ({early_warning:.1f}/100)")
 
         if distance is not None:
             if distance <= 2:
@@ -273,14 +295,16 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
                 bias = "bearish"
                 reasons.append(f"Distance to cascade <=2% ({distance:.2f}%)")
             elif distance <= 5:
-                score = min(score, 25.0)
-                regime = "ABM LEVERAGE STRESS"
+                score = min(score, 42.0 if early_warning is not None else 25.0)
+                if early_warning is None:
+                    regime = "ABM LEVERAGE STRESS"
                 bias = "bearish"
                 reasons.append(f"Distance to cascade <=5% ({distance:.2f}%)")
             elif distance <= 10:
-                score = min(score, 38.0)
-                regime = "ABM MARGIN BUILDUP"
-                bias = "bearish"
+                score = min(score, 45.0 if early_warning is not None else 38.0)
+                if early_warning is None:
+                    regime = "ABM MARGIN BUILDUP"
+                    bias = "bearish"
                 reasons.append(f"Distance to cascade <=10% ({distance:.2f}%)")
             else:
                 reasons.append(f"Distance to cascade contained ({distance:.2f}%)")
@@ -311,8 +335,8 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
         score_int = _bounded(score)
         return {
             "tool_score": score_int,
-            "tool_regime": regime if score_int < 45 else regime_from_score(score_int),
-            "tool_bias": bias if score_int < 45 else bias_from_score(score_int),
+            "tool_regime": regime,
+            "tool_bias": bias,
             "score_reason": "; ".join(reasons) if reasons else "ABM cascade metrics not in stress zone",
         }
 
@@ -352,6 +376,7 @@ def derive_metric_implied_scores(
     ssi_values = values_for(".ssi_pct")
     xi_values = values_for(".evt_xi")
     pvgo_values = values_for(".pvgo_pct")
+    abm_early_warning_values = values_for(".abm_early_warning_score")
     abm_distance_values = values_for(".distance_to_cascade_pct")
     abm_panic_values = values_for(".panic_ratio_pct")
     abm_vulnerability_values = values_for(".cascade_vulnerability")
@@ -368,6 +393,7 @@ def derive_metric_implied_scores(
     max_ssi = max(ssi_values) if ssi_values else None
     max_xi = max(xi_values) if xi_values else None
     max_pvgo = max(pvgo_values) if pvgo_values else None
+    max_abm_early_warning = max(abm_early_warning_values) if abm_early_warning_values else None
     min_abm_distance = min(abm_distance_values) if abm_distance_values else None
     max_abm_panic = max(abm_panic_values) if abm_panic_values else None
     max_abm_vulnerability = max(abm_vulnerability_values) if abm_vulnerability_values else None
@@ -482,15 +508,25 @@ def derive_metric_implied_scores(
         elif max_ssi >= 55:
             tail_score = min(tail_score, 42.0)
             tail_reasons.append(f"SSI >=55% ({max_ssi:.1f}%)")
+    if max_abm_early_warning is not None:
+        if max_abm_early_warning >= 75:
+            tail_score = min(tail_score, 15.0)
+            tail_reasons.append(f"ABM early-warning score RED >=75 ({max_abm_early_warning:.1f}/100)")
+        elif max_abm_early_warning >= 60:
+            tail_score = min(tail_score, 25.0)
+            tail_reasons.append(f"ABM early-warning score ORANGE >=60 ({max_abm_early_warning:.1f}/100)")
+        elif max_abm_early_warning >= 45:
+            tail_score = min(tail_score, 42.0)
+            tail_reasons.append(f"ABM early-warning score YELLOW >=45 ({max_abm_early_warning:.1f}/100)")
     if min_abm_distance is not None:
         if min_abm_distance <= 2:
             tail_score = min(tail_score, 12.0)
             tail_reasons.append(f"ABM distance to cascade <=2% ({min_abm_distance:.2f}%)")
         elif min_abm_distance <= 5:
-            tail_score = min(tail_score, 25.0)
+            tail_score = min(tail_score, 42.0 if max_abm_early_warning is not None else 25.0)
             tail_reasons.append(f"ABM distance to cascade <=5% ({min_abm_distance:.2f}%)")
         elif min_abm_distance <= 10:
-            tail_score = min(tail_score, 38.0)
+            tail_score = min(tail_score, 45.0 if max_abm_early_warning is not None else 38.0)
             tail_reasons.append(f"ABM distance to cascade <=10% ({min_abm_distance:.2f}%)")
     if max_abm_panic is not None:
         if max_abm_panic >= 50:
@@ -529,6 +565,15 @@ def derive_metric_implied_scores(
     if max_cqs is not None and max_cqs >= 80:
         weighted = min(weighted, 44.0)
         caps.append("FEAR cap: CQS >=80")
+    if max_abm_early_warning is not None and max_abm_early_warning >= 75:
+        weighted = min(weighted, 29.0)
+        caps.append("PRE-CRASH cap: ABM early-warning score RED >=75")
+    elif max_abm_early_warning is not None and max_abm_early_warning >= 60:
+        weighted = min(weighted, 39.0)
+        caps.append("FEAR cap: ABM early-warning score ORANGE >=60")
+    elif max_abm_early_warning is not None and max_abm_early_warning >= 45:
+        weighted = min(weighted, 44.0)
+        caps.append("FEAR cap: ABM early-warning score YELLOW >=45")
     if (
         max_ltmm_breakdown is not None
         and max_ltmm_breakdown >= 1

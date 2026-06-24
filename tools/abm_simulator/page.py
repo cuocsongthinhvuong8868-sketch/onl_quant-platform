@@ -25,6 +25,7 @@ OPTIONAL_TABLES = {
     "abm_latent_state": "Latent state",
     "abm_validation": "Validation",
 }
+SCENARIO_TABLE = "abm_scenario_grid"
 
 
 def _load_csv(table: str) -> pd.DataFrame:
@@ -88,15 +89,60 @@ def _fmt_num(value: float | None, digits: int = 2, suffix: str = "") -> str:
     return f"{value:.{digits}f}{suffix}"
 
 
+def _boolish(value: Any) -> bool:
+    if isinstance(value, str):
+        return value.strip().lower() in {"1", "true", "yes", "y"}
+    try:
+        if value is None or pd.isna(value):
+            return False
+    except Exception:
+        pass
+    return bool(value)
+
+
 def _regime_color(regime: str) -> str:
     return {
         "CASCADE_WARNING": "#c1121f",
+        "CASCADE_RISK": "#c1121f",
         "LEVERAGE_STRESS": "#f77f00",
+        "STRESS_RISING": "#f77f00",
+        "FRAGILITY_BUILDUP": "#b7791f",
+        "POST_SHOCK_STRESS": "#7b2cbf",
         "MARGIN_BUILDUP": "#2f6f9f",
         "BUBBLE_BUILDING": "#2f6f9f",
         "PANIC_OVERSOLD": "#7a9e35",
         "SAFE_VALUE": "#2a9d8f",
     }.get(str(regime or "").upper(), "#6c757d")
+
+
+def _warning_level_color(level: str, score: float | None = None) -> str:
+    level_key = str(level or "").upper()
+    if level_key == "RED":
+        return "#c1121f"
+    if level_key == "ORANGE":
+        return "#f77f00"
+    if level_key == "YELLOW":
+        return "#b7791f"
+    if level_key == "GREEN":
+        return "#2a9d8f"
+    if score is not None:
+        if score >= 75:
+            return "#c1121f"
+        if score >= 60:
+            return "#f77f00"
+        if score >= 45:
+            return "#b7791f"
+    return "#6c757d"
+
+
+def _format_warning_basis(value: Any) -> str:
+    if value is None:
+        return "N/A"
+    text = str(value).strip()
+    if not text or text.upper() == "N/A":
+        return "N/A"
+    parts = [part.strip().replace("_", " ").capitalize() for part in text.split(",") if part.strip()]
+    return "; ".join(parts) if parts else "N/A"
 
 
 def _agent_mix_frame(row: pd.Series) -> pd.DataFrame:
@@ -150,6 +196,7 @@ def render() -> None:
 
     tables = {**REQUIRED_TABLES, **OPTIONAL_TABLES}
     frames = {table: _load_csv(table) for table in tables}
+    scenario_frame = _load_csv(SCENARIO_TABLE)
     missing = _missing_required(frames)
     if missing:
         st.warning(
@@ -176,56 +223,118 @@ def render() -> None:
     leverage = _float(latest, "avg_leverage_ratio")
     confidence = _float(latest, "stress_confidence", "stress_confidence_stress_test", "stress_confidence_alert")
     quality = _float(latest, "input_quality_score", "input_quality_score_alert")
+    early_warning = _float(latest, "early_warning_score")
+    early_level = str(_first(latest, "early_warning_level", default="N/A"))
+    warning_basis = str(_first(latest, "warning_basis", default="N/A"))
+    warning_basis_label = _format_warning_basis(warning_basis)
+    warning_color = _warning_level_color(early_level, early_warning)
+    warning_score_label = _fmt_num(early_warning, 1, "/100") if early_warning is not None else "N/A"
+    qp_panel_available = _boolish(_first(latest, "qp_panel_available", "alert_uses_quant_platform_panel", default=False))
+    qp_panel_quality = _float(latest, "qp_panel_quality")
 
-    col1, col2, col3, col4, col5 = st.columns(5)
-    with col1:
+    top_col1, top_col2 = st.columns([1, 1.45])
+    with top_col1:
         st.markdown(
             (
-                "<div style='border:1px solid {color};border-radius:6px;padding:10px;text-align:center;'>"
+                "<div style='border:1px solid {color};border-radius:6px;padding:14px;text-align:center;height:100%;'>"
                 "<div style='font-size:0.78rem;color:{color};font-weight:700;'>REGIME</div>"
-                "<div style='font-size:1.05rem;color:{color};font-weight:700;margin-top:8px;'>{regime}</div>"
+                "<div style='font-size:1.22rem;color:{color};font-weight:700;margin-top:8px;'>{regime}</div>"
+                "<div style='font-size:0.76rem;color:#6c757d;margin-top:8px;'>As of {date}</div>"
                 "</div>"
-            ).format(color=color, regime=regime),
+            ).format(color=color, regime=regime, date=latest_date_label),
             unsafe_allow_html=True,
         )
-    with col2:
+    with top_col2:
+        st.markdown(
+            (
+                "<div style='border:1px solid {warning_color};border-radius:6px;padding:14px;'>"
+                "<div style='display:flex;justify-content:space-between;gap:12px;align-items:flex-start;'>"
+                "<div>"
+                "<div style='font-size:0.78rem;color:{warning_color};font-weight:700;'>EARLY-WARNING SCORE</div>"
+                "<div style='font-size:1.85rem;color:{warning_color};font-weight:800;line-height:1.2;margin-top:4px;'>{score}</div>"
+                "</div>"
+                "<div style='font-size:0.95rem;color:{warning_color};font-weight:700;text-align:right;'>{level}</div>"
+                "</div>"
+                "<div style='font-size:0.78rem;color:#6c757d;margin-top:8px;'>Basis: {basis}</div>"
+                "</div>"
+            ).format(
+                warning_color=warning_color,
+                score=warning_score_label,
+                level=early_level,
+                basis=warning_basis_label,
+            ),
+            unsafe_allow_html=True,
+        )
+        if early_warning is not None:
+            st.progress(max(0, min(100, int(round(early_warning)))))
+
+    warning_message = f"Early-warning score: {warning_score_label} ({early_level}) | Drivers: {warning_basis_label}"
+    if early_warning is None:
+        st.info("Early-warning score is not available in the latest ABM alert file.")
+    elif str(early_level).upper() in {"RED", "ORANGE", "YELLOW"}:
+        st.warning(warning_message)
+    else:
+        st.success(warning_message)
+
+    col1, col2, col3, col4 = st.columns(4)
+    with col1:
         st.metric("Distance to Cascade", _fmt_pct(distance))
-    with col3:
+    with col2:
         st.metric("Panic Ratio", _fmt_pct(panic))
-    with col4:
+    with col3:
         st.metric("Avg Leverage", _fmt_num(leverage, suffix="x"))
-    with col5:
+    with col4:
         st.metric("Stress Confidence", _fmt_pct(confidence, 0))
 
     st.caption(
         f"As of {latest_date_label} | Input quality: {_fmt_pct(quality, 0)} | "
         f"Rows aligned: {len(merged)}"
     )
+    if qp_panel_available:
+        st.caption(
+            "Data note: Early-warning score uses additional quant-platform stock price/volume panel "
+            f"features when available. Latest panel quality: {_fmt_pct(qp_panel_quality, 0)}."
+        )
 
-    if regime == "CASCADE_WARNING" or (distance is not None and distance <= 0.02):
+    if regime in {"CASCADE_WARNING", "CASCADE_RISK"} or (distance is not None and distance <= 0.02):
         st.error("Cascade warning: margin-call distance is extremely narrow. Prioritize de-risking and liquidity.")
-    elif regime == "LEVERAGE_STRESS" or (distance is not None and distance <= 0.05):
+    elif regime in {"LEVERAGE_STRESS", "STRESS_RISING"} or (distance is not None and distance <= 0.05):
         st.warning("Leverage stress: avoid adding leverage and monitor weak-liquidity positions closely.")
-    elif regime in {"MARGIN_BUILDUP", "BUBBLE_BUILDING"}:
+    elif regime == "POST_SHOCK_STRESS":
+        st.warning("Post-shock stress: market damage is already visible; treat signals as containment rather than early warning.")
+    elif regime in {"FRAGILITY_BUILDUP", "MARGIN_BUILDUP", "BUBBLE_BUILDING"}:
         st.info("Margin buildup: leverage/crowding risk is accumulating, but cascade is not yet confirmed.")
     else:
         st.success("ABM state is not flagging immediate cascade stress.")
 
-    tab_agents, tab_stress, tab_latent, tab_data = st.tabs(
-        ["Agent Mix", "Stress Test", "Cascade & Latent State", "Data"]
+    tab_agents, tab_stress, tab_scenarios, tab_latent, tab_data = st.tabs(
+        ["Agent Mix", "Stress Test", "Scenario Grid", "Cascade & Latent State", "Data"]
     )
 
     with tab_agents:
-        if len(merged) == 1:
-            fig = px.pie(
-                _agent_mix_frame(latest),
-                names="agent",
-                values="share_pct",
-                title="Current agent population share",
-                color="agent",
-            )
-            st.plotly_chart(fig, use_container_width=True)
-        else:
+        mix_frame = _agent_mix_frame(latest)
+        fig = px.pie(
+            mix_frame,
+            names="agent",
+            values="share_pct",
+            title="Current agent population share",
+            color="agent",
+            hole=0.36,
+        )
+        fig.update_traces(
+            textposition="inside",
+            texttemplate="%{label}<br>%{percent}",
+            hovertemplate="%{label}: %{value:.2f}%<extra></extra>",
+        )
+        fig.update_layout(
+            legend=dict(orientation="h", y=1.08),
+            margin=dict(l=10, r=10, t=56, b=10),
+        )
+        st.plotly_chart(fig, use_container_width=True)
+
+        st.dataframe(mix_frame.sort_values("share_pct", ascending=False), use_container_width=True, hide_index=True)
+
+        if len(merged) > 1:
             plot_df = merged[["as_of_date", "pct_fundamental", "pct_momentum", "pct_foreign", "pct_leveraged"]].copy()
             if "pct_noise" in merged.columns:
                 plot_df["pct_noise"] = merged["pct_noise"]
@@ -243,13 +352,22 @@ def render() -> None:
             )
             for col in ["Fundamental", "Momentum", "Foreign", "Leveraged", "Noise"]:
                 plot_df[col] = plot_df[col] * 100.0
-            fig = px.area(
+            fig = px.bar(
                 plot_df,
                 x="as_of_date",
                 y=["Fundamental", "Momentum", "Foreign", "Leveraged", "Noise"],
+                title="Agent mix history",
                 labels={"value": "Share (%)", "as_of_date": "Date", "variable": "Agent"},
             )
-            fig.update_layout(legend=dict(orientation="h", y=1.08))
+            fig.update_traces(hovertemplate="%{fullData.name}: %{y:.2f}%<extra></extra>")
+            fig.update_layout(
+                barmode="stack",
+                bargap=0.18,
+                hovermode="x unified",
+                legend=dict(orientation="h", y=1.08),
+                margin=dict(l=10, r=10, t=56, b=10),
+            )
+            fig.update_yaxes(range=[0, 100], ticksuffix="%")
             st.plotly_chart(fig, use_container_width=True)
 
     with tab_stress:
@@ -311,7 +429,63 @@ def render() -> None:
             }
         )
 
+    with tab_scenarios:
+        if scenario_frame.empty:
+            st.info("Scenario-grid output is not available yet.")
+        else:
+            latest_scenarios = scenario_frame[scenario_frame["as_of_date"].eq(scenario_frame["as_of_date"].max())].copy()
+            latest_scenarios = latest_scenarios.sort_values(["scenario_rank", "scenario_name"])
+            plot_cols = [col for col in ["scenario_name", "dd_total", "dd_endogenous", "panic_ratio"] if col in latest_scenarios.columns]
+            if {"scenario_name", "dd_total"}.issubset(latest_scenarios.columns):
+                fig = go.Figure()
+                fig.add_trace(
+                    go.Bar(
+                        x=latest_scenarios["scenario_name"],
+                        y=latest_scenarios["dd_total"] * 100.0,
+                        name="Total DD",
+                        marker_color="#c1121f",
+                    )
+                )
+                if "dd_endogenous" in latest_scenarios.columns:
+                    fig.add_trace(
+                        go.Bar(
+                            x=latest_scenarios["scenario_name"],
+                            y=latest_scenarios["dd_endogenous"] * 100.0,
+                            name="Endogenous DD",
+                            marker_color="#f77f00",
+                        )
+                    )
+                fig.update_layout(
+                    barmode="group",
+                    yaxis_title="Drawdown (%)",
+                    legend=dict(orientation="h", y=1.08),
+                )
+                st.plotly_chart(fig, use_container_width=True)
+            if plot_cols:
+                display = latest_scenarios.copy()
+                for col in ["dd_total", "dd_exogenous", "dd_endogenous", "panic_ratio", "shock_magnitude"]:
+                    if col in display.columns:
+                        display[col] = display[col].astype(float)
+                st.dataframe(display.tail(50), use_container_width=True)
+
     with tab_latent:
+        st.markdown("#### Early-warning score")
+        ew_col1, ew_col2, ew_col3 = st.columns([1, 1, 2])
+        with ew_col1:
+            st.metric("Score", warning_score_label)
+        with ew_col2:
+            st.metric("Level", early_level)
+        with ew_col3:
+            st.markdown("**Drivers**")
+            st.caption(warning_basis_label)
+
+        if early_warning is None:
+            st.info("Early-warning score is not available in the latest ABM alert file.")
+        elif str(early_level).upper() in {"RED", "ORANGE", "YELLOW"}:
+            st.warning(warning_message)
+        else:
+            st.success(warning_message)
+
         if "distance_to_cascade" in merged.columns and len(merged) > 1:
             fig = px.line(
                 merged,
@@ -324,7 +498,71 @@ def render() -> None:
             fig.add_hline(y=5.0, line_dash="dash", line_color="orange", annotation_text="Warning 5%")
             st.plotly_chart(fig, use_container_width=True)
 
+        if "early_warning_score" in merged.columns:
+            ew_history_cols = ["as_of_date", "early_warning_score"]
+            if "early_warning_level" in merged.columns:
+                ew_history_cols.append("early_warning_level")
+            if "warning_basis" in merged.columns:
+                ew_history_cols.append("warning_basis")
+            ew_history = merged[ew_history_cols].copy()
+            ew_history["early_warning_score"] = pd.to_numeric(ew_history["early_warning_score"], errors="coerce")
+            ew_history = ew_history.dropna(subset=["early_warning_score"])
+
+            if ew_history.empty:
+                st.info("No early-warning score history is available yet. Rerun the ABM v4 pipeline/backfill to populate it.")
+            else:
+                ew_history["date"] = pd.to_datetime(ew_history["as_of_date"], errors="coerce").dt.strftime("%Y-%m-%d")
+                ew_history["date"] = ew_history["date"].fillna(ew_history["as_of_date"].astype(str))
+                fig = go.Figure()
+                fig.add_trace(
+                    go.Scatter(
+                        x=ew_history["date"],
+                        y=ew_history["early_warning_score"],
+                        mode="lines+markers",
+                        name="Early-warning score",
+                        line=dict(color=warning_color, width=2),
+                        marker=dict(size=9, color=warning_color),
+                    )
+                )
+                fig.update_layout(
+                    title="Early-warning score history",
+                    xaxis_title="Date",
+                    yaxis_title="Score",
+                    xaxis=dict(type="category"),
+                    yaxis=dict(range=[0, 100]),
+                    margin=dict(l=10, r=10, t=56, b=10),
+                )
+                fig.add_hline(y=45.0, line_dash="dash", line_color="goldenrod", annotation_text="Yellow")
+                fig.add_hline(y=60.0, line_dash="dash", line_color="orange", annotation_text="Orange")
+                fig.add_hline(y=75.0, line_dash="dash", line_color="red", annotation_text="Red")
+                st.plotly_chart(fig, use_container_width=True)
+                ew_display = ew_history.sort_values("as_of_date", ascending=False)
+                if "warning_basis" in ew_display.columns:
+                    ew_display = ew_display.rename(columns={"warning_basis": "drivers"})
+                    ew_display["drivers"] = ew_display["drivers"].map(_format_warning_basis)
+                display_cols = [
+                    col
+                    for col in ["date", "early_warning_score", "early_warning_level", "drivers"]
+                    if col in ew_display.columns
+                ]
+                st.dataframe(
+                    ew_display[display_cols],
+                    use_container_width=True,
+                    hide_index=True,
+                )
+                if len(ew_history) < len(merged):
+                    st.caption(
+                        "Only ABM v4+ alert rows carry early-warning score; older rows remain blank until historical "
+                        "backfill is rerun with the v4 methodology."
+                    )
+        else:
+            st.info(
+                "The current ABM alert file does not include `early_warning_score`. "
+                "Rerun the upgraded ABM pipeline to create this column."
+            )
+
         latent_cols = [
+            "early_warning_score",
             "mli",
             "liquidity_stress",
             "margin_leverage_level",
@@ -350,6 +588,9 @@ def render() -> None:
         status_cols = [
             "as_of_date",
             "regime_flag",
+            "early_warning_score",
+            "early_warning_level",
+            "warning_basis",
             "distance_to_cascade",
             "panic_ratio",
             "avg_leverage_ratio",
@@ -365,4 +606,3 @@ def render() -> None:
 
 
 show = render
-

@@ -168,9 +168,9 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 ## ABM Market Simulator
 
-- Domain: margin cascade and forced-selling stress.
+- Domain: ABM v4 pre-shock early-warning and margin cascade stress.
 - Horizon: days to weeks.
-- Primary signal: distance to cascade, panic ratio, average leverage, and cascade vulnerability.
-- Interpretation: narrow cascade distance plus elevated panic ratio caps bullish conclusions.
-- Limit: ABM is an early-warning stress diagnostic, not an exact crash-timing model.
-- Authority: the ABM adapter score/regime/bias are authoritative when CSV metrics are available.
+- Primary signal: early-warning score and early-warning level.
+- Interpretation: YELLOW, ORANGE, and RED reduce risk budget before a shock; distance to cascade, panic ratio, average leverage, and cascade vulnerability are supporting diagnostics.
+- Limit: ABM is a pre-shock stress diagnostic, not an exact crash-timing model or standalone buy/sell signal.
+- Authority: ABM v4 early-warning score/level and the adapter score/regime/bias are authoritative when CSV metrics are available.

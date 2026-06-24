@@ -23,6 +23,7 @@ REQUIRED_TABLES = [
 OPTIONAL_TABLES = [
     "abm_latent_state",
     "abm_validation",
+    "abm_scenario_grid",
 ]
 ALL_TABLES = REQUIRED_TABLES + OPTIONAL_TABLES
 
@@ -92,4 +93,3 @@ def main(argv: list[str] | None = None) -> int:
 
 if __name__ == "__main__":
     sys.exit(main())
-

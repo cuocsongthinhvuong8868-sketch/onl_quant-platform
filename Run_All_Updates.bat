@@ -43,7 +43,7 @@ if errorlevel 1 (
 )
 
 echo.
-echo [5/5] Syncing ABM data from LTMM if available ...
+echo [5/5] Syncing ABM data and scenario grid from LTMM if available ...
 python -m command.update_abm_data
 if errorlevel 1 (
   echo [ERROR] command.update_abm_data failed.

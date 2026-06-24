@@ -177,12 +177,12 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "authority": "Adapter score/regime/bias are authoritative; do not relabel from raw PVGO pct.",
     },
     "abm_simulator": {
-        "domain": "margin_cascade_and_forced_selling",
+        "domain": "abm_v4_pre_shock_early_warning_and_margin_cascade",
         "horizon": "days_to_weeks",
-        "primary_metric": "distance_to_cascade_pct_and_panic_ratio_pct",
-        "score_direction": "Lower distance to cascade and higher panic ratio are worse.",
-        "limits": "Early-warning stress diagnostic, not an exact crash-timing model.",
-        "authority": "Adapter score/regime/bias are authoritative when ABM CSV metrics are available.",
+        "primary_metric": "early_warning_score_and_level",
+        "score_direction": "Higher early-warning score is worse; YELLOW/ORANGE/RED reduce risk budget. Distance, panic, leverage, and cascade vulnerability are supporting diagnostics.",
+        "limits": "Pre-shock stress diagnostic, not an exact crash-timing model and not a standalone buy/sell signal.",
+        "authority": "ABM v4 early_warning_score/level and adapter score/regime/bias are authoritative when ABM CSV metrics are available.",
     },
 }
 HUMILITY_DEFAULT_RULES = [
@@ -1016,6 +1016,7 @@ def _build_evidence_packet(
         "coe_pct": [r"\bCOE assumption\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
         "distance_to_cascade_pct": [r"Distance to Cascade[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "panic_ratio_pct": [r"(?:Simulated\s+)?Panic Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
+        "abm_early_warning_score": [r"Early-warning Score[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*(?:/100)?"],
         "abm_avg_leverage_ratio": [r"Avg Leverage Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)x?"],
         "cascade_vulnerability": [r"Cascade Vulnerability[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
         "abm_stress_confidence_pct": [r"Stress Confidence[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
@@ -2939,11 +2940,47 @@ def _build_abm_structured_snapshot() -> tuple[str, str]:
         except Exception:
             return "N/A"
 
+    def raw_num(value: Any, digits: int = 1) -> str:
+        try:
+            if value is None or pd.isna(value):
+                return "N/A"
+            return f"{float(value):.{digits}f}"
+        except Exception:
+            return "N/A"
+
+    def bool_label(value: Any) -> str:
+        if isinstance(value, str):
+            return "Yes" if value.strip().lower() in {"1", "true", "yes", "y"} else "No"
+        try:
+            if value is None or pd.isna(value):
+                return "N/A"
+        except Exception:
+            pass
+        return "Yes" if bool(value) else "No"
+
+    def warning_drivers(value: Any) -> str:
+        if value is None:
+            return "N/A"
+        text = str(value).strip()
+        if not text:
+            return "N/A"
+        parts = [part.strip().replace("_", " ").capitalize() for part in text.split(",") if part.strip()]
+        return "; ".join(parts) if parts else "N/A"
+
+    early_score = latest_alert.get("early_warning_score")
+    early_level = latest_alert.get("early_warning_level", "N/A")
+    warning_basis = latest_alert.get("warning_basis", "N/A")
+    panel_used = latest_alert.get("alert_uses_quant_platform_panel", latest_state.get("qp_panel_available"))
+
     snapshot = f"""
-=== ABM MARKET SIMULATION & MARGIN CASCADE STRESS MONITOR ===
+=== ABM V4 EARLY-WARNING & MARGIN CASCADE STRESS MONITOR ===
 Current snapshot:
 - Date: {as_of_date}
 - Regime Flag: {latest_alert.get('regime_flag', 'N/A')}
+- Early-warning Score: {raw_num(early_score)}/100
+- Early-warning Level: {early_level}
+- Early-warning Drivers: {warning_drivers(warning_basis)}
+- Uses Quant Platform stock panel: {bool_label(panel_used)}
 - Distance to Cascade: {pct(latest_alert.get('distance_to_cascade'))}
 - Simulated Panic Ratio: {pct(latest_stress.get('panic_ratio'))}
 - Exogenous Drawdown: {pct(latest_stress.get('dd_exogenous'))}
@@ -2981,9 +3018,10 @@ Latent margin state:
 - Top Decile Event Lift: {num(latest_validation.get('lift_top_decile'))}
 
 Usage discipline:
-- ABM is an early-warning dashboard for leverage/crowding stress and forced-selling amplification.
-- Treat narrow cascade distance plus elevated panic ratio as a tail-risk cap on bullish conclusions.
-- Do not interpret ABM as exact crash timing.
+- ABM v4 is a pre-shock early-warning dashboard for leverage/crowding stress and forced-selling amplification.
+- Treat Early-warning Score/Level as the primary ABM signal; distance to cascade, panic ratio, leverage, and vulnerability are supporting diagnostics.
+- YELLOW means risk-budget caution, ORANGE means de-risking pressure, RED means severe cascade-risk warning.
+- Do not interpret ABM as exact crash timing or as a standalone directional price forecast.
 """.strip()
     return as_of_date, snapshot
 
@@ -3069,6 +3107,10 @@ def _build_decision_state(
                 hard_constraints.append(f"Global FCI CQS high at {value:.1f}")
             if key == "pvgo_pct" and value >= 50:
                 hard_constraints.append(f"PVGO expectation risk high at {value:.1f}%")
+            if key == "abm_early_warning_score" and value >= 75:
+                hard_constraints.append(f"ABM early-warning RED at {value:.1f}/100")
+            elif key == "abm_early_warning_score" and value >= 60:
+                hard_constraints.append(f"ABM early-warning ORANGE at {value:.1f}/100")
 
     consensus_map = _build_consensus_map(current_packets, tool_scores)
     metric_implied = derive_metric_implied_scores(metric_values, bias_counts, tool_scores=tool_scores)
