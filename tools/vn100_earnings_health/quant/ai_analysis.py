@@ -25,6 +25,17 @@ def load_project_env() -> None:
 
 load_project_env()
 
+AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
+VN100_AI_CACHE_VERSION = "structured_yoy_v1"
+
+
+def encode_vn100_ai_cache(content: str) -> str:
+    marker = f"<!-- {AI_CIO_CACHE_VERSION_HEADER}: {VN100_AI_CACHE_VERSION} -->\n"
+    text = str(content or "")
+    if text.startswith(marker):
+        return text
+    return marker + text
+
 
 def fmt_score(value: Any, digits: int = 1) -> str:
     if pd.isna(value):
@@ -567,5 +578,5 @@ def run_ai_analysis(
     )
     result = response.choices[0].message.content or ""
     target_cache.parent.mkdir(parents=True, exist_ok=True)
-    target_cache.write_text(result, encoding="utf-8")
+    target_cache.write_text(encode_vn100_ai_cache(result), encoding="utf-8")
     return result, target_cache

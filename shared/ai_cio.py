@@ -28,6 +28,7 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "feargreed": "pca_point_in_time_v1",
     "global_financial_conditions": "pca_point_in_time_v1",
     "vnibor": "structured_20d_trend_v1",
+    "vn100_earnings_health": "structured_yoy_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_v1",
     "executive_summary": "ai_cio_methodology_v2",
@@ -2973,15 +2974,16 @@ def _get_vnibor_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
     return snapshot_date, context
 
 
-def _get_latest_vn100_ai_report(provider_key: str = "kimi-2.6") -> tuple[str, str]:
-    """Return latest cached VN100 AI interpretation for this provider, with fallback to any provider."""
+def _get_latest_vn100_ai_report(provider_key: str = "kimi-2.6", mode_key: str = "yoy") -> tuple[str, str]:
+    """Return latest current-methodology VN100 AI interpretation for this provider/mode."""
     import datetime as datetime_mod
 
     cache_dir = DATA_LAKE / "daily_cache"
     cache_dir.mkdir(parents=True, exist_ok=True)
-    files = list(cache_dir.glob(f"vn100_earnings_health_{provider_key}_*.txt"))
+    mode_key = str(mode_key or "yoy").lower()
+    files = list(cache_dir.glob(f"vn100_earnings_health_{provider_key}_{mode_key}_*.txt"))
     if not files:
-        files = list(cache_dir.glob("vn100_earnings_health_*.txt"))
+        files = list(cache_dir.glob(f"vn100_earnings_health_*_{mode_key}_*.txt"))
     if not files:
         return "N/A", ""
 
@@ -2991,18 +2993,22 @@ def _get_latest_vn100_ai_report(provider_key: str = "kimi-2.6") -> tuple[str, st
             return (file_date, p.stat().st_mtime)
         return (date(1970, 1, 1), p.stat().st_mtime)
 
-    latest_file = sorted(files, key=file_sort_key, reverse=True)[0]
-    parsed_date = _parse_date_from_filename(latest_file.stem)
-    if parsed_date:
-        date_str = parsed_date.strftime("%d/%m/%Y")
-    else:
-        mtime = datetime_mod.datetime.fromtimestamp(latest_file.stat().st_mtime)
-        date_str = mtime.strftime("%d/%m/%Y")
+    for latest_file in sorted(files, key=file_sort_key, reverse=True):
+        parsed_date = _parse_date_from_filename(latest_file.stem)
+        if parsed_date:
+            date_str = parsed_date.strftime("%d/%m/%Y")
+        else:
+            mtime = datetime_mod.datetime.fromtimestamp(latest_file.stat().st_mtime)
+            date_str = mtime.strftime("%d/%m/%Y")
 
-    try:
-        return date_str, latest_file.read_text(encoding="utf-8").strip()
-    except Exception as e:
-        return "N/A", f"Lỗi đọc file VN100 AI cache: {e}"
+        try:
+            content = _read_cache_file(latest_file, "vn100_earnings_health")
+            if content is not None:
+                return date_str, content.strip()
+        except Exception as e:
+            return "N/A", f"Lỗi đọc file VN100 AI cache: {e}"
+
+    return "N/A", ""
 
 
 def _build_vn100_structured_snapshot() -> tuple[str, str]:
