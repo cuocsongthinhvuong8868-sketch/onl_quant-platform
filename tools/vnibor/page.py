@@ -27,8 +27,19 @@ except ImportError:
     }
 
 VNIBOR_FILE = "LaiSuatLienNganHang_Wichart.csv"
+AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
+VNIBOR_AI_CACHE_VERSION = "structured_20d_trend_v1"
 REGIME_ICON = {"TIGHT": "🔴", "ELEVATED": "🟠", "NORMAL": "🔵", "EASY": "🟢", "N/A": "⚪"}
 SIGNAL_ICON = {"STRESS": "💥", "WARNING": "⚠️", "ACCOMMODATIVE": "🟢", "NEUTRAL": "⚪"}
+
+
+def _encode_vnibor_ai_cache(content: str) -> str:
+    marker = f"<!-- {AI_CIO_CACHE_VERSION_HEADER}: {VNIBOR_AI_CACHE_VERSION} -->\n"
+    text = str(content or "")
+    if text.startswith(marker):
+        return text
+    return marker + text
+
 
 def render():
     st.title("Vietnam Interbank Market Rate (VNIBOR) Monitor")
@@ -240,7 +251,7 @@ def render():
 
                                 ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                                 with open(ai_cache_file, "w", encoding="utf-8") as f:
-                                    f.write(result_text)
+                                    f.write(_encode_vnibor_ai_cache(result_text))
 
                                 st.success("Hoàn thành phân tích!")
                                 with st.container(border=True):

@@ -27,6 +27,7 @@ AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
 AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "feargreed": "pca_point_in_time_v1",
     "global_financial_conditions": "pca_point_in_time_v1",
+    "vnibor": "structured_20d_trend_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_v1",
     "executive_summary": "ai_cio_methodology_v2",
@@ -1639,7 +1640,7 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
         "feargreed", "manipulation", "dispersion", "upside_ratio",
         "bank_valuation_ai", "sentiment_factor_news", "market_breadth", "esr_monitor",
         "va_res", "var_cvar_vnindex",
-        "fed_liquidity", "global_financial_conditions",
+        "fed_liquidity", "global_financial_conditions", "vnibor",
         "executive_summary", "telegram_summary", "historical_trend"
     ]
     for tool in tool_names:
@@ -2852,21 +2853,122 @@ Current snapshot:
     return label, snapshot
 
 
+def _build_vnibor_child_prompt(summary: dict, trend: dict) -> str:
+    prompt_path = ROOT_DIR / "promt" / "vnibor_promt.md"
+    prompt_template = prompt_path.read_text(encoding="utf-8")
+    return (
+        prompt_template
+        .replace("[Nhập ngày]", summary.get("date", "N/A"))
+        .replace("[Overnight_ON]", f"{summary.get('overnight', 0.0):.2f}")
+        .replace("[1_Week]", f"{summary.get('w1', 0.0):.2f}")
+        .replace("[2_Weeks]", f"{summary.get('w2', 0.0):.2f}")
+        .replace("[ON_Impulse]", f"{summary.get('impulse', 0.0):+.2f}")
+        .replace("[ON_ZScore]", f"{summary.get('z_score', 0.0):+.2f}")
+        .replace("[ON_Percentile]", f"{summary.get('percentile', 0.0):.3f}")
+        .replace("[Spread_1W_ON]", f"{summary.get('spread_1w', 0.0):+.2f}")
+        .replace("[Spread_2W_ON]", f"{summary.get('spread_2w', 0.0):+.2f}")
+        .replace("[Regime]", summary.get("regime", "N/A"))
+        .replace("[Signal]", summary.get("signal", "N/A"))
+        .replace("[Trend_20D_Label]", trend.get("trend_label", "N/A"))
+        .replace("[ON_20D_Change]", trend.get("on_20d_change", "N/A"))
+        .replace("[ON_MA5_20D_Change]", trend.get("on_ma5_20d_change", "N/A"))
+        .replace("[ON_MA5_20D_Slope]", trend.get("on_ma5_slope", "N/A"))
+        .replace("[ON_20D_Avg]", trend.get("on_20d_avg", "N/A"))
+        .replace("[ON_20D_Min]", trend.get("on_20d_min", "N/A"))
+        .replace("[ON_20D_Max]", trend.get("on_20d_max", "N/A"))
+        .replace("[ON_20D_Up_Days]", trend.get("up_days", "N/A"))
+        .replace("[ON_20D_Down_Days]", trend.get("down_days", "N/A"))
+        .replace("[Inversion_20D_Count]", trend.get("inversion_days", "N/A"))
+        .replace("[Stress_Warning_20D_Count]", trend.get("stress_warning_days", "N/A"))
+        .replace("[Regime_20D_Counts]", trend.get("regime_counts", "N/A"))
+        .replace("[Signal_20D_Counts]", trend.get("signal_counts", "N/A"))
+        .replace("[Trend_20D_Table]", trend.get("trend_table", "N/A"))
+    )
+
+
+def run_vnibor_child_report(
+    client,
+    provider_key: str = "kimi-2.6",
+    model: str = None,
+    force: bool = False,
+) -> str:
+    """
+    Generate the VNIBOR child AI report from the latest VNIBOR data.
+
+    Auto AI CIO consumes child-tool txt reports. Without this step, it can read
+    the last manually generated VNIBOR cache even when the CSV data is current.
+    """
+    cached = None if force else _read_cache("vnibor", provider_key)
+    if cached:
+        return cached
+
+    try:
+        from tools.vnibor.quant.metrics import (
+            load_vnibor_data,
+            process_vnibor_logic,
+            summarize_latest,
+            summarize_20d_trend,
+        )
+
+        df_processed = process_vnibor_logic(load_vnibor_data())
+        summary = summarize_latest(df_processed)
+        trend = summarize_20d_trend(df_processed, lookback=20)
+        full_prompt = _build_vnibor_child_prompt(summary, trend)
+    except Exception as e:
+        result = f"DATA INSUFFICIENT: Không generate được VNIBOR child report ({e})"
+        _write_cache("vnibor", result, provider_key)
+        return result
+
+    parts = full_prompt.split("# INPUT DATA")
+    system_prompt = parts[0].strip()
+    user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
+    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
+    result = call_ai(
+        client,
+        system_prompt,
+        user_prompt,
+        model=model or cfg["api_model"],
+        temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    _write_cache("vnibor", result, provider_key)
+    return result
+
+
 def _get_vnibor_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
     """Combine structured VNIBOR trend with optional cached VNIBOR AI report."""
     snapshot_date, snapshot = _build_vnibor_structured_trend()
     ai_date, ai_report = _get_latest_report_for_macro("vnibor", provider_key)
-    if ai_report and not ai_report.startswith("*Chưa có"):
+    snapshot_dt = _parse_report_date_label(snapshot_date)
+    ai_dt = _parse_report_date_label(ai_date)
+    is_stale = snapshot_dt is not None and ai_dt is not None and ai_dt < snapshot_dt
+    has_current_ai_report = (
+        ai_report
+        and not ai_report.startswith("*Chưa có")
+        and not ai_report.startswith("*No current-methodology")
+        and not is_stale
+    )
+    if has_current_ai_report:
         context = (
             f"{snapshot}\n\n"
             f"=== VNIBOR AI INTERPRETATION CACHE (Ngày báo cáo: {ai_date}) ===\n"
             f"{ai_report}"
         )
     else:
+        cache_note = "*Chưa có cache AI riêng của VNIBOR; AI CIO phải tự diễn giải từ structured snapshot + 20D trend phía trên.*"
+        if is_stale:
+            cache_note = (
+                f"*Bỏ qua cache AI VNIBOR ngày {ai_date} vì cũ hơn snapshot dữ liệu {snapshot_date}; "
+                "AI CIO phải tự diễn giải từ structured snapshot + 20D trend phía trên.*"
+            )
+        elif ai_report and ai_report.startswith("*No current-methodology"):
+            cache_note = (
+                f"{ai_report}\n"
+                "*AI CIO phải tự diễn giải từ structured snapshot + 20D trend phía trên.*"
+            )
         context = (
             f"{snapshot}\n\n"
             "=== VNIBOR AI INTERPRETATION CACHE ===\n"
-            "*Chưa có cache AI riêng của VNIBOR; AI CIO phải tự diễn giải từ structured snapshot + 20D trend phía trên.*"
+            f"{cache_note}"
         )
     return snapshot_date, context
 
@@ -3408,6 +3510,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)
+    run_vnibor_child_report(client, provider_key, model, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
