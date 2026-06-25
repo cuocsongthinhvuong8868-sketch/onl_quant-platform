@@ -1,0 +1,29 @@
+## 1. Observations
+- OLS Slope hiện tại 0.23, xếp thứ 13.0th percentile — cực thấp, cho thấy mức độ nhạy cảm của VN30F1M trước biến động rổ VIN rất yếu.
+- Correlation 0.61 ở percentile 53.1th — trung bình, mối quan hệ tuyến tính không đặc biệt chặt chẽ.
+- Event Study: ΔCorr = 0.13, ΔSlope = -0.58 → rơi vào STATUS QUO, không có dịch chuyển trạng thái đáng kể.
+
+## 2. Microstructure Read
+Slope cực thấp trong khi Correlation chỉ ở mức trung bình cho thấy nhóm VIC/VHM/VRE gần như **mất khả năng dẫn dắt** VN30F1M. Dù vẫn giữ tương quan (chỉ số vẫn có thể đi cùng hướng), nhưng mỗi biến động của rổ VIN chỉ tác động rất nhỏ đến hợp đồng tương lai. Đây là dấu hiệu thị trường đang rời xa trụ Vingroup, dòng tiền có thể xoay sang nhóm khác (Bank, Chứng). Không có tín hiệu can thiệp bất thường vì cả hai percentile không đồng thời >80th.
+
+## 3. Event Study Interpretation
+Trạng thái STATUS QUO phản ánh giai đoạn yên ắng, không có cú sốc phá vỡ cấu trúc dẫn dắt. Với ΔSlope âm sâu nhưng ΔCorr dương nhỏ, thị trường đang trong quá trình suy yếu dần của VIN (chứ không phải đảo chiều đột ngột). Intraday/qua đêm, xác suất side-way hoặc giao dịch loanh quanh cao, thiếu edge rõ ràng từ composite VIN. Tuyệt đối không đánh theo quán tính event.
+
+## 4. Verdict
+- **Trade plan: NO TRADE.**  
+  Không đủ tín hiệu để Long/Short F1; spread VIN-vs-Bank cũng không có xác nhận. STATUS QUO + slope thấp = đứng ngoài quan sát là tối ưu.
+- **Leading indicator cần theo dõi:** Nhóm Ngân hàng (CTG, VCB, BID) và Chứng khoán (SSI, VND) – nếu các mã này tăng mạnh kèm khối lượng đột biến, xác nhận dòng tiền xoay trục, sẽ mở cơ hội Long F1 khi không còn neo vào VIN.
+- **Stop-loss tham khảo (nếu sau này có tín hiệu):** Với VIC tại 225.00, một mức dừng lỗ kỹ thuật có thể là dưới 220.50 (≈ -2%) dựa trên biên độ giao dịch gần đây. Tuy nhiên, hiện tại không có vị thế nên chỉ để tham chiếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "25/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 13.0,
+  "corr_percentile": 53.1,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

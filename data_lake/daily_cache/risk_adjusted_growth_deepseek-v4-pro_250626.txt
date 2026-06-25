@@ -1,0 +1,30 @@
+## 1. Scenario Assessment
+Kịch bản trung lập (K=1.0, CoE=14%) không hề khắc nghiệt – đây là baseline đo lường chi phí vốn chủ sở hữu ngành ngân hàng Việt Nam. Vậy mà mặt bằng Alpha gần như toàn âm: chỉ SHB tạo ra giá trị thặng dư (Alpha +1.3%), còn ACB, SSB âm nhẹ, LPB, EIB, VPB âm sâu. Dưới góc nhìn stock-picking, ngành đang ở trạng thái “đốt vốn” – phần lớn các ngân hàng không tạo ra disciplined return vượt 14% sau khi trừ hình phạt rủi ro.
+
+## 2. Top Alpha Decomposition
+- **SHB (Fortress)**: Alpha dương duy nhất đến từ bộ ba hoàn hảo – *định giá rẻ* (P/B 0.93), *ROE bền vững* (17.5%) và *biến động cực thấp* (σROE 1.9%). Hình phạt rủi ro gần như không đáng kể, cộng với payout thấp (8.6%) giúp phần lớn lợi nhuận được tái đầu tư. Đây là mẫu “pháo đài” điển hình.
+- **ACB (Premium Burn)**: ROE rất cao 23% nhưng P/B 1.22 không rẻ, cộng σROE 2.7% khiến risk penalty lấy đi đáng kể lợi thế. Kết quả: Disciplined Return thấp hơn CoE 0.9% – chất lượng tốt nhưng giá đã phản ánh phần nhiều, chưa tạo thặng dư.
+- **SSB (Lưng chừng)**: ROE 15.6% vừa đủ, P/B 1.07 trung tính, σ 2.2% không quá cao. Nhưng sau penalty, return chỉ còn ~12.4%, âm 1.6%. Không rơi vào bẫy, cũng không phải cỗ máy sinh lời.
+
+## 3. Value Traps Warning
+- **LPB (Premium Burn rõ rệt)**: P/B 3.54 cực đắt. Dù ROE 21.1% khá cao, nhưng risk penalty 3.8% và payout 21% khiến Disciplined Return chỉ vỏn vẹn 0.9% – Alpha -13%. Định giá ảo tưởng phá hủy toàn bộ giá trị nội tại.
+- **EIB (Bẫy ROE thấp)**: ROE 10% èo uột, σROE lại cao (3.8%), P/B 1.47 chẳng hề rẻ. Alpha -11.3% – chất lượng kém, định giá không biện hộ được.
+- **VPB (Rủi ro ngầm)**: ROE 14.1% chưa đủ bù đắp σ cao 4.7% và P/B 1.26. Alpha -10.3% cho thấy rủi ro đang ăn trọn phần bù kỳ vọng.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress)**: **SHB** – phân bổ 60–70% danh mục ngân hàng. Đây là mã duy nhất tạo Alpha dương trong baseline.
+- **Tactical**: Tạm thời không có vị thế mua mới đủ thuyết phục. ACB có thể được giữ nếu đã sở hữu nhưng không phải điểm mua; SSB chưa cho thấy lợi thế rõ rệt.
+- **Cấm mua / underweight**: LPB, EIB, VPB.
+- Quan điểm ngành: **bearish** – chỉ một mã có Alpha dương nhẹ; phần còn lại đều đốt vốn ở mức giá hiện tại. Cân nhắc giảm tỷ trọng bank sector cho đến khi mặt bằng định giá hạ nhiệt hoặc ROE cải thiện.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

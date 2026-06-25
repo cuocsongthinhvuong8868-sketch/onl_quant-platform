@@ -1,0 +1,29 @@
+## 1. Observations
+- **Stress Index (VN30):** 0.00% – không có mã nào thủng VaR 95% (ngưỡng cảnh báo 40%).
+- **Số mã breach:** 0 / 30 cổ phiếu trong rổ.
+- **Complacency Index (toàn thị trường):** 5.56% – xa ngưỡng nguy hiểm 80%.
+- **Số mã mispriced:** 6 mã có chênh lệch giá mua – bán bị nén bất thường; dẫn đầu: TCB, OCB, VHM.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index đang ở mức đáy tuyệt đối – không ghi nhận bất kỳ cú thủng VaR nào, đồng nghĩa **không có dấu hiệu lây lan real‑time** giữa các cổ phiếu lớn. Không có “top 3 crash” để đánh giá, do đó nguy cơ đuôi hệ thống từ cổ phiếu đơn lẻ lan ra toàn rổ gần như bằng không trong phiên hôm nay. Dữ liệu chỉ đơn thuần phản ánh một thị trường không có biến động cực đoan vào thời điểm quan sát, nhưng không loại trừ khả năng stress bùng phát từ các yếu tố bên ngoài.
+
+## 3. Complacency Assessment (Module C) – Đúng bản chất
+Complacency 5.56% rất thấp, cho thấy **thị trường KHÔNG ở chế độ “ngủ quên” (complacency regime)**. Điều này tuyệt đối không đồng nghĩa với việc thị trường đang ổn định hay vận hành lành mạnh. Mức thấp này có thể xuất hiện cả trong hoảng loạn lẫn uptrend mạnh – miễn là chênh lệch giá mua‑bán không bị nén quá mức. Kết hợp với Stress Index bằng 0, bức tranh hiện tại cho thấy: **không có áp lực bán tháo lan truyền cũng như không có hiện tượng định giá sai rủi ro trên diện rộng**, nhưng vẫn tồn tại rủi ro cục bộ (6 mã mispriced). Vì vậy, không được phép chủ quan, thị trường vẫn có thể chuyển pha nhanh nếu có cú sốc mới.
+
+## 4. Stock‑Level Risk Calls
+- **Module B (crash):** Không có mã nào thủng VaR → không phát sinh lệnh bán/bảo vệ khẩn cấp từ danh sách này.
+- **Module C (mispriced):** TCB, OCB, VHM có spread bị nén chặt nhất, phản ánh sự tự mãn (micro‑complacency) ở cấp độ cổ phiếu riêng lẻ. Khi thị trường chung bất ngờ biến động, các mã này có thể chịu giãn spread đột ngột, gây sụt giảm thanh khoản và trượt giá mạnh. **Cảnh báo:** cân nhắc giảm tỷ trọng hoặc đặt trailing stop dựa trên các mốc kỹ thuật (ví dụ: cắt nếu giá đóng cửa dưới MA20 trên đồ thị ngày) thay vì neo vào mức giá tuyệt đối.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["TCB", "OCB", "VHM"],
+  "confidence": "medium"
+}
+```

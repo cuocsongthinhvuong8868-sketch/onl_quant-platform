@@ -1,0 +1,32 @@
+## 1. Observations
+- **MA20 (27.5%):** Thấp – dưới 30%, thị trường rơi vào vùng suy yếu ngắn hạn, chưa chạm ngưỡng quá bán (<20%).
+- **MA60 (26.1%):** Thấp – trung hạn chưa có dấu hiệu cải thiện, định hướng điều chỉnh vẫn tiếp diễn.
+- **MA125 (24.7%):** Thấp – sức mạnh chu kỳ 6 tháng suy giảm rõ rệt, phần lớn cổ phiếu mất động lực trung-dài.
+- **MA252 (26.8%):** Thấp – xu hướng dài hạn đang trong trạng thái Bear; chỉ ~1/4 rổ duy trì được trên MA 1 năm.
+
+## 2. Structural Health
+Cả bốn đường MA hội tụ ở mức thấp (24–28%), không xảy ra phân kỳ. Mức độ lan tỏa đồng loạt dưới 30% mã > MA20 và dưới 40% mã > MA252 khớp chính xác với mẫu hình **Bear Confirmed** (suy yếu có tính cấu trúc, không phải rũ bỏ tạm thời). Không có bẫy tăng hay phân kỳ – đây là sự xác nhận downtrend kéo dài.
+
+## 3. Money Flow Leadership
+- **Dẫn dắt ngắn hạn (Volume * MA20):** Ghi nhận các mã AAA, ABB, AGR, APG, ASP, ASM… Tổ hợp trải rộng qua nhiều ngành: Chứng khoán (AGR, APG), Ngân hàng (ABB), Nhựa (AAA, APF), Dầu khí (ASP), Thủy sản/BĐS (ASM). Không có nhóm ngành đơn lẻ áp đảo.
+- **Dẫn dắt dài hạn (Volume * MA252):** Gồm BID, BSR, BMP, BFC, … nghiêng về Ngân hàng (BID), Năng lượng/Hóa chất (BSR, BFC, ASP), và Chứng khoán (BMS). Sự chồng lấn với danh sách ngắn hạn ở ABB, APF, ASP, BCA cho thấy dòng tiền thông minh vẫn luân chuyển trong nhóm trụ nhưng không bùng nổ.
+- **Thiên hướng:** Hỗn hợp – vừa có chất phòng thủ (BID, ABB), vừa có yếu tố chu kỳ (BSR, BMP). Chưa đủ tín hiệu phân bổ dứt khoát vào một phía.
+
+## 4. Verdict
+Trong chế độ **Bear Confirmed**, chiến lược phù hợp là **Defensive cash-up** – ưu tiên bảo toàn vốn, hạn chế mở mới vị thế mua. Không áp dụng trend-following hay mean-reversion T+ khi độ rộng dài hạn suy yếu nghiêm trọng. Đòn bẩy khuyến nghị: **0%** (không margin), bởi MA252 chỉ 26.8% và không hội đủ điều kiện an toàn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 27.5,
+  "ma60_pct": 26.1,
+  "ma125_pct": 24.7,
+  "ma252_pct": 26.8,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

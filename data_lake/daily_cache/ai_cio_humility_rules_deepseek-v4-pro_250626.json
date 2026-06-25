@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-25",
+  "composite_score": 29,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 9,
+      "unit": "sessions",
+      "description": "Chuỗi căng thẳng thanh khoản VNIBOR giảm mạnh xuống dưới 5 phiên trong 20 phiên"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 27.5,
+      "unit": "%",
+      "description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận thị trường thoát bear confirmed"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.3,
+      "unit": "%",
+      "description": "Chỉ số stress hệ thống hạ nhiệt xuống dưới vùng cảnh báo 55%"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.374,
+      "unit": "",
+      "description": "Đuôi béo không còn xuất hiện ở bất kỳ ngưỡng POT nào, xi_max dưới 0.25"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Rủi ro tập trung nhóm Vingroup duy trì ở mức thấp (không còn là mối đe dọa)"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.8,
+      "unit": "th pct",
+      "description": "Điều kiện tài chính toàn cầu hạ nhiệt rõ rệt, CQS rời vùng khủng hoảng (dưới phân vị 80)"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-25",
+  "source": "ai_cio_executive_summary"
+}

@@ -1,0 +1,29 @@
+## 1. Observations
+- **Spread_Z = -0.71σ**: Mức phân tán (dispersion) hiện tại thấp hơn bình quân 60 phiên, không cho thấy dấu hiệu căng thẳng về cấu trúc.
+- **DPI = 40.0%**: Chỉ số ổn định của dispersion regime ở mức thấp, xác nhận rằng trạng thái phân tán hiện tại không kéo dài bất thường.
+- **Avg Corr = 0.006**: Tương quan cặp trung bình gần như bằng 0, thị trường phân hóa cực mạnh – môi trường lý tưởng cho chọn lọc cổ phiếu (stock-picking).
+- **Skew/Kurt**: Không có dữ liệu, không thể đánh giá trực diện rủi ro đuôi (tail risk).
+
+## 2. Structural State
+- Tổ hợp **DPI thấp + Spread_Z âm** chỉ ra thị trường đang ở trạng thái bình thường, không bị stress. Không có hiện tượng căng cục bộ (Spread_Z thấp) cũng như không tồn tại regime kéo dài (DPI thấp). Do đó, đây **không phải** stress cục bộ hay regime persistent – cấu trúc ổn định.
+
+## 3. Cross-Check & Tail Direction
+- Thiếu dữ liệu về CS Skewness và Kurtosis nên không thể xác định chính xác đuôi nào đang “gãy” hay mức độ fat-tail. Tuy nhiên, với tương quan gần 0 và dispersion dưới trung bình, khả năng cao thị trường không có outliers cực đoan chi phối. Mô hình phân phối chuẩn có thể vẫn tạm chấp nhận được, nhưng cần bổ sung dữ liệu skew/kurt để kết luận chắc chắn.
+
+## 4. Regime Mapping
+- Đối chiếu bản đồ 2D (DPI × Corr): **DPI thấp (40%) + Corr thấp (0.006)** → **Healthy Stock-Picking**. Đây là vùng phân hóa lành mạnh, nơi các yếu tố riêng lẻ của cổ phiếu chi phối thay vì biến động đồng loạt.
+- **Rủi ro lớn nhất cho PM**: Trong môi trường này, rủi ro không đến từ bầy đàn hay đổ vỡ thanh khoản toàn thị trường, mà chủ yếu là **rủi ro đặc thù (idiosyncratic risk)** nếu danh mục quá tập trung vào một vài cổ phiếu hoặc nhóm ngành. Tương quan thấp giúp đa dạng hóa mạnh, nhưng cũng đòi hỏi kỹ năng chọn lọc cao hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "25/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.71,
+  "dpi_pct": 40.0,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

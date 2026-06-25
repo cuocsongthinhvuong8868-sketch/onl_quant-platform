@@ -1,0 +1,38 @@
+## 1. Observations
+- SSI ở mức 65.3% — thuộc vùng **WARNING** (tích lũy rủi ro ngầm)
+- Market State: **EUPHORIC RISK** (uptrend + stress cao)
+- Top Pillar dẫn dắt: #1 S_LIQ (36%), #2 S_VAL (32%), #3 S_COR (17%)
+- VN30 đóng cửa trên MA125, phù hợp với xu hướng tăng trong trạng thái EUPHORIC
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ là driver chính (36%) — chỉ báo **Volume Dry-Up** đang rất cao.  
+Điều này phản ánh thanh khoản (tổng dollar volume) sụt giảm mạnh so với trung bình 1 năm (MA20/MA252 thấp → −log cao). Trong uptrend, volume khô cạn cảnh báo dòng tiền yếu dần, lực đẩy giá suy giảm, đặc biệt nguy hiểm khi phần lớn SSI tính từ phiên giảm (downside mode).
+
+S_VAL (32%) cho thấy sức căng định giá — VN30 đã tăng đáng kể trong 252 ngày, vượt xa lãi suất tiền gửi, khiến valuation trở nên mong manh.
+
+S_COR (17%) kết hợp với EVR PC1 38.2% cho thấy tương quan hệ thống duy trì ở mức đáng chú ý. Khi S_COR + S_LIQ cùng cao, hiện tượng “herding + volume dry‑up” hình thành, đây là chữ ký kinh điển của **bull‑trap**: nhà đầu tư co cụm vào một nhóm cổ phiếu hẹp trong lúc thanh khoản chung teo tóp.
+
+## 3. Cross-Check
+- VN30 giao dịch ở vùng giá cao (trên MA125) trong khi SSI leo lên WARNING (65.3%) → **phân kỳ giá – stress** rõ rệt. Rủi ro bull‑trap đang hiện hữu.
+- HMM regime EUPHORIC RISK khớp hoàn toàn với SSI, không có mâu thuẫn. Toàn bộ hệ thống xác nhận thị trường tăng trong trạng thái rủi ro cao.
+
+## 4. Verdict
+- **Cash weight đề xuất: 40%** danh mục.  
+  Mức tiền mặt này nhằm giảm thiệt hại nếu bull‑trap kích hoạt bán tháo, đồng thời để sẵn sàng tái phân bổ khi stress hạ nhiệt.
+- **Hedge action: reduce_beta** — ưu tiên giảm tỷ trọng cổ phiếu có beta cao, thu hẹp rủi ro hệ thống.  
+  Chưa dùng short futures hay mua put vì SSI chưa vào CRITICAL, nhưng sẵn sàng nâng mức phòng hộ nếu S_LIQ tiếp tục tăng và SSI vượt 0.80.
+- Pillar drivers không mâu thuẫn; ngược lại, chúng cùng chỉ về một kịch bản stress ngầm. Do đó có tín hiệu hành động rõ ràng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.3,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

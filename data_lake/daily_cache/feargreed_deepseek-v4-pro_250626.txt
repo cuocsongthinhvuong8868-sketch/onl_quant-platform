@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score: 52.0/100 — nằm giữa vùng NEUTRAL (40–60), không phát tín hiệu cực đoan.
+- EGARCH Vol chuẩn hóa: 18.3%, giảm mạnh 10.7% so với phiên trước — biến động đang thu hẹp nhanh.
+- Rolling Skewness: –0.03 — gần như cân bằng, không thể hiện đuôi trái dày hay đuôi phải lệch.
+- Downside Correlation (norm): 2.4% — rất thấp; Upside Correlation (norm): 32.5% — ở mức trung bình, cho thấy liên kết tăng giá mạnh hơn liên kết giảm giá.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha NEUTRAL / STOCK-PICKING kinh điển: rủi ro hệ thống thấp (vol giảm, tương quan giảm không đáng kể), phân hóa cổ phiếu rõ nét. Không có bằng chứng của sợ hãi lan tỏa hay tham lam cực đoan. Xu hướng vol giảm nhanh có thể phản ánh sự tự mãn, nhưng chưa đạt ngưỡng cảnh báo (vol vẫn trên 15%).
+
+## 3. Cross-Check
+- Score (52.0) và EGARCH Vol (giảm) nhất quán: cả hai cùng chỉ về vùng rủi ro thấp dần.
+- Skewness gần zero nhưng Upside Correlation cao hơn hẳn Downside Correlation — một divergence nhẹ: skew không xác nhận cấu trúc tương quan lạc quan. Tuy nhiên, mức chênh lệch không đủ lớn để tạo flag rủi ro đáng kể.
+
+## 4. Verdict
+Beta đề xuất cho danh mục VN-Index: 1.0 (trung lập). Không có tín hiệu đủ mạnh để nâng/hạ beta phòng thủ hay tấn công. Hành động cụ thể: duy trì vị thế theo chỉ số, tập trung vào chọn cổ phiếu (stock picking) để tạo alpha. Việc vol giảm cho phép gia tăng kích thước vị thế nếu có lợi thế chọn lọc, nhưng không khuyến nghị đòn bẩy dàn trải.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "25/06/2026",
+  "regime": "NEUTRAL",
+  "score": 52.0,
+  "confidence": "high",
+  "beta_target": 1.0,
+  "key_signals": [
+    "Risk Score 52.0 trong vùng NEUTRAL (40-60), không có dấu hiệu cực đoan",
+    "EGARCH Vol giảm mạnh -10.7% xuống 18.3%, phản ánh rủi ro hệ thống suy yếu"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 52.0
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
