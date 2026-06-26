@@ -1,0 +1,47 @@
+## 1. Trạng thái sentiment regime hiện tại
+
+- **1 ngày:** `risk_on` (macro composite +0.17) – ở mức thấp hơn hẳn các khung dài.
+- **7 ngày:** `strong_risk_on` (+0.60) – đỉnh tâm lý tích cực.
+- **30 ngày:** `strong_risk_on` (+0.42) – vẫn duy trì tích cực mạnh.
+
+→ **Hướng thay đổi:** Khung ngắn đang hạ nhiệt từ `strong_risk_on` xuống `risk_on`, báo hiệu động lượng tích cực có thể chững lại; các xung lực tiêu cực từ thanh khoản và hàng hóa đang gia tăng trong phiên gần nhất.
+
+## 2. Các kênh kéo risk-on / risk-off mạnh nhất
+
+- **Kéo risk-on mạnh:**
+  - `monetary_policy` (+2.00 ở cả 7d & 30d) – tín hiệu thắt chặt được đọc là ổn định hệ thống.
+  - `credit_stress` (+2.00 ở 1d, +1.50 ở 7d) – căng thẳng tín dụng rất thấp.
+  - `earnings` (+1.16 ở 1d, +0.97 ở 7d) – kỳ vọng lợi nhuận tích cực.
+- **Kéo risk-off mạnh:**
+  - `commodity` (-0.46 1d, -1.07 7d, -0.22 30d) – giá hàng hóa lao dốc đa dạng.
+  - `liquidity` (-0.50 1d, -0.18 7d, -0.11 30d) – hút ròng qua OMO và thanh khoản hệ thống bị siết.
+
+## 3. Tổng hợp các driver chính (từ input)
+
+**Tích cực:**
+1. **Tỷ giá trung tâm tăng liên tục** (25,183→25,197) – được sentiment hiểu là hỗ trợ xuất khẩu, các mức tăng đạt điểm +1.45 đến +1.56.
+2. **Lãi suất huy động nhóm NHTM khác tăng 1 bps** (kênh `monetary_policy`, +1.556) – củng cố niềm tin vào lành mạnh ngân hàng.
+3. **ECB tăng lãi suất tiền gửi 25 bps lên 2.65%** (tháng 06/2026) – tín hiệu chính sách ngoại biên rõ ràng, được sentiment ghi nhận +1.53.
+4. **Lợi suất TPCP đi ngang** (credit_stress +0.463) – không có biến động tiêu cực về nợ công.
+5. **Kế hoạch khu công nghiệp Diễn Quỳnh 1 (Nghệ An) và AEON Đà Nẵng sắp khai trương** (growth) – các câu chuyện tăng trưởng nội địa.
+
+**Tiêu cực:**
+1. **Giá bạc Mỹ đáy 6 tháng** (56.74 USD/oz, -2% ngày, score -0.646).
+2. **Giá vàng thế giới đáy 6 tháng** (128.8 triệu đồng/lượng, score -0.565) – hai tài sản trú ẩn cùng suy yếu phát tín hiệu rủi ro cầu toàn cầu.
+3. **Giá cao su tự nhiên Trung Quốc đáy tháng** (-0.377) – hàng hóa đầu vào công nghiệp giảm sâu.
+4. **NHNN hút ròng 2,552.5 tỷ đồng qua OMO** (liquidity, -0.214) – thắt chặt tiền đồng chủ động.
+5. **Giá dầu WTI thủng đáy tháng** (73.32 USD/thùng, -0.9%) – xuất hiện trong 7d/30d với điểm -1.29, xác nhận xu hướng giá năng lượng yếu.
+
+## 4. Kết luận tác động cho AI CIO
+
+- **Hỗ trợ:** Sentiment xác nhận hệ thống tài chính – ngân hàng vững (credit_stress thấp, monetary_policy ổn định). Nền tảng trong nước vẫn nghiêng về rủi ro chấp nhận, nhất là qua các câu chuyện tăng trưởng và tỷ giá hỗ trợ xuất khẩu.
+- **Xung đột:** Nhưng sự sụt giảm mạnh trên diện rộng của giá hàng hóa (kim loại quý, cao su, năng lượng) và động thái hút ròng thanh khoản của NHNN đang tạo ra tín hiệu trái chiều rõ rệt trong khung 1 ngày – có thể cảnh báo vĩ mô đang bị thách thức bởi cầu yếu bên ngoài và thắt chặt nội địa.
+- **Trung lập / Cảnh báo:** Dù chế độ 7d và 30d là `strong_risk_on`, đà suy yếu ở 1d và sự tương phản giữa `monetary_policy` tích cực với `liquidity` tiêu cực hàm ý rằng một lớp vĩ mô thận trọng (ví dụ tăng tỷ trọng phòng thủ, giảm đòn bẩy) sẽ phù hợp hơn là tiếp tục mở rộng rủi ro.
+
+**Khuyến nghị:** Duy trì vị thế thị trường, nhưng theo dõi sát `liquidity` và `commodity` – nếu cải thiện trong 1–2 phiên tới, đà risk-on mạnh có thể quay lại; ngược lại, nếu các kênh này tiếp tục xấu đi, hạ bớt tài sản nhạy với chu kỳ hàng hóa và nhóm vốn hóa nhỏ.
+
+## 5. Caveat (Lưu ý về dữ liệu)
+
+- **Nguồn phủ sóng:** Dữ liệu thiên về MozyFin (tin tài chính trong nước) và WiData (dữ liệu thị trường); có thể thiếu góc nhìn từ các nguồn quốc tế chuyên sâu khác.
+- **Độ trễ của bản tin:** Generated_at gần thời điểm hiện tại, không có dấu hiệu “stale feed”. 
+- **Nhiễu tiêu đề (headline noise):** Cảm biến sentiment dựa trên quy tắc có thể khuếch đại quá mức các biến động giá hàng hóa từ Trung Quốc/Mỹ (ví dụ than cốc +1.291 trong khi cả kênh `commodity` vẫn âm nặng). Cần đối chiếu với các chỉ báo định lượng khác trước khi ra quyết định.

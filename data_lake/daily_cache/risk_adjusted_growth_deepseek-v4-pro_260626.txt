@@ -1,0 +1,31 @@
+## 1. Scenario Assessment  
+Kịch bản K = 1.0 và Cost of Equity 14% là mức nền cho ngân hàng VN, không khắc nghiệt bất thường. Tuy nhiên, mặt bằng ngành cho thấy sự đốt vốn phổ biến: **chỉ SHB có Alpha > 0**; tất cả các mã còn lại đều âm. Ngay cả với tham số trung lập, phần lớn ngân hàng không tạo ra lợi nhuận vượt chi phí vốn chủ sở hữu – một tín hiệu cảnh giác cao cho nhà đầu tư giá trị.
+
+## 2. Top Alpha Decomposition  
+**SHB (Alpha +1.3%)** – Pháo đài (Fortress). Lợi thế đến từ **định giá rẻ (P/B = 0.93)** kết hợp ROE khá (17.5%) và σROE cực thấp (1.9%). Payout khiêm tốn 8.6% giúp giữ lại phần lớn lợi nhuận tái đầu tư. Công thức Disciplined Return = (17.5%×0.914)/0.93 − 1.9% ≈ 15.3%, vượt CoE 14%, xác nhận giá trị thặng dư bền vững.  
+
+**ACB (Alpha -1.0%)** – Gần điểm hòa vốn, nhưng vẫn ở vùng tiêu cực. ROE cao 23.0% nhưng P/B = 1.23 không còn rẻ, σROE 2.7% tạo phạt rủi ro vừa phải. Phân loại: **Growth Trap nhẹ** – chất lượng tốt nhưng định giá đã phản ánh kỳ vọng, margin of safety không đủ.  
+
+**MBB (Alpha -1.7%)** – ROE cao (21.8%), σROE thấp kỷ lục 1.6%, nhưng P/B = 1.47 đắt hơn hẳn. Dù giữ lại nhiều lợi nhuận (payout 6.7%), lợi suất kỷ luật chỉ đạt ~12.2%, thiếu 1.7% so với CoE. **Premium Burn** – doanh nghiệp tuyệt vời với giá không hấp dẫn.
+
+## 3. Value Traps Warning  
+**LPB (Alpha -12.8%)** – P/B 3.35 cực đắt, biến thành “Premium Burn” thảm họa. ROE 21.1% không thể bù đắp định giá phi lý. **EIB (Alpha -11.3%)** – Cạm bẫy cổ điển: ROE ì ạch 10.0% dưới cả CoE, P/B 1.47 không phải là rẻ. σROE 3.8% đẩy Disciplined Return tụt dốc. **VPB (Alpha -10.3%)** – ROE 14.1% chỉ ngang CoE, nhưng σROE 4.7% cao nhất nhóm, payout lớn (24.6%) làm xói mòn nền tảng; đây là **Growth Trap** yếu ớt.
+
+## 4. Portfolio Construction  
+- **Core Holding** (~70% phân bổ ngân hàng): **SHB** – Fortress duy nhất với Alpha dương rõ ràng và biên an toàn từ P/B dưới 1.  
+- **Tactical** (0–20%): Có thể cân nhắc ACB, MBB nếu nhà đầu tư chấp nhận rủi ro specculative gần Alpha zero, nhưng phải theo dõi sát định giá và biến động ROE.  
+- **Cấm mua/Underweight**: **LPB, EIB, VPB** – toàn bộ nhóm đội sổ vì hoặc P/B ảo tưởng, hoặc ROE yếu kém, hoặc biến động lớn.  
+
+Sector view: **thận trọng tối đa**. Chỉ một ngân hàng tạo giá trị thực; phần còn lại đốt vốn ngay cả ở kịch bản trung lập. Ưu tiên phòng thủ và chọn lọc khắc nghiệt.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

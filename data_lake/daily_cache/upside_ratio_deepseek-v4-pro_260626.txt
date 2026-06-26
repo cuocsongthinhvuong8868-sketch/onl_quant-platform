@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Chỉ số Lực cầu 7.53% thấp hơn nhiều so với trung bình dài hạn (13.13%) → mức độ quan tâm mua đang bị nén.
+- Lực cung 9.65% cũng thấp hơn Mu (12.98%) → áp lực bán chủ động chưa lan rộng, thị trường thiếu thanh khoản rõ nét.
+- Cả hai phía đều có hiệu ứng Momentum (Phi_cầu = 0.213, Phi_cung = 0.231) – trạng thái hiện tại có xu hướng tự duy trì, không có tín hiệu đảo chiều.
+
+## 2. Supply-Demand Dynamics
+Dòng tiền hiện tại rơi vào trạng thái **zombification**: cả lực mua lẫn lực bán đều co hẹp dưới mức cân bằng dài hạn, thanh khoản cạn, giá ít biến động nhưng phân phối lệnh yếu. Bên cung giữ momentum nhỉnh hơn (|Phi_dn| = 0.231 > 0.213), cho thấy xu hướng bán ra có tính bền vững cao hơn một chút, dù biên độ tuyệt đối vẫn thấp.
+
+## 3. Stress-Test Read
+Kịch bản P95 Downside đạt 25.91% – nếu thị trường xấu đi, mức độ bán tháo có thể rất sâu trong 19 phiên tới. So sánh với P95 Upside 23.15%, đuôi rủi ro bất cân xứng nghiêng về phía giảm điểm (downside tail risk dày hơn). Điều này củng cố lập trường thận trọng.
+
+## 4. Verdict
+Đề xuất tỷ trọng giải ngân **0 – 20%**. Chiến lược: **phòng thủ**, giữ tiền mặt là chính, chỉ nắm giữ những vị thế phòng hộ hoặc cổ phiếu có dòng tiền ổn định vượt trội. Không mua đuổi vì thiếu xác nhận lực cầu, cũng chưa đủ tín hiệu để “bắt đáy” khi momentum bán vẫn còn. Mức độ tự tin: **medium** – tín hiệu không nhiễu nhưng còn mờ, cần chờ đột biến thanh khoản ở một trong hai phía.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 25.91,
+  "p95_upside_pct": 23.15,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

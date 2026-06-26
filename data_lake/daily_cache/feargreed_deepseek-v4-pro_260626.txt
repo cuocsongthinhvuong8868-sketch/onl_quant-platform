@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 50.4/100 nằm chính giữa vùng NEUTRAL (40–60), Δ -1.7 – giảm nhẹ về phía FEAR.
+- EGARCH Vol (chuẩn hóa) 15.9%, Δ -2.4% – biến động thấp hơn phiên trước, ở mặt bằng trung bình – thấp.
+- Rolling Skewness -0.05 – gần đối xứng, lệch trái không đáng kể.
+- Downside Correlation (norm) 2.8% – rất thấp; Upside Correlation (norm) 32.7% – cao gấp >10 lần.
+
+## 2. Interpretation
+Dữ liệu hiện tại phản ánh pha NEUTRAL / STOCK PICKING đặc trưng bởi rủi ro hệ thống yếu. Biến động giảm kết hợp tương quan giảm điểm cực thấp cho thấy xác suất bán tháo lan tỏa toàn thị trường đang ở mức thấp, trong khi các nhịp tăng vẫn có sự đồng pha nhất định.
+
+## 3. Cross-Check
+Không có divergence đáng kể: Score 50.4 nhất quán với mặt bằng vol 15.9% (↓). Skewness hơi âm đi kèm Downside Correlation gần zero là tín hiệu nhất quán – rủi ro đuôi trái hiện diện nhưng mang tính cá biệt, chưa leo thang thành rủi ro hệ thống. Upside Correlation > Downside Correlation củng cố bức tranh non‑bearish.
+
+## 4. Verdict
+Beta mục tiêu đề xuất cho danh mục VN‑Index: **0.95–1.0**. Môi trường phân hóa mạnh ủng hộ chiến lược tập trung chọn cổ phiếu (stock picking) thay vì phòng thủ thụ động. Chưa cần kích hoạt các công cụ phòng vệ đuôi (tail hedge) do tương quan giảm điểm rất thấp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "26/06/2026",
+  "regime": "NEUTRAL",
+  "score": 50.4,
+  "confidence": "high",
+  "beta_target": 0.95,
+  "key_signals": [
+    "Vol giảm còn 15.9% - mặt bằng thấp",
+    "Downside correlation chỉ 2.8% - rủi ro hệ thống rất yếu",
+    "Upside correlation 32.7% - thị trường đồng pha khi tăng"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 50.4
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

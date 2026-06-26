@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-06-26",
+  "composite_score": 29,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 8,
+      "unit": "sessions",
+      "description": "Số phiên stress/warning giảm dưới 5 báo hiệu thanh khoản nội địa thực sự hạ nhiệt."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 28.5,
+      "unit": "%",
+      "description": "Độ rộng vượt 45% cho thấy thị trường phục hồi trên diện rộng, không còn phân phối."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 65.1,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% báo hiệu căng thẳng hệ thống giảm đáng kể."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.374,
+      "unit": "",
+      "description": "Chỉ số đuôi béo giảm dưới 0.25 đảm bảo phân phối không còn đuôi cực dầy ổn định."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Hệ số tương quan nhóm cổ phiếu Vin duy trì dưới phân vị 70, loại bỏ rủi ro tập trung."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.8,
+      "unit": "th pct",
+      "description": "Phân vị tín dụng cấp thấp giảm dưới 80% cho thấy căng thẳng tài chính toàn cầu giảm rõ."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-06-26",
+  "source": "ai_cio_executive_summary"
+}

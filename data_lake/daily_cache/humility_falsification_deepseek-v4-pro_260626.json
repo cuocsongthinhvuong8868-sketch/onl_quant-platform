@@ -1,0 +1,269 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-06-26T11:40:04",
+  "t_data_date": "2026-06-26",
+  "target_report_date": "2026-06-25",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_250626.txt",
+  "report_mtime": "report:2026-06-26T11:30:19|sidecar:2026-06-26T11:30:19",
+  "parsed": {
+    "report_date": "2026-06-25",
+    "composite_score": 29.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 9.0,
+        "unit": "sessions",
+        "description": "Chuỗi căng thẳng thanh khoản VNIBOR giảm mạnh xuống dưới 5 phiên trong 20 phiên"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 27.5,
+        "unit": "%",
+        "description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận thị trường thoát bear confirmed"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 65.3,
+        "unit": "%",
+        "description": "Chỉ số stress hệ thống hạ nhiệt xuống dưới vùng cảnh báo 55%"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.374,
+        "unit": "",
+        "description": "Đuôi béo không còn xuất hiện ở bất kỳ ngưỡng POT nào, xi_max dưới 0.25"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 1.667,
+        "unit": "th pct",
+        "description": "Rủi ro tập trung nhóm Vingroup duy trì ở mức thấp (không còn là mối đe dọa)"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.8,
+        "unit": "th pct",
+        "description": "Điều kiện tài chính toàn cầu hạ nhiệt rõ rệt, CQS rời vùng khủng hoảng (dưới phân vị 80)"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-06-25",
+      "composite_score": 29,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 9,
+          "unit": "sessions",
+          "description": "Chuỗi căng thẳng thanh khoản VNIBOR giảm mạnh xuống dưới 5 phiên trong 20 phiên"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 27.5,
+          "unit": "%",
+          "description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận thị trường thoát bear confirmed"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 65.3,
+          "unit": "%",
+          "description": "Chỉ số stress hệ thống hạ nhiệt xuống dưới vùng cảnh báo 55%"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.374,
+          "unit": "",
+          "description": "Đuôi béo không còn xuất hiện ở bất kỳ ngưỡng POT nào, xi_max dưới 0.25"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 1.667,
+          "unit": "th pct",
+          "description": "Rủi ro tập trung nhóm Vingroup duy trì ở mức thấp (không còn là mối đe dọa)"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.8,
+          "unit": "th pct",
+          "description": "Điều kiện tài chính toàn cầu hạ nhiệt rõ rệt, CQS rời vùng khủng hoảng (dưới phân vị 80)"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-06-25",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "9 sessions",
+      "T actual": 8.0,
+      "T actual display": "8 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "Intact",
+      "Data date": "2026-06-24",
+      "Description": "Chuỗi căng thẳng thanh khoản VNIBOR giảm mạnh xuống dưới 5 phiên trong 20 phiên",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "27.5%",
+      "T actual": 28.47058823529412,
+      "T actual display": "28.5%",
+      "Delta": 0.9705882352941195,
+      "Delta display": "+0.971%",
+      "Status": "Intact",
+      "Data date": "2026-06-26",
+      "Description": "Tỷ lệ mã trên MA20 vượt 45%, xác nhận thị trường thoát bear confirmed",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "65.3%",
+      "T actual": 65.06248632984072,
+      "T actual display": "65.1%",
+      "Delta": -0.23751367015927372,
+      "Delta display": "-0.238%",
+      "Status": "Intact",
+      "Data date": "2026-06-26",
+      "Description": "Chỉ số stress hệ thống hạ nhiệt xuống dưới vùng cảnh báo 55%",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.374",
+      "T actual": 0.37400177901712506,
+      "T actual display": "0.374",
+      "Delta": 1.7790171250586795e-06,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-06-26",
+      "Description": "Đuôi béo không còn xuất hiện ở bất kỳ ngưỡng POT nào, xi_max dưới 0.25",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "1.667 th pct",
+      "T actual": 1.6666666666666667,
+      "T actual display": "1.667 th pct",
+      "Delta": -0.0003333333333332966,
+      "Delta display": "-0 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-06-26",
+      "Description": "Rủi ro tập trung nhóm Vingroup duy trì ở mức thấp (không còn là mối đe dọa)",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.8 th pct",
+      "T actual": 99.8015873015873,
+      "T actual display": "99.8 th pct",
+      "Delta": 0.0015873015873069107,
+      "Delta display": "+0.002 th pct",
+      "Status": "Intact",
+      "Data date": "2026-06-25",
+      "Description": "Điều kiện tài chính toàn cầu hạ nhiệt rõ rệt, CQS rời vùng khủng hoảng (dưới phân vị 80)",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 8,
+      "date": "2026-06-24",
+      "error": ""
+    },
+    "breadth": {
+      "value": 28.47058823529412,
+      "date": "2026-06-26",
+      "error": ""
+    },
+    "ssi": {
+      "value": 65.06248632984072,
+      "date": "2026-06-26",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-06-26",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.37400177901712506,
+      "date": "2026-06-26",
+      "error": ""
+    },
+    "coupling": {
+      "value": 1.6666666666666667,
+      "date": "2026-06-26",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.8015873015873,
+      "date": "2026-06-25",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}

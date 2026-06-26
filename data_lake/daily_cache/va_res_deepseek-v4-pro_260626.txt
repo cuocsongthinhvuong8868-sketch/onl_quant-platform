@@ -1,0 +1,30 @@
+## 1. Observations
+- Stress Index VN30: **0.00%** – chưa chạm ngưỡng cảnh báo 40%.
+- Số mã thủng VaR 95%: **0/30** – không có cú sốc đuôi đơn lẻ nào.
+- Complacency Index toàn thị trường: **5.56%** – rất thấp so với ngưỡng nguy hiểm 80%.
+- Số mã bị định giá sai (mispriced): **6**, trong đó TCB, OCB, VHM dẫn đầu về spread bị nén chặt.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress bằng 0 phản ánh **không có hiện tượng lây lan real‑time** giữa các cổ phiếu lớn. Việc toàn bộ rổ VN30 không mã nào thủng VaR 95% cho thấy áp lực bán cực đoan chưa xuất hiện, cấu trúc tương quan đuôi đang “ngủ yên”. Dưới ngưỡng 40%, không có tín hiệu khởi phát khủng hoảng hệ thống.  
+- Vì danh sách Top 3 breach rỗng, không có cú sốc cá biệt nổi bật nào cần cảnh báo giảm tỷ trọng ngay lập tức.
+
+## 3. Complacency Assessment (Module C)
+Chỉ số Complacency **5.56%** có nghĩa **thị trường KHÔNG ở regime “ngủ quên”** – không có bằng chứng về trạng thái phân phối đỉnh hoặc tích lũy kéo dài với volatility thấp gây nén spread. **Điều này không đồng nghĩa thị trường ổn định hay an toàn.** Với Stress Index = 0, khả năng thị trường đang trong giai đoạn hoảng loạn hay sụp đổ là thấp, nhưng vẫn có thể đang trong uptrend mạnh hoặc phục hồi có biến động vừa phải (spread chưa giãn rộng). Chỉ báo Complacency thấp chỉ đơn thuần nói lên rằng rủi ro không bị che giấu qua định giá sai trên diện rộng; nó không hàm ý “bình thường” hay “không có áp lực bán”. Nhà quản trị rủi ro cần duy trì cảnh giác với các kịch bản đảo chiều bất ngờ không được báo trước bởi hai module này.
+
+## 4. Stock-Level Risk Calls
+- **Module B (Contagion):** Không có mã nào thủng VaR → không có khuyến nghị bán/giảm tỷ trọng nào từ góc độ lây lan đuôi.
+- **Module C (Mispriced):** TCB, OCB, VHM đang có spread bị nén chặt nhất. Tuy chưa phải tín hiệu bán ngay, nhưng phần bù rủi ro đang định giá thấp bất thường, khiến các cổ phiếu này nhạy cảm với điều chỉnh nếu biến động bất ngờ ập đến. Khuyến nghị **hạn chế mở mới** ở vùng giá hiện tại, đặt điểm chốt lời/cắt lỗ theo trailing stop‑loss dựa trên MA20 ngày thay vì cố định mức giá tuyệt đối. Theo dõi độ giãn spread đột ngột ở TCB, OCB, VHM như chỉ báo sớm về thay đổi chế độ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["TCB", "OCB", "VHM"],
+  "confidence": "medium"
+}
+```

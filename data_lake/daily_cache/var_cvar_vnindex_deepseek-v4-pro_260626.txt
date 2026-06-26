@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_v1 -->
+## 1. Observations
+- Historical VaR 95% (5th pct 3Y rolling) ghi nhận mức -1.65%, sâu hơn parametric -1.48%, cho thấy đuôi trái dày hơn phân phối chuẩn.
+- EVT VaR 99% (sự kiện 1/100) xuống -3.69%, cao gấp 2.2 lần giá trị Gaussian cùng độ tin cậy, ám chỉ rủi ro đuôi bị đánh giá thấp.
+- Chỉ số hình dạng GPD ξ = +0.345, lọt vào vùng FAT TAIL (>0.30); phân phối có thể có phương sai vô hạn, ES không ổn định.
+- Hill index xác nhận chéo ở mức +0.447, cùng chiều và tương đương magnitude, củng cố tín hiệu đuôi dày nhưng có sự nhạy cảm ngưỡng (threshold-sensitive).
+
+## 2. Tail Thickness Diagnosis
+ξ trung tâm +0.345 thuộc bracket FAT TAIL. Tuy nhiên, kiểm tra độ nhạy ngưỡng cho thấy ξ dao động từ +0.168 (heavy tail) đến +0.374 (fat tail) khi thay đổi POT threshold. Do đó, kết luận thận trọng là **cảnh báo đuôi béo phụ thuộc ngưỡng** (threshold-sensitive fat-tail warning). Hill index +0.447 đồng hướng, nhưng biên độ cao hơn ξ trung tâm, không phân kỳ nghiêm trọng nên giữ được độ tin cậy ở mức trung bình.  
+ES–VaR spread = -1.37% vượt xa σ₃₀ = 0.85%, khẳng định rủi ro đuôi thực nghiệm vượt mức Gaussian; đây là tín hiệu corroborate mạnh.
+
+## 3. Gaussian Gap
+Tính Gaussian VaR 99% từ tham số: μ ≈ -0.08%, σ = 0.85% → VaR₉₉ ≈ μ - 2.33σ = -2.06%.  
+EVT VaR 99% = -3.69%. Khoảng cách 1.63 điểm phần trăm (pp) > 1pp → **mô hình Gaussian ước tính thấp rủi ro cực đoan đáng kể**, không còn phù hợp cho phân bổ vốn rủi ro.
+
+## 4. Verdict – Hedging Implications
+Với ξ vượt ngưỡng 0.30 (dù threshold-sensitive), nên từ bỏ chiến lược momentum, hạn chế đòn bẩy nếu ở mức cao. Hành động cụ thể:
+- Mua quyền chọn bán ITM (in-the-money) để bảo vệ danh mục khỏi đợt sụt giảm sâu (drawdown >5%).
+- Thiết lập vị thế bán hợp đồng tương lai (short futures) để phòng vệ rủi ro đuôi.
+- Giảm 30-50% vị thế định hướng nếu hiện tại dùng VaR Gaussian làm thước đo.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "26/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.374,
+  "xi_range": 0.206,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.63,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.374
+- EVT Xi Range: 0.206
+- EVT VaR99 Range: 0.11pp
+- EVT ES99 Range: 0.70pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive

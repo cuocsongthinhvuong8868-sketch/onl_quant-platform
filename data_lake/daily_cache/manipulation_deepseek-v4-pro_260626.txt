@@ -1,0 +1,28 @@
+## 1. Observations
+- Slope ở mức 0.23 với percentile cực thấp 12.7th (<20th), cho thấy độ nhạy của VN30F1M với composite VIN hiện rất yếu.
+- Correlation 0.61 nằm ở percentile 52.7th, vẫn duy trì tương quan trung bình, thị trường chưa phân rã hoàn toàn.
+- Regime hiện tại là **STATUS QUO** – không có biến động đột biến nào đủ lớn về ΔCorr (0.05) hay ΔSlope (-0.72) để kích hoạt các trạng thái Coupling/Decoupling/Anchoring.
+
+## 2. Microstructure Read
+VIC/VHM/VRE đã mất vai trò dẫn dắt VN30F1M; với slope chỉ 0.23, mỗi biến động của nhóm VIN hầu như không truyền tải đáng kể lên chỉ số futures. Correlation vẫn ở mức trung bình cho thấy dòng tiền vẫn còn liên kết, nhưng lực đẩy từ VIN không còn quyết định xu hướng. Khả năng cao thị trường đang xoay trục sang các nhóm ngành khác (Ngân hàng, Chứng khoán) – đây là tín hiệu củng cố khi slope percentile rơi vào vùng cực thấp.
+
+## 3. Event Study Interpretation
+STATUS QUO từ đầu tháng 4/2026 cho thấy không có sự kiện cấu trúc nào (can thiệp, break-down tương quan) xảy ra. Mặc dù ΔSlope giảm mạnh -0.72, nhưng ΔCorr chỉ nhích nhẹ 0.05 nên không đạt ngưỡng Decoupling hay Anchoring. Trong ngày, điều này đồng nghĩa với việc biến động của VIN sẽ kém tin cậy để dự báo F1; giữ vị thế qua đêm càng không có cơ sở vì thiếu tín hiệu rõ ràng từ mô hình.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** – Mô hình không cung cấp edge để Long/Short F1 hay Spread dựa trên nhóm VIN. Slope quá thấp khiến mọi tín hiệu từ VIC/VHM/VRE dễ gây nhiễu.
+- **Leading indicator:** Cần theo dõi diễn biến nhóm Ngân hàng (đặc biệt là BID, CTG, VPB) – nếu nhóm này tăng mạnh trong khi composite VIN đi ngang, đó là tín hiệu xác nhận sự dịch chuyển dòng tiền và có thể cân nhắc Long F1 dựa trên dẫn dắt mới (không nằm trong phạm vi mô hình hiện tại).
+- **Stop-loss reference:** Không áp dụng do NO TRADE.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "26/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 12.7,
+  "corr_percentile": 52.7,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

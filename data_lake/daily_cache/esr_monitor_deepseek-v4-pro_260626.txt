@@ -1,0 +1,35 @@
+## 1. Observations
+- SSI: **65.1%** – regime **WARNING**  
+- Market State: **EUPHORIC RISK** (uptrend + high stress)  
+- PCA PC1 EVR: **38.2%** (systemic correlation elevated)  
+- Top 3 stress drivers: **S_LIQ (36%)**, **S_VAL (32%)**, **S_COR (17%)**  
+- Pillar mode: **downside** (chỉ các phiên giảm mới được tính)
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ** dẫn dắt với trọng số 36% – đây là tín hiệu **volume khô cạn so với chuẩn 1 năm**. Trong các phiên giảm, tổng dollar volume teo lại rõ rệt (MA20 thấp hơn hẳn MA252), phản ánh thanh khoản biến mất khi thị trường yếu. Đây là dấu hiệu mong manh: chỉ cần áp lực bán gia tăng, không có lực mua đỡ, giá có thể lao dốc nhanh.
+
+**S_VAL** (32%) ghi nhận định giá căng thẳng – VN30 đã tăng trưởng vượt xa lãi suất tiền gửi trong 252 ngày qua. Định giá cao nhưng thiếu nền thanh khoản lành mạnh làm tăng rủi ro đảo chiều.
+
+**S_COR** (17%) thể hiện tương quan hệ thống cao (PC1 giải thích 38.2% biến động) – các cổ phiếu di chuyển đồng pha trong phiên giảm, hiện tượng herding. Khi kết hợp với volume dry-up, đây là **chữ ký bull-trap**: dòng tiền co cụm, ai cũng nắm cổ phiếu giống nhau, định giá cao nhưng không có người mua đỡ khi giảm.
+
+## 3. Cross-Check
+- **Phân kỳ giá – stress**: VN30 trên MA125 (xu hướng tăng) nhưng SSI ở mức WARNING (65.1%) → rủi ro ngầm tích tụ trong khi giá vẫn được đẩy lên, đúng kịch bản bull trap của chế độ EUPHORIC RISK.  
+- **HMM khớp**: Market state theo HMM là EUPHORIC RISK, không mâu thuẫn với SSI hiện tại. Không có cờ lệch pha cần giương cao.
+
+## 4. Verdict
+Tỷ trọng tiền mặt đề xuất: **35%** danh mục.  
+Hành động phòng hộ: **Giảm beta** tổng thể – cắt giảm cổ phiếu beta cao, xoay sang nhóm phòng thủ (tiện ích, tiêu dùng thiết yếu). Không sử dụng margin ở giai đoạn này.  
+Mua put hoặc short VN30F1M sẽ được cân nhắc nếu SSI vọt lên >80% (CRITICAL). Hiện tại tín hiệu WARNING với driver chính là khô cạn thanh khoản khi giảm là đủ sớm để hành động giảm rủi ro, chưa cần hedge đuôi nặng.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.1,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
