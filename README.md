@@ -1,244 +1,349 @@
-# Emerging Market Quantitative Research & Strategy Platform
+# Vietnam Equities Quant Research & AI-CIO Platform
 
-**A macro-regime-aware systematic research framework for Vietnam equities, combining central bank liquidity modeling, systemic stress monitoring, equity factor research, extreme-tail risk estimation, relative-value cointegration, and audit-logged research synthesis.**
+**A macro-regime-aware systematic research platform for Vietnam equities, combining macro liquidity, systemic stress monitoring, factor research, tail-risk modeling, pairs trading, bank valuation, and AI-assisted CIO reporting.**
 
 ![Python](https://img.shields.io/badge/Python-3.10%2B-blue)
-![Streamlit](https://img.shields.io/badge/Streamlit-App-red)
-![License](https://img.shields.io/badge/license-MIT-green)
-![Tests](https://img.shields.io/badge/tests-passing-brightgreen)
+![Streamlit](https://img.shields.io/badge/Streamlit-Multipage_App-red)
+![Research](https://img.shields.io/badge/Use-Quant_Research-lightgrey)
 
-This project is a modular quantitative research platform engineered for Vietnam equities. It integrates macro liquidity indicators, global and local financial stress monitors, cross-sectional equity factor models, tail-risk estimations, statistical arbitrage diagnostics, and bank valuation overlays. 
+This repository is a professional quant research portfolio project, not a retail trading bot. It is designed as a research and decision-support workbench for Vietnam equities, with deterministic quantitative modules feeding structured dashboards and an AI-CIO reporting layer.
 
-It is designed as an institutional research and strategy workbench, separating deterministic quantitative math from presentation logic. It serves as a decision-support and stress-testing system, not an automated execution engine or retail trading application.
+The project demonstrates how fragmented market data, macro liquidity, local funding rates, factor signals, behavioral risk, valuation data, and tail-risk diagnostics can be converted into repeatable investment evidence. It does not claim live PnL, guaranteed alpha, production execution, or financial advice.
 
----
+## What This Demonstrates
 
-## 1. Institutional Context & Frontier Market Microstructure
+| Capability | Hiring Signal |
+| --- | --- |
+| Macro-regime research | Liquidity, global financial conditions, VNIBOR, LTMM transmission indicators |
+| Quant risk modeling | EVT VaR/ES, volatility modeling, PCA, HMM/regime classification |
+| Systematic equity research | Factor scoring, IC validation, pairs trading, composite backtest framework |
+| Research engineering | Modular Streamlit app, local data lake, cache layer, GitHub Actions update workflows |
+| AI-assisted investment research | Evidence packets, deterministic context, score/regime ledger, PDF/Telegram reporting |
 
-Vietnam equities present a distinct microstructure and research profile:
-* **High Retail Participation:** Over 90% of daily trading volume is retail-driven, leading to high noise-to-signal ratios, extreme herd behavior, and frequent sentiment-driven volatility spikes.
-* **Fragmented & Unadjusted Data:** Corporate actions (stock splits, dividend payments) often corrupt raw price series, creating artificial structural breaks in cointegration models.
-* **Macro & Liquidity Sensitivity:** Capital flows are highly sensitive to interbank funding liquidity (VNIBOR), global dollar liquidity regimes, and credit quotas (system-wide lending limits).
-* **High Sector Concentration:** The index is heavily weighted toward Financials (Banks) and Real Estate, requiring robust sector neutralization in cross-sectional models.
+For hiring managers, this project shows:
 
-This platform converts raw market feeds, central bank balance sheets, interbank rates, and sentiment indicators into structured, repeatable research evidence. The goal is not discretionary stock-picking, but rather **systematic signal validation, tail-risk pricing, and audit-logged strategy synthesis**.
+- Vietnam equities domain knowledge across macro, market microstructure, bank valuation, and data quality constraints.
+- Quantitative risk modeling with tail-risk, volatility, PCA, regime, and factor validation techniques.
+- Python research engineering using Streamlit, pandas, NumPy, SciPy, statsmodels, scikit-learn, arch, Numba, and local caching.
+- Separation between quant/business logic and UI rendering, where most math lives in `tools/*/quant/` and Streamlit pages act as adapters.
+- Awareness of model risk, data leakage, corporate actions, cache invalidation, and production limits.
 
----
+## Why This Project Exists
 
-## 2. Core Capabilities
+Vietnam equities have market features that make generic stock dashboards weak research tools:
 
-| Research Area | Module / Tool | Quantitative Methods & Math | Research Output | Target Quant Competency & Safeguard |
-|---|---|---|---|---|
-| **Macro Liquidity** | `tools/fed_liquidity` | FRED WALCL, TGA, RRP; Central Bank Net Liquidity proxy; weekly liquidity impulse; EWMA z-scores | Net liquidity trend metrics and weekly velocity signals | Central bank balance sheet modeling, credit impulse analysis |
-| **Global Financial Conditions** | `tools/global_financial_conditions` | Multi-asset macro proxies; rolling percentile stress rankings; expanding point-in-time PCA | Global stress index (CQS percentile) and principal drivers | **Look-ahead bias prevention** via expanding-window eigenvectors |
-| **Local Funding** | `tools/vnibor` | VNIBOR term structure slope modeling, daily percentile regime classification | Interbank funding liquidity states and yield-curve slope diagnostics | Local money market knowledge, interest rate term structure analysis |
-| **Systemic Stress** | `tools/esr_monitor` | VN30 stress pillars (volatility clustering, cross-sectional dispersion, funding pressure), expanding PCA | Systemic Stress Index (SSI); rule-based and HMM regime classification | Multi-dimensional stress indexing, regime classification |
-| **Behavioral Risk** | `tools/fear_greed` | Point-in-time PCA market factor, EGARCH(1,1,1) tail volatility model with skewed Student-t innovations, Kelly skewness | Sentiment-driven risk score and market-internal volatility indicators | **Robust volatility fallback routine** under MLE optimizer divergence |
-| **Market Breadth** | `tools/market_breadth`, `tools/upside_ratio` | Cross-sectional MA participation, volume-weighted concentration, Monte Carlo simulated breadth envelope | Participation density, upside/downside ratio, dispersion diagnostics | Market microstructure, cross-sectional dispersion, ensemble simulations |
-| **Tail Risk** | `tools/var_cvar_vnindex`, `tools/va_res` | Extreme Value Theory (EVT) Peaks-Over-Threshold (POT) fitted to Generalized Pareto Distribution (GPD); Hill tail-index estimator | Extreme VaR / Expected Shortfall (ES) at 99% and 99.5% tail levels | **Threshold sensitivity analysis** validating model stability |
-| **Factor Research** | `tools/factor_examination` | Momentum, reversal, low-vol, beta, idiosyncratic vol, Amihud illiquidity, size, anti-lottery retail bias; outlier-trimmed z-scores | Cross-sectional factor ranks and Information Coefficient (IC) validation | Equity factor implementation, sector neutralization, IC decay validation |
-| **Statistical Arbitrage** | `tools/pairs_trading` | Engle-Granger 2-step (ADF $p < 0.05$), Johansen trace/VECM, Ornstein-Uhlenbeck (OU) half-life, Hurst exponent, DCC-GARCH | Trading candidate screening, spread mean-reversion metrics, live trading signals | **Capital-constrained sizing** using rolling hedge ratios |
-| **Bank Valuation** | `tools/bank_valuation`, `tools/risk_adjusted_growth` | Adjusted book value (non-performing loan haircuts), sustainable ROE, residual income projections, risk-adjusted growth | Bank fair value, valuation gaps, P/B regime analysis, credit/capital flags | Bottom-up equity modeling integrated with systematic risk scores |
-| **Corporate Health** | `tools/vn100_earnings_health` | Financial statement normalization, growth quality, cash conversion, leverage stress, sector diffusion | VN100 corporate health score ledger and fundamental diagnostics | Fundamental data engineering, cross-sectional balance sheet scoring |
-| **Valuation Overlay** | `tools/pvgo` | VNINDEX PVGO / P/E / COE-style valuation context | Growth-expectations and valuation-risk context | Linking expectation metrics to macroeconomic regime models |
-| **News Sentiment** | `tools/sentiment_factor_news` | Headline classification taxonomy, TF-IDF / rule-based sentiment factor extraction | Sentiment time-series feed and news narrative drivers | Alternative data engineering, reproducible news classification |
-| **Automated Synthesis** | `shared/ai_cio.py`, `promt/` | Deterministic evidence compilation, structured context injection, audit-trail generation (ledger & context sidecars) | Executive summary, score/regime ledger, audit-trail files | **LLM alignment under strict quantitative boundaries** |
+- Liquidity and funding conditions matter. Local rates such as VNIBOR, system liquidity, margin conditions, and global dollar stress can dominate short-term risk appetite.
+- Data quality is uneven. Corporate actions, missing fields, delayed financial statements, and source-specific quirks can create false signals if not handled explicitly.
+- Market structure is concentrated. Banks, real estate, and large-cap index constituents can drive broad index behavior, while retail participation amplifies sentiment cycles.
+- Regimes shift quickly. A useful research process needs to connect macro stress, internal breadth, valuation, factor quality, and downside risk instead of treating each chart in isolation.
 
----
+The platform frames Vietnam equity research as an evidence pipeline: collect data, compute model outputs, validate assumptions, surface model limitations, and synthesize a CIO-style decision brief. The goal is repeatable research and risk-aware decision support, not autonomous trading.
 
-## 3. Platform Architecture
+## Core Capabilities
+
+| Research Area | Module / Tool | Methods | Output | Hiring Signal |
+| --- | --- | --- | --- | --- |
+| Macro liquidity | `tools/fed_liquidity`, `command/update_fed_liquidity.py` | FRED WALCL, TGA, RRP; net liquidity; weekly impulse; 52-week z-score | ADD/CUT/HOLD liquidity signal and latest liquidity snapshot | Central-bank liquidity modeling |
+| Global financial conditions | `tools/global_financial_conditions` | FRED and Yahoo stress proxies; rolling z-scores; expanding point-in-time PCA; driver classification | STRESS/ELEVATED/CALM regime, PC1/PC2, stress drivers | Global macro risk framework without look-ahead PCA |
+| Local rates / funding | `tools/vnibor`, `command/update_vnibor.py` | WiChart VNIBOR feed; ON rate impulse; 5-day smoothing; rolling percentile; 1W/2W spreads | EASY/NORMAL/ELEVATED/TIGHT local liquidity regime | Local money-market specialization |
+| Liquidity transmission | `tools/ltmm`, `data_lake/data_LTMM/` | Local LTMM JSON/report ingestion; FLI, MLI, TE, FRI and trigger snapshots | Structured transmission and bottleneck evidence for AI-CIO | Macro transmission diagnostics |
+| Systemic stress | `tools/esr_monitor` | Stress pillars; expanding-window PCA; rule-based classifier; HMM and walk-forward HMM support | Systemic Stress Index and high-stress regime labels | Market-risk regime modeling |
+| Behavioral risk | `tools/fear_greed` | Point-in-time PCA market factor; EGARCH(1,1,1) skewed-t; GARCH/EWMA fallback; Kelly skewness | Fear/greed risk score and market-internal volatility diagnostics | Robust volatility and sentiment modeling |
+| Breadth and dispersion | `tools/market_breadth`, `tools/upside_ratio`, `tools/dispersion` | MA participation, volume concentration, dispersion, Monte Carlo breadth envelope | Participation, upside/downside, and dispersion diagnostics | Cross-sectional market internals |
+| Tail risk | `tools/var_cvar_vnindex`, `tools/va_res` | Rolling Gaussian VaR, historical VaR, Expected Shortfall, EVT POT-GPD, Hill estimator, threshold sensitivity | VNINDEX VaR/ES and tail stability diagnostics | Market risk and extreme-loss modeling |
+| Factor research | `tools/factor_examination` | Momentum, reversal, low-vol, beta, idio-vol, Amihud liquidity, size, anti-lottery; robust z-score; sector neutralization; IC validation | Cross-sectional ranks, factor exposures, IC summaries, decile diagnostics | Systematic equity research workflow |
+| Pairs trading | `tools/pairs_trading` | Engle-Granger, Johansen, OU half-life, Hurst, z-score spreads, dynamic correlation filter, mini/aggregate backtests | Candidate pairs, spread diagnostics, live research signals | Statistical arbitrage research |
+| Bank valuation | `tools/bank_valuation`, `tools/risk_adjusted_growth` | Adjusted book value, sustainable ROE, residual income, justified P/B, credit/funding/capital/collateral risk scores | Fair value, valuation gap, stress value, risk classification | Bottom-up valuation plus systematic risk overlays |
+| Corporate health | `tools/vn100_earnings_health` | Financial statement normalization, growth quality, cash conversion, leverage stress, sector diffusion, PCA outputs | VN100 health scores, alerts, sector/company ledgers | Fundamental data engineering |
+| Valuation overlay | `tools/pvgo` | VNINDEX PVGO / P/E / cost-of-equity style context | Growth-expectation and valuation-risk context | Linking macro regimes to valuation context |
+| News sentiment | `tools/sentiment_factor_news` | Mozyfin/WiData connectors; rule-based taxonomy; channel scoring; headline drivers | 1d/7d/30d sentiment feed, regime, channel scores | Alternative data and reproducible news classification |
+| Backtest framework | `tools/backtest` | Composite signal from Fear & Greed, breadth, ESR, ES stress; logistic allocation; ESR overlay; MA200 hard cap; transaction fee | Strategy diagnostics, drawdown and allocation history | Research validation and risk-aware allocation design |
+| Data health | `pages/D_Data_Health.py`, `src/data_manager.py` | Freshness checks, missing-date timeline, JSON/CSV export | Data lake health status and audit report | Research data operations |
+| AI-CIO synthesis | `shared/ai_cio.py`, `promt/`, `command/run_ai_cio_auto.py` | Evidence packets, deterministic context, score/regime parser, ledger, PDF export, Telegram/GitHub Actions delivery | CIO-style research brief and `data_lake/Ai_cio_report.csv` history | Bounded LLM research workflow |
+
+## Architecture Overview
 
 ```mermaid
-flowchart TD
-    A[External Data Sources] --> B[Data Layer]
-    B --> C[Quantitative Engine Core]
-    C --> D[Presentation Layer]
-    C --> E[Research Synthesis Layer]
-    E --> F[Report Outputs]
+flowchart TB
+    subgraph External_Data[External data sources]
+        VNSTOCK[VNSTOCK / vnstock]
+        FRED[FRED]
+        YAHOO[Yahoo Finance]
+        WICHART[WiChart VNIBOR]
+        NEWS[Mozyfin / WiData]
+        LOCAL[Local JSON and CSV feeds]
+    end
 
-    A --> A1[VNSTOCK API]
-    A --> A2[FRED API]
-    A --> A3[Yahoo Finance API]
-    A --> A4[WiData / Mozyfin news feeds]
-    A --> A5[Local fundamental JSON feeds]
+    subgraph Data_Layer[Data layer]
+        LAKE[data_lake/]
+        COMMANDS[command/*.py update scripts]
+        CACHE[shared/daily_cache.py and data_lake/daily_cache/]
+        HEALTH[src/data_manager.py]
+    end
 
-    B --> B1[data_lake/*.csv cached historical data]
-    B --> B2[data_lake/*/outputs model runs]
-    B --> B3[data_lake/daily_cache computation caches]
-    B --> B4[src.data_manager data freshness guards]
+    subgraph Quant_Layer[Quant and business logic layer]
+        QUANT[tools/*/quant/]
+        SHARED[shared/data_loader.py and shared utilities]
+        LIBS[pandas, NumPy, SciPy, statsmodels, arch, sklearn, Numba]
+    end
 
-    C --> C1[tools/*/quant/ independent math libraries]
-    C --> C2[shared/data_loader.py aligned loading]
-    C --> C3[Libraries: pandas, numpy, scipy, statsmodels, arch, numba]
+    subgraph Presentation[Presentation layer]
+        APP[app.py]
+        PAGES[pages/*.py]
+        TOOLPAGES[tools/*/page.py]
+        CHARTS[tools/*/ui/ charts and sidebars]
+    end
 
-    D --> D1[app.py Streamlit entrance]
-    D --> D2[pages/*.py macro/micro views]
-    D --> D3[tools/*/page.py visualization adapters]
+    subgraph AI_CIO[AI-CIO reporting layer]
+        PACKETS[evidence packets]
+        PROMPTS[promt/*.md templates]
+        LEDGER[data_lake/Ai_cio_report.csv]
+        REPORTS[reports/*.pdf and daily cache sidecars]
+        DELIVERY[Telegram / GitHub Actions automation]
+    end
 
-    E --> E1[shared/ai_cio.py evidence compiler]
-    E --> E2[promt/*.md structured templates]
-    E --> E3[deterministic decision-state validation]
-
-    F --> F1[Streamlit UI Dashboard]
-    F --> F2[reports/*.pdf research reports]
-    F --> F3[data_lake/Ai_cio_report.csv immutable ledger]
-    F --> F4[Telegram summary alert bot]
+    VNSTOCK --> COMMANDS
+    FRED --> COMMANDS
+    YAHOO --> COMMANDS
+    WICHART --> COMMANDS
+    NEWS --> COMMANDS
+    LOCAL --> LAKE
+    COMMANDS --> LAKE
+    LAKE --> CACHE
+    LAKE --> HEALTH
+    LAKE --> QUANT
+    CACHE --> QUANT
+    QUANT --> PRESENTATION
+    SHARED --> QUANT
+    LIBS --> QUANT
+    QUANT --> PACKETS
+    PACKETS --> PROMPTS
+    PROMPTS --> REPORTS
+    REPORTS --> LEDGER
+    REPORTS --> DELIVERY
 ```
 
-The codebase separates deterministic quantitative logic from presentation and rendering frameworks:
-* **Quantitative Engine Core (`tools/*/quant/`)**: Raw mathematical calculations written in pure Python/NumPy/Pandas/SciPy/Statsmodels/Numba. These modules contain no presentation dependencies, allowing them to be imported and run in automated backtesting pipelines or Jupyter notebooks.
-* **Data Lake Layer (`data_lake/`)**: A local repository-local cache of raw and pre-computed files. Data freshness checkers in `src/` ensure that no stale inputs enter calculations.
-* **Research Synthesis Layer (`shared/ai_cio.py`, `promt/`)**: Translates quantitative outputs into structured evidence packets. The LLM acts strictly as a deterministic text compiler, constrained by markdown templates (`promt/`) and forced to cite metrics. It records a decision-state JSON and updates an immutable ledger (`data_lake/Ai_cio_report.csv`) for complete auditability.
-* **Presentation Layer (`app.py`, `pages/`)**: Streamlit dashboards presenting charts, diagnostics, and reports on demand, utilizing disk caching to prevent redundant calculations.
+Important architectural point: Streamlit does not own the research math. Quant modules return structured data, diagnostics, and report snapshots; page modules render them. This separation makes the research layer easier to test, cache, reuse in notebooks, and integrate into automation.
 
----
+## Quant Methodology Highlights
 
-## 4. Quantitative Methodology & Mathematical Controls
+| Method | Problem It Solves | Used In | Why It Matters |
+| --- | --- | --- | --- |
+| Expanding point-in-time PCA | Avoids historical revisions from future covariance information | `global_financial_conditions`, `fear_greed`, `esr_monitor` | Reduces look-ahead bias in regime and market-factor extraction |
+| EVT POT-GPD | Models extreme left-tail losses beyond ordinary historical quantiles | `var_cvar_vnindex` | VaR/ES estimation in fat-tailed Vietnam equity returns |
+| Hill tail-index diagnostic | Cross-checks GPD shape stability | `var_cvar_vnindex` | Helps detect unstable tail fits and threshold sensitivity |
+| EGARCH skewed-t with fallback | Models asymmetric volatility and fat tails while surviving optimizer failures | `fear_greed` | Keeps volatility signals available during noisy market regimes |
+| Kelly skewness | Measures robust return asymmetry | `fear_greed` | Captures downside/upside imbalance without relying only on moment skew |
+| HMM and rule-based regimes | Converts continuous stress indices into interpretable market states | `esr_monitor`, `tools/backtest` | Useful for stress monitoring and allocation overlays |
+| Engle-Granger and Johansen tests | Tests long-run relationships among equity prices | `pairs_trading` | Separates statistical-arbitrage candidates from high-correlation noise |
+| OU half-life and Hurst | Filters spread mean reversion speed and persistence | `pairs_trading` | Helps reject spreads that are too noisy, too slow, or drifting |
+| DCC-GARCH / EWMA dynamic correlation | Monitors relationship breakdown after pair selection | `shared/dcc_garch.py`, `pairs_trading/quant/dcc_filter.py` | Adds a short-run co-movement check to long-run cointegration tests |
+| Factor scoring and IC validation | Converts price/volume effects into sector-neutral cross-sectional evidence | `factor_examination` | Supports systematic ranking and forward return validation |
+| Residual income model | Values banks from adjusted book, sustainable ROE, and cost of equity | `bank_valuation` | Connects bottom-up bank accounting to equity valuation |
+| Composite allocation backtest | Tests a risk-aware allocation rule from model outputs | `backtest` | Demonstrates research-to-portfolio translation without claiming live alpha |
 
-### 4.1. Extreme Value Theory (EVT POT-GPD) Tail Risk Modeling
-Emerging market equities display high kurtosis and negative skewness, making standard Gaussian VaR parametric models highly inaccurate. Simple historical VaR is highly unstable due to small sample sizes in the tail (e.g., only 7 tail observations in a 3-year window).
+## Data Workflow
 
-The platform implements the Pickands-Balkema-de Haan (1974, 1975) theorem. For a sufficiently high threshold $u$, the conditional distribution of exceedances $Y = (X - u \mid X > u)$ converges to the Generalized Pareto Distribution (GPD):
+The repository includes a local data lake and update scripts. Some files are committed as snapshots so the app can run locally without every external feed being live at startup.
 
-$$F_u(y) \approx G_{\xi, \beta}(y) = 1 - \left(1 + \frac{\xi y}{\beta}\right)^{-1/\xi} \quad \text{for } \xi \neq 0$$
+Common data artifacts:
 
-Where $\xi$ is the shape parameter (tail heaviness) and $\beta$ is the scale parameter.
-1. The threshold $u$ is chosen dynamically as the 90th percentile of the negative daily returns (losses).
-2. The GPD parameters are estimated using Maximum Likelihood Estimation (MLE).
-3. The Value-at-Risk ($VaR_\alpha$) and Expected Shortfall ($ES_\alpha$) are computed using the closed-form GPD solutions:
+- `data_lake/market_data.csv` and `data_lake/market_volume.csv`: equity close and volume panel.
+- `data_lake/vnindex_cache.csv` and `data_lake/vn30_cache.csv`: index data.
+- `data_lake/fed_liquidity_cache.csv`: Fed liquidity monitor cache.
+- `data_lake/global_financial_conditions_cache.csv`: global stress monitor cache.
+- `data_lake/LaiSuatLienNganHang_Wichart.csv`: VNIBOR/local rates cache.
+- `data_lake/sentiment_factor_news/feed/`: classified sentiment feed outputs.
+- `data_lake/bank_valuation/`, `data_lake/risk_adjusted_growth/`, `data_lake/vn100_earnings_health/`: fundamental and valuation data stores.
+- `data_lake/daily_cache/`: model/report caches and AI-CIO sidecars.
+- `reports/`: generated AI-CIO PDFs.
 
-$$VaR_\alpha = u + \frac{\beta}{\xi} \left[ \left( \frac{n}{N_u} (1 - \alpha) \right)^{-\xi} - 1 \right]$$
-
-$$ES_\alpha = \frac{VaR_\alpha}{1 - \xi} + \frac{\beta - \xi u}{1 - \xi}$$
-
-A non-parametric Hill tail-index estimator is calculated concurrently to cross-check $\xi$ stability and prevent MLE optimizer errors.
-
-### 4.2. Expanding Window Point-in-Time PCA
-Standard PCA run over a complete dataset introduces look-ahead bias because future covariance matrices influence the eigenvectors. To model global and behavioral conditions without leakage, we use an **expanding window point-in-time PCA**:
-
-$$\mathbf{\Sigma}_t = \text{Cov}(\mathbf{X}_{t_0:t})$$
-
-$$\mathbf{\Sigma}_t \mathbf{w}_{i,t} = \lambda_{i,t} \mathbf{w}_{i,t}$$
-
-* Loadings $\mathbf{w}_{i,t}$ and eigenvalues $\lambda_{i,t}$ are computed using only information available up to time $t$.
-* To optimize execution, PCA models are refitted at a set frequency (e.g., every 10 trading sessions) rather than daily, which matches institutional risk reporting cycles.
-* Unit tests enforce that appending new data does not rewrite historical factor values.
-
-### 4.3. Robust Volatility Fallbacks
-To ensure continuous estimation of behavioral volatility under turbulent market regimes, the volatility engine utilizes a hierarchical fallback structure:
-1. **EGARCH(1,1,1)** with skewed Student-t innovations: Chosen to model asymmetric leverage effects (where negative shocks increase volatility more than positive shocks) and fat tails.
-2. **GARCH(1,1)** with Gaussian innovations: Activated if the EGARCH MLE solver fails to converge on noisy returns.
-3. **RiskMetrics EWMA**: Activated if the GARCH optimizer fails, ensuring a stable, uninterrupted risk signal output.
-
-### 4.4. Cointegration & Mean-Reversion Spread Dynamics
-The relative-value pairs trading engine filters pairs hierarchically to verify statistical viability:
-1. **Cointegration Test:** Engle-Granger two-step regression of $\ln(p_{1,t}) = \alpha + \beta \ln(p_{2,t}) + \epsilon_t$, applying an ADF test on the residuals $\epsilon_t$ (rejecting non-stationarity at $p < 0.05$). Johansen trace tests are run for multi-asset spreads.
-2. **Mean-Reversion Speed:** Residuals are modeled as an Ornstein-Uhlenbeck (OU) process:
-
-$$d\epsilon_t = \theta (\mu - \epsilon_t) dt + \sigma dW_t$$
-
-We solve via OLS: $\Delta \epsilon_t = a + b \epsilon_{t-1} + e_t$. The half-life is computed as:
-
-$$HL = \frac{\ln(2)}{\theta} \quad \text{where } \theta = -b$$
-
-Pairs are strictly restricted to $HL \in [5, 30]$ trading days to match typical risk-arbitrage capital horizons.
-3. **Dynamic Correlation:** Spreads are filtered using Dynamic Conditional Correlation (DCC-GARCH) to gate pairs experiencing correlation breakdowns.
-
----
-
-## 5. Model Validation & Statistical Safeguards
-
-To address model risk, the repository implements automated testing (`pytest`) covering critical structural assumptions:
-
-* **Look-Ahead Bias Invariance:** Tests verify that when future returns are appended to the dataset, historical PCA outputs (GFC and Fear & Greed indices) remain unchanged.
-* **Optimizer Fallback Verification:** Mocks are used to force EGARCH convergence failures, verifying that the system degrades gracefully to GARCH and EWMA without throwing uncaught exceptions.
-* **Threshold Stability Grids:** The EVT framework implements `evt_threshold_sensitivity` to calculate VaR and Expected Shortfall across a grid of POT thresholds (5% to 15%). Model confidence requires that the shape parameter $\xi$ remains stable and within normal equity ranges ($\xi \in [0.15, 0.45]$).
-* **Ensemble Reproducibility:** Confirms that Monte Carlo breadth simulations produce identical envelopes when using fixed seeds.
-* **Neutral Hedge Sizing:** Validates that pairs trading order tickets size long/short legs dynamically using rolling betas, maintaining market neutrality under capital constraints.
-
----
-
-## 6. Quickstart & Reproducibility
-
-### 6.1. Local Sandbox (No API Keys Required)
-The repository is committed with a pre-populated data snapshot inside `data_lake/` (market data, interbank rates, macro caches, and bank details). **No API registration is required to run the local Streamlit dashboard or test suite.**
-
-### 6.2. Installation
+Representative update commands:
 
 ```bash
-# Clone the repository
-git clone <repo-url>
+# Market data from tickers.csv through vnstock
+python3 -m command.update_data
+python3 -m command.update_data --backfill 2190
+python3 -m command.update_data --from-date 2020-01-01
+
+# Macro and rates
+FRED_API_KEY=... python3 command/update_fed_liquidity.py
+FRED_API_KEY=... python3 command/update_global_financial_conditions.py
+python3 -m command.update_vnibor
+FRED_API_KEY=... python3 command/update_us_margin_m2.py
+
+# Precompute research artifacts
+python3 -m command.update_factor_examination
+python3 -m command.update_pvgo_valuation
+python3 -m command.update_vn100_corporate_health
+python3 -m command.update_abm_data
+
+# Alternative data / news sentiment
+python3 command/update_sentiment_factor_news.py --once --source mozyfin
+python3 command/update_sentiment_factor_news.py --once --source widata
+
+# Reports
+python3 command/generate_report.py
+
+# Visual screenshot PDF report. TODO: verify/install Playwright and Pillow,
+# because they are imported by the script but are not listed in requirements.txt.
+python3 command/generate_visual_report.py --base-url http://localhost:8501
+```
+
+There are also helper scripts:
+
+- `Run_App.command` / `Run_App.bat`: launch Streamlit on port `8502`.
+- `Run_All_Updates.command` / `Run_All_Updates.bat`: run a local multi-step data refresh.
+- `.github/workflows/*.yml`: scheduled and on-demand GitHub Actions for market data, Fed liquidity, global conditions, sentiment feed, US margin/M2, command runner, and AI-CIO reports.
+
+## Quickstart
+
+### macOS / Linux
+
+```bash
+git clone https://github.com/cuocsongthinhvuong8868-sketch/onl_quant-platform.git
 cd onl_quant-platform
 
-# Create virtual environment
-python -m venv .venv
-source .venv/bin/activate  # Windows: .venv\Scripts\activate
+python3 -m venv .venv
+source .venv/bin/activate
 
-# Install dependencies
-pip install -r requirements.txt
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+python -m streamlit run app.py
 ```
 
-### 6.3. Running Validation Tests
-Execute the test suite to verify the statistical invariants and fallback paths:
+### Windows PowerShell
+
+```powershell
+git clone https://github.com/cuocsongthinhvuong8868-sketch/onl_quant-platform.git
+cd onl_quant-platform
+
+py -3.11 -m venv .venv
+.venv\Scripts\activate
+
+python -m pip install --upgrade pip
+python -m pip install -r requirements.txt
+
+python -m streamlit run app.py
+```
+
+### Optional Configuration
+
+Create a local `.env` file or configure Streamlit/GitHub secrets as needed. Do not commit secrets; `.env` and `.streamlit/secrets.toml` are ignored by `.gitignore`.
+
+Common optional variables:
+
+| Variable | Used For |
+| --- | --- |
+| `VNSTOCK_API_KEY` | vnstock market data access when required by the source |
+| `FRED_API_KEY` | Fed liquidity, global financial conditions, US margin/M2 |
+| `DEEPSEEK_API_KEY` | Scheduled AI-CIO automation through `command/run_ai_cio_auto.py` |
+| `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Optional Telegram AI-CIO delivery |
+| `TELEGRAM_SEND_FULL_PDF` | Set to `1`/`true` to attach the full AI-CIO PDF in Telegram automation |
+| `GITHUB_TOKEN` | Streamlit/GitHub cache sync and workflow output commits |
+| `WIDATA_SIGN_TOKEN` | WiData sentiment feed |
+| `MOZYFIN_ACCESS_TOKEN`, `MOZYFIN_API_KEY`, `MOZYFIN_COOKIES_JSON` | Mozyfin news sentiment feed |
+| `KIMI_LOCAL_BASE_URL`, `KIMI_LOCAL_MODEL`, `KIMI_LOCAL_TEMPERATURE`, `KIMI_LOCAL_TIMEOUT` | Optional local Kimi-compatible endpoint |
+| `AI_KEY_1234` style Streamlit secrets | Optional 4-digit API key shortcuts used by `shared/api_key_helper.py` |
+| `LTMM_GOLD_DIR` | Optional ABM/LTMM gold CSV sync source |
+
+### Tests
+
+The repository contains targeted tests under `tests/` for AI-CIO post-processing, data management, page-layout auth, bank valuation, methodology controls, and sentiment feed logic.
 
 ```bash
-PYTHONPATH=. pytest -v
+python -m pip install pytest  # if pytest is not already installed
+PYTHONPATH=. pytest -q
 ```
 
-### 6.4. Running the Dashboard
-Launch the interactive Streamlit research app locally:
+## Repository Structure
 
-```bash
-streamlit run app.py
-```
-*(Alternatively, macOS users can execute the helper script: `./Run_App.command`)*
-
-### 6.5. Ingestion & In-Production Updates
-To update the underlying databases (requires active API keys mapped in environment variables / `.env` file):
-
-```bash
-# Update core market data
-python command/update_data.py
-
-# Ingest and update specific risk monitors
-python command/update_fed_liquidity.py
-python command/update_global_financial_conditions.py
-python command/update_vnibor.py
-python command/update_factor_examination.py
-python command/update_pvgo_valuation.py
-
-# Run corporate health and alternative sentiment feeds
-python -m command.update_vn100_corporate_health
-python command/update_sentiment_factor_news.py --once --source mozyfin
-
-# Generate automated report and update report ledger
-python command/run_ai_cio_auto.py --force
+```text
+.
+|-- app.py                         # Streamlit home and AI-CIO report controls
+|-- pages/                         # Multipage Streamlit wrappers
+|-- tools/                         # Research modules, quant engines, UI adapters, reports
+|-- shared/                        # Data loading, cache, AI-CIO, DCC-GARCH, GitHub sync, layout
+|-- command/                       # Data update, report generation, automation entry points
+|-- src/                           # Data health / data management utilities
+|-- docs/                          # Methodology and module handbooks
+|-- data_lake/                     # Local data snapshots, model outputs, caches, ledgers
+|-- reports/                       # Generated PDF reports
+|-- promt/                         # AI-CIO and tool prompt templates
+|-- tests/                         # Pytest coverage for selected methodology and infrastructure paths
+|-- .github/workflows/             # Scheduled and on-demand automation
+|-- requirements.txt
+`-- README.md
 ```
 
----
+## AI-CIO Reporting Layer
 
-## 7. Model Risk & Research Boundaries
+The AI-CIO layer is not a replacement for deterministic models. It is a synthesis layer on top of structured evidence generated by the quant modules.
 
-The platform operates within specific model risk boundaries:
-1. **Price Adjustment Constraints:** Pairs trading models utilize raw historical prices; spreads are susceptible to artificial breaks around corporate action dates (stock splits, stock dividends). Real-time trading requires adjusting prices for corporate actions.
-2. **Transaction Cost Invariance:** The strategy backtester assumes zero transaction fees, zero slippage, and infinite liquidity. True alpha estimation requires incorporating Vietnam-specific transaction taxes, trading commissions, and market impact models.
-3. **Factor Orthogonalization:** Ranks in `factor_examination` are sector-neutralized but lack multi-factor risk model orthogonalization. Composite signals may carry unintended exposures to macroeconomic growth or interest rate shifts.
-4. **Regime Drift:** Regime classification frameworks (SSI and HMM) assume historical cycle dynamics are repeatable. They are subject to drift under structural shifts, such as changes in foreign ownership regulations or state monetary frameworks.
-5. **Alternative Data Bias:** News sentiment is classified using TF-IDF / keywords mapping local news feeds. This methodology is prone to classification error and reporting bias from state-influenced local financial media.
+Implemented behavior includes:
 
----
+- Child-tool reports and structured evidence packets from macro, valuation, sentiment, risk, and market-internal modules.
+- A deterministic decision-state object with score/regime parsing and hard-constraint context.
+- Prompt templates under `promt/` that constrain the LLM to supplied evidence.
+- Context sidecars in `data_lake/daily_cache/ai_cio_context_*.json` and metric snapshots in `data_lake/ai_cio_metrics/`.
+- Report history in `data_lake/Ai_cio_report.csv`.
+- PDF generation in `app.py` and `command/run_ai_cio_auto.py`.
+- Optional Telegram delivery and GitHub Actions automation for scheduled reporting.
 
-## 8. Target Quant Competencies
+This layer should be treated as research decision support. The LLM summarizes, reconciles, and explains evidence; it should not be interpreted as an autonomous allocation engine or trading advisor.
 
-This codebase demonstrates specific competencies key for **Quantitative Research Analyst**, **Systematic Portfolio Manager**, **Quant Developer**, and **Risk Quant** roles:
-* **Time-Series Invariance:** Implementing point-in-time expanding window estimation models.
-* **Emerging Market Microstructure:** Designing factor models and cointegration rules adapted to retail-dominated, illiquid markets.
-* **Risk Engineering:** Fitting GPD distributions under EVT theory, implementing threshold sensitivity checks, and coding robust numerical fallback logic.
-* **Software Cleanliness:** Separating core mathematical computation (`tools/*/quant/`) from presentation frameworks (`app.py`), writing clean unit tests, and establishing automated logging.
-* **Bounded AI System Design:** Formatting structured context and defining deterministic decision-states to utilize LLMs as objective compilers, preventing hallucination.
+## Screenshots / Demo
 
----
+TODO: verify screenshots before embedding them in this README.
 
-## 9. Disclaimer
+Suggested screenshots to add:
 
-This platform is intended for quantitative research and educational validation only. It does not constitute investment advice. No live execution results, trading performance, or alpha capacity claims are implied. Any deployment in a live trading environment requires separate validation, compliance audits, and execution risk-control setups.
+- Home page with macro, micro, behavioral finance, and data health entry points.
+- Global Financial Conditions or VNIBOR module showing regime diagnostics.
+- Factor Examination output with cross-sectional ranks and IC validation.
+- Pairs Trading lab with spread, z-score, half-life, and dynamic correlation.
+- AI-CIO report export view with ledger/PDF generation.
+
+## Known Limitations
+
+These are intentional research and engineering notes. They make the platform stronger because they identify model risk and production gaps instead of hiding them.
+
+- `shared/ai_cio.py` is large and should be refactored into a registry-based reporting architecture with smaller tool adapters.
+- Pairs trading should use a fully adjusted price pipeline for dividends, splits, and corporate actions. The current pairs module explicitly warns that prices are not guaranteed to be adjusted.
+- Several UI/reporting paths still use broad `except Exception:` blocks. These should be replaced with specific exceptions, structured logging, and testable failure states.
+- `shared/dcc_garch.py` exists and is wrapped by pairs trading, but pairs workflows default to EWMA correlation in several paths. DCC-GARCH should be exposed and validated more consistently if it becomes part of the core pair filter.
+- Factor composite scores currently default to equal weighting. A regime-aware or IC-weighted factor model is a natural next step.
+- Some AI/report cache artifacts use local run date (`date.today()`) rather than the latest available data date. Data-date-aware cache keys would reduce timezone and stale-data ambiguity.
+- Long IC validations, aggregate backtests, and visual report generation can be slow in Streamlit. Background jobs or precomputed artifacts would improve cloud reliability.
+- Strategy modules need deeper out-of-sample validation, walk-forward reports, transaction-cost sensitivity, and leakage checks before any live research use.
+- The AI-CIO layer depends on external LLM behavior and should remain bounded by deterministic evidence, audit trails, and human review.
+
+## Roadmap
+
+Near-term:
+
+- Fix and document the adjusted-price pipeline for pairs trading.
+- Add out-of-sample and walk-forward reports for strategy modules.
+- Improve factor validation with IC stability, turnover, sector exposure, and decile robustness reports.
+- Refactor AI-CIO orchestration into a registry of evidence producers.
+- Replace broad exceptions with structured logging and narrower failure handling.
+
+Mid-term:
+
+- Add regime-aware or IC-weighted factor composites.
+- Integrate and validate DCC-GARCH filtering more deeply in pairs trading.
+- Expand unit and integration tests around data loaders, report generation, and core quant functions.
+- Add a Dockerized reproducible environment.
+- Improve interview-ready report artifacts and screenshots.
+
+Long-term:
+
+- Build a research notebook gallery for methodology walkthroughs.
+- Add a model validation dashboard for leakage, drift, threshold sensitivity, and data freshness.
+- Add experiment tracking for factor, regime, and strategy variants.
+- Strengthen data quality checks for corporate actions, missing volume, stale financial statements, and source divergence.
+
+## Disclaimer
+
+This repository is for quantitative research, portfolio demonstration, and educational purposes only. It is not financial advice, not a production trading system, and not a guarantee of investment performance. Any live deployment would require independent validation, transaction-cost and liquidity modeling, risk controls, monitoring, legal/compliance review, and human oversight.
