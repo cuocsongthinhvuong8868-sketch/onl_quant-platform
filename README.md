@@ -10,6 +10,22 @@ This repository is a professional quant research portfolio project, not a retail
 
 The project demonstrates how fragmented market data, macro liquidity, local funding rates, factor signals, behavioral risk, valuation data, and tail-risk diagnostics can be converted into repeatable investment evidence. It does not claim live PnL, guaranteed alpha, production execution, or financial advice.
 
+## Table of Contents
+
+- [What This Demonstrates](#what-this-demonstrates)
+- [Why This Project Exists](#why-this-project-exists)
+- [Core Capabilities](#core-capabilities)
+- [Architecture Overview](#architecture-overview)
+- [Quant Methodology Highlights](#quant-methodology-highlights)
+- [Data Workflow](#data-workflow)
+- [Quickstart](#quickstart)
+- [Repository Structure](#repository-structure)
+- [AI-CIO Reporting Layer](#ai-cio-reporting-layer)
+- [Screenshots / Demo](#screenshots--demo)
+- [Known Limitations](#known-limitations)
+- [Roadmap](#roadmap)
+- [Disclaimer](#disclaimer)
+
 ## What This Demonstrates
 
 | Capability | Hiring Signal |
@@ -43,22 +59,15 @@ The platform frames Vietnam equity research as an evidence pipeline: collect dat
 
 | Research Area | Module / Tool | Methods | Output | Hiring Signal |
 | --- | --- | --- | --- | --- |
-| Macro liquidity | `tools/fed_liquidity`, `command/update_fed_liquidity.py` | FRED WALCL, TGA, RRP; net liquidity; weekly impulse; 52-week z-score | ADD/CUT/HOLD liquidity signal and latest liquidity snapshot | Central-bank liquidity modeling |
-| Global financial conditions | `tools/global_financial_conditions` | FRED and Yahoo stress proxies; rolling z-scores; expanding point-in-time PCA; driver classification | STRESS/ELEVATED/CALM regime, PC1/PC2, stress drivers | Global macro risk framework without look-ahead PCA |
-| Local rates / funding | `tools/vnibor`, `command/update_vnibor.py` | WiChart VNIBOR feed; ON rate impulse; 5-day smoothing; rolling percentile; 1W/2W spreads | EASY/NORMAL/ELEVATED/TIGHT local liquidity regime | Local money-market specialization |
-| Liquidity transmission | `tools/ltmm`, `data_lake/data_LTMM/` | Local LTMM JSON/report ingestion; FLI, MLI, TE, FRI and trigger snapshots | Structured transmission and bottleneck evidence for AI-CIO | Macro transmission diagnostics |
-| Systemic stress | `tools/esr_monitor` | Stress pillars; expanding-window PCA; rule-based classifier; HMM and walk-forward HMM support | Systemic Stress Index and high-stress regime labels | Market-risk regime modeling |
-| Behavioral risk | `tools/fear_greed` | Point-in-time PCA market factor; EGARCH(1,1,1) skewed-t; GARCH/EWMA fallback; Kelly skewness | Fear/greed risk score and market-internal volatility diagnostics | Robust volatility and sentiment modeling |
-| Breadth and dispersion | `tools/market_breadth`, `tools/upside_ratio`, `tools/dispersion` | MA participation, volume concentration, dispersion, Monte Carlo breadth envelope | Participation, upside/downside, and dispersion diagnostics | Cross-sectional market internals |
-| Tail risk | `tools/var_cvar_vnindex`, `tools/va_res` | Rolling Gaussian VaR, historical VaR, Expected Shortfall, EVT POT-GPD, Hill estimator, threshold sensitivity | VNINDEX VaR/ES and tail stability diagnostics | Market risk and extreme-loss modeling |
+| Macro liquidity and global conditions | `tools/fed_liquidity`, `tools/global_financial_conditions`, `command/update_fed_liquidity.py`, `command/update_global_financial_conditions.py` | FRED WALCL/TGA/RRP, net liquidity, weekly impulse, rolling z-scores, expanding point-in-time PCA | Liquidity signal, stress regime, PC1/PC2, stress drivers | Macro-regime research without look-ahead PCA |
+| Local funding and liquidity transmission | `tools/vnibor`, `tools/ltmm`, `command/update_vnibor.py`, `data_lake/data_LTMM/` | VNIBOR impulse, 5-day smoothing, rate percentiles, 1W/2W spreads, FLI/MLI/TE/FRI trigger snapshots | Local liquidity regime and transmission bottleneck evidence | Vietnam money-market specialization |
+| Systemic, behavioral, and internal risk | `tools/esr_monitor`, `tools/fear_greed`, `tools/market_breadth`, `tools/upside_ratio`, `tools/dispersion` | Stress pillars, expanding-window PCA, HMM support, EGARCH skewed-t, Kelly skewness, breadth/dispersion diagnostics | Stress index, fear/greed score, participation, upside/downside, dispersion | Multi-layer risk regime monitoring |
+| Tail risk and VaR/ES | `tools/var_cvar_vnindex`, `tools/va_res` | Rolling Gaussian VaR, historical VaR, Expected Shortfall, EVT POT-GPD, Hill estimator, threshold sensitivity | VNINDEX VaR/ES and tail stability diagnostics | Market risk and extreme-loss modeling |
 | Factor research | `tools/factor_examination` | Momentum, reversal, low-vol, beta, idio-vol, Amihud liquidity, size, anti-lottery; robust z-score; sector neutralization; IC validation | Cross-sectional ranks, factor exposures, IC summaries, decile diagnostics | Systematic equity research workflow |
 | Pairs trading | `tools/pairs_trading` | Engle-Granger, Johansen, OU half-life, Hurst, z-score spreads, dynamic correlation filter, mini/aggregate backtests | Candidate pairs, spread diagnostics, live research signals | Statistical arbitrage research |
-| Bank valuation | `tools/bank_valuation`, `tools/risk_adjusted_growth` | Adjusted book value, sustainable ROE, residual income, justified P/B, credit/funding/capital/collateral risk scores | Fair value, valuation gap, stress value, risk classification | Bottom-up valuation plus systematic risk overlays |
-| Corporate health | `tools/vn100_earnings_health` | Financial statement normalization, growth quality, cash conversion, leverage stress, sector diffusion, PCA outputs | VN100 health scores, alerts, sector/company ledgers | Fundamental data engineering |
-| Valuation overlay | `tools/pvgo` | VNINDEX PVGO / P/E / cost-of-equity style context | Growth-expectation and valuation-risk context | Linking macro regimes to valuation context |
-| News sentiment | `tools/sentiment_factor_news` | Mozyfin/WiData connectors; rule-based taxonomy; channel scoring; headline drivers | 1d/7d/30d sentiment feed, regime, channel scores | Alternative data and reproducible news classification |
-| Backtest framework | `tools/backtest` | Composite signal from Fear & Greed, breadth, ESR, ES stress; logistic allocation; ESR overlay; MA200 hard cap; transaction fee | Strategy diagnostics, drawdown and allocation history | Research validation and risk-aware allocation design |
-| Data health | `pages/D_Data_Health.py`, `src/data_manager.py` | Freshness checks, missing-date timeline, JSON/CSV export | Data lake health status and audit report | Research data operations |
+| Bank valuation and fundamentals | `tools/bank_valuation`, `tools/risk_adjusted_growth`, `tools/vn100_earnings_health` | Adjusted book value, sustainable ROE, residual income, justified P/B, credit/funding/capital/collateral risk, growth quality, sector diffusion | Fair value, valuation gap, stress value, risk classification, VN100 health ledger | Bottom-up valuation plus systematic overlays |
+| Valuation and sentiment overlays | `tools/pvgo`, `tools/sentiment_factor_news` | PVGO / P/E / cost-of-equity context, Mozyfin/WiData connectors, rule-based taxonomy, channel scoring | Growth-expectation context, 1d/7d/30d sentiment feed, headline drivers | Alternative data and valuation-context integration |
+| Backtest and data health | `tools/backtest`, `pages/D_Data_Health.py`, `src/data_manager.py` | Composite risk signal, logistic allocation, ESR overlay, MA200 cap, transaction fee, freshness checks, missing-date timeline | Strategy diagnostics, allocation history, data lake health report | Research validation and data operations |
 | AI-CIO synthesis | `shared/ai_cio.py`, `promt/`, `command/run_ai_cio_auto.py` | Evidence packets, deterministic context, score/regime parser, ledger, PDF export, Telegram/GitHub Actions delivery | CIO-style research brief and `data_lake/Ai_cio_report.csv` history | Bounded LLM research workflow |
 
 ## Architecture Overview
@@ -295,15 +304,19 @@ This layer should be treated as research decision support. The LLM summarizes, r
 
 ## Screenshots / Demo
 
-TODO: verify screenshots before embedding them in this README.
+These screenshots were generated from the local Streamlit app using `python3 -m streamlit run app.py --server.port=8502 --server.headless=true`.
 
-Suggested screenshots to add:
+### Home / Dashboard
 
-- Home page with macro, micro, behavioral finance, and data health entry points.
-- Global Financial Conditions or VNIBOR module showing regime diagnostics.
-- Factor Examination output with cross-sectional ranks and IC validation.
-- Pairs Trading lab with spread, z-score, half-life, and dynamic correlation.
-- AI-CIO report export view with ledger/PDF generation.
+![Home dashboard](docs/screenshots/home-dashboard.png)
+
+### Factor Examination
+
+![Factor Examination](docs/screenshots/factor-examination.png)
+
+### AI-CIO Report
+
+![AI-CIO report export controls](docs/screenshots/ai-cio-report.png)
 
 ## Known Limitations
 
