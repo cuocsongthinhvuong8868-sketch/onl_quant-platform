@@ -465,6 +465,35 @@ def _cache_version_for_tool(tool_name: str) -> str | None:
     return AI_CIO_TOOL_CACHE_VERSIONS.get(str(tool_name or ""))
 
 
+def strip_wrapping_markdown_fence(report_text: str) -> str:
+    """Remove a whole-report Markdown/text code fence returned by some LLMs."""
+
+    text = str(report_text or "").strip()
+    if not text:
+        return ""
+
+    header = ""
+    header_pattern = (
+        rf"^\s*(<!--\s*{re.escape(AI_CIO_CACHE_VERSION_HEADER)}\s*:\s*[^>]+-->)\s*"
+    )
+    header_match = re.match(header_pattern, text, flags=re.IGNORECASE)
+    if header_match:
+        header = header_match.group(1).strip() + "\n"
+        body = text[header_match.end():].lstrip()
+    else:
+        body = text
+
+    opening = re.match(r"^```(?:markdown|md|text)?[ \t]*(?:\r?\n|$)", body, flags=re.IGNORECASE)
+    if not opening:
+        return text
+    if not re.search(r"(?:\r?\n)?```[ \t]*$", body):
+        return text
+
+    body = body[opening.end():]
+    body = re.sub(r"\s*```[ \t]*$", "", body).strip()
+    return (header + body).strip()
+
+
 def _encode_cache_content(tool_name: str, content: str) -> str:
     version = _cache_version_for_tool(tool_name)
     text = str(content or "")
@@ -490,7 +519,10 @@ def _decode_cache_content(tool_name: str, content: str) -> str | None:
         return None
     if match.group(1).strip() != expected:
         return None
-    return text[match.end():].lstrip("\r\n")
+    decoded = text[match.end():].lstrip("\r\n")
+    if str(tool_name or "") == "executive_summary":
+        decoded = strip_wrapping_markdown_fence(decoded)
+    return decoded
 
 
 def _read_cache_file(path: Path, tool_name: str) -> str | None:
@@ -654,14 +686,15 @@ def _clean_telegram_summary(summary: str, target_date: date, score_val: str, reg
 def postprocess_executive_summary_report(report_text: str, provider_key: str) -> tuple[str, Path | None]:
     """Strip the machine JSON block from the human report and save it as a sidecar file."""
 
-    payload, span = _extract_falsification_payload(report_text)
-    clean_text = report_text
+    source_text = strip_wrapping_markdown_fence(report_text)
+    payload, span = _extract_falsification_payload(source_text)
+    clean_text = source_text
     if span is not None:
-        clean_text = f"{report_text[:span[0]].rstrip()}\n\n{report_text[span[1]:].lstrip()}".strip()
-    elif '"falsification_rules"' in report_text:
-        clean_text = _strip_incomplete_falsification_block(report_text)
+        clean_text = f"{source_text[:span[0]].rstrip()}\n\n{source_text[span[1]:].lstrip()}".strip()
+    elif '"falsification_rules"' in source_text:
+        clean_text = _strip_incomplete_falsification_block(source_text)
 
-    if payload is None and '"falsification_rules"' in report_text:
+    if payload is None and '"falsification_rules"' in source_text:
         payload = _fallback_humility_payload_from_markdown(clean_text)
 
     sidecar_path = _write_humility_rules_payload(payload, provider_key) if payload else None
@@ -672,7 +705,7 @@ def postprocess_executive_summary_report(report_text: str, provider_key: str) ->
     if regime_val == "N/A" and payload:
         regime_val = _clean_regime_value(str(payload.get("regime", ""))) or "N/A"
     if score_val == "N/A" or regime_val == "N/A":
-        fallback_score, fallback_regime = parse_score_regime(report_text)
+        fallback_score, fallback_regime = parse_score_regime(source_text)
         if score_val == "N/A":
             score_val = fallback_score
         if regime_val == "N/A":
@@ -1419,7 +1452,7 @@ def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = AI
             if alt_paths:
                 path = alt_paths[0]
         if path.exists():
-            content = path.read_text(encoding="utf-8").strip()
+            content = strip_wrapping_markdown_fence(path.read_text(encoding="utf-8").strip())
             score_val, regime_val = parse_score_regime(content)
             selected.append(
                 {

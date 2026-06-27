@@ -2,7 +2,11 @@ import json
 from pathlib import Path
 from datetime import date, timedelta
 
-from shared.ai_cio import parse_score_regime, postprocess_executive_summary_report
+from shared.ai_cio import (
+    parse_score_regime,
+    postprocess_executive_summary_report,
+    strip_wrapping_markdown_fence,
+)
 
 
 def test_parse_score_regime_strict_line():
@@ -20,6 +24,40 @@ def test_parse_score_regime_from_summary_fallback():
 """
 
     assert parse_score_regime(text) == ("11", "CRISIS / PRE-CRASH")
+
+
+def test_strip_wrapping_markdown_fence_preserves_report_body():
+    report = (
+        "<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->\n"
+        "```markdown\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+        "final score & regime : 29 ; regime : PRE-CRASH / PANIC\n"
+        "```\n"
+    )
+
+    clean = strip_wrapping_markdown_fence(report)
+
+    assert clean.startswith("<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->")
+    assert "```markdown" not in clean
+    assert not clean.endswith("```")
+    assert "### EXECUTIVE BOTTOM LINE" in clean
+
+
+def test_postprocess_strips_whole_report_markdown_fence():
+    report = (
+        "```markdown\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+        "final score & regime : 29 ; regime : PRE-CRASH / PANIC\n"
+        "```\n"
+    )
+
+    clean, path = postprocess_executive_summary_report(report, "deepseek-v4-pro")
+
+    assert path is None
+    assert clean == (
+        "### EXECUTIVE BOTTOM LINE\n"
+        "final score & regime : 29 ; regime : PRE-CRASH / PANIC"
+    )
 
 
 def test_postprocess_strips_and_saves_humility_json(tmp_path, monkeypatch):
@@ -111,6 +149,32 @@ def test_recent_summaries_uses_compact_ledger_not_raw_reports(tmp_path, monkeypa
         }
     ]
     assert "EXECUTIVE BOTTOM LINE" not in context
+
+
+def test_recent_summary_cache_fallback_strips_wrapping_markdown_fence(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    data_lake = tmp_path / "data_lake"
+    cache_dir = data_lake / "daily_cache"
+    cache_dir.mkdir(parents=True)
+    yesterday = date.today() - timedelta(days=1)
+    cache_path = cache_dir / f"executive_summary_deepseek-v4-pro_{yesterday.strftime('%d%m%y')}.txt"
+    cache_path.write_text(
+        "<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->\n"
+        "```markdown\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+        "final score & regime : 29 ; regime : PRE-CRASH / PANIC\n"
+        "```\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", data_lake)
+    monkeypatch.setattr(ai_cio, "CSV_HISTORY_PATH", data_lake / "missing.csv")
+
+    rows = ai_cio._read_recent_summary_ledger("deepseek-v4-pro", n_past=1)
+
+    assert rows[0]["score"] == "29"
+    assert rows[0]["regime"] == "PRE-CRASH / PANIC"
+    assert "```markdown" not in rows[0]["brief"]
 
 
 def test_history_csv_only_accepts_deepseek_provider(tmp_path, monkeypatch):
@@ -508,6 +572,22 @@ def test_methodology_versioned_cache_rejects_legacy_content(tmp_path, monkeypatc
     raw = path.read_text(encoding="utf-8")
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["var_cvar_vnindex"] in raw
     assert ai_cio._read_cache("var_cvar_vnindex", "test-provider") == "current report"
+
+
+def test_executive_summary_cache_read_strips_wrapping_markdown_fence(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+
+    ai_cio._write_cache(
+        "executive_summary",
+        "```markdown\n# Report\nfinal score & regime : 29 ; regime : PRE-CRASH / PANIC\n```\n",
+        "test-provider",
+    )
+
+    assert ai_cio._read_cache("executive_summary", "test-provider") == (
+        "# Report\nfinal score & regime : 29 ; regime : PRE-CRASH / PANIC"
+    )
 
 
 def test_humility_evt_default_uses_sensitivity_upper_bound():

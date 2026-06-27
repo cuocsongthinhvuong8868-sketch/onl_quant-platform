@@ -244,6 +244,8 @@ def _create_pdf(text: str, path: str):
         if not line:
             pdf.ln(2)
             continue
+        if line.startswith("<!--") and line.endswith("-->"):
+            continue
         
         pdf.set_x(10)
         
@@ -258,6 +260,14 @@ def _create_pdf(text: str, path: str):
         else:
             pdf.multi_cell(text_width, 6, line.replace('**', ''))
     pdf.output(path)
+
+
+def _normalize_cio_report_text(text: str) -> str:
+    try:
+        from shared.ai_cio import strip_wrapping_markdown_fence
+    except Exception:
+        return str(text or "")
+    return strip_wrapping_markdown_fence(text)
 
 # ── Xuất PDF AI CIO (chọn ngày) ──
 if "cio_pdf_choice" not in st.session_state:
@@ -357,6 +367,7 @@ if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__cho
     report_text = ""
     if _pdf_path_obj and _pdf_path_obj.exists():
         report_text = _pdf_path_obj.read_text(encoding="utf-8")
+        report_text = _normalize_cio_report_text(report_text)
     
     if not report_text:
         st.error(f"⚠️ Không tìm thấy báo cáo cho ngày {_pdf_date_str[:2]}/{_pdf_date_str[2:4]}/{_pdf_date_str[4:]}. Vui lòng chạy Executive Summary cho ngày này trước.")
@@ -387,7 +398,7 @@ if st.session_state.get("cio_txt_view"):
     _txt_path = st.session_state.cio_txt_view
     if _txt_path and _txt_path.exists():
         with st.expander("👁️ Nội dung Báo cáo TXT", expanded=True):
-            st.markdown(_txt_path.read_text(encoding="utf-8"))
+            st.markdown(_normalize_cio_report_text(_txt_path.read_text(encoding="utf-8")))
             if st.button("✖️ Đóng", key="btn_close_txt"):
                 st.session_state.cio_txt_view = None
                 st.rerun()
@@ -501,6 +512,7 @@ if st.session_state.show_cio_input:
                         
                         cached_sum = _read_cache("executive_summary", cio_provider)
                         if cached_sum and not refresh_btn:
+                            cached_sum = _normalize_cio_report_text(cached_sum)
                             st.session_state["cio_report"] = cached_sum
                             st.session_state["cio_provider"] = cio_provider
                             st.success("Tải kết quả AI CIO từ bộ nhớ tạm!")
@@ -508,6 +520,7 @@ if st.session_state.show_cio_input:
                             report_text = cached_sum
                         else:
                             summary_report = run_executive_summary(cio_key, cio_provider)
+                            summary_report = _normalize_cio_report_text(summary_report)
                             st.session_state["cio_report"] = summary_report
                             st.session_state["cio_provider"] = cio_provider
                             st.success("Hoàn thành Báo cáo Tổng lệnh!")
