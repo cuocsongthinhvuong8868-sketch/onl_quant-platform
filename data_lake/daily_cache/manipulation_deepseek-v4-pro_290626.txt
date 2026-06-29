@@ -1,0 +1,31 @@
+## 1. Observations
+- OLS Slope ở mức **0.21** (phân vị 6.8th) – rất thấp, phản ánh độ nhạy của VN30F1M với composite VIC/VHM/VRE cực yếu.
+- Correlation **0.57** (phân vị 44.0th) – trung bình thấp, mối liên kết lỏng lẻo, không đủ tin cậy để dẫn dắt.
+- Regime phân loại là **STATUS QUO** (ΔCorr -0.03, ΔSlope -0.63), không rơi vào coupling hay decoupling mạnh, không có event đáng kể.
+
+## 2. Microstructure Read
+- Nhóm VIC/VHM/VRE gần như **mất vai trò dẫn dắt** chỉ số VN30F1M. Slope chỉ 0.21, mỗi biến động 1% của composite VIN chỉ tác động ~0.21% lên F1. Correlation 0.57 không cho thấy sự chi phối rõ rệt.
+- Cả hai percentile đều không vượt ngưỡng 80th (không có can thiệp), đồng thời slope percentile <20th cho thấy thị trường đã “rời bỏ” VIN như một động lực chính. Dòng tiền có thể đang luân chuyển sang Bank/Chứng.
+- VN30F1M hiện tại 2,010 điểm không chịu áp lực trực tiếp từ VIN, do đó phân tích dựa trên VIN sẽ kém hiệu quả.
+
+## 3. Event Study Interpretation
+- STATUS QUO nghĩa là không có biến động cấu trúc trong mối quan hệ VIN-F1 gần đây (ΔCorr ~0). Dù ΔSlope -0.63 khá âm (slope giảm mạnh), nhưng correlation không dịch chuyển nên regime không phải DECOUPLING hay ANCHORING.
+- Intraday/overnight: Không có edge từ mô hình này để mở vị thế. Nên giữ trạng thái trung lập, theo dõi thêm xác nhận từ dòng tiền ngành khác.
+
+## 4. Verdict
+- **Trade plan: NO TRADE**. Mô hình không cung cấp tín hiệu đủ mạnh để Short hay Long F1 dựa trên VIN. Ép giao dịch trong STATUS QUO là rủi ro không cần thiết.
+- **Leading indicator**: Theo dõi nhóm Ngân hàng (VCB, BID, CTG) – nếu Bank bứt phá, có thể kéo VN30F1M lên mà không cần VIN. Ngược lại, nếu VN30F1M thủng 2,000 điểm với thanh khoản lớn, cân nhắc đánh giá lại.
+- **Stop-loss**: Không áp dụng do không có vị thế.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "29/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 6.8,
+  "corr_percentile": 44.0,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

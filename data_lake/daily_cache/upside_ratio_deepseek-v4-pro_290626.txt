@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Lực cầu hiện tại 13.18% nhỉnh hơn trung bình dài hạn 12.94% (+0.24 điểm %), cho thấy sự gia tăng nhẹ ở nhóm cổ phiếu dẫn dắt.
+- Lực cung hiện tại 7.29% thấp hơn nhiều so với Mu 13.04% (-5.75 điểm %), áp lực bán sụt giảm rõ rệt, thị trường không còn trạng thái “xả hàng”.
+- Cả hai hệ số tự tương quan Phi đều > 0.10 (cầu 0.226, cung 0.227) – cả hai chiều cùng ở chế độ Momentum, xu hướng hiện tại có xác suất tiếp diễn cao.
+
+## 2. Supply-Demand Dynamics
+- Trạng thái dòng tiền hiện tại là **tích lũy (accumulation)**: lực cầu duy trì trên trung bình (up >> mu) trong khi lực cung nén dưới trung bình (down << mu). Đây là mô hình bên mua đang gom hàng lặng lẽ, bên bán dần cạn cung.
+- Momentum thực sự gần như cân bằng khi |Phi_up| (0.226) và |Phi_dn| (0.227) lệch nhau chỉ 0.001. Lực bán giữ đà nhỉnh hơn không đáng kể, chưa đủ để xác lập ưu thế rõ ràng – vai trò quyết định hiện nghiêng về trạng thái tích lũy hơn là bên nào dẫn dắt momentum.
+
+## 3. Stress-Test Read
+- P95 Downside = 25.98%: nếu thị trường gãy, mô hình cảnh báo kịch bản panic có thể lan đến hơn một phần tư số mã giảm mạnh, tương ứng biên độ rủi ro đuôi rất rộng.
+- Bất cân xứng rủi ro: P95 Downside (25.98%) vượt P95 Upside (23.02%) gần 3 điểm %, đuôi rủi ro phía giảm dày hơn, cho thấy dù đang tích lũy, áp lực bán tiềm tàng vẫn có thể bùng phát mạnh nếu xuất hiện cú shock.
+
+## 4. Verdict
+- Tỷ trọng giải ngân đề xuất: **40%**. Không hành động khi cả hai Phi nằm trong [-0.10, +0.10] là NO ACTIONABLE, nhưng hiện tại có tín hiệu momentum kèm tích lũy, có thể hành động có kiểm soát.
+- Chiến lược: **“rình bắt đáy” (bottom fishing)**. Môi trường tích lũy ủng hộ việc mua vào khi giá điều chỉnh, nhưng do đuôi rủi ro giảm điểm dày hơn, không nên đuổi mua (chase momentum). Phòng thủ hoàn toàn là quá thận trọng khi cung đang co hẹp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "neutral",
+  "p95_downside_pct": 25.98,
+  "p95_upside_pct": 23.02,
+  "deployment_pct": 40,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

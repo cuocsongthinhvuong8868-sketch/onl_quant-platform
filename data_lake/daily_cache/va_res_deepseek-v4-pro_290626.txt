@@ -1,0 +1,29 @@
+## 1. Observations
+- VN30 Stress Index: **3.33%** (dưới ngưỡng cảnh báo 40%)
+- Số mã thủng VaR 95%: **1/30** (VIC)
+- Complacency Index: **6.48%** (dưới ngưỡng nguy hiểm 80%)
+- Số mã mispriced (spread nén bất thường): **7**, dẫn đầu: VIB, TCB, OCB
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress ở mức 3.33% cho thấy **không có dấu hiệu lây lan hệ thống real-time**. Duy nhất VIC thủng VaR 95%, khả năng cao là sự cố cá biệt (idiosyncratic) chứ chưa phải đầu sóng lan rộng. Tuy nhiên cần theo dõi sát nếu VIC tiếp tục giảm và kéo thêm các mã vốn hóa lớn khác thủng ngưỡng trong những phiên tới.
+
+## 3. Complacency Assessment (Module C)
+Complacency Index 6.48% – **thị trường KHÔNG ở regime ngủ quên** (mất cảnh giác, spread nén trên diện rộng). Điều này KHÔNG đồng nghĩa thị trường an toàn hay vận hành ổn định. Stress thấp và complacency thấp chỉ phản ánh một trạng thái không có cấu trúc bù rủi ro bị bóp méo, cũng không có căng thẳng lây lan tức thời. Tuy nhiên, sự tồn tại của 7 mã mispriced (spread nén cục bộ) cho thấy vẫn tồn tại các túi định giá sai rủi ro riêng lẻ, đặc biệt ở nhóm ngân hàng (VIB, TCB, OCB). Những mã này dù thị trường chung chưa cảnh báo, nhưng đang tiềm ẩn rủi ro điều chỉnh nếu tâm lý thay đổi đột ngột.
+
+## 4. Stock-Level Risk Calls
+- **Top 1 Crash (VIC)**: Rủi ro giảm tiếp nếu không giữ được hỗ trợ động (MA20/MA50 trên D1). Giảm tỷ trọng nếu xác nhận phá vỡ volume đột biến.
+- **Top 3 Mispriced (VIB, TCB, OCB)**: Cảnh báo tiềm ẩn – spread đang bị nén chặt. Nếu thị trường chuyển sang risk-off, các mã này có thể chịu biến động mạnh do định giá chưa phản ánh đủ phần bù rủi ro. Hạn chế mua đuổi; cân nhắc hedging hoặc trailing stop gần (ví dụ dưới MA10 khung D1).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "VIB", "TCB", "OCB"],
+  "confidence": "medium"
+}
+```
