@@ -1,0 +1,45 @@
+## 1. Mechanical Decomposition
+Tuần 24/06/2026, thanh khoản ròng (Net Liquidity) giảm **36.5 tỷ USD**, về mức **5,812.4 tỷ USD**. Với RRP đã gần cạn (chỉ ~4.5 tỷ USD), biến động chủ yếu đến từ hai cấu phần chính:
+
+- **WALCL (Bảng cân đối Fed)** nhiều khả năng giảm nhẹ do Fed tiếp tục chương trình thắt chặt định lượng (QT) – tài sản đáo hạn không được tái đầu tư. Đây là lực rút thanh khoản thụ động.
+- **WTREGEN (Tài khoản tổng hợp của Kho bạc)** đã tăng mạnh (ước tính +~40 tỷ USD) lên mức 918.7 tỷ USD. Nguyên nhân chính: dòng tiền thuế doanh nghiệp quý II (hạn chót 15/06) được Kho bạc hấp thụ, tạm thời hút thanh khoản khỏi hệ thống ngân hàng (TGA ↑ = hút, theo cơ chế).
+
+Như vậy, sự sụt giảm tuần này là kết quả của cặp đôi **TGA tích lũy + QT đều đặn**, trong khi RRP không còn nhiều dư địa để tác động. TGA tăng là yếu tố chi phối chính.
+
+## 2. Cycle Positioning
+Vị thế chu kỳ thanh khoản: **QT_active**, nhưng đã tiến vào giai đoạn cuối khi  
+- RRP đã hoàn toàn cạn (4.5 tỷ USD << ngưỡng <100 tỷ), nghĩa là “buffer” cho thanh khoản từ tiền của quỹ thị trường tiền tệ không còn.  
+- TGA đang trong pha tích lũy cuối quý (biến động theo mùa vụ thuế), dự kiến sẽ giảm trở lại khi Kho bạc giải ngân trong những tuần tới.  
+So với lịch sử, Net Liquidity 5,812 tỷ USD thấp hơn đỉnh 2022 (~6.8 nghìn tỷ) nhưng vẫn cao hơn đáy 2024 (~5.5 nghìn tỷ). Hệ thống vẫn đang ở trạng thái thắt chặt, nhưng mức độ co hẹp đã giảm tốc do không còn kênh rút mạnh từ RRP.
+
+## 3. Signal Strength
+- Tín hiệu: **HOLD** (trung tính).  
+- Z-Score (52 tuần): **-0.51σ**, nằm trong vùng ồn, chưa đạt ngưỡng ±1σ để xác nhận ADD hay CUT.  
+- Impulse EMA(4) = -19.9 tỷ USD, thể hiện đà suy giảm nhẹ và khớp với HOLD.  
+Độ mạnh yếu của tín hiệu: mức cận biên, không đủ để kích hoạt một pha risk-on hay risk-off rõ ràng.
+
+## 4. Cross-Asset Spillover (1–4 tuần)
+- **SPX/NDX:** Bias trung tính, hơi thiên về giảm nhẹ do thanh khoản liên tục bị rút ròng qua TGA, nhưng mức rút không sốc. Định giá và yếu tố lợi nhuận sẽ là động lực chính.  
+- **DXY:** Hưởng lợi nhẹ từ thanh khoản USD thắt chặt (TGA cao), có thể giữ sức hoặc tăng nhẹ.  
+- **Gold/Crypto:** Áp lực nhẹ, vì môi trường thanh khoản giảm thường không ủng hộ tài sản phi lãi suất.  
+- **VN-Index:** Với độ trễ 4–8 tuần, đà suy giảm thanh khoản Fed có thể tạo lực cản nhẹ lên dòng vốn ngoại và tâm lý, nhưng chưa đến mức tiêu cực. Bias trung tính, nghiêng về thận trọng.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)
+- **RRP đã zero-gần:** Khi RRP cạn, CUT signal từ việc rút thanh khoản có xu hướng yếu đi vì không còn kênh “dự trữ” để thổi phồng động thái rút.  
+- **Nhiễu mùa vụ thuế:** TGA spike tháng 6 có thể giảm nhanh khi Kho bạc chi tiêu (lương, trợ cấp, giải ngân dự án), bơm trả lại thanh khoản.  
+- **Fed buyback đặc biệt / khả năng thay đổi tốc độ QT:** Nếu Fed bất ngờ giảm pace QT hoặc có can thiệp khẩn cấp, hoàn toàn có thể đảo chiều bức tranh.
+
+## 6. KẾT LUẬN
+Regime: QT_active giai đoạn cuối; trong 2-4 tuần tới, thanh khoản giữ trạng thái giằng co giữa lực kéo từ TGA giảm và QT nền, chưa đủ điều kiện để đẩy risk assets sang một hướng rõ ràng.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5812.4,
+  "signal": "HOLD",
+  "z_score": -0.51,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

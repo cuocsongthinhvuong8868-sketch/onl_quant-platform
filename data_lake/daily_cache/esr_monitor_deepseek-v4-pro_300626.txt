@@ -1,0 +1,37 @@
+## 1. Observations
+- SSI: **64.8% → WARNING** (rủi ro hệ thống đang tích lũy ngầm)  
+- Market State: **HEALTHY** (low stress + uptrend, giá trên MA125)  
+- PCA concentration: PC1 EVR = 38.2% (tương quan hệ thống tăng)  
+- Top 3 pillar drivers: **S_LIQ (36%)**, **S_VAL (31%)**, **S_COR (18%)**  
+- Pillar Mode: **downside** – chỉ tính các yếu tố căng thẳng trong những phiên giảm
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ** đang dẫn dắt với trọng số 36% – chỉ số Volume Dry‑Up (−log(MA20/MA252)) ở mức cao, phản ánh **tổng dollar volume thị trường đang khô cạn rõ rệt so với chuẩn 1 năm**. Thanh khoản suy yếu trong bối cảnh giá neo cao là tín hiệu đáng ngại.  
+
+**S_VAL** (31%) cho thấy áp lực định giá đáng kể: cặp giá/lãi suất tiền gửi 252 ngày bị kéo căng, hàm ý định giá VN30 đã chạy trước nền tảng lợi suất thực.  
+
+**S_COR** (18%) kết hợp với PC1 EVR 38.2% chỉ ra **hiện tượng di chuyển đồng pha gia tăng** (herding), thường xuất hiện ở giai đoạn trễ của một xu hướng tăng.  
+
+Cấu trúc S_LIQ đỉnh + S_VAL cao + S_COR tăng → chữ ký **bull‑trap** dưới góc nhìn phân rã rủi ro: volume cạn, định giá nóng, tương quan cao – ba yếu tố cùng hướng stress.
+
+## 3. Cross-Check
+- **Giá VN30 đóng trên MA125** (xu hướng tăng kỹ thuật) nhưng **SSI đã vào WARNING (64.8%)** → phân kỳ tiêu cực: thị trường bề ngoài khỏe mạnh, bên trong rủi ro ngầm đang dày lên.  
+- **HMM regime HEALTHY chưa khớp với SSI WARNING** – do HMM sử dụng ngưỡng quyết định cố định, trong khi SSI (chế độ downside) nhạy hơn với áp lực bán dồn nén. Đây là dấu hiệu HMM có thể điều chỉnh chậm, cần chú ý trong các phiên tới.
+
+## 4. Verdict
+- **Tỷ trọng tiền mặt đề xuất: 30%** danh mục, nâng cao phòng thủ trước rủi ro thanh khoản và định giá.  
+- **Hành động phòng hộ: giảm beta** – tăng tỉ trọng cổ phiếu phòng thủ, hạn chế đòn bẩy; chưa khuyến nghị bán khống chỉ số hay mua put vì SSI chưa vượt 80% và HMM vẫn đang ở trạng thái HEALTHY.  
+- Các pillar drivers nhất quán theo hướng bearish (S_LIQ, S_VAL, S_COR), không có mâu thuẫn nội tại → tín hiệu có thể hành động được, dù cần xác nhận thêm từ HMM trong 1‑2 phiên.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.8,
+  "regime": "WARNING",
+  "market_state": "HEALTHY",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 30,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

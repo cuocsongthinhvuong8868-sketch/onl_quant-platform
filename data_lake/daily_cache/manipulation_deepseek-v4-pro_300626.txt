@@ -1,0 +1,28 @@
+## 1. Observations
+- OLS Slope ở 0.21 (percentile 7.4th) – rất thấp, chỉ báo độ nhạy của composite VIC/VHM/VRE lên VN30F1M gần như biến mất.
+- Correlation ở 0.58 (percentile 47.2th) – trung bình, không đủ mạnh để tạo tín hiệu đáng tin cậy.
+- Regime xác định là **STATUS QUO** do ΔCorr (+0.02) và ΔSlope (-0.68) không đồng thời vượt ngưỡng kích hoạt các trạng thái khác.
+
+## 2. Microstructure Read
+Vai trò chi phối của nhóm VIN lên VN30F1M hiện tại rất mờ nhạt. Slope cực thấp cho thấy biến động giá của VIC, VHM, VRE hầu như không kéo theo được chỉ số tương lai. Dù correlation vẫn ở mức trung bình, điều này chỉ phản ánh mối tương quan nền hơn là khả năng dẫn dắt. Không có dấu hiệu bất thường kiểu can thiệp thị trường (cả hai percentile đều không cùng >80th). Thị trường đã chuyển hướng quan tâm sang nhóm khác.
+
+## 3. Event Study Interpretation
+Trạng thái **STATUS QUO** từ 03/04/2026 hàm ý không có thay đổi cấu trúc đáng kể trong mối quan hệ VIN–F1. ΔCorr gần bằng 0 cho thấy mức độ tương quan duy trì ổn định, còn ΔSlope giảm mạnh đơn lẻ không đủ để hình thành chế độ mới (ví dụ như DECOUPLING). Do đó, cả intraday lẫn overnight đều không có edge rõ ràng từ mô hình PCA này. Nhà giao dịch ngắn hạn nên đứng ngoài hoặc tìm kiếm tín hiệu từ nhóm ngành khác.
+
+## 4. Verdict
+- **Trade plan:** `NO TRADE`. Hệ thống VIN-F1 không cung cấp tín hiệu đủ mạnh để vào lệnh.
+- **Leading indicator cần theo dõi:** Nhóm Ngân hàng (VCB, BID, CTG) hoặc Chứng khoán (SSI, VND), vì dòng tiền có xu hướng xoay vòng khi họ VIN mất vai trò dẫn dắt.
+- **Stop-loss reference:** Không áp dụng do không có vị thế được mở.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "30/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 7.4,
+  "corr_percentile": 47.2,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

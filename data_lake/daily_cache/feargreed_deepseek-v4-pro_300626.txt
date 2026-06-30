@@ -1,0 +1,44 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score: 48.9/100 – trong biên độ NEUTRAL (40-60), giảm -0.7 so phiên trước.
+- EGARCH Vol (chuẩn hóa): 12.7% – mức trung bình, giảm mạnh -4.0%.
+- Rolling Skewness: -0.03 – gần bằng 0, không có đuôi bất đối xứng rõ rệt.
+- Downside Correlation: 2.8% – rất thấp; Upside Correlation: 23.4% – chênh lệch rõ nhưng chưa ở vùng cực đoan của lòng tham.
+
+## 2. Interpretation
+Dữ liệu chỉ ra thị trường đang trong pha **NEUTRAL / STOCK PICKING**, ưu tiên phân hóa cổ phiếu. Rủi ro hệ thống phía giảm giá ở mức tối thiểu (downside correlation cực thấp), trong khi biến động tiếp tục suy giảm. Không có bằng chứng của hoảng loạn bán tháo hay đầu cơ đám đông quá mức.
+
+## 3. Cross-Check
+- **Score ↔ EGARCH Vol**: Score trung bình đi cùng vol trung bình và đang hạ – nhất quán, không có divergence.
+- **Skewness ↔ Correlation**: Skewness ≈ 0 kết hợp với down-cor rất thấp và up-cor tăng vừa phải – phù hợp với môi trường phân hóa, ít rủi ro đuôi; không có dấu hiệu chuyển pha bất thường.
+
+Tất cả các tín hiệu đều đồng thuận, không xuất hiện mâu thuẫn nội bộ.
+
+## 4. Verdict
+**Beta exposure đề xuất: 0.80** cho danh mục VN-Index.  
+- Duy trì tỷ trọng cổ phiếu ở mức trung bình – cao, tập trung vào lựa chọn mã riêng lẻ (stock picking).  
+- Không cần tăng cường phòng hộ hệ thống (downside correlation quá thấp).  
+- Có thể xem xét tăng nhẹ tỷ trọng nếu tín hiệu kỹ thuật từng cổ phiếu xác nhận.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "30/06/2026",
+  "regime": "NEUTRAL",
+  "score": 48.9,
+  "confidence": "high",
+  "beta_target": 0.8,
+  "key_signals": [
+    "Score 48.9 – nằm trong vùng NEUTRAL/STOCK PICKING",
+    "Downside correlation rất thấp (2.8%) – rủi ro hệ thống giảm giá không đáng kể",
+    "Upside correlation 23.4% – cải thiện nhưng chưa đạt ngưỡng GREED"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 48.9
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

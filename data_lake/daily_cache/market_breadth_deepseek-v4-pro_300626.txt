@@ -1,0 +1,33 @@
+## 1. Observations
+- MA20: 35.5% — thấp, chưa chạm ngưỡng quá bán (<20%) nhưng phản ánh xung lực ngắn hạn yếu, đa số cổ phiếu vận động dưới đường trung bình động 1 tháng.
+- MA60: 30.1% — thấp, xác nhận xu hướng trung hạn (1 quý) vẫn trong trạng thái điều chỉnh, chưa có tín hiệu kết thúc.
+- MA125: 26.1% — rất thấp, chỉ hơn ¼ rổ vượt được MA nửa năm, chu kỳ kinh doanh 6 tháng đang suy yếu lan rộng.
+- MA252: 28.0% — thấp, đường xu hướng dài hạn (1 năm) cho thấy chưa đến 30% mã duy trì được cấu trúc tăng trưởng bền vững, thị trường lệch pha Bear.
+
+## 2. Structural Health
+Cả bốn đường MA đều ở vùng thấp, tạo thành mặt cắt đồng thuận tiêu cực (không có phân kỳ mạnh giữa MA20 và MA252). MA20 tuy cao hơn một chút so với MA252 nhưng không đạt ngưỡng tạo bẫy (Bear Trap cần MA20 oversold <20% và MA252 >50%). Hiện tượng giảm dần từ MA20→MA125 cho thấy dòng tiền ngắn hạn teo tóp, dài hạn chưa hồi phục. Khớp với mẫu hình **Neutral nghiêng Bear** — thị trường không trong uptrend mạnh cũng chưa rơi vào Bear Confirmed (vì MA20 >30%). Cấu trúc kỹ thuật đang giằng co ở biên dưới, rủi ro suy yếu tiếp vẫn hiện hữu.
+
+## 3. Money Flow Leadership
+- **Top volume MA20 (ngắn hạn)**: xuất hiện các mã Tài chính – Ngân hàng (ABB), Chứng khoán (AGR) đan xen với Nhựa (AAA), Thủy sản (ANV) và một số mã nhỏ khác. Không có ngành dẫn dắt rõ nét, dòng tiền đầu cơ phân tán, thiếu trụ đỡ.
+- **Top volume MA252 (dài hạn)**: nổi bật Ngân hàng (ABB, BID), Năng lượng – Lọc hóa dầu (BSR), Nhựa (BMP). Các mã này vừa có thanh khoản cao vừa duy trì được xu hướng trên MA năm, cho thấy dòng tiền lớn vẫn ẩn náu ở nhóm phòng thủ vốn hóa lớn, ít biến động.
+- Overlap giữa hai nhóm ở ABB, ADS, APF — phản ánh smart money vừa chơi ngắn vừa giữ dài ở một số cổ phiếu an toàn. Tổng thể leadership nghiêng về **Defensive** (Ngân hàng, Năng lượng) hơn là Aggressive (Thép, Chứng khoán đầu cơ).
+
+## 4. Verdict
+- **Chiến lược**: Defensive cash-up — ưu tiên bảo toàn vốn, giảm tỷ trọng cổ phiếu yếu, không mở mới vị thế đuổi theo sóng nhỏ. Thị trường chưa đủ oversold để canh hồi phục T+ theo mean-reversion; trend-following không khả thi vì breadth quá thấp.
+- **Đòn bẩy**: 0% margin (MA252 chỉ 28%, đi ngược hoàn toàn quy tắc cho phép margin >30%).
+- Không có phân kỳ rõ ràng giữa MA20 và MA252 để kích hoạt WAIT; tuy nhiên, do MA20 trên 30% trong khi MA252 yếu, tình huống vẫn giằng co – khuyến nghị đứng ngoài và chờ tín hiệu dòng tiền cải thiện trên MA60.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 35.5,
+  "ma60_pct": 30.1,
+  "ma125_pct": 26.1,
+  "ma252_pct": 28.0,
+  "regime": "neutral",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "low"
+}
+```
