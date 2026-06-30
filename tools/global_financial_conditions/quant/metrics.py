@@ -30,8 +30,9 @@ EM_OAS, OVX, VVIX, T10Y2Y, DXY là auxiliary — chỉ z-score + percentile, KH�
 Pipeline:
   1. fetch_raw_data(fred_api_key) -> DataFrame 11 raw cols
   2. process_gfcm_logic(df_raw) -> DataFrame với:
-       * Per-series rolling z-score & percentile rank 252d (1Y)
-       * Credit Quality Spread (CCC − HY) + percentile
+       * Per-series rolling z-score 252d (1Y)
+       * Per-series percentile rank max 756d (3Y) with 252d warm-up
+       * Credit Quality Spread (CCC − HY) + percentile rank max 756d
        * Expanding point-in-time PCA 6-series (PC1 = stress, PC2 = divergence)
        * PC1 rolling percentile 1Y
        * Regime classification (STRESS / ELEVATED / CALM)
@@ -66,8 +67,11 @@ YAHOO_TICKERS = {
 }
 
 START_DATE = "2003-01-01"       # MOVE Yahoo coverage starts ~2003
-ROLLING_WINDOW = 252            # 1 năm trading days — FRED ICE BofA chỉ cấp ~3 năm history
-                                # (ICE pull license 2021); 252d cho phép ~280 valid regime points.
+ROLLING_WINDOW = 252            # Legacy default: 1Y z-score/PCA/regime window.
+ZSCORE_WINDOW = ROLLING_WINDOW
+PC1_PERCENTILE_WINDOW = ROLLING_WINDOW
+SERIES_PERCENTILE_WINDOW = 756  # 3Y max trading-day window for indicator percentile ranks.
+SERIES_PERCENTILE_MIN_PERIODS = ROLLING_WINDOW  # Start PR after 1Y to avoid empty credit history.
 
 PCT_STRESS = 0.80               # PC1_pct ≥ 0.80 → STRESS
 PCT_ELEVATED = 0.50             # 0.50 ≤ PC1_pct < 0.80 → ELEVATED, dưới = CALM
@@ -283,8 +287,12 @@ def _rolling_zscore(s: pd.Series, window: int) -> pd.Series:
     return (s - mean) / std
 
 
-def _rolling_pct_rank(s: pd.Series, window: int) -> pd.Series:
-    return s.rolling(window=window, min_periods=window).rank(pct=True)
+def _rolling_pct_rank(
+    s: pd.Series, window: int, min_periods: int | None = None
+) -> pd.Series:
+    if min_periods is None:
+        min_periods = window
+    return s.rolling(window=window, min_periods=min_periods).rank(pct=True)
 
 
 # ────────────────────────────────────────────────────────────────────────────
@@ -480,10 +488,19 @@ def _classify_driver(
 # ────────────────────────────────────────────────────────────────────────────
 
 def process_gfcm_logic(
-    df_raw: pd.DataFrame, window: int = ROLLING_WINDOW
+    df_raw: pd.DataFrame,
+    window: int = ZSCORE_WINDOW,
+    *,
+    pct_window: int = SERIES_PERCENTILE_WINDOW,
+    pct_min_periods: int = SERIES_PERCENTILE_MIN_PERIODS,
+    pc1_pct_window: int = PC1_PERCENTILE_WINDOW,
 ) -> tuple[pd.DataFrame, dict]:
     """
     Full pipeline: z-score → percentile → PCA (6 core) → regime/driver.
+
+    `window` remains the 1Y z-score/PCA window. Per-indicator percentile ranks
+    use a 3Y max window with a 1Y warm-up; PC1_pct/regime stays 1Y so the
+    shorter post-2023 ICE BofA credit history does not blank out PCA/regime.
     """
     if df_raw is None or df_raw.empty:
         return pd.DataFrame(columns=OUTPUT_COLUMNS), {}
@@ -495,9 +512,13 @@ def process_gfcm_logic(
     for col in RAW_COLUMNS:
         label = _LABEL[col]
         df[f"{label}_z"] = _rolling_zscore(df[col], window)
-        df[f"{label}_pct"] = _rolling_pct_rank(df[col], window)
+        df[f"{label}_pct"] = _rolling_pct_rank(
+            df[col], pct_window, min_periods=pct_min_periods
+        )
 
-    df["CQS_pct"] = _rolling_pct_rank(df["Credit_Quality_Spread"], window)
+    df["CQS_pct"] = _rolling_pct_rank(
+        df["Credit_Quality_Spread"], pct_window, min_periods=pct_min_periods
+    )
 
     pca_z_cols = [f"{_LABEL[c]}_z" for c in PCA_COLUMNS]
     df_pc, meta = fit_expanding_pca(df[pca_z_cols])
@@ -507,7 +528,13 @@ def process_gfcm_logic(
     # EMA smoothing PC1 để giảm regime flicker (span=5, half-life ~3 ngày).
     # Regime + PC1_pct dùng PC1_smooth; PC1 raw giữ nguyên cho 5d change.
     df["PC1_smooth"] = df["PC1"].ewm(span=PC1_EMA_SPAN, adjust=False).mean()
-    df["PC1_pct"] = _rolling_pct_rank(df["PC1_smooth"], window)
+    df["PC1_pct"] = _rolling_pct_rank(df["PC1_smooth"], pc1_pct_window)
+    meta.update({
+        "zscore_window": window,
+        "series_percentile_window": pct_window,
+        "series_percentile_min_periods": pct_min_periods,
+        "pc1_percentile_window": pc1_pct_window,
+    })
 
     df["Regime"] = [_classify_regime(p) for p in df["PC1_pct"]]
     df["Driver"] = [

@@ -230,17 +230,17 @@ def plot_pc1_with_regime(df: pd.DataFrame) -> go.Figure:
 
 def plot_percentile_grid(df: pd.DataFrame) -> go.Figure:
     """
-    6-panel small multiples: percentile rank 1Y của 6 PCA-core series
+    6-panel small multiples: percentile rank 3Y max của 6 PCA-core series
     (VIX, MOVE, SKEW, HY, CCC, IG). Shading vùng 80% (HIGH).
     Layout 3x2.
     """
     specs = [
-        ("VIX_pct",  "VIX Percentile Rank (1Y)",  "VIX",  "VIX"),
-        ("MOVE_pct", "MOVE Percentile Rank (1Y)", "MOVE", "MOVE"),
-        ("SKEW_pct", "SKEW Percentile Rank (1Y)", "SKEW", "SKEW"),
-        ("HY_pct",   "HY OAS Percentile Rank (1Y)",  "HY",  "HY_OAS"),
-        ("CCC_pct",  "CCC OAS Percentile Rank (1Y)", "CCC", "CCC_OAS"),
-        ("IG_pct",   "IG OAS Percentile Rank (1Y)",  "IG",  "IG_OAS"),
+        ("VIX_pct",  "VIX Percentile Rank (3Y Max)",  "VIX",  "VIX"),
+        ("MOVE_pct", "MOVE Percentile Rank (3Y Max)", "MOVE", "MOVE"),
+        ("SKEW_pct", "SKEW Percentile Rank (3Y Max)", "SKEW", "SKEW"),
+        ("HY_pct",   "HY OAS Percentile Rank (3Y Max)",  "HY",  "HY_OAS"),
+        ("CCC_pct",  "CCC OAS Percentile Rank (3Y Max)", "CCC", "CCC_OAS"),
+        ("IG_pct",   "IG OAS Percentile Rank (3Y Max)",  "IG",  "IG_OAS"),
     ]
 
     fig = make_subplots(
@@ -374,7 +374,7 @@ def plot_credit_quality_spread(df: pd.DataFrame) -> go.Figure:
         latest_pct = df_valid["CQS_pct"].dropna().iloc[-1]
         fig.add_annotation(
             x=df_valid.index[-1], y=df_valid["Credit_Quality_Spread"].iloc[-1],
-            text=f"PR 1Y: {latest_pct*100:.0f}%",
+            text=f"PR 3Y: {latest_pct*100:.0f}%",
             showarrow=True, arrowhead=2, arrowcolor="#be123c",
             font=dict(color="#be123c", size=11),
             bgcolor="white", bordercolor="#be123c", borderwidth=1,

@@ -7,7 +7,8 @@ Luồng:
        VIXCLS / BAMLH0A0HYM2 / BAMLH0A3HYC / BAMLC0A0CM / BAMLEMCBPIOAS / T10Y2Y
   2. Pull 5 Yahoo tickers:
        ^MOVE / ^SKEW / ^OVX / ^VVIX / DX-Y.NYB
-  3. Compute rolling z-score + percentile rank 252d (1Y) cho 11 series,
+  3. Compute rolling z-score 252d (1Y) + percentile rank max 756d (3Y, min 252d)
+     cho 11 series,
      expanding point-in-time PCA 6-core (VIX/MOVE/SKEW/HY/CCC/IG), regime + driver
   4. Lưu vào data_lake/global_financial_conditions_cache.csv
 

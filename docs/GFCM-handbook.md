@@ -54,9 +54,9 @@ Sau đó dùng signal này để đánh giá spillover sang VN-Index với lag 4
 ```
 Raw 11 series
     ↓
-Per-series z-score (rolling 252d) + Percentile rank (rolling 252d)
+Per-series z-score (rolling 252d) + Percentile rank (rolling max 756d, min 252d)
     ↓
-PCA fit static trên 6 core series (VIX, MOVE, SKEW, HY, CCC, IG)
+Expanding point-in-time PCA trên 6 core series (VIX, MOVE, SKEW, HY, CCC, IG)
     → PC1 (common stress factor), PC2 (divergence)
     ↓
 PC1_smooth = PC1.ewm(span=5)  ← EMA(5) giảm regime flicker
@@ -64,7 +64,7 @@ PC1_smooth = PC1.ewm(span=5)  ← EMA(5) giảm regime flicker
 PC1_pct = rolling percentile rank 252d của PC1_smooth
     ↓
 Regime: PC1_pct ≥ 80% = STRESS · 50-80% = ELEVATED · < 50% = CALM
-Driver: argmax percentile của 6 core series (+ BROAD_STRESS nếu ≥ 4/6 ≥ 80%)
+Driver: argmax 3Y indicator percentile của 6 core series (+ BROAD_STRESS nếu ≥ 4/6 ≥ 80%)
 ```
 
 ### Tại sao chỉ 6 series vào PCA?
@@ -116,7 +116,7 @@ Raw PC1 có high-freq noise → regime bands (STRESS/ELEVATED/CALM) nhảy nhanh
 
 ## 5. Driver Flag
 
-Sau khi xác định Regime, Driver chỉ ra **stress đến từ đâu** trong 6 core series:
+Sau khi xác định Regime, Driver chỉ ra **stress đến từ đâu** trong 6 core series, dùng percentile rank của từng indicator trên cửa sổ tối đa 3Y với warm-up 1Y:
 
 | Driver | Trigger | Ý nghĩa |
 |---|---|---|
@@ -164,7 +164,7 @@ Sau khi xác định Regime, Driver chỉ ra **stress đến từ đâu** trong 
 - **Header metrics**: Regime icon + Driver + PC1 EMA(5) value + PC1 5d delta
 - **6 PCA core percentiles** + **5 auxiliary percentiles** ở 2 hàng
 - **Chart PC1 + Regime bands**: 2 line — raw mờ (gray) + EMA(5) bold (dark), background color = regime
-- **Percentile grid 6 panel**: hiển thị PR 1Y của 6 PCA core với 80% threshold shaded
+- **Percentile grid 6 panel**: hiển thị PR 3Y max của 6 PCA core với 80% threshold shaded
 - **Scatter PC1 vs PC2**: 252 phiên gần nhất, color = recency
 - **Credit Quality Spread**: line CCC − HY với percentile annotation
 - **AI Analysis tab**: prompt 8 sections, output 550-700 từ tiếng Việt + JSON tail
@@ -173,7 +173,7 @@ Sau khi xác định Regime, Driver chỉ ra **stress đến từ đâu** trong 
 
 ## 8. Limitations & Caveats
 
-1. **ICE BofA truncation**: 4 series FRED (HY/CCC/IG/EM) chỉ có history ~3 năm do ICE pull license 2021. Đây là lý do rolling window đặt 252d (1Y) thay vì 756d (3Y) — để có đủ valid regime points.
+1. **ICE BofA truncation**: 4 series FRED (HY/CCC/IG/EM) chỉ có history ~3 năm do ICE pull license 2021. Indicator percentiles dùng cửa sổ tối đa 756d (3Y) nhưng warm-up 252d để chart không bị gần như trống; z-score/PCA/PC1 regime percentile vẫn giữ 252d (1Y) để có đủ valid regime points.
 2. **MOVE Yahoo coverage** bắt đầu ~2003 — không backtest pre-2003.
 3. **PC1 5d change dùng raw**, không phải smoothed → có thể spike đột biến trong khi Regime chưa kịp chuyển (early warning hữu ích).
 4. **EMA(5) lag**: regime trigger lag ~3 ngày so với raw — chấp nhận được vì avoid noise-driven false transitions.
@@ -230,7 +230,11 @@ YAHOO_TICKERS = {
 }
 
 START_DATE = "2003-01-01"
-ROLLING_WINDOW = 252        # 1Y
+ROLLING_WINDOW = 252        # Legacy 1Y z-score/PCA/regime window
+ZSCORE_WINDOW = 252
+PC1_PERCENTILE_WINDOW = 252
+SERIES_PERCENTILE_WINDOW = 756
+SERIES_PERCENTILE_MIN_PERIODS = 252
 PCT_STRESS = 0.80           # STRESS threshold
 PCT_ELEVATED = 0.50         # ELEVATED threshold
 PCT_DRIVER_HIGH = 0.80      # Driver flag threshold

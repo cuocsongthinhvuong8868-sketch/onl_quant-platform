@@ -77,7 +77,7 @@ command/
 | 8 | C | VaRES | `va_res` | Cornish-Fisher + Self-baseline Complacency | Executive summary |
 | 9 | C | **Var-CVaR VNINDEX** | `var_cvar_vnindex` | Gaussian + Historical + **EVT POT-GPD** + Hill | Executive summary |
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | Standalone (AI tab trên page) |
-| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, **expanding point-in-time PCA**, regime via PC1 percentile 1Y | Standalone (AI tab trên page) |
+| 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, indicator PR 3Y max, **expanding point-in-time PCA**, regime via PC1 percentile 1Y | Standalone (AI tab trên page) |
 | 12 | A | **Bank Valuation** | `bank_valuation` | Bottom-up bank valuation + valuation breadth regime proxy | Standalone |
 | 13 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
 | 14 | B | **Factor Examination** | `factor_examination` | 10 cross-section factor, sector-neutral ICB, portfolio examination | Standalone |
@@ -237,7 +237,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - Regime via PC1 rolling percentile 1Y: STRESS (≥80%) / ELEVATED (50-80%) / CALM (<50%)
 - Driver flag: EQUITY_DRIVEN / RATES_DRIVEN / HY_CREDIT_DRIVEN / CCC_CREDIT_DRIVEN / BROAD_STRESS (≥3/4 ≥80pct) / NO_STRESS
 - 2-tab page: **📊 Level** (4-panel raw + mean overlay) / **🧠 Analytics** (PC1+regime band, percentile small multiples, PC2-vs-PC1 scatter, CQS chart, AI section)
-- Sidebar: slider "Lùi bao nhiêu năm?" (1-22, default 3) — chỉ filter display, PCA fit + percentile vẫn dùng full history
+- Sidebar: slider "Lùi bao nhiêu năm?" (1-22, default 3) — chỉ filter display; z-score/PCA/regime và indicator percentile windows dùng full unfiltered cache
 - Standalone AI tab (giống fed_liquidity pattern), KHÔNG inject executive summary
 - History từ 2003 (limit của MOVE Yahoo coverage)
 - Smoke test: PCA loadings + explained variance valid, regime distribution reasonable
@@ -399,7 +399,7 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - `tools/risk_adjusted_growth/quant/data_prep.py` → `PRICE_THOUSANDS_TO_VND = 1000`
 - `tools/var_cvar_vnindex/quant/evt.py` → `DEFAULT_REFIT_EVERY = 21`
 - `tools/fear_greed/quant/volatility.py` → `EWMA_LAMBDA = 0.94` (fallback)
-- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 252` (1Y — FRED ICE BofA truncate), `PC1_EMA_SPAN = 5` (smooth), `PCT_STRESS = 0.80`, `PCT_ELEVATED = 0.50`, `START_DATE = "2003-01-01"`, `PCA_COLUMNS` (6 core) vs `AUX_COLUMNS` (5)
+- `tools/global_financial_conditions/quant/metrics.py` → `ROLLING_WINDOW = 252` (1Y z-score/PCA/regime), `SERIES_PERCENTILE_WINDOW = 756`, `SERIES_PERCENTILE_MIN_PERIODS = 252`, `PC1_EMA_SPAN = 5` (smooth), `PCT_STRESS = 0.80`, `PCT_ELEVATED = 0.50`, `START_DATE = "2003-01-01"`, `PCA_COLUMNS` (6 core) vs `AUX_COLUMNS` (5)
 
 **Universe & data:**
 - ~250 tickers `tickers.csv`; VN30 hardcoded `VN30_TICKERS` (30 mã) trong `tools/esr_monitor/quant/metrics.py:36`

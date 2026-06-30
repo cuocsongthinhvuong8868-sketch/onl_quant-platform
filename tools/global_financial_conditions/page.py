@@ -46,8 +46,29 @@ except ImportError:
     }
 
 GFCM_FILE = "global_financial_conditions_cache.csv"
+GFCM_AI_CACHE_VERSION = "indicator_pr3y_pca_point_in_time_v1"
+GFCM_AI_CACHE_MARKER = f"<!-- ai-cio-cache-version: {GFCM_AI_CACHE_VERSION} -->"
 
 REGIME_ICON = {"STRESS": "🔴", "ELEVATED": "🟠", "CALM": "🟢", "N/A": "⚪"}
+
+
+def _encode_gfcm_ai_cache(content: str) -> str:
+    text = str(content or "")
+    if text.startswith(GFCM_AI_CACHE_MARKER):
+        return text
+    return f"{GFCM_AI_CACHE_MARKER}\n{text}"
+
+
+def _decode_gfcm_ai_cache(content: str) -> str | None:
+    text = str(content or "").lstrip()
+    if not text.startswith(GFCM_AI_CACHE_MARKER):
+        return None
+    return text[len(GFCM_AI_CACHE_MARKER):].lstrip("\r\n")
+
+
+def _strip_gfcm_ai_cache_marker(content: str) -> str:
+    decoded = _decode_gfcm_ai_cache(content)
+    return decoded if decoded is not None else str(content or "")
 
 
 def _load_gfcm() -> pd.DataFrame:
@@ -80,7 +101,8 @@ def render():
         st.title("🌐 Global Financial Conditions Monitor")
         st.caption(
             "11 indicators · Vol (VIX/MOVE/SKEW/OVX/VVIX) + Credit (HY/CCC/IG/EM OAS) + Macro (2s10s/DXY) · "
-            "Expanding point-in-time PCA 6-core · Regime via PC1 percentile rank 1Y"
+            "Indicator PR max 3Y (warm-up 1Y) · Expanding point-in-time PCA 6-core · "
+            "Regime via PC1 percentile rank 1Y"
         )
     with col_handbook:
         st.write("")  # spacer để align với title
@@ -240,7 +262,7 @@ def render():
     # Tab 2 — Analytics
     # ────────────────────────────────────────────────────────────────────
     with tab_analytics:
-        st.subheader("Percentile Rank · PCA · Regime")
+        st.subheader("Percentile Rank 3Y · PCA · Regime")
 
         # Row 1: PC1 + 6 PCA-core percentiles
         st.markdown("**PCA core (6 series)**")
@@ -364,10 +386,18 @@ def render():
         tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
 
         with tab_current:
+            cached_result = None
             if ai_cache_file.exists():
-                st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
                 with open(ai_cache_file, "r", encoding="utf-8") as f:
-                    cached_result = f.read()
+                    cached_result = _decode_gfcm_ai_cache(f.read())
+                if cached_result is None:
+                    st.info(
+                        "Cache AI hôm nay được tạo trước methodology PR 3Y; "
+                        "chạy lại để refresh."
+                    )
+
+            if cached_result is not None:
+                st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
                 with st.container(border=True):
                     st.markdown(cached_result)
 
@@ -413,7 +443,7 @@ def render():
                                     # Macro group
                                     .replace("[T10Y2Y]", f"{summary['t10y2y']:+.2f}")
                                     .replace("[DXY]", f"{summary['dxy']:.2f}")
-                                    # Percentile ranks 1Y (11 indicators)
+                                    # Indicator percentile ranks: 3Y max window with 1Y warm-up.
                                     .replace("[VIX_pct]", f"{summary['vix_pct']*100:.0f}")
                                     .replace("[MOVE_pct]", f"{summary['move_pct']*100:.0f}")
                                     .replace("[SKEW_pct]", f"{summary['skew_pct']*100:.0f}")
@@ -426,7 +456,7 @@ def render():
                                     .replace("[T10Y2Y_pct]", f"{summary['t10y2y_pct']*100:.0f}")
                                     .replace("[DXY_pct]", f"{summary['dxy_pct']*100:.0f}")
                                     .replace("[CQS_pct]", f"{summary['cqs_pct']*100:.0f}")
-                                    # Z-scores 1Y (chỉ inject 6 PCA cores cho prompt gọn)
+                                    # Z-scores remain 1Y (chỉ inject 6 PCA cores cho prompt gọn)
                                     .replace("[VIX_z]", f"{summary['vix_z']:+.2f}")
                                     .replace("[MOVE_z]", f"{summary['move_z']:+.2f}")
                                     .replace("[SKEW_z]", f"{summary['skew_z']:+.2f}")
@@ -463,7 +493,7 @@ def render():
 
                                 ai_cache_file.parent.mkdir(parents=True, exist_ok=True)
                                 with open(ai_cache_file, "w", encoding="utf-8") as f:
-                                    f.write(result_text)
+                                    f.write(_encode_gfcm_ai_cache(result_text))
 
                                 st.success("Hoàn thành phân tích!")
                                 with st.container(border=True):
@@ -491,6 +521,6 @@ def render():
                 with st.container(border=True):
                     try:
                         with open(_sel_path, "r", encoding="utf-8") as f:
-                            st.markdown(f.read())
+                            st.markdown(_strip_gfcm_ai_cache_marker(f.read()))
                     except Exception as e:
                         st.error(f"Lỗi đọc file: {e}")

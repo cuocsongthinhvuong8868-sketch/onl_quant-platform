@@ -1,0 +1,113 @@
+# BÁO CÁO THANH KHOẢN VĨ MÔ LTMM
+**Ngày phân tích:** 2026-06-30  
+**Trạng thái tổng thể:** STRESS_TRANSMITTING
+
+---
+
+## 1. Phân tích Thượng nguồn (Funding Liquidity - FLI)
+
+FLI đạt -0.182 điểm, duy trì trạng thái **neutral** với chất lượng dữ liệu ở mức **usable** (0.73). Mức điểm này cho thấy nguồn cung thanh khoản từ Ngân hàng Trung ương và tài khóa đang ở trạng thái cân bằng, không có dấu hiệu thắt chặt hay dồi dào rõ rệt.
+
+Tuy nhiên, cần lưu ý dấu vết **FX offshore stress footprint** đạt -0.434 điểm (neutral, chất lượng HIGH) – đây là tín hiệu cho thấy áp lực tỷ giá từ thị trường offshore vẫn hiện hữu, dù chưa đạt ngưỡng căng thẳng. Điều này phản ánh SBV đang duy trì chính sách điều hành linh hoạt, không can thiệp mạnh vào thị trường ngoại hối nhưng vẫn phải theo dõi sát biến động DXY và dòng vốn ngoại.
+
+**Kết luận thượng nguồn:** Nguồn cung thanh khoản cơ bản ổn định, không có cú sốc từ phía SBV hay tài khóa. Rủi ro chính đến từ kênh tỷ giá offshore – cần giám sát nếu DXY tiếp tục tăng.
+
+---
+
+## 2. Chẩn đoán Nút thắt truyền dẫn (Friction Layer & Wedge Diagnostics)
+
+### 2.1. Nút thắt cổ chai chính
+
+**Term interbank volume contraction** (FRI_counterparty) đạt stress_score **1.036** – đây là nút thắt duy nhất ở trạng thái **tightening** trong toàn bộ hệ thống. Chất lượng dữ liệu ở mức **LOW_SHORT_BASELINE**, nghĩa là baseline ngắn hạn có thể chưa đủ tin cậy, nhưng mức stress >1.0 là tín hiệu rõ ràng về sự co hẹp thanh khoản kỳ hạn trên thị trường liên ngân hàng.
+
+### 2.2. Phân tích vector FRI
+
+- **FRI_banking** (-0.475, neutral): Deposit rate dispersion ở mức -0.425 – chênh lệch lãi suất huy động đang thu hẹp, phản ánh sự cạnh tranh huy động vốn giảm bớt.
+- **FRI_intermediary** (0.372, neutral): Margin call wave footprint ở -0.432 – dấu hiệu cho thấy áp lực margin call chưa lan rộng, nhưng cần theo dõi nếu thị trường giảm sâu.
+- **FRI_collateral** (0.668, neutral): Chất lượng **warning** – dữ liệu collateral chưa đạt độ tin cậy cao, nhưng điểm số dương nhẹ cho thấy thị trường repo chưa có căng thẳng.
+- **FRI_regulatory** (0.0004, neutral): Gần như trung tính tuyệt đối, không có tác động từ chính sách.
+
+### 2.3. Dấu vết ẩn (Hard-Gap Overlays)
+
+**Interbank line tightness proxy** đạt -1.187 điểm (easy) – đây là tín hiệu tích cực cho thấy hạn mức liên ngân hàng vẫn dồi dào, bù đắp phần nào cho sự co hẹp volume kỳ hạn. Tuy nhiên, **Equity-rate wedge** (-0.420, neutral) cho thấy chênh lệch giữa lợi suất cổ phiếu và trái phiếu đang thu hẹp, có thể tạo áp lực định giá lại tài sản rủi ro.
+
+**Kết luận kênh truyền dẫn:** Nút thắt chính là **Term interbank volume contraction** – dòng vốn kỳ hạn trên liên ngân hàng đang co hẹp, nhưng được bù đắp bởi hạn mức ngắn hạn dồi dào. Các kênh truyền dẫn khác vẫn ở trạng thái neutral, chưa có dấu hiệu tắc nghẽn hệ thống.
+
+---
+
+## 3. Khảo sát Thị trường Hạ nguồn (Market Liquidity - MLI)
+
+MLI đạt -0.350 điểm, trạng thái **neutral** với chất lượng **usable** (0.608). Thị trường chứng khoán đang ở trạng thái thanh khoản trung bình, không có dấu hiệu dry-up hay bùng nổ.
+
+### 3.1. Phân tích chi tiết các cấu phần MLI
+
+- **Foreign flow 5d pressure** (-1.006, easy): Dòng vốn ngoại 5 ngày đang ở trạng thái dễ chịu – đây là tín hiệu tích cực, cho thấy áp lực bán ròng của khối ngoại đã giảm đáng kể.
+- **VN30F basis pressure** (-0.277, neutral): Basis phái sinh đang ở mức bình thường, không có dấu hiệu arbitrage hay hedging mạnh.
+- **Market breadth deterioration** (-0.090, neutral): Độ rộng thị trường thu hẹp nhẹ nhưng chưa đáng ngại.
+- **ATC sell pressure footprint** (0.018, neutral): Áp lực bán ATC gần như bằng 0.
+- **Fund system AUM contraction** (-0.081, neutral): Tài sản quỹ giảm nhẹ nhưng không đáng kể.
+
+### 3.2. Đánh giá truyền dẫn FLI → MLI
+
+FLI neutral (-0.182) và MLI neutral (-0.350) đang **đồng pha** – không có hiện tượng divergence. Điều này xác nhận kênh truyền dẫn đang hoạt động bình thường, dù có nút thắt cục bộ ở thị trường liên ngân hàng kỳ hạn.
+
+**Kết luận hạ nguồn:** Thị trường chứng khoán đang ở trạng thái thanh khoản ổn định, không có căng thẳng. Dòng vốn ngoại đang hỗ trợ tích cực.
+
+---
+
+## 4. Kiểm toán Narrative Triggers
+
+### 4.1. Trigger FIRE duy nhất: **transmission_breakdown**
+
+Đây là trigger quan trọng nhất trong phiên này. Điều kiện kích hoạt: **1/1 fresh condition met** – tín hiệu cho thấy có sự gián đoạn trong chuỗi truyền dẫn thanh khoản. Cụ thể, sự kết hợp giữa:
+- FLI neutral nhưng có nút thắt **Term interbank volume contraction** (tightening)
+- MLI vẫn neutral nhưng có dấu hiệu **Equity-rate wedge** thu hẹp
+
+Đã tạo ra một điểm nghẽn cục bộ trong kênh truyền dẫn, đủ để kích hoạt cảnh báo hệ thống.
+
+### 4.2. Các trigger cận biên
+
+- **intermediary_balance_sheet_stress**: 2/4 fresh conditions met – chưa đủ để kích hoạt nhưng đang tiến gần. Cần theo dõi margin call footprint và AUM contraction.
+- **complacency_risk_pattern**: 1/2 conditions met – duration chưa đủ dài để kích hoạt.
+- **fx_liquidity_drain_alert**: 1/4 conditions met – áp lực tỷ giá offshore đã xuất hiện nhưng chưa đủ mạnh.
+- **margin_pre_shock**: 1/3 conditions met – chưa đủ điều kiện.
+
+### 4.3. Trigger không kích hoạt
+
+Các trigger như **banking_funding_squeeze**, **forced_deleveraging**, **collateral_chain_breakdown** đều có 0/3-0/4 fresh conditions met – cho thấy không có rủi ro hệ thống từ các kênh này.
+
+---
+
+## 5. Kết luận & Cảnh báo Rủi ro Hệ thống
+
+### 5.1. Macro State tổng hợp: **STRESS_TRANSMITTING**
+
+Hệ thống đang ở trạng thái **căng thẳng truyền dẫn cục bộ** – không phải khủng hoảng toàn diện, nhưng có một điểm nghẽn rõ rệt ở kênh liên ngân hàng kỳ hạn đã kích hoạt trigger **transmission_breakdown**.
+
+### 5.2. Rủi ro chính
+
+1. **Term interbank volume contraction** (stress_score 1.036) – nếu kéo dài, có thể lan sang các kênh khác và gây ra hiệu ứng domino.
+2. **Equity-rate wedge** thu hẹp – có thể dẫn đến định giá lại tài sản rủi ro nếu lợi suất trái phiếu tăng.
+3. **intermediary_balance_sheet_stress** đang tiến gần ngưỡng kích hoạt (2/4 conditions met).
+
+### 5.3. Điểm tích cực
+
+- Dòng vốn ngoại đang hỗ trợ (foreign flow 5d pressure ở mức easy)
+- Hạn mức liên ngân hàng ngắn hạn dồi dào (interbank line tightness proxy -1.187)
+- Không có trigger nào liên quan đến forced deleveraging hay margin shock
+
+### 5.4. Khuyến nghị giám sát
+
+- **Biến số chính:** Term interbank volume (ngày T+1, T+2)
+- **Nút thắt cần theo dõi:** FRI_counterparty và FRI_intermediary
+- **Chất lượng dữ liệu:** Các chỉ số FRI_collateral, FRI_counterparty, FRI_intermediary, FRI_regulatory đều ở trạng thái **warning** – cần xác nhận lại độ tin cậy trước khi đưa ra quyết định
+
+```json
+{
+  "tool": "ltmm_macro",
+  "macro_state": "STRESS_TRANSMITTING",
+  "primary_bottleneck": "Term interbank volume contraction",
+  "active_triggers_count": 1,
+  "confidence_level": "medium"
+}
+```

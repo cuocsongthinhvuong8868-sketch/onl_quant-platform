@@ -26,7 +26,7 @@ TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
 AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
 AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "feargreed": "pca_point_in_time_v1",
-    "global_financial_conditions": "pca_point_in_time_v1",
+    "global_financial_conditions": "indicator_pr3y_pca_point_in_time_v1",
     "vnibor": "structured_20d_trend_v1",
     "vn100_earnings_health": "structured_yoy_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
@@ -45,9 +45,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "global_financial_conditions": {
         "domain": "external_credit_and_macro_stress",
         "horizon": "4-12_weeks",
-        "primary_metric": "cqs_percentile_and_point_in_time_pc1",
-        "score_direction": "Higher CQS percentile is worse for risk assets.",
-        "limits": "PCA is expanding point-in-time with periodic refits; no full-history PCA backfit or look-ahead revision. Do not offset high credit stress with short-term news sentiment.",
+        "primary_metric": "cqs_percentile_3y_and_point_in_time_pc1",
+        "score_direction": "Higher 3Y CQS percentile is worse for risk assets.",
+        "limits": "Indicator percentiles are 3Y max with 1Y warm-up; PC1 regime percentile remains 1Y. PCA is expanding point-in-time with periodic refits; no full-history PCA backfit or look-ahead revision. Do not offset high credit stress with short-term news sentiment.",
         "authority": "Adapter score/regime/bias are authoritative when available.",
     },
     "margin_m2_overlay": {
@@ -2774,8 +2774,10 @@ def run_global_financial_conditions_child_report(
         result,
         "global_financial_conditions_methodology",
         [
-            f"CQS Percentile: {summary['cqs_pct']*100:.1f}",
-            f"PC1 Percentile: {summary['pc1_pct']*100:.1f}",
+            f"CQS Percentile 3Y: {summary['cqs_pct']*100:.1f}",
+            f"PC1 Regime Percentile 1Y: {summary['pc1_pct']*100:.1f}",
+            "Indicator Percentile Window: 756 sessions max, 252 sessions min",
+            "Z-Score Window: 252 sessions",
             "PCA Method: expanding_point_in_time",
             "PCA Full-History Fit: 0",
             "PCA Refit Every Sessions: 21",

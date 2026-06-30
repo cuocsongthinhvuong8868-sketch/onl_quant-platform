@@ -9,8 +9,12 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 
 ## Ngày dữ liệu: [Nhập ngày]
 
+## Methodology note
+- Indicator percentile ranks use a rolling 3Y max window with 1Y minimum warm-up.
+- Z-scores and PC1 regime percentile remain rolling 1Y.
+
 ## Volatility (5)
-| Chỉ báo | Level | Z-score (1Y) | Percentile rank (1Y) |
+| Chỉ báo | Level | Z-score (1Y) | Percentile rank (3Y max) |
 |---|---|---|---|
 | VIX (CBOE Equity Vol)                | [VIX]      | [VIX_z]σ   | [VIX_pct]%   |
 | MOVE (ICE BofAML Bond Vol)           | [MOVE] bps | [MOVE_z]σ  | [MOVE_pct]%  |
@@ -19,7 +23,7 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 | VVIX (Vol-of-Vol)                    | [VVIX]     | —          | [VVIX_pct]%  |
 
 ## Credit (4)
-| Chỉ báo | Level | Z-score (1Y) | Percentile rank (1Y) |
+| Chỉ báo | Level | Z-score (1Y) | Percentile rank (3Y max) |
 |---|---|---|---|
 | HY OAS (US High Yield broad)         | [HY_OAS]%  | [HY_z]σ    | [HY_pct]%    |
 | CCC OAS (Deep Junk)                  | [CCC_OAS]% | [CCC_z]σ   | [CCC_pct]%   |
@@ -27,16 +31,16 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 | EM OAS (EM Corp Plus)                | [EM_OAS]%  | —          | [EM_pct]%    |
 
 ## Macro Overlay (2)
-| Chỉ báo | Level | Percentile rank (1Y) |
+| Chỉ báo | Level | Percentile rank (3Y max) |
 |---|---|---|
 | 2s10s (T10Y2Y, %)                    | [T10Y2Y]   | [T10Y2Y_pct]% |
 | DXY (ICE Dollar Index)               | [DXY]      | [DXY_pct]%    |
 
 ## Derived
-- Credit Quality Spread (CCC − HY): [CQS]% (percentile 1Y: [CQS_pct]%)
+- Credit Quality Spread (CCC − HY): [CQS]% (percentile 3Y max: [CQS_pct]%)
 
 ## PCA Composite (6-core: VIX/MOVE/SKEW/HY/CCC/IG)
-- PC1 (stress factor, EMA(5) smoothed): [PC1]σ — percentile rank 1Y: [PC1_pct]%
+- PC1 (stress factor, EMA(5) smoothed): [PC1]σ — regime percentile rank 1Y: [PC1_pct]%
 - PC1 raw hôm nay (chưa smooth): [PC1_raw]σ
 - PC1 5-day change (raw): [PC1_5d]σ
 - PC2 (divergence factor): [PC2]σ
@@ -48,6 +52,7 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 ## PCA methodology control
 - PCA is expanding point-in-time with periodic refits. Historical factor values are not produced by fitting PCA on the full future-inclusive history.
 - Do not describe PC1 history as retrospectively revised by the latest sample.
+- Do not call VIX/MOVE/HY/CCC/IG/CQS percentiles "1Y"; those indicator percentiles are 3Y max with 1Y warm-up. PC1_pct remains 1Y.
 
 ## Regime & Driver
 - Regime: [Regime]   (STRESS / ELEVATED / CALM)
@@ -82,7 +87,7 @@ Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm
 | DXY | Trade-weighted USD strength | DXY ↑ → EM FX pressure, FDI outflow, EM equity risk-off |
 
 ## PCA interpretation
-- **PC1** giải thích phần variance lớn nhất, gọi là "common stress factor" — composite của 6 core: 3 vol (VIX/MOVE/SKEW) + 3 credit (HY/CCC/IG). PC1 cao ⇒ financial conditions tighten đồng loạt (giống Goldman GS-FCI rising). PC1_pct ≥ 80% (1Y) = stress regime.
+- **PC1** giải thích phần variance lớn nhất, gọi là "common stress factor" — composite của 6 core: 3 vol (VIX/MOVE/SKEW) + 3 credit (HY/CCC/IG). PC1 cao ⇒ financial conditions tighten đồng loạt (giống Goldman GS-FCI rising). PC1_pct ≥ 80% (1Y regime percentile) = stress regime.
 - **PC2** capture divergence: vol-driven vs credit-driven stress. Dấu của PC2 cần đối chiếu loadings (trong updater log) để diễn giải đúng.
 
 ## Driver flag
