@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_v1 -->
+## 1. Observations  
+- Historical VaR 95% (–1.65%) sát với Parametric VaR 95% (–1.53%) nhưng vẫn nhích sâu hơn, cho thấy phân phối loss không hoàn toàn Gaussian dù ở mức độ vừa phải.  
+- EVT VaR 99% = –3.69% — mức sụt giảm kỳ vọng cho sự kiện 1/100 ngày cao gấp hơn 2.4 lần biến động 30 ngày, báo hiệu đuôi dày.  
+- Hệ số hình dạng GPD ξ = +0.345, nằm trong vùng **fat tail** (>0.30), nơi rủi ro cực đoan tăng mạnh và Expected Shortfall có thể không hội tụ nếu ξ ≥ 1.  
+- Hill index = +0.447 cùng chiều, củng cố tín hiệu đuôi cực dày, đồng thời ES–VaR spread = –1.37% vượt hẳn σ₃₀ (0.85%), xác nhận đuôi dày từ bằng chứng thực nghiệm.
+
+## 2. Tail Thickness Diagnosis  
+ξ = 0.345 > 0.30 → **FAT TAIL** (rủi ro cực đoan cao, Gaussian không còn an toàn). Hill index (+0.447) cùng dấu, đồng biên độ (sai khác < 0.1), tạo tín hiệu robust. Tuy nhiên, ξ dao động mạnh giữa các ngưỡng POT (min 0.168 – heavy, max 0.374 – fat) và threshold_stable = 0, nên kết luận là **threshold‑sensitive fat‑tail warning**: mức độ dày của đuôi vẫn là fat tail nhưng phân loại hình dạng đuôi không ổn định hoàn toàn. ES–VaR spread 1.37% > σ 0.85% → đuôi dày được xác nhận thực nghiệm, không chỉ từ mô hình.
+
+## 3. Gaussian Gap  
+Tính nhanh Gaussian VaR 99%: từ Parametric VaR 95% = –1.53% ≈ μ – 1.65σ, với σ = 0.85% → μ ≈ –0.13%. VaR 99% Gaussian = μ – 2.33σ = –0.13% – 2.33×0.85% ≈ –2.11%. So với EVT VaR 99% = –3.69%, chênh lệch **1.58 điểm phần trăm** (>1pp). Gaussian đánh giá thấp rủi ro hơn 1.5 lần, hoàn toàn không phù hợp để phân bổ vốn rủi ro.
+
+## 4. Verdict — Hedging Implications  
+Với ξ > 0.30, thị trường rơi vào chế độ đuôi cực dày. Hành động khuyến nghị: tránh chiến lược momentum (dễ bị quét stop‑loss hàng loạt), chủ động mua quyền chọn bán trong‑the‑money (puts ITM) để phòng vệ danh mục trước drawdown sâu, và bán khống hợp đồng tương lai chỉ số (short futures) để trung hòa delta. Nếu chỉ giảm đòn bẩy, rủi ro đuôi vẫn tiềm ẩn vượt xa ước lượng Gaussian.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "29/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.374,
+  "xi_range": 0.206,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.58,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.374
+- EVT Xi Range: 0.206
+- EVT VaR99 Range: 0.11pp
+- EVT ES99 Range: 0.70pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive

@@ -1,0 +1,32 @@
+## 1. Observations  
+- SSI: 64.9% – vùng **WARNING**, áp lực hệ thống tích luỹ dưới bề mặt.  
+- Thị trường đang ở trạng thái **EUPHORIC RISK** (xu hướng tăng + stress cao).  
+- Ba trụ cột dẫn dắt: **S_LIQ (36%)**, **S_VAL (31%)**, **S_COR (18%)**.  
+- Toàn bộ tính toán chỉ dựa trên phiên giảm – phản ánh rủi ro thực trong nhịp điều chỉnh.
+
+## 2. Risk Decomposition  
+**S_LIQ** là động lực chính – chỉ số *volume khô cạn so với chuẩn 1 năm* đang ở mức cao. Dòng tiền tổng thể suy yếu đáng kể dù giá vẫn neo trên MA125. **S_VAL** thể hiện căng thẳng định giá khi lợi nhuận 252 ngày của VN30 chênh lệch lớn so với lãi suất huy động. Trong chế độ EUPHORIC RISK, yếu tố này tạo rủi ro điều chỉnh mạnh nếu tâm lý đảo chiều. **S_COR** ghi nhận tương quan nội bộ đang tăng (EVR PC1 38.2%), dấu hiệu herding điển hình.  
+Kết hợp **S_LIQ + S_VAL** vẽ lên cấu trúc “bẫy bò” – thị trường tăng bằng hơi, thanh khoản rút cạn, định giá căng.
+
+## 3. Cross-Check  
+- Giá VN30 nằm trên MA125 (xu hướng tăng kỹ thuật), trong khi SSI liên tiếp ở biên trên của WARNING → phân kỳ tích cực về giá nhưng tiêu cực về stress, phù hợp với cảnh báo bull-trap.  
+- HMM regime **EUPHORIC RISK** đồng thuận hoàn toàn với mức SSI 64.9% và trạng thái thị trường – không có mâu thuẫn. Xác suất chuyển sang ACTIVE_STRESS sẽ tăng nếu SSI tiến sát 80%.
+
+## 4. Verdict  
+**Tỷ trọng tiền mặt đề xuất: 35% danh mục.**  
+Hành động phòng hộ: **giảm beta tổng thể** (hạ tỷ trọng cổ phiếu nhạy với VN30, dịch chuyển về nhóm phòng thủ). Chưa khuyến nghị bán khống hay mua put vì SSI chưa vượt ngưỡng CRITICAL.  
+Theo dõi sát S_LIQ và SSI trong 5-10 phiên tới; nếu SSI vượt **0.75** sẽ nâng tiền mặt lên 50% và xem xét mua bảo hiểm. Volume khô cạn là chỉ báo rủi ro thanh khoản hàng đầu – dù giá chưa giảm, môi trường có thể thay đổi nhanh khi dòng tiền không quay lại.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

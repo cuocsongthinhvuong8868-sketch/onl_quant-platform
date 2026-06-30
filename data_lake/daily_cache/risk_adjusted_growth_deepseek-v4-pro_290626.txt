@@ -1,0 +1,35 @@
+## 1. Scenario Assessment  
+Bộ tham số K=1.0 (trung lập) và CoE=14% phản ánh baseline khá khắc nghiệt đối với ngành ngân hàng Việt. Chỉ duy nhất SHB tạo được Alpha dương (+1.4%), toàn bộ phần còn lại đang đốt vốn cổ đông (Alpha < 0). Mặt bằng ngành về cơ bản chưa tạo ra đủ Disciplined Return để bù đắp chi phí vốn – dấu hiệu của kỷ luật vốn yếu và định giá chưa thực sự hấp dẫn trên diện rộng.
+
+## 2. Top Alpha Decomposition  
+**SHB** – Fortress duy nhất: P/B rẻ (0.93), ROE 17.5% khá cao nhưng quan trọng nhất là σ(ROE) cực thấp (1.9%), payout chỉ 8.6% giữ lại nhiều lợi nhuận để tái đầu tư. Sự kết hợp giữa định giá rẻ, chất lượng cao và compounding mạnh tạo ra Alpha dương bền vững.  
+
+**ACB** – Growth Trap: ROE rất cao (23.0%) nhưng σ(ROE) 2.7% và P/B 1.25 khiến Disciplined Return chỉ ở 12.8%, không đủ vượt CoE. Chất lượng cao nhưng định giá đã phản ánh phần lớn kỳ vọng.  
+
+**MBB** – Cheap-ish nhưng chưa đủ: ROE 21.8%, σ(ROE) thấp (1.6%) cho thấy chất tốt, nhưng P/B 1.49 đã neo cao, đẩy Disciplined Return xuống 12.1%. Alpha âm nhẹ, cần định giá giảm thêm để trở thành Fortress.
+
+## 3. Value Traps Warning  
+**LPB** – Premium Burn điển hình: P/B 3.46 quá đắt, ROE 21.1% không thể biện minh, cộng thêm σ(ROE) 3.8% khiến Alpha sâu -12.9%. Bẫy giá trị do định giá ảo tưởng.  
+
+**EIB** – Cheap Trap: P/B 1.48 không quá cao nhưng ROE chỉ 10.0% quá yếu, σ lại cao (3.8%), không thể tạo ra giá trị thực.  
+
+**VPB** – Growth Trap rõ nét: ROE 14.1% ở mức trung bình, σ(ROE) cao nhất ngành (4.7%) ăn mòn phần lớn lợi nhuận giữ lại, kết hợp payout 24.6% càng làm xói mòn khả năng tái đầu tư.
+
+## 4. Portfolio Construction  
+- **Core Holding (60–70%)**: SHB – pháo đài duy nhất có Alpha dương, đại diện cho giá trị bền vững.  
+- **Tactical (20–30%)**: ACB, MBB – chất lượng cao nhưng định giá chưa đủ hấp dẫn; có thể xem xét nếu P/B điều chỉnh hoặc σ giảm, nhưng hiện tại chưa tạo Alpha.  
+- **Cấm mua/underweight**: LPB, EIB, VPB – đốt vốn nặng, rủi ro định giá hoặc chất lượng ROE quá thấp.  
+
+Do chỉ 1/6 cổ phiếu có Alpha > 0, cần thận trọng; ưu tiên tập trung vào SHB, giảm tỷ trọng các tên còn lại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,33 @@
+## 1. Observations
+- Spread_Z = `-0.59σ` – mức phân tán (dispersion) thấp hơn trung bình 60 phiên, không có dấu hiệu căng giãn.
+- DPI = 41.7% – dưới ngưỡng 70%, chưa hình thành “chế độ phân tán kéo dài”, dispersion hiện tại mang tính tạm thời.
+- Tương quan bình quân = 0.006 – gần như bằng 0, các cổ phiếu di chuyển độc lập, môi trường phân hóa lý tưởng cho chọn lọc cổ phiếu.
+- Skewness & Kurtosis không có dữ liệu (N/A), hạn chế khả năng đánh giá hướng đuôi phân phối.
+
+## 2. Structural State
+Tổ hợp DPI – Spread_Z cho thấy thị trường đang ở trạng thái **bình thường, không bị stress**. Spread thấp hơn trung vị 60 ngày (Z-score âm) chứng minh các outlier không chi phối mặt bằng chung. DPI ở mức trung bình – không đủ cao để suy luận một chế độ dispersion kéo dài. Như vậy, cấu trúc hiện tại **không mang tính cục bộ cũng không phải stress regime lì lợm**, mà chỉ là dao động thấp của độ phân tán so với quá khứ gần.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu số đo Skewness và Kurtosis, chưa thể xác định **đuôi nào đang gãy**. Nếu có Skewness < -1, đó là dấu hiệu sập cổ phiếu cá biệt; ngược lại, Skewness > +1 báo hiệu cú đẩy điên rồ lên một nhóm thiểu số. Kurtosis > 5 sẽ cảnh báo rủi ro fat‑tail khiến mô hình phân phối chuẩn sai lệch. Ở đây, việc thiếu hụt dữ liệu buộc chúng ta **tạm giả định đuôi đối xứng** và chưa có tín hiệu bất thường từ đuôi béo. Các portfolio manager nên theo dõi sát các chỉ số này nếu được cập nhật ở các phiên sau.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Corr):  
+- DPI ≈ 42% (thấp–trung bình),  
+- Corr ≈ 0 (rất thấp)  
+→ Trùng khớp hoàn toàn vào ô **Healthy Stock‑Picking**.  
+Đây là môi trường phân hóa lành mạnh, tương quan thấp giúp đa dạng hóa danh mục hiệu quả.  
+**Rủi ro lớn nhất cho PM** không phải là herding crash hay khô thanh khoản hệ thống, mà là **tập trung quá mức vào một nhóm cổ phiếu riêng lẻ** – vì các chuyển động phi tập trung sẽ phơi bày rủi ro đặc thù. Nếu macro shock bất ngờ, tương quan có thể tăng vọt từ mức đáy, nhưng đó chưa phải kịch bản cận kề dựa trên dữ liệu hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "29/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.59,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```
