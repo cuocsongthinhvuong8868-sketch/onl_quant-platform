@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread_Z = -0.17σ, nằm sát trung bình lịch sử 60 phiên – cấu trúc không bị kéo căng.
+- DPI = 41.7%, thấp hơn ngưỡng 70% – dispersion chưa hình thành regime bền vững.
+- Avg Pairwise Correlation = 0.006, cực thấp – thị trường phân hóa mạnh, đặc trưng môi trường chọn cổ phiếu.
+- Cross-Sectional Skewness và Kurtosis không có dữ liệu trong snapshot.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không có dấu hiệu stress. Spread_Z âm nhẹ cho thấy mức độ phân tán suất sinh lời không vượt trội so với quá khứ gần. DPI ở mức trung bình cho thấy nếu có dispersion xảy ra, nó chưa đủ dai dẳng để xác lập một chế độ rủi ro cấu trúc. Không tồn tại stress cục bộ (Spread_Z cao, DPI thấp) hay stress regime kéo dài (cả hai cùng cao).
+
+## 3. Cross-Check & Tail Direction
+Với Skewness và Kurtosis đều không sẵn có, không thể xác định đuôi phân phối nào đang chịu áp lực. Khi thiếu số liệu, giả định mặc định là phân phối suất sinh lời tương đối cân xứng, tuy nhiên cần bổ sung chỉ báo để loại trừ các cú sốc fat‑tail ẩn. Nếu dữ liệu bổ sung cho thấy Kurtosis > 5, các mô hình phân phối chuẩn sẽ không còn ý nghĩa trong ước lượng rủi ro.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Correlation): DPI thấp (~42%) và Correlation gần như bằng 0 → thị trường đang trong ô **Healthy Stock-Picking**. Đây là môi trường thuận lợi cho các chiến lược chọn cổ phiếu dựa trên phân tích cơ bản hoặc yếu tố (factor investing), vì đa dạng hóa hoạt động hiệu quả. Rủi ro lớn nhất với PM là **hiệu ứng bầy đàn đột ngột quay lại** – nếu tương quan tăng vọt từ 0.006 lên các mức cao, danh mục dù phân tán kỹ cũng có thể bị tổn thương do các vị thế đồng loạt bán tháo (herding crash). Ngoài ra, với môi trường phân hóa cao, PM cần chú ý đến rủi ro đặc thù (idiosyncratic) tích lũy khi tập trung quá mức vào một số ít cổ phiếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "30/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.17,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

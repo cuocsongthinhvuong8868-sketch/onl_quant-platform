@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Upside Breadth hiện tại 10.12%, thấp hơn Mu dài hạn 2.84pp – áp lực cầu đang co cụm rõ rệt.
+- Downside Breadth 5.88%, lệch rất sâu so với Mu 13.06% (âm 7.18pp) – cung cũng nén mạnh, thị trường thiếu động lực giảm.
+- Cả hai chiều đều trong trạng thái momentum (Phi 0.226 cầu, 0.225 cung) – quán tính song hành, không bên nào suy yếu đột biến.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại là **zombification**: cả Upside lẫn Downside Breadth đồng loạt bị nén dưới mức trung bình dài hạn. Điều này phản ánh thanh khoản cạn, thị trường “chết lâm sàng”, rất ít cổ phiếu biến động >±2%. Momentum đôi bên cân bằng tuyệt đối (|Phi_up| = 0.226 ≈ |Phi_dn| = 0.225), cho thấy **không bên nào giữ ưu thế đà thực sự**; dòng tiền dường như đứng ngoài quan sát.
+
+## 3. Stress-Test Read
+P95 Downside lên tới 25.69%, cao hơn hẳn P95 Upside 23.00% – **đuôi rủi ro bán tháo dày hơn** kịch bản bùng nổ mua. Nếu áp lực bán bất ngờ kích hoạt, xác suất lan rộng panic (hơn ¼ mã giảm mạnh) là đáng kể. Asymmetry ngả về downside, cảnh báo thị trường mong manh trước shock tiêu cực.
+
+## 4. Verdict
+Tỷ trọng giải ngân đề xuất: **20%**. Chiến lược: **phòng thủ**. Zombification thường kéo dài và dễ bị phá vỡ bởi biến động đột biến, trong khi tail risk down chiếm ưu thế, việc mua đuổi hay rình bắt đáy đều rủi ro. Không đủ cơ sở để hành động quyết liệt. (Nếu cả hai Phi đều <0.10, mới “NO ACTIONABLE” – ở đây momentum rõ, nhưng kém tin cậy nên chỉ phòng thủ nhẹ.)
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "neutral",
+  "p95_downside_pct": 25.69,
+  "p95_upside_pct": 23.00,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "low"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

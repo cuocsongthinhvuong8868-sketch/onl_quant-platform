@@ -1,0 +1,32 @@
+## 1. Observations
+- VN30 Stress Index: 3.33% (ngưỡng cảnh báo 40%)
+- Số mã thủng VaR 95%: 1/30 (duy nhất VNM)
+- Complacency Index toàn thị trường: 6.48% (ngưỡng nguy hiểm 80%)
+- Số mã bị định giá sai rủi ro (spread nén): 7 mã, top 3: VIB, TCB, VND
+
+## 2. Contagion Assessment (Module B)
+- Mức stress 3.33% cho thấy rủi ro lây lan real-time trong VN30 là **rất thấp**, không có dấu hiệu lan tỏa hệ thống.
+- VNM là mã duy nhất thủng VaR 95% – đây là **sự cố cá biệt**, không phải đầu sóng systemic. Rủi ro lây lan từ VNM sang nhóm vốn hóa lớn khác hiện không đáng kể.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+- Với Complacency chỉ 6.48%, thị trường **KHÔNG ở regime “ngủ quên”** (không có hiện tượng spread bị nén trên diện rộng).  
+- **Điều này KHÔNG đồng nghĩa thị trường ổn định** – nó chỉ đơn thuần loại trừ kịch bản định giá sai rủi ro âm thầm.  
+- Kết hợp với Stress Index thấp, bức tranh hiện tại gợi ý thị trường đang vận động trong môi trường có volatility tự nhiên (spread không bị bóp méo) và không có lây lan cấp tính. Tuy vậy, 7 mã mispriced cho thấy một vài khu vực vẫn đang định giá rủi ro chưa hợp lý, cần giám sát riêng lẻ.
+
+## 4. Stock-Level Risk Calls
+- **VNM** (Top Crash): Tín hiệu thủng VaR cá biệt – khuyến nghị giảm tỷ trọng hoặc đặt stop‑loss chặt (ví dụ: thủng MA20 trên khung D1). Theo dõi sát dòng tiền bất thường.
+- **VIB, TCB, VND** (Top Mispriced): Spread đang bị nén cực đoan, phản ánh thị trường định giá rủi ro quá thấp cho các cổ phiếu này. Cảnh báo tiềm ẩn điều chỉnh nếu biến động đột ngột quay trở lại; cân nhắc hedge hoặc tránh mở vị thế mới.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["VNM", "VIB", "TCB", "VND"],
+  "confidence": "medium"
+}
+```
