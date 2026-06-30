@@ -28,7 +28,7 @@ except ImportError:
 
 VNIBOR_FILE = "LaiSuatLienNganHang_Wichart.csv"
 AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
-VNIBOR_AI_CACHE_VERSION = "structured_20d_trend_v1"
+VNIBOR_AI_CACHE_VERSION = "structured_20d_trend_v2"
 REGIME_ICON = {"TIGHT": "🔴", "ELEVATED": "🟠", "NORMAL": "🔵", "EASY": "🟢", "N/A": "⚪"}
 SIGNAL_ICON = {"STRESS": "💥", "WARNING": "⚠️", "ACCOMMODATIVE": "🟢", "NEUTRAL": "⚪"}
 
@@ -39,6 +39,11 @@ def _encode_vnibor_ai_cache(content: str) -> str:
     if text.startswith(marker):
         return text
     return marker + text
+
+
+def _is_vnibor_ai_cache_current(content: str) -> bool:
+    marker = f"<!-- {AI_CIO_CACHE_VERSION_HEADER}: {VNIBOR_AI_CACHE_VERSION} -->"
+    return str(content or "").lstrip().startswith(marker)
 
 
 def render():
@@ -180,6 +185,9 @@ def render():
                 st.success("Tải kết quả AI từ bộ nhớ tạm (Cache ngày)!")
                 with open(ai_cache_file, "r", encoding="utf-8") as f:
                     cached_result = f.read()
+                if not _is_vnibor_ai_cache_current(cached_result):
+                    os.remove(ai_cache_file)
+                    st.rerun()
                 with st.container(border=True):
                     st.markdown(cached_result)
 

@@ -78,7 +78,7 @@ Tỷ lệ phân bổ tài sản định lượng nhạy bén cho Nhà đầu tư
 - Đánh giá kênh truyền dẫn thanh khoản: Thuận lợi (tailwind) hay khó khăn (headwind)? Có hiện tượng stress hoặc nghẽn truyền dẫn thanh khoản từ thượng nguồn (Fed, Global) về hạ nguồn (VNIBOR, LTMM) không?
 - Đọc US Margin Debt/M2 nếu có trong INPUT như một lớp speculative leverage overlay: nếu Margin/M2 cao hoặc percentile/z-score cao trong khi Global FCI đang ELEVATED/STRESS, coi đây là bằng chứng rủi ro crowded leverage/deleveraging có thể khuếch đại stress; nếu thấp hoặc đang giảm mạnh YoY, ghi nhận deleveraging/cushion. Biến này monthly/lagged, không được dùng để tự mình đổi regime PCA hoặc phá hard constraints.
 - Với VNIBOR, **không được chỉ đọc snapshot phiên hiện tại**. Phải đọc trend 20 phiên: Trend label, ON 20D change, ON MA5 20D change, ON MA5 slope, số phiên curve đảo ngược 1W-ON, số phiên STRESS/WARNING, Regime counts và Signal counts.
-- Nếu VNIBOR snapshot hiện tại hạ nhiệt nhưng trend 20 phiên vẫn tightening/liquidity squeeze, phải xem đó là rủi ro thanh khoản còn tích tụ. Nếu snapshot căng nhưng trend 20 phiên đang easing rõ, phải hạ mức độ cảnh báo.
+- Nếu VNIBOR snapshot hiện tại hạ nhiệt nhưng trend 20 phiên vẫn tightening/liquidity squeeze, phải xem đó là rủi ro thanh khoản còn tích tụ. Nếu trend 20 phiên là stress unwinding/post-squeeze easing, phải phân biệt rõ đó là di sản stress đang hạ nhiệt, không phải squeeze đang tích tụ. Nếu snapshot căng nhưng trend 20 phiên đang easing rõ, phải hạ mức độ cảnh báo.
 
 ### Step 0.5 — Fundamental Corporate Health Layer (VN100 Corporate Health)
 - Đọc VN100 như **fundamental macro bottom-up indicator**, không phải price/technical signal.
@@ -156,7 +156,7 @@ Pick ONE từ matrix dưới (kết hợp phân tích vĩ mô ở Step 0 và con
 - Phân tích bối cảnh thanh khoản vĩ mô toàn cầu & trong nước bằng lăng kính học thuật cross-asset chặt chẽ (WALCL, TGA, RRP, VIX, MOVE, HY/CCC OAS, VNIBOR, Upstream/Downstream transmission).
 - Đánh giá kênh truyền dẫn thanh khoản: Thuận lợi (tailwind) hay khó khăn (headwind)? Có hiện tượng nghẽn hay stress truyền dẫn từ Fed/Global sang VNIBOR/LTMM không?
 - Nếu INPUT có **US Margin Debt/M2 overlay**, phải có 1-2 câu riêng về mức độ leverage crowding/deleveraging: Margin/M2 hiện tại, z-score/percentile nếu có, và vì sao biến này chỉ là overlay monthly chứ không phải tín hiệu PCA/hard rule.
-- Bắt buộc có 1-2 câu riêng về **VNIBOR 20-session trend**: tightening / easing / sideways / liquidity squeeze / mixed; nêu ON MA5 change, số phiên đảo ngược curve và số phiên STRESS/WARNING nếu có.
+- Bắt buộc có 1-2 câu riêng về **VNIBOR 20-session trend**: tightening / easing / sideways / liquidity squeeze / stress unwinding / mixed; nêu ON MA5 change, số phiên đảo ngược curve và số phiên STRESS/WARNING nếu có.
 - **`💡 Diễn giải bình dân (Layman's terms)`**: Cung cấp một lớp giải nghĩa bằng tiếng Việt trực quan, ngắn gọn (2-3 dòng) để tóm lược rõ nét cơ chế ảnh hưởng của vĩ mô lên VN-Index (ví dụ: áp lực thanh khoản từ nợ xấu Mỹ + sốc giá dầu + USD tăng giá tạo thành các gọng kìm "headwind" như thế nào).
 
 ### 0.5 Fundamental Corporate Health Layer (VN100 Corporate Health)

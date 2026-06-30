@@ -187,11 +187,27 @@ def summarize_20d_trend(df_processed: pd.DataFrame, lookback: int = 20) -> dict:
     inversion_days = int((df["Spread_1W_ON"] < 0).sum()) if "Spread_1W_ON" in df.columns else 0
     stress_warning_days = int(df["Signal"].isin(["STRESS", "WARNING"]).sum()) if "Signal" in df.columns else 0
 
-    if stress_warning_days >= max(5, lookback // 4) or inversion_days >= max(4, lookback // 5):
+    latest_signal = str(df["Signal"].iloc[-1]) if "Signal" in df.columns else "N/A"
+    latest_regime = str(df["Regime"].iloc[-1]) if "Regime" in df.columns else "N/A"
+    latest_spread_1w = float(df["Spread_1W_ON"].iloc[-1]) if "Spread_1W_ON" in df.columns else np.nan
+
+    stress_threshold = stress_warning_days >= max(5, lookback // 4)
+    inversion_threshold = inversion_days >= max(4, lookback // 5)
+    clear_tightening = on_ma5_20d_change >= 0.75 or on_ma5_slope >= 0.05
+    clear_easing = on_ma5_20d_change <= -0.75 or on_ma5_slope <= -0.05
+    current_stable = (
+        latest_signal not in ["STRESS", "WARNING"]
+        and latest_regime in ["EASY", "NORMAL"]
+        and (pd.isna(latest_spread_1w) or latest_spread_1w >= 0)
+    )
+
+    if (stress_threshold or inversion_threshold) and clear_easing and current_stable:
+        trend_label = "stress unwinding / post-squeeze easing"
+    elif stress_threshold or inversion_threshold:
         trend_label = "liquidity squeeze / stress building"
-    elif on_ma5_20d_change >= 0.75 or on_ma5_slope >= 0.05:
+    elif clear_tightening:
         trend_label = "tightening trend"
-    elif on_ma5_20d_change <= -0.75 or on_ma5_slope <= -0.05:
+    elif clear_easing:
         trend_label = "easing trend"
     elif abs(on_ma5_20d_change) < 0.25 and abs(on_ma5_slope) < 0.02:
         trend_label = "sideways / stable liquidity"

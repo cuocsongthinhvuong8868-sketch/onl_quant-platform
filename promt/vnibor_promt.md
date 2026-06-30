@@ -46,7 +46,8 @@ Sử dụng 20 phiên gần nhất để nhận diện xu hướng, không chỉ
   - tightening trend: ON MA5 tăng đều, slope dương, số phiên stress tăng
   - easing trend: ON MA5 giảm đều, stress giảm
   - sideways/stable: ON MA5 ít thay đổi, regime không xấu đi
-  - liquidity squeeze/stress building: nhiều phiên curve đảo ngược hoặc nhiều signal STRESS/WARNING
+  - liquidity squeeze/stress building: nhiều phiên curve đảo ngược hoặc nhiều signal STRESS/WARNING và phiên hiện tại vẫn căng/không có easing rõ
+  - stress unwinding/post-squeeze easing: 20 phiên có di sản stress nhưng ON MA5 đang giảm rõ, phiên hiện tại không còn STRESS/WARNING và curve không đảo ngược
 
 | Chỉ số / Tình trạng | Mức độ | Ý nghĩa đối với Hệ thống & Thị trường |
 |---|---|---|
@@ -66,7 +67,7 @@ Sử dụng 20 phiên gần nhất để nhận diện xu hướng, không chỉ
 - Cấu trúc kỳ hạn (Term Structure): Có xảy ra tình trạng đảo ngược đường cong lãi suất liên ngân hàng không (ON vượt 1W/2W)? Ý nghĩa của mức chênh lệch hiện tại.
 
 ## 2. Trend 20 phiên
-- Phải kết luận trend 20 phiên là tightening / easing / sideways / liquidity squeeze / mixed.
+- Phải kết luận trend 20 phiên là tightening / easing / sideways / liquidity squeeze / stress unwinding / mixed.
 - Dùng ON MA5 change, slope, số phiên tăng/giảm, số phiên curve đảo ngược và số phiên STRESS/WARNING.
 - Nếu snapshot hiện tại mâu thuẫn với trend 20 phiên, phải nói rõ: ví dụ "phiên hiện tại hạ nhiệt nhưng trend 20 phiên vẫn tightening".
 
@@ -92,7 +93,7 @@ Sử dụng 20 phiên gần nhất để nhận diện xu hướng, không chỉ
 {
   "tool": "vnibor",
   "overnight_rate_pct": <value>,
-  "trend_20d": "<tightening|easing|sideways|liquidity_squeeze|mixed>",
+  "trend_20d": "<tightening|easing|sideways|liquidity_squeeze|stress_unwinding|mixed>",
   "regime": "<EASY|NORMAL|ELEVATED|TIGHT>",
   "signal": "<STRESS|WARNING|ACCOMMODATIVE|NEUTRAL>",
   "spread_inverted": <true|false>,
