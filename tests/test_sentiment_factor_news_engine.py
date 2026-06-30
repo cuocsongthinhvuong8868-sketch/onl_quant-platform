@@ -15,7 +15,7 @@ def test_default_fetch_limits_match_daily_ingestion_target(monkeypatch):
 
     reloaded = importlib.reload(config)
 
-    assert reloaded.FETCH_LIMIT_MOZYFIN == 1000
+    assert reloaded.FETCH_LIMIT_MOZYFIN == 100
     assert reloaded.FETCH_LIMIT_WIDATA == 500
 
 
@@ -80,6 +80,12 @@ def test_mozyfin_cookie_parser_accepts_github_secret_formats(monkeypatch):
     assert mozyfin_connector._cookies_to_dict("value_f") == {"cookie_f": "value_f"}
 
 
+def test_mozyfin_limit_is_clamped_to_api_v2_maximum():
+    assert mozyfin_connector._sanitize_news_limit(1000) == 100
+    assert mozyfin_connector._sanitize_news_limit(0) == 1
+    assert mozyfin_connector._sanitize_news_limit("bad") == 100
+
+
 def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp_path):
     token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjQxMDI0NDQ4MDB9.sig"
     calls = {"post": 0, "get": 0}
@@ -105,6 +111,7 @@ def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp
     def fake_get(*args, **kwargs):
         calls["get"] += 1
         assert kwargs["headers"]["Authorization"] == f"Bearer {token}"
+        assert kwargs["params"]["limit"] == 100
         return FakeResponse(payload={"data": [{"id": 1, "title": "ok"}]})
 
     monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "")
@@ -119,7 +126,7 @@ def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp
     monkeypatch.delenv("MOZYFIN_AUTH_HEADER", raising=False)
     monkeypatch.setenv("MOZYFIN_COOKIES_JSON", json.dumps([{"name": "session", "value": "abc"}]))
 
-    assert mozyfin_connector.fetch_mozyfin_news(limit=10) == [{"id": 1, "title": "ok"}]
+    assert mozyfin_connector.fetch_mozyfin_news(limit=1000) == [{"id": 1, "title": "ok"}]
     assert calls == {"post": 1, "get": 1}
 
 

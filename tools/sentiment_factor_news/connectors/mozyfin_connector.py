@@ -26,6 +26,7 @@ DEFAULT_NEXT_ACTION_IDS = (
     "00de0fef2648a54493cdc0d04f0043907069fbf84d",
 )
 DEFAULT_LOGTO_COOKIE_NAME = "logto_lo72piqtf8w4trlipqian"
+MOZYFIN_MAX_NEWS_LIMIT = 100
 
 API_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -350,11 +351,28 @@ def _has_auth(headers: dict) -> bool:
     return bool(headers.get("Authorization") or headers.get(auth_header))
 
 
-def fetch_mozyfin_news(limit: int = 10000) -> list[dict]:
+def _sanitize_news_limit(limit: int) -> int:
+    try:
+        parsed = int(limit)
+    except (TypeError, ValueError):
+        parsed = MOZYFIN_MAX_NEWS_LIMIT
+
+    if parsed < 1:
+        return 1
+    if parsed > MOZYFIN_MAX_NEWS_LIMIT:
+        logger.warning(
+            f"Mozyfin API v2 accepts limit <= {MOZYFIN_MAX_NEWS_LIMIT}; clamping requested limit {parsed}."
+        )
+        return MOZYFIN_MAX_NEWS_LIMIT
+    return parsed
+
+
+def fetch_mozyfin_news(limit: int = MOZYFIN_MAX_NEWS_LIMIT) -> list[dict]:
     """
     Fetch raw news from Mozyfin API.
     """
     url = f"{MOZYFIN_API_BASE.rstrip('/')}/news"
+    limit = _sanitize_news_limit(limit)
     logger.info(f"Fetching mozyfin news with limit={limit}")
 
     headers = _build_headers()

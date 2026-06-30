@@ -38,7 +38,7 @@ GIT_COMMIT_AUTHOR_NAME = os.getenv("GIT_COMMIT_AUTHOR_NAME", "market-sentiment-b
 GIT_COMMIT_AUTHOR_EMAIL = os.getenv("GIT_COMMIT_AUTHOR_EMAIL", "bot@example.com")
 
 # Runtime settings
-FETCH_LIMIT_MOZYFIN = int(os.getenv("FETCH_LIMIT_MOZYFIN", "1000"))
+FETCH_LIMIT_MOZYFIN = int(os.getenv("FETCH_LIMIT_MOZYFIN", "100"))
 FETCH_LIMIT_WIDATA = int(os.getenv("FETCH_LIMIT_WIDATA", "500"))
 TIMEZONE = os.getenv("TIMEZONE", "Asia/Ho_Chi_Minh")
 RUN_WINDOW_MINUTES = int(os.getenv("RUN_WINDOW_MINUTES", "30"))

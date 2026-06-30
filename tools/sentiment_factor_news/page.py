@@ -173,9 +173,9 @@ def render():
     limit_mozyfin = st.sidebar.number_input(
         "Mozyfin limit",
         min_value=1,
-        max_value=10000,
+        max_value=100,
         value=config.FETCH_LIMIT_MOZYFIN,
-        step=100,
+        step=10,
     )
     limit_widata = st.sidebar.number_input(
         "WiData limit",

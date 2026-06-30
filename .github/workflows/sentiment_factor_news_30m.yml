@@ -45,7 +45,7 @@ jobs:
           pip install -r requirements.txt
 
       - name: Run Mozyfin news feed
-        run: python command/update_sentiment_factor_news.py --once --source mozyfin --limit-mozyfin 1000
+        run: python command/update_sentiment_factor_news.py --once --source mozyfin --limit-mozyfin 100
 
       - name: Run WiData market signal feed
         run: python command/update_sentiment_factor_news.py --once --source widata --limit-widata 500
