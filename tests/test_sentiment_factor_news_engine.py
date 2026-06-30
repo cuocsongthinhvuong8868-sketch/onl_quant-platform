@@ -61,6 +61,25 @@ def test_mozyfin_connector_api_key_header(monkeypatch, tmp_path):
     assert headers["x-api-key"] == "key123"
 
 
+def test_mozyfin_cookie_parser_accepts_github_secret_formats(monkeypatch):
+    assert mozyfin_connector._cookies_to_dict({"name": "cookie_a", "value": "value_a"}) == {
+        "cookie_a": "value_a"
+    }
+    assert mozyfin_connector._cookies_to_dict({"cookies": [{"name": "cookie_b", "value": "value_b"}]}) == {
+        "cookie_b": "value_b"
+    }
+    assert mozyfin_connector._cookies_to_dict("cookie_c=value_c; cookie_d=value_d") == {
+        "cookie_c": "value_c",
+        "cookie_d": "value_d",
+    }
+    assert mozyfin_connector._cookies_to_dict(
+        "MOZYFIN_COOKIES_JSON='[{\"name\":\"cookie_e\",\"value\":\"value_e\"}]'"
+    ) == {"cookie_e": "value_e"}
+
+    monkeypatch.setenv("MOZYFIN_COOKIE_NAME", "cookie_f")
+    assert mozyfin_connector._cookies_to_dict("value_f") == {"cookie_f": "value_f"}
+
+
 def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp_path):
     token = "eyJhbGciOiJIUzI1NiJ9.eyJleHAiOjQxMDI0NDQ4MDB9.sig"
     calls = {"post": 0, "get": 0}

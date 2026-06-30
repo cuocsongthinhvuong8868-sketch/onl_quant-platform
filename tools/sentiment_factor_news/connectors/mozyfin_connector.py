@@ -25,6 +25,7 @@ DEFAULT_NEXT_ACTION_IDS = (
     "00f0e3d2d4b37aab0e6c8e80c94677d393318a47b7",
     "00de0fef2648a54493cdc0d04f0043907069fbf84d",
 )
+DEFAULT_LOGTO_COOKIE_NAME = "logto_lo72piqtf8w4trlipqian"
 
 API_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -89,23 +90,71 @@ def _cookie_header_to_dict(raw_cookie: str) -> dict:
     return cookies
 
 
+def _strip_env_assignment(raw_text: str) -> str:
+    text = raw_text.strip().lstrip("\ufeff")
+    if text.startswith("export "):
+        text = text[len("export ") :].strip()
+
+    match = re.match(r"^(MOZYFIN_COOKIES_JSON|MOZYFIN_COOKIE|COOKIES|COOKIE)\s*=\s*(.*)$", text, flags=re.I | re.S)
+    if match:
+        text = match.group(2).strip()
+
+    for _ in range(2):
+        if len(text) >= 2 and text[0] == text[-1] and text[0] in {"'", '"'}:
+            text = text[1:-1].strip()
+
+    return text
+
+
+def _parse_cookie_text(raw_text: str) -> dict:
+    text = _strip_env_assignment(raw_text)
+    if not text:
+        return {}
+
+    if text.startswith(("{", "[")):
+        try:
+            return _cookies_to_dict(json.loads(text))
+        except Exception:
+            pass
+
+    cookie_dict = _cookie_header_to_dict(text)
+    if cookie_dict:
+        return cookie_dict
+
+    cookie_name = os.getenv("MOZYFIN_COOKIE_NAME", DEFAULT_LOGTO_COOKIE_NAME).strip()
+    if cookie_name:
+        return {cookie_name: text}
+
+    return {}
+
+
 def _cookies_to_dict(cookie_data) -> dict:
     if isinstance(cookie_data, dict):
-        return {str(k): str(v) for k, v in cookie_data.items() if k and v is not None}
+        if cookie_data.get("name") and cookie_data.get("value") is not None:
+            return {str(cookie_data["name"]): str(cookie_data["value"])}
+
+        for key in ("cookies", "Cookies", "cookie", "Cookie"):
+            if key in cookie_data:
+                parsed = _cookies_to_dict(cookie_data[key])
+                if parsed:
+                    return parsed
+
+        ignored_keys = {"origins", "Origin", "url", "domain", "path", "expires", "sameSite"}
+        return {
+            str(k): str(v)
+            for k, v in cookie_data.items()
+            if k not in ignored_keys and v is not None and isinstance(v, (str, int, float, bool))
+        }
 
     if isinstance(cookie_data, list):
         cookies = {}
         for item in cookie_data:
-            if not isinstance(item, dict):
-                continue
-            name = item.get("name")
-            value = item.get("value")
-            if name and value is not None:
-                cookies[str(name)] = str(value)
+            parsed = _cookies_to_dict(item)
+            cookies.update(parsed)
         return cookies
 
     if isinstance(cookie_data, str):
-        return _cookie_header_to_dict(cookie_data)
+        return _parse_cookie_text(cookie_data)
 
     return {}
 
@@ -119,11 +168,14 @@ def _load_mozyfin_cookies(cookie_file_path: str) -> dict:
                 logger.info("Loaded Mozyfin cookies from environment variable.")
                 return cookie_dict
         except Exception:
-            cookie_dict = _cookie_header_to_dict(cookie_env)
+            cookie_dict = _parse_cookie_text(cookie_env)
             if cookie_dict:
-                logger.info("Loaded Mozyfin cookies from environment cookie header.")
+                logger.info("Loaded Mozyfin cookies from environment text.")
                 return cookie_dict
-            logger.error("Error parsing MOZYFIN_COOKIES_JSON env.")
+            logger.warning(
+                "MOZYFIN_COOKIES_JSON is set but could not be parsed. Expected JSON cookie list, "
+                "Playwright storageState, cookie header text, or raw Mozyfin cookie value."
+            )
 
     if cookie_file_path and os.path.exists(cookie_file_path):
         try:
