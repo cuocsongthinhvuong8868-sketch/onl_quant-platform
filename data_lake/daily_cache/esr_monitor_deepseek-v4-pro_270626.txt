@@ -1,0 +1,33 @@
+## 1. Observations
+- SSI: **65.1%** – režim WARNING (tích lũy rủi ro ngầm)
+- Market State: **EUPHORIC RISK** (HMM), giá VN30 trên MA125
+- Top pillar drivers: **S_LIQ (36%)**, **S_VAL (32%)**, **S_COR (17%)**
+- PCA Concentration (EVR PC1): 38.2%
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ dẫn dắt**: Volume khô cạn so với bình quân 1 năm. Chỉ số này cao báo hiệu thanh khoản toàn thị trường đang co hẹp rõ rệt, dù chỉ số vẫn tăng – tín hiệu cổ điển của bẫy tăng giá.
+- **S_VAL (căng thẳng định giá)**: Lợi nhuận 252 ngày của VN30 vượt xa lãi suất tiền gửi, cho thấy định giá đã bị kéo giãn đáng kể, tạo áp lực điều chỉnh.
+- **S_COR (tương quan hệ thống)**: EVR PC1 đạt 38.2%, thể hiện mức độ đồng pha cao giữa các cổ phiếu – dấu vết herding, khiến danh mục kém đa dạng hóa thực sự.
+- Kết hợp S_LIQ + S_COR: volume cạn + đồng thuận cao = signature của bull‑trap. Rủi ro đảo chiều nhanh khi dòng tiền mới không đủ nâng đỡ định giá.
+
+## 3. Cross-Check
+- **Phân kỳ giá – stress**: VN30 neo trên MA125, thị trường biểu lộ tâm lý hưng phấn, trong khi SSI đã vào vùng WARNING (65.1%). Đây là dạng phân kỳ điển hình giữa price action và stress ngầm, củng cố kịch bản bull‑trap.
+- **Đồng thuận HMM**: Market state EUPHORIC RISK khớp hoàn toàn với mức SSI cao – không có mâu thuẫn, cả hai cùng chỉ ra rủi ro đang tích tụ dưới bề mặt.
+
+## 4. Verdict
+- **Tỷ trọng tiền mặt đề xuất**: **50%** danh mục.
+- **Hedge action**: **Giảm beta** (reduce_beta) – thu hẹp vị thế cổ phiếu có hệ số nhạy cao, chuyển dần sang phòng thủ. Không mở bán khống chỉ số ở WARNING, nhưng sẵn sàng phương án mua put nếu SSI vượt ngưỡng 80%. Hiện tại không có tín hiệu hành động mạnh hơn do S_PRES và S_VOL chưa nổi; driver mâu thuẫn nếu chỉ nhìn bề mặt, nhưng S_LIQ khô cạn trong uptrend đủ để kích hoạt phản ứng phòng ngừa.
+- **Lưu ý**: Tuyệt đối không sử dụng margin/đòn bẩy.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 65.1,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 50,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

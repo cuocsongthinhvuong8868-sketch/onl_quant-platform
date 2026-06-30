@@ -25,7 +25,7 @@ LOGS_DIR.mkdir(exist_ok=True)
 WIDATA_SIGN_TOKEN = os.getenv("WIDATA_SIGN_TOKEN", "")
 
 # Mozyfin / Antofin settings
-MOZYFIN_API_BASE = os.getenv("MOZYFIN_API_BASE", "https://api.mozyfin.com/api/v1")
+MOZYFIN_API_BASE = os.getenv("MOZYFIN_API_BASE", "https://api.mozyfin.com/api/v2")
 MOZYFIN_ACCESS_TOKEN = os.getenv("MOZYFIN_ACCESS_TOKEN", "")
 MOZYFIN_API_KEY = os.getenv("MOZYFIN_API_KEY", "")
 MOZYFIN_AUTH_HEADER = os.getenv("MOZYFIN_AUTH_HEADER", "Authorization")

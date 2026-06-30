@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 50.4/100, giảm 1.7 điểm phiên trước, nằm sát trung tâm vùng NEUTRAL (40–60).
+- EGARCH Vol (chuẩn hóa) 15.9%, giảm 2.4% so với phiên trước, chưa chạm ngưỡng báo động cao.
+- Rolling Skewness -0.05, âm nhẹ nhưng không đủ sâu để đặt cờ tail-risk.
+- Downside Correlation (norm) 2.8% – rất thấp; Upside Correlation (norm) 32.7% – chênh lệch lớn cho thấy cổ phiếu ít đồng pha khi giảm, nhưng đồng pha tốt khi tăng.
+
+## 2. Interpretation
+Dữ liệu phản ánh pha NEUTRAL/STOCK-PICKING điển hình: biến động giảm, độ lệch âm không đáng kể, tương quan giảm gần như không tồn tại. Thị trường không có dấu hiệu rủi ro hệ thống lan rộng khi điều chỉnh, nhưng cũng chưa hình thành đồng thuận tăng quá mức. Xác suất cao đây là môi trường phân hóa, phù hợp chọn cổ phiếu hơn đặt cược chỉ số.
+
+## 3. Cross-Check
+**Divergence**: Score 50.4 (trung tính) trong khi tương quan giảm cực thấp (2.8%) và tương quan tăng khá cao (32.7%) – một cấu trúc thường thấy ở pha GREED nhẹ hoặc hồi phục sau sợ hãi, nhưng skewness -0.05 chưa xác nhận tâm lý hưng phấn. Sự lệch pha này cho thấy mô hình Fear & Greed đang bỏ qua yếu tố downside-correlation thấp; do đó, rủi ro giảm hệ thống có thể thấp hơn mức điểm 50.4 gợi ý. Cần theo dõi nếu skewness chuyển dương rõ rệt, lúc đó score nhiều khả năng tăng nhanh.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.5 (trung lập thị trường), không nới lỏng cũng không siết chặt.  
+- **Hành động**: Giữ tỉ trọng cổ phiếu ở mức cân bằng, ưu tiên chiến lược stock-picking dựa trên yếu tố cơ bản và kỹ thuật riêng lẻ. Có thể xem xét giảm nhẹ phòng hộ nhờ tương quan giảm thấp, nhưng không đẩy beta vượt 0.6 khi skewness còn âm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "26/06/2026",
+  "regime": "NEUTRAL",
+  "score": 50.4,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Downside Correlation cực thấp 2.8%, Upside Correlation 32.7% – bất đối xứng theo hướng giảm rủi ro hệ thống",
+    "Skewness -0.05 còn âm nhẹ, chưa xác nhận chuyển pha GREED",
+    "EGARCH vol giảm về 15.9%, không gây áp lực margin call"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 50.4
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

@@ -1,0 +1,30 @@
+## 1. Observations
+- Spread annualized 11.70% (CSSD > CSAD) nhưng Spread_Z = -0.27σ, gần như trung tính so với quá khứ 60 ngày.
+- DPI = 40.0%, không nằm trong vùng cảnh báo kéo dài (DPI > 70%).
+- Tương quan trung bình cặp đôi (Ledoit-Wolf) = 0.006, tiệm cận 0 – phân hóa cực mạnh.
+- Cross-Sectional Skewness & Kurtosis không có dữ liệu, hạn chế đánh giá đuôi phân phối.
+
+## 2. Structural State
+Thị trường đang trong trạng thái bình thường, không có dấu hiệu stress hệ thống.  
+Spread dương cho thấy vẫn tồn tại một vài outlier gây giãn đuôi, nhưng mức độ không lớn (Z-score âm nhẹ) và không bền vững (DPI thấp). Không xảy ra stress **cục bộ** (Spread_Z cao, DPI thấp) hay **regime persistent** (cả hai cùng cao).
+
+## 3. Cross-Check & Tail Direction
+Do thiếu CS Skew và Kurtosis, không thể xác định hướng đuôi bị gãy hay mức độ fat-tail. Với Skew = N/A, không loại trừ đuôi âm hay dương, nhưng việc Spread > 0 (CSSD > CSAD) gợi ý có một số cổ phiếu chạy xa trung bình, không có tính hệ thống. Kurtosis không xác định nên mô hình phân phối chuẩn vẫn có thể tạm dùng, nhưng cần bổ sung dữ liệu để kiểm tra.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D: **DPI thấp (40%) + Tương quan thấp (0.006)** → ô **Healthy Stock-Picking**.  
+Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu (stock-picking), nơi các diễn biến riêng lẻ chiếm ưu thế, rủi ro hệ thống rất thấp. Rủi ro chính đối với PM là **idiosyncratic risk** – biến động đơn lẻ của các vị thế tập trung. Không có nguy cơ bầy đàn đổ vỡ (herding crash) hay cạn thanh khoản do tương quan gần zero.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "26/06/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.27,
+  "dpi_pct": 40.0,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```

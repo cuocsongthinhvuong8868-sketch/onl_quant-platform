@@ -1,0 +1,81 @@
+# BẢN TIN THANH KHOẢN VĨ MÔ – LTMM MACRO STATE
+**Ngày phân tích:** 2026-06-24
+
+---
+
+## 1. Phân tích Thượng nguồn (Funding Liquidity - FLI)
+
+FLI đạt 0.2227 điểm, duy trì trạng thái **neutral** với chất lượng dữ liệu ở mức **usable** (quality_score: 0.684). Điều này cho thấy nguồn cung thanh khoản từ Ngân hàng Trung ương và kênh tài khóa đang ở trạng thái cân bằng, không có dấu hiệu thắt chặt hay dư thừa đột biến.
+
+Tuy nhiên, cần lưu ý dấu vết **FX offshore stress footprint** ghi nhận stress_score -0.2663 (neutral) với chất lượng **HIGH** – đây là tín hiệu cảnh báo từ thị trường ngoại hối offshore. Mặc dù chưa đạt ngưỡng căng thẳng, nhưng sự hiện diện của footprint này với độ tin cậy cao cho thấy áp lực tỷ giá vẫn đang âm ỉ, có thể ảnh hưởng đến quyết định điều hành của SBV trong các phiên tới. Dự trữ ngoại hối chưa bị tác động trực tiếp, nhưng kênh BoP đang được theo dõi chặt chẽ.
+
+---
+
+## 2. Chẩn đoán Nút thắt truyền dẫn (Friction Layer & Wedge Diagnostics)
+
+Vector FRI ghi nhận một nút thắt cổ chai đáng chú ý:
+
+- **FRI_collateral (stress_score: 0.7618, tightening):** Đây là nút thắt duy nhất trong toàn bộ hệ thống đạt trạng thái **tightening**. Chất lượng dữ liệu ở mức **warning** (quality_score: 0.57), nhưng mức stress cao nhất trong tất cả các constraint cho thấy thị trường repo và tài sản thế chấp đang chịu áp lực đáng kể. Điều này phản ánh chi phí giao dịch repo tăng hoặc khả năng tiếp cận collateral bị thu hẹp.
+
+- **FRI_intermediary (stress_score: 0.4716, neutral):** Dù chưa đạt ngưỡng tightening, nhưng đây là nút thắt có stress cao thứ hai trong vector FRI. Dấu vết **Margin call wave footprint** (stress_score: 0.2917) và **VN30F basis pressure** (stress_score: 0.6308) cho thấy áp lực margin đang gia tăng tại các CTCK, mặc dù chưa đến mức báo động.
+
+- **Hard-Gap Overlays:** Dấu vết **Interbank line tightness proxy** (stress_score: 0.1881) và **Term interbank volume contraction** (stress_score: 0.2270) đều ở trạng thái neutral với chất lượng thấp, cho thấy kênh liên ngân hàng chưa có dấu hiệu thắt chặt rõ rệt.
+
+**Nhận định tổng thể:** Kênh truyền dẫn đang bị tắc nghẽn cục bộ tại lớp collateral, nhưng chưa lan rộng sang các kênh khác. Sự phân hóa giữa FRI_collateral (tightening) và các FRI còn lại (neutral) tạo ra một cấu trúc truyền dẫn không đồng nhất.
+
+---
+
+## 3. Khảo sát Thị trường Hạ nguồn (Market Liquidity - MLI)
+
+MLI đạt -1.2020 điểm, trạng thái **easy** với chất lượng **usable** (quality_score: 0.608). Đây là tín hiệu tích cực cho thấy thanh khoản thị trường chứng khoán đang ở trạng thái dồi dào, không có dấu hiệu dry-up.
+
+Tuy nhiên, cần đặt MLI trong bối cảnh **TE (Transmission Efficiency)** đang ở trạng thái **breakdown** với điểm số -2.7484 và chất lượng **high**. Đây là divergence quan trọng: MLI dễ dàng nhưng hiệu quả truyền dẫn đang đứt gãy. Điều này có nghĩa là thanh khoản thị trường đang hoạt động độc lập với nguồn cung thượng nguồn, tạo ra một cấu trúc "bong bóng thanh khoản cục bộ" – dòng tiền trên thị trường chứng khoán không còn phản ánh trung thực trạng thái thanh khoản hệ thống.
+
+Các dấu vết MLI khác:
+- **VN30F basis pressure (0.6308):** Áp lực basis phái sinh ở mức trung bình, phản ánh chi phí hedging đang tăng.
+- **Foreign flow 5d pressure (0.3952):** Áp lực dòng vốn ngoại trong 5 ngày ở mức trung bình thấp.
+- **Market breadth deterioration (0.3125):** Độ rộng thị trường suy giảm nhẹ.
+
+---
+
+## 4. Kiểm toán Narrative Triggers
+
+**Trigger FIRE duy nhất: transmission_breakdown**
+- Trạng thái: **FIRE** (1/1 fresh conditions met)
+- Đây là trigger quan trọng nhất trong phiên này. Việc transmission_breakdown kích hoạt xác nhận sự đứt gãy trong chuỗi truyền dẫn thanh khoản từ thượng nguồn (FLI neutral) xuống hạ nguồn (MLI easy). Cơ chế: FLI không thắt chặt nhưng MLI vẫn dễ dàng cho thấy thanh khoản thị trường đang được duy trì bởi các yếu tố nội sinh (margin, dòng tiền đầu cơ) thay vì nguồn cung hệ thống.
+
+**Các trigger cận biên:**
+- **developer_cashflow_to_bank_stress (2/3 conditions met):** Chỉ còn thiếu 1 điều kiện để kích hoạt. Đây là rủi ro tiềm ẩn từ kênh bất động sản – ngân hàng.
+- **intermediary_balance_sheet_stress (2/4 conditions met):** Áp lực bảng cân đối trung gian đang gia tăng, nhưng chưa đủ điều kiện kích hoạt do chưa đáp ứng yêu cầu thời gian (duration_not_yet_met).
+- **margin_pre_shock (2/3 conditions met):** Tín hiệu tiền sốc margin đang hình thành, cần theo dõi sát trong các phiên tới.
+
+---
+
+## 5. Kết luận & Cảnh báo Rủi ro Hệ thống
+
+**Macro State tổng hợp: STRESS_TRANSMITTING**
+
+Hệ thống đang ở trạng thái **căng thẳng truyền dẫn** với các đặc điểm:
+1. **Thượng nguồn ổn định** (FLI neutral) nhưng có dấu hiệu áp lực tỷ giá offshore.
+2. **Kênh truyền dẫn bị tắc nghẽn cục bộ** tại lớp collateral (FRI_collateral tightening) và đang hình thành áp lực margin.
+3. **Hạ nguồn dễ dàng một cách bất thường** (MLI easy) trong bối cảnh TE breakdown, tạo ra sự lệch pha nguy hiểm.
+4. **Trigger transmission_breakdown đã kích hoạt**, xác nhận sự đứt gãy trong chuỗi truyền dẫn.
+
+**Rủi ro hệ thống:** Trung bình – Cao. Nguy cơ chính là sự đảo chiều đột ngột của thanh khoản thị trường khi các yếu tố nội sinh (margin, dòng đầu cơ) suy yếu, trong khi kênh truyền dẫn chính thức vẫn bị tắc nghẽn.
+
+**Các biến số cần giám sát chặt chẽ:**
+- FRI_collateral: Nếu tiếp tục tăng, có thể kích hoạt collateral_chain_breakdown.
+- Margin call wave footprint: Nếu vượt ngưỡng 0.5, sẽ đẩy margin_pre_shock thành FIRE.
+- FX offshore stress footprint: Dù đang neutral nhưng chất lượng HIGH, cần theo dõi diễn biến tỷ giá.
+
+**Chất lượng dữ liệu:** Data Ops Quality đạt 12/12 pass, đảm bảo độ tin cậy của phân tích.
+
+```json
+{
+  "tool": "ltmm_macro",
+  "macro_state": "STRESS_TRANSMITTING",
+  "primary_bottleneck": "FRI_collateral",
+  "active_triggers_count": 1,
+  "confidence_level": "high"
+}
+```

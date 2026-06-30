@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_v1 -->
+## 1. Observations
+- **Historical VaR 95% (1.65% loss)** cao hơn so với Parametric VaR 95% (1.48%), cho thấy đuôi phân phối thực tế dày hơn dự báo Gaussian.
+- **EVT VaR 99%** ước tính mức lỗ 3.69% – sâu hơn đáng kể so với các ngưỡng 95%, phản ánh rủi ro cực đoan lớn.
+- **ξ (GPD shape) = +0.345** – vượt ngưỡng 0.30, xếp vào vùng **FAT TAIL**; dữ liệu cho thấy xác suất xảy ra tổn thất cực lớn cao hơn nhiều so với phân phối chuẩn.
+- **Hill index = +0.447** – cùng dấu và cùng biên độ cao, củng cố tín hiệu đuôi dày, dù độ nhạy ngưỡng khiến phân loại kém ổn định.
+
+## 2. Tail Thickness Diagnosis
+- **ξ = 0.345 > 0.30** → **Fat tail**. Đây là vùng mà các mô hình Gaussian bị “hỏng”, ước tính rủi ro thấp hơn thực tế một cách có hệ thống.
+- **Hill cross-check**: Hill = 0.447, cùng dấu dương và magnitude cao, **xác nhận đuôi dày**. Tuy nhiên, chênh lệch 0.102 giữa Hill và ξ kết hợp với khoảng biến thiên ξ lớn (0.206) qua các ngưỡng POT → tín hiệu bị nhiễu bởi lựa chọn ngưỡng. Gọi là **“threshold-sensitive fat-tail warning”**.
+- **ES – VaR spread = 1.37%**, lớn hơn hẳn σ₃₀ (0.85%) – xác nhận thực nghiệm rằng đuôi dày vượt Gaussian, tổn thất trung bình trong ngày cực xấu ở mức khốc liệt.
+
+## 3. Gaussian Gap
+- **Gaussian VaR 99%** (dùng μ từ VaR 95% và z₂.₃₃) ≈ -2.06% (μ ≈ -0.08%, σ=0.85%).  
+- **EVT VaR 99% = -3.69%**, **gap 1.63 điểm phần trăm** – vượt xa ngưỡng 1 pp.  
+- Kết luận: **Gaussian model bị phá vỡ**, không đủ an toàn để phân bổ vốn rủi ro (risk capital allocation). Phương pháp EVT cần được tích hợp.
+
+## 4. Verdict — Hedging Implications
+- ξ > 0.30 → **Hành động phòng hộ mạnh**: tránh các chiến lược momentum (dễ bị quét dừng lỗ trong đuôi dày), **mua puts ITM** để bảo vệ danh mục ngay ở vùng lỗ gần, và **bán khô futures** để giảm net delta. Đòn bẩy cần cắt giảm tối đa, không chỉ 30–50%.  
+- Lưu ý: Do tín hiệu nhạy ngưỡng (threshold-sensitive), không nên xem đây là dự báo chính xác điểm rơi, mà là cảnh báo để chủ động phòng thủ đuôi rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "26/06/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.374,
+  "xi_range": 0.206,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.63,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.374
+- EVT Xi Range: 0.206
+- EVT VaR99 Range: 0.11pp
+- EVT ES99 Range: 0.70pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive

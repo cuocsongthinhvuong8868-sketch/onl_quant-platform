@@ -1,0 +1,28 @@
+## 1. Observations
+– VN30 Stress Index ở mức 0.00%, không ghi nhận mã nào vi phạm VaR 95%.  
+– Complacency Index đạt 5.56%, thấp xa ngưỡng cảnh báo 80%, chỉ 6 mã bị nén spread định giá rủi ro.  
+– Top 3 mispriced (spread nén chặt nhất) gồm TCB, OCB, VHM – hai ngân hàng và một bất động sản.
+
+## 2. Contagion Assessment (Module B)
+Stress Index = 0% đồng nghĩa không có dấu hiệu lây lan đang diễn ra real-time. Với 0/30 mã thủng VaR, không tồn tại sự cố cá biệt hay đầu sóng hệ thống trong rổ VN30. Căng thẳng trên diện rộng hiện không được ghi nhận.
+
+## 3. Complacency Assessment (Module C)
+Chỉ số Complacency ở mức 5.56% — tức thị trường **không ở regime ngủ quên**. Tuy nhiên điều này không hề đồng nghĩa với “thị trường ổn định” hay “vận hành bình thường”; nó chỉ loại trừ khả năng định giá rủi ro đang bị nén trên diện rộng. Kết hợp với Stress Index = 0%, bức tranh cho thấy thị trường không có cả hai thái cực: vừa không hoảng loạn lây lan, vừa không mất cảnh giác tập thể. Phần lớn cổ phiếu có spread giãn rộng hợp lý, nhưng vẫn tồn tại một nhóm nhỏ (6 mã) có cấu trúc bù rủi ro **bị nén cục bộ** – tiềm ẩn rủi ro điều chỉnh nếu xuất hiện biến động bất ngờ.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** Không có mã nào breach, do đó không đưa ra khuyến nghị bán/giảm tỷ trọng từ tín hiệu này.
+- **Top 3 Mispriced (Module C):** TCB, OCB, VHM đang có spread bị nén chặt nhất, định giá rủi ro thấp bất thường. Nhà đầu tư nắm giữ các mã này nên thận trọng, thiết lập điểm cắt lỗ động (ví dụ nếu giá đóng cửa dưới MA20 ngày) và giảm kỳ vọng lợi nhuận/rủi ro ngắn hạn. Các vị thế mua mới cần đánh giá lại biên an toàn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["TCB", "OCB", "VHM"],
+  "confidence": "medium"
+}
+```

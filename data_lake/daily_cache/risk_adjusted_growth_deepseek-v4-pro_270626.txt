@@ -1,0 +1,29 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14%) không khắc nghiệt – đây là baseline chuẩn cho ngân hàng VN. Tuy nhiên mặt bằng toàn ngành cho thấy phần lớn các mã đều đốt vốn (Economic Alpha < 0). Chỉ duy nhất SHB ghi nhận Alpha dương nhẹ (+1.3%), cho thấy nhà đầu tư đang trả giá khá đầy đủ cho chất lượng tài sản, khiến cơ hội tìm kiếm giá trị thặng dư rất hạn chế.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +1.3%)** – **Fortress**: Lợi thế đến từ P/B rẻ (0.93) kết hợp ROE khá cao (17.5%) và biến động cực thấp (σROE 1.9%). Payout thấp (8.6%) giúp giữ lại lợi nhuận để tái đầu tư, củng cố sức mạnh kép. Mô hình kinh doanh bền vững, ít bị tổn thương.
+- **ACB (Alpha -1.0%)** – **Premium Burn**: Dù ROE lên tới 23.0% và σ thấp, P/B 1.23 khiến Disciplined Return không đủ bù đắp chi phí vốn. Định giá chưa rẻ đủ để biến chất lượng thành giá trị thặng dư.
+- **MBB (Alpha -1.7%)** – **Premium Burn**: Tương tự ACB, ROE 21.8% và σ cực thấp (1.6%) nhưng P/B cao hơn (1.47) làm giảm mạnh lợi suất kỷ luật. Diện mạo chất lượng nhưng giá đã phản ánh phần lớn kỳ vọng.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.8%)** – **Premium Burn**: P/B 3.35 quá đắt, cộng thêm σROE 3.8% khiến Alpha lao dốc. Mức định giá ảo tưởng này chỉ phù hợp nếu ROE duy trì trên 30% ổn định – hiện tại là rủi ro lớn.
+- **EIB (Alpha -11.3%)** – **Cheap Trap**: P/B 1.47 tưởng rẻ nhưng ROE chỉ 10.0% và biến động cao (σ 3.8%) tạo ra bẫy giá trị kinh điển. Nhà đầu tư trả giá trung bình cho một ngân hàng yếu.
+- **VPB (Alpha -10.3%)** – **Growth Trap**: ROE 14.1% kết hợp σ cao nhất nhóm (4.7%), Payout lớn (24.6%) làm xói mòn khả năng tái tạo vốn. Dù P/B 1.26 không quá cao, án phạt rủi ro khiến giá trị thực bị đè nặng.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress)**: SHB – chiếm 60‑70% tỷ trọng ngân hàng, hưởng lợi từ P/B dưới 1 và chất lượng ổn định.
+- **Tactical**: Không có cổ phiếu nào thực sự rẻ mà không phải bẫy trong nhóm dẫn đầu. Các mã còn lại (ACB, MBB) dù chất lượng nhưng định giá chưa đủ hấp dẫn, chỉ nên theo dõi.
+- **Avoid / Underweight**: LPB, EIB, VPB tuyệt đối tránh. ACB và MBB nên giữ tỷ trọng thấp (<10% tổng danh mục) cho đến khi P/B điều chỉnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

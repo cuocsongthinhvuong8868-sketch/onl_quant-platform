@@ -53,25 +53,72 @@ def generate_content_hash(source_system: str, source_id: str, url: str, title: s
     hash_input = f"{source_system}|{source_id}|{url}|{title}".lower().strip()
     return hashlib.sha256(hash_input.encode("utf-8")).hexdigest()
 
+def normalize_string_list(value, dict_keys: tuple[str, ...] = ("slug", "id", "code", "name", "title")) -> list[str]:
+    """Normalize string/list/dict fields from Mozyfin API v1/v2."""
+    if value is None:
+        return []
+    if isinstance(value, str):
+        return [value.strip()] if value.strip() else []
+    if not isinstance(value, list):
+        value = [value]
+
+    rows = []
+    for item in value:
+        raw_value = item
+        if isinstance(item, dict):
+            raw_value = None
+            for key in dict_keys:
+                if item.get(key):
+                    raw_value = item.get(key)
+                    break
+        if raw_value:
+            rows.append(str(raw_value).strip())
+    return [row for row in rows if row]
+
+def normalize_mozyfin_impact(raw_impact) -> str | None:
+    if not raw_impact:
+        return None
+
+    impact = str(raw_impact).lower().strip()
+    mapping = {
+        "positive": "bullish",
+        "very_positive": "bullish",
+        "bullish": "bullish",
+        "negative": "bearish",
+        "very_negative": "bearish",
+        "bearish": "bearish",
+        "neutral": "neutral",
+    }
+    return mapping.get(impact, "neutral")
+
+def normalize_source_name(source) -> str:
+    if isinstance(source, dict):
+        for key in ("name", "title", "code", "domain"):
+            if source.get(key):
+                return clean_text(source.get(key))
+        return "Mozyfin"
+    return clean_text(source or "Mozyfin")
+
 def normalize_mozyfin(item: dict) -> dict:
     """Normalize a raw Mozyfin news item to UnifiedNewsItem schema."""
     source_id = str(item.get("id", ""))
-    title = clean_text(item.get("title", ""))
-    summary = clean_text(item.get("vi_summary") or item.get("summary") or "")
-    url = item.get("url", "")
+    title = clean_text(item.get("title") or item.get("headline_vi") or "")
+    summary = clean_text(item.get("summary_vi") or item.get("vi_summary") or item.get("summary") or "")
+    url = item.get("url") or item.get("link") or ""
     
-    timestamp_utc, timestamp_vn = parse_and_format_dates(item.get("published_date"))
+    timestamp_utc, timestamp_vn = parse_and_format_dates(
+        item.get("published_at") or item.get("published_date") or item.get("processed_at") or item.get("created_at")
+    )
     
     # Extract entities and sectors
-    entities = [str(e).upper().strip() for e in (item.get("entities") or []) if e]
-    sectors = [str(s).strip() for s in (item.get("sectors") or []) if s]
+    entities = [
+        e.upper()
+        for e in normalize_string_list(item.get("entities"), ("symbol", "ticker", "code", "name", "id"))
+    ]
+    sectors = normalize_string_list(item.get("sectors"))
     
-    raw_topics = [str(t).strip() for t in (item.get("key_topics") or []) if t]
-    raw_impact = item.get("market_impact")
-    if raw_impact:
-        raw_impact = str(raw_impact).lower().strip()
-        if raw_impact not in ["bullish", "bearish", "neutral"]:
-            raw_impact = "neutral"
+    raw_topics = normalize_string_list(item.get("topics") or item.get("key_topics"))
+    raw_impact = normalize_mozyfin_impact(item.get("sentiment") or item.get("market_impact"))
             
     content_hash = generate_content_hash("mozyfin", source_id, url, title)
     
@@ -81,7 +128,7 @@ def normalize_mozyfin(item: dict) -> dict:
         "source_id": source_id,
         "timestamp_utc": timestamp_utc,
         "timestamp_vn": timestamp_vn,
-        "source_name": clean_text(item.get("source") or "Mozyfin"),
+        "source_name": normalize_source_name(item.get("source")),
         "title": title,
         "summary": summary,
         "url": url,

@@ -1,0 +1,58 @@
+**1. Trạng thái sentiment news hiện tại**
+
+- **Cửa sổ 1 ngày:** `risk_on`, composite = +0.1704. Cường độ yếu hơn hẳn các khung dài.
+- **Cửa sổ 7 ngày:** `strong_risk_on`, composite = +0.5965.
+- **Cửa sổ 30 ngày:** `strong_risk_on`, composite = +0.4239.
+
+**Xu hướng thay đổi:** Dòng tiền news 1 ngày đang hạ nhiệt đáng kể so với mặt bằng “strong risk-on” của tuần và tháng, nhưng chưa đảo chiều pha. Có dấu hiệu chốt lời/điều chỉnh ngắn hạn trong bối cảnh tâm lý vẫn tích cực trên khung trung dài.
+
+---
+
+**2. Các channel kéo risk-on / risk-off mạnh nhất**
+
+- **Kéo risk-on mạnh nhất:**
+  - `credit_stress=+2.000` (1d): Lợi suất TPCP ổn định, tín nhiệm thị trường tốt.
+  - `monetary_policy=+2.000` (7d/30d): Kỳ vọng mặt bằng lãi suất huy động và chính sách hỗ trợ.
+  - `earnings=+1.163` (1d) và `+0.974` (7d): Tin tức lợi nhuận doanh nghiệp hỗ trợ.
+  - `growth=+0.049` (1d): Các dự án hạ tầng, bán lẻ, chuyển đổi xanh.
+
+- **Kéo risk-off mạnh nhất:**
+  - `commodity=-1.073` (7d) và `-0.463` (1d): Hàng loạt giá hàng hóa cơ bản (vàng, bạc, cao su, PVC, dầu, heo hơi) xuống đáy ngắn hạn.
+  - `liquidity=-0.501` (1d): NHNN hút ròng qua OMO, tín hiệu thắt chặt nhẹ thanh khoản.
+  - `fx_external=-0.345` (1d): Tỷ giá trung tâm giảm nhẹ (VND lên giá), có thể gây áp lực lên xuất khẩu.
+
+---
+
+**3. Tóm tắt 3-5 driver tích cực và tiêu cực quan trọng**
+
+*Tích cực (từ input):*
+- Giá than cốc Trung Quốc lập đỉnh 1 năm, đạt 1,955 CNY/tấn sau khi tăng 1.4% (tín hiệu nhu cầu công nghiệp, dù kênh commodity tổng thể âm).
+- Lợi suất TPCP đi ngang phiên 26/06, không có căng thẳng tín dụng.
+- Nghệ An quy hoạch gần 500ha KCN Diễn Quỳnh 1 – động lực tăng trưởng FDI/hạ tầng.
+- AEON Đà Nẵng Thanh Khê sắp khai trương – tiêu dùng nội địa mở rộng.
+- (Window 7d) Lãi suất huy động kỳ hạn 6-9T nhóm NHTM khác tăng 1 bps, kỳ vọng nới lỏng dần.
+
+*Tiêu cực (từ input):*
+- Giá bạc Hoa Kỳ giảm xuống đáy 6 tháng, còn 56.74 USD/ounce (mất 2%).
+- Giá vàng thế giới thủng đáy 6 tháng, xuống mức 128.8 triệu đồng/lượng.
+- Giá cao su thiên nhiên Trung Quốc thủng đáy tháng (16,716.7 CNY/tấn).
+- NHNN hút ròng 2,552.5 tỷ đồng qua OMO phiên 26/06, làm giảm thanh khoản hệ thống.
+- Tỷ giá trung tâm giảm 2 đồng, có thể đảo chiều kỳ vọng tỷ giá ổn định gần đây.
+
+---
+
+**4. Kết luận tác động lên AI CIO**
+
+- **Supports** (ủng hộ giữ risk-on): Cả ba cửa sổ đều có composite dương, chế độ ngự trị từ `risk_on` đến `strong_risk_on`. Các kênh nội tại Việt Nam (credit_stress, earnings, monetary_policy, growth) kể một câu chuyện vĩ mô khả quan, phù hợp với lớp macro layer nếu đang overweight cổ phiếu/tín dụng.  
+- **Conflicts** (cần lưu ý): Hàng hóa lao dốc trên diện rộng (vàng, bạc, cao su, dầu) phát tín hiệu nhu cầu toàn cầu yếu – có thể xung khắc với kỳ vọng tăng trưởng mạnh. Thanh khoản bị hút ròng qua OMO là tiếng ồn thắt chặt sớm, dù nhỏ.  
+- **Neutral** (trung lập): FX biến động nhẹ, chưa đáng lo ngại.  
+
+**Khuyến nghị hành động:** Giữ vị thế risk-on nhưng giảm quy mô hoặc phòng hộ một phần, nhất là các ngành nhạy hàng hóa (cao su, thép). Theo dõi sát nếu composite 1d tiếp tục suy yếu dưới 0.1 hoặc kênh commodity mở rộng đà giảm.
+
+---
+
+**5. Caveat (cảnh báo nguồn và nhiễu)**
+
+- **Phủ sóng nguồn:** Chỉ từ hai nguồn Mozyfin (199/300 bài 1d) và WiData (101/300), có thể bỏ lỡ góc nhìn từ báo chí chính thống hoặc dữ liệu vi mô khác.  
+- **Stale feed:** Generated_at là 26/06/2026 17:27, trùng ngày phân tích – dữ liệu tươi, không bị trễ.  
+- **Rủi ro headline noise:** Các mốc “đáy 6 tháng/tháng” dễ bị phóng đại; than cốc tăng giá nhưng toàn kênh commodity vẫn âm nặng, cần trọng số đúng mức. Hành động dựa trên sentiment ngắn hạn cần chờ xác nhận từ giá và dòng tiền thực.

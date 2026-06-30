@@ -1,0 +1,28 @@
+## 1. Observations
+- OLS Slope ở phân vị 12.7th – rất thấp (<20th), cho thấy mối quan hệ tuyến tính giữa composite VIC/VHM/VRE và VN30F1M gần như không tồn tại.
+- Correlation ở phân vị 52.7th – bình thường (20–80th), không có sự gắn kết bất thường.
+- Regime hiện tại là **STATUS QUO**, không có event chuyển trạng thái rõ ràng từ 01/04/2026 đến nay (ΔCorr = 0.05, ΔSlope = -0.72).
+
+## 2. Microstructure Read
+Với slope cực thấp, composite VIN không còn vai trò dẫn dắt VN30F1M. Thị trường đã chuyển sự chú ý sang các nhóm khác (Bank, Chứng, Thép). Không có dấu hiệu can thiệp vì cả hai percentile không cùng trên 80th; đây là sự suy giảm tự nhiên của mối liên kết VIN – F1, tiệm cận ngưỡng decoupling nhưng chưa chính thức.
+
+## 3. Event Study Interpretation
+ΔSlope = -0.72 (âm sâu) phản ánh đà mất dẫn dắt của VIN, nhưng ΔCorr chỉ nhích nhẹ 0.05 nên không đủ điều kiện kích hoạt **DECOUPLING** (đòi hỏi cả hai Δ < -0.15). Trạng thái STATUS QUO kéo dài đồng nghĩa không có tín hiệu đột biến để giao dịch intraday hay qua đêm. Nếu correlation tiếp tục giảm xuống dưới percentile 20th, sẽ xác nhận decoupling và có cơ hội trade short F1.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** – không có edge từ mô hình VIN–F1 lúc này.
+- Leading indicator cần theo dõi: diễn biến giá VPB, CTG (Bank) và HPG (Thép) để phát hiện ai đang dẫn dắt thay thế; cập nhật slope & correlation nếu chúng chạm ngưỡng cực thấp.
+- Stop-loss reference: Không cần thiết vì không giữ vị thế. Nếu sau đó vào lệnh Short VIC dựa trên tín hiệu decoupling, mức stop có thể tham khảo tại **234.84** (228.00 × 1.03).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "26/06/2026",
+  "regime": "STATUS QUO",
+  "slope_percentile": 12.7,
+  "corr_percentile": 52.7,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```
