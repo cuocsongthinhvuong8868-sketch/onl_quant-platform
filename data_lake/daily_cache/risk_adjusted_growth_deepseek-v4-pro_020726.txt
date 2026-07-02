@@ -1,0 +1,30 @@
+## 1. Scenario Assessment  
+Kịch bản trung lập (K=1.0, CoE=14%) không quá khắc nghiệt đối với mặt bằng ngành ngân hàng Việt Nam. Tuy nhiên, trên 6 mã khảo sát, chỉ duy nhất SHB tạo ra Economic Alpha dương (+1.0%), còn lại toàn bộ đều đốt vốn (alpha < 0), phản ánh phần lớn cổ phiếu đang được định giá cao hơn khả năng sinh lời bền vững điều chỉnh rủi ro.
+
+## 2. Top Alpha Decomposition  
+**SHB** (Alpha +1.0%) – Hưởng lợi từ bộ ba: P/B rẻ nhất nhóm (0.95), ROE cao (17.5%) và biến động ROE cực thấp (σROE 1.9%). Risk penalty nhỏ giúp Disciplined Return vượt chi phí vốn. Đây là hình mẫu **Fortress** – chất lượng cao, giá rẻ, rủi ro thấp.  
+
+**ACB** (Alpha -1.1%) – ROE ấn tượng (23.0%) nhưng P/B 1.24 không còn room an toàn, cộng với σROE 2.7% khiến risk penalty ăn mòn một phần lợi nhuận giữ lại. ACB rơi vào **Growth Trap** – tăng trưởng tốt nhưng giá không đủ rẻ để bù đắp rủi ro.  
+
+**MSB** (Alpha -2.3%) – Không chia cổ tức, giữ lại toàn bộ lợi nhuận (ROE 16.7%), nhưng P/B 1.18 và σROE 2.5% làm Disciplined Return thấp hơn CoE. Có thể xem là **Cheap Trap** nhẹ – định giá tưởng rẻ nhưng chất lượng chưa đủ xuất sắc.
+
+## 3. Value Traps Warning  
+**LPB** (-12.8%) – **Premium Burn** điển hình: P/B 3.37 quá đắt so với ROE 21.1%. Risk penalty 3.8% khiến lợi nhuận giữ lại gần như bị xóa sổ, alpha âm sâu.  
+**EIB** (-11.5%) – ROE thấp (10.0%) kết hợp σROE cao (3.8%) đẩy Disciplined Return xuống mức bèo bọt dù P/B không quá cao (1.50). Bẫy giá trị kinh điển.  
+**VPB** (-10.6%) – σROE lớn nhất nhóm (4.7%) tạo risk penalty nặng, triệt tiêu phần lớn lợi nhuận từ ROE trung bình (14.1%). P/B 1.31 không đủ bù rủi ro – dạng **Risk Trap**.
+
+## 4. Portfolio Construction  
+Trong thế trận toàn ngành gần như không có alpha dương đáng kể, phân bổ ngân hàng nên ở mức rất hạn chế. Nếu bắt buộc phải nắm giữ, **SHB (Fortress)** xứng đáng là core holding duy nhất (60–70% bank allocation).  
+**Tránh xa / Underweight**: LPB, EIB, VPB do alpha âm sâu và rủi ro giảm giá dài hạn. ACB và MSB cũng chưa đủ hấp dẫn ở mặt bằng giá hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

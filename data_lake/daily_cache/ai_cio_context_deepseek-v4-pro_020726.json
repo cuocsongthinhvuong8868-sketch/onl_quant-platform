@@ -1,0 +1,1780 @@
+{
+  "provider": "deepseek-v4-pro",
+  "generated_at": "2026-07-02T03:32:38",
+  "decision_state": {
+    "report_date": "02/07/2026",
+    "data_date": "02/07/2026",
+    "bias_counts": {
+      "bullish": 1,
+      "bearish": 13,
+      "neutral_or_mixed": 6
+    },
+    "consensus_map": {
+      "hard_adapter_consensus": {
+        "bullish": [],
+        "bearish": [
+          {
+            "tool": "vnibor",
+            "tool_score": 25,
+            "tool_regime": "PRE-CRASH / PANIC",
+            "reason": "VNIBOR ON >=5% (12.49%)"
+          },
+          {
+            "tool": "ltmm",
+            "tool_score": 30,
+            "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
+            "reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+          },
+          {
+            "tool": "market_breadth",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "Breadth MA20 <45% (43.5%)"
+          },
+          {
+            "tool": "var_cvar_vnindex",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "EVT central xi fat but threshold-sensitive: xi=0.345, xi_min=0.168, xi_range=0.206"
+          },
+          {
+            "tool": "abm_simulator",
+            "tool_score": 35,
+            "tool_regime": "ABM GREEN EARLY WARNING",
+            "reason": "Early-warning score below yellow (20.7/100); Distance to cascade <=10% (7.00%); Avg leverage >=2.5x (2.50x); Cascade vulnerability high (0.66)"
+          },
+          {
+            "tool": "pvgo",
+            "tool_score": 42,
+            "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+            "reason": "PVGO elevated expectations (48.4%)"
+          }
+        ],
+        "neutral_or_mixed": [
+          {
+            "tool": "global_financial_conditions",
+            "tool_score": 55,
+            "tool_regime": "NEUTRAL / STOCK-PICKING",
+            "reason": "CQS not in stress zone (3.0)"
+          },
+          {
+            "tool": "esr_monitor",
+            "tool_score": 42,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "SSI >=55% (64.7%)"
+          }
+        ]
+      },
+      "soft_interpretive_consensus": {
+        "bullish": [
+          {
+            "tool": "bank_valuation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "bearish": [
+          {
+            "tool": "margin_m2_overlay",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "vn100_corporate_health",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "humility_falsification",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "dispersion",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "upside_ratio",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "va_res",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "risk_adjusted_growth",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "neutral_or_mixed": [
+          {
+            "tool": "fed_liquidity",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "fear_greed",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "manipulation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "sentiment_factor_news",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ]
+      },
+      "usage_rule": "Report hard_adapter_consensus as the stable cross-model consensus. Report soft_interpretive_consensus separately as provider-dependent interpretation; do not mix soft bullish/no-action labels into hard consensus counts."
+    },
+    "hard_constraints": [
+      "Breadth MA20 weak at 43.5%",
+      "EVT xi threshold-sensitive: base xi=0.345, xi_min=0.168, xi_range=0.206; no standalone hard cap",
+      "Global FCI CQS high at 80.0"
+    ],
+    "metric_values": {
+      "global_financial_conditions.cqs_percentile": 3.0,
+      "vnibor.vnibor_on": 12.49,
+      "ltmm.ltmm_fli": -0.182,
+      "ltmm.ltmm_mli": -0.351,
+      "ltmm.ltmm_te": -2.827,
+      "ltmm.ltmm_fri_collateral": 0.668,
+      "ltmm.ltmm_fire_trigger_count": 1.0,
+      "ltmm.ltmm_transmission_breakdown_fire": 1.0,
+      "humility_falsification.ssi_pct": 55.0,
+      "humility_falsification.evt_xi": 5.0,
+      "humility_falsification.evt_xi_max": 5.0,
+      "humility_falsification.breadth_ma20_pct": 45.0,
+      "humility_falsification.cqs_percentile": 80.0,
+      "market_breadth.breadth_ma20_pct": 43.5,
+      "esr_monitor.ssi_pct": 64.7,
+      "var_cvar_vnindex.evt_xi": 0.345,
+      "var_cvar_vnindex.evt_xi_min": 0.168,
+      "var_cvar_vnindex.evt_xi_max": 0.374,
+      "var_cvar_vnindex.evt_xi_range": 0.206,
+      "var_cvar_vnindex.evt_var99_range_pp": 0.11,
+      "var_cvar_vnindex.evt_es99_range_pp": 0.7,
+      "var_cvar_vnindex.evt_threshold_stable": 0.0,
+      "abm_simulator.distance_to_cascade_pct": 7.0,
+      "abm_simulator.panic_ratio_pct": 0.0,
+      "abm_simulator.abm_early_warning_score": 20.7,
+      "abm_simulator.abm_avg_leverage_ratio": 2.5,
+      "abm_simulator.cascade_vulnerability": 0.66,
+      "abm_simulator.abm_stress_confidence_pct": 67.14,
+      "pvgo.pvgo_pct": 48.39,
+      "pvgo.pe": 13.84,
+      "pvgo.coe_pct": 14.0
+    },
+    "tool_scores": [
+      {
+        "tool": "global_financial_conditions",
+        "tool_score": 55,
+        "tool_regime": "NEUTRAL / STOCK-PICKING",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "CQS not in stress zone (3.0)"
+      },
+      {
+        "tool": "vnibor",
+        "tool_score": 25,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "VNIBOR ON >=5% (12.49%)"
+      },
+      {
+        "tool": "ltmm",
+        "tool_score": 30,
+        "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
+        "tool_bias": "bearish",
+        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+      },
+      {
+        "tool": "market_breadth",
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (43.5%)"
+      },
+      {
+        "tool": "esr_monitor",
+        "tool_score": 42,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "SSI >=55% (64.7%)"
+      },
+      {
+        "tool": "var_cvar_vnindex",
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "EVT central xi fat but threshold-sensitive: xi=0.345, xi_min=0.168, xi_range=0.206"
+      },
+      {
+        "tool": "abm_simulator",
+        "tool_score": 35,
+        "tool_regime": "ABM GREEN EARLY WARNING",
+        "tool_bias": "bearish",
+        "score_reason": "Early-warning score below yellow (20.7/100); Distance to cascade <=10% (7.00%); Avg leverage >=2.5x (2.50x); Cascade vulnerability high (0.66)"
+      },
+      {
+        "tool": "pvgo",
+        "tool_score": 42,
+        "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+        "tool_bias": "bearish",
+        "score_reason": "PVGO elevated expectations (48.4%)"
+      }
+    ],
+    "metric_implied_subscores": {
+      "macro_risk_score": 20,
+      "market_internal_score": 30,
+      "tail_risk_score": 35
+    },
+    "metric_implied_score": 31,
+    "metric_implied_regime": "FEAR / DISTRIBUTION",
+    "tool_score_count": 8,
+    "score_band_reason": {
+      "macro": [
+        "CQS >=80 (80.0)",
+        "VNIBOR ON >=5% (12.49%)",
+        "LTMM transmission_breakdown trigger FIRE",
+        "LTMM TE breakdown (-2.827)",
+        "broad bearish evidence balance"
+      ],
+      "market_internal": [
+        "Breadth MA20 <45% (43.5%)",
+        "current-tool consensus skewed bearish",
+        "PVGO elevated expectations (48.4%)"
+      ],
+      "tail": [
+        "EVT xi threshold-sensitive: xi=5.000, xi_min=0.168, xi_range=0.206",
+        "SSI >=55% (64.7%)",
+        "ABM distance to cascade <=10% (7.00%)",
+        "ABM cascade vulnerability high (0.66)"
+      ],
+      "caps": [
+        "No EVT hard cap: central xi >=0.30 is threshold-sensitive",
+        "FEAR cap: Breadth MA20 <45%",
+        "FEAR cap: CQS >=80"
+      ]
+    },
+    "previous_cio_diagnostic": {
+      "date": "2026-06-30",
+      "regime": "PRE-CRASH / PANIC",
+      "score_delta_from_metric_implied": 2.0,
+      "use_rule": "Diagnostic only. Do not anchor final score to prior CIO score."
+    },
+    "writer_rules": [
+      "Do not copy historical prose; use history only for deltas.",
+      "Use evidence packets as the source of truth; omit raw child-report narration.",
+      "In Tool Consensus, separate hard_adapter_consensus from soft_interpretive_consensus.",
+      "Use metric_implied_score/regime as the baseline score before any LLM overlay.",
+      "Do not place final score in 8-14 solely because recent history was 11-13.",
+      "Hard constraints dominate LLM overlay and allocation.",
+      "If evidence is missing, mark it DATA INSUFFICIENT instead of filling gaps."
+    ]
+  },
+  "history_ledger": [
+    {
+      "date": "2026-06-30",
+      "score": "29",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-29",
+      "score": "29",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-27",
+      "score": "29",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-26",
+      "score": "29",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-25",
+      "score": "29",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-24",
+      "score": "28",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-23",
+      "score": "20",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-22",
+      "score": "27",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-21",
+      "score": "24",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-20",
+      "score": "24",
+      "regime": "PRE-CRASH / PANIC",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-18",
+      "score": "13",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-17",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-16",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-15",
+      "score": "11",
+      "regime": "CRISIS/PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-14",
+      "score": "11",
+      "regime": "CRISIS/PRE-CRASH",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-12",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-11",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-10",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-09",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-08",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-05",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-04",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-03",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-02",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-06-01",
+      "score": "11",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-05-31",
+      "score": "12",
+      "regime": "CRISIS / PRE-CRASH",
+      "source": "manual",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-05-29",
+      "score": "14",
+      "regime": "DISTRIBUTION / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-05-28",
+      "score": "18",
+      "regime": "DISTRIBUTION / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-05-27",
+      "score": "14",
+      "regime": "DISTRIBUTION / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    },
+    {
+      "date": "2026-05-26",
+      "score": "12",
+      "regime": "DISTRIBUTION / PRE-CRASH",
+      "source": "auto",
+      "provider": "deepseek-v4-pro"
+    }
+  ],
+  "evidence_packets": [
+    {
+      "tool": "historical_trend",
+      "layer": "history",
+      "date": "N/A",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- \"score\": \"29\",\n- \"regime\": \"PRE-CRASH / PANIC\",\n- \"score\": \"29\",\n- \"regime\": \"PRE-CRASH / PANIC\",\n- \"score\": \"29\",\n- \"regime\": \"PRE-CRASH / PANIC\",\n- \"score\": \"29\",\n- \"regime\": \"PRE-CRASH / PANIC\",\n- \"score\": \"29\",\n- \"regime\": \"PRE-CRASH / PANIC\","
+    },
+    {
+      "tool": "fed_liquidity",
+      "layer": "macro",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Tuần này Net Liquidity ghi nhận mức giảm -$36.5B, đưa tổng về $5,812.4B. Phân rã thành phần:\n- - Net Liquidity hiện tại ($5,812B) thấp hơn mức đỉnh năm 2024 (khoảng $6,700B) và sát vùng thấp lịch sử kể từ khi RRP cạn. So với đáy giữa 2024, thanh khoản hiện tại tương đương hoặc nhỉnh hơn đôi chút, nhưng xu hướng vẫn đang đi ngang – suy yếu dần.\n- - Z-Score (52 tuần): -0.51σ, nằm trong phạm vi bình thường (không đạt ngưỡng -1σ để kích hoạt CUT).\n- - Impulse EMA(4): -$19.9B – xác nhận đà giảm ngắn hạn nhưng chưa đủ cực đoan. Tín hiệu HOLD khớp với thực tế: thanh khoản co nhẹ nhưng không rơi vào vùng stress.\n- - VN-Index (lag 4-8 tuần): Với độ trễ truyền thống, tín hiệu HOLD và Z-Score âm nhẹ cho thấy khả năng VN-Index chững lại trong 2-4 tuần tới, thiên về kiểm tra vùng hỗ trợ hơn là bùng nổ. Tác động cụ thể y\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "global_financial_conditions",
+      "layer": "macro",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "cqs_percentile": 3.0
+      },
+      "evidence_excerpt": "- | Macro | 2s10s | +0.30% | 52% | TRUNG TÍNH |\n- | Macro | DXY | 101.17 | 45% | LOW |\n- - SKEW 68% và VIX 65% nằm trong vùng ELEVATED, cho thấy nỗi sợ “đuôi dày” (tail risk) và phòng hộ cổ phiếu đang diễn ra âm thầm.\n- Chỉ số căng thẳng tổng hợp PC1 (smooth) đạt +0.47σ, tương đương percentile 63% trên khung 1 năm – xác lập regime ELEVATED (STRESS yêu cầu PC1 ≥ 80%). Driver được gắn cờ là CCC_CREDIT_DRIVEN vì CCC OAS là thành phần có percentile cao nhất trong 6 core (88%). Điều này có nghĩa nhân tố gây căng thẳng tài chính chung (PC1) đang bị chi phối bởi nỗi lo vỡ nợ tập trung ở nhóm junk sâu, chứ không phải do biến động cổ phiếu hay lãi suất. PC2 ở mức +0.59σ, củng cố sự phân kỳ: credit stress là chủ đạo, trong khi các chỉ báo vol (VIX, MOVE) còn thấp, tạo ra một divergence credit/vol rõ nét.\n- “Nhiệt kế” đ\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 55,
+        "tool_regime": "NEUTRAL / STOCK-PICKING",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "CQS not in stress zone (3.0)"
+      }
+    },
+    {
+      "tool": "margin_m2_overlay",
+      "layer": "macro",
+      "date": "2026-05-31",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- === US MARGIN DEBT / M2 STRUCTURED SNAPSHOT (OVERLAY ONLY) ===\n- - Margin/M2 5Y z-score: 2.62σ\n- - Signal regime: ELEVATED_LEVERAGE\n- - Monthly/lagged speculative leverage overlay only.\n- - Not included in Global FCI PCA, PC1, PC1 percentile, or GFCM hard regime.\n- - Use it to interpret whether Global FCI stress is amplified by crowded leverage."
+    },
+    {
+      "tool": "vnibor",
+      "layer": "macro",
+      "date": "2026-06-29",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "vnibor_on": 12.49
+      },
+      "evidence_excerpt": "- === VNIBOR STRUCTURED SNAPSHOT + 20D TREND ===\n- - ON Z-Score: -0.06999126838030655\n- - Regime: ELEVATED\n- - Signal: STRESS\n- 20-session trend:\n- - Trend label: liquidity squeeze / stress building\n- - ON MA5 slope/session: -0.161%\n- - STRESS/WARNING days: 6\n- - Regime counts: TIGHT: 7, EASY: 6, NORMAL: 5, ELEVATED: 2\n- - Signal counts: NEUTRAL: 14, STRESS: 4, WARNING: 2",
+      "adapter_score": {
+        "tool_score": 25,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "VNIBOR ON >=5% (12.49%)"
+      }
+    },
+    {
+      "tool": "ltmm",
+      "layer": "macro",
+      "date": "30/06/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ltmm_fli": -0.182,
+        "ltmm_mli": -0.351,
+        "ltmm_te": -2.827,
+        "ltmm_fri_collateral": 0.668,
+        "ltmm_fire_trigger_count": 1.0,
+        "ltmm_transmission_breakdown_fire": 1.0
+      },
+      "evidence_excerpt": "- === LTMM STRUCTURED SNAPSHOT - LIQUIDITY TRANSMISSION ===\n- - LTMM FLI: -0.182 | state: neutral | quality: 0.7296296296296299\n- - LTMM MLI: -0.351 | state: neutral | quality: 0.6080000000000001\n- - LTMM TE: -2.827 | state: breakdown | quality: 1.0\n- - LTMM FRI_collateral: +0.668 | state: neutral | quality: warning\n- - LTMM divergence: FLI neutral (-0.182) -> MLI neutral (-0.351) | no large upstream/downstream spread\n- - LTMM Fire Trigger Count: 1\n- - LTMM transmission_breakdown FIRE: 1\n- Top bottlenecks by stress score:\n- | constraint | layer | stress_score | state | quality | observation_date |",
+      "adapter_score": {
+        "tool_score": 30,
+        "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
+        "tool_bias": "bearish",
+        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+      }
+    },
+    {
+      "tool": "vn100_corporate_health",
+      "layer": "fundamental",
+      "date": "2026Q1 / YoY",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - VN100 Health Score: 50.5\n- - Market-cap weighted Health Score: 53.3\n- - Market-cap Health Gap: +2.8\n- - Regime: Mixed / Divergent\n- - Verdict: Accounting Recovery / Low Cash Confirmation\n- - Macro Read: Doanh thu và lợi nhuận phục hồi rộng, nhưng dòng tiền và healthy growth chưa xác nhận nên chưa thể gọi là phục hồi khỏe.\n- - Confidence: High\n- - Cash-confirmed Recovery: Weak\n- - Systemic Stress: Contained\n- Breadth and stress:"
+    },
+    {
+      "tool": "humility_falsification",
+      "layer": "audit",
+      "date": "N/A",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ssi_pct": 55.0,
+        "evt_xi": 5.0,
+        "evt_xi_max": 5.0,
+        "breadth_ma20_pct": 45.0,
+        "cqs_percentile": 80.0
+      },
+      "evidence_excerpt": "- - Thesis status: WATCH\n- - Rules triggered: 1/6\n- - Cache: REFRESHED (/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/humility_falsification_deepseek-v4-pro_020726.json)\n- | VNIBOR Monitor | STRESS/WARNING sessions (20D) | < 5 sessions | 6 sessions | 6 sessions | 0 sessions | Intact | 2026-06-29 |\n- | Market Breadth | Breadth MA20 | > 45.0% | 35.5% | 43.5% | +8.029% | Intact | 2026-07-02 |\n- | ESR Monitor | Systemic Stress Index (SSI) | < 55.0% | 64.8% | 64.7% | -0.098% | Intact | 2026-07-02 |\n- | Tail Risk (EVT) | EVT Xi Max (5%-15% thresholds) | < 0.25 | 0.374 | 0.374 | +0 | Intact | 2026-07-02 |\n- | Manipulation / Coupling | Vingroup Slope Percentile | < 70.0 th pct | 3.333 th pct | 5 th pct | +1.667 th pct | FALSIFIED | 2026-07-02 |\n- | Global Financial Conditions | CQS Per\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "fear_greed",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Risk Score 48.0/100, giảm 0.4 điểm, nằm trong vùng NEUTRAL (40–60).\n- Có phân kỳ nhẹ giữa Risk Score và EGARCH Vol: vol thấp thường đẩy score về vùng GREED, nhưng score vẫn ở NEUTRAL do skewness âm, cho thấy yếu tố này đang kìm hãm tâm lý lạc quan. Không có phân kỳ lớn giữa Skewness và Correlation: skew âm nhưng up-corr cao và down-corr thấp xác nhận sự bất đối xứng tích cực – thị trường dễ đồng thuận khi tăng hơn khi giảm.\n- ## 5. Structured Tail\n- \"regime\": \"NEUTRAL\",\n- \"score\": 48.0,\n- \"confidence\": \"medium\",\n- - FearGreed Risk Score: 48.0\n- - PCA Refit Every Sessions: 21"
+    },
+    {
+      "tool": "manipulation",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - Trade plan: NO TRADE. Mô hình không cung cấp edge do slope quá thấp, correlation không đủ mạnh, regime STATUS QUO.\n- - Leading indicator cần theo dõi: nhóm Ngân hàng (VCB, BID, CTG) – nơi đang hút dòng tiền thay thế Vingroup. Nếu Bank tăng mạnh kèm thanh khoản đột biến, có thể xem xét Short F1 hedge. Hiện tại chưa đủ tín hiệu.\n- ## 5. Structured Tail\n- \"regime\": \"STATUS QUO\",\n- \"confidence\": \"low\""
+    },
+    {
+      "tool": "dispersion",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - DPI = 41.7%: xác suất thấp rằng dispersion regime này sẽ kéo dài, chỉ đang trong pha tạm thời.\n- Thị trường đang ở trạng thái bình thường, không bị stress. Spread_Z âm (-0.63σ) cho thấy mức độ phân tán hiện tại không cao hơn lịch sử gần đây, DPI 41.7% khẳng định đây không phải là một dispersion regime có tính dai dẳng. Stress (nếu có) là cục bộ, không mang tính hệ thống.\n- ## 3. Cross-Check & Tail Direction\n- Do thiếu dữ liệu Skewness và Kurtosis, không thể kiểm tra được đuôi nào đang bị gãy. Không có bằng chứng về “cú sập cá biệt” (CS Skew < -1) hay “cú đẩy điên rồ” (CS Skew > +1), cũng không có cơ sở để đán\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "upside_ratio",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- ## 3. Stress-Test Read\n- ## 5. Structured Tail\n- \"regime\": \"zombification\",\n- \"confidence\": \"medium\"\n- - MC Interpretation: scenario_diagnostic_not_allocation_authority"
+    },
+    {
+      "tool": "bank_valuation",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bullish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Phân loại regime\n- - Tỉ trọng định giá cao áp đảo (13/23) và không có mã nào thực sự rẻ với rủi ro thấp, trong khi mã rẻ duy nhất (NAB) bị gắn cảnh báo rủi ro („Undervalued but Risky“).\n- - Khoảng cách định giá (valuation gap) mang nặng chiều âm: trung vị -18.2%, trimmed mean -18.7%, gap theo vốn hóa -24.8%, phản ánh mặt bằng giá đang phản ánh kỳ vọng cao hơn giá trị nội tại nền tảng.\n- Kiểm tra chéo: xác nhận giá có củng cố kết luận regime?\n- - Trong các mã hợp lý/rẻ, chỉ 1 mã ghi nhận „Undervalued, Price Confirmed” (NAB – nhưng kèm rủi ro cao). Phần lớn còn lại rơi vào “Fair, Weak Price Action” (3 mã) hoặc “Neutral Confirmation” (3 mã), chỉ 3 mã “Fair Value, Market Agrees” (TPB, SSB, MBB). Điều này cho thấy thị trường không đồng thuận mạnh với tín hiệu định giá rẻ hay hợp lý, củng cố bức tranh định giá ca\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "market_breadth",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "breadth_ma20_pct": 43.5
+      },
+      "evidence_excerpt": "- \"tool\": \"market_breadth\",\n- \"regime\": \"divergence\",\n- \"confidence\": \"medium\"\n- ## 1. Observations\n- - MA20: 43.5% cổ phiếu đóng trên đường trung bình 1 tháng – mức trung bình thấp, chưa rơi vào vùng quá bán (<20%) nhưng không đủ lực để tạo sóng.\n- - MA60: 33.4% – thấp, cho thấy phần lớn thị trường vẫn nằm dưới xu hướng trung hạn, chưa xác nhận kết thúc điều chỉnh.\n- - MA125: 26.8% – rất thấp, chỉ ~1/4 mã duy trì trên MA nửa năm, sức khỏe chu kỳ kinh doanh suy yếu rõ rệt.\n- - MA252: 29.4% – rất thấp, dưới 30% báo hiệu chế độ thị trường giảm dài hạn (secular bear).\n- ## 2. Structural Health\n- Cả bốn đường MA đều\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (43.5%)"
+      }
+    },
+    {
+      "tool": "esr_monitor",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "ssi_pct": 64.7
+      },
+      "evidence_excerpt": "- - SSI hiện tại 64.7%, thuộc vùng WARNING, tích lũy rủi ro ngầm.\n- - Market State: EUPHORIC RISK (high stress + uptrend).\n- - VN30 close trên MA125, nhưng divergence tiềm ẩn với stress index.\n- ## 2. Risk Decomposition (Bóc tách)\n- S_LIQ đang là driver chính, phản ánh tình trạng volume khô cạn so với norm 1 năm. Thanh khoản sụt giảm đáng kể trong khi giá vẫn neo cao – đây là dấu hiệu thiếu lực đỡ từ dòng tiền thực. S_VAL (valuation tension) đứng thứ nhì, cho thấy định giá căng hơn nhiều so với lợi suất tiền gửi, tức phần bù rủi ro (risk premium) đã bị nén mỏng. S_COR (systemic correlation) ở mức cao (PC1 EVR 38.\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 42,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "SSI >=55% (64.7%)"
+      }
+    },
+    {
+      "tool": "va_res",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - VN30 Stress Index: 0.00% — không ghi nhận áp lực lây lan real-time trong rổ bluechip.\n- - Số mã thủng VaR 95%: 0 trên 30 — không có đợt bán tháo cá biệt nào.\n- VN30 Stress = 0.00% khẳng định không có sự kiện lây lan đang diễn ra. Toàn bộ 30 cổ phiếu đều chưa xuyên thủng mức VaR 95% trong ngày, bác bỏ kịch bản khủng hoảng cục bộ hoặc hệ thống. Tín hiệu này đồng nhất với môi trường không hoảng loạn, không có đầu sóng systemic nào hình thành.\n- Kết hợp với Stress Index = 0.00%, bức tranh hiện tại gợi ý một pha vận động có xu hướng mạnh (nhiều khả năng uptrend) khiến spread tự nhiên giãn ra, đẩy Complacency xuống\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "var_cvar_vnindex",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "evt_xi": 0.345,
+        "evt_xi_min": 0.168,
+        "evt_xi_max": 0.374,
+        "evt_xi_range": 0.206,
+        "evt_var99_range_pp": 0.11,
+        "evt_es99_range_pp": 0.7,
+        "evt_threshold_stable": 0.0
+      },
+      "evidence_excerpt": "- - Historical VaR 95% (cuộn 3 năm) ở mức -1.65% – phản ánh thiệt hại 5% một ngày theo phân phối lịch sử, không bắt trọn phần đuôi cực đoan.\n- - EVT VaR 99% (POT/GPD) đạt -3.69% – xác suất 1/100 ngày lỗ vượt mức này; cao gấp hơn 2 lần Historical VaR 95%.\n- - Hệ số đuôi GPD ξ = +0.345 – nằm trong vùng FAT TAIL (ξ > 0.30), cảnh báo rủi ro cực đoan không được Gaussian phản ánh.\n- ## 2. Tail Thickness Diagnosis\n- - ξ (+0.345) thuộc bracket FAT TAIL (ξ > 0.30). Tuy nhiên, do ngưỡng POT thay đổi, ξ dao động từ 0.168 (heavy) đến 0.374 (fat) → đây là “threshold-sensitive fat‑tail warning”, không phải fat‑tail vững chắc.\n- [trimmed: raw report omitted]",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "EVT central xi fat but threshold-sensitive: xi=0.345, xi_min=0.168, xi_range=0.206"
+      }
+    },
+    {
+      "tool": "abm_simulator",
+      "layer": "tail_risk",
+      "date": "2026-06-30",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "distance_to_cascade_pct": 7.0,
+        "panic_ratio_pct": 0.0,
+        "abm_early_warning_score": 20.7,
+        "abm_avg_leverage_ratio": 2.5,
+        "cascade_vulnerability": 0.66,
+        "abm_stress_confidence_pct": 67.14
+      },
+      "evidence_excerpt": "- === ABM V4 EARLY-WARNING & MARGIN CASCADE STRESS MONITOR ===\n- - Regime Flag: STRESS_RISING\n- - Early-warning Score: 20.7/100\n- - Early-warning Drivers: Liquidity stress; Leverage crowding; Distance to cascade\n- - Stress Confidence: 67.14%\n- - Input Quality Score: 67.14%\n- - Market Liquidity Index (MLI): 0.05\n- - Liquidity Stress: 3.00\n- - Valuation Gap: 6.33%\n- - Trend Z-score: 0.40",
+      "adapter_score": {
+        "tool_score": 35,
+        "tool_regime": "ABM GREEN EARLY WARNING",
+        "tool_bias": "bearish",
+        "score_reason": "Early-warning score below yellow (20.7/100); Distance to cascade <=10% (7.00%); Avg leverage >=2.5x (2.50x); Cascade vulnerability high (0.66)"
+      }
+    },
+    {
+      "tool": "sentiment_factor_news",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "neutral_or_mixed",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- - 1d: risk_on (composite +0.21), thấp hơn rõ rệt so với các khung dài hạn.\n- - 7d: strong_risk_on (composite +0.41).\n- - 30d: strong_risk_on (composite +0.52).\n- Hướng thay đổi: Sentiment tích cực chủ đạo nhưng đà ngắn hạn hạ nhiệt nhẹ. Composite 1d giảm từ +0.41 (7d) xuống +0.21, báo hiệu rủi ro ngắn hạn hoặc chốt lời tin tức. Khung 7d–30d vẫn xác nhận chế độ strong_risk_on.\n- 2. Các channel kéo risk-on / risk-off mạnh nhất\n- - Risk‑on:\n- - *credit_stress* (7d +1.02, 30d +1.01) – phản ánh chất lượng tín dụng cải thiện\n- - Risk‑off:\n- - *liquidity* (1d -0.21, 7d -0.15).\n- - Lợi suất TPCP đi ngang phiên 01/07/2026 (credit_stress → thanh khoản trái phiếu ổn định)."
+    },
+    {
+      "tool": "risk_adjusted_growth",
+      "layer": "current_tool",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {},
+      "evidence_excerpt": "- Kịch bản trung lập (K=1.0, CoE=14%) không quá khắc nghiệt đối với mặt bằng ngành ngân hàng Việt Nam. Tuy nhiên, trên 6 mã khảo sát, chỉ duy nhất SHB tạo ra Economic Alpha dương (+1.0%), còn lại toàn bộ đều đốt vốn (alpha < 0), phản ánh phần lớn cổ phiếu đang được định giá cao hơn khả năng sinh lời bền vững điều chỉnh rủi ro.\n- ## 2. Top Alpha Decomposition\n- SHB (Alpha +1.0%) – Hưởng lợi từ bộ ba: P/B rẻ nhất nhóm (0.95), ROE cao (17.5%) và biến động ROE cực thấp (σROE 1.9%). Risk penalty nhỏ giúp Disciplined Return vượt chi phí vốn. Đây là hình mẫu Fortress – chất lượng cao, giá rẻ, rủi ro thấp.\n- ACB (Alpha -1.1%) – ROE ấn tượng (23.0%) nhưng P/B 1.24 không còn room an toàn, cộng với σROE 2.7% khiến risk penalty ăn mòn một phần lợi nhuận giữ lại. ACB rơi vào Growth Trap – tăng trưởng tốt nhưng giá không đ\n- [trimmed: raw report omitted]"
+    },
+    {
+      "tool": "pvgo",
+      "layer": "valuation",
+      "date": "02/07/2026",
+      "bias": "bearish",
+      "score": null,
+      "regime": null,
+      "key_metrics": {
+        "pvgo_pct": 48.39,
+        "pe": 13.84,
+        "coe_pct": 14.0
+      },
+      "evidence_excerpt": "- === PVGO VALUATION STRUCTURED SNAPSHOT ===\n- - PVGO z-score: -0.85\n- - Negative/low PVGO means the market embeds low growth expectations, potentially supportive if earnings quality holds.\n- - Elevated/very high/extreme PVGO means valuation depends heavily on growth expectations; treat as expectation-risk overlay for AI CIO allocation and confidence.",
+      "adapter_score": {
+        "tool_score": 42,
+        "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+        "tool_bias": "bearish",
+        "score_reason": "PVGO elevated expectations (48.4%)"
+      }
+    }
+  ],
+  "metrics_snapshot_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/ai_cio_metrics/metrics_020726.json",
+  "metrics_snapshot": {
+    "metrics_version": "2.0",
+    "provider": "deepseek-v4-pro",
+    "generated_at": "2026-07-02T03:32:38",
+    "report_date": "02/07/2026",
+    "data_date": "02/07/2026",
+    "authority_rules": [
+      "This JSON is deterministic and generated by code before final LLM synthesis.",
+      "Adapter tool_score/tool_regime/tool_bias are authoritative when present.",
+      "LLM may explain or lightly overlay, but must not relabel adapter outputs from prose.",
+      "History is for persistence/delta only; it must not anchor today's final score.",
+      "Human report excerpts are supporting evidence, not the scoring source of truth."
+    ],
+    "score_anchor": {
+      "metric_implied_score": 31,
+      "metric_implied_regime": "FEAR / DISTRIBUTION",
+      "metric_implied_subscores": {
+        "macro_risk_score": 20,
+        "market_internal_score": 30,
+        "tail_risk_score": 35
+      },
+      "score_band_reason": {
+        "macro": [
+          "CQS >=80 (80.0)",
+          "VNIBOR ON >=5% (12.49%)",
+          "LTMM transmission_breakdown trigger FIRE",
+          "LTMM TE breakdown (-2.827)",
+          "broad bearish evidence balance"
+        ],
+        "market_internal": [
+          "Breadth MA20 <45% (43.5%)",
+          "current-tool consensus skewed bearish",
+          "PVGO elevated expectations (48.4%)"
+        ],
+        "tail": [
+          "EVT xi threshold-sensitive: xi=5.000, xi_min=0.168, xi_range=0.206",
+          "SSI >=55% (64.7%)",
+          "ABM distance to cascade <=10% (7.00%)",
+          "ABM cascade vulnerability high (0.66)"
+        ],
+        "caps": [
+          "No EVT hard cap: central xi >=0.30 is threshold-sensitive",
+          "FEAR cap: Breadth MA20 <45%",
+          "FEAR cap: CQS >=80"
+        ]
+      },
+      "hard_constraints": [
+        "Breadth MA20 weak at 43.5%",
+        "EVT xi threshold-sensitive: base xi=0.345, xi_min=0.168, xi_range=0.206; no standalone hard cap",
+        "Global FCI CQS high at 80.0"
+      ]
+    },
+    "consensus": {
+      "hard_adapter_consensus": {
+        "bullish": [],
+        "bearish": [
+          {
+            "tool": "vnibor",
+            "tool_score": 25,
+            "tool_regime": "PRE-CRASH / PANIC",
+            "reason": "VNIBOR ON >=5% (12.49%)"
+          },
+          {
+            "tool": "ltmm",
+            "tool_score": 30,
+            "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
+            "reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+          },
+          {
+            "tool": "market_breadth",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "Breadth MA20 <45% (43.5%)"
+          },
+          {
+            "tool": "var_cvar_vnindex",
+            "tool_score": 35,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "EVT central xi fat but threshold-sensitive: xi=0.345, xi_min=0.168, xi_range=0.206"
+          },
+          {
+            "tool": "abm_simulator",
+            "tool_score": 35,
+            "tool_regime": "ABM GREEN EARLY WARNING",
+            "reason": "Early-warning score below yellow (20.7/100); Distance to cascade <=10% (7.00%); Avg leverage >=2.5x (2.50x); Cascade vulnerability high (0.66)"
+          },
+          {
+            "tool": "pvgo",
+            "tool_score": 42,
+            "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+            "reason": "PVGO elevated expectations (48.4%)"
+          }
+        ],
+        "neutral_or_mixed": [
+          {
+            "tool": "global_financial_conditions",
+            "tool_score": 55,
+            "tool_regime": "NEUTRAL / STOCK-PICKING",
+            "reason": "CQS not in stress zone (3.0)"
+          },
+          {
+            "tool": "esr_monitor",
+            "tool_score": 42,
+            "tool_regime": "FEAR / DISTRIBUTION",
+            "reason": "SSI >=55% (64.7%)"
+          }
+        ]
+      },
+      "soft_interpretive_consensus": {
+        "bullish": [
+          {
+            "tool": "bank_valuation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "bearish": [
+          {
+            "tool": "margin_m2_overlay",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "vn100_corporate_health",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "humility_falsification",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "dispersion",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "upside_ratio",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "va_res",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "risk_adjusted_growth",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ],
+        "neutral_or_mixed": [
+          {
+            "tool": "fed_liquidity",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "fear_greed",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "manipulation",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          },
+          {
+            "tool": "sentiment_factor_news",
+            "source": "excerpt_inference",
+            "confidence": "soft",
+            "score": null,
+            "regime": null
+          }
+        ]
+      },
+      "usage_rule": "Report hard_adapter_consensus as the stable cross-model consensus. Report soft_interpretive_consensus separately as provider-dependent interpretation; do not mix soft bullish/no-action labels into hard consensus counts."
+    },
+    "tools": {
+      "fed_liquidity": {
+        "tool": "fed_liquidity",
+        "layer": "macro",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "global_financial_conditions": {
+        "tool": "global_financial_conditions",
+        "layer": "macro",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "cqs_percentile": 3.0
+        },
+        "adapter_available": true,
+        "tool_score": 55,
+        "tool_regime": "NEUTRAL / STOCK-PICKING",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "CQS not in stress zone (3.0)",
+        "data_quality": "structured_adapter"
+      },
+      "margin_m2_overlay": {
+        "tool": "margin_m2_overlay",
+        "layer": "macro",
+        "as_of": "2026-05-31",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "vnibor": {
+        "tool": "vnibor",
+        "layer": "macro",
+        "as_of": "2026-06-29",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "vnibor_on": 12.49
+        },
+        "adapter_available": true,
+        "tool_score": 25,
+        "tool_regime": "PRE-CRASH / PANIC",
+        "tool_bias": "bearish",
+        "score_reason": "VNIBOR ON >=5% (12.49%)",
+        "data_quality": "structured_adapter"
+      },
+      "ltmm": {
+        "tool": "ltmm",
+        "layer": "macro",
+        "as_of": "30/06/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "ltmm_fli": -0.182,
+          "ltmm_mli": -0.351,
+          "ltmm_te": -2.827,
+          "ltmm_fri_collateral": 0.668,
+          "ltmm_fire_trigger_count": 1.0,
+          "ltmm_transmission_breakdown_fire": 1.0
+        },
+        "adapter_available": true,
+        "tool_score": 30,
+        "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
+        "tool_bias": "bearish",
+        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)",
+        "data_quality": "structured_adapter"
+      },
+      "vn100_corporate_health": {
+        "tool": "vn100_corporate_health",
+        "layer": "fundamental",
+        "as_of": "2026Q1 / YoY",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "humility_falsification": {
+        "tool": "humility_falsification",
+        "layer": "audit",
+        "as_of": "N/A",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "ssi_pct": 55.0,
+          "evt_xi": 5.0,
+          "evt_xi_max": 5.0,
+          "breadth_ma20_pct": 45.0,
+          "cqs_percentile": 80.0
+        },
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "fear_greed": {
+        "tool": "fear_greed",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "manipulation": {
+        "tool": "manipulation",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "dispersion": {
+        "tool": "dispersion",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "upside_ratio": {
+        "tool": "upside_ratio",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "bank_valuation": {
+        "tool": "bank_valuation",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bullish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "market_breadth": {
+        "tool": "market_breadth",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "breadth_ma20_pct": 43.5
+        },
+        "adapter_available": true,
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "Breadth MA20 <45% (43.5%)",
+        "data_quality": "structured_adapter"
+      },
+      "esr_monitor": {
+        "tool": "esr_monitor",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "ssi_pct": 64.7
+        },
+        "adapter_available": true,
+        "tool_score": 42,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "neutral_or_mixed",
+        "score_reason": "SSI >=55% (64.7%)",
+        "data_quality": "structured_adapter"
+      },
+      "va_res": {
+        "tool": "va_res",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "var_cvar_vnindex": {
+        "tool": "var_cvar_vnindex",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "evt_xi": 0.345,
+          "evt_xi_min": 0.168,
+          "evt_xi_max": 0.374,
+          "evt_xi_range": 0.206,
+          "evt_var99_range_pp": 0.11,
+          "evt_es99_range_pp": 0.7,
+          "evt_threshold_stable": 0.0
+        },
+        "adapter_available": true,
+        "tool_score": 35,
+        "tool_regime": "FEAR / DISTRIBUTION",
+        "tool_bias": "bearish",
+        "score_reason": "EVT central xi fat but threshold-sensitive: xi=0.345, xi_min=0.168, xi_range=0.206",
+        "data_quality": "structured_adapter"
+      },
+      "abm_simulator": {
+        "tool": "abm_simulator",
+        "layer": "tail_risk",
+        "as_of": "2026-06-30",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "distance_to_cascade_pct": 7.0,
+          "panic_ratio_pct": 0.0,
+          "abm_early_warning_score": 20.7,
+          "abm_avg_leverage_ratio": 2.5,
+          "cascade_vulnerability": 0.66,
+          "abm_stress_confidence_pct": 67.14
+        },
+        "adapter_available": true,
+        "tool_score": 35,
+        "tool_regime": "ABM GREEN EARLY WARNING",
+        "tool_bias": "bearish",
+        "score_reason": "Early-warning score below yellow (20.7/100); Distance to cascade <=10% (7.00%); Avg leverage >=2.5x (2.50x); Cascade vulnerability high (0.66)",
+        "data_quality": "structured_adapter"
+      },
+      "sentiment_factor_news": {
+        "tool": "sentiment_factor_news",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "neutral_or_mixed",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "risk_adjusted_growth": {
+        "tool": "risk_adjusted_growth",
+        "layer": "current_tool",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {},
+        "adapter_available": false,
+        "tool_score": null,
+        "tool_regime": null,
+        "tool_bias": null,
+        "score_reason": null,
+        "data_quality": "soft_excerpt_only"
+      },
+      "pvgo": {
+        "tool": "pvgo",
+        "layer": "valuation",
+        "as_of": "02/07/2026",
+        "bias": "bearish",
+        "report_score": null,
+        "report_regime": null,
+        "key_metrics": {
+          "pvgo_pct": 48.39,
+          "pe": 13.84,
+          "coe_pct": 14.0
+        },
+        "adapter_available": true,
+        "tool_score": 42,
+        "tool_regime": "PVGO ELEVATED EXPECTATION RISK",
+        "tool_bias": "bearish",
+        "score_reason": "PVGO elevated expectations (48.4%)",
+        "data_quality": "structured_adapter"
+      }
+    },
+    "history": {
+      "window_size": 30,
+      "history_window": [
+        {
+          "date": "2026-05-26",
+          "score": 12,
+          "regime": "DISTRIBUTION / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-05-27",
+          "score": 14,
+          "regime": "DISTRIBUTION / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-05-28",
+          "score": 18,
+          "regime": "DISTRIBUTION / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-05-29",
+          "score": 14,
+          "regime": "DISTRIBUTION / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-05-31",
+          "score": 12,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "manual",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-01",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-02",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-03",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-04",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-05",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-08",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-09",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-10",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-11",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-12",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-14",
+          "score": 11,
+          "regime": "CRISIS/PRE-CRASH",
+          "source": "manual",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-15",
+          "score": 11,
+          "regime": "CRISIS/PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-16",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-17",
+          "score": 11,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-18",
+          "score": 13,
+          "regime": "CRISIS / PRE-CRASH",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-20",
+          "score": 24,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "manual",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-21",
+          "score": 24,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "manual",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-22",
+          "score": 27,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-23",
+          "score": 20,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-24",
+          "score": 28,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-25",
+          "score": 29,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-26",
+          "score": 29,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-27",
+          "score": 29,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "manual",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-29",
+          "score": 29,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        },
+        {
+          "date": "2026-06-30",
+          "score": 29,
+          "regime": "PRE-CRASH / PANIC",
+          "source": "auto",
+          "provider": "deepseek-v4-pro"
+        }
+      ],
+      "rolling_summary": {
+        "history_count": 30,
+        "current_baseline_score": 31,
+        "current_baseline_regime": "FEAR / DISTRIBUTION",
+        "latest_prior_score": 29,
+        "score_avg_5d": 29.4,
+        "score_avg_10d": 27.5,
+        "score_avg_20d": 20.0,
+        "score_change_1d": 2.0,
+        "score_change_5d": 2.0,
+        "score_change_10d": 7.0,
+        "days_below_30": 0,
+        "days_below_15": 0,
+        "current_regime_streak": 1,
+        "min_20d": 11,
+        "max_20d": 31,
+        "usage_rule": "Use for persistence/delta only. Do not anchor the final score to history."
+      }
+    },
+    "methodology_cards": [
+      {
+        "tool": "fed_liquidity",
+        "domain": "global_liquidity",
+        "horizon": "4-12_weeks",
+        "primary_metric": "net_liquidity_impulse",
+        "score_direction": "Higher is safer / more supportive.",
+        "limits": "Liquidity quality matters; emergency balance-sheet expansion is not automatically bullish.",
+        "authority": "Use structured metrics and adapter/decision_state when present; do not relabel from prose alone."
+      },
+      {
+        "tool": "global_financial_conditions",
+        "domain": "external_credit_and_macro_stress",
+        "horizon": "4-12_weeks",
+        "primary_metric": "cqs_percentile_3y_and_point_in_time_pc1",
+        "score_direction": "Higher 3Y CQS percentile is worse for risk assets.",
+        "limits": "Indicator percentiles are 3Y max with 1Y warm-up; PC1 regime percentile remains 1Y. PCA is expanding point-in-time with periodic refits; no full-history PCA backfit or look-ahead revision. Do not offset high credit stress with short-term news sentiment.",
+        "authority": "Adapter score/regime/bias are authoritative when available."
+      },
+      {
+        "tool": "margin_m2_overlay",
+        "domain": "speculative_leverage_overlay",
+        "horizon": "monthly_lagged",
+        "primary_metric": "margin_debt_to_m2_zscore",
+        "score_direction": "Higher leverage crowding is worse when other stress tools are weak.",
+        "limits": "Monthly overlay only; never a standalone regime switch.",
+        "authority": "Use as amplification/discount context, not as a hard score driver unless adapter exists."
+      },
+      {
+        "tool": "vnibor",
+        "domain": "domestic_funding_liquidity",
+        "horizon": "1-4_weeks",
+        "primary_metric": "overnight_rate_and_20_session_stress",
+        "score_direction": "Higher/stickier funding stress is worse.",
+        "limits": "Single-day easing does not neutralize a stressed 20-session trend.",
+        "authority": "Adapter score/regime/bias are authoritative when available."
+      },
+      {
+        "tool": "ltmm",
+        "domain": "liquidity_transmission",
+        "horizon": "1-8_weeks",
+        "primary_metric": "upstream_downstream_transmission_state",
+        "score_direction": "Cleaner transmission is safer.",
+        "limits": "Treat as transmission context, not a standalone crash signal.",
+        "authority": "Use structured state if present; otherwise cite as soft interpretation."
+      },
+      {
+        "tool": "vn100_corporate_health",
+        "domain": "bottom_up_fundamental_health",
+        "horizon": "quarterly",
+        "primary_metric": "vn100_health_score_and_breadth",
+        "score_direction": "Higher health score and breadth are safer.",
+        "limits": "Not a short-term timing tool; can diverge from price-based internals.",
+        "authority": "Use as confidence and internal-quality overlay, not as a direct market-timing override."
+      },
+      {
+        "tool": "humility_falsification",
+        "domain": "thesis_audit",
+        "horizon": "current_vs_prior_rules",
+        "primary_metric": "triggered_falsification_rules",
+        "score_direction": "Fewer active falsification triggers preserve thesis confidence.",
+        "limits": "Does not create a new thesis; it audits the previous one.",
+        "authority": "If WATCH/FALSIFIED, discuss explicitly in trend and confidence."
+      },
+      {
+        "tool": "fear_greed",
+        "domain": "sentiment_and_positioning",
+        "horizon": "days_to_weeks",
+        "primary_metric": "risk_score_from_point_in_time_pca_factors",
+        "score_direction": "Higher score is safer / more risk-on, unless extreme greed is flagged.",
+        "limits": "Factor PCA is expanding point-in-time; sentiment is secondary to hard liquidity, breadth, and tail-risk constraints.",
+        "authority": "Use adapter score if available; otherwise treat as soft sentiment evidence."
+      },
+      {
+        "tool": "manipulation",
+        "domain": "index_coupling_and_concentration",
+        "horizon": "days_to_weeks",
+        "primary_metric": "vingroup_slope_percentile",
+        "score_direction": "Higher coupling/concentration stress is worse.",
+        "limits": "Mostly idiosyncratic/system-structure risk; do not overrule broad systemic tools alone.",
+        "authority": "Use as concentration risk overlay unless adapter provides a hard score."
+      },
+      {
+        "tool": "dispersion",
+        "domain": "market_structure_and_participation_quality",
+        "horizon": "days_to_weeks",
+        "primary_metric": "dispersion_pressure_index",
+        "score_direction": "Health depends on whether dispersion confirms or undermines index moves.",
+        "limits": "Low dispersion can mean idle/compressed risk, not automatically bullish.",
+        "authority": "Use as soft market-internal evidence unless adapter provides a hard score."
+      },
+      {
+        "tool": "upside_ratio",
+        "domain": "upside_participation",
+        "horizon": "days_to_weeks",
+        "primary_metric": "upside_participation_ratio",
+        "score_direction": "Higher sustained upside participation is safer.",
+        "limits": "Monte Carlo projections are deterministic/reproducible with fixed seeds and are scenario diagnostics, not independent allocation authority. Zombie rallies without breadth confirmation should not lift regime materially.",
+        "authority": "Use as internal participation evidence; do not overrule breadth/tail caps."
+      },
+      {
+        "tool": "bank_valuation",
+        "domain": "sector_valuation",
+        "horizon": "weeks_to_months",
+        "primary_metric": "valuation_gap_and_quality_flags",
+        "score_direction": "Undervalued plus quality confirmation is supportive.",
+        "limits": "Cheap banks are not buy signals when market regime forbids equity risk.",
+        "authority": "Use only with Risk-Adjusted Growth for stock selection."
+      },
+      {
+        "tool": "market_breadth",
+        "domain": "market_internal_participation",
+        "horizon": "days_to_weeks",
+        "primary_metric": "breadth_ma20_pct",
+        "score_direction": "Higher breadth is safer / healthier.",
+        "limits": "Weak breadth caps bullish interpretation even if news or valuation is supportive.",
+        "authority": "Adapter score/regime/bias are authoritative."
+      },
+      {
+        "tool": "esr_monitor",
+        "domain": "systemic_stress",
+        "horizon": "days_to_weeks",
+        "primary_metric": "ssi_pct",
+        "score_direction": "Higher SSI is worse.",
+        "limits": "Tail-risk override dominates allocation; do not soften with valuation alone.",
+        "authority": "Adapter score/regime/bias are authoritative."
+      },
+      {
+        "tool": "va_res",
+        "domain": "contagion_and_complacency",
+        "horizon": "days_to_weeks",
+        "primary_metric": "contagion_complacency_modules",
+        "score_direction": "Higher contagion/complacency stress is worse.",
+        "limits": "Use for tail-risk color and avoid list; not a standalone composite score.",
+        "authority": "Use as tail-risk evidence; adapter wins if present."
+      },
+      {
+        "tool": "var_cvar_vnindex",
+        "domain": "left_tail_risk",
+        "horizon": "days_to_weeks",
+        "primary_metric": "evt_xi_with_threshold_sensitivity",
+        "score_direction": "Higher EVT xi is worse.",
+        "limits": "EVT threshold sensitivity is a robustness/confidence diagnostic, not a second bearish vote. A single high xi only becomes a hard cap when elevated/fat-tail classification is robust across thresholds.",
+        "authority": "Adapter score/regime/bias are authoritative."
+      },
+      {
+        "tool": "abm_simulator",
+        "domain": "abm_v4_pre_shock_early_warning_and_margin_cascade",
+        "horizon": "days_to_weeks",
+        "primary_metric": "early_warning_score_and_level",
+        "score_direction": "Higher early-warning score is worse; YELLOW/ORANGE/RED reduce risk budget. Distance, panic, leverage, and cascade vulnerability are supporting diagnostics.",
+        "limits": "Pre-shock stress diagnostic, not an exact crash-timing model and not a standalone buy/sell signal.",
+        "authority": "ABM v4 early_warning_score/level and adapter score/regime/bias are authoritative when ABM CSV metrics are available."
+      },
+      {
+        "tool": "sentiment_factor_news",
+        "domain": "news_sentiment",
+        "horizon": "1-3_days",
+        "primary_metric": "news_sentiment_factor",
+        "score_direction": "More positive news is supportive only at short horizon.",
+        "limits": "Short-term noise; cannot veto macro, funding, breadth, or tail-risk stress.",
+        "authority": "Use as soft overlay unless hard adapter exists."
+      },
+      {
+        "tool": "risk_adjusted_growth",
+        "domain": "bank_growth_quality",
+        "horizon": "weeks_to_months",
+        "primary_metric": "economic_alpha",
+        "score_direction": "Higher economic alpha is better for stock selection.",
+        "limits": "Stock-picking tool only; cannot override low AI CIO allocation regime.",
+        "authority": "Use with Bank Valuation for bank picks; not a market-regime override."
+      },
+      {
+        "tool": "pvgo",
+        "domain": "valuation_expectation_risk",
+        "horizon": "medium_term",
+        "primary_metric": "pvgo_pct",
+        "score_direction": "Higher PVGO means more embedded growth expectation risk.",
+        "limits": "Not a crash timing signal; amplifies risk when breadth/liquidity/tail risk are weak.",
+        "authority": "Adapter score/regime/bias are authoritative; do not relabel from raw PVGO pct."
+      }
+    ]
+  }
+}

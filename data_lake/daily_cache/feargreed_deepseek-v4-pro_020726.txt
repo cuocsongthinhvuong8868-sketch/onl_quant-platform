@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 48.0/100, giảm 0.4 điểm, nằm trong vùng NEUTRAL (40–60).
+- EGARCH Vol (chuẩn hóa) 4.0%, giảm 2.0% so với phiên trước, ở mức thấp.
+- Rolling Skewness -0.16, thể hiện đuôi trái nhẹ.
+- Downside Correlation 3.2% (thấp), Upside Correlation 23.0% (cao hơn hẳn).
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, các chỉ báo đồng thuận với một pha NEUTRAL / STOCK PICKING. Biến động giảm và tương quan giảm điểm thấp cho thấy áp lực bán hệ thống đang suy yếu, trong khi tương quan tăng điểm cao cho thấy các nhịp hồi phục có sự lan tỏa. Tuy vậy, skewness âm nhẹ cảnh báo thị trường chưa hoàn toàn thoát khỏi trạng thái phòng thủ. Nhìn chung, rủi ro hệ thống ở mức thấp, thị trường phân hóa, cơ hội nằm ở cấp độ cổ phiếu đơn lẻ.
+
+## 3. Cross-Check
+Có phân kỳ nhẹ giữa Risk Score và EGARCH Vol: vol thấp thường đẩy score về vùng GREED, nhưng score vẫn ở NEUTRAL do skewness âm, cho thấy yếu tố này đang kìm hãm tâm lý lạc quan. Không có phân kỳ lớn giữa Skewness và Correlation: skew âm nhưng up-corr cao và down-corr thấp xác nhận sự bất đối xứng tích cực – thị trường dễ đồng thuận khi tăng hơn khi giảm.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.6** cho danh mục VN-Index. Hành động cụ thể: duy trì tỷ trọng cổ phiếu ở mức trung tính hơi thiên về nắm giữ; ưu tiên chọn lọc các cổ phiếu có upside correlation cao và nền tảng cơ bản vững, hạn chế những mã có độ nhạy giảm điểm lớn. Đây là môi trường phù hợp cho chiến lược stock picking hơn là đặt cược vào beta thuần.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "02/07/2026",
+  "regime": "NEUTRAL",
+  "score": 48.0,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Upside correlation 23.0% vs Downside 3.2%",
+    "EGARCH vol 4.0% thấp",
+    "Skewness -0.16 âm nhẹ"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 48.0
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

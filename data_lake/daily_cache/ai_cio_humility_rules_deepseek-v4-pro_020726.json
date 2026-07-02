@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-02",
+  "composite_score": 32,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 6,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING 20 phiên duy trì dưới 5 sẽ báo hiệu hạ nhiệt thanh khoản"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 43.5,
+      "unit": "%",
+      "description": "Tỷ lệ cổ phiếu trên MA20 vượt 45% xác nhận phân phối kết thúc"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 64.7,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% triệt tiêu cảnh báo rủi ro hệ thống"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.374,
+      "unit": "",
+      "description": "Toàn bộ EVT xi max hạ dưới 0.25 sẽ loại bỏ fat‑tail warning"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 5,
+      "unit": "th pct",
+      "description": "Phân vị coupling Vingroup duy trì dưới 70th củng cố sự suy yếu ảnh hưởng nhóm này"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "CQS toàn cầu dưới 80th xác nhận môi trường tín dụng chưa stress"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-02",
+  "source": "ai_cio_executive_summary"
+}

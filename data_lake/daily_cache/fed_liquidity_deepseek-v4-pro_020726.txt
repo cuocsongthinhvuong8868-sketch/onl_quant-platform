@@ -1,0 +1,43 @@
+## 1. Mechanical Decomposition
+Tuần này Net Liquidity ghi nhận mức giảm -$36.5B, đưa tổng về $5,812.4B. Phân rã thành phần:
+- **WALCL (tài sản Fed)**: Tiếp tục giảm nhẹ theo lịch trình QT (đáo hạn trái phiếu không tái đầu tư), làm giảm thanh khoản hệ thống.
+- **TGA (tài khoản Kho bạc)**: Tăng lên $918.7B, tức Kho bạc tích lũy tiền mặt (rút ròng khỏi hệ thống ngân hàng), đây là yếu tố chính gây sụt giảm thanh khoản tuần này.
+- **RRP (Reverse Repo)**: Chỉ còn $4.5B, gần như bằng 0, không còn đóng vai trò hút/bơm đáng kể.
+
+Kết luận: Động lực giảm chủ yếu đến từ việc Kho bạc hút tiền (thu thuế quý II) kết hợp với QT kéo dài.
+
+## 2. Cycle Positioning
+- **FED đang trong pha QT**: Bảng cân đối suy giảm chậm, không có dấu hiệu tái QE. RRP đã cạn kiệt (xấp xỉ $0), đánh dấu chấm dứt pha “bơm thanh khoản” từ việc quỹ thị trường tiền tệ rút khỏi RRP trước đây.
+- **TGA**: Đang trong giai đoạn tích lũy (đỉnh thuế tháng 6), tạo áp lực hút thanh khoản tạm thời. Kỳ vọng sẽ xả bớt trong tháng 7 khi Kho bạc chi tiêu, giúp bơm trở lại.
+- **Net Liquidity hiện tại ($5,812B)** thấp hơn mức đỉnh năm 2024 (khoảng $6,700B) và sát vùng thấp lịch sử kể từ khi RRP cạn. So với đáy giữa 2024, thanh khoản hiện tại tương đương hoặc nhỉnh hơn đôi chút, nhưng xu hướng vẫn đang đi ngang – suy yếu dần.
+
+## 3. Signal Strength
+- **Tín hiệu**: **HOLD** (trung tính).
+- **Z-Score (52 tuần)**: -0.51σ, nằm trong phạm vi bình thường (không đạt ngưỡng -1σ để kích hoạt CUT).
+- **Impulse EMA(4)**: -$19.9B – xác nhận đà giảm ngắn hạn nhưng chưa đủ cực đoan. Tín hiệu HOLD khớp với thực tế: thanh khoản co nhẹ nhưng không rơi vào vùng stress.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **SPX/NDX**: Thanh khoản giảm nhẹ tạo gió ngược khiêm tốn, nhưng không đủ mạnh để gây sụt giảm. Kỳ vọng sideway với volatility thấp, rủi ro xu hướng vẫn trung tính.
+- **DXY**: TGA cao + thanh khoản giảm hỗ trợ đồng USD ngắn hạn. DXY có thể duy trì trên vùng cao, gây áp lực lên vàng và EM.
+- **Vàng / Crypto**: DXY mạnh thường không thuận lợi; vàng chịu lực cản, crypto có thể giảm nhẹ khi thanh khoản toàn cầu se lại.
+- **VN-Index (lag 4-8 tuần)**: Với độ trễ truyền thống, tín hiệu HOLD và Z-Score âm nhẹ cho thấy khả năng VN-Index chững lại trong 2-4 tuần tới, thiên về kiểm tra vùng hỗ trợ hơn là bùng nổ. Tác động cụ thể yếu vì hệ số tương quan chỉ ~0.3.
+
+## 5. Risk Factors (điểm mù có thể làm sai lệch tín hiệu)
+- **RRP cạn**: Khi RRP ~0, tín hiệu CUT có thể yếu đi vì không còn room để bơm ngược từ dòng tiền rời RRP. Đồng thời, thanh khoản nhạy cực mạnh với biến động TGA – chỉ cần Kho bạc xả tiền đầu tháng 7, Net Liquidity có thể bật tăng trở lại nhanh.
+- **TGA mùa thuế (tháng 6)**: Spike hiện tại phần lớn do nộp thuế quý doanh nghiệp, mang tính tạm thời. Khi yếu tố này qua đi, áp lực tháo bớt.
+- **Fed emergency facility**: Xác suất thấp, nhưng nếu Fed tăng cường repo hoặc hạ lãi suất kỹ thuật có thể bơm thanh khoản đột biến.
+
+## 6. KẾT LUẬN
+Regime **QT_active** với nền thanh khoản đang co gọn nhưng chưa tới ngưỡng siết chặt. Trong 2-4 tuần tới, rủi ro chung cho risk assets ở mức trung bình – US equity và crypto dao động sideway, VN-Index có thể chịu áp lực nhẹ nhưng chưa đủ yếu tố kích hoạt sụt giảm sâu. Diễn biến TGA tháng 7 sẽ quyết định xu hướng tiếp theo.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5812.4,
+  "signal": "HOLD",
+  "z_score": -0.51,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

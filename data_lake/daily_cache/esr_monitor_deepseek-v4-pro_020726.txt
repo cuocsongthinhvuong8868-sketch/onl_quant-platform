@@ -1,0 +1,28 @@
+## 1. Observations
+- SSI hiện tại 64.7%, thuộc vùng WARNING, tích lũy rủi ro ngầm.
+- Market State: EUPHORIC RISK (high stress + uptrend).
+- Top 3 pillar drivers (downside-only): S_LIQ (36%), S_VAL (31%), S_COR (18%).
+- VN30 close trên MA125, nhưng divergence tiềm ẩn với stress index.
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ đang là driver chính, phản ánh tình trạng **volume khô cạn so với norm 1 năm**. Thanh khoản sụt giảm đáng kể trong khi giá vẫn neo cao – đây là dấu hiệu thiếu lực đỡ từ dòng tiền thực. S_VAL (valuation tension) đứng thứ nhì, cho thấy định giá căng hơn nhiều so với lợi suất tiền gửi, tức phần bù rủi ro (risk premium) đã bị nén mỏng. S_COR (systemic correlation) ở mức cao (PC1 EVR 38.2%) bổ sung thêm bức tranh herding: cổ phiếu di chuyển đồng pha quá mức, giảm khả năng chọn lọc phòng thủ. Tổ hợp S_LIQ + S_COR + S_VAL là signature kinh điển của bull-trap: thanh khoản teo dần, tương quan cao, định giá căng – một kịch bản đảo chiều đột ngột dễ xảy ra khi có catalyst nhỏ.
+
+## 3. Cross-Check
+Với VN30 đang trên MA125 và nhiều khả năng ở đỉnh cục bộ, SSI leo lên WARNING cho thấy divergence rõ nét: giá cao hơn, stress ngầm cao hơn – đúng mô hình bull-trap. HMM regime EUPHORIC RISK khớp hoàn toàn với SSI level (high stress trong uptrend). Không phát hiện lệch giữa quantitative model và hành động giá, củng cố tín hiệu rủi ro.
+
+## 4. Verdict
+Nâng tỷ trọng tiền mặt lên **35%** danh mục. Không khuyến nghị sử dụng margin dưới bất kỳ hình thức nào. Hành động phòng hộ: **giảm beta** danh mục (chốt lời một phần các cổ phiếu có độ nhạy thị trường cao) thay vì short outright, giữ tư thế thận trọng, sẵn sàng bảo vệ thành quả uptrend. Chưa đủ điều kiện kích hoạt short tương lai hay mua put mạnh tay vì SSI chưa vào CRITICAL, nhưng hạ beta là phản ứng cần thiết với bất đối xứng rủi ro/lợi nhuận ở thời điểm hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.7,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

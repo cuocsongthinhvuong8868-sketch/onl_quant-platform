@@ -1,0 +1,33 @@
+## 1. Observations
+- **VN30 Stress Index**: 0.00% — không ghi nhận áp lực lây lan real-time trong rổ bluechip.
+- **Số mã thủng VaR 95%**: 0 trên 30 — không có đợt bán tháo cá biệt nào.
+- **Complacency Index**: 7.41% — thấp, cho thấy thị trường **không** rơi vào trạng thái ngủ quên. Số mã bị mispriced (spread nén bất thường): 8 mã, đứng đầu là VIB, TCB, VCG.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress = 0.00% khẳng định không có sự kiện lây lan đang diễn ra. Toàn bộ 30 cổ phiếu đều chưa xuyên thủng mức VaR 95% trong ngày, bác bỏ kịch bản khủng hoảng cục bộ hoặc hệ thống. Tín hiệu này đồng nhất với môi trường không hoảng loạn, không có đầu sóng systemic nào hình thành.
+
+## 3. Complacency Assessment (Module C)
+Complacency ở mức rất thấp (7.41%), cách xa ngưỡng nguy hiểm 80%. Điều này **chỉ** có nghĩa thị trường KHÔNG ở chế độ “ngủ quên” – tức spread không bị nén trên diện rộng, và rủi ro đang được phản ánh tương đối qua chênh lệch giá. **Cấm** suy ra “ thị trường ổn định” hay “bình thường”.  
+
+Kết hợp với Stress Index = 0.00%, bức tranh hiện tại gợi ý một pha vận động có xu hướng mạnh (nhiều khả năng uptrend) khiến spread tự nhiên giãn ra, đẩy Complacency xuống thấp. Không có dấu hiệu panic hay phân phối đỉnh. Tuy vậy, cần theo dõi sát 8 mã đang bị nén spread cục bộ – đó là những điểm nóng tiềm ẩn điều chỉnh riêng lẻ.
+
+## 4. Stock-Level Risk Calls
+- **Module B (Crash)**: không có mã nào thủng VaR, không đưa ra lệnh cắt lỗ/giảm tỷ trọng trong ngày.
+- **Module C (Mispriced)**: VIB, TCB, VCG có spread nén chặt nhất, báo hiệu định giá sai rủi ro ở cấp cổ phiếu. Khuyến nghị:  
+  - Rà soát vị thế nắm giữ, ưu tiên giảm tỷ trọng nếu giá lưỡng lự tại kháng cự kỹ thuật hoặc phân kỳ âm trên khung ngày.  
+  - Đặt dừng lỗ linh hoạt theo % từ giá hiện tại (ví dụ: -3% đến -5%) hoặc khi thủng MA20 trên D1.  
+  - Không nên gia tăng mua mới cho đến khi spread trở lại mức bình thường.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 7.41,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIB", "TCB", "VCG"],
+  "confidence": "medium"
+}
+```

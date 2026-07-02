@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Lực cầu hiện tại 4.71% thấp hơn nhiều so với trung bình dài hạn 12.67% (delta –7.96%); lực cung 3.06% cũng thấp hơn hẳn so với 13.07% (delta –10.01%). Cả hai chiều đều bị nén mạnh.
+- Hệ số tự tương quan Phi của cầu (0.230) và của cung (0.226) đều > 0.10, xác nhận chế độ Momentum (đà tiếp diễn) trên cả hai mặt.
+- Kết hợp “Up nén + Down nén” → trạng thái Zombification: dòng tiền co hẹp, thanh khoản cạn dần.
+
+## 2. Supply-Demand Dynamics
+Thị trường đang trong Zombification: cả bên mua chủ động lẫn bên bán đều co cụm ở ngưỡng thấp bất thường, kèm momentum khiến trạng thái này có xu hướng kéo dài. Xét về động lượng, |Phi| của cầu (0.230) nhỉnh hơn không đáng kể so với cung (0.226), nên bên cầu tạm thời giữ momentum thực sự, dù chênh lệch quá nhỏ để tạo lợi thế rõ rệt. Tính chất “đóng băng” vẫn áp đảo.
+
+## 3. Stress-Test Read
+P95 Downside = 25.98%, cao hơn hẳn P95 Upside (22.64%). Đuôi rủi ro giảm dày hơn, phản ánh kịch bản panic sell có xác suất xuất hiện cao hơn và biên độ mạnh hơn so với bùng nổ mua. Bất đối xứng này nghiêng về phía bảo vệ danh mục.
+
+## 4. Verdict
+Trong môi trường Zombification, rủi ro đuôi giảm chiếm ưu thế, tỷ trọng giải ngân đề xuất ở mức 15%. Chiến lược **phòng thủ** được ưu tiên: hạn chế mua mới, giữ tiền mặt hoặc tài sản phòng hộ. Không nên bắt đáy vì động lượng thấp có thể tiếp diễn, cũng không mua đuổi khi chưa có tín hiệu bùng nổ. Dù không rơi vào “NO ACTIONABLE” (cả hai Phi đều ngoài vùng nhiễu), tín hiệu vẫn quá yếu để gia tăng rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 25.98,
+  "p95_upside_pct": 22.64,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

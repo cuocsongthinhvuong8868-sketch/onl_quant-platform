@@ -1,0 +1,29 @@
+## 1. Observations
+- Spread_Z = -0.63σ: biên độ phân tán đang nằm dưới mức trung bình 60 ngày, không có dấu hiệu căng cấu trúc.
+- DPI = 41.7%: xác suất thấp rằng dispersion regime này sẽ kéo dài, chỉ đang trong pha tạm thời.
+- Avg Pairwise Correlation = 0.006: tương quan nội bộ cực thấp, các cổ phiếu di chuyển độc lập với nhau.
+- Cross-Sectional Skewness & Kurtosis không khả dụng (N/A) → không thể xác định hướng đuôi.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không bị stress. Spread_Z âm (-0.63σ) cho thấy mức độ phân tán hiện tại không cao hơn lịch sử gần đây, DPI 41.7% khẳng định đây không phải là một dispersion regime có tính dai dẳng. Stress (nếu có) là cục bộ, không mang tính hệ thống.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu Skewness và Kurtosis, không thể kiểm tra được đuôi nào đang bị gãy. Không có bằng chứng về “cú sập cá biệt” (CS Skew < -1) hay “cú đẩy điên rồ” (CS Skew > +1), cũng không có cơ sở để đánh giá liệu phân phối lợi suất có fat-tail (Kurt > 5) hay không. Do đó, phân tích đuôi phải được xem là không hoàn chỉnh.
+
+## 4. Regime Mapping
+Theo bản đồ 2D (DPI × Corr), với DPI thấp (<70%) và Corr thấp (≈0.006), trạng thái hiện tại rơi vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu (stock selection) dựa trên phân tích cơ bản hoặc factor, vì rủi ro bầy đàn không đáng kể và sự phân tán lợi suất có thể khai thác qua các vị thế tương đối (relative value).  
+Rủi ro lớn nhất cho Portfolio Manager lúc này là **concentration risk nội tại của danh mục** – nếu nắm giữ quá ít cổ phiếu, sự cố riêng lẻ (idiosyncratic) có thể gây tổn thất lớn, bởi thị trường rất phân hóa và không có xu hướng chung để hấp thụ sai sót.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "02/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.63,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

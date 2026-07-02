@@ -1,0 +1,33 @@
+## 1. Observations
+- MA20: 43.5% cổ phiếu đóng trên đường trung bình 1 tháng – mức **trung bình thấp**, chưa rơi vào vùng quá bán (<20%) nhưng không đủ lực để tạo sóng.
+- MA60: 33.4% – **thấp**, cho thấy phần lớn thị trường vẫn nằm dưới xu hướng trung hạn, chưa xác nhận kết thúc điều chỉnh.
+- MA125: 26.8% – **rất thấp**, chỉ ~1/4 mã duy trì trên MA nửa năm, sức khỏe chu kỳ kinh doanh suy yếu rõ rệt.
+- MA252: 29.4% – **rất thấp**, dưới 30% báo hiệu chế độ thị trường giảm dài hạn (secular bear).
+
+## 2. Structural Health
+Cả bốn đường MA đều dưới 50%, không có tín hiệu đồng thuận tăng. MA20 (43.5%) tuy cao hơn MA252 (29.4%) nhưng cả hai đều yếu; đây là trạng thái **phân kỳ (divergence)** – ngắn hạn có nhịp hồi kỹ thuật nhưng nền tảng dài hạn quá mỏng. Không khớp với mô hình Strong Bull hay Bear Confirmed tiêu chuẩn, mà mang tính bất ổn cao, dễ bị hẫng nhịp. Đây là tín hiệu cảnh báo thị trường kém sức khỏe, cần chờ xác nhận thêm.
+
+## 3. Money Flow Leadership
+- Nhóm dẫn dắt thanh khoản ngắn hạn (giữ MA20) gồm nhiều mã tài chính: ACB, AAS, AGR, ABB (ngân hàng/chứng khoán) xen lẫn doanh nghiệp thương mại – **nhóm tài chính chiếm ưu thế rõ**.
+- Nhóm lãnh đạo dài hạn (giữ MA252) có ABB, BID, BMP, BSR, BFC – các blue-chip phòng thủ (ngân hàng lớn, nhựa, lọc hóa dầu, phân bón). Có sự trùng lặp ở ABB, ADS, nhưng phần lớn leader dài hạn là cổ phiếu phòng thủ, ít tính đầu cơ.
+- Dòng tiền thông minh đang ưu tiên **defensive** (Banks, Utilities, Vật liệu cơ bản) thay vì nhóm tăng trưởng nóng (Thép, Chứng khoán đầu cơ). Điều này củng cố thêm quan điểm thận trọng.
+
+## 4. Verdict
+**Chiến lược**: Phòng thủ, giữ tiền mặt là chủ đạo.
+- Thị trường suy yếu toàn diện, không có cơ sở cho trend-following hoặc mean-reversion T+ an toàn. Divergence giữa MA20 và MA252 yêu cầu **WAIT FOR CONFIRMATION** – chưa vội mở vị thế mua.
+- Đòn bẩy đề xuất: **0% margin** (MA252 < 30% và phân kỳ, không đủ điều kiện sử dụng margin >0%).
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 43.5,
+  "ma60_pct": 33.4,
+  "ma125_pct": 26.8,
+  "ma252_pct": 29.4,
+  "regime": "divergence",
+  "leadership_sector": "defensive",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
