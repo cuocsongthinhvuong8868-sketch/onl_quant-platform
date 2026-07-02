@@ -1,18 +1,18 @@
 <!-- ai-cio-cache-version: pca_point_in_time_v1 -->
 ## 1. Observations
-- Risk Score 48.0/100, giảm 0.4 điểm, nằm trong vùng NEUTRAL (40–60).
-- EGARCH Vol (chuẩn hóa) 4.0%, giảm 2.0% so với phiên trước, ở mức thấp.
-- Rolling Skewness -0.16, thể hiện đuôi trái nhẹ.
-- Downside Correlation 3.2% (thấp), Upside Correlation 23.0% (cao hơn hẳn).
+- Risk Score 48.2/100, giảm nhẹ 0.2 điểm, duy trì trong vùng NEUTRAL (40–60).
+- EGARCH Vol chuẩn hóa 4.0%, giảm 2.0% – biến động thấp và có xu hướng thu hẹp.
+- Rolling Skewness -0.10, sát ngưỡng zero, không thể hiện áp lực bán hay mua bất thường.
+- Downside Correlation (norm) 2.4%, thấp kỷ lục; Upside Correlation 23.2%, cao gấp gần 10 lần.
 
 ## 2. Interpretation
-Trên dữ liệu hiện tại, các chỉ báo đồng thuận với một pha NEUTRAL / STOCK PICKING. Biến động giảm và tương quan giảm điểm thấp cho thấy áp lực bán hệ thống đang suy yếu, trong khi tương quan tăng điểm cao cho thấy các nhịp hồi phục có sự lan tỏa. Tuy vậy, skewness âm nhẹ cảnh báo thị trường chưa hoàn toàn thoát khỏi trạng thái phòng thủ. Nhìn chung, rủi ro hệ thống ở mức thấp, thị trường phân hóa, cơ hội nằm ở cấp độ cổ phiếu đơn lẻ.
+Trên dữ liệu hiện tại, thị trường đang ở pha NEUTRAL / STOCK PICKING điển hình: biến động thấp, tương quan giảm mạnh ở chiều giảm điểm trong khi tương quan tăng nhẹ ở chiều tăng, cho thấy rủi ro hệ thống không lan tỏa khi bán, nhưng vẫn có một số nhóm cổ phiếu tăng đồng pha. Không có dấu hiệu của FEAR hay GREED cực đoan.
 
 ## 3. Cross-Check
-Có phân kỳ nhẹ giữa Risk Score và EGARCH Vol: vol thấp thường đẩy score về vùng GREED, nhưng score vẫn ở NEUTRAL do skewness âm, cho thấy yếu tố này đang kìm hãm tâm lý lạc quan. Không có phân kỳ lớn giữa Skewness và Correlation: skew âm nhưng up-corr cao và down-corr thấp xác nhận sự bất đối xứng tích cực – thị trường dễ đồng thuận khi tăng hơn khi giảm.
+Tín hiệu có phân kỳ nhẹ: Score 48.2 (trung tính) nhưng EGARCH Vol thấp và giảm thường gắn với pha GREED; tuy nhiên Skewness gần zero và Downside Correlation cực thấp (2.4%) lại bác bỏ động lượng tăng rộng – Upside Correlation tuy cao hơn nhưng vẫn dưới ngưỡng báo động (thường >40%). Nhất quán tổng thể: phân hóa mạnh, thiếu sức mạnh để chuyển pha sang GREED.
 
 ## 4. Verdict
-Beta exposure đề xuất: **0.6** cho danh mục VN-Index. Hành động cụ thể: duy trì tỷ trọng cổ phiếu ở mức trung tính hơi thiên về nắm giữ; ưu tiên chọn lọc các cổ phiếu có upside correlation cao và nền tảng cơ bản vững, hạn chế những mã có độ nhạy giảm điểm lớn. Đây là môi trường phù hợp cho chiến lược stock picking hơn là đặt cược vào beta thuần.
+Beta exposure đề xuất **0.5–0.7** cho danh mục VN-Index. Hành động ưu tiên: giảm phụ thuộc vào chỉ số, tập trung vào chọn lọc cổ phiếu (stock picking) từ phân tích cơ bản và kỹ thuật riêng lẻ. Không kích hoạt vị thế phòng thủ hay tấn công toàn thị trường vì môi trường phân hóa không cung cấp tín hiệu định hướng rõ ràng.
 
 ## 5. Structured Tail
 ```json
@@ -20,19 +20,18 @@ Beta exposure đề xuất: **0.6** cho danh mục VN-Index. Hành động cụ 
   "tool": "fear_greed",
   "date": "02/07/2026",
   "regime": "NEUTRAL",
-  "score": 48.0,
+  "score": 48.2,
   "confidence": "medium",
   "beta_target": 0.6,
   "key_signals": [
-    "Upside correlation 23.0% vs Downside 3.2%",
-    "EGARCH vol 4.0% thấp",
-    "Skewness -0.16 âm nhẹ"
+    "Vol thấp & giảm nhưng phân hóa mạnh (down-corr rất thấp)",
+    "Skewness gần zero – không biến dạng đuôi rủi ro"
   ]
 }
 ```
 
 === AI CIO STRUCTURED METRICS: fear_greed_methodology ===
-- FearGreed Risk Score: 48.0
+- FearGreed Risk Score: 48.2
 - PCA Method: expanding_point_in_time
 - PCA Full-History Fit: 0
 - PCA Refit Every Sessions: 21

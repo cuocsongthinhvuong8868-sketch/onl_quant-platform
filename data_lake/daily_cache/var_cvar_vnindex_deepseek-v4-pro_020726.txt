@@ -1,31 +1,24 @@
 <!-- ai-cio-cache-version: evt_threshold_sensitivity_v1 -->
 ## 1. Observations
-- Historical VaR 95% (cuộn 3 năm) ở mức **-1.65%** – phản ánh thiệt hại 5% một ngày theo phân phối lịch sử, không bắt trọn phần đuôi cực đoan.
-- EVT VaR 99% (POT/GPD) đạt **-3.69%** – xác suất 1/100 ngày lỗ vượt mức này; cao gấp hơn 2 lần Historical VaR 95%.
-- Hệ số đuôi GPD **ξ = +0.345** – nằm trong vùng FAT TAIL (ξ > 0.30), cảnh báo rủi ro cực đoan không được Gaussian phản ánh.
-- Chỉ số Hill = **+0.447** – cùng chiều và xấp xỉ magnitude với ξ, củng cố tín hiệu đuôi dày; nhưng độ nhạy ngưỡng (threshold_sensitive) làm giảm độ tin cậy toàn phần.
+- Historical VaR 95% ghi nhận tại –1.65%, sâu hơn parametric VaR Gaussian (–1.44%), phản ánh phân phối thực tế lệch âm so với giả định chuẩn.
+- EVT VaR 99% chạm –3.69%, gấp hơn 2 lần biến động ngày 30 phiên (σ₃₀ = 0.84%), báo hiệu rủi ro đuôi cực lớn ngoài tầm kiểm soát của mô hình truyền thống.
+- Hệ số đuôi GPD ξ = +0.345, vượt ngưỡng 0.30, xếp vào vùng **fat tail** – rủi ro cực đoan có thể khiến ES không ổn định.
+- Hill index = +0.447 cùng dấu và gần với ξ, củng cố tín hiệu đuôi dày, dù độ nhạy ngưỡng (threshold sensitive) làm giảm độ chắc chắn của phân loại đuôi.
 
 ## 2. Tail Thickness Diagnosis
-- **ξ (+0.345) thuộc bracket FAT TAIL** (ξ > 0.30). Tuy nhiên, do ngưỡng POT thay đổi, ξ dao động từ 0.168 (heavy) đến 0.374 (fat) → đây là **“threshold-sensitive fat‑tail warning”**, không phải fat‑tail vững chắc.
-- Hill cross‑check đồng thuận (cùng dấu, magnitude cao), làm tăng độ tin cậy nhưng vẫn để lại nghi ngờ vì chênh lệch 0.102 so với ξ.
-- ES‑VaR spread 95% = 1.37%, **lớn hơn σ₃₀ (0.84%)** → xác nhận thực nghiệm đuôi dày hơn nhiều so với phân phối chuẩn.
+ξ = 0.345 thuộc bracket **fat tail** (>0.30). Hill cross-check xác nhận (cùng dương, chênh lệch ~0.1) nên tín hiệu đuôi dày là đáng tin cậy, nhưng do xi dao động từ 0.168 (heavy) đến 0.374 (fat) khi quét ngưỡng POT 5%–15%, đây là **threshold-sensitive fat-tail warning** – phân loại đuôi không ổn định dù mức VaR 99 khá ổn định (range chỉ 0.11pp).  
+Chênh lệch ES – VaR 95% thực tế là 1.37%, lớn hơn σ₃₀ (0.84%), càng củng cố bằng chứng đuôi dày trên dữ liệu lịch sử.
 
 ## 3. Gaussian Gap
-- Gaussian VaR 99%: μ (≈ -0.048%) + z₀.₀₁·σ = -2.00%.
-- EVT VaR 99%: **-3.69%**.
-- Chênh lệch (gap) = **1.69 điểm phần trăm**, vượt xa ngưỡng 1pp.
+Gaussian VaR 99% ước tính: μ – 2.33·σ = –0.054% – 2.33×0.84% ≈ –2.01%.  
+EVT VaR 99% = –3.69%.  
+Chênh lệch ≈ **1.68pp**, vượt xa mốc 1pp. Mô hình Gaussian đánh giá thấp nghiêm trọng rủi ro đuôi, không nên dùng cho phân bổ vốn rủi ro hay cấp hạn mức.
 
-**Kết luận:** Mô hình Gaussian đánh giá thấp rủi ro cực đoan nghiêm trọng – **không còn phù hợp cho phân bổ vốn rủi ro**.
-
-## 4. Verdict — Hedging Implications
-- Với ξ > 0.30 (ngay cả khi threshold‑sensitive) và Gaussian gap quá lớn, các hành động sau là cần thiết:
-  - **Tránh hoàn toàn** các chiến lược momentum / trend‑following.
-  - **Mua put ITM** thay vì OTM để bảo vệ trước các cú sốc đuôi.
-  - **Short hợp đồng tương lai** để hedge trực tiếp.
-  - Giảm đòn bẩy mạnh tay (tối thiểu 50%).
+## 4. Verdict – Hedging Implications
+Với ξ > 0.30, thị trường đang ở chế độ rủi ro đuôi cực dày. Dù tín hiệu nhạy ngưỡng, mức độ tổn thất 99% vẫn sâu hơn Gaussian 1.68pp, đòi hỏi phòng hộ chủ động.  
+**Khuyến nghị cụ thể:** ngừng chiến lược momentum, giảm đòn bẩy, mua quyền chọn bán trong tiền (ITM puts) kết hợp bán hợp đồng tương lai (short futures) để bảo vệ danh mục trước drawdown cực đoan 4–6% trong một phiên.
 
 ## 5. Structured Tail
-
 ```json
 {
   "tool": "var_cvar_vnindex",
@@ -39,8 +32,8 @@
   "xi_range": 0.206,
   "threshold_stable": 0,
   "tail_regime": "fat",
-  "gaussian_gap_pp": 1.69,
-  "hedge_action": "avoid_momentum_buy_puts_itm_short_futures",
+  "gaussian_gap_pp": 1.68,
+  "hedge_action": "buy_puts_itm",
   "confidence": "medium"
 }
 ```

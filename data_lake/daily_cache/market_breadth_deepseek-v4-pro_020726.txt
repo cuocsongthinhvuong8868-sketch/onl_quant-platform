@@ -1,32 +1,31 @@
 ## 1. Observations
-- MA20: 43.5% cổ phiếu đóng trên đường trung bình 1 tháng – mức **trung bình thấp**, chưa rơi vào vùng quá bán (<20%) nhưng không đủ lực để tạo sóng.
-- MA60: 33.4% – **thấp**, cho thấy phần lớn thị trường vẫn nằm dưới xu hướng trung hạn, chưa xác nhận kết thúc điều chỉnh.
-- MA125: 26.8% – **rất thấp**, chỉ ~1/4 mã duy trì trên MA nửa năm, sức khỏe chu kỳ kinh doanh suy yếu rõ rệt.
-- MA252: 29.4% – **rất thấp**, dưới 30% báo hiệu chế độ thị trường giảm dài hạn (secular bear).
+- **MA20 (42.4%)**: dưới ngưỡng trung tính 50%, chưa chạm vùng quá bán (<20%) – xung lực ngắn hạn yếu nhưng chưa cực đoan.
+- **MA60 (32.7%)**: chỉ 1/3 mã vượt đường trung bình quý, xu hướng trung hạn vẫn tiêu cực.
+- **MA125 (27.1%)**: rất thấp, củng cố bức tranh suy yếu nửa năm.
+- **MA252 (28.7%)**: chỉ hơn 1/4 rổ nằm trên MA 1 năm, xác nhận chế độ bear dài hạn (secular weakness).
 
 ## 2. Structural Health
-Cả bốn đường MA đều dưới 50%, không có tín hiệu đồng thuận tăng. MA20 (43.5%) tuy cao hơn MA252 (29.4%) nhưng cả hai đều yếu; đây là trạng thái **phân kỳ (divergence)** – ngắn hạn có nhịp hồi kỹ thuật nhưng nền tảng dài hạn quá mỏng. Không khớp với mô hình Strong Bull hay Bear Confirmed tiêu chuẩn, mà mang tính bất ổn cao, dễ bị hẫng nhịp. Đây là tín hiệu cảnh báo thị trường kém sức khỏe, cần chờ xác nhận thêm.
+Cả 4 khung thời gian cùng chỉ về vùng thấp, không có sự phân kỳ mạnh (MA20 không mạnh đột biến, MA252 không phục hồi). Tuy nhiên MA20 vẫn trên 30% nên chưa đạt điều kiện của mẫu **Bear Confirmed** (đòi hỏi MA20 < 30% **và** MA252 < 40%). Thực tế thị trường đang trong trạng thái **Neutral – nghiêng Bear**, độ rộng suy yếu nhưng chưa rơi vào quá bán cực đoan.
 
 ## 3. Money Flow Leadership
-- Nhóm dẫn dắt thanh khoản ngắn hạn (giữ MA20) gồm nhiều mã tài chính: ACB, AAS, AGR, ABB (ngân hàng/chứng khoán) xen lẫn doanh nghiệp thương mại – **nhóm tài chính chiếm ưu thế rõ**.
-- Nhóm lãnh đạo dài hạn (giữ MA252) có ABB, BID, BMP, BSR, BFC – các blue-chip phòng thủ (ngân hàng lớn, nhựa, lọc hóa dầu, phân bón). Có sự trùng lặp ở ABB, ADS, nhưng phần lớn leader dài hạn là cổ phiếu phòng thủ, ít tính đầu cơ.
-- Dòng tiền thông minh đang ưu tiên **defensive** (Banks, Utilities, Vật liệu cơ bản) thay vì nhóm tăng trưởng nóng (Thép, Chứng khoán đầu cơ). Điều này củng cố thêm quan điểm thận trọng.
+- **Dòng tiền ngắn hạn (MA20)**: Các mã dẫn đầu thanh khoản tập trung vào **nhóm tài chính** – ngân hàng (ACB, ABB) và chứng khoán (AAS, ABS, AGR). Xuất hiện thêm một vài doanh nghiệp nông nghiệp/công nghiệp (ANV, APF).
+- **Lãnh đạo dài hạn (MA252)**: Vẫn có mặt ngân hàng (ABB, BID), bên cạnh năng lượng (BSR), phân bón (BFC), nhựa (BMP) và một số mã chu kỳ khác. Trùng với nhóm ngắn hạn ở ABB, APF.
+- **Hành vi “smart money”**: Dòng tiền lớn ưu tiên **phòng thủ (ngân hàng)** và một số cổ phiếu chu kỳ chọn lọc, không mở rộng sang nhóm tăng trưởng rủi ro cao.
 
 ## 4. Verdict
-**Chiến lược**: Phòng thủ, giữ tiền mặt là chủ đạo.
-- Thị trường suy yếu toàn diện, không có cơ sở cho trend-following hoặc mean-reversion T+ an toàn. Divergence giữa MA20 và MA252 yêu cầu **WAIT FOR CONFIRMATION** – chưa vội mở vị thế mua.
-- Đòn bẩy đề xuất: **0% margin** (MA252 < 30% và phân kỳ, không đủ điều kiện sử dụng margin >0%).
+**Chiến lược: Phòng thủ, nắm giữ tiền mặt.**  
+Độ rộng cực yếu ở MA252 (28.7%) triệt tiêu mọi tín hiệu mua đuổi. MA20 chưa chạm quá bán (<20%) nên chưa đủ điều kiện cho mean‑reversion T+ an toàn. **Margin đề xuất 0%** (MA252 quá thấp, không đạt ngưỡng >70%). Không có phân kỳ rõ rệt để yêu cầu “chờ xác nhận”, nhưng việc gia tăng rủi ro lúc này là không hợp lý.
 
 ```json
 {
   "tool": "market_breadth",
-  "ma20_pct": 43.5,
-  "ma60_pct": 33.4,
-  "ma125_pct": 26.8,
-  "ma252_pct": 29.4,
-  "regime": "divergence",
-  "leadership_sector": "defensive",
-  "strategy": "wait",
+  "ma20_pct": 42.4,
+  "ma60_pct": 32.7,
+  "ma125_pct": 27.1,
+  "ma252_pct": 28.7,
+  "regime": "neutral",
+  "leadership_sector": "financials",
+  "strategy": "defensive",
   "margin_pct": 0,
   "confidence": "medium"
 }

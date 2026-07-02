@@ -1,17 +1,20 @@
 <!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
 ## 1. Observations
-- Lực cầu hiện tại 4.71% thấp hơn nhiều so với trung bình dài hạn 12.67% (delta –7.96%); lực cung 3.06% cũng thấp hơn hẳn so với 13.07% (delta –10.01%). Cả hai chiều đều bị nén mạnh.
-- Hệ số tự tương quan Phi của cầu (0.230) và của cung (0.226) đều > 0.10, xác nhận chế độ Momentum (đà tiếp diễn) trên cả hai mặt.
-- Kết hợp “Up nén + Down nén” → trạng thái Zombification: dòng tiền co hẹp, thanh khoản cạn dần.
+- Cả hai chiều cung – cầu đều nén mạnh dưới mức trung bình dài hạn: bên mua chỉ 6.82% (Mu 12.69%), bên bán 5.18% (Mu 13.10%) → thanh khoản teo tóp.
+- Hệ số tự tương quan Phi cả cầu (0.230) và cung (0.225) đều trên ngưỡng +0.10 → cả hai đang trong chế độ **momentum**, đà hiện tại có xu hướng kéo dài.
+- Mức chênh lệch current‑vs‑mu đồng nhất phía nén → xác nhận trạng thái **zombification**, không đủ dòng tiền chốt lời hay bắt đáy rõ nét.
 
 ## 2. Supply-Demand Dynamics
-Thị trường đang trong Zombification: cả bên mua chủ động lẫn bên bán đều co cụm ở ngưỡng thấp bất thường, kèm momentum khiến trạng thái này có xu hướng kéo dài. Xét về động lượng, |Phi| của cầu (0.230) nhỉnh hơn không đáng kể so với cung (0.226), nên bên cầu tạm thời giữ momentum thực sự, dù chênh lệch quá nhỏ để tạo lợi thế rõ rệt. Tính chất “đóng băng” vẫn áp đảo.
+- Trạng thái dòng tiền hiện tại là **zombification**: cả lực mua lẫn lực bán đều co rút xa so với quá khứ, thị trường di chuyển vô hồn, thiếu thanh khoản thực.
+- Bên cầu giữ momentum nhỉnh hơn đôi chút (|Phi demand| = 0.230 so với |Phi supply| = 0.225), nhưng chênh lệch quá nhỏ để khẳng định ưu thế rõ ràng. Thực chất hai chiều đang tự nuôi đà riêng trong biên độ hẹp.
 
 ## 3. Stress-Test Read
-P95 Downside = 25.98%, cao hơn hẳn P95 Upside (22.64%). Đuôi rủi ro giảm dày hơn, phản ánh kịch bản panic sell có xác suất xuất hiện cao hơn và biên độ mạnh hơn so với bùng nổ mua. Bất đối xứng này nghiêng về phía bảo vệ danh mục.
+- P95 Downside = 25.68%: xác suất 5% thị trường chứng kiến một cơn panic sell khiến tỉ lệ mã giảm sâu vọt lên mức này. Biên độ rủi ro rất nghiêm trọng nếu cấu trúc gãy.
+- P95 Upside = 22.74% – thấp hơn đuôi bán, cho thấy tail risk **phía giảm dày hơn**, thị trường phòng thủ mạnh hơn là sẵn sàng bùng nổ.
 
 ## 4. Verdict
-Trong môi trường Zombification, rủi ro đuôi giảm chiếm ưu thế, tỷ trọng giải ngân đề xuất ở mức 15%. Chiến lược **phòng thủ** được ưu tiên: hạn chế mua mới, giữ tiền mặt hoặc tài sản phòng hộ. Không nên bắt đáy vì động lượng thấp có thể tiếp diễn, cũng không mua đuổi khi chưa có tín hiệu bùng nổ. Dù không rơi vào “NO ACTIONABLE” (cả hai Phi đều ngoài vùng nhiễu), tín hiệu vẫn quá yếu để gia tăng rủi ro.
+- Đề xuất giải ngân chỉ **10–15%**. Thanh khoản chết cứng, payout không tương xứng với rủi ro đuôi.
+- Chiến lược: **phòng thủ**. Không đuổi theo momentum yếu ớt, không bắt đáy khi chưa có dấu hiệu phân phối hoặc tích luỹ rõ ràng; chờ thanh khoản hồi phục trước khi hành động lớn.
 
 ## 5. Structured Tail
 ```json
@@ -19,11 +22,11 @@ Trong môi trường Zombification, rủi ro đuôi giảm chiếm ưu thế, t�
   "tool": "upside_ratio",
   "regime": "zombification",
   "momentum_winner": "demand",
-  "p95_downside_pct": 25.98,
-  "p95_upside_pct": 22.64,
+  "p95_downside_pct": 25.68,
+  "p95_upside_pct": 22.74,
   "deployment_pct": 15,
   "strategy": "defensive",
-  "confidence": "medium"
+  "confidence": "low"
 }
 ```
 

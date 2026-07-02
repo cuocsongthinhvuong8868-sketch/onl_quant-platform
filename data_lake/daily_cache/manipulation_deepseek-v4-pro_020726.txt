@@ -1,20 +1,22 @@
-## 1. Observations  
-- OLS Slope 0.21 nằm ở phân vị 7.0%, rất thấp → độ nhạy của VIC/VHM/VRE lên VN30F1M đang suy yếu trầm trọng.  
-- Correlation 0.58 ở phân vị 46.6% (trung bình) → mối liên kết chưa gãy hoàn toàn nhưng không đáng tin cậy để dẫn dắt.  
-- Event Study xác nhận STATUS QUO (ΔCorr = 0.02, ΔSlope = -0.77) → không xuất hiện đảo chiều cấu trúc, chỉ là sự suy giảm lực đẩy từ nhóm Vingroup.
+## 1. Observations
+- **OLS Slope** ở mức 0.21, ứng với percentile 6.9th – cực thấp, cho thấy độ nhạy của composite VIN với VN30F1M gần như biến mất.
+- **Correlation** đạt 0.58 (percentile 46.3th) – mức tương quan trung bình, không đủ mạnh để xác nhận một sự dẫn dắt có ý nghĩa.
+- **Regime hiện tại STATUS QUO** do ΔCorr (+0.02) không vượt ngưỡng ±0.15, bất chấp ΔSlope giảm sâu –0.77 (thuộc vùng DECOUPLING nếu ΔCorr đồng pha).
 
-## 2. Microstructure Read  
-- Slope ở phân vị cực thấp (<20th) → Vingroup mất vai trò chi phối VN30F1M. Thị trường đã “rời tay” khỏi cổ phiếu họ Vin, dòng tiền đang tìm kiếm nhóm dẫn dắt khác (Bank, Chứng khoán, Thép).  
-- Correlation vừa phải cho thấy đôi lúc VN30F1M vẫn phản ứng cùng chiều với composite, nhưng biên độ rất nhỏ, không đủ để đặt cược chênh lệch. Không có dấu hiệu can thiệp (cả hai percentile không cùng >80th).
+## 2. Microstructure Read
+- Vai trò của VIC/VHM/VRE đối với VN30F1M đang **mất quyền chi phối rõ rệt**. Slope percentile < 8th cho thấy biến động giá của nhóm VIN gần như không truyền tải sang chỉ số, thị trường đã “rời VIN”.  
+- Hiện tượng cả hai percentile < 80th loại trừ khả năng can thiệp bất thường, xác nhận tín hiệu phi tập trung tự nhiên từ dòng tiền.  
+- Tương quan ở mức 46.3th chỉ phản ánh sự đồng pha ngẫu nhiên, không phải động lực dẫn dắt có hệ thống.
 
-## 3. Event Study Interpretation  
-- Trạng thái STATUS QUO kéo dài từ 07/04/2026: ΔSlope giảm mạnh (-0.77) trong khi correlation đi ngang (tăng 0.02) cho thấy thị trường đã tái phân bổ vốn ra khỏi cổ phiếu Vin nhưng chưa tạo biến động lớn.  
-- Intraday: không có tín hiệu bất thường để giao dịch đột phá qua đêm. Overnight: giữ nguyên trạng thái quan sát, không giữ vị thế.
+## 3. Event Study Interpretation
+- Từ 07/04/2026, ΔSlope –0.77 kết hợp ΔCorr +0.02 tạo ra một **STATUS QUO nguy hiểm**: tương quan không đứt nhưng độ dốc sụp mạnh, báo hiệu dòng tiền đang đứng ngoài quan sát nhóm VIN, chưa có tín hiệu đảo chiều hay tiếp tục xu hướng rõ ràng.  
+- Trong phiên intraday, không có edge để nắm bắt. Overnight cũng thiếu tín hiệu vì regime không có momentum cấu trúc.  
+- Nếu regime là TÍN HIỆU GIẢ, đã khẳng định NO TRADE; hiện tại STATUS QUO cũng có ý nghĩa tương tự: hành động không rõ ràng.
 
-## 4. Verdict  
-- Trade plan: **NO TRADE**. Mô hình không cung cấp edge do slope quá thấp, correlation không đủ mạnh, regime STATUS QUO.  
-- Leading indicator cần theo dõi: nhóm Ngân hàng (VCB, BID, CTG) – nơi đang hút dòng tiền thay thế Vingroup. Nếu Bank tăng mạnh kèm thanh khoản đột biến, có thể xem xét Short F1 hedge. Hiện tại chưa đủ tín hiệu.  
-- Stop-loss reference: không áp dụng cho NO TRADE. Nếu phải đặt một kịch bản dự phòng (không khuyến nghị), có thể dùng mức thủng kênh giá của VN30F1M tại 2,005 điểm (≈ -0.5% so với giá đóng cửa 2,015.70) làm điểm cắt lỗ cho bất kỳ vị thế âu lo nào, nhưng đây chỉ là mức tham khảo kỹ thuật, không phải từ mô hình.
+## 4. Verdict
+- **Trade plan: NO TRADE.** Không đủ điều kiện để Long/Short F1 hay Spread VIN vs Bank.  
+- **Leading indicator:** Theo dõi nhóm Ngân hàng (BID, CTG, VCB) và Thép (HPG) – nếu các cổ phiếu này dẫn dắt chỉ số trong khi nhóm VIN lình xình, có thể củng cố kịch bản decoupling sẽ kéo dài. Nếu bất ngờ VIC/VHM/VRE bứt phá với volume đột biến, lúc đó tính lại.  
+- Do không có vị thế, không cần stop-loss cụ thể. Nếu tìm kiếm điểm tham khảo tiềm năng, có thể đặt mental stop dưới mức giá hiện tại (ví dụ VIC 220.30 –3% ≈ 213.7) nhưng chỉ dùng để canh re‑entry nếu slope hồi phục vượt 20th percentile, không phải lệnh hiện tại.  
 
 ## 5. Structured Tail
 ```json
@@ -22,8 +24,8 @@
   "tool": "manipulation",
   "date": "02/07/2026",
   "regime": "STATUS QUO",
-  "slope_percentile": 7.0,
-  "corr_percentile": 46.6,
+  "slope_percentile": 6.9,
+  "corr_percentile": 46.3,
   "trade_signal": "no_trade",
   "confidence": "low"
 }
