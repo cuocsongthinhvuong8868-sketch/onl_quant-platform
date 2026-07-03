@@ -1,0 +1,28 @@
+## 1. Observations
+- OLS Slope ở phân vị 7.0th (rất thấp): VN30F1M gần như không phản ứng với chuyển động của composite VIC/VHM/VRE.
+- Correlation ở phân vị 46.4th (bình thường-thấp): mối liên kết vẫn tồn tại nhưng lỏng, không đủ để dẫn dắt.
+- Regime hiện tại: **DECOUPLING** (ΔCorr = -0.33, ΔSlope = -0.87) — VIN mất hoàn toàn quyền chi phối chỉ số, thị trường đang được dẫn dắt bởi các nhóm ngành khác.
+
+## 2. Microstructure Read
+VIC/VHM/VRE lúc này không còn là nam châm kéo VN30F1M. Khi cả delta tương quan và delta slope cùng giảm mạnh, các lực đẩy từ nhóm VIN không truyền sang chỉ số tương lai. Với slope percentile < 20th và corr percentile chỉ ở trung bình, không có hiện tượng can thiệp (intervention) nào — đây là tín hiệu thị trường đã “rời” VIN một cách tự nhiên. Dòng tiền đang xoay vòng sang các cổ phiếu khác, khả năng cao là nhóm ngân hàng/chứng khoán/thép.
+
+## 3. Event Study Interpretation
+Trạng thái DECOUPLING báo hiệu trong phiên hôm nay và qua đêm, các biến động ở VIC/VHM/VRE sẽ ít còn giá trị dự báo cho VN30F1M. Nếu đặt lệnh dựa trên tín hiệu từ VIN sẽ dễ bị nhiễu, rủi ro đảo chiều không được phản ánh vào chỉ số. Do đó, mọi quyết định intraday cần ưu tiên theo dõi leading indicators từ Ngân hàng (VCB, BID, CTG) hoặc Chứng khoán (SSI, HCM). Không phải regime TÍN HIỆU GIẢ nên không cảnh báo NO TRADE cứng từ rule, nhưng bản chất decoupling khiến edge từ VIN gần như bằng 0.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** trên riêng VN30F1M nếu chỉ dùng tín hiệu từ VIC/VHM/VRE. Chưa có đủ xác nhận từ nhóm dẫn dắt mới để vào lệnh hướng Long/Short rõ ràng.
+- Leading indicator cần theo dõi: nhóm ngân hàng (đặc biệt VCB, BID); nếu Bank Index phá kháng cự kèm thanh khoản tăng, có thể tạo cơ hội Long F1 với xác nhận từ nhóm này.
+- Stop-loss reference: không áp dụng vì chưa có vị thế. Nếu chuyển sang Spread VIN-vs-Bank (ví dụ short VIC/VHM/VRE, long VN30F1M), điểm dừng lỗ nên dựa trên VIC mất 3-5% từ giá close hiện tại (220,300 VND → stop nếu VIC vượt 226,900 VND với mức 3%).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "03/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 7.0,
+  "corr_percentile": 46.4,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

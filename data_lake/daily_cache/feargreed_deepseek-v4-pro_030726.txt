@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Điểm rủi ro tổng hợp 48.2, trong dải NEUTRAL (40-60); thay đổi +0.3 so với phiên trước.
+- EGARCH Vol chuẩn hóa hiện 2.4%, giảm 2.0% so với phiên trước – mức biến động rất thấp và đang thu hẹp nhanh.
+- Rolling Skewness -0.02, gần như bằng 0 – phân phối lợi nhuận cân xứng, không có đuôi trái dày đáng kể.
+- Downside Correlation chỉ 4.0% (rất thấp), trong khi Upside Correlation là 23.4% (trung bình) – lực kéo tăng điểm có tính lan tỏa hơn là lực bán tháo.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha phân hóa (STOCK PICKING), với rủi ro hệ thống thấp. Biến động co lại gần mức nền, tương quan bán không đáng kể, và skew gần trung tính ủng hộ kịch bản định giá riêng lẻ từng cổ phiếu hơn là chuyển động đồng loạt. Không có dấu hiệu của sợ hãi đám đông (fear) hay tham lam cực đoan (extreme greed).
+
+## 3. Cross-Check
+- Score 48.2 đi cùng EGARCH Vol giảm mạnh – sự kết hợp nhất quán với môi trường ít căng thẳng thanh khoản.
+- Skewness ≈ 0 và Downside Correlation thấp (4.0%) cùng pha với Upside Correlation cao hơn (23.4%) – không có phân kỳ giữa các chỉ báo đuôi trái/phải. Tín hiệu chung ủng hộ một trạng thái ổn định, không mâu thuẫn.
+
+## 4. Verdict
+Beta mục tiêu đề xuất cho danh mục VN-Index: 0.6.  
+Hành động: duy trì một phần tiếp xúc thị trường, tập trung vào chọn cổ phiếu có upside momentum cao và tương quan dương ở pha tăng điểm. Không yêu cầu phòng thủ quá mức (hedge toàn bộ) vì downside correlation rất thấp làm giảm xác suất bán tháo hệ thống. Nếu score vượt quá 60 hoặc volatility quay đầu tăng mạnh, cân nhắc giảm beta về 0.4.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "03/07/2026",
+  "regime": "NEUTRAL",
+  "score": 48.2,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": [
+    "EGARCH Vol giảm mạnh 2.0%",
+    "Downside Correlation rất thấp 4.0%"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 48.2
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

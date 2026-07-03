@@ -1,0 +1,31 @@
+## 1. Observations
+- Spread annualized ở mức 11.12%, dương cho thấy đuôi phân phối vẫn có đóng góp nhưng không quá mức – Spread_Z = -0.41σ, nằm sát trung bình động 60 phiên, không có dấu hiệu bị kéo căng bất thường.
+- DPI = 41.7%, nằm dưới ngưỡng 70%, xác nhận chế độ phân tán không kéo dài dai dẳng mà chỉ mang tính giai đoạn.
+- Tương quan bình quân cặp cổ phiếu (Ledoit-Wolf) cực thấp ở 0.006, gần sát 0, phản ánh môi trường phân hóa rất mạnh, các diễn biến giá hầu như độc lập.
+- Cross-Sectional Skewness và Kurtosis không có dữ liệu (N/A), không thể xác định trực tiếp hướng lệch đuôi.
+
+## 2. Structural State
+Với Spread_Z âm nhẹ (-0.41σ) và DPI khiêm tốn (41.7%), thị trường hiện tại không rơi vào trạng thái căng thẳng hệ thống. Mức Spread dương nhưng không bị kéo giãn đáng kể so với quá khứ gần, trong khi DPI thấp cho thấy bất kỳ sự phân tán nào vừa xảy ra cũng không đủ bền vững để hình thành một regime kéo dài.  
+Cấu trúc là **bình thường, không có stress** mang tính hệ thống hay dai dẳng. Không tồn tại stress cục bộ kiểu “Spread_Z cao nhưng DPI thấp”, càng không có stress regime khi cả hai đều cao.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu Cross-Sectional Skewness và Kurtosis, không thể định lượng mức độ lệch đuôi hay độ dày đuôi. Tuy nhiên, các chỉ báo hiện có không gợi ý một cú gãy đuôi rõ rệt: Spread dương nhưng chỉ loanh quanh trung bình, tương quan gần 0 cho thấy nếu có outliers, chúng mang tính cá biệt đơn lẻ hơn là cú sốc lây lan toàn thị trường.  
+Với Skew không có, không xác định được liệu đuôi trái (cú sập cá biệt) hay đuôi phải (cú đẩy điên rồ) đang chiếm ưu thế. Tạm thời giả định phân phối tương đối cân xứng vì spread không biến dạng lớn.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Corr): DPI ở ngưỡng thấp (dưới 70%) và Corr ở mức cực thấp (0.006) đặt thị trường vào ô **Healthy Stock‑Picking**. Đây là môi trường phân hóa rõ nét, các cổ phiếu biến động độc lập, ít hiệu ứng bầy đàn, tạo điều kiện cho các chiến lược chọn cổ phiếu (long/short) hoạt động hiệu quả.  
+Rủi ro lớn nhất đối với Portfolio Manager không phải là herding crash hay khô thanh khoản toàn thị trường, mà là **rủi ro tập trung (concentration risk)** và một cú đảo chiều tương quan đột ngột: nếu tương quan tăng vọt từ đáy, các vị thế phân tán có thể bị tổn thương đồng thời, xóa bỏ lợi thế stock‑picking.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "03/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.41,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

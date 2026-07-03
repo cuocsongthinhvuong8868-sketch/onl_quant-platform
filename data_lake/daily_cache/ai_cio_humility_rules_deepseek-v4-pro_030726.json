@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-03",
+  "composite_score": 31,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Stress thanh khoản nội địa hạ nhiệt nếu số phiên STRESS/WARNING xuống dưới 5"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 35.5,
+      "unit": "%",
+      "description": "Dòng tiền lan tỏa trở lại, báo hiệu thị trường phục hồi rộng"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 64.8,
+      "unit": "%",
+      "description": "Căng thẳng hệ thống giảm về vùng an toàn"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.374,
+      "unit": "",
+      "description": "Đuôi béo biến mất trên toàn dải ngưỡng GPD"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 6.667,
+      "unit": "th pct",
+      "description": "Thị trường tiếp tục decoupling, không còn bị Vingroup chi phối"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 80.0,
+      "unit": "th pct",
+      "description": "Chênh lệch tín dụng deep-junk hạ nhiệt dưới ngưỡng cao"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-03",
+  "source": "ai_cio_executive_summary"
+}

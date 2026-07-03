@@ -1,0 +1,34 @@
+## 1. Observations
+- **MA20 (35.5%)**: thấp – chưa đến một nửa số mã giữ được xu hướng 1 tháng, phản ánh áp lực bán ngắn hạn lan rộng.
+- **MA60 (31.5%)**: thấp – xác nhận điều chỉnh trung hạn vẫn chiếm ưu thế, chưa có tín hiệu kết thúc.
+- **MA125 (27.5%)**: rất thấp – sức mạnh chu kỳ nửa năm suy yếu nghiêm trọng, ít cổ phiếu duy trì được momentum.
+- **MA252 (26.4%)**: rất thấp – xu thế dài hạn nằm sâu dưới ngưỡng 40%, thị trường đang trong pha giảm giá kéo dài.
+
+## 2. Structural Health
+Bốn đường MA đồng thuận ở mức thấp, tạo thành cấu trúc suy yếu đồng bộ, không ghi nhận phân kỳ. MA20 dù chưa rơi xuống dưới 30% để kích hoạt mẫu hình `Bear Confirmed` theo định nghĩa, nhưng MA252 duy trì dưới 40% khiến thị trường tiến sát trạng thái giảm giá xác nhận. Tạm coi đây là **Bear Confirmed không điển hình** – xu hướng chính vẫn là giảm, chưa có mầm mống đảo chiều.
+
+## 3. Money Flow Leadership
+- **Dẫn dắt ngắn hạn (MA20)**: nhóm Chứng khoán – Ngân hàng chiếm ưu thế (AAS, ABS, ACB, APG, API…) cho thấy dòng tiền đầu cơ tìm đến cổ phiếu tài chính có độ nhạy cao.
+- **Dẫn dắt dài hạn (MA252)**: vẫn có mặt Ngân hàng và Chứng khoán (ABB, BID, BVS…), nhưng xuất hiện thêm Sản xuất (BFC, BMP) và Năng lượng (BSR) – dấu hiệu smart money phân tán phòng thủ.
+- Overlap giữa hai nhóm dẫn dắt thấp, dòng tiền dài hạn không đồng thuận với ngắn hạn. **Tổng thể thiên về phòng thủ**, chưa đủ điều kiện để vào chu kỳ tấn công.
+
+## 4. Verdict
+- **Chiến lược**: Phòng thủ, ưu tiên giữ tiền mặt; không phù hợp trend-following hay đánh mean-reversion T+ vì breadth chưa rơi vào oversold.
+- **Đòn bẩy**: 0% margin – điều kiện bắt buộc (MA252 > 70% và không divergence) không thỏa mãn.
+- Tín hiệu chưa rõ ràng để chuyển sang canh mua, nhưng cũng chưa có phân kỳ xác nhận bẫy tăng/giảm. **Hành động chính: đứng ngoài quan sát, chờ xác nhận cải thiện breadth.**
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 35.5,
+  "ma60_pct": 31.5,
+  "ma125_pct": 27.5,
+  "ma252_pct": 26.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "financials",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```

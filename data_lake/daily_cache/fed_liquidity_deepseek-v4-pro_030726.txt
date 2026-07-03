@@ -1,0 +1,45 @@
+## 1. Mechanical Decomposition
+Trong tuần, Net Liquidity (NL) tăng +30.9 tỷ USD, nâng tổng NL lên 5,843.3 tỷ USD.  
+- **WALCL** (bảng cân đối Fed) ở 6,724.6 tỷ USD. Nếu Fed vẫn đang thu hẹp (QT) thì WALCL giảm nhẹ; tuy nhiên con số tuyệt đối cho thấy tài sản vẫn ở mức cao.  
+- **TGA** (tài khoản của Kho bạc tại Fed) là 880.2 tỷ USD. Nếu TGA giảm so với tuần trước, Kho bạc đang bơm thanh khoản trở lại hệ thống ngân hàng (chi tiêu > thu thuế). Đây có thể là động lực chính cho impulse dương.  
+- **RRP** (reverse repo) chỉ còn 1.0 tỷ USD – gần như cạn kiệt. Nguồn tiền từ MMF rút khỏi RRP hầu như không còn đóng góp được nữa.  
+
+Như vậy, xung lực tuần này phần lớn đến từ TGA giảm (BƠM), trong khi RRP không tạo thêm biến động và QT có thể vẫn đang hút nhẹ.
+
+## 2. Cycle Positioning
+- **Pha thanh khoản**: QT vẫn đang diễn ra (WALCL có xu hướng giảm), nhưng tác động đã bị bù đắp một phần bởi chi tiêu của Kho bạc. RRP đã cạn ở mức dưới 1 tỷ USD (so với đỉnh >2,500 tỷ USD năm 2022), đánh dấu sự kết thúc của “buffer” dự trữ này. Khi RRP về 0, sức hút từ QT bắt đầu lan trực tiếp vào dự trữ ngân hàng (reserves) – khiến Fed phải thận trọng hơn với tốc độ QT.  
+- **So sánh lịch sử**:  
+  - Đỉnh NL ~6.5 nghìn tỷ USD (2021) khi QE còn mạnh và TGA thấp.  
+  - Đáy NL ~5.2 nghìn tỷ USD (cuối 2023) do QT mạnh + TGA cao.  
+  Hiện tại NL 5.84 nghìn tỷ USD nằm ở vùng trung tính – không quá dồi dào cũng không thắt chặt gay gắt.  
+- TGA ở 880 tỷ USD là mức tương đối cao (Kho bạc đang tích lũy), nhưng đã có dấu hiệu xả trong tuần, tạo xung lực dương tạm thời.
+
+## 3. Signal Strength
+- **Tín hiệu**: **HOLD** – phù hợp với logic khi Z-score chỉ +0.57σ (dưới ngưỡng +1σ để thành ADD) và Impulse EMA(4) dương nhưng rất nhỏ (+0.44 tỷ USD).  
+- Không có sự bùng nổ thanh khoản (ADD) cũng không có cơn sốc rút thanh khoản (CUT). Z-score ở vùng “cận biên” yếu, chưa đạt extreme. Impulse EMA đồng thuận với tín hiệu trung tính.
+
+## 4. Cross-Asset Spillover (1-4 tuần tới)
+- **US Equities (SPX/NDX)**: Thanh khoản không phải là headwind, nhưng cũng thiếu catalyst mạnh. Bias **trung tính – hơi tích cực** nhờ TGA đang xả nhẹ.  
+- **DXY**: Với NL ổn định, đồng USD ít chịu áp lực mạnh từ yếu tố thanh khoản; DXY có thể sideway.  
+- **Gold/Crypto**: Lợi suất thực và tâm lý rủi ro chi phối. HOLD signal ủng hộ kịch bản không có biến động lớn, crypto có thể hưởng lợi nhẹ từ môi trường thanh khoản không thắt chặt.  
+- **VN-Index (lag 4-8 tuần)**: Với NL hiện tại và dự kiến duy trì trung tính, áp lực từ DXY lên VND giảm bớt. Dòng vốn ngoại có thể ổn định, tạo bias **trung tính – hơi tích cực** cho thị trường Việt Nam, nhưng không đủ mạnh để kỳ vọng một sóng tăng lớn từ liquidity đơn thuần.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)
+- **RRP quá thấp**: Khi RRP cạn kiệt, các tín hiệu CUT truyền thống (dựa vào RRP giảm) mất hiệu lực. Điều này làm suy yếu khả năng cảnh báo sớm của mô hình.  
+- **Biến động TGA theo mùa**: Tháng 7 không phải mùa thuế lớn, nhưng Kho bạc có thể thay đổi kế hoạch phát hành/bơm trả gây nhiễu impulse ngắn hạn.  
+- **Fed đảo chiều QT**: Nếu Fed bất ngờ tuyên bố dừng QT hoặc khởi động QE nhỏ, NL sẽ tăng vọt ngoài dự báo – biến HOLD thành ADD nhanh chóng. Ngược lại, một cú sốc thanh khoản từ thị trường repo có thể làm reserves sụt giảm đột ngột, đẩy Z-score xuống vùng CUT.
+
+## 6. Kết luận
+Thanh khoản Fed đang ở vùng trung tính ổn định, với RRP đã cạn và TGA tạm thời hỗ trợ. Chế độ **neutral** này không tạo rủi ro lớn cho tài sản rủi ro, nhưng cũng chưa đủ sức kích hoạt một đợt bùng nổ risk-on. Triển vọng 2-4 tuần: risk assets (đặc biệt VN-Index) duy trì trạng thái ổn định, thiên về tích cực nhẹ.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5843.326,
+  "signal": "HOLD",
+  "z_score": 0.57,
+  "regime": "neutral",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

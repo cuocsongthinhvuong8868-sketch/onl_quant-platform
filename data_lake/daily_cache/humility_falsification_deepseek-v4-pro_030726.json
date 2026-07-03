@@ -1,0 +1,269 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-03T13:35:07",
+  "t_data_date": "2026-07-03",
+  "target_report_date": "2026-07-02",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_020726.txt",
+  "report_mtime": "report:2026-07-03T13:24:09|sidecar:2026-07-03T13:24:09",
+  "parsed": {
+    "report_date": "2026-07-02",
+    "composite_score": 31.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 42.4,
+        "unit": "%",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 64.8,
+        "unit": "%",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.374,
+        "unit": "",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 5.0,
+        "unit": "th pct",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 80.0,
+        "unit": "th pct",
+        "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-02",
+      "composite_score": 31,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 42.4,
+          "unit": "%",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 64.8,
+          "unit": "%",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.374,
+          "unit": "",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 5,
+          "unit": "th pct",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 80.0,
+          "unit": "th pct",
+          "description": "Điều kiện nào sẽ làm sai luận điểm hiện tại"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-02",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 5.0,
+      "T actual display": "5 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-07-01",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "42.4%",
+      "T actual": 35.529411764705884,
+      "T actual display": "35.5%",
+      "Delta": -6.8705882352941146,
+      "Delta display": "-6.871%",
+      "Status": "Intact",
+      "Data date": "2026-07-03",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "64.8%",
+      "T actual": 64.81213991455986,
+      "T actual display": "64.8%",
+      "Delta": 0.012139914559867293,
+      "Delta display": "+0.012%",
+      "Status": "Intact",
+      "Data date": "2026-07-03",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.374",
+      "T actual": 0.37400177901712506,
+      "T actual display": "0.374",
+      "Delta": 1.7790171250586795e-06,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-07-03",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "5 th pct",
+      "T actual": 6.666666666666667,
+      "T actual display": "6.667 th pct",
+      "Delta": 1.666666666666667,
+      "Delta display": "+1.667 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-03",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "80.0 th pct",
+      "T actual": 99.8015873015873,
+      "T actual display": "99.8 th pct",
+      "Delta": 19.801587301587304,
+      "Delta display": "+19.8 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-02",
+      "Description": "Điều kiện nào sẽ làm sai luận điểm hiện tại",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 5,
+      "date": "2026-07-01",
+      "error": ""
+    },
+    "breadth": {
+      "value": 35.529411764705884,
+      "date": "2026-07-03",
+      "error": ""
+    },
+    "ssi": {
+      "value": 64.81213991455986,
+      "date": "2026-07-03",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-03",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.37400177901712506,
+      "date": "2026-07-03",
+      "error": ""
+    },
+    "coupling": {
+      "value": 6.666666666666667,
+      "date": "2026-07-03",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.8015873015873,
+      "date": "2026-07-02",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}
