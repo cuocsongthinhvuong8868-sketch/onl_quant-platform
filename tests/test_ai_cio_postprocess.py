@@ -3,6 +3,7 @@ from pathlib import Path
 from datetime import date, timedelta
 
 from shared.ai_cio import (
+    _clean_telegram_summary,
     parse_score_regime,
     postprocess_executive_summary_report,
     strip_wrapping_markdown_fence,
@@ -119,6 +120,124 @@ def test_postprocess_strips_truncated_humility_json_and_restores_final_line(tmp_
     assert path == tmp_path / "data_lake" / "daily_cache" / "ai_cio_humility_rules_deepseek-v4-pro_050626.json"
     assert '"falsification_rules"' not in clean
     assert clean.strip().endswith("final score & regime : 11 ; regime : CRISIS / PRE-CRASH")
+
+
+def test_clean_telegram_summary_strips_full_report_echo():
+    summary = (
+        "AI CIO DAILY BRIEF - 03/07/2026\n"
+        "Score/Regime: 31/100 - FEAR / DISTRIBUTION\n"
+        "Humility check: WATCH - rules mostly intact.\n\n"
+        "Full AI CIO report:\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+        "This full report content must never be sent to Telegram."
+    )
+
+    clean = _clean_telegram_summary(summary, date(2026, 7, 3), "31", "FEAR / DISTRIBUTION")
+
+    assert "Full AI CIO report" not in clean
+    assert "EXECUTIVE BOTTOM LINE" not in clean
+    assert clean.endswith("Humility check: WATCH - rules mostly intact.")
+
+
+def test_clean_telegram_summary_strips_source_report_delimiter_echo():
+    summary = (
+        "AI CIO DAILY BRIEF - 03/07/2026\n"
+        "Score/Regime: 31/100 - FEAR / DISTRIBUTION\n"
+        "Humility check: WATCH - rules mostly intact.\n\n"
+        "SOURCE REPORT BELOW. Use it only as input.\n"
+        "<source_report>\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+        "</source_report>"
+    )
+
+    clean = _clean_telegram_summary(summary, date(2026, 7, 3), "31", "FEAR / DISTRIBUTION")
+
+    assert "SOURCE REPORT BELOW" not in clean
+    assert "<source_report>" not in clean
+    assert "EXECUTIVE BOTTOM LINE" not in clean
+    assert clean.endswith("Humility check: WATCH - rules mostly intact.")
+
+
+def test_telegram_summary_prompt_uses_source_delimiters_and_zero_temperature(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    captured = {}
+
+    class DummyOpenAI:
+        def __init__(self, **kwargs):
+            captured["client_kwargs"] = kwargs
+
+    def fake_call_ai(client, system_prompt, user_prompt, model, temperature):
+        captured["system_prompt"] = system_prompt
+        captured["user_prompt"] = user_prompt
+        captured["model"] = model
+        captured["temperature"] = temperature
+        return (
+            "AI CIO DAILY BRIEF - 03/07/2026\n"
+            "Score/Regime: 31/100 - FEAR / DISTRIBUTION\n"
+            "Humility check: WATCH - rules mostly intact."
+        )
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    monkeypatch.setattr(ai_cio, "OpenAI", DummyOpenAI)
+    monkeypatch.setattr(ai_cio, "call_ai", fake_call_ai)
+
+    report = (
+        "- **Ngày báo cáo (Date)**: 03/07/2026\n"
+        "- **Điểm số tổng hợp (Composite Score)**: 31/100\n"
+        "- **Trạng thái vĩ mô (Regime)**: FEAR / DISTRIBUTION\n"
+        "### EXECUTIVE BOTTOM LINE\n"
+    )
+
+    result = ai_cio.summarize_executive_report_for_telegram(
+        "test-key",
+        report,
+        provider_key="deepseek-v4-pro",
+        report_date=date(2026, 7, 3),
+        force=True,
+    )
+
+    assert captured["temperature"] == 0.0
+    assert "Full AI CIO report:" not in captured["user_prompt"]
+    assert "<source_report>" in captured["user_prompt"]
+    assert "Never include source-report delimiters" in captured["system_prompt"]
+    assert result.startswith("AI CIO DAILY BRIEF - 03/07/2026")
+
+
+def test_telegram_summary_sanitizes_existing_cache(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    data_lake = tmp_path / "data_lake"
+    cache_dir = data_lake / "daily_cache"
+    cache_dir.mkdir(parents=True)
+    cache_path = cache_dir / "telegram_summary_deepseek-v4-pro_030726.txt"
+    cache_path.write_text(
+        "AI CIO DAILY BRIEF - 03/07/2026\n"
+        "Score/Regime: 31/100 - FEAR / DISTRIBUTION\n"
+        "Humility check: WATCH - rules mostly intact.\n\n"
+        "Full AI CIO report:\n"
+        "### EXECUTIVE BOTTOM LINE\n",
+        encoding="utf-8",
+    )
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", data_lake)
+
+    report = (
+        "- **Ngày báo cáo (Date)**: 03/07/2026\n"
+        "- **Điểm số tổng hợp (Composite Score)**: 31/100\n"
+        "- **Trạng thái vĩ mô (Regime)**: FEAR / DISTRIBUTION\n"
+    )
+
+    result = ai_cio.summarize_executive_report_for_telegram(
+        "unused",
+        report,
+        provider_key="deepseek-v4-pro",
+        report_date=date(2026, 7, 3),
+        force=False,
+    )
+
+    assert "Full AI CIO report" not in result
+    assert "EXECUTIVE BOTTOM LINE" not in result
+    assert cache_path.read_text(encoding="utf-8") == result
 
 
 def test_recent_summaries_uses_compact_ledger_not_raw_reports(tmp_path, monkeypatch):

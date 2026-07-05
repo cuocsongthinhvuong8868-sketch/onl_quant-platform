@@ -610,14 +610,18 @@ def summarize_executive_report_for_telegram(
 
     target_date = report_date or _parse_report_date_from_text(report_text) or date.today()
     cache_path = get_telegram_summary_path(provider_key, target_date)
+    score_val, regime_val = parse_score_regime(report_text)
     if cache_path.exists() and not force:
-        return cache_path.read_text(encoding="utf-8").strip()
+        cached = cache_path.read_text(encoding="utf-8").strip()
+        cleaned = _clean_telegram_summary(cached, target_date, score_val, regime_val)
+        if cleaned != cached:
+            cache_path.write_text(cleaned, encoding="utf-8")
+        return cleaned
 
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["deepseek-v4-pro"])
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
     model = cfg["api_model"]
-    temperature = min(float(cfg.get("temperature", 0.5)), 0.3)
-    score_val, regime_val = parse_score_regime(report_text)
+    temperature = 0.0
     structured_context = _read_ai_cio_context_for_summary(provider_key, target_date)
 
     system_prompt = (
@@ -629,6 +633,7 @@ def summarize_executive_report_for_telegram(
         "source for the Overlay line and key drivers. "
         "If the report contains section 5.5 LLM Overlay, explicitly summarize the "
         "metric-implied score, overlay adjustment, and final CIO score in one line. "
+        "Never include source-report delimiters or a copied section of the full report. "
         "Keep the output under 2300 Vietnamese characters. Plain text only; no Markdown tables, no JSON."
     )
     user_prompt = f"""
@@ -655,8 +660,10 @@ Action:
 - <risk trigger to monitor>
 Humility check: <INTACT/WATCH/FALSIFIED if available, plus 1 sentence>
 
-Full AI CIO report:
+SOURCE REPORT BELOW. Use it only as input. Do not quote, copy, or include this section in your answer.
+<source_report>
 {report_text}
+</source_report>
 """.strip()
 
     summary = call_ai(client, system_prompt, user_prompt, model=model, temperature=temperature)
@@ -670,6 +677,7 @@ def _clean_telegram_summary(summary: str, target_date: date, score_val: str, reg
     text = (summary or "").strip()
     text = re.sub(r"^```(?:text|markdown)?\s*", "", text, flags=re.IGNORECASE)
     text = re.sub(r"\s*```$", "", text)
+    text = _strip_telegram_source_echo(text)
     text = re.sub(r"\n{3,}", "\n\n", text).strip()
     if not text:
         text = (
@@ -681,6 +689,27 @@ def _clean_telegram_summary(summary: str, target_date: date, score_val: str, reg
         text = text[: TELEGRAM_SUMMARY_CHAR_LIMIT - 80].rstrip()
         text += "\n\n[Trimmed for Telegram. Read full report for details.]"
     return text
+
+
+def _strip_telegram_source_echo(text: str) -> str:
+    """Remove source report content if the model echoes prompt input into Telegram output."""
+
+    if not text:
+        return ""
+
+    source_markers = [
+        r"(?im)^\s*Full AI CIO report\s*:\s*",
+        r"(?im)^\s*SOURCE REPORT BELOW\b.*",
+        r"(?im)^\s*<source_report\b[^>]*>\s*",
+    ]
+    cut_points = [
+        match.start()
+        for pattern in source_markers
+        if (match := re.search(pattern, text))
+    ]
+    if not cut_points:
+        return text
+    return text[: min(cut_points)].rstrip()
 
 
 def postprocess_executive_summary_report(report_text: str, provider_key: str) -> tuple[str, Path | None]:
