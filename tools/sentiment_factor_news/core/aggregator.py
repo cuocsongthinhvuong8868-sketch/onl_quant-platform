@@ -2,6 +2,8 @@ from datetime import datetime, timezone, timedelta
 import logging
 import re
 from tools.sentiment_factor_news.core.taxonomy import MACRO_CHANNELS
+import scipy.stats as stats
+import numpy as np
 
 # List of macro abbreviations to not treat as tickers
 MACRO_ABBRS = {
@@ -68,12 +70,14 @@ def classify_regime(score: float) -> str:
     return "strong_risk_off"
 
 
-def calculate_channel_scores(items: list[dict]) -> dict[str, float]:
+def calculate_channel_scores(items: list[dict]) -> tuple[dict[str, float], dict[str, float]]:
     """
     Calculate scores for each channel in MACRO_CHANNELS.
     Using average of final_score for active items.
+    Also calculates Bayesian probability of being positive.
     """
     scores = {}
+    probs = {}
     channel_items = {channel: [] for channel in MACRO_CHANNELS}
     
     for item in items:
@@ -85,21 +89,34 @@ def calculate_channel_scores(items: list[dict]) -> dict[str, float]:
         ch_list = channel_items[channel]
         if not ch_list:
             scores[channel] = 0.0
+            probs[channel] = 0.5
             continue
             
-        total_score = sum(i.get("final_score", 0.0) for i in ch_list)
-        # Section 10.3: Divide by count of active items (score >= 0.01) to avoid decay dilution
-        active_count = sum(1 for i in ch_list if abs(i.get("final_score", 0.0)) >= 0.01)
+        active_scores = [i.get("final_score", 0.0) for i in ch_list if abs(i.get("final_score", 0.0)) >= 0.01]
+        active_count = len(active_scores)
+        total_score = sum(active_scores)
+        
         score = total_score / active_count if active_count > 0 else 0.0
         # Apply sensitivity multiplier to map discounted scores back to [-2.0, 2.0] range
         scaled_score = score * 5.0
         # Clamp to [-2.0, 2.0]
         scores[channel] = max(-2.0, min(2.0, round(scaled_score, 4)))
-
-
-
         
-    return scores
+        # Bayesian Conjugate Prior update
+        if active_count > 0:
+            sample_mean = scaled_score
+            # Apply Effective Sample Size (ESS) to prevent statistical overconfidence in large windows
+            n_eff = np.sqrt(active_count)
+            # Prior N(0, 1), Likelihood N(mu, 0.25)
+            post_var = 1.0 / (1.0 + (n_eff / 0.25))
+            post_mu = post_var * (n_eff * sample_mean / 0.25)
+            # Calculate non-directional confidence level: P(sign(mu) == sign(sample_mean))
+            prob_pos = stats.norm.cdf(abs(post_mu) / np.sqrt(post_var))
+            probs[channel] = round(float(prob_pos), 4)
+        else:
+            probs[channel] = 0.5
+            
+    return scores, probs
 
 def build_macro_composite(channel_scores: dict[str, float]) -> float:
     """Calculate composite score based on Vietnam macro weights."""
@@ -126,8 +143,23 @@ def filter_items_by_window(items: list[dict], minutes: int) -> list[dict]:
 
 def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str) -> dict:
     """Build the feed dictionary for a specific window."""
-    channel_scores = calculate_channel_scores(items)
+    channel_scores, channel_probs = calculate_channel_scores(items)
     macro_composite = build_macro_composite(channel_scores)
+    
+    # Calculate composite Bayesian probability
+    active_scores = [i.get("final_score", 0.0) for i in items if abs(i.get("final_score", 0.0)) >= 0.01]
+    active_count = len(active_scores)
+    if active_count > 0:
+        sample_mean = macro_composite
+        # Apply Effective Sample Size (ESS) to prevent statistical overconfidence
+        n_eff = np.sqrt(active_count)
+        post_var = 1.0 / (1.0 + (n_eff / 0.25))
+        post_mu = post_var * (n_eff * sample_mean / 0.25)
+        # Calculate non-directional confidence level: P(sign(mu) == sign(sample_mean))
+        composite_prob = float(stats.norm.cdf(abs(post_mu) / np.sqrt(post_var)))
+    else:
+        composite_prob = 0.5
+        
     regime = classify_regime(macro_composite)
     
     # Filter function to exclude company-specific news
@@ -209,8 +241,10 @@ def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str)
         "generated_at": generated_at_vn,
         "window": window_name,
         "macro_composite": macro_composite,
+        "macro_composite_prob_pos": composite_prob,
         "regime": regime,
         "channel_scores": channel_scores,
+        "channel_probs": channel_probs,
         "top_positive_drivers": top_pos,
         "top_negative_drivers": top_neg,
         "news_count": len(items),

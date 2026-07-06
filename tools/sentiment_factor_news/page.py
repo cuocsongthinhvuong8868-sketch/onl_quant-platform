@@ -53,12 +53,13 @@ def _driver_frame(drivers: list[dict]) -> pd.DataFrame:
 def _render_overview(feed: dict):
     regime = feed.get("regime", "neutral")
     composite = float(feed.get("macro_composite", 0.0) or 0.0)
+    composite_prob = float(feed.get("macro_composite_prob_pos", 0.5))
     source_counts = feed.get("source_counts", {})
 
     c1, c2, c3, c4 = st.columns(4)
     c1.metric("Generated at", feed.get("generated_at", "N/A"))
     c2.metric("Regime", REGIME_LABELS.get(regime, regime))
-    c3.metric("Composite", f"{composite:+.3f}", help="Weighted composite, range roughly -0.5 to +0.5.")
+    c3.metric(f"Composite (P_conf: {composite_prob:.1%})", f"{composite:+.3f}", help="Weighted composite. P_conf is the non-directional Bayesian Confidence Level.")
     c4.metric("News count", int(feed.get("news_count", 0) or 0))
 
     c5, c6 = st.columns(2)
@@ -67,15 +68,16 @@ def _render_overview(feed: dict):
 
     st.divider()
     scores = feed.get("channel_scores", {})
+    probs = feed.get("channel_probs", {})
     if scores:
         df_scores = (
-            pd.DataFrame([{"channel": k, "score": float(v)} for k, v in scores.items()])
+            pd.DataFrame([{"channel": k, "score": float(v), "prob_pos": float(probs.get(k, 0.5))} for k, v in scores.items()])
             .sort_values("score", ascending=False)
             .set_index("channel")
         )
-        st.subheader("Sentiment Score by Macro Channel")
-        st.bar_chart(df_scores)
-        st.dataframe(df_scores.reset_index(), use_container_width=True, hide_index=True)
+        st.subheader("Sentiment Score & Bayes Prob by Macro Channel")
+        st.bar_chart(df_scores["score"])
+        st.dataframe(df_scores.reset_index().style.format({"score": "{:+.3f}", "prob_pos": "{:.1%}"}), use_container_width=True, hide_index=True)
 
     st.divider()
     left, right = st.columns(2)

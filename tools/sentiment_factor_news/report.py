@@ -56,14 +56,15 @@ def load_channel_scores() -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def _top_channels(channel_scores: dict[str, Any], n: int = 5, reverse: bool = True) -> list[dict[str, Any]]:
+def _top_channels(channel_scores: dict[str, Any], channel_probs: dict[str, Any] = None, n: int = 5, reverse: bool = True) -> list[dict[str, Any]]:
     rows = []
     for channel, value in (channel_scores or {}).items():
         try:
             score = float(value)
         except Exception:
             score = 0.0
-        rows.append({"channel": channel, "score": round(score, 4)})
+        prob = float(channel_probs.get(channel, 0.5)) if channel_probs else 0.5
+        rows.append({"channel": channel, "score": round(score, 4), "prob_pos": round(prob, 4)})
     rows.sort(key=lambda row: row["score"], reverse=reverse)
     return rows[:n]
 
@@ -96,17 +97,19 @@ def snapshot(df_close=None, load_custom=None, window: str = "1d") -> dict[str, A
         }
 
     channel_scores = feed.get("channel_scores", {})
+    channel_probs = feed.get("channel_probs", {})
     return {
         "status": "ok",
         "error": "",
         "generated_at": feed.get("generated_at", ""),
         "window": feed.get("window", window),
         "macro_composite": round(float(feed.get("macro_composite", 0.0)), 4),
+        "macro_composite_prob_pos": round(float(feed.get("macro_composite_prob_pos", 0.5)), 4),
         "regime": feed.get("regime", "neutral"),
         "news_count": int(feed.get("news_count", 0) or 0),
         "source_counts": feed.get("source_counts", {}),
-        "top_positive_channels": _top_channels(channel_scores, reverse=True),
-        "top_negative_channels": _top_channels(channel_scores, reverse=False),
+        "top_positive_channels": _top_channels(channel_scores, channel_probs, reverse=True),
+        "top_negative_channels": _top_channels(channel_scores, channel_probs, reverse=False),
         "top_positive_drivers": feed.get("top_positive_drivers", [])[:5],
         "top_negative_drivers": feed.get("top_negative_drivers", [])[:5],
     }
@@ -122,10 +125,10 @@ def build_structured_report() -> str:
 
         source_counts = snap.get("source_counts", {})
         pos_channels = ", ".join(
-            f"{row['channel']}={row['score']:+.3f}" for row in snap.get("top_positive_channels", [])
+            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_pos']:.0%})" for row in snap.get("top_positive_channels", [])
         )
         neg_channels = ", ".join(
-            f"{row['channel']}={row['score']:+.3f}" for row in snap.get("top_negative_channels", [])
+            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_pos']:.0%})" for row in snap.get("top_negative_channels", [])
         )
         pos_drivers = "\n".join(_format_driver(item) for item in snap.get("top_positive_drivers", [])) or "- N/A"
         neg_drivers = "\n".join(_format_driver(item) for item in snap.get("top_negative_drivers", [])) or "- N/A"
@@ -134,7 +137,7 @@ def build_structured_report() -> str:
             f"""=== Window {window} ===
 Generated at: {snap['generated_at']}
 Regime: {snap['regime']}
-Macro composite: {snap['macro_composite']:+.4f}
+Macro composite: {snap['macro_composite']:+.4f} (Bayes Confidence: {snap.get('macro_composite_prob_pos', 0.5):.0%})
 News count: {snap['news_count']}
 Source counts: mozyfin={source_counts.get('mozyfin', 0)}, widata={source_counts.get('widata', 0)}
 Top positive channels: {pos_channels}
@@ -164,8 +167,11 @@ def build_sentiment_factor_news_ai_prompt() -> tuple[str, str]:
 {build_structured_report()}
 
 # REQUIRED OUTPUT
-1. Nêu regime news sentiment hiện tại ở 1d, 7d, 30d và hướng thay đổi nếu các window lệch nhau.
-2. Chỉ ra các channel đang kéo risk-on/risk-off mạnh nhất.
+1. Nêu regime news sentiment hiện tại ở 1d, 7d, 30d. Sử dụng mức độ xác nhận tin cậy "Bayes Confidence" (P_conf) để làm Guardrail cho độ chắc chắn của kết luận:
+   - P_conf > 85%: Bắt buộc dùng giọng điệu "Khẳng định chắc chắn" (Strongly Confirmed) theo hướng của Regime.
+   - 65% < P_conf <= 85%: Dùng giọng điệu "Nghiêng về / Dấu hiệu ban đầu" (Leaning) theo hướng của Regime.
+   - P_conf <= 65%: Bắt buộc dùng giọng điệu "Giằng co / Nhiễu loạn" (Inconclusive / Mixed Signals), tuyệt đối cấm kết luận xu hướng rõ ràng vì thông tin chưa đủ độ tin cậy.
+2. Chỉ ra các channel đang kéo risk-on/risk-off mạnh nhất. Chú ý tới mức độ xác nhận tin cậy của kênh đó thông qua P_conf.
 3. Tóm tắt 3-5 positive/negative drivers quan trọng, không bịa thêm tin ngoài input.
 4. Kết luận tác động lên AI CIO: supports / conflicts / neutral với macro layer và market-internal tools.
 5. Nêu caveat: source coverage, stale feed nếu generated_at cũ, và rủi ro headline noise.
