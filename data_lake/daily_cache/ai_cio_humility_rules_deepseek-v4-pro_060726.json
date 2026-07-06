@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-06",
+  "composite_score": 31,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Nếu số phiên STRESS/WARNING giảm dưới 5, thanh khoản nội địa cải thiện đủ để lung lay luận điểm bearish."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 28,
+      "unit": "%",
+      "description": "Breadth vượt 45% báo hiệu thị trường phục hồi diện rộng, phủ nhận phân phối."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 64.3,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% loại bỏ cảnh báo rủi ro hệ thống, hỗ trợ tăng tỷ trọng."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.382,
+      "unit": "",
+      "description": "Đuôi phân phối trở lại mỏng (xi_max <0.25) sẽ vô hiệu hóa rào cản tail‑risk đối với allocation."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Coupling với Vingroup duy trì dưới 70th pct xác nhận thị trường vận hành độc lập, giảm rủi ro cấu trúc."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "CQS percentile dưới 80 xác nhận chất lượng tín dụng toàn cầu không còn bóp nghẹt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-06",
+  "source": "ai_cio_executive_summary"
+}

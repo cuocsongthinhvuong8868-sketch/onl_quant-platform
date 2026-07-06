@@ -1,0 +1,31 @@
+## 1. Scenario Assessment
+Kịch bản K=1.0 (trung lập) và CoE=14% là mức baseline không khắc nghiệt, nhưng mặt bằng ngành vẫn cho thấy áp lực tạo giá trị rất lớn. Hầu hết các ngân hàng đều có Economic Alpha ≤ 0, cho thấy đa số bank đang đốt vốn cổ đông hoặc chỉ hòa vốn chi phí vốn. Duy nhất SHB có Alpha dương, phản ánh cơ chế “stock-picking” hiện tại rất kén chọn cổ phiếu.
+
+## 2. Top Alpha Decomposition
+- **SHB (+1.7%) – Fortress điển hình:** Mức Alpha dương được dẫn dắt bởi P/B cực rẻ (0.91) kết hợp chất lượng ổn định vượt trội (ROE 17.5%, σROE chỉ 1.9%). Payout thấp (8.6%) giúp phần lớn lợi nhuận được tái đầu tư, duy trì vòng xoáy compounding an toàn.  
+- **ACB (-0.8%) – Cận Fortress, định giá hơi cao:** ROE cao (23%) và σROE chấp nhận được (2.7%) nhưng P/B 1.21 cùng risk penalty đã làm xói mòn toàn bộ phần bù dương. Alpha âm nhẹ, gần như bằng chi phí vốn.  
+- **MBB (-2.0%) – Premium Burn nhẹ:** Sở hữu ROE cao (21.8%) và độ ổn định tốt nhất nhóm (σ=1.6%), nhưng P/B 1.50 khiến lợi suất sau điều chỉnh rủi ro không đủ bù CoE.
+
+## 3. Value Traps Warning
+- **LPB (-12.6%): Premium Burn nặng** – P/B 3.25 là định giá phi thực tế so với ROE 21.1% và σ cao 3.8%. Risk penalty lớn cộng payout 21% kìm hãm compounding.  
+- **EIB (-11.1%): Cheap Trap** – ROE chỉ 10.0%, thấp hơn cả CoE, dù P/B 1.43 không quá đắt. Biến động lợi nhuận cao (σ=3.8%) nhưng không tạo ra phần bù xứng đáng.  
+- **VPB (-10.5%): Growth Trap** – ROE 14.1% chỉ vừa bằng CoE nhưng σ lên tới 4.7% cùng payout 24.6% bào mòn lợi nhuận giữ lại. Định giá P/B 1.29 là không đủ rẻ cho rủi ro đó.
+
+## 4. Portfolio Construction
+- **Core Holding (60-70%):** SHB – Fortress với Alpha dương duy nhất, phòng thủ tốt nhờ P/B <1 và σ cực thấp.  
+- **Tactical (20-30%):** ACB, MBB có thể cân nhắc nếu kỳ vọng CoE giảm hoặc định giá điều chỉnh về vùng hấp dẫn hơn, nhưng hiện tại chưa tạo Alpha.  
+- **Cấm mua/Underweight:** LPB, EIB, VPB. Rủi ro đốt vốn rất hiện hữu, tránh xa kể cả khi giá có tăng đầu cơ.  
+
+**Nhận định:** Ngành không đáng “avoid” hoàn toàn vì vẫn có SHB, nhưng cơ hội rất tập trung, đòi hỏi kỷ luật chọn lọc cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,28 @@
+## 1. Observations
+- VN30 Stress Index ở mức 10.00%, cách xa ngưỡng cảnh báo 40%.
+- Số mã thủng VaR 95%: 3/30 (BVH, PLX, GVR), phản ánh áp lực bán cục bộ, không lan rộng.
+- Complacency Index chỉ 6.48% (ngưỡng nguy hiểm 80%), kèm 7 mã bị định giá sai (misprice), dẫn đầu là TCB, VDS, VND.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress 10.00% – thấp hơn nhiều so với ngưỡng 40%. Số lượng breach 3/30 cho thấy hiện tượng lây lan rủi ro hệ thống chưa hiện diện trong thời gian thực. Ba mã breach sâu nhất (BVH, PLX, GVR) nhiều khả năng là sự cố cá biệt (idiosyncratic) hơn là dấu hiệu đầu sóng systematic. Không có bằng chứng về một cơn hoảng loạn diện rộng trên nhóm VN30.
+
+## 3. Complacency Assessment (Module C)
+Complacency 6.48% – cực thấp. Điều này chỉ đơn thuần xác nhận thị trường **không ở regime “ngủ quên”**, không có tình trạng spread bị nén trên diện rộng do mất cảnh giác. Tuyệt đối không được suy diễn thành “thị trường bình thường” hay “ổn định”. Complacency thấp có thể đi kèm với uptrend mạnh hoặc hoảng loạn; trong trường hợp này, Stress Index cũng thấp, loại trừ kịch bản hoảng loạn. Như vậy, thị trường hiện tại không bị méo mó bởi định giá sai rủi ro che giấu, nhưng cũng không có tín hiệu đảm bảo an toàn tuyệt đối.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):** BVH, PLX, GVR đã thủng VaR 95%. Cần đánh giá vị thế: nếu nắm giữ, cân nhắc giảm tỷ trọng hoặc đặt stop-loss động cách giá hiện tại 5–7%, hoặc khi giá đóng cửa dưới MA20 ngày.  
+- **Top 3 Mispriced (Module C):** TCB, VDS, VND có spread bị nén chặt nhất. Cảnh báo tiềm ẩn: khi biến động tăng, những mã này dễ bị điều chỉnh giá mạnh do phần bù rủi ro bị định giá quá thấp trước đó. Không khuyến nghị mua đuổi, nên theo dõi sát tín hiệu đảo chiều kỹ thuật.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 10.00,
+  "breach_count": 3,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["BVH", "PLX", "GVR", "TCB", "VDS", "VND"],
+  "confidence": "medium"
+}
+```

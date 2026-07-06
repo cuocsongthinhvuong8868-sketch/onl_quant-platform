@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 48.5 (+0.3), nằm trong vùng NEUTRAL (40–60), không cho thấy áp lực cực đoan.
+- EGARCH Vol (chuẩn hóa) tăng mạnh +4.4 điểm % lên 6.7%, cao hơn hẳn mức biến động thấp đặc trưng của pha GREED.
+- Rolling Skewness bằng –0.00, phân phối lợi nhuận cân đối, không tồn tại đuôi âm có ý nghĩa.
+- Downside Correlation 4.8% (thấp) so với Upside Correlation 23.6% (cao gấp ~5 lần) – đám đông tham gia mạnh vào nhịp tăng nhưng phân hóa mạnh khi giảm.
+
+## 2. Interpretation
+Dữ liệu phản ánh pha NEUTRAL/STOCK PICKING với mức độ phân hoá cổ phiếu rất cao (downside correlation thấp). Mặc dù biến động bất ngờ tăng vọt, thị trường chưa có biểu hiện bán tháo hệ thống do skew bằng 0 và tương quan giảm yếu. Xác suất cao đây là trạng thái giằng co, chưa hình thành rủi ro đuôi, nhưng đà tăng của vol có thể là tín hiệu sớm cho sự dịch chuyển về phía FEAR nếu lan toả tiêu cực xuất hiện trong vài phiên tới.
+
+## 3. Cross-Check
+Tồn tại phân kỳ đáng lưu ý: EGARCH Vol tăng +4.4% – mức nhảy có ý nghĩa thống kê lớn – trong khi Risk Score gần như không thay đổi (+0.3). Điều này cho thấy các yếu tố còn lại (skew cân bằng, upside correlation vượt trội) đã “hấp thụ” tín hiệu rủi ro từ biến động. Trên dữ liệu hiện tại, sự phân kỳ này báo hiệu thị trường có khả năng đang định giá quá thấp rủi ro; nếu vol tiếp tục leo thang, mức score có thể giảm nhanh.
+
+## 4. Verdict
+Dựa trên tín hiệu vol tăng và phân kỳ score, beta danh mục VN-Index nên được giảm nhẹ về vùng 0.7 (từ mức trung tính 1.0). Hành động cụ thể: ưu tiên nắm giữ các cổ phiếu thanh khoản cao, sẵn sàng hedging bằng hợp đồng tương lai hoặc quyền chọn nếu EGARCH Vol vượt 8% và Downside Correlation nhích lên trên 10%. Không có tín hiệu đủ mạnh để chuyển sang phòng thủ toàn diện.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "06/07/2026",
+  "regime": "NEUTRAL",
+  "score": 48.5,
+  "confidence": "medium",
+  "beta_target": 0.7,
+  "key_signals": [
+    "EGARCH Vol +4.4% lên 6.7% trong khi Score chỉ thay đổi +0.3",
+    "Upside Correlation 23.6% >> Downside 4.8%",
+    "Rolling Skewness -0.00"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 48.5
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

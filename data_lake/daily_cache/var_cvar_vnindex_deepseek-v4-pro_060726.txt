@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_v1 -->
+## 1. Observations
+- Historical VaR 95% (3Y rolling) ở mức –1.65%, cho thấy đuôi phân phối thực tế dày hơn parametric VaR (–1.45%) dù chỉ ở mức vừa phải.
+- EVT VaR 99% lên tới –3.69%, sâu hơn rất nhiều so với ước lượng Gaussian cùng mức tin cậy, báo hiệu rủi ro đuôi cực đoan lớn.
+- Hệ số đuôi GPD ξ = +0.345, nằm trong vùng **fat tail** (ξ > 0.30), tức phân phối có đuôi dày bất thường, ES có thể không ổn định.
+- Hill-index = +0.447 cùng dấu và xấp xỉ magnitude, củng cố tín hiệu fat tail, dù vẫn tồn tại nhạy cảm ngưỡng.
+
+## 2. Tail Thickness Diagnosis
+Với ξ = 0.345 > 0.30, đuôi phân phối được xếp vào **fat tail** – Gaussian sẽ đánh giá thấp rủi ro đuôi một cách trầm trọng. Hill xác nhận chiều hướng và mức độ tương đương (0.447), tín hiệu đủ mạnh. Spread ES – VaR (95%) bằng 1.37%, lớn hơn hẳn σ₃₀ (0.83%), xác nhận thực nghiệm về đuôi dày: tổn thất trung bình trong các sự kiện đuôi vượt xa VaR đơn thuần. Tuy nhiên, ξ dao động từ 0.168 (heavy) đến 0.382 (fat) khi thay đổi ngưỡng POT, cho thấy phân loại đuôi **nhạy cảm ngưỡng** – fat tail chỉ được khẳng định ở một số ngưỡng, không hoàn toàn ổn định.
+
+## 3. Gaussian Gap
+Gaussian VaR 99% lý thuyết: μ + z₀.₀₁·σ. Từ Parametric VaR 95% –1.45% suy ra μ ≈ –0.08%. Do đó Gaussian VaR 99% ≈ –0.08% + (–2.33)·0.83% = –2.02%. EVT VaR 99% thực tế là –3.69%. **Chênh lệch 1.67 điểm phần trăm**, vượt xa ngưỡng 1 pp – mô hình Gaussian đã hoàn toàn “broken” đối với ước lượng vốn rủi ro. Phân bổ vốn dựa trên normal assumption sẽ thiếu hụt trầm trọng ở các sự kiện 1/100.
+
+## 4. Verdict – Hedging Implications
+Với ξ > 0.30, chế độ đuôi là fat tail (dù có cảnh báo nhạy cảm ngưỡng). Hành động khuyến nghị:
+- Tránh các chiến lược momentum dựa trên giả định phân phối chuẩn.
+- Mua quyền chọn bán **ITM (in-the-money)** để bảo vệ trực tiếp trước drawdowns sâu.
+- **Short hợp đồng tương lai** để phòng hộ hệ thống, giảm đòn bẩy ròng xuống mức tối thiểu.
+- Tuyệt đối không dùng Gaussian VaR để cấp phát vốn rủi ro; thay vào đó dùng EVT ES 99% (–6.15%) làm điểm tham chiếu cho stress test.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "06/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.382,
+  "xi_range": 0.214,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.67,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.382
+- EVT Xi Range: 0.214
+- EVT VaR99 Range: 0.11pp
+- EVT ES99 Range: 0.75pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive

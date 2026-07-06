@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread_Z = -0.79σ: mức chênh lệch phân tán đang thấp hơn đáng kể so với trung bình 60 phiên, không có dấu hiệu căng thẳng cấu trúc.
+- DPI = 41.7%: nằm dưới ngưỡng 70% – chưa hình thành chế độ phân tán kéo dài.
+- Avg Pairwise Correlation = 0.006: tương quan gần như bằng 0, thị trường phân hóa cực mạnh, không có hành vi bầy đàn.
+- CS Skewness & Kurtosis không có dữ liệu (N/A) – không thể đánh giá trực tiếp đuôi phân phối lợi suất.
+
+## 2. Structural State
+Thị trường đang ở trạng thái hoàn toàn bình thường, không hề có stress cấu trúc. Spread_Z âm sâu (-0.79σ) cho thấy dispersion hiện tại co hẹp, không bị kéo căng bởi outlier. DPI khiêm tốn (41.7%) xác nhận không tồn tại một regime phân tán dai dẳng; đây là môi trường ổn định, không có dấu hiệu quá độ sang trạng thái bất thường.
+
+## 3. Cross-Check & Tail Direction
+Do dữ liệu CS Skewness và Kurtosis không khả dụng, không thể xác định bên đuôi nào đang gãy hay liệu có fat-tail hay không. Tuy nhiên, căn cứ vào Spread_Z âm và tương quan cực thấp, nhiễu loạn nếu có sẽ chỉ mang tính chất cục bộ ở một vài mã riêng lẻ, không mang tính hệ thống. Không có bằng chứng về hoảng loạn hay cú đẩy điên rồ lan tỏa toàn thị trường.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Corr): DPI thấp (41.7%) kết hợp với tương quan trung bình cực thấp (0.006) đặt thị trường vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu: biến động không bị đồng pha, rủi ro lan truyền thấp, cơ hội alpha từ phân hóa nội bộ rõ rệt. Rủi ro lớn nhất đối với Portfolio Manager lúc này không đến từ bầy đàn hay thanh khoản cạn kiệt, mà là rủi ro đặc thù cổ phiếu (idiosyncratic) – danh mục tập trung quá mức vào một vài tên có thể bị tổn thương bởi thông tin riêng lẻ mà không có “phao cứu sinh” từ tương quan thị trường.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "06/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.79,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```

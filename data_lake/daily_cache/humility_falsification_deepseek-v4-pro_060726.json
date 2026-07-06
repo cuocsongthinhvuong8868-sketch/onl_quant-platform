@@ -1,0 +1,269 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-06T14:56:25",
+  "t_data_date": "2026-07-06",
+  "target_report_date": "2026-07-05",
+  "report_match": "fallback:2026-07-03",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_030726.txt",
+  "report_mtime": "report:2026-07-06T14:45:49|sidecar:2026-07-06T14:45:49",
+  "parsed": {
+    "report_date": "2026-07-03",
+    "composite_score": 31.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Stress thanh khoản nội địa hạ nhiệt nếu số phiên STRESS/WARNING xuống dưới 5"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 35.5,
+        "unit": "%",
+        "description": "Dòng tiền lan tỏa trở lại, báo hiệu thị trường phục hồi rộng"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 64.8,
+        "unit": "%",
+        "description": "Căng thẳng hệ thống giảm về vùng an toàn"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.374,
+        "unit": "",
+        "description": "Đuôi béo biến mất trên toàn dải ngưỡng GPD"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 6.667,
+        "unit": "th pct",
+        "description": "Thị trường tiếp tục decoupling, không còn bị Vingroup chi phối"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 80.0,
+        "unit": "th pct",
+        "description": "Chênh lệch tín dụng deep-junk hạ nhiệt dưới ngưỡng cao"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-03",
+      "composite_score": 31,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Stress thanh khoản nội địa hạ nhiệt nếu số phiên STRESS/WARNING xuống dưới 5"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 35.5,
+          "unit": "%",
+          "description": "Dòng tiền lan tỏa trở lại, báo hiệu thị trường phục hồi rộng"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 64.8,
+          "unit": "%",
+          "description": "Căng thẳng hệ thống giảm về vùng an toàn"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.374,
+          "unit": "",
+          "description": "Đuôi béo biến mất trên toàn dải ngưỡng GPD"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 6.667,
+          "unit": "th pct",
+          "description": "Thị trường tiếp tục decoupling, không còn bị Vingroup chi phối"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 80.0,
+          "unit": "th pct",
+          "description": "Chênh lệch tín dụng deep-junk hạ nhiệt dưới ngưỡng cao"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-03",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 5.0,
+      "T actual display": "5 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-07-02",
+      "Description": "Stress thanh khoản nội địa hạ nhiệt nếu số phiên STRESS/WARNING xuống dưới 5",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "35.5%",
+      "T actual": 28.000000000000004,
+      "T actual display": "28.0%",
+      "Delta": -7.4999999999999964,
+      "Delta display": "-7.5%",
+      "Status": "Intact",
+      "Data date": "2026-07-06",
+      "Description": "Dòng tiền lan tỏa trở lại, báo hiệu thị trường phục hồi rộng",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "64.8%",
+      "T actual": 64.3479572404202,
+      "T actual display": "64.3%",
+      "Delta": -0.4520427595797969,
+      "Delta display": "-0.452%",
+      "Status": "Intact",
+      "Data date": "2026-07-06",
+      "Description": "Căng thẳng hệ thống giảm về vùng an toàn",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.374",
+      "T actual": 0.3815868868865632,
+      "T actual display": "0.382",
+      "Delta": 0.007586886886563227,
+      "Delta display": "+0.008",
+      "Status": "Intact",
+      "Data date": "2026-07-06",
+      "Description": "Đuôi béo biến mất trên toàn dải ngưỡng GPD",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "6.667 th pct",
+      "T actual": 1.6666666666666667,
+      "T actual display": "1.667 th pct",
+      "Delta": -5.000333333333333,
+      "Delta display": "-5 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-06",
+      "Description": "Thị trường tiếp tục decoupling, không còn bị Vingroup chi phối",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "80.0 th pct",
+      "T actual": 99.93386243386243,
+      "T actual display": "99.9 th pct",
+      "Delta": 19.93386243386243,
+      "Delta display": "+19.9 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-03",
+      "Description": "Chênh lệch tín dụng deep-junk hạ nhiệt dưới ngưỡng cao",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 5,
+      "date": "2026-07-02",
+      "error": ""
+    },
+    "breadth": {
+      "value": 28.000000000000004,
+      "date": "2026-07-06",
+      "error": ""
+    },
+    "ssi": {
+      "value": 64.3479572404202,
+      "date": "2026-07-06",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-06",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3815868868865632,
+      "date": "2026-07-06",
+      "error": ""
+    },
+    "coupling": {
+      "value": 1.6666666666666667,
+      "date": "2026-07-06",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.93386243386243,
+      "date": "2026-07-03",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}
