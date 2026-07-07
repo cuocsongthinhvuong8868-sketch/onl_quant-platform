@@ -1,0 +1,37 @@
+## 1. Observations
+- SSI ở mức 63.9% – vùng WARNING (tích lũy rủi ro ngầm, chưa tới CRITICAL)
+- Market State: EUPHORIC RISK (high stress + uptrend) – đồng nhất với HMM regime
+- Top pillar dẫn dắt: S_LIQ (36%), S_VAL (31%), S_COR (18%)
+- PCA Concentration (EVR PC1) 38.2%, phản ánh tương quan hệ thống đáng kể
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ (Volume Dry-Up) 36%** – driver chính. Chỉ báo dựa trên −log(MA20/MA252) của tổng dollar volume. Giá trị cao cho thấy thanh khoản khô cạn mạnh so với trung bình 1 năm. Volume giảm tạo nền giá mong manh, đặc biệt khi xuất hiện pha điều chỉnh.
+
+**S_VAL (Valuation Tension) 31%** – lợi nhuận 252 ngày của VN30 so với lãi suất tiền gửi hiện đang căng, phản ánh định giá mở rộng quá mức. Cùng với volume thấp, đây là tín hiệu thiếu sự xác nhận từ dòng tiền mới.
+
+**S_COR (Systemic Correlation) 18%** – tương quan toàn thị trường vẫn duy trì ở mức tương đối cao (EVR PC1 38.2%), cho thấy herding behavior còn tồn tại, nhưng khi kết hợp với volume dry-up và định giá cao, bộ ba này là **bull‑trap signature** kinh điển: nhà đầu tư đồng loạt giữ vị thế dài nhưng thanh khoản mỏng, dễ bị đảo chiều đột ngột.
+
+## 3. Cross-Check
+- VN30 đang trên MA125, trend kỹ thuật là uptrend; SSI lại vào WARNING → divergence nội tại: giá ở vùng cao nhưng systemic stress ngầm báo động. Đây chính là setup EUPHORIC RISK mà HMM đã nhận diện.
+- Chế độ HMM (EUPHORIC RISK) khớp với SSI level (WARNING), không có mâu thuẫn. Không flag.
+
+## 4. Verdict
+Với SSI ở ngưỡng WARNING cao, driver chính từ thanh khoản khô cạn và định giá căng, tôi đánh giá rủi ro bull‑trap là hiện hữu. Đề xuất tăng tỷ trọng tiền mặt lên **35%** để giảm thiểu thiệt hại nếu xuất hiện correction trong 5‑20 phiên tới.
+
+Hành động phòng ngừa: **giảm beta danh mục** – ưu tiên cổ phiếu phòng thủ, cắt bớt các vị thế chu kỳ có hệ số beta cao. Mua protective puts trên hợp đồng tương lai VN30 cũng là phương án phù hợp, nhưng trong vai trò CRO tôi chọn cách giảm rủi ro trực tiếp qua cơ cấu tài sản.
+
+Lưu ý không sử dụng đòn bẩy, giữ tâm thế phòng thủ đến khi SSI giảm bền vững dưới 50% hoặc volume hồi phục rõ rệt.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.9,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

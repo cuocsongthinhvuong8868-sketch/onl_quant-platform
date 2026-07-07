@@ -1,0 +1,45 @@
+**I. Trạng thái News Sentiment (có kiểm soát bằng Bayes Confidence)**  
+- **1d:** Regime **Strong Risk-On** (Macro composite +0.6296, P_conf 100%) → *Khẳng định chắc chắn* sentiment ngắn hạn đang rất lạc quan.  
+- **7d:** Regime **Risk-On** (Macro composite +0.2734, P_conf 99%) → *Khẳng định chắc chắn* sentiment tuần vẫn duy trì tích cực, cường độ thấp hơn 1d.  
+- **30d:** Regime **Strong Risk-On** (Macro composite +0.5500, P_conf 100%) → *Khẳng định chắc chắn* sentiment trung hạn vững vàng ở vùng hưng phấn.
+
+**II. Các kênh dẫn dắt Risk-On / Risk-Off chính (có trọng số P_conf)**  
+- **Risk-On mạnh nhất:**  
+  - `credit_stress` (+2.000 1d, P_conf 100%) – tín hiệu căng thẳng tín dụng hạ nhiệt, thị trường trái phiếu ổn định.  
+  - `fx_external` (+2.000 1d, P_conf 100%) – tỷ giá đi ngang/managed, áp lực ngoại hối thấp.  
+  - `earnings` (+1.439 1d, P_conf 100%) – kỳ vọng lợi nhuận doanh nghiệp khả quan.  
+  - `banking_system` (+0.984 1d, P_conf 96%) – hệ thống ngân hàng lành mạnh.  
+  - `monetary_policy` (+1.985 30d, P_conf 100%) – chính sách tiền tệ hỗ trợ (lãi suất ON tăng phản ánh thanh khoản tốt, không phải thắt chặt tiêu cực).  
+  - `growth` (+0.855 1d, P_conf 100%) – tăng trưởng kinh tế được xác nhận qua FDI và GRDP địa phương.
+
+- **Risk-Off đáng lưu ý (cản trở nhưng chưa lấn át):**  
+  - `real_estate_collateral` (-0.781 1d, P_conf 92%; -0.840 7d, P_conf 97%) – bất động sản cung vượt cầu, thanh khoản giảm.  
+  - `commodity` (-0.320 1d, P_conf 78%; -0.639 7d, P_conf 100%; -0.462 30d, P_conf 100%) – giá hàng hóa cơ bản (quặng sắt, thép, PVC) giảm sâu, phát tín hiệu cầu toàn cầu yếu.  
+  - `liquidity` (-0.486 1d, P_conf 95%) – NHNN hút ròng mạnh qua OMO, gây thắt chặt ngắn hạn.  
+  - `inflation` (+0.000 1d, P_conf 50% – không rõ ràng; -0.818 7d/30d, P_conf 93% – tín hiệu giảm phát từ giá heo hơi và hàng hóa, cần theo dõi).
+
+**III. Các động lực chính (Top Drivers – chỉ trích dẫn từ feed)**  
+
+*Tích cực:*  
+1. Tỷ giá trung tâm 07/07 đi ngang tại 25.202, tuần trước có phiên tăng nhẹ (25.183→25.206) – thị trường ngoại hối ổn định.  
+2. Lãi suất ON liên ngân hàng tăng mạnh (6.01% ngày 06/07, 6.62% ngày 02/07) – được xếp vào tín hiệu `monetary_policy` tích cực, phản ánh nhu cầu vốn tốt.  
+3. FDI 6 tháng đạt 34.65 tỷ USD đăng ký; GRDP Hải Phòng +11.33% (đứng thứ 3 toàn quốc), Hà Nội hướng mục tiêu tăng trưởng 11% – `growth` vững.  
+4. Lợi suất TPCP đi ngang, thị trường trái phiếu không biến động tiêu cực – `credit_stress` giảm.  
+5. (Bổ sung từ 30d) ECB tăng lãi suất tiền gửi 25 bps lên 2.65% – tín hiệu môi trường tiền tệ toàn cầu ổn định.
+
+*Tiêu cực:*  
+1. NHNN hút ròng 15,964 tỷ đồng qua OMO phiên 07/07 – thanh khoản bị hút về, có thể thắt chặt tạm thời.  
+2. Bất động sản Hà Nội: nguồn cung lập đỉnh, thanh khoản giảm tốc – rủi ro tài sản đảm bảo ngân hàng.  
+3. Giá quặng sắt Trung Quốc rơi đáy một năm, thép HRC giảm sâu, PVC chạm đáy 10 năm – phản ánh sức cầu sản xuất/xây dựng suy yếu.  
+4. Giá heo hơi Việt Nam giảm xuống đáy một tháng (64,667 đồng/kg) – áp lực giảm phát lên kênh nông sản.  
+5. Tỷ giá trung tâm 02-03/07 giảm 1-2 đồng (-0.728 điểm) – vài nhịp điều chỉnh nhẹ, cần theo dõi.
+
+**IV. Tác động đến AI CIO (soft overlay)**  
+- **Hỗ trợ:** News sentiment ở cả ba khung thời gian đều “khẳng định chắc chắn” Risk-On, hoàn toàn ủng hộ kịch bản vĩ mô tích cực (tăng trưởng, dòng vốn FDI, hệ thống ngân hàng lành mạnh).  
+- **Xung đột tiềm tàng:** Kênh `real_estate_collateral` và `commodity` liên tục gửi tín hiệu Risk-Off với độ tin cậy cao (P_conf 92–100%). Điều này có thể mâu thuẫn với giả định tăng trưởng tín dụng – bất động sản bền vững hoặc hồi phục về nhu cầu hàng hóa toàn cầu của AI.  
+- **Trung lập / cần theo dõi:** Thanh khoản bị hút ròng (kênh `liquidity` -0.486) là một điểm nghẽn ngắn hạn; nếu kéo dài sẽ gây xung đột với triển vọng Risk-On. Kênh `inflation` 1d chưa rõ (P_conf 50%) nhưng 7d/30d cho tín hiệu giảm phát nhẹ, cần xác nhận thêm.
+
+**V. Caveat (Cảnh báo về chất lượng dữ liệu)**  
+- **Nguồn dữ liệu:** 99% tin đến từ hai nguồn (mozyfin – bot crawler tin tức; widata – dữ liệu thị trường). Thiếu đa dạng báo chí truyền thống, có thể bỏ sót tin chính sách/quan trọng từ kênh công báo hoặc chuyên gia.  
+- **Độ trễ:** Feed sinh lúc 17:30 ngày 07/07/2026, coi như cập nhật trong ngày; tuy nhiên một số dữ liệu giá hàng hóa (than cốc, quặng sắt) có thể có độ trễ T+1.  
+- **Rủi ro headline noise:** Các tin tiêu đề như “FDI đạt 34.65 tỷ USD 6 tháng” hoặc “giá PVC đáy 10 năm” có thể chỉ là điểm dữ liệu đơn lẻ, không phản ánh đầy đủ bức tranh xu hướng. Luôn cần đối chiếu với nguồn định lượng gốc và mô hình nội bộ của AI.

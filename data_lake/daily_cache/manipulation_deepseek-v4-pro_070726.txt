@@ -1,0 +1,32 @@
+## 1. Observations
+
+- **Slope 0.15** ở percentile 1.4 – nằm dưới rất xa ngưỡng 20th, xác nhận độ dốc hồi quy gần như bằng 0, VIN không tạo lực kéo có ý nghĩa cho VN30F1M.
+- **Correlation 0.53** ở percentile 30.5 – mối tương quan chỉ ở mức trung bình yếu, chưa cực thấp nhưng đủ để thấy mối liên kết lỏng lẻo.
+- **Regime DECOUPLING** với ΔCorr –0.55 và ΔSlope –0.95, cả hai cùng âm vượt ngưỡng ±0.15, cho thấy sự suy giảm động lượng dẫn dắt mạnh mẽ kể từ event ngày 10/04/2026.
+
+## 2. Microstructure Read
+
+Vai trò chi phối của bộ ba VIC/VHM/VRE lên VN30F1M gần như bị triệt tiêu. Slope percentile <20th và corr chỉ ở 30.5th cùng xác nhận thị trường đã “rời” nhóm VIN, không còn xem đây là động lực định hướng intraday. Không có dấu hiệu can thiệp qua VIN (cả hai percentile không cùng >80th), dòng tiền lớn không dùng VIN để đẩy chỉ số. Cần nhìn sang bank (VCB, BID) hoặc thép (HPG) để tìm driver thực sự.
+
+## 3. Event Study Interpretation
+
+Trạng thái DECOUPLING với động lượng âm sâu (ΔCorr –0.55, ΔSlope –0.95) không phải ngẫu nhiên tạm thời mà phản ánh xu hướng dứt bỏ vai trò dẫn dắt của VIN. Intraday, mọi tín hiệu từ VIC/VHM đều có độ tin cậy thấp, dễ dẫn đến false signal nếu dùng để dự báo hướng VN30F1M. Overnight, mô hình không ủng hộ giữ vị thế dựa trên VIN vì regime hiện tại chưa có dấu hiệu tái coupling.
+
+## 4. Verdict
+
+- **Trade plan:** **Spread VIN‑vs‑Bank** – short basket VIC/VHM/VRE (proxy: VIC) và long các mã ngân hàng dẫn dắt như VCB, BID, CTG, tận dụng phân kỳ khi VIN đã mất quyền dẫn dắt, kỳ vọng bank sẽ là động lực thay thế.
+- **Leading indicator:** VCB, BID, CTG; nếu bank yếu bất ngờ thì giám sát HPG.
+- **Stop‑loss reference:** Nếu **VIC** vượt **224.70** (≈ +2% từ giá close hiện tại 220.30), đóng ngay vị thế short VIN. Tương tự, đóng long bank nếu VCB giảm quá 2% so với giá entry (được xác định lúc vào lệnh). Tuyệt đối không giữ qua đêm.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "07/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.4,
+  "corr_percentile": 30.5,
+  "trade_signal": "spread",
+  "confidence": "medium"
+}
+```

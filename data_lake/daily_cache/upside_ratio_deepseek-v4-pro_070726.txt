@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- **Delta cầu:** Hiện tại 12.00% thấp hơn Mu dài hạn 12.53% một biên độ nhẹ (-0.53%), cho thấy mặt bằng mua đang hơi yếu so với quá khứ.
+- **Delta cung:** 6.35% so với Mu 13.33% (-6.98%), cung co hẹp cực mạnh – phía bán gần như biến mất.
+- **Phi cả hai chiều >0.10:** Cầu (0.237) và cung (0.207) đều ở chế độ Momentum, tức đà hiện tại có xu hướng tự duy trì; thị trường không nhiễu ngẫu nhiên.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền:** **Zombification** – cả upside breadth lẫn downside breadth đồng thời bị nén dưới trung bình dài hạn. Thanh khoản teo tóp, số mã tăng mạnh và giảm mạnh đều thấp, dòng tiền không rõ định hướng.
+- **Bên giữ momentum thực sự:** |Phi_up| = 0.237 nhỉnh hơn |Phi_dn| = 0.207, tức đà mua có quán tính vượt trội hơn một chút. Tuy nhiên cả cung lẫn cầu đều đang tự củng cố xu hướng riêng, tạo thế giằng co, không bên nào áp đảo tuyệt đối.
+
+## 3. Stress-Test Read
+- **P95 Downside = 25.57%:** Nếu thị trường gãy, mô phỏng cho thấy có 5% khả năng tỷ lệ cổ phiếu giảm >2% trong phiên đạt tới 25.57%, phản ánh đuôi rủi ro bán tháo rất dày.
+- **Asymmetry:** P95 Upside 22.69% thấp hơn P95 Downside → phân phối xác suất lệch tiêu cực, nhấn mạnh rủi ro giảm sâu cao hơn đáng kể so với cơ hội bùng nổ tăng.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân:** 30%.
+- **Chiến lược:** **Phòng thủ**. Trong trạng thái zombification, thanh khoản mỏng có thể bùng phát biến động mạnh khi có xúc tác. Momentum hai bên làm tăng rủi ro đảo chiều đột ngột, trong khi mô phỏng Monte Carlo báo hiệu đuôi rủi ro bán tháo dày hơn. Do đó ưu tiên bảo toàn vốn, hạn chế giải ngân mới, chỉ duy trì tỷ trọng thấp ở những cổ phiếu có nền tảng phòng thủ cao.
+- (Không khuyến nghị “bắt đáy” hay “mua đuổi” vì đà hai chiều không đủ tin cậy; cũng không là NO ACTIONABLE vì Phi >0.10, tồn tại signal momentum).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 25.57,
+  "p95_upside_pct": 22.69,
+  "deployment_pct": 30,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-07",
+  "composite_score": 31,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Khi số phiên STRESS/WARNING trong 20 phiên giảm dưới 5, báo hiệu căng thẳng thanh khoản VNIBOR đã hạ nhiệt, phá vỡ luận điểm PRE‑CRASH."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 30.0,
+      "unit": "%",
+      "description": "Khi tỷ lệ mã trên MA20 vượt 45%, xác nhận độ rộng phục hồi, thị trường chuyển sang trạng thái khỏe hơn, xóa bỏ lo ngại distribution."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.9,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% cho thấy rủi ro hệ thống đã được kiểm soát, không còn WARNING, làm giảm mức độ cảnh báo đuôi."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.382,
+      "unit": "",
+      "description": "Khi xi_max ở tất cả ngưỡng threshold đều dưới 0.25, phân phối đuôi trở về Gaussian, loại bỏ fat‑tail premium khỏi rủi ro danh mục."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Nếu Vingroup Slope Percentile duy trì dưới 70ᵗʰ pct, rủi ro tập trung do Vingroup dẫn dắt vẫn ở mức thấp, phủ định lo ngại manipulation."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 80.0,
+      "unit": "th pct",
+      "description": "CQS Percentile giảm xuống dưới 80ᵗʰ pct (khung 3 năm) cho thấy căng thẳng tín dụng junk giảm, loại bỏ yếu tố vĩ mô cực đoan."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-07",
+  "source": "ai_cio_executive_summary"
+}

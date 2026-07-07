@@ -1,0 +1,33 @@
+## 1. Observations
+- **Stress Index 0.00%**: không có mã VN30 nào vi phạm VaR 95%, hoàn toàn vắng bóng tín hiệu lây lan real‑time.
+- **Số mã thủng VaR (Module B)**: 0/30.
+- **Complacency Index 10.19%**: cách xa ngưỡng nguy hiểm 80%, thị trường **không** rơi vào trạng thái “ngủ quên”.
+- **Mã bị định giá sai (Module C)**: 11 mã, nổi bật nhất là **CTS, AGR, TCB** với spread bị nén chặt.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress = 0.00% khẳng định **không tồn tại cú sốc hệ thống** đang lan truyền trên nhóm blue‑chips. Không có mã nào thủng VaR 95%, do đó không thể phân tích “sự cố cá biệt hay đầu sóng systemic”. Rủi ro lây lan hiện bằng 0.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Chỉ số Complacency **thấp tuyệt đối (10.19%)** chỉ có nghĩa duy nhất: **thị trường hiện không trong regime ngủ quên** (tích lũy/phân phối vùng cao với volatility thấp và spread bị nén một cách hệ thống).  
+Điều này **không** cho phép kết luận thị trường “bình thường” hay “ổn định”. Trên lý thuyết, thị trường có thể đang hoảng loạn, sụp đổ, hoặc tăng mạnh – tất cả đều tự nhiên cho Complacency thấp vì spread giãn rộng.  
+Tuy nhiên, ở đây Stress Index = 0%, không có dấu hiệu sợ hãi cấp tính. Do đó, bức tranh hiện tại là một thị trường không bị bóp méo rủi ro trên diện rộng, cũng không bị stress lây lan. Dù vậy, 11 mã có spread nén bất thường vẫn là điểm nóng – chúng có thể là những “túi” tự mãn cục bộ, sẵn sàng điều chỉnh nếu dòng tiền đổi chiều.
+
+## 4. Stock‑Level Risk Calls
+- **Module B**: không có mã lao dốc, không phát sinh tín hiệu bán khẩn cấp.
+- **Module C** (cảnh báo tiềm ẩn):  
+  **CTS, AGR, TCB** bị nén spread mạnh nhất → định giá đang lạc quan, thiếu phần bù rủi ro đuôi.  
+  Hành động phòng ngừa: kiểm tra vị thế, đặt trailing stop dạng % (ví dụ 5–7% từ giá hiện tại) hoặc sử dụng tín hiệu phá vỡ MA20 trên khung D1. **Không khuyến nghị bán ngay**, nhưng rủi ro bất đối xứng tăng lên.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 10.19,
+  "mispriced_count": 11,
+  "regime": "spread_normal",
+  "watchlist_short": ["CTS", "AGR", "TCB"],
+  "confidence": "medium"
+}
+```

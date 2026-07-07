@@ -1,0 +1,33 @@
+## 1. Mechanical Decomposition
+Tuần này, Net Liquidity tăng +30.9 tỷ USD, đạt 5,843.3 tỷ USD. Động cơ chính đến từ **giảm TGA** (Treasury General Account) – kho bạc Mỹ chi ròng mạnh, bơm thanh khoản trở lại hệ thống. WALCL (bảng cân đối Fed) hầu như không đổi trong tuần, vẫn ở mức 6,724.6 tỷ USD, phản ánh QT diễn ra chậm rãi. ON RRP chỉ còn 1 tỷ USD (gần như zero), không còn ảnh hưởng biên. Như vậy, xung lực tăng đến từ chi tiêu của Treasury, không phải từ Fed nới lỏng. TGA hiện tại ở 880 tỷ USD – vẫn cao hơn mức mục tiêu tối thiểu, nên khả năng bơm tiếp vẫn còn, nhưng cũng có thể hút ngược nếu Treasury tích luỹ trở lại.
+
+## 2. Cycle Positioning
+Fed vẫn trong pha **QT (thu hẹp bảng cân đối)** khi WALCL thấp hơn đỉnh ~8.9 nghìn tỷ USD năm 2022. Tuy nhiên, việc ON RRP cạn kiệt (dưới 100 tỷ USD) đánh dấu chuyển giai đoạn: lá chắn thanh khoản đã biến mất, mọi biến động thanh khoản giờ truyền thẳng vào dự trữ ngân hàng và thị trường repo. TGA ở mức cao nhưng đang giảm là chất xúc tác khiến Net Liquidity hồi nhẹ so với đáy 2024 (ước khoảng 5.4–5.6 nghìn tỷ USD). So với đỉnh 2022 (~6.4 nghìn tỷ), hiện tại thấp hơn gần 10%, nhưng vẫn ở ngưỡng dồi dào. Chúng ta đang trong giai đoạn **QT_active với TGA biến động mạnh**, chưa có dấu hiệu QE trở lại.
+
+## 3. Signal Strength
+Hệ thống tín hiệu cho ra **HOLD** – trung tính. Impulse EMA(4) = +0.44 tỷ USD (~0.01% Net Liquidity), dương nhưng rất yếu. Z-Score 52 tuần ở +0.57σ, tức chưa đạt ngưỡng +1σ để kích hoạt ADD, cũng không âm để thành CUT. Sự khớp giữa Impulse EMA và Z-Score là hợp lý: xung lực tích luỹ chưa đủ mạnh để chuyển tín hiệu, môi trường hiện tại **không có bias rủi ro rõ ràng**. Tín hiệu này cần theo dõi liên tục; nếu TGA tiếp tục giảm mạnh, Impulse EMA có thể tăng tốc và đẩy Z lên cao hơn trong vài tuần tới.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **SPX/NDX**: Không có xung lực thanh khoản bùng nổ, tín hiệu HOLD cho thấy xu hướng trung tính – thị trường sẽ nhạy cảm hơn với data vĩ mô và lợi suất. Biến động có thể đi ngang.
+- **DXY/Gold/Crypto**: DXY có thể chịu áp lực nhẹ do Treasury giảm TGA (cung USD tăng), nhưng quy mô chưa đủ gây biến động lớn. Gold và Crypto hưởng lợi nhẹ từ thanh khoản không căng thẳng, nhưng chưa có động lực bứt phá.
+- **VN-Index** (lag 4-8 tuần): Với độ trễ, tín hiệu trung tính tuần này sẽ ít tác động tức thì. Tương quan lịch sử dương 0.25–0.35 gợi ý dòng vốn ngoại vào thị trường cận biên không đảo chiều tiêu cực, nhưng cũng chưa đủ lực cho xu hướng tăng mạnh. Thiên về trung tính – tích luỹ.
+
+## 5. Risk Factors
+- **RRP gần zero**: Khi RRP về 0, mọi đợt giảm thanh khoản (QT hoặc TGA tăng) sẽ hút thẳng dự trữ ngân hàng, tạo áp lực repo tăng vọt – CUT signal dễ xuất hiện nếu TGA bất ngờ tích luỹ.
+- **TGA mùa thuế**: Dữ liệu 1/7 có thể bị nhiễu bởi đợt thu thuế quý II (June). TGA ở 880 tỷ USD vẫn cao, nếu Treasury quay lại xây dựng số dư (ví dụ trước phát hành trái phiếu dài hạn), Net Liquidity có thể sụt nhanh.
+- **Fed emergency facility không dự báo trước**: Nếu căng thẳng trên thị trường repo đột ngột, Fed có thể kích hoạt công cụ hỗ trợ, làm sai lệch tín hiệu QT.
+
+## 6. KẾT LUẬN
+Regime hiện tại: **QT_active nhưng tạm trung tính do Treasury giảm TGA**. Trong 2-4 tuần tới, nếu TGA tiếp tục hạ, xung lực có thể đẩy sang vùng ADD nhẹ, hỗ trợ risk assets; ngược lại, một cú tăng TGA đột biến có thể gây áp lực giảm mạnh. Xu hướng cho VN-Index: trung tính, cần chờ tín hiệu rõ ràng hơn.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5843.326,
+  "signal": "HOLD",
+  "z_score": 0.57,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread annualized 11.42% với Z-score -0.35σ – biên độ phân tán nằm trong vùng bình thường, không dấu hiệu căng đuôi.
+- DPI đạt 41.7% – mức phân hoá duy trì ở ngưỡng trung bình, không hình thành regime kéo dài hay sự cố đơn lẻ.
+- Tương quan cặp đôi trung bình (Ledoit-Wolf) chỉ 0.006, gần bằng 0 – các cổ phiếu vận động gần như độc lập, phân hoá rõ rệt.
+- Cross-Sectional Skewness và Kurtosis không có dữ liệu – không thể đánh giá trực tiếp tính bất đối xứng hay fat-tail của phân phối lợi suất.
+
+## 2. Structural State
+DPI thấp (dưới 70%) kết hợp Spread_Z âm nhẹ cho thấy thị trường đang ở trạng thái cấu trúc bình thường, không tồn tại stress. Không có tín hiệu của stress cục bộ (spread Z cao nhưng DPI thấp) cũng như stress regime kéo dài (cả hai cùng cao). Môi trường hiện tại phản ánh sự vận động phân hoá lành mạnh mà không chịu sức ép từ các yếu tố vĩ mô hoặc dòng tiền đầu cơ tập trung.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu CS Skew và Kurtosis, không thể kết luận hướng gãy đuôi. Tuy nhiên, với tương quan tiến sát 0, hiện tượng bầy đàn không tồn tại, giảm thiểu xác suất xảy ra các cú sốc đuôi đồng loạt (herding crash). Nếu có biến động mạnh, nhiều khả năng sẽ chỉ ảnh hưởng cục bộ vào một nhóm cổ phiếu riêng lẻ.
+
+## 4. Regime Mapping
+Đối chiếu khung 2D (DPI × Correlation): DPI thấp (<70%) và tương quan cực thấp (~0) đặt thị trường vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu (bottom-up), nơi hiệu suất phụ thuộc chủ yếu vào kỹ năng phân tích doanh nghiệp thay vì xu hướng vĩ mô. Rủi ro lớn nhất với Portfolio Manager là sự thay đổi chế độ đột ngột: nếu có cú sốc vĩ mô khiến tương quan tăng vọt (correlation spike), lợi thế phân hoá sẽ biến mất, toàn bộ danh mục có thể đồng pha và khó phòng vệ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "07/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.35,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.006,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```
