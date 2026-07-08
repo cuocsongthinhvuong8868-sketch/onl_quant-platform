@@ -12,7 +12,7 @@ from tools.global_financial_conditions.quant.metrics import (
 )
 from tools.pairs_trading.quant.backtest import generate_order_ticket
 from tools.upside_ratio.quant.engine import run_hybrid_ensemble_mc
-from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
+from tools.var_cvar_vnindex.quant.evt import evt_posterior_intervals, evt_threshold_sensitivity
 
 
 def test_fear_greed_pca_is_invariant_to_appended_future_data() -> None:
@@ -97,3 +97,18 @@ def test_evt_threshold_sensitivity_reports_robustness_grid() -> None:
     assert len(valid) == 5
     assert valid["n_exceed"].is_monotonic_increasing
     assert np.isfinite(valid[["xi", "evt_var_99", "evt_es_99"]].to_numpy()).all()
+
+
+def test_evt_posterior_intervals_are_reproducible_and_ordered() -> None:
+    rng = np.random.default_rng(101)
+    returns = pd.Series(rng.standard_t(df=4, size=1_000) * 0.01)
+
+    first = evt_posterior_intervals(returns, draws=900, burn_in=300, seed=777)
+    second = evt_posterior_intervals(returns, draws=900, burn_in=300, seed=777)
+
+    assert first["status"] == "ok"
+    assert first["posterior_samples"] == 600
+    assert 0.05 <= first["acceptance_rate"] <= 0.95
+    for key in ["xi", "beta", "evt_var_99", "evt_es_99"]:
+        assert first[key]["p05"] <= first[key]["p50"] <= first[key]["p95"]
+        assert first[key] == second[key]

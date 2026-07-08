@@ -1,3 +1,4 @@
+<<<<<<< Updated upstream
 **I. Trạng thái News Sentiment (có kiểm soát bằng Bayes Confidence)**  
 - **1d:** Regime **Strong Risk-On** (Macro composite +0.6296, P_conf 100%) → *Khẳng định chắc chắn* sentiment ngắn hạn đang rất lạc quan.  
 - **7d:** Regime **Risk-On** (Macro composite +0.2734, P_conf 99%) → *Khẳng định chắc chắn* sentiment tuần vẫn duy trì tích cực, cường độ thấp hơn 1d.  
@@ -43,3 +44,40 @@
 - **Nguồn dữ liệu:** 99% tin đến từ hai nguồn (mozyfin – bot crawler tin tức; widata – dữ liệu thị trường). Thiếu đa dạng báo chí truyền thống, có thể bỏ sót tin chính sách/quan trọng từ kênh công báo hoặc chuyên gia.  
 - **Độ trễ:** Feed sinh lúc 17:30 ngày 07/07/2026, coi như cập nhật trong ngày; tuy nhiên một số dữ liệu giá hàng hóa (than cốc, quặng sắt) có thể có độ trễ T+1.  
 - **Rủi ro headline noise:** Các tin tiêu đề như “FDI đạt 34.65 tỷ USD 6 tháng” hoặc “giá PVC đáy 10 năm” có thể chỉ là điểm dữ liệu đơn lẻ, không phản ánh đầy đủ bức tranh xu hướng. Luôn cần đối chiếu với nguồn định lượng gốc và mô hình nội bộ của AI.
+=======
+1. **Tình trạng tâm lý tin tức hiện tại theo từng cửa sổ:**
+   - **1 ngày:** Regime **risk_on**, nhưng chỉ ở mức **Nghiêng về (Leaning)** do mức tin cậy P_conf = 82% (ngưỡng 65–85%). Tâm lý tích cực chưa đủ mạnh để xác nhận chắc chắn.
+   - **7 ngày:** Regime **neutral**, với P_conf = 78% → **Nghiêng về trung tính**; tín hiệu giằng co, chưa rõ xu hướng rủi ro rõ rệt.
+   - **30 ngày:** Regime **strong_risk_on**, P_conf = 100% (>85%) → **Khẳng định chắc chắn** tâm lý ưa rủi ro mạnh, đây là tín hiệu đáng tin cậy nhất cho hoạch định trung hạn.
+
+2. **Các kênh kéo risk‑on/risk‑off mạnh nhất (kèm độ tin cậy P_conf):**
+   - *Kênh kéo risk‑on rõ nhất:*
+     - Ngắn hạn (1d–7d): **earnings** (+1.359, P_conf 100%), **growth** (+0.736~+0.777, 100%), **banking_system** (+0.732~+0.836, 91–100%) – tất cả đều có độ tin cậy rất cao.
+     - Trung hạn (30d): **monetary_policy** (+1.885, 100%) và **credit_stress** (+0.950, 100%) nổi bật, phản ánh kỳ vọng mặt bằng lãi suất ổn định và áp lực tín dụng được kiểm soát.
+   - *Kênh kéo risk‑off đáng chú ý:*
+     - **commodity** luôn âm trên cả 3 khung thời gian (1d: –0.788, P_conf 97%; 7d: –0.572, 100%; 30d: –0.568, 100%) → áp lực từ giá nguyên liệu giảm (PVC, quặng sắt, thép…), dù một vài mặt hàng tăng giá nhưng không đủ xoay chiều chỉ số kênh.
+     - **fx_external** âm mạnh trên 7d (–1.558, 100%) do tỷ giá trung tâm điều chỉnh giảm nhẹ, gây lo ngại dòng vốn.
+
+3. **Tóm tắt 3–5 động lực tích cực / tiêu cực chính (chỉ từ dữ liệu đầu vào):**
+   - *Tích cực:*
+     - Chính sách thuế mới giảm chi phí, tạo thuận lợi cho người nộp thuế (growth, 1d).
+     - Hội nghị Thành ủy TP.HCM bàn giải pháp thúc đẩy tăng trưởng (growth, 1d).
+     - Kinh tế Lâm Đồng tăng trưởng bứt phá quý II/2026 (growth, 1d).
+     - Lợi suất TPCP đi ngang (credit_stress, 1d–7d) – giảm áp lực chi phí vốn.
+     - Đà tăng của giá than cốc, ngô, bông (commodity, 7d) – dù kênh tổng thể âm, những tín hiệu giá tăng riêng lẻ cho thấy nhu cầu vẫn có điểm sáng.
+   - *Tiêu cực:*
+     - Cảnh báo nợ xấu từ TS. Đào Minh Tú – “Nguy cơ nợ xấu hiện hữu và tiềm ẩn đang rất lớn” (monetary_policy, 1d).
+     - Giá nhựa PVC Trung Quốc xuống đáy 10 năm (commodity, 7d–30d) và quặng sắt Trung Quốc xuống đáy 1 năm (commodity, 7d) – tín hiệu cầu suy yếu từ Trung Quốc.
+     - Tỷ giá trung tâm giảm nhẹ liên tiếp (fx_external, 7d).
+     - Áp lực lạm phát vẫn hiện hữu (inflation, 7d–30d) – mặc dù P_conf chỉ 84% (nghiêng về tiêu cực) nhưng là rủi ro cần theo dõi.
+
+4. **Kết luận tác động lên AI CIO:**
+   - Tín hiệu **ngắn hạn (1–7 ngày) giằng co**: growth/earnings hỗ trợ nhưng commodity và cảnh báo nợ xấu kìm hãm. Phản ứng thận trọng, chưa vội tăng mạnh rủi ro.
+   - Tín hiệu **trung hạn (30 ngày)** khẳng định chắc chắn **risk‑on mạnh**, được dẫn dắt bởi chính sách tiền tệ kỳ vọng ổn định, hệ thống ngân hàng lành mạnh và tăng trưởng lợi nhuận. Điều này *ủng hộ* chiến lược tăng tỷ trọng tài sản rủi ro của AI CIO nếu phù hợp với macro layer.
+   - Mâu thuẫn cần lưu ý: kênh commodity và fx_external kéo ngược. AI CIO nên đối chiếu với dữ liệu vĩ mô cứng (lạm phát, xuất nhập khẩu) và các công cụ phân tích market‑internal để xác nhận. Nhịp điều chỉnh ngắn hạn có thể là cơ hội tái cơ cấu danh mục.
+
+5. **Lưu ý (caveat):**
+   - Mẫu nguồn chỉ từ mozyfin và widata, thiên về tài chính – không phủ toàn bộ sự kiện chính trị hay xã hội.
+   - Dữ liệu mới cập nhật sáng 07/07/2026, không trễ (stale).
+   - Rủi ro “headline noise” cao: các tin giá hàng hóa đơn lẻ hoặc biến động tỷ giá nhỏ có thể gây tín hiệu giả; không nên dùng feed này như quy tắc phân bổ cứng.
+>>>>>>> Stashed changes

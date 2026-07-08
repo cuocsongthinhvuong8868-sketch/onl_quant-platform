@@ -43,6 +43,13 @@ COMPANY_NAMES = [
 
 logger = logging.getLogger(__name__)
 
+SENTIMENT_SCORE_SCALE = 5.0
+BAYES_PRIOR_MEAN = 0.0
+BAYES_PRIOR_SD = 1.0
+BAYES_BASE_SIGMA = 0.5
+BAYES_RELIABILITY_FLOOR = 0.05
+ACTIVE_SCORE_THRESHOLD = 0.01
+
 VN_MACRO_WEIGHTS = {
     "liquidity": 0.20,
     "banking_system": 0.175,
@@ -70,53 +77,127 @@ def classify_regime(score: float) -> str:
     return "strong_risk_off"
 
 
-def calculate_channel_scores(items: list[dict]) -> tuple[dict[str, float], dict[str, float]]:
+def _safe_float(value, default: float) -> float:
+    try:
+        out = float(value)
+    except Exception:
+        return default
+    if not np.isfinite(out):
+        return default
+    return out
+
+
+def _item_reliability(item: dict) -> float:
+    source_weight = _safe_float(item.get("source_weight"), 0.8)
+    confidence = _safe_float(item.get("confidence"), 0.7)
+    time_decay = _safe_float(item.get("time_decay"), 1.0)
+    reliability = source_weight * confidence * time_decay
+    return float(max(BAYES_RELIABILITY_FLOOR, min(1.0, reliability)))
+
+
+def bayesian_sentiment_posterior(items: list[dict]) -> dict[str, float | int | str]:
+    """Normal-normal posterior for the latent sentiment mean.
+
+    Each article contributes an observation on the legacy scaled sentiment axis
+    [-2, 2]. ``source_weight``, classifier ``confidence``, and ``time_decay``
+    enter as likelihood precision, not as a market-return probability.
     """
-    Calculate scores for each channel in MACRO_CHANNELS.
-    Using average of final_score for active items.
-    Also calculates Bayesian probability of being positive.
-    """
-    scores = {}
-    probs = {}
+    observations: list[float] = []
+    reliabilities: list[float] = []
+
+    for item in items:
+        score = _safe_float(item.get("final_score"), 0.0)
+        if abs(score) < ACTIVE_SCORE_THRESHOLD:
+            continue
+        observations.append(score * SENTIMENT_SCORE_SCALE)
+        reliabilities.append(_item_reliability(item))
+
+    active_count = len(observations)
+    if active_count == 0:
+        return {
+            "posterior_mean": 0.0,
+            "posterior_sd": round(BAYES_PRIOR_SD, 4),
+            "prob_positive": 0.5,
+            "prob_negative": 0.5,
+            "prob_same_direction": 0.5,
+            "ci_5": round(stats.norm.ppf(0.05, loc=BAYES_PRIOR_MEAN, scale=BAYES_PRIOR_SD), 4),
+            "ci_95": round(stats.norm.ppf(0.95, loc=BAYES_PRIOR_MEAN, scale=BAYES_PRIOR_SD), 4),
+            "active_count": 0,
+            "reliability_sum": 0.0,
+            "direction": "neutral",
+        }
+
+    y = np.asarray(observations, dtype=np.float64)
+    reliability = np.asarray(reliabilities, dtype=np.float64)
+    base_var = BAYES_BASE_SIGMA ** 2
+    prior_var = BAYES_PRIOR_SD ** 2
+
+    obs_precision = reliability / base_var
+    posterior_precision = (1.0 / prior_var) + float(obs_precision.sum())
+    posterior_var = 1.0 / posterior_precision
+    posterior_mean = posterior_var * (
+        (BAYES_PRIOR_MEAN / prior_var) + float(np.sum(obs_precision * y))
+    )
+    posterior_sd = float(np.sqrt(posterior_var))
+    prob_positive = float(stats.norm.sf(0.0, loc=posterior_mean, scale=posterior_sd))
+    prob_negative = float(1.0 - prob_positive)
+    prob_same_direction = max(prob_positive, prob_negative)
+
+    if abs(posterior_mean) < 1e-8:
+        direction = "neutral"
+        prob_same_direction = 0.5
+    else:
+        direction = "positive" if posterior_mean > 0 else "negative"
+
+    return {
+        "posterior_mean": round(float(np.clip(posterior_mean, -2.0, 2.0)), 4),
+        "posterior_sd": round(posterior_sd, 4),
+        "prob_positive": round(prob_positive, 4),
+        "prob_negative": round(prob_negative, 4),
+        "prob_same_direction": round(float(prob_same_direction), 4),
+        "ci_5": round(float(np.clip(stats.norm.ppf(0.05, loc=posterior_mean, scale=posterior_sd), -2.0, 2.0)), 4),
+        "ci_95": round(float(np.clip(stats.norm.ppf(0.95, loc=posterior_mean, scale=posterior_sd), -2.0, 2.0)), 4),
+        "active_count": active_count,
+        "reliability_sum": round(float(reliability.sum()), 4),
+        "direction": direction,
+    }
+
+
+def _neutral_channel_posterior() -> dict[str, float | int | str]:
+    return bayesian_sentiment_posterior([])
+
+
+def calculate_channel_scores_with_posteriors(
+    items: list[dict],
+) -> tuple[dict[str, float], dict[str, float], dict[str, dict]]:
+    scores: dict[str, float] = {}
+    probs: dict[str, float] = {}
+    posteriors: dict[str, dict] = {}
     channel_items = {channel: [] for channel in MACRO_CHANNELS}
-    
+
     for item in items:
         channel = item.get("macro_channel", "unknown")
         if channel in channel_items:
             channel_items[channel].append(item)
-            
+
     for channel in MACRO_CHANNELS:
-        ch_list = channel_items[channel]
-        if not ch_list:
-            scores[channel] = 0.0
-            probs[channel] = 0.5
-            continue
-            
-        active_scores = [i.get("final_score", 0.0) for i in ch_list if abs(i.get("final_score", 0.0)) >= 0.01]
-        active_count = len(active_scores)
-        total_score = sum(active_scores)
-        
-        score = total_score / active_count if active_count > 0 else 0.0
-        # Apply sensitivity multiplier to map discounted scores back to [-2.0, 2.0] range
-        scaled_score = score * 5.0
-        # Clamp to [-2.0, 2.0]
-        scores[channel] = max(-2.0, min(2.0, round(scaled_score, 4)))
-        
-        # Bayesian Conjugate Prior update
-        if active_count > 0:
-            sample_mean = scaled_score
-            # Apply Effective Sample Size (ESS) to prevent statistical overconfidence in large windows
-            n_eff = np.sqrt(active_count)
-            # Prior N(0, 1), Likelihood N(mu, 0.25)
-            post_var = 1.0 / (1.0 + (n_eff / 0.25))
-            post_mu = post_var * (n_eff * sample_mean / 0.25)
-            # Calculate non-directional confidence level: P(sign(mu) == sign(sample_mean))
-            prob_pos = stats.norm.cdf(abs(post_mu) / np.sqrt(post_var))
-            probs[channel] = round(float(prob_pos), 4)
-        else:
-            probs[channel] = 0.5
-            
+        posterior = bayesian_sentiment_posterior(channel_items[channel])
+        posteriors[channel] = posterior
+        scores[channel] = float(posterior["posterior_mean"])
+        probs[channel] = float(posterior["prob_same_direction"])
+
+    return scores, probs, posteriors
+
+
+def calculate_channel_scores(items: list[dict]) -> tuple[dict[str, float], dict[str, float]]:
+    """
+    Calculate scores for each channel in MACRO_CHANNELS.
+    Returns legacy score and confidence maps. New callers should use
+    calculate_channel_scores_with_posteriors to access interval diagnostics.
+    """
+    scores, probs, _ = calculate_channel_scores_with_posteriors(items)
     return scores, probs
+
 
 def build_macro_composite(channel_scores: dict[str, float]) -> float:
     """Calculate composite score based on Vietnam macro weights."""
@@ -124,6 +205,44 @@ def build_macro_composite(channel_scores: dict[str, float]) -> float:
     for channel, weight in VN_MACRO_WEIGHTS.items():
         composite += channel_scores.get(channel, 0.0) * weight
     return round(composite, 4)
+
+
+def build_macro_composite_posterior(channel_posteriors: dict[str, dict]) -> dict[str, float | int | str]:
+    mean = 0.0
+    variance = 0.0
+    active_count = 0
+    reliability_sum = 0.0
+
+    for channel, weight in VN_MACRO_WEIGHTS.items():
+        posterior = channel_posteriors.get(channel) or _neutral_channel_posterior()
+        mean += float(posterior.get("posterior_mean", 0.0)) * weight
+        variance += (weight ** 2) * (float(posterior.get("posterior_sd", BAYES_PRIOR_SD)) ** 2)
+        active_count += int(posterior.get("active_count", 0) or 0)
+        reliability_sum += float(posterior.get("reliability_sum", 0.0) or 0.0)
+
+    sd = float(np.sqrt(max(variance, 1e-12)))
+    prob_positive = float(stats.norm.sf(0.0, loc=mean, scale=sd))
+    prob_negative = float(1.0 - prob_positive)
+    prob_same_direction = max(prob_positive, prob_negative)
+    if abs(mean) < 1e-8:
+        direction = "neutral"
+        prob_same_direction = 0.5
+    else:
+        direction = "positive" if mean > 0 else "negative"
+
+    return {
+        "posterior_mean": round(float(np.clip(mean, -2.0, 2.0)), 4),
+        "posterior_sd": round(sd, 4),
+        "prob_positive": round(prob_positive, 4),
+        "prob_negative": round(prob_negative, 4),
+        "prob_same_direction": round(float(prob_same_direction), 4),
+        "ci_5": round(float(np.clip(stats.norm.ppf(0.05, loc=mean, scale=sd), -2.0, 2.0)), 4),
+        "ci_95": round(float(np.clip(stats.norm.ppf(0.95, loc=mean, scale=sd), -2.0, 2.0)), 4),
+        "active_count": active_count,
+        "reliability_sum": round(reliability_sum, 4),
+        "direction": direction,
+    }
+
 
 def filter_items_by_window(items: list[dict], minutes: int) -> list[dict]:
     """Filter items published within the last N minutes."""
@@ -143,22 +262,10 @@ def filter_items_by_window(items: list[dict], minutes: int) -> list[dict]:
 
 def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str) -> dict:
     """Build the feed dictionary for a specific window."""
-    channel_scores, channel_probs = calculate_channel_scores(items)
-    macro_composite = build_macro_composite(channel_scores)
-    
-    # Calculate composite Bayesian probability
-    active_scores = [i.get("final_score", 0.0) for i in items if abs(i.get("final_score", 0.0)) >= 0.01]
-    active_count = len(active_scores)
-    if active_count > 0:
-        sample_mean = macro_composite
-        # Apply Effective Sample Size (ESS) to prevent statistical overconfidence
-        n_eff = np.sqrt(active_count)
-        post_var = 1.0 / (1.0 + (n_eff / 0.25))
-        post_mu = post_var * (n_eff * sample_mean / 0.25)
-        # Calculate non-directional confidence level: P(sign(mu) == sign(sample_mean))
-        composite_prob = float(stats.norm.cdf(abs(post_mu) / np.sqrt(post_var)))
-    else:
-        composite_prob = 0.5
+    channel_scores, channel_probs, channel_posteriors = calculate_channel_scores_with_posteriors(items)
+    macro_posterior = build_macro_composite_posterior(channel_posteriors)
+    macro_composite = float(macro_posterior["posterior_mean"])
+    composite_prob = float(macro_posterior["prob_same_direction"])
         
     regime = classify_regime(macro_composite)
     
@@ -241,10 +348,13 @@ def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str)
         "generated_at": generated_at_vn,
         "window": window_name,
         "macro_composite": macro_composite,
+        "macro_composite_posterior": macro_posterior,
         "macro_composite_prob_pos": composite_prob,
+        "macro_composite_prob_positive": float(macro_posterior["prob_positive"]),
         "regime": regime,
         "channel_scores": channel_scores,
         "channel_probs": channel_probs,
+        "channel_posteriors": channel_posteriors,
         "top_positive_drivers": top_pos,
         "top_negative_drivers": top_neg,
         "news_count": len(items),

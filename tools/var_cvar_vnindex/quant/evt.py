@@ -42,6 +42,9 @@ DEFAULT_ROLLING_WINDOW = 756        # 3 năm trading days
 DEFAULT_REFIT_EVERY = 21            # ~1 tháng giữa các lần refit (industry standard cho monthly risk reports)
 DEFAULT_QUANTILES = (0.95, 0.99, 0.995)
 DEFAULT_SENSITIVITY_THRESHOLDS = (0.05, 0.075, 0.10, 0.125, 0.15)
+DEFAULT_MCMC_DRAWS = 4000
+DEFAULT_MCMC_BURN_IN = 1000
+DEFAULT_MCMC_SEED = 42
 
 
 # ──────────────────────────────────────────────────────────────────────────
@@ -259,6 +262,122 @@ def evt_threshold_sensitivity(
         rows.append(row)
 
     return pd.DataFrame(rows).sort_values("threshold_pct").reset_index(drop=True)
+
+
+def _gpd_log_posterior(theta: np.ndarray, exceedances: np.ndarray, log_beta_center: float) -> float:
+    xi = float(theta[0])
+    log_beta = float(theta[1])
+    if not (-0.5 < xi < 0.95) or not np.isfinite(log_beta):
+        return -np.inf
+    beta = float(np.exp(log_beta))
+    if beta <= 0 or not np.isfinite(beta):
+        return -np.inf
+    support = 1.0 + xi * exceedances / beta
+    if np.any(support <= 0):
+        return -np.inf
+
+    log_like = float(np.sum(genpareto.logpdf(exceedances, c=xi, loc=0, scale=beta)))
+    if not np.isfinite(log_like):
+        return -np.inf
+
+    xi_prior_sd = 0.35
+    log_beta_prior_sd = 1.0
+    xi_prior = -0.5 * ((xi - 0.20) / xi_prior_sd) ** 2 - np.log(xi_prior_sd)
+    beta_prior = -0.5 * ((log_beta - log_beta_center) / log_beta_prior_sd) ** 2 - np.log(log_beta_prior_sd)
+    return float(log_like + xi_prior + beta_prior)
+
+
+def _summarize_interval(values: np.ndarray) -> dict[str, float]:
+    clean = values[np.isfinite(values)]
+    if len(clean) == 0:
+        return {"p05": np.nan, "p50": np.nan, "p95": np.nan}
+    p05, p50, p95 = np.quantile(clean, [0.05, 0.50, 0.95])
+    return {"p05": float(p05), "p50": float(p50), "p95": float(p95)}
+
+
+def evt_posterior_intervals(
+    returns: pd.Series,
+    window: int = DEFAULT_ROLLING_WINDOW,
+    threshold_pct: float = DEFAULT_THRESHOLD_PCT,
+    quantiles: Tuple[float, ...] = (0.99, 0.995),
+    draws: int = DEFAULT_MCMC_DRAWS,
+    burn_in: int = DEFAULT_MCMC_BURN_IN,
+    seed: int = DEFAULT_MCMC_SEED,
+    proposal_sd: Tuple[float, float] = (0.035, 0.08),
+) -> dict:
+    """MCMC posterior intervals for the latest POT-GPD window.
+
+    This runs only on the latest window, so it is suitable for report snapshots.
+    VaR/ES intervals are returned on return scale, matching rolling_evt_metrics.
+    """
+    clean_returns = pd.Series(returns).replace([np.inf, -np.inf], np.nan).dropna()
+    if len(clean_returns) < window:
+        return {"status": "insufficient_data", "method": "gpd_random_walk_mcmc"}
+    if draws <= burn_in + 10:
+        raise ValueError("draws must exceed burn_in by at least 10")
+
+    losses = -clean_returns.tail(window).to_numpy(dtype=np.float64, copy=False)
+    params = fit_evt_window(losses, threshold_pct=threshold_pct)
+    if params is None:
+        return {"status": "insufficient_or_unstable", "method": "gpd_random_walk_mcmc"}
+
+    u = float(params["threshold"])
+    exceedances = losses[np.isfinite(losses) & (losses > u)] - u
+    if len(exceedances) < DEFAULT_MIN_EXCEEDANCES:
+        return {"status": "insufficient_or_unstable", "method": "gpd_random_walk_mcmc"}
+
+    start = np.array([float(params["xi"]), float(np.log(params["beta"]))], dtype=np.float64)
+    log_beta_center = float(start[1])
+    rng = np.random.default_rng(seed)
+
+    samples = np.empty((draws, 2), dtype=np.float64)
+    current = start.copy()
+    current_lp = _gpd_log_posterior(current, exceedances, log_beta_center)
+    accepted = 0
+    step = np.array(proposal_sd, dtype=np.float64)
+
+    for i in range(draws):
+        proposed = current + rng.normal(0.0, step)
+        proposed_lp = _gpd_log_posterior(proposed, exceedances, log_beta_center)
+        if np.log(rng.random()) < proposed_lp - current_lp:
+            current = proposed
+            current_lp = proposed_lp
+            accepted += 1
+        samples[i] = current
+
+    posterior = samples[burn_in:]
+    xi_samples = posterior[:, 0]
+    beta_samples = np.exp(posterior[:, 1])
+
+    out = {
+        "status": "ok",
+        "method": "gpd_random_walk_mcmc",
+        "threshold_pct": float(threshold_pct),
+        "threshold": u,
+        "n_total": int(params["n_total"]),
+        "n_exceed": int(params["n_exceed"]),
+        "draws": int(draws),
+        "burn_in": int(burn_in),
+        "posterior_samples": int(len(posterior)),
+        "acceptance_rate": round(float(accepted / draws), 4),
+        "xi": _summarize_interval(xi_samples),
+        "beta": _summarize_interval(beta_samples),
+    }
+
+    for quantile in quantiles:
+        suffix = _quantile_suffix(quantile)
+        var_values = np.array([
+            -evt_var(quantile, u, xi, beta, int(params["n_total"]), int(params["n_exceed"]))
+            for xi, beta in zip(xi_samples, beta_samples)
+        ])
+        es_values = np.array([
+            -evt_es(quantile, u, xi, beta, int(params["n_total"]), int(params["n_exceed"]))
+            for xi, beta in zip(xi_samples, beta_samples)
+        ])
+        out[f"evt_var_{suffix}"] = _summarize_interval(var_values)
+        out[f"evt_es_{suffix}"] = _summarize_interval(es_values)
+
+    return out
 
 
 def _quantile_suffix(quantile: float) -> str:

@@ -4,7 +4,7 @@ import os
 from datetime import date
 from shared.data_loader import load_custom
 from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
-from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
+from tools.var_cvar_vnindex.quant.evt import evt_posterior_intervals, evt_threshold_sensitivity
 from tools.var_cvar_vnindex.ui.sidebar import render_sidebar
 from tools.var_cvar_vnindex.ui.charts import plot_var_cvar, plot_evt_tail_risk
 
@@ -15,6 +15,21 @@ except ImportError:
         "kimi-2.6": {"display": "Kimi 2.6", "api_model": "kimi-k2.6", "base_url": "https://api.moonshot.ai/v1"},
         "deepseek-v4-pro": {"display": "DeepSeek V4 Pro", "api_model": "deepseek-v4-pro", "base_url": "https://api.deepseek.com/v1"},
     }
+
+
+def _evt_xi_label(xi_val):
+    return "Light" if xi_val < 0.05 else ("Heavy" if xi_val < 0.30 else "Fat Tail")
+
+
+def _evt_xi_prompt_value(xi_val, intervals):
+    xi_text = f"{xi_val:+.3f} MLE ({_evt_xi_label(xi_val)})"
+    if intervals and intervals.get("status") == "ok":
+        xi = intervals.get("xi", {})
+        xi_text += (
+            f"; MCMC posterior p50 {xi.get('p50', 0.0):+.3f}, "
+            f"90% CI [{xi.get('p05', 0.0):+.3f}, {xi.get('p95', 0.0):+.3f}]"
+        )
+    return xi_text
 
 
 def show():
@@ -57,6 +72,9 @@ def show():
             df_metrics = calculate_var_cvar_metrics(vni_series)
             st.session_state.var_cvar_metrics = df_metrics
             st.session_state.var_cvar_evt_sensitivity = evt_threshold_sensitivity(
+                df_metrics["return"]
+            )
+            st.session_state.var_cvar_evt_intervals = evt_posterior_intervals(
                 df_metrics["return"]
             )
 
@@ -139,6 +157,43 @@ def show():
                                 f"range ES99={abs(es99_range)*100:.2f} điểm %. "
                                 "Range lớn cho thấy kết quả phụ thuộc mạnh vào threshold và cần thận trọng."
                             )
+                    intervals = st.session_state.get("var_cvar_evt_intervals")
+                    if intervals is None:
+                        intervals = evt_posterior_intervals(df_metrics["return"])
+                        st.session_state.var_cvar_evt_intervals = intervals
+                    with st.expander("EVT MCMC posterior interval", expanded=False):
+                        if intervals.get("status") != "ok":
+                            st.warning("Không đủ dữ liệu để chạy MCMC interval.")
+                        else:
+                            interval_rows = [
+                                {"metric": "xi", **intervals["xi"]},
+                                {
+                                    "metric": "EVT VaR99 (%)",
+                                    "p05": intervals["evt_var_99"]["p05"] * 100,
+                                    "p50": intervals["evt_var_99"]["p50"] * 100,
+                                    "p95": intervals["evt_var_99"]["p95"] * 100,
+                                },
+                                {
+                                    "metric": "EVT ES99 (%)",
+                                    "p05": intervals["evt_es_99"]["p05"] * 100,
+                                    "p50": intervals["evt_es_99"]["p50"] * 100,
+                                    "p95": intervals["evt_es_99"]["p95"] * 100,
+                                },
+                            ]
+                            st.caption(
+                                f"Method={intervals.get('method')} | "
+                                f"acceptance={intervals.get('acceptance_rate', 0):.1%} | "
+                                f"samples={intervals.get('posterior_samples', 0)}"
+                            )
+                            st.dataframe(
+                                pd.DataFrame(interval_rows).style.format({
+                                    "p05": "{:+.3f}",
+                                    "p50": "{:+.3f}",
+                                    "p95": "{:+.3f}",
+                                }),
+                                use_container_width=True,
+                                hide_index=True,
+                            )
                 else:
                     st.info("ℹ️ EVT cần ≥ 3 năm data (756 phiên). Quay lại sau khi backfill xong.")
         else:
@@ -190,12 +245,12 @@ def show():
 
             ce5, ce6, ce7, ce8 = st.columns(4)
             with ce5:
-                xi_val = latest['evt_xi']
-                xi_label = "Light" if xi_val < 0.05 else ("Heavy" if xi_val < 0.30 else "Fat Tail ⚠️")
-                st.metric("ξ (GPD shape)", f"{xi_val:+.3f}",
+                xi_val = float(latest['evt_xi'])
+                xi_label = _evt_xi_label(xi_val)
+                st.metric("xi MLE (GPD shape)", f"{xi_val:+.3f}",
                           delta=xi_label,
                           delta_color="off" if xi_val < 0.15 else "inverse",
-                          help="Tail index. ξ>0.15=heavy; ξ>0.30=fat (đuôi cực dày, rủi ro cực đoan).")
+                          help="MLE point estimate. xi>0.15=heavy; xi>0.30=fat tail.")
             with ce6:
                 hill_val = latest['hill_index']
                 st.metric("Hill index", f"{hill_val:+.3f}",
@@ -207,13 +262,23 @@ def show():
                 st.metric("# Exceedances", f"{int(latest['evt_n_exceed'])}",
                           help="Số phiên loss vượt threshold trong window 3 năm.")
 
+            interval_snapshot = st.session_state.get("var_cvar_evt_intervals")
+            if interval_snapshot and interval_snapshot.get("status") == "ok":
+                xi_interval = interval_snapshot.get("xi", {})
+                st.caption(
+                    f"MCMC posterior xi: p50={xi_interval.get('p50', 0.0):+.3f}, "
+                    f"90% CI=[{xi_interval.get('p05', 0.0):+.3f}, "
+                    f"{xi_interval.get('p95', 0.0):+.3f}]. "
+                    "The metric above remains the MLE point estimate used by legacy scoring."
+                )
+
             # Diagnostic so sánh Gaussian vs EVT
             gauss_99 = latest['mean_30'] + (-2.3263) * latest['stdev_30']  # z_99
             underestimate = (latest['evt_var_99'] - gauss_99) * 100
             st.info(
                 f"💡 **Diagnostic:** Gaussian VaR 99% (μ₃₀ + z₀.₀₁·σ₃₀) ≈ {gauss_99*100:.2f}% — "
                 f"EVT cho {latest['evt_var_99']*100:.2f}%. Gaussian đang **{'underestimate' if underestimate < 0 else 'overestimate'} "
-                f"tail risk {abs(underestimate):.2f} điểm phần trăm**. ξ={xi_val:+.3f} → "
+                f"tail risk {abs(underestimate):.2f} điểm phần trăm**. xi MLE={xi_val:+.3f} → "
                 f"{'phân phối có đuôi dày, mô hình Gaussian không phù hợp.' if xi_val > 0.15 else 'phân phối khá gần Gaussian.'}"
             )
 
@@ -265,6 +330,61 @@ def show():
                                 full_prompt = full_prompt.replace("[Historical VaR]", f"{latest['historical_var']*100:.2f}%")
                                 full_prompt = full_prompt.replace("[Expected Shortfall]", f"{latest['expected_shortfall']*100:.2f}%")
                                 full_prompt = full_prompt.replace("[ES - VaR Spread]", f"{(latest['expected_shortfall'] - latest['historical_var'])*100:.2f}%")
+                                if has_evt:
+                                    intervals = st.session_state.get("var_cvar_evt_intervals")
+                                    full_prompt = full_prompt.replace("[EVT VaR 99%]", f"{latest['evt_var_99']*100:.2f}%")
+                                    full_prompt = full_prompt.replace("[EVT VaR 99.5%]", f"{latest['evt_var_995']*100:.2f}%")
+                                    full_prompt = full_prompt.replace("[EVT ES 99%]", f"{latest['evt_es_99']*100:.2f}%")
+                                    full_prompt = full_prompt.replace("[EVT Xi]", _evt_xi_prompt_value(float(latest['evt_xi']), intervals))
+                                    full_prompt = full_prompt.replace("[Hill Index]", f"{latest['hill_index']:+.3f}")
+                                    full_prompt = full_prompt.replace("[EVT N Exceed]", str(int(latest['evt_n_exceed'])))
+
+                                    sensitivity = st.session_state.get("var_cvar_evt_sensitivity")
+                                    valid_sensitivity = (
+                                        sensitivity[sensitivity["status"] == "ok"]
+                                        if sensitivity is not None else pd.DataFrame()
+                                    )
+                                    if not valid_sensitivity.empty:
+                                        xi_min = float(valid_sensitivity["xi"].min())
+                                        xi_max = float(valid_sensitivity["xi"].max())
+                                        xi_range = xi_max - xi_min
+                                        var99_range = float(valid_sensitivity["evt_var_99"].max() - valid_sensitivity["evt_var_99"].min())
+                                        es99_range = float(valid_sensitivity["evt_es_99"].max() - valid_sensitivity["evt_es_99"].min())
+                                        stable_flag = int(xi_range <= 0.10 and abs(var99_range) <= 0.01 and abs(es99_range) <= 0.015)
+                                        full_prompt = full_prompt.replace("[EVT Xi Min]", f"{xi_min:+.3f}")
+                                        full_prompt = full_prompt.replace("[EVT Xi Max]", f"{xi_max:+.3f}")
+                                        full_prompt = full_prompt.replace("[EVT Xi Range]", f"{xi_range:.3f}")
+                                        full_prompt = full_prompt.replace("[EVT VaR99 Range]", f"{abs(var99_range)*100:.2f}pp")
+                                        full_prompt = full_prompt.replace("[EVT ES99 Range]", f"{abs(es99_range)*100:.2f}pp")
+                                        full_prompt = full_prompt.replace("[EVT Threshold Stable]", str(stable_flag))
+                                        full_prompt = full_prompt.replace("[EVT Sensitivity Status]", "stable" if stable_flag else "threshold_sensitive")
+
+                                    if intervals and intervals.get("status") == "ok":
+                                        full_prompt = full_prompt.replace("[EVT Interval Method]", str(intervals.get("method", "gpd_random_walk_mcmc")))
+                                        full_prompt = full_prompt.replace("[EVT MCMC Acceptance]", f"{intervals.get('acceptance_rate', 0):.1%}")
+                                        full_prompt = full_prompt.replace("[EVT MCMC Samples]", str(intervals.get("posterior_samples", 0)))
+                                        full_prompt = full_prompt.replace("[EVT Xi P05]", f"{intervals['xi']['p05']:+.3f}")
+                                        full_prompt = full_prompt.replace("[EVT Xi P50]", f"{intervals['xi']['p50']:+.3f}")
+                                        full_prompt = full_prompt.replace("[EVT Xi P95]", f"{intervals['xi']['p95']:+.3f}")
+                                        full_prompt = full_prompt.replace("[EVT VaR99 P05]", f"{intervals['evt_var_99']['p05']*100:.2f}%")
+                                        full_prompt = full_prompt.replace("[EVT VaR99 P50]", f"{intervals['evt_var_99']['p50']*100:.2f}%")
+                                        full_prompt = full_prompt.replace("[EVT VaR99 P95]", f"{intervals['evt_var_99']['p95']*100:.2f}%")
+                                        full_prompt = full_prompt.replace("[EVT ES99 P05]", f"{intervals['evt_es_99']['p05']*100:.2f}%")
+                                        full_prompt = full_prompt.replace("[EVT ES99 P50]", f"{intervals['evt_es_99']['p50']*100:.2f}%")
+                                        full_prompt = full_prompt.replace("[EVT ES99 P95]", f"{intervals['evt_es_99']['p95']*100:.2f}%")
+
+                                for placeholder in [
+                                    "[EVT VaR 99%]", "[EVT VaR 99.5%]", "[EVT ES 99%]",
+                                    "[EVT Xi]", "[Hill Index]", "[EVT N Exceed]",
+                                    "[EVT Xi Min]", "[EVT Xi Max]", "[EVT Xi Range]",
+                                    "[EVT VaR99 Range]", "[EVT ES99 Range]",
+                                    "[EVT Threshold Stable]", "[EVT Sensitivity Status]",
+                                    "[EVT Interval Method]", "[EVT MCMC Acceptance]", "[EVT MCMC Samples]",
+                                    "[EVT Xi P05]", "[EVT Xi P50]", "[EVT Xi P95]",
+                                    "[EVT VaR99 P05]", "[EVT VaR99 P50]", "[EVT VaR99 P95]",
+                                    "[EVT ES99 P05]", "[EVT ES99 P50]", "[EVT ES99 P95]",
+                                ]:
+                                    full_prompt = full_prompt.replace(placeholder, "N/A")
 
                                 parts = full_prompt.split("# INPUT DATA")
                                 system_prompt = parts[0].strip()

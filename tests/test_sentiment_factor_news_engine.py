@@ -1,9 +1,15 @@
 import importlib
 import json
+from datetime import datetime, timezone
 
 from tools.sentiment_factor_news.core.classifier import classify_and_tag_item
+from tools.sentiment_factor_news.core.aggregator import (
+    bayesian_sentiment_posterior,
+    build_window_feed,
+)
 from tools.sentiment_factor_news.core.normalizer import normalize_mozyfin, normalize_widata
 from tools.sentiment_factor_news.core.scorer import score_item
+from tools.sentiment_factor_news import report as sentiment_report
 from tools.sentiment_factor_news.report import snapshot
 from tools.sentiment_factor_news import config
 from tools.sentiment_factor_news.connectors import mozyfin_connector
@@ -211,3 +217,103 @@ def test_snapshot_reads_copied_feed():
     assert snap["window"] == "latest_1d"
     assert snap["news_count"] > 0
     assert "macro_composite" in snap
+
+
+def test_sentiment_posterior_uses_reliability_as_likelihood_precision():
+    reliable = [
+        {
+            "final_score": 0.20,
+            "source_weight": 1.0,
+            "confidence": 1.0,
+            "time_decay": 1.0,
+        }
+    ]
+    noisy = [
+        {
+            "final_score": 0.20,
+            "source_weight": 0.2,
+            "confidence": 0.5,
+            "time_decay": 0.5,
+        }
+    ]
+
+    reliable_post = bayesian_sentiment_posterior(reliable)
+    noisy_post = bayesian_sentiment_posterior(noisy)
+
+    assert reliable_post["posterior_mean"] > noisy_post["posterior_mean"]
+    assert reliable_post["posterior_sd"] < noisy_post["posterior_sd"]
+    assert reliable_post["prob_positive"] > noisy_post["prob_positive"]
+
+
+def test_window_feed_exports_channel_and_macro_posteriors():
+    feed = build_window_feed(
+        [
+            {
+                "macro_channel": "liquidity",
+                "final_score": 0.25,
+                "source_weight": 0.9,
+                "confidence": 0.8,
+                "time_decay": 1.0,
+                "source_system": "widata",
+                "raw_category": "Vĩ mô",
+                "entities": [],
+                "title": "Liquidity improves",
+                "summary": "",
+            }
+        ],
+        "latest_1d",
+        "2026-07-07T10:00:00+07:00",
+    )
+
+    assert "macro_composite_posterior" in feed
+    assert "channel_posteriors" in feed
+    assert feed["channel_posteriors"]["liquidity"]["active_count"] == 1
+    assert feed["macro_composite_prob_pos"] == feed["macro_composite_posterior"]["prob_same_direction"]
+
+
+def test_load_feed_backfills_legacy_posterior_fields(monkeypatch, tmp_path):
+    feed_dir = tmp_path / "feed"
+    feed_dir.mkdir()
+    monkeypatch.setattr(sentiment_report, "FEED_DIR", feed_dir)
+
+    legacy_feed = {
+        "generated_at": "2026-07-07T08:00:00+07:00",
+        "window": "latest_1d",
+        "macro_composite": 0.0,
+        "macro_composite_prob_pos": 0.5,
+        "macro_composite_prob_positive": None,
+        "regime": "neutral",
+        "channel_scores": {"liquidity": 0.0},
+        "channel_probs": {"liquidity": 0.5},
+        "top_positive_drivers": [],
+        "top_negative_drivers": [],
+        "news_count": 1,
+        "source_counts": {"widata": 1},
+    }
+    (feed_dir / "latest_1d.json").write_text(json.dumps(legacy_feed), encoding="utf-8")
+
+    fresh_timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    row = {
+        "timestamp_utc": fresh_timestamp,
+        "timestamp_vn": "2026-07-07T08:00:00+07:00",
+        "macro_channel": "liquidity",
+        "final_score": 0.25,
+        "source_weight": 0.9,
+        "confidence": 0.8,
+        "time_decay": 1.0,
+        "source_system": "widata",
+        "source_name": "WiData",
+        "raw_category": "Vĩ mô",
+        "entities": [],
+        "title": "Liquidity improves",
+        "summary": "",
+    }
+    (feed_dir / "classified_news.jsonl").write_text(json.dumps(row) + "\n", encoding="utf-8")
+
+    feed = sentiment_report.load_feed("1d")
+
+    assert feed["posterior_backfilled"] is True
+    assert feed["channel_posteriors"]["liquidity"]["active_count"] == 1
+    assert feed["channel_posteriors"]["liquidity"]["prob_positive"] > 0.5
+    assert feed["channel_posteriors"]["liquidity"]["ci_95"] > 0.0
+    assert feed["macro_composite_prob_positive"] > 0.5

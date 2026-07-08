@@ -30,7 +30,8 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "vnibor": "structured_20d_trend_v1",
     "vn100_earnings_health": "structured_yoy_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
-    "var_cvar_vnindex": "evt_threshold_sensitivity_v1",
+    "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
+    "sentiment_factor_news": "weighted_bayesian_posterior_v1",
     "executive_summary": "ai_cio_methodology_v2",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
@@ -157,9 +158,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "var_cvar_vnindex": {
         "domain": "left_tail_risk",
         "horizon": "days_to_weeks",
-        "primary_metric": "evt_xi_with_threshold_sensitivity",
+        "primary_metric": "evt_xi_mle_with_threshold_sensitivity_and_mcmc_interval",
         "score_direction": "Higher EVT xi is worse.",
-        "limits": "EVT threshold sensitivity is a robustness/confidence diagnostic, not a second bearish vote. A single high xi only becomes a hard cap when elevated/fat-tail classification is robust across thresholds.",
+        "limits": "EVT threshold sensitivity and MCMC posterior intervals are robustness/confidence diagnostics, not second bearish votes. A single high xi only becomes a hard cap when elevated/fat-tail classification is robust across thresholds.",
         "authority": "Adapter score/regime/bias are authoritative.",
     },
     "sentiment_factor_news": {
@@ -1096,6 +1097,16 @@ def _extract_first_number(patterns: list[str], text: str) -> float | None:
     return None
 
 
+def _format_evt_xi_summary(snap: dict[str, Any], xi_label: str) -> str:
+    xi_text = f"{snap['evt_xi']:+.3f} MLE ({xi_label})"
+    if snap.get("evt_interval_available"):
+        xi_text += (
+            f"; MCMC posterior p50 {snap['evt_xi_p50']:+.3f}, "
+            f"90% CI [{snap['evt_xi_p05']:+.3f}, {snap['evt_xi_p95']:+.3f}]"
+        )
+    return xi_text
+
+
 def _build_evidence_packet(
     tool_id: str,
     report_text: str,
@@ -1119,7 +1130,14 @@ def _build_evidence_packet(
 
     metric_patterns = {
         "ssi_pct": [r"\bSSI\b[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "evt_xi": [r"\bxi\b[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"Tail Index.*?([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi": [
+            r"EVT\s+Xi(?:\s+MLE)?\s*:[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+            r"\bxi_mle\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+            r"Tail Index.*?([-+]?\d+(?:\.\d+)?)",
+        ],
+        "evt_xi_p05": [r"EVT\s+Xi\s+P05[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi_p50": [r"EVT\s+Xi\s+P50[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
+        "evt_xi_p95": [r"EVT\s+Xi\s+P95[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
         "evt_xi_min": [r"EVT\s+Xi\s+Min[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_min\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
         "evt_xi_max": [r"EVT\s+Xi\s+Max[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_max\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
         "evt_xi_range": [r"EVT\s+Xi\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_range\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
@@ -2278,7 +2296,7 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
             .replace("[EVT VaR 99%]", f"{snap['evt_var_99']*100:.2f}%")\
             .replace("[EVT VaR 99.5%]", f"{snap['evt_var_995']*100:.2f}%")\
             .replace("[EVT ES 99%]", f"{snap['evt_es_99']*100:.2f}%")\
-            .replace("[EVT Xi]", f"{snap['evt_xi']:+.3f} ({xi_label})")\
+            .replace("[EVT Xi]", _format_evt_xi_summary(snap, xi_label))\
             .replace("[Hill Index]", f"{snap['hill_index']:+.3f}")\
             .replace("[EVT N Exceed]", str(snap['evt_n_exceed']))
         if snap.get("evt_sensitivity_available"):
@@ -2298,6 +2316,28 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
                 "[EVT Threshold Stable]", "[EVT Sensitivity Status]",
             ]:
                 full_prompt = full_prompt.replace(placeholder, "N/A")
+        if snap.get("evt_interval_available"):
+            full_prompt = full_prompt\
+                .replace("[EVT Interval Method]", str(snap.get("evt_interval_method", "gpd_random_walk_mcmc")))\
+                .replace("[EVT MCMC Acceptance]", f"{snap['evt_interval_acceptance_rate']:.1%}")\
+                .replace("[EVT MCMC Samples]", str(snap.get("evt_interval_samples", 0)))\
+                .replace("[EVT Xi P05]", f"{snap['evt_xi_p05']:+.3f}")\
+                .replace("[EVT Xi P50]", f"{snap['evt_xi_p50']:+.3f}")\
+                .replace("[EVT Xi P95]", f"{snap['evt_xi_p95']:+.3f}")\
+                .replace("[EVT VaR99 P05]", f"{snap['evt_var99_p05']*100:.2f}%")\
+                .replace("[EVT VaR99 P50]", f"{snap['evt_var99_p50']*100:.2f}%")\
+                .replace("[EVT VaR99 P95]", f"{snap['evt_var99_p95']*100:.2f}%")\
+                .replace("[EVT ES99 P05]", f"{snap['evt_es99_p05']*100:.2f}%")\
+                .replace("[EVT ES99 P50]", f"{snap['evt_es99_p50']*100:.2f}%")\
+                .replace("[EVT ES99 P95]", f"{snap['evt_es99_p95']*100:.2f}%")
+        else:
+            for placeholder in [
+                "[EVT Interval Method]", "[EVT MCMC Acceptance]", "[EVT MCMC Samples]",
+                "[EVT Xi P05]", "[EVT Xi P50]", "[EVT Xi P95]",
+                "[EVT VaR99 P05]", "[EVT VaR99 P50]", "[EVT VaR99 P95]",
+                "[EVT ES99 P05]", "[EVT ES99 P50]", "[EVT ES99 P95]",
+            ]:
+                full_prompt = full_prompt.replace(placeholder, "N/A")
     else:
         # Data < 756 ngày — bỏ EVT fields, AI prompt vẫn chạy với classic metrics
         for placeholder in [
@@ -2306,6 +2346,10 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
             "[EVT Xi Min]", "[EVT Xi Max]", "[EVT Xi Range]",
             "[EVT VaR99 Range]", "[EVT ES99 Range]",
             "[EVT Threshold Stable]", "[EVT Sensitivity Status]",
+            "[EVT Interval Method]", "[EVT MCMC Acceptance]", "[EVT MCMC Samples]",
+            "[EVT Xi P05]", "[EVT Xi P50]", "[EVT Xi P95]",
+            "[EVT VaR99 P05]", "[EVT VaR99 P50]", "[EVT VaR99 P95]",
+            "[EVT ES99 P05]", "[EVT ES99 P50]", "[EVT ES99 P95]",
         ]:
             full_prompt = full_prompt.replace(placeholder, "N/A (cần ≥ 756 phiên)")
 
@@ -2318,7 +2362,7 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
     if snap.get("evt_available"):
         footer_lines.extend(
             [
-                f"EVT Xi: {snap['evt_xi']:+.3f}",
+                f"EVT Xi MLE: {snap['evt_xi']:+.3f}",
                 f"EVT Hill: {snap['hill_index']:+.3f}",
             ]
         )
@@ -2332,6 +2376,23 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
                 f"EVT ES99 Range: {abs(snap['evt_sensitivity_es99_range'])*100:.2f}pp",
                 f"EVT Threshold Stable: {1 if snap.get('evt_sensitivity_stable') else 0}",
                 f"EVT Sensitivity Status: {snap.get('evt_sensitivity_status', 'threshold_sensitive')}",
+            ]
+        )
+    if snap.get("evt_interval_available"):
+        footer_lines.extend(
+            [
+                f"EVT Interval Method: {snap.get('evt_interval_method', 'gpd_random_walk_mcmc')}",
+                f"EVT MCMC Acceptance: {snap['evt_interval_acceptance_rate']:.1%}",
+                f"EVT MCMC Samples: {snap.get('evt_interval_samples', 0)}",
+                f"EVT Xi P05: {snap['evt_xi_p05']:+.3f}",
+                f"EVT Xi P50: {snap['evt_xi_p50']:+.3f}",
+                f"EVT Xi P95: {snap['evt_xi_p95']:+.3f}",
+                f"EVT VaR99 P05: {snap['evt_var99_p05']*100:.2f}%",
+                f"EVT VaR99 P50: {snap['evt_var99_p50']*100:.2f}%",
+                f"EVT VaR99 P95: {snap['evt_var99_p95']*100:.2f}%",
+                f"EVT ES99 P05: {snap['evt_es99_p05']*100:.2f}%",
+                f"EVT ES99 P50: {snap['evt_es99_p50']*100:.2f}%",
+                f"EVT ES99 P95: {snap['evt_es99_p95']*100:.2f}%",
             ]
         )
     res = _append_structured_footer(res, "var_cvar_vnindex_methodology", footer_lines)

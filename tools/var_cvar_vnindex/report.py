@@ -1,6 +1,6 @@
 import pandas as pd
 from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
-from tools.var_cvar_vnindex.quant.evt import evt_threshold_sensitivity
+from tools.var_cvar_vnindex.quant.evt import evt_posterior_intervals, evt_threshold_sensitivity
 
 
 def _empty_snapshot(err: str = "") -> dict:
@@ -31,6 +31,22 @@ def _empty_snapshot(err: str = "") -> dict:
         "evt_sensitivity_es99_range": 0.0,
         "evt_sensitivity_stable": False,
         "evt_sensitivity_status": "unavailable",
+        "evt_interval_available": False,
+        "evt_interval_method": "gpd_random_walk_mcmc",
+        "evt_interval_acceptance_rate": 0.0,
+        "evt_interval_samples": 0,
+        "evt_xi_p05": 0.0,
+        "evt_xi_p50": 0.0,
+        "evt_xi_p95": 0.0,
+        "evt_beta_p05": 0.0,
+        "evt_beta_p50": 0.0,
+        "evt_beta_p95": 0.0,
+        "evt_var99_p05": 0.0,
+        "evt_var99_p50": 0.0,
+        "evt_var99_p95": 0.0,
+        "evt_es99_p05": 0.0,
+        "evt_es99_p50": 0.0,
+        "evt_es99_p95": 0.0,
         "status": "error" if err else "ok",
         "error": err,
     }
@@ -114,6 +130,31 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
                 "evt_sensitivity_es99_range": es99_range,
                 "evt_sensitivity_stable": stable,
                 "evt_sensitivity_status": "stable" if stable else "threshold_sensitive",
+            })
+
+        intervals = evt_posterior_intervals(df_metrics["return"])
+        if intervals.get("status") == "ok":
+            xi_interval = intervals.get("xi", {})
+            beta_interval = intervals.get("beta", {})
+            var99_interval = intervals.get("evt_var_99", {})
+            es99_interval = intervals.get("evt_es_99", {})
+            snap.update({
+                "evt_interval_available": True,
+                "evt_interval_method": intervals.get("method", "gpd_random_walk_mcmc"),
+                "evt_interval_acceptance_rate": float(intervals.get("acceptance_rate", 0.0)),
+                "evt_interval_samples": int(intervals.get("posterior_samples", 0)),
+                "evt_xi_p05": float(xi_interval.get("p05", 0.0)),
+                "evt_xi_p50": float(xi_interval.get("p50", 0.0)),
+                "evt_xi_p95": float(xi_interval.get("p95", 0.0)),
+                "evt_beta_p05": float(beta_interval.get("p05", 0.0)),
+                "evt_beta_p50": float(beta_interval.get("p50", 0.0)),
+                "evt_beta_p95": float(beta_interval.get("p95", 0.0)),
+                "evt_var99_p05": float(var99_interval.get("p05", 0.0)),
+                "evt_var99_p50": float(var99_interval.get("p50", 0.0)),
+                "evt_var99_p95": float(var99_interval.get("p95", 0.0)),
+                "evt_es99_p05": float(es99_interval.get("p05", 0.0)),
+                "evt_es99_p50": float(es99_interval.get("p50", 0.0)),
+                "evt_es99_p95": float(es99_interval.get("p95", 0.0)),
             })
 
     return snap

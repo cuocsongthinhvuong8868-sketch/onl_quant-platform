@@ -12,22 +12,71 @@ from config import DATA_LAKE
 SENTIMENT_DATA_DIR = DATA_LAKE / "sentiment_factor_news"
 FEED_DIR = SENTIMENT_DATA_DIR / "feed"
 WINDOWS = ("1d", "7d", "30d")
+WINDOW_MINUTES = {
+    "1d": 24 * 60,
+    "7d": 7 * 24 * 60,
+    "30d": 30 * 24 * 60,
+}
+
+
+def _normalize_window(window: str) -> str:
+    normalized = str(window or "1d").strip().lower()
+    if normalized in {"latest", "default"}:
+        return "1d"
+    if normalized.startswith("latest_"):
+        normalized = normalized.removeprefix("latest_")
+    return normalized if normalized in WINDOWS else "1d"
 
 
 def _feed_path(window: str) -> Path:
-    normalized = str(window or "1d").strip().lower()
-    if normalized in {"latest", "default"}:
+    raw = str(window or "1d").strip().lower()
+    if raw in {"latest", "default"}:
         return FEED_DIR / "latest.json"
-    if normalized not in WINDOWS:
-        normalized = "1d"
+    normalized = _normalize_window(raw)
     return FEED_DIR / f"latest_{normalized}.json"
+
+
+def _feed_needs_posterior_backfill(feed: dict[str, Any]) -> bool:
+    channel_posteriors = feed.get("channel_posteriors")
+    macro_posterior = feed.get("macro_composite_posterior")
+    return (
+        not isinstance(channel_posteriors, dict)
+        or not channel_posteriors
+        or not isinstance(macro_posterior, dict)
+        or not macro_posterior
+        or feed.get("macro_composite_prob_positive") in (None, "")
+    )
+
+
+def _backfill_legacy_posterior_fields(feed: dict[str, Any], window: str) -> dict[str, Any]:
+    if not _feed_needs_posterior_backfill(feed):
+        return feed
+
+    try:
+        from tools.sentiment_factor_news.core.aggregator import build_window_feed, filter_items_by_window
+
+        normalized = _normalize_window(window)
+        rows = load_classified_news()
+        if not rows:
+            return feed
+        items = filter_items_by_window(rows, WINDOW_MINUTES[normalized])
+        rebuilt = build_window_feed(
+            items,
+            str(feed.get("window") or f"latest_{normalized}"),
+            str(feed.get("generated_at") or ""),
+        )
+        rebuilt["posterior_backfilled"] = True
+        return rebuilt
+    except Exception:
+        return feed
 
 
 def load_feed(window: str = "1d") -> dict[str, Any]:
     path = _feed_path(window)
     if not path.exists():
         raise FileNotFoundError(f"{path} not found. Run python command/update_sentiment_factor_news.py")
-    return json.loads(path.read_text(encoding="utf-8"))
+    feed = json.loads(path.read_text(encoding="utf-8"))
+    return _backfill_legacy_posterior_fields(feed, window)
 
 
 def load_classified_news(limit: int | None = None) -> list[dict[str, Any]]:
@@ -56,7 +105,13 @@ def load_channel_scores() -> pd.DataFrame:
     return pd.read_csv(path)
 
 
-def _top_channels(channel_scores: dict[str, Any], channel_probs: dict[str, Any] = None, n: int = 5, reverse: bool = True) -> list[dict[str, Any]]:
+def _top_channels(
+    channel_scores: dict[str, Any],
+    channel_probs: dict[str, Any] = None,
+    channel_posteriors: dict[str, Any] = None,
+    n: int = 5,
+    reverse: bool = True,
+) -> list[dict[str, Any]]:
     rows = []
     for channel, value in (channel_scores or {}).items():
         try:
@@ -64,7 +119,15 @@ def _top_channels(channel_scores: dict[str, Any], channel_probs: dict[str, Any] 
         except Exception:
             score = 0.0
         prob = float(channel_probs.get(channel, 0.5)) if channel_probs else 0.5
-        rows.append({"channel": channel, "score": round(score, 4), "prob_pos": round(prob, 4)})
+        posterior = (channel_posteriors or {}).get(channel, {})
+        rows.append({
+            "channel": channel,
+            "score": round(score, 4),
+            "prob_pos": round(float(posterior.get("prob_positive", 0.5)), 4),
+            "prob_conf": round(prob, 4),
+            "ci_5": round(float(posterior.get("ci_5", 0.0)), 4),
+            "ci_95": round(float(posterior.get("ci_95", 0.0)), 4),
+        })
     rows.sort(key=lambda row: row["score"], reverse=reverse)
     return rows[:n]
 
@@ -98,6 +161,8 @@ def snapshot(df_close=None, load_custom=None, window: str = "1d") -> dict[str, A
 
     channel_scores = feed.get("channel_scores", {})
     channel_probs = feed.get("channel_probs", {})
+    channel_posteriors = feed.get("channel_posteriors", {})
+    macro_posterior = feed.get("macro_composite_posterior", {})
     return {
         "status": "ok",
         "error": "",
@@ -105,11 +170,15 @@ def snapshot(df_close=None, load_custom=None, window: str = "1d") -> dict[str, A
         "window": feed.get("window", window),
         "macro_composite": round(float(feed.get("macro_composite", 0.0)), 4),
         "macro_composite_prob_pos": round(float(feed.get("macro_composite_prob_pos", 0.5)), 4),
+        "macro_composite_prob_positive": round(float(feed.get("macro_composite_prob_positive", 0.5)), 4),
+        "macro_composite_posterior_sd": round(float(macro_posterior.get("posterior_sd", 0.0)), 4),
+        "macro_composite_ci_5": round(float(macro_posterior.get("ci_5", 0.0)), 4),
+        "macro_composite_ci_95": round(float(macro_posterior.get("ci_95", 0.0)), 4),
         "regime": feed.get("regime", "neutral"),
         "news_count": int(feed.get("news_count", 0) or 0),
         "source_counts": feed.get("source_counts", {}),
-        "top_positive_channels": _top_channels(channel_scores, channel_probs, reverse=True),
-        "top_negative_channels": _top_channels(channel_scores, channel_probs, reverse=False),
+        "top_positive_channels": _top_channels(channel_scores, channel_probs, channel_posteriors, reverse=True),
+        "top_negative_channels": _top_channels(channel_scores, channel_probs, channel_posteriors, reverse=False),
         "top_positive_drivers": feed.get("top_positive_drivers", [])[:5],
         "top_negative_drivers": feed.get("top_negative_drivers", [])[:5],
     }
@@ -125,10 +194,10 @@ def build_structured_report() -> str:
 
         source_counts = snap.get("source_counts", {})
         pos_channels = ", ".join(
-            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_pos']:.0%})" for row in snap.get("top_positive_channels", [])
+            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_conf']:.0%}, CI:{row['ci_5']:+.2f}/{row['ci_95']:+.2f})" for row in snap.get("top_positive_channels", [])
         )
         neg_channels = ", ".join(
-            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_pos']:.0%})" for row in snap.get("top_negative_channels", [])
+            f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_conf']:.0%}, CI:{row['ci_5']:+.2f}/{row['ci_95']:+.2f})" for row in snap.get("top_negative_channels", [])
         )
         pos_drivers = "\n".join(_format_driver(item) for item in snap.get("top_positive_drivers", [])) or "- N/A"
         neg_drivers = "\n".join(_format_driver(item) for item in snap.get("top_negative_drivers", [])) or "- N/A"
@@ -137,7 +206,7 @@ def build_structured_report() -> str:
             f"""=== Window {window} ===
 Generated at: {snap['generated_at']}
 Regime: {snap['regime']}
-Macro composite: {snap['macro_composite']:+.4f} (Bayes Confidence: {snap.get('macro_composite_prob_pos', 0.5):.0%})
+Macro composite posterior mean: {snap['macro_composite']:+.4f} (same-direction posterior confidence: {snap.get('macro_composite_prob_pos', 0.5):.0%}, P(sentiment mean > 0): {snap.get('macro_composite_prob_positive', 0.5):.0%}, 90% CI: {snap.get('macro_composite_ci_5', 0.0):+.3f} to {snap.get('macro_composite_ci_95', 0.0):+.3f})
 News count: {snap['news_count']}
 Source counts: mozyfin={source_counts.get('mozyfin', 0)}, widata={source_counts.get('widata', 0)}
 Top positive channels: {pos_channels}
@@ -167,7 +236,7 @@ def build_sentiment_factor_news_ai_prompt() -> tuple[str, str]:
 {build_structured_report()}
 
 # REQUIRED OUTPUT
-1. Nêu regime news sentiment hiện tại ở 1d, 7d, 30d. Sử dụng mức độ xác nhận tin cậy "Bayes Confidence" (P_conf) để làm Guardrail cho độ chắc chắn của kết luận:
+1. Nêu regime news sentiment hiện tại ở 1d, 7d, 30d. Sử dụng mức độ xác nhận tin cậy posterior cùng chiều "P_conf" để làm Guardrail cho độ chắc chắn của kết luận. P_conf và P(sentiment mean > 0) là xác suất về latent news-sentiment mean, KHÔNG phải xác suất VNINDEX tăng:
    - P_conf > 85%: Bắt buộc dùng giọng điệu "Khẳng định chắc chắn" (Strongly Confirmed) theo hướng của Regime.
    - 65% < P_conf <= 85%: Dùng giọng điệu "Nghiêng về / Dấu hiệu ban đầu" (Leaning) theo hướng của Regime.
    - P_conf <= 65%: Bắt buộc dùng giọng điệu "Giằng co / Nhiễu loạn" (Inconclusive / Mixed Signals), tuyệt đối cấm kết luận xu hướng rõ ràng vì thông tin chưa đủ độ tin cậy.

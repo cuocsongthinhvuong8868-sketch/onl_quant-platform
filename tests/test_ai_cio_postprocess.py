@@ -658,10 +658,13 @@ def test_evidence_packet_extracts_evt_sensitivity_metrics():
     import shared.ai_cio as ai_cio
 
     report = """
-    EVT Xi: +0.345
+    EVT Xi MLE: +0.345
     EVT Xi Min: +0.168
     EVT Xi Max: +0.374
     EVT Xi Range: 0.206
+    EVT Xi P05: +0.201
+    EVT Xi P50: +0.423
+    EVT Xi P95: +0.651
     EVT VaR99 Range: 0.11pp
     EVT ES99 Range: 0.70pp
     EVT Threshold Stable: 0
@@ -673,6 +676,9 @@ def test_evidence_packet_extracts_evt_sensitivity_metrics():
     assert packet["key_metrics"]["evt_xi_min"] == 0.168
     assert packet["key_metrics"]["evt_xi_max"] == 0.374
     assert packet["key_metrics"]["evt_xi_range"] == 0.206
+    assert packet["key_metrics"]["evt_xi_p05"] == 0.201
+    assert packet["key_metrics"]["evt_xi_p50"] == 0.423
+    assert packet["key_metrics"]["evt_xi_p95"] == 0.651
     assert packet["key_metrics"]["evt_threshold_stable"] == 0
     assert packet["adapter_score"]["tool_score"] == 35
 

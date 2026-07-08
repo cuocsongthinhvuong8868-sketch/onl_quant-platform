@@ -16,7 +16,7 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
 - EVT VaR 99% (1/100-event): [EVT VaR 99%]
 - EVT VaR 99.5% (1/200-event): [EVT VaR 99.5%]
 - EVT ES 99%: [EVT ES 99%]
-- ξ (GPD shape): [EVT Xi]
+- xi MLE + MCMC posterior (GPD shape): [EVT Xi]
 - Hill index (cross-check): [Hill Index]
 - # exceedances (top 10% losses, 3Y window): [EVT N Exceed]
 
@@ -28,6 +28,13 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
 - EVT ES99 range across thresholds: [EVT ES99 Range]
 - Threshold stable flag (1=stable, 0=threshold-sensitive): [EVT Threshold Stable]
 - Sensitivity status: [EVT Sensitivity Status]
+
+## EVT MCMC posterior interval - parameter uncertainty
+- Method: [EVT Interval Method]
+- MCMC acceptance rate / posterior samples: [EVT MCMC Acceptance] / [EVT MCMC Samples]
+- Xi posterior p05 / p50 / p95: [EVT Xi P05] / [EVT Xi P50] / [EVT Xi P95]
+- EVT VaR99 posterior p05 / p50 / p95: [EVT VaR99 P05] / [EVT VaR99 P50] / [EVT VaR99 P95]
+- EVT ES99 posterior p05 / p50 / p95: [EVT ES99 P05] / [EVT ES99 P50] / [EVT ES99 P95]
 
 # REFERENCE
 
@@ -90,6 +97,7 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
 - EVT threshold sensitivity is a confidence/robustness diagnostic. Do not double-count it as an extra bearish signal.
 - If xi is fat-tail only at some thresholds, write "threshold-sensitive fat-tail warning" instead of "robust fat-tail".
 - If VaR99 range is tight but xi range is wide, report tail magnitude as stable but tail-shape classification as uncertain.
+- Use EVT MCMC posterior intervals to describe parameter uncertainty. If xi p05-p95 crosses tail-regime boundaries, lower confidence even when the point estimate is high.
 
 # RULES
 - KHÔNG dự báo điểm số VNINDEX

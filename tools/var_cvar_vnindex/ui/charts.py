@@ -71,7 +71,7 @@ def plot_evt_tail_risk(df_plot: pd.DataFrame):
       Subplot 1: VaR/ES tại 95%, 99%, 99.5% (POT-GPD extrapolated).
                  So sánh trực tiếp với Historical VaR 95% và Parametric VaR 95%
                  để thấy Gaussian underestimate tail risk như thế nào.
-      Subplot 2: ξ (GPD shape) + Hill index theo thời gian.
+      Subplot 2: xi MLE (GPD shape) + Hill index theo thời gian.
                  ξ > 0.15 = heavy tail; > 0.3 = fat tail thật sự.
                  Spike trong stress regime → cảnh báo trước drawdown.
     """
@@ -81,7 +81,7 @@ def plot_evt_tail_risk(df_plot: pd.DataFrame):
         vertical_spacing=0.08,
         subplot_titles=(
             "EVT VaR/ES tại quantile cực đoan (POT-GPD extrapolation)",
-            "ξ (GPD shape) + Hill index — chỉ số đuôi nặng (heavy tail signal)",
+            "xi MLE (GPD shape) + Hill index - chỉ số đuôi nặng (heavy tail signal)",
         ),
     )
 
@@ -135,7 +135,7 @@ def plot_evt_tail_risk(df_plot: pd.DataFrame):
     if 'evt_xi' in df_plot.columns:
         fig.add_trace(go.Scatter(
             x=df_plot.index, y=df_plot['evt_xi'],
-            mode='lines', name='ξ (GPD shape)',
+            mode='lines', name='xi MLE (GPD shape)',
             line=dict(color='#059669', width=2),
         ), row=2, col=1)
     if 'hill_index' in df_plot.columns:
