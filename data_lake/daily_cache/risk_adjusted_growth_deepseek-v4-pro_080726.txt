@@ -1,0 +1,30 @@
+## 1. Bối cảnh thị trường
+Bộ tham số trung lập (K=1.0, CoE=14%, stress=0%) là baseline cho ngành ngân hàng Việt Nam. Kết quả cho thấy mặt bằng chung đang **đốt vốn cổ đông**: trong 6 cổ phiếu được xét, duy nhất SHB tạo ra Alpha dương (+1.7%). Các mã còn lại đều có Disciplined Return không bù đắp nổi chi phí vốn – điều này phản ánh ngành đang định giá quá cao so với chất lượng lợi nhuận rủi ro, bất chấp một số ROE khá tốt.
+
+## 2. Phân tích nhóm dẫn đầu
+- **SHB** – Alpha +1.7%, P/B 0.91. Đây là “Pháo đài” (Fortress): ROE 17.5% khá cao, biến động ROE cực thấp (σ=1.9%), tỷ lệ chi trả thấp (8.6%) giúp phần lớn lợi nhuận được tái đầu tư. P/B dưới 1 khiến Disciplined Return đạt ~15.7%, vượt CoE 14%. Chất lượng ổn định và định giá rẻ tạo biên an toàn thực sự.
+- **ACB** – Alpha -1.1%, P/B 1.24. Dù ROE rất cao (23%), mức P/B trên 1 và độ biến động 2.7% khiến Disciplined Return chỉ còn ~12.9%, không đủ bù đắp CoE. Lợi nhuận cao nhưng bị penalty rủi ro ăn mòn – đây là tình huống “Growth Trap” điển hình: tăng trưởng hấp dẫn nhưng giá đã phản ánh quá nhiều kỳ vọng.
+- **MSB** – Alpha -2.3%, P/B 1.18. ROE 16.7% ở mức trung bình, không chia cổ tức giúp giữ lại toàn bộ lợi nhuận, song P/B >1 và σ=2.5% khiến lợi suất điều chỉnh rủi ro chỉ ~11.7%. Cổ phiếu đang “Premium Burn” – giá không rẻ nhưng chất lượng không đủ để biện minh.
+
+## 3. Cảnh báo bẫy giá trị (Bottom 3)
+- **LPB** – Alpha -12.8%. P/B 3.36 quá đắt so với ROE 21.1% và rủi ro cao (σ=3.8%). Đây là trường hợp kinh điển của Premium Burn: giá trên trời chỉ dựa vào tăng trưởng quá khứ, không bù nổi penalty rủi ro.
+- **EIB** – Alpha -11.2%. ROE chỉ 10%, thấp nhất nhóm, trong khi rủi ro lại cao (σ=3.8%). P/B 1.45 không hề rẻ – bẫy giá trị “Cheap Trap” ẩn mình sau cái nhìn tưởng chừng P/B thấp nhưng ROE èo uột.
+- **VPB** – Alpha -10.6%. ROE 14.1% đi kèm biến động lớn nhất (σ=4.7%). Risk Penalty cao nuốt gần hết lợi suất thô, khiến cổ phiếu trở thành Growth Trap điển hình: tăng trưởng không bền vững trên nền rủi ro.
+
+## 4. Xây dựng danh mục ngành ngân hàng
+- **Core Holding (Fortress):** SHB chiếm 100% tỷ trọng nếu buộc phải phân bổ vào ngành (tương đương 60-70% của phân bổ bank). Đây là cổ phiếu duy nhất tạo giá trị thặng dư bền vững.
+- **Tactical:** Không có ứng viên “Cheap-but-not-trap” thực sự. ACB và MSB đều đang đốt vốn, không nên giữ chiến thuật.
+- **Cấm mua / Underweight rõ ràng:** LPB, EIB, VPB – ba mã phá hủy giá trị cổ đông mạnh nhất. Nền giá hiện tại mang tính đầu cơ, không dựa trên nền tảng lợi nhuận rủi ro.
+- **Góc nhìn ngành:** Khi chỉ 1/6 mã có Alpha dương và toàn bộ nhóm dưới đáy âm kịch sàn, khuyến nghị **tránh toàn ngành** cho đến khi kịch bản CoE thấp hơn hoặc P/B co lại đáng kể.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "avoid",
+  "confidence": "medium"
+}
+```

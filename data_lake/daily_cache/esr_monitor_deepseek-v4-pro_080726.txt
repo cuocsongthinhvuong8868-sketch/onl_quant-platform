@@ -1,0 +1,38 @@
+## 1. Observations
+- SSI: 63.6% — thuộc vùng WARNING
+- Market State (HMM): EUPHORIC RISK (stress cao + uptrend)
+- Top 3 pillar drivers: S_LIQ (36%), S_VAL (31%), S_COR (18%)
+- VN30 Index đóng cửa trên MA125; PCA PC1 EVR = 38.2%; Pillar Mode tính trên downside (chỉ dùng phiên giảm)
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ dẫn dắt rủi ro hệ thống với trọng số 36%, phản ánh **volume khô cạn** so với norm 1 năm (Volume Dry-Up). Trong bối cảnh uptrend, hiện tượng này cho thấy thanh khoản teo tóp khi giá lên — dấu hiệu “bull-trap” (bẫy tăng giá).  
+
+S_VAL (31%) cho biết định giá đang căng thẳng: lợi nhuận 252 ngày của VN30 vượt xa lãi suất tiền gửi, tạo áp lực xoay chiều khi niềm tin lung lay.  
+
+S_COR (18%) với PC1 EVR 38.2% xác nhận tương quan đồng pha cao — herding (hành vi bầy đàn) đang chi phối thị trường. Tổ hợp S_LIQ + S_COR cao trong uptrend là “bull-trap signature” điển hình, cảnh báo tích lũy rủi ro ngầm dù VN30 còn neo trên MA125.  
+
+Lưu ý: các chỉ báo đều được đo trên phiên giảm, do đó tín hiệu stress tập trung rõ rệt vào những ngày giá yếu.
+
+## 3. Cross-Check
+- **Price vs. SSI divergence**: VN30 dao động quanh đỉnh (trên MA125) trong khi SSI ở mức WARNING 63.6% — phân kỳ giá/stress củng cố kịch bản bull-trap.
+- **HMM regime khớp SSI**: EUPHORIC RISK nhất quán với mức stress WARNING và xu hướng tăng, không có lệch pha.
+- Dù chưa vào CRITICAL, sự kết hợp của các driver (thanh khoản khô, định giá căng, tương quan cao) cho thấy rủi ro sụt giảm mạnh hoàn toàn có thể hiện hữu nếu thanh khoản đảo chiều.
+
+## 4. Verdict
+- **Tỷ trọng tiền mặt đề xuất**: nâng lên **30%** danh mục, nhằm giảm độ tiếp xúc với rủi ro hệ thống.
+- **Hành động phòng hộ**: **giảm beta** (reduce_beta) — cắt giảm các vị thế cổ phiếu có hệ số beta cao, hạn chế mở mới. Chưa đủ điều kiện để short VN30F1M hay mua put vì SSI chưa đạt ngưỡng CRITICAL, nhưng nếu SSI vượt 80% sẽ kích hoạt hành động mạnh tay hơn.
+- Các pillar drivers không mâu thuẫn; tín hiệu hành động nhất quán, tuy nhiên mức độ thận trọng còn ở trung bình do SSI vẫn nằm trong WARNING.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.6,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 30,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

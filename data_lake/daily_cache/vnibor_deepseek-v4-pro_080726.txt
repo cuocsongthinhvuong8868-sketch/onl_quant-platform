@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+Lãi suất qua đêm (ON) phiên 2026-07-05 đóng cửa tại 6.01%, có mức tăng đột biến trong phiên là +0.34% (ON Impulse). Biến động này đẩy mặt bằng lãi suất ngắn hạn tiếp tục neo trên vùng thắt chặt (TIGHT), phản ánh điều kiện vốn liên ngân hàng đang rất khan hiếm.
+Cấu trúc kỳ hạn không bị đảo ngược: chênh lệch 1W-ON và 2W-ON lần lượt là +0.30% và +0.35%. Mặc dù dương, mức spread này rất hẹp, cho thấy áp lực thanh khoản chủ yếu tập trung ở kỳ hạn qua đêm và đang có xu hướng lan nhẹ sang các kỳ hạn dài hơn. Đây không phải là dạng squeeze cực ngắn hạn điển hình (curve đảo ngược) mà là trạng thái căng thẳng nền kéo dài, đẩy toàn bộ đường cong lãi suất lên cao.
+
+## 2. Trend 20 phiên
+Trend 20 phiên được xác định là **liquidity squeeze / stress building**. Các bằng chứng định lượng:
+- ON MA5 tăng mạnh từ 3.76% (28/6) lên 7.35% (5/7), tương ứng mức tăng ròng +0.94% trong 20 phiên, với slope trung bình mỗi phiên +0.037% – tốc độ leo dốc rất cao so với lịch sử.
+- Trong 20 phiên, số phiên ghi nhận tín hiệu STRESS hoặc WARNING lên tới 5 phiên (trong đó có 4 phiên STRESS gần đây). Đặc biệt phiên 29/6 chứng kiến cú sốc ON lên 12.49% (impulse +8.76%), để lại di sản căng thẳng tâm lý và thanh khoản trên hệ thống.
+- Số phiên curve đảo ngược (spread âm) xuất hiện đúng 1 phiên (29/6), nhưng các phiên sau đó dù spread dương trở lại nhưng vẫn ở mức thấp bất thường.
+- Regime xấu đi rõ rệt: từ EASY (8/6-18/6) chuyển sang NORMAL rồi TIGHT trong 6/20 phiên cuối, không có dấu hiệu quay về vùng dễ thở.
+Xu hướng chung là áp lực thanh khoản gia tăng liên tục, không phải cú spike đơn lẻ.
+
+## 3. Đánh giá Trạng thái Thanh khoản (Regime & Z-Score)
+Với ON MA5 smoothed ở mức cao, Z-Score hiện tại là +1.48 và Percentile 0.917 – lãi suất qua đêm hiện đang đứng ở phân vị trên 91.7% của phân phối 1 năm, tức cao hơn gần như toàn bộ lịch sử quan sát được. Đây là mức xác suất rất thấp, báo hiệu hệ thống đang trải qua giai đoạn căng thẳng thanh khoản nghiêm trọng.
+Trạng thái Regime TIGHT và Signal STRESS cùng xác nhận: dữ liệu VNIBOR phản ánh một môi trường thiếu hụt vốn ngắn hạn sâu và kéo dài. Input hiện tại không đủ dữ liệu để kết luận nguyên nhân của trạng thái này; các giả định về can thiệp OMO, tín phiếu, tỷ giá hay mùa vụ thuế đều nằm ngoài phạm vi phân tích và cần được kiểm chứng riêng.
+
+## 4. Tác động Lan tỏa tới VN-Index (Spillover Analysis)
+Thanh khoản liên ngân hàng thắt chặt ở mức ON > 6%, kết hợp trend 20 phiên là “liquidity squeeze / stress building” sẽ lan tỏa tiêu cực tới thị trường chứng khoán với độ trễ 2-4 tuần. Cơ chế chính:
+- Chi phí vốn margin gia tăng: Lãi suất ON cao làm tăng chi phí tài trợ vị thế đòn bẩy, giảm sức hấp dẫn của margin trading. Dòng tiền cá nhân có xu hướng dịch chuyển về tiết kiệm hoặc kênh thu nhập cố định nếu mặt bằng lãi suất huy động phản ứng theo.
+- Tâm lý dòng tiền nội bị ảnh hưởng: Sự kiện ON spike lên 12.49% ngày 29/6 dù chỉ một phiên nhưng để lại vết sẹo tâm lý; việc ON chưa hạ nhiệt hẳn (vẫn >6%) khiến niềm tin vào thanh khoản ổn định bị lung lay. Trend tightening kéo dài gây áp lực bán hơn là một cú sốc đơn lẻ.
+Do đó, spillover tới VN-Index được đánh giá là **negative** trong trung hạn ngắn, xác suất cao xảy ra điều chỉnh hoặc ít nhất là giảm động lực tăng điểm.
+
+## 5. Rủi ro & Điều kiện cần theo dõi
+Các điểm dữ liệu cần giám sát trong các phiên tới:
+- ON có duy trì trên ngưỡng 5.0-6.0% không; nếu ON giảm về dưới 4% và MA5 giảm nhanh, tín hiệu stress sẽ yếu đi.
+- ON MA5 slope: cần chuyển từ dương sang âm để xác nhận stress unwinding.
+- Spread 1W-ON và 2W-ON: nếu mở rộng lên >1% và duy trì, áp lực qua đêm giảm bớt.
+- Số phiên STRESS/WARNING mới: nếu giảm về 0 trong 5-10 phiên tiếp theo, thanh khoản đang trở lại trạng thái bình thường.
+Các yếu tố ngoài phạm vi input như can thiệp của SBV qua OMO, biến động tỷ giá hay mùa vụ ngân sách cần được kiểm tra từ nguồn dữ liệu khác để ghép nối bức tranh đầy đủ.
+
+## 6. KẾT LUẬN & KHUYẾN NGHỊ
+Thanh khoản hệ thống đang ở trạng thái căng thẳng đỉnh điểm theo dữ liệu lịch sử 1 năm; rủi ro lan tỏa tiêu cực sang VN-Index trong 2-4 tuần tới là đáng kể. Nhà đầu tư nên thận trọng với vị thế đòn bẩy và theo dõi sát diễn biến lãi suất ON MA5.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 6.01,
+  "trend_20d": "liquidity_squeeze",
+  "regime": "TIGHT",
+  "signal": "STRESS",
+  "spread_inverted": false,
+  "spillover_vnindex": "negative",
+  "confidence": "high"
+}
+```

@@ -1,0 +1,33 @@
+## 1. Observations
+- MA20 ở mức **32.7%** – thấp (dưới 40%), chưa đến vùng quá bán (<20%), phản ánh lực cầu ngắn hạn yếu ớt.
+- MA60 chỉ **28.7%** – thấp, gần như không có động lượng trung hạn.
+- MA125 đạt **25.4%** – thấp, xác nhận xu hướng nửa năm đi xuống.
+- MA252 ở **25.4%** – thấp, khẳng định xu thế giảm dài hạn (bear regime) bao trùm toàn thị trường.
+
+## 2. Structural Health
+Cả bốn đường MA đều dưới ngưỡng 40% – cho thấy sự đồng thuận tuyệt đối trong yếu kém. MA20 (32.7%) nhỉnh trên ngưỡng 30% của mẫu **Bear Confirmed** một chút, nhưng MA252 thấp sâu (25.4%) đáp ứng đầy đủ điều kiện “MA252 < 40%”. Về bản chất, thị trường đang trong pha suy yếu dài hạn, nằm gần sát Bear Confirmed. Không xuất hiện Bear Trap do MA20 chưa oversold, cũng không có dấu hiệu phân kỳ (cả ngắn và dài hạn đều yếu).
+
+## 3. Money Flow Leadership
+- **Top volume giữ MA20 (xung lực ngắn hạn):** chủ yếu là các mã Chứng khoán và Ngân hàng (AAS, ABS, AGR, APG, ABB, ACB) – dòng tiền đầu cơ ngắn hạn đổ vào nhóm Financials.
+- **Top volume giữ MA252 (leader dài hạn):** thiên về phòng thủ rõ rệt: Ngân hàng (ABB, BID), Tiện ích (BWE), Năng lượng (BSR), Phân bón (BFC), Y tế (BMS). Trùng lặp duy nhất là ABB.
+- Dòng tiền thông minh ưu tiên defensive, trong khi đầu cơ ngắn hạn chỉ khu trú ở nhóm tài chính. Leadership tổng thể nghiêng hẳn về phòng thủ.
+
+## 4. Verdict
+- **Chiến lược:** Phòng thủ – nắm tiền mặt, không giải ngân mới. Với MA252 chỉ 25.4%, xu hướng giảm dài hạn chưa đảo chiều, nên tránh mọi vị thế mua. Không có tín hiệu phân kỳ cần chờ thêm, nhưng rủi ro vẫn cao.
+- **Đòn bẩy**: 0% margin, do MA252 thấp xa so với ngưỡng an toàn (70%) và không có leader dẫn dắt mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 32.7,
+  "ma60_pct": 28.7,
+  "ma125_pct": 25.4,
+  "ma252_pct": 25.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
