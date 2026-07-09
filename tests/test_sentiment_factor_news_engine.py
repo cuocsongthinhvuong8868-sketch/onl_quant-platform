@@ -373,6 +373,15 @@ def test_report_formats_dynamic_source_counts():
     )
 
 
+def test_ai_prompt_discounts_mozyfin_social_source_counts():
+    system_prompt, user_prompt = sentiment_report.build_sentiment_factor_news_ai_prompt()
+
+    assert "Mozyfin social posts" in system_prompt
+    assert "source_counts" in system_prompt
+    assert "mozyfin_social" in user_prompt
+    assert "lower-confidence social/opinion" in user_prompt
+
+
 def test_load_feed_backfills_legacy_posterior_fields(monkeypatch, tmp_path):
     feed_dir = tmp_path / "feed"
     feed_dir.mkdir()

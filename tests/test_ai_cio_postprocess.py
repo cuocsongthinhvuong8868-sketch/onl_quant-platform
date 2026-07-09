@@ -29,7 +29,7 @@ def test_parse_score_regime_from_summary_fallback():
 
 def test_strip_wrapping_markdown_fence_preserves_report_body():
     report = (
-        "<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->\n"
+        "<!-- ai-cio-cache-version: ai_cio_methodology_v3 -->\n"
         "```markdown\n"
         "### EXECUTIVE BOTTOM LINE\n"
         "final score & regime : 29 ; regime : PRE-CRASH / PANIC\n"
@@ -38,7 +38,7 @@ def test_strip_wrapping_markdown_fence_preserves_report_body():
 
     clean = strip_wrapping_markdown_fence(report)
 
-    assert clean.startswith("<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->")
+    assert clean.startswith("<!-- ai-cio-cache-version: ai_cio_methodology_v3 -->")
     assert "```markdown" not in clean
     assert not clean.endswith("```")
     assert "### EXECUTIVE BOTTOM LINE" in clean
@@ -279,7 +279,7 @@ def test_recent_summary_cache_fallback_strips_wrapping_markdown_fence(tmp_path, 
     yesterday = date.today() - timedelta(days=1)
     cache_path = cache_dir / f"executive_summary_deepseek-v4-pro_{yesterday.strftime('%d%m%y')}.txt"
     cache_path.write_text(
-        "<!-- ai-cio-cache-version: ai_cio_methodology_v2 -->\n"
+        "<!-- ai-cio-cache-version: ai_cio_methodology_v3 -->\n"
         "```markdown\n"
         "### EXECUTIVE BOTTOM LINE\n"
         "final score & regime : 29 ; regime : PRE-CRASH / PANIC\n"
@@ -424,6 +424,20 @@ def test_ai_cio_metrics_snapshot_contains_adapter_history_and_methodology(tmp_pa
     assert path.name.startswith("metrics_")
     assert latest.exists()
     assert json.loads(latest.read_text(encoding="utf-8"))["tools"]["pvgo"]["tool_score"] == 42
+
+
+def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
+    import shared.ai_cio as ai_cio
+
+    card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
+    master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
+
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v3"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
+    assert "mozyfin_social" in card["limits"]
+    assert "source_counts" in card["authority"]
+    assert "mozyfin_social" in master_prompt
+    assert "lower-confidence social/opinion" in master_prompt
 
 
 def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch):

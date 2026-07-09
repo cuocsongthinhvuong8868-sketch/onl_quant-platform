@@ -240,6 +240,7 @@ def build_sentiment_factor_news_ai_prompt() -> tuple[str, str]:
         "Use only the supplied rule-based news sentiment feed. "
         "Do not invent news, prices, or macro values. "
         "Treat Mozyfin social posts as a lower-confidence social/opinion overlay. "
+        "If source_counts is dominated by mozyfin_social, discount signal strength and state that caveat. "
         "Treat this feed as a soft, fast-moving sentiment overlay, not a hard allocation rule. "
         "Answer in Vietnamese, concise and decision-useful."
     )
@@ -258,5 +259,6 @@ def build_sentiment_factor_news_ai_prompt() -> tuple[str, str]:
 3. Tóm tắt 3-5 positive/negative drivers quan trọng, không bịa thêm tin ngoài input.
 4. Kết luận tác động lên AI CIO: supports / conflicts / neutral với macro layer và market-internal tools.
 5. Nêu caveat: source coverage, stale feed nếu generated_at cũ, và rủi ro headline noise.
+6. If source_counts contains many `mozyfin_social` rows, explicitly label them as lower-confidence social/opinion evidence.
 """.strip()
     return system_prompt, user_prompt

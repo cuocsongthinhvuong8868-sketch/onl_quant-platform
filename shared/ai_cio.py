@@ -31,8 +31,8 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "vn100_earnings_health": "structured_yoy_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
-    "sentiment_factor_news": "weighted_bayesian_posterior_v1",
-    "executive_summary": "ai_cio_methodology_v2",
+    "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
+    "executive_summary": "ai_cio_methodology_v3",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -166,10 +166,10 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "sentiment_factor_news": {
         "domain": "news_sentiment",
         "horizon": "1-3_days",
-        "primary_metric": "news_sentiment_factor",
+        "primary_metric": "news_sentiment_factor_with_source_counts",
         "score_direction": "More positive news is supportive only at short horizon.",
-        "limits": "Short-term noise; cannot veto macro, funding, breadth, or tail-risk stress.",
-        "authority": "Use as soft overlay unless hard adapter exists.",
+        "limits": "Short-term noise; mozyfin_social is lower-confidence social/opinion evidence and cannot veto macro, funding, breadth, or tail-risk stress.",
+        "authority": "Use as soft overlay unless hard adapter exists; discount signal strength when source_counts is dominated by mozyfin_social.",
     },
     "risk_adjusted_growth": {
         "domain": "bank_growth_quality",
