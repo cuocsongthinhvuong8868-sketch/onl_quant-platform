@@ -1,6 +1,7 @@
 from __future__ import annotations
 
 import os
+from collections import Counter
 from datetime import date
 from types import SimpleNamespace
 
@@ -29,13 +30,21 @@ REGIME_LABELS = {
 }
 
 
-def _run_ingestion(source: str, limit_mozyfin: int, limit_widata: int):
+def _run_ingestion(
+    source: str,
+    limit_mozyfin: int,
+    limit_mozyfin_social: int,
+    limit_widata: int,
+    social_track: str | None,
+):
     from tools.sentiment_factor_news.engine import run_ingestion
 
     args = SimpleNamespace(
         source=source,
         limit_mozyfin=limit_mozyfin,
+        limit_mozyfin_social=limit_mozyfin_social,
         limit_widata=limit_widata,
+        social_track=social_track,
         publish_git=False,
     )
     run_ingestion(args)
@@ -76,10 +85,11 @@ def _render_overview(feed: dict):
     )
     c4.metric("News count", int(feed.get("news_count", 0) or 0))
 
-    c5, c6, c7 = st.columns(3)
+    c5, c6, c7, c8 = st.columns(4)
     c5.metric("Mozyfin", int(source_counts.get("mozyfin", 0) or 0))
-    c6.metric("WiData", int(source_counts.get("widata", 0) or 0))
-    c7.metric(
+    c6.metric("Mozyfin Social", int(source_counts.get("mozyfin_social", 0) or 0))
+    c7.metric("WiData", int(source_counts.get("widata", 0) or 0))
+    c8.metric(
         "P(sentiment > 0)",
         f"{composite_prob_positive:.1%}",
         help="Posterior probability that latent news sentiment mean is positive.",
@@ -173,6 +183,125 @@ def _render_news_feed(news_stream: list[dict], source_filter: str, query: str):
             url = item.get("url")
             if url:
                 st.markdown(f"[Original link]({url})")
+
+
+def _social_sentiment_label(item: dict) -> str:
+    raw = str(item.get("raw_impact") or "").lower()
+    if raw == "bullish":
+        return "BULLISH"
+    if raw == "bearish":
+        return "BEARISH"
+    return str(item.get("sentiment_label") or "neutral").upper()
+
+
+def _render_social_posts(news_stream: list[dict], query: str):
+    social_items = [item for item in news_stream if item.get("source_system") == "mozyfin_social"]
+    if query:
+        q = query.lower()
+        social_items = [
+            item for item in social_items
+            if q in str(item.get("title", "")).lower()
+            or q in str(item.get("summary", "")).lower()
+            or q in str(item.get("source_name", "")).lower()
+            or q in " ".join(str(entity) for entity in (item.get("entities") or [])).lower()
+        ]
+
+    if not social_items:
+        st.info("No Mozyfin social posts in the current classified feed. Run ingestion with source `mozyfin_social`.")
+        return
+
+    rows = []
+    all_entities = []
+    for item in social_items:
+        entities = item.get("entities") or []
+        all_entities.extend(entities)
+        rows.append({
+            "timestamp": item.get("timestamp_vn", ""),
+            "sender": item.get("sender_name") or item.get("source_name", "N/A"),
+            "writing_track": item.get("writing_track") or "",
+            "category": item.get("social_category") or item.get("raw_category") or "",
+            "sentiment": _social_sentiment_label(item),
+            "macro_channel": item.get("macro_channel", "unknown"),
+            "score": float(item.get("final_score", 0.0) or 0.0),
+            "title": item.get("title", ""),
+            "summary": item.get("summary", ""),
+            "entities": entities,
+            "url": item.get("url", ""),
+        })
+
+    df = pd.DataFrame(rows).sort_values("timestamp", ascending=False)
+    total_posts = len(df)
+    bullish_count = int((df["sentiment"] == "BULLISH").sum())
+    bearish_count = int((df["sentiment"] == "BEARISH").sum())
+    entity_counts = Counter(all_entities)
+    top_ticker, top_ticker_count = entity_counts.most_common(1)[0] if entity_counts else ("N/A", 0)
+
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Social posts", total_posts)
+    c2.metric("Bullish", f"{bullish_count / total_posts:.1%}", f"{bullish_count} posts")
+    c3.metric("Bearish", f"{bearish_count / total_posts:.1%}", f"{bearish_count} posts")
+    c4.metric("Top ticker", top_ticker, f"{top_ticker_count} mentions")
+
+    left, right = st.columns(2)
+    with left:
+        st.subheader("Sentiment Mix")
+        st.bar_chart(df["sentiment"].value_counts())
+        st.subheader("Writing Track")
+        st.bar_chart(df["writing_track"].replace("", "unknown").value_counts().head(10))
+    with right:
+        st.subheader("Top Senders")
+        st.bar_chart(df["sender"].value_counts().head(10))
+        st.subheader("Top Mentioned Tickers")
+        if entity_counts:
+            st.bar_chart(pd.Series(dict(entity_counts.most_common(10))))
+        else:
+            st.info("No ticker/entity mentions found.")
+
+    st.divider()
+    f1, f2, f3, f4 = st.columns([2, 2, 2, 3])
+    with f1:
+        track_options = ["All"] + sorted([value for value in df["writing_track"].dropna().unique() if value])
+        selected_track = st.selectbox("Writing track", track_options, key="social_writing_track_filter")
+    with f2:
+        category_options = ["All"] + sorted([value for value in df["category"].dropna().unique() if value])
+        selected_category = st.selectbox("Category", category_options, key="social_category_filter")
+    with f3:
+        sentiment_options = ["All"] + sorted([value for value in df["sentiment"].dropna().unique() if value])
+        selected_sentiment = st.selectbox("Sentiment", sentiment_options, key="social_sentiment_filter")
+    with f4:
+        local_query = st.text_input("Search social posts", key="social_local_search")
+
+    filtered = df.copy()
+    if selected_track != "All":
+        filtered = filtered[filtered["writing_track"] == selected_track]
+    if selected_category != "All":
+        filtered = filtered[filtered["category"] == selected_category]
+    if selected_sentiment != "All":
+        filtered = filtered[filtered["sentiment"] == selected_sentiment]
+    if local_query:
+        q = local_query.lower()
+        filtered = filtered[
+            filtered["title"].str.lower().str.contains(q, na=False)
+            | filtered["summary"].str.lower().str.contains(q, na=False)
+            | filtered["sender"].str.lower().str.contains(q, na=False)
+        ]
+
+    st.caption(f"Showing {len(filtered)} matching social posts.")
+    for row in filtered.head(100).to_dict("records"):
+        label = f"{row['sentiment']} | {row['sender']} | {row['title']}"
+        with st.expander(label):
+            st.markdown(f"**Published:** {row['timestamp']}")
+            st.markdown(
+                f"**Track:** `{row['writing_track'] or 'unknown'}` | "
+                f"**Category:** `{row['category'] or 'unknown'}` | "
+                f"**Channel:** `{row['macro_channel']}` | "
+                f"**Score:** `{row['score']:+.3f}`"
+            )
+            if row["entities"]:
+                st.markdown(f"**Entities:** {', '.join(row['entities'])}")
+            st.markdown(str(row["summary"] or ""))
+            if row["url"]:
+                st.markdown(f"[Original link]({row['url']})")
 
 
 def _render_timeline():
@@ -289,16 +418,24 @@ def _render_ai_analysis(ai_provider: str, api_key: str):
 
 def render():
     st.title("News Sentiment Factor Monitor")
-    st.caption("Rule-based Vietnam macro/news sentiment feed from Mozyfin and WiData signals.")
+    st.caption("Rule-based Vietnam macro/news/social sentiment feed from Mozyfin and WiData signals.")
 
     st.sidebar.header("News Sentiment Feed")
     window = st.sidebar.radio("Window", ["1d", "7d", "30d"], horizontal=True, key="sentiment_window")
-    source_filter = st.sidebar.selectbox("Source filter", ["All", "mozyfin", "widata"], key="sentiment_source_filter")
+    source_filter = st.sidebar.selectbox(
+        "Source filter",
+        ["All", "mozyfin", "mozyfin_social", "widata"],
+        key="sentiment_source_filter",
+    )
     query = st.sidebar.text_input("Search", key="sentiment_search")
 
     st.sidebar.divider()
     st.sidebar.subheader("Ingestion")
-    source = st.sidebar.selectbox("Fetch source", ["all", "mozyfin", "widata"], key="sentiment_fetch_source")
+    source = st.sidebar.selectbox(
+        "Fetch source",
+        ["all", "mozyfin", "mozyfin_social", "widata"],
+        key="sentiment_fetch_source",
+    )
     limit_mozyfin = st.sidebar.number_input(
         "Mozyfin limit",
         min_value=1,
@@ -313,10 +450,28 @@ def render():
         value=config.FETCH_LIMIT_WIDATA,
         step=100,
     )
+    limit_mozyfin_social = st.sidebar.number_input(
+        "Mozyfin social limit",
+        min_value=1,
+        max_value=100,
+        value=config.FETCH_LIMIT_MOZYFIN_SOCIAL,
+        step=10,
+    )
+    social_track = st.sidebar.text_input(
+        "Social writing_track filter",
+        key="sentiment_social_track",
+        placeholder="Optional, e.g. MARKET_INSIGHT",
+    )
     if st.sidebar.button("Run ingestion", use_container_width=True, key="sentiment_run_ingestion"):
         with st.spinner("Fetching and processing sentiment feed..."):
             try:
-                _run_ingestion(source, int(limit_mozyfin), int(limit_widata))
+                _run_ingestion(
+                    source,
+                    int(limit_mozyfin),
+                    int(limit_mozyfin_social),
+                    int(limit_widata),
+                    social_track.strip() or None,
+                )
                 st.success("Ingestion completed.")
                 st.rerun()
             except Exception as exc:
@@ -347,8 +502,8 @@ def render():
 
     feed = _load_feed_safe(window)
     news_stream = load_classified_news()
-    tab_overview, tab_news, tab_history, tab_ai, tab_snapshot = st.tabs(
-        ["Overview", "News Feed", "Timeline", "AI Analysis", "AI CIO Snapshot"]
+    tab_overview, tab_news, tab_social, tab_history, tab_ai, tab_snapshot = st.tabs(
+        ["Overview", "News Feed", "Social Posts", "Timeline", "AI Analysis", "AI CIO Snapshot"]
     )
 
     with tab_overview:
@@ -357,6 +512,9 @@ def render():
 
     with tab_news:
         _render_news_feed(news_stream, source_filter, query)
+
+    with tab_social:
+        _render_social_posts(news_stream, query)
 
     with tab_history:
         _render_timeline()

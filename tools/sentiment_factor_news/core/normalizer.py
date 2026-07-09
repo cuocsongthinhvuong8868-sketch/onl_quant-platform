@@ -1,5 +1,6 @@
 import html
 import hashlib
+import json
 from datetime import datetime, timezone, timedelta
 import logging
 
@@ -99,6 +100,25 @@ def normalize_source_name(source) -> str:
         return "Mozyfin"
     return clean_text(source or "Mozyfin")
 
+
+def normalize_social_entities(value) -> list[str]:
+    if isinstance(value, str):
+        text = value.strip()
+        if not text:
+            return []
+        if text.startswith("["):
+            try:
+                parsed = json.loads(text.replace("'", '"'))
+                return normalize_social_entities(parsed)
+            except Exception:
+                pass
+        return [item.strip().upper() for item in text.split(",") if item.strip()]
+
+    return [
+        item.upper()
+        for item in normalize_string_list(value, ("symbol", "ticker", "code", "name", "id"))
+    ]
+
 def normalize_mozyfin(item: dict) -> dict:
     """Normalize a raw Mozyfin news item to UnifiedNewsItem schema."""
     source_id = str(item.get("id", ""))
@@ -148,6 +168,67 @@ def normalize_mozyfin(item: dict) -> dict:
             "unit": None
         },
         "content_hash": content_hash
+    }
+
+
+def normalize_mozyfin_social(item: dict) -> dict:
+    """Normalize a raw Mozyfin social post to UnifiedNewsItem schema."""
+    source_id = str(item.get("id", ""))
+    title = clean_text(
+        item.get("headline_vi")
+        or item.get("headline")
+        or item.get("title")
+        or item.get("summary_vi")
+        or item.get("summary")
+        or ""
+    )
+    summary = clean_text(item.get("summary_vi") or item.get("summary") or item.get("content") or "")
+    url = item.get("url") or item.get("link") or item.get("source_url") or ""
+    sender_name = clean_text(item.get("sender_name") or item.get("sender") or item.get("author") or "Mozyfin Social")
+    writing_track = clean_text(item.get("writing_track") or "")
+    category = clean_text(item.get("category") or "")
+
+    timestamp_utc, timestamp_vn = parse_and_format_dates(
+        item.get("started_at")
+        or item.get("published_at")
+        or item.get("created_at")
+        or item.get("updated_at")
+    )
+
+    raw_tags = [tag for tag in [writing_track, category] if tag]
+    entities = normalize_social_entities(item.get("entities"))
+    raw_impact = normalize_mozyfin_impact(item.get("sentiment") or item.get("market_impact"))
+    content_hash = generate_content_hash("mozyfin_social", source_id, url, title)
+
+    return {
+        "news_id": f"mozyfin_social_{source_id}",
+        "source_system": "mozyfin_social",
+        "source_id": source_id,
+        "timestamp_utc": timestamp_utc,
+        "timestamp_vn": timestamp_vn,
+        "source_name": sender_name,
+        "title": title,
+        "summary": summary,
+        "url": url,
+        "language": "vi",
+        "raw_category": category,
+        "raw_tags": raw_tags,
+        "raw_topics": [writing_track] if writing_track else [],
+        "raw_impact": raw_impact,
+        "raw_importance": 0,
+        "entities": entities,
+        "sectors": [],
+        "country": "Vietnam",
+        "macro_info": {
+            "title": None,
+            "value": None,
+            "prev_value": None,
+            "unit": None
+        },
+        "content_hash": content_hash,
+        "sender_name": sender_name,
+        "writing_track": writing_track,
+        "social_category": category,
     }
 
 def normalize_widata(item: dict) -> dict:
@@ -225,6 +306,8 @@ def normalize_item(item: dict, source_system: str) -> dict:
     """Normalize a raw dictionary to UnifiedNewsItem depending on source."""
     if source_system == "mozyfin":
         return normalize_mozyfin(item)
+    elif source_system == "mozyfin_social":
+        return normalize_mozyfin_social(item)
     elif source_system == "widata":
         return normalize_widata(item)
     else:

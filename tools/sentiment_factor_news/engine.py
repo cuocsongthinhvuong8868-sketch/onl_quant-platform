@@ -10,7 +10,7 @@ from datetime import datetime, timezone, timedelta
 from tools.sentiment_factor_news import config
 
 # Import connectors
-from tools.sentiment_factor_news.connectors.mozyfin_connector import fetch_mozyfin_news
+from tools.sentiment_factor_news.connectors.mozyfin_connector import fetch_mozyfin_news, fetch_mozyfin_social_posts
 from tools.sentiment_factor_news.connectors.widata_connector import fetch_widata_signals
 
 # Import core modules
@@ -46,14 +46,24 @@ def run_ingestion(args):
     
     # 1. Fetch raw items
     raw_mozyfin = []
+    raw_mozyfin_social = []
     raw_widata = []
     
     mozyfin_limit = args.limit_mozyfin or config.FETCH_LIMIT_MOZYFIN
+    mozyfin_social_limit = getattr(args, "limit_mozyfin_social", None) or config.FETCH_LIMIT_MOZYFIN_SOCIAL
     widata_limit = args.limit_widata or config.FETCH_LIMIT_WIDATA
+    social_track = getattr(args, "social_track", None) or None
     
     if args.source in ["all", "mozyfin"]:
         logger.info("Fetching Mozyfin news...")
         raw_mozyfin = fetch_mozyfin_news(limit=mozyfin_limit)
+
+    if args.source in ["all", "mozyfin_social"]:
+        logger.info("Fetching Mozyfin social posts...")
+        raw_mozyfin_social = fetch_mozyfin_social_posts(
+            limit=mozyfin_social_limit,
+            writing_track=social_track,
+        )
         
     if args.source in ["all", "widata"]:
         logger.info("Fetching WiData signals...")
@@ -64,6 +74,9 @@ def run_ingestion(args):
     if raw_mozyfin:
         with open(config.DATA_DIR / "raw" / f"raw_mozyfin_{time_suffix}.json", "w", encoding="utf-8") as f:
             json.dump(raw_mozyfin, f, ensure_ascii=False, indent=2)
+    if raw_mozyfin_social:
+        with open(config.DATA_DIR / "raw" / f"raw_mozyfin_social_{time_suffix}.json", "w", encoding="utf-8") as f:
+            json.dump(raw_mozyfin_social, f, ensure_ascii=False, indent=2)
     if raw_widata:
         with open(config.DATA_DIR / "raw" / f"raw_widata_{time_suffix}.json", "w", encoding="utf-8") as f:
             json.dump(raw_widata, f, ensure_ascii=False, indent=2)
@@ -75,6 +88,12 @@ def run_ingestion(args):
             normalized_items.append(normalize_item(item, "mozyfin"))
         except Exception as e:
             logger.error(f"Error normalizing Mozyfin item {item.get('id')}: {e}")
+
+    for item in raw_mozyfin_social:
+        try:
+            normalized_items.append(normalize_item(item, "mozyfin_social"))
+        except Exception as e:
+            logger.error(f"Error normalizing Mozyfin social item {item.get('id')}: {e}")
             
     for item in raw_widata:
         try:
@@ -224,10 +243,17 @@ def main():
     parser = argparse.ArgumentParser(description="Market Sentiment Feed Engine")
     parser.add_argument("--once", action="store_true", help="Run once and exit")
     parser.add_argument("--loop", type=int, default=0, help="Run every N minutes (0 = do not loop)")
-    parser.add_argument("--source", choices=["all", "mozyfin", "widata"], default="all", help="Data source to fetch")
+    parser.add_argument(
+        "--source",
+        choices=["all", "mozyfin", "mozyfin_social", "widata"],
+        default="all",
+        help="Data source to fetch",
+    )
     parser.add_argument("--publish-git", action="store_true", help="Commit and push changes to remote git repository")
     parser.add_argument("--limit-mozyfin", type=int, default=None, help="Override Mozyfin limit")
+    parser.add_argument("--limit-mozyfin-social", type=int, default=None, help="Override Mozyfin social-post limit")
     parser.add_argument("--limit-widata", type=int, default=None, help="Override WiData limit")
+    parser.add_argument("--social-track", type=str, default=None, help="Optional Mozyfin social writing_track filter")
     args = parser.parse_args()
 
 

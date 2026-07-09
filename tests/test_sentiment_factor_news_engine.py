@@ -7,7 +7,7 @@ from tools.sentiment_factor_news.core.aggregator import (
     bayesian_sentiment_posterior,
     build_window_feed,
 )
-from tools.sentiment_factor_news.core.normalizer import normalize_mozyfin, normalize_widata
+from tools.sentiment_factor_news.core.normalizer import normalize_mozyfin, normalize_mozyfin_social, normalize_widata
 from tools.sentiment_factor_news.core.scorer import score_item
 from tools.sentiment_factor_news import report as sentiment_report
 from tools.sentiment_factor_news.report import snapshot
@@ -22,6 +22,7 @@ def test_default_fetch_limits_match_daily_ingestion_target(monkeypatch):
     reloaded = importlib.reload(config)
 
     assert reloaded.FETCH_LIMIT_MOZYFIN == 100
+    assert reloaded.FETCH_LIMIT_MOZYFIN_SOCIAL == 100
     assert reloaded.FETCH_LIMIT_WIDATA == 500
 
 
@@ -90,6 +91,37 @@ def test_mozyfin_limit_is_clamped_to_api_v2_maximum():
     assert mozyfin_connector._sanitize_news_limit(1000) == 100
     assert mozyfin_connector._sanitize_news_limit(0) == 1
     assert mozyfin_connector._sanitize_news_limit("bad") == 100
+
+
+def test_mozyfin_social_fetch_uses_authorized_endpoint(monkeypatch, tmp_path):
+    class FakeResponse:
+        status_code = 200
+        text = ""
+
+        def json(self):
+            return {"data": [{"id": "social-1", "headline_vi": "ok"}]}
+
+        def raise_for_status(self):
+            return None
+
+    def fake_get(url, **kwargs):
+        assert url.endswith("/social-post")
+        assert kwargs["headers"]["Authorization"] == "Bearer abc123"
+        assert kwargs["params"] == {"limit": 100, "writing_track": "MARKET_INSIGHT"}
+        return FakeResponse()
+
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "abc123")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
+    monkeypatch.setattr(mozyfin_connector, "TOKEN_CACHE_FILE", tmp_path / "missing_token.txt")
+    monkeypatch.setattr(mozyfin_connector.requests, "get", fake_get)
+    monkeypatch.delenv("MOZYFIN_ACCESS_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_API_KEY", raising=False)
+    monkeypatch.delenv("MOZYFIN_COOKIES_JSON", raising=False)
+
+    rows = mozyfin_connector.fetch_mozyfin_social_posts(limit=1000, writing_track="MARKET_INSIGHT")
+
+    assert rows == [{"id": "social-1", "headline_vi": "ok"}]
 
 
 def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp_path):
@@ -185,6 +217,34 @@ def test_mozyfin_v2_news_schema_normalizes_positive_sentiment():
     assert normalized["entities"] == ["VCB"]
 
 
+def test_mozyfin_social_post_scores_positive_with_lower_source_weight():
+    fresh_timestamp = datetime.now(timezone.utc).isoformat().replace("+00:00", "Z")
+    raw_item = {
+        "id": "social-1001",
+        "sender_name": "QT Stocks",
+        "headline_vi": "VN-Index breakout supports stock market risk appetite",
+        "summary_vi": "Analysts are bullish as liquidity improves and banks lead the move.",
+        "sentiment": "BULLISH",
+        "writing_track": "MARKET_INSIGHT",
+        "category": "stock market",
+        "entities": ["SSI", "VCB"],
+        "started_at": fresh_timestamp,
+    }
+
+    normalized = normalize_mozyfin_social(raw_item)
+    classification = classify_and_tag_item(normalized)
+    scores = score_item(normalized, classification)
+
+    assert normalized["source_system"] == "mozyfin_social"
+    assert normalized["source_name"] == "QT Stocks"
+    assert normalized["raw_impact"] == "bullish"
+    assert normalized["entities"] == ["SSI", "VCB"]
+    assert classification["macro_channel"] == "risk_appetite"
+    assert classification["sentiment_label"] == "positive"
+    assert scores["source_weight"] == 0.55
+    assert scores["final_score"] > 0.0
+
+
 def test_widata_fx_pressure_scores_negative():
     raw_item = {
         "id": 2002,
@@ -269,6 +329,48 @@ def test_window_feed_exports_channel_and_macro_posteriors():
     assert "channel_posteriors" in feed
     assert feed["channel_posteriors"]["liquidity"]["active_count"] == 1
     assert feed["macro_composite_prob_pos"] == feed["macro_composite_posterior"]["prob_same_direction"]
+
+
+def test_window_feed_counts_sources_dynamically():
+    feed = build_window_feed(
+        [
+            {
+                "macro_channel": "risk_appetite",
+                "final_score": 0.12,
+                "source_weight": 0.55,
+                "confidence": 0.6,
+                "time_decay": 1.0,
+                "source_system": "mozyfin_social",
+                "raw_category": "stock market",
+                "entities": ["SSI"],
+                "title": "Social post",
+                "summary": "",
+            },
+            {
+                "macro_channel": "liquidity",
+                "final_score": 0.25,
+                "source_weight": 0.85,
+                "confidence": 0.8,
+                "time_decay": 1.0,
+                "source_system": "widata",
+                "raw_category": "Vĩ mô",
+                "entities": [],
+                "title": "Liquidity improves",
+                "summary": "",
+            },
+        ],
+        "latest_1d",
+        "2026-07-07T10:00:00+07:00",
+    )
+
+    assert feed["source_counts"] == {"mozyfin_social": 1, "widata": 1}
+
+
+def test_report_formats_dynamic_source_counts():
+    assert (
+        sentiment_report._format_source_counts({"mozyfin_social": 2, "widata": 1})
+        == "mozyfin_social=2, widata=1"
+    )
 
 
 def test_load_feed_backfills_legacy_posterior_fields(monkeypatch, tmp_path):

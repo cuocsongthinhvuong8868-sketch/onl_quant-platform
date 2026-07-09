@@ -145,6 +145,19 @@ def _format_driver(driver: dict[str, Any]) -> str:
     return f"- {title} | channel={channel} | score={score_text} | source={source} | time={timestamp}"
 
 
+def _format_source_counts(source_counts: dict[str, Any]) -> str:
+    if not source_counts:
+        return "N/A"
+    rows = []
+    for source, count in sorted(source_counts.items()):
+        try:
+            count_text = str(int(count))
+        except Exception:
+            count_text = str(count)
+        rows.append(f"{source}={count_text}")
+    return ", ".join(rows)
+
+
 def snapshot(df_close=None, load_custom=None, window: str = "1d") -> dict[str, Any]:
     try:
         feed = load_feed(window)
@@ -192,7 +205,7 @@ def build_structured_report() -> str:
             blocks.append(f"=== Window {window} ===\nDATA INSUFFICIENT: {snap.get('error')}")
             continue
 
-        source_counts = snap.get("source_counts", {})
+        source_counts = _format_source_counts(snap.get("source_counts", {}))
         pos_channels = ", ".join(
             f"{row['channel']}={row['score']:+.3f}(P_conf:{row['prob_conf']:.0%}, CI:{row['ci_5']:+.2f}/{row['ci_95']:+.2f})" for row in snap.get("top_positive_channels", [])
         )
@@ -208,7 +221,7 @@ Generated at: {snap['generated_at']}
 Regime: {snap['regime']}
 Macro composite posterior mean: {snap['macro_composite']:+.4f} (same-direction posterior confidence: {snap.get('macro_composite_prob_pos', 0.5):.0%}, P(sentiment mean > 0): {snap.get('macro_composite_prob_positive', 0.5):.0%}, 90% CI: {snap.get('macro_composite_ci_5', 0.0):+.3f} to {snap.get('macro_composite_ci_95', 0.0):+.3f})
 News count: {snap['news_count']}
-Source counts: mozyfin={source_counts.get('mozyfin', 0)}, widata={source_counts.get('widata', 0)}
+Source counts: {source_counts}
 Top positive channels: {pos_channels}
 Top negative channels: {neg_channels}
 
@@ -226,6 +239,7 @@ def build_sentiment_factor_news_ai_prompt() -> tuple[str, str]:
         "You are a Vietnam macro/news sentiment analyst for an AI CIO. "
         "Use only the supplied rule-based news sentiment feed. "
         "Do not invent news, prices, or macro values. "
+        "Treat Mozyfin social posts as a lower-confidence social/opinion overlay. "
         "Treat this feed as a soft, fast-moving sentiment overlay, not a hard allocation rule. "
         "Answer in Vietnamese, concise and decision-useful."
     )

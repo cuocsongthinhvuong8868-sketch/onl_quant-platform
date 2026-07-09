@@ -211,6 +211,7 @@ python3 -m command.update_abm_data
 
 # Alternative data / news sentiment
 python3 command/update_sentiment_factor_news.py --once --source mozyfin
+python3 command/update_sentiment_factor_news.py --once --source mozyfin_social
 python3 command/update_sentiment_factor_news.py --once --source widata
 
 # Reports

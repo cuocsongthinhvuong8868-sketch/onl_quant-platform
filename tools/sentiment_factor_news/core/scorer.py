@@ -17,6 +17,7 @@ DEFAULT_TIME_DECAY = 1.0
 SOURCE_WEIGHTS = {
     "widata": 0.85,
     "mozyfin": 0.80,
+    "mozyfin_social": 0.55,
     "unknown": 0.60,
 }
 

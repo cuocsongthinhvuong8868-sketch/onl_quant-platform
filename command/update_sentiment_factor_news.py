@@ -4,6 +4,7 @@ Update Sentiment Factor From News feed.
 Usage:
   python command/update_sentiment_factor_news.py --once
   python command/update_sentiment_factor_news.py --once --source mozyfin
+  python command/update_sentiment_factor_news.py --once --source mozyfin_social
 """
 from pathlib import Path
 import sys

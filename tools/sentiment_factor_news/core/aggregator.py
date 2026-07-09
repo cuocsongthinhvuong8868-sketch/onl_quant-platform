@@ -341,8 +341,10 @@ def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str)
     top_neg = [to_driver_format(i) for i in neg_drivers[:5]]
     
     # Count sources
-    mozyfin_count = sum(1 for i in items if i.get("source_system") == "mozyfin")
-    widata_count = sum(1 for i in items if i.get("source_system") == "widata")
+    source_counts = {}
+    for item in items:
+        source_system = item.get("source_system") or "unknown"
+        source_counts[source_system] = source_counts.get(source_system, 0) + 1
     
     return {
         "generated_at": generated_at_vn,
@@ -358,8 +360,5 @@ def build_window_feed(items: list[dict], window_name: str, generated_at_vn: str)
         "top_positive_drivers": top_pos,
         "top_negative_drivers": top_neg,
         "news_count": len(items),
-        "source_counts": {
-            "mozyfin": mozyfin_count,
-            "widata": widata_count
-        }
+        "source_counts": source_counts
     }

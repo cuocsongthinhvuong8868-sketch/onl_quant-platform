@@ -85,6 +85,23 @@ def classify_macro_channel(item: dict) -> str:
             elif "hàng hóa" in cat.lower():
                 return "commodity"
                 
+    elif source_system == "mozyfin_social":
+        cat = str(item.get("raw_category") or "").lower()
+        track = str(item.get("writing_track") or "").lower()
+        tags_text = " ".join(str(tag).lower() for tag in (item.get("raw_tags") or []))
+        social_meta = f"{cat} {track} {tags_text}"
+
+        if "bank" in social_meta:
+            return "banking_system"
+        if "real estate" in social_meta or "property" in social_meta:
+            return "real_estate_collateral"
+        if "commodity" in social_meta or "oil" in social_meta:
+            return "commodity"
+        if "company" in social_meta or "earn" in social_meta or "review" in social_meta:
+            return "earnings"
+        if "stock" in social_meta or "market" in social_meta or "pulse" in social_meta:
+            return "risk_appetite"
+
     # 3. Fallback keyword search on Title + Summary
     text = f"{item.get('title', '')} {item.get('summary', '')}".lower()
     

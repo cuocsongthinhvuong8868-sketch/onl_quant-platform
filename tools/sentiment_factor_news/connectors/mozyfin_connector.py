@@ -27,6 +27,7 @@ DEFAULT_NEXT_ACTION_IDS = (
 )
 DEFAULT_LOGTO_COOKIE_NAME = "logto_lo72piqtf8w4trlipqian"
 MOZYFIN_MAX_NEWS_LIMIT = 100
+MOZYFIN_MAX_SOCIAL_LIMIT = 100
 
 API_HEADERS = {
     "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
@@ -307,16 +308,21 @@ def _refresh_from_available_cookies() -> str:
 
 def _resolve_access_token() -> str:
     now = time.time()
+    stale_candidates = []
 
     env_token = _runtime_access_token()
     if _token_is_fresh(env_token, now):
         return env_token
+    if env_token:
+        stale_candidates.append(env_token)
 
     if TOKEN_CACHE_FILE.exists():
         try:
             cached = TOKEN_CACHE_FILE.read_text(encoding="utf-8").strip()
             if _token_is_fresh(cached, now):
                 return cached
+            if cached:
+                stale_candidates.append(cached)
         except Exception:
             pass
 
@@ -324,7 +330,14 @@ def _resolve_access_token() -> str:
     if refreshed:
         return refreshed
 
-    return env_token
+    if _runtime_api_key():
+        return ""
+
+    if stale_candidates:
+        logger.warning("Using stale Mozyfin token after cookie refresh failed.")
+        return stale_candidates[0]
+
+    return ""
 
 
 def _build_headers() -> dict:
@@ -352,19 +365,60 @@ def _has_auth(headers: dict) -> bool:
 
 
 def _sanitize_news_limit(limit: int) -> int:
+    return _sanitize_limit(limit, MOZYFIN_MAX_NEWS_LIMIT, "news")
+
+
+def _sanitize_social_limit(limit: int) -> int:
+    return _sanitize_limit(limit, MOZYFIN_MAX_SOCIAL_LIMIT, "social-post")
+
+
+def _sanitize_limit(limit: int, max_limit: int, label: str) -> int:
     try:
         parsed = int(limit)
     except (TypeError, ValueError):
-        parsed = MOZYFIN_MAX_NEWS_LIMIT
+        parsed = max_limit
 
     if parsed < 1:
         return 1
-    if parsed > MOZYFIN_MAX_NEWS_LIMIT:
+    if parsed > max_limit:
         logger.warning(
-            f"Mozyfin API v2 accepts limit <= {MOZYFIN_MAX_NEWS_LIMIT}; clamping requested limit {parsed}."
+            f"Mozyfin API v2 {label} accepts limit <= {max_limit}; clamping requested limit {parsed}."
         )
-        return MOZYFIN_MAX_NEWS_LIMIT
+        return max_limit
     return parsed
+
+
+def _request_mozyfin_endpoint(url: str, params: dict, label: str):
+    headers = _build_headers()
+    if not _has_auth(headers):
+        logger.warning(
+            "MOZYFIN_ACCESS_TOKEN / MOZYFIN_TOKEN / MOZYFIN_API_KEY / "
+            "MOZYFIN_COOKIES_JSON is not configured. Mozyfin now requires "
+            f"authenticated access for /{label}, so this source will be skipped."
+        )
+        return None
+
+    response = requests.get(url, headers=headers, params=params, timeout=20)
+    if response.status_code == 401:
+        logger.warning(f"Mozyfin {label} API unauthorized; attempting one cookie refresh retry.")
+        refreshed = _refresh_from_available_cookies()
+        if refreshed:
+            retry_headers = dict(API_HEADERS)
+            retry_headers["Authorization"] = (
+                refreshed if refreshed.lower().startswith("bearer ") else f"Bearer {refreshed}"
+            )
+            response = requests.get(url, headers=retry_headers, params=params, timeout=20)
+
+        if response.status_code == 401:
+            logger.error(f"Mozyfin {label} API unauthorized. Response: {response.text[:500]}")
+            return None
+
+    if response.status_code == 429:
+        logger.error(f"Mozyfin {label} API rate limited with HTTP 429.")
+        return None
+
+    response.raise_for_status()
+    return response
 
 
 def fetch_mozyfin_news(limit: int = MOZYFIN_MAX_NEWS_LIMIT) -> list[dict]:
@@ -375,44 +429,37 @@ def fetch_mozyfin_news(limit: int = MOZYFIN_MAX_NEWS_LIMIT) -> list[dict]:
     limit = _sanitize_news_limit(limit)
     logger.info(f"Fetching mozyfin news with limit={limit}")
 
-    headers = _build_headers()
-    if not _has_auth(headers):
-        logger.warning(
-            "MOZYFIN_ACCESS_TOKEN / MOZYFIN_TOKEN / MOZYFIN_API_KEY / "
-            "MOZYFIN_COOKIES_JSON is not configured. Mozyfin now requires "
-            "authenticated access for /news, so this source will be skipped."
-        )
-        return []
-
     try:
-        response = requests.get(
-            url,
-            headers=headers,
-            params={"limit": limit},
-            timeout=20,
-        )
-        if response.status_code == 401:
-            logger.warning("Mozyfin API unauthorized; attempting one cookie refresh retry.")
-            refreshed = _refresh_from_available_cookies()
-            if refreshed:
-                retry_headers = dict(API_HEADERS)
-                retry_headers["Authorization"] = (
-                    refreshed if refreshed.lower().startswith("bearer ") else f"Bearer {refreshed}"
-                )
-                response = requests.get(url, headers=retry_headers, params={"limit": limit}, timeout=20)
-
-            if response.status_code == 401:
-                logger.error(f"Mozyfin API unauthorized. Response: {response.text[:500]}")
-                return []
-
-        if response.status_code == 429:
-            logger.error("Mozyfin API rate limited with HTTP 429.")
+        response = _request_mozyfin_endpoint(url, {"limit": limit}, "news")
+        if response is None:
             return []
-
-        response.raise_for_status()
         data = response.json().get("data", [])
         logger.info(f"Successfully fetched {len(data)} items from Mozyfin")
         return data
     except Exception as e:
         logger.error(f"Error fetching Mozyfin news: {e}", exc_info=True)
+        return []
+
+
+def fetch_mozyfin_social_posts(limit: int = MOZYFIN_MAX_SOCIAL_LIMIT, writing_track: str | None = None) -> list[dict]:
+    """
+    Fetch social posts from Mozyfin API.
+    """
+    url = f"{MOZYFIN_API_BASE.rstrip('/')}/social-post"
+    limit = _sanitize_social_limit(limit)
+    params = {"limit": limit}
+    if writing_track:
+        params["writing_track"] = str(writing_track).strip()
+
+    logger.info(f"Fetching Mozyfin social posts with limit={limit}")
+
+    try:
+        response = _request_mozyfin_endpoint(url, params, "social-post")
+        if response is None:
+            return []
+        data = response.json().get("data", [])
+        logger.info(f"Successfully fetched {len(data)} social posts from Mozyfin")
+        return data
+    except Exception as e:
+        logger.error(f"Error fetching Mozyfin social posts: {e}", exc_info=True)
         return []
