@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope:** 0.15 (percentile 1.4th – cực thấp), cho thấy mức phản ứng của VN30F1M với tổ hợp VIC/VHM/VRE gần như bằng 0 trong phân phối lịch sử.  
+- **Correlation:** 0.53 (percentile 30.8th – trung bình thấp), xác nhận liên kết lỏng lẻo, không đủ độ tin cậy để dự báo chỉ số từ nhóm VIN.  
+- **Regime hiện tại:** DECOUPLING với ΔCorr = –0.68 và ΔSlope = –0.98, đà phân rã mạnh cả hai chiều, VIN mất hoàn toàn quyền dẫn dắt VN30F1M.
+
+## 2. Microstructure Read
+Trong bối cảnh này, VIC/VHM/VRE không còn vai trò chi phối. Slope quá thấp (1.4th) kết hợp với correlation chưa xuống đáy nhưng ở ngưỡng lỏng lẻo cho thấy thị trường đã rời khỏi nhịp VIN. VN30F1M vận động theo các nhóm khác – đặc biệt là Bank, Chứng, Thép. Do cả hai percentile đều < 80th, không có dấu hiệu can thiệp; ngược lại, slope dưới 20th xác nhận **market đã decouple khỏi VIN** – biến động ở cổ phiếu họ Vingroup sẽ ít lan truyền sang chỉ số.
+
+## 3. Event Study Interpretation
+Trạng thái DECOUPLING bắt nguồn từ momentum suy giảm mạnh (ΔCorr, ΔSlope rất âm) báo hiệu xu hướng phân rã còn tiếp diễn. **Intraday**, tín hiệu từ VIN không đáng tin cậy để mở vị thế hướng (Long/Short) trên VN30F1M.  
+Không có tín hiệu rõ ràng để giữ qua đêm theo nhóm này; thay vào đó, edge nằm ở chênh lệch tương đối: VIN sẽ yếu hơn phần còn lại của VN30 khi thị trường đi lên.
+
+## 4. Verdict
+- **Trade plan:** Spread VIN‑vs‑Bank – short tổ hợp VIC/VHM/VRE (tỷ trọng theo vốn hoá), long VN30F1M (hoặc long basket ngân hàng).  
+- **Leading indicator cần theo dõi:** Nhóm ngân hàng (BID, CTG, VCB, VPB) và thép (HPG). Nếu các mã này tăng mạnh, spread mở rộng có lợi.  
+- **Stop-loss reference:** Chốt chân short VIN nếu VIC vượt 227.3 (≈ 220.70 × 1.03), VHM vượt 154.5, VRE vượt 27.86; hoặc nếu tương quan VIN‑F1 phục hồi lên trên 0.60 kèm slope > 0.25 thì đóng spread.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "08/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.4,
+  "corr_percentile": 30.8,
+  "trade_signal": "spread",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-08",
+  "composite_score": 31,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "VNIBOR hạ nhiệt rõ rê: số phiên căng thẳng dưới 5"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 32.7,
+      "unit": "%",
+      "description": "Độ rộng thị trường cải thiện vượt 45%"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.6,
+      "unit": "%",
+      "description": "SSI rời vùng cảnh báo xuống dưới 55%"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.382,
+      "unit": "",
+      "description": "Đuôi béo hạ nhiệt đồng thuận: xi max < 0.25"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 1.667,
+      "unit": "th pct",
+      "description": "Decoupling Vingroup kéo dài, slope percentile giữ cực thấp (<70th)"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "Stress tín dụng toàn cầu hạ nhiệt: CQS percentile dưới 80"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-08",
+  "source": "ai_cio_executive_summary"
+}

@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Lực cầu hiện tại (9.88%) thấp hơn đáng kể so với Mu dài hạn (12.47%), cho thấy độ rộng mua bị nén.
+- Lực cung hiện tại (4.24%) cũng thấp xa so với Mu (13.23%), áp lực bán cũng bị kìm hãm.
+- Cả hai phía đều có Phi > 0.10 (Cầu: 0.236, Cung: 0.212) – tín hiệu Momentum rõ ràng, đà hiện tại sẽ tiếp diễn.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền: **zombification (thanh khoản cạn)** – độ rộng tăng và giảm cùng nén dưới trung bình dài hạn, thị trường co hẹp, ít biến động thực chất.  
+Bên nắm momentum thực sự: Dù |Phi| cầu (0.236) nhỉnh hơn cung (0.212), khác biệt không đáng kể. Cả hai bên cùng duy trì quán tính, nhưng thiếu biên độ bứt phá → chưa bên nào chiếm ưu thế áp đảo.
+
+## 3. Stress-Test Read
+Kịch bản P95 Downside = 25.33%: Nếu thị trường gãy, độ rộng bán có thể bùng nổ gấp gần 6 lần hiện tại, phản ánh rủi ro đuôi dày và bất đối xứng rõ nét.  
+Bất đối xứng: P95 Upside (22.88%) thấp hơn P95 Downside → rủi ro đuôi bán (tail risk) nặng hơn đuôi mua. Kịch bản hoảng loạn có biên độ lớn và dễ xảy ra hơn kịch bản bùng nổ mua.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 25%.**  
+- **Chiến lược: Phòng thủ.**  
+Thị trường ở trạng thái zombie với thanh khoản cạn, momentum hai chiều nhưng thiếu lực đẩy mạnh. Rủi ro đuôi bán vượt trội khuyến nghị nắm giữ tiền mặt lớn, chỉ giải ngân thăm dò ở mức thấp. Không có tín hiệu cho “mua đuổi” hay “bắt đáy” do chưa có xác nhận đảo chiều từ mean-reversion.  
+(Trường hợp cả hai |Phi| < 0.10 mới dẫn đến NO ACTIONABLE, không áp dụng ở đây.)
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 25.33,
+  "p95_upside_pct": 22.88,
+  "deployment_pct": 25,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

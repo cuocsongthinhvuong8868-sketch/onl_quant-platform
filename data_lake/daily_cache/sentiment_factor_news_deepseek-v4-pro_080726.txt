@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_v1 -->
+**1. Trạng thái News Sentiment (1d / 7d / 30d)**
+
+- **1d (08/07, 196 tin): strong_risk_on** – posterior mean = +0.637 (CI 90%: +0.335 → +0.939), P_conf = 100%. *Giọng điệu: Khẳng định chắc chắn – tâm lý tin tức đang nghiêng mạnh về rủi ro.*  
+- **7d (844 tin): strong_risk_on** – posterior mean = +0.486 (CI 90%: +0.347 → +0.626), P_conf = 100%. *Khẳng định chắc chắn, xu hướng tích cực duy trì trong tuần.*  
+- **30d (5,385 tin): strong_risk_on** – posterior mean = +0.567 (CI 90%: +0.508 → +0.627), P_conf = 100%. *Khẳng định chắc chắn, bức tranh trung hạn hoàn toàn nghiêng về chấp nhận rủi ro.*
+
+→ Cả ba khung thời gian đều đạt ngưỡng “Khẳng định chắc chắn” với P_conf = 100%, củng cố độ tin cậy cực cao cho chế độ phi rủi ro.
+
+---
+
+**2. Các kênh đang kéo risk-on/risk-off mạnh nhất**
+
+*Kênh kéo risk-on (xác nhận mạnh nhất)*  
+- **fx_external (1d: +2.00, P_conf 100%)** – tín hiệu tỷ giá ổn định/tăng hỗ trợ dòng vốn.  
+- **credit_stress (1d: +1.43, P_conf 100%)** – lợi suất TPCP Mỹ tăng nhưng không phát tín hiệu căng thẳng tín dụng, phản ánh niềm tin tăng trưởng.  
+- **earnings (7d: +1.35, P_conf 100%)** – triển vọng lợi nhuận doanh nghiệp tích cực rõ nét.  
+- **banking_system (1d: +0.81, P_conf 97%)** – ngành ngân hàng lạc quan về lợi nhuận.  
+- **monetary_policy (30d: +1.89, P_conf 100%)** – mặt bằng lãi suất liên ngân hàng tăng được đọc là tín hiệu tiền tệ lành mạnh, hỗ trợ kinh tế.
+
+*Kênh kéo risk-off đáng lưu ý (có độ tin cậy cao)*  
+- **liquidity (1d: -0.39, P_conf 94% – Xác nhận tiêu cực nhẹ)** – NHNN hút ròng OMO tạo áp lực nhẹ.  
+- **commodity (30d: -0.55, P_conf 100%)** – giá hàng hóa đầu vào giảm sâu và kéo dài, phát tín hiệu giảm phát nhập khẩu, gây lực cản. Dù kênh này có những tin tích cực đơn lẻ (than cốc tăng), xu hướng nền vẫn âm.  
+- **risk_appetite (7d: -0.18, P_conf 93% – Âm vừa phải)** – khẩu vị rủi ro hạ nhiệt nhẹ, có thể do lo ngại hàng hóa.  
+- **inflation (cả 1d/7d/30d: P_conf ≤84% – Giằng co)** – chưa đủ độ tin cậy để xác nhận xu hướng, nhiễu loạn, không tạo tín hiệu rõ ràng.
+
+→ Tín hiệu chung: phần lớn các kênh đều xác nhận risk-on mạnh, kênh commodity và liquidity đối trọng ở mức khiêm tốn nhưng có độ tin cậy cao, cần theo dõi.
+
+---
+
+**3. Các động lực (drivers) quan trọng nhất**
+
+*Động lực tích cực (kéo risk-on)*  
+1. **Tỷ giá trung tâm mạnh lên (08/07: 25,206 VND/USD, tăng 4 đồng)** – hỗ trợ dòng vốn và ổn định vĩ mô, kênh fx_external ghi điểm +1.47.  
+2. **84% ngân hàng kỳ vọng lợi nhuận tăng năm 2026** – kênh banking_system, củng cố triển vọng ngành.  
+3. **Lợi suất TPCP Mỹ 1Y tăng mạnh 10 bps (08/07)** – đọc là tín hiệu tin tưởng vào tăng trưởng toàn cầu, không gây stress, kênh credit_stress +0.46.  
+4. **Đà tăng trưởng GDP 8.18%** – kênh growth, xác nhận động lực nội tại mạnh.  
+5. **Lãi suất liên ngân hàng O/N tăng lên 6.62% (02/07)** và duy trì cao – phản ánh mặt bằng tiền tệ thích ứng với tăng trưởng, kênh monetary_policy dương đậm (+0.83 trong 7d).
+
+*Động lực tiêu cực (kéo risk-off)*  
+1. **NHNN hút ròng 1,438 tỷ đồng qua OMO (08/07)** – lực hút thanh khoản nhẹ, kênh liquidity -0.22.  
+2. **Giá vàng SJC và vàng nhẫn giảm sâu (08/07)** – tín hiệu tâm lý giảm nhiệt, kênh growth -0.16.  
+3. **Giá quặng sắt Trung Quốc rơi đáy 1 năm, chỉ 712.8 CNY/tấn (07/07)** – cảnh báo suy yếu nhu cầu công nghiệp, kênh commodity -1.03.  
+4. **Giá nhựa PVC Trung Quốc xuống đáy 10 năm (03/07)** – giảm phát đầu vào sâu, kênh commodity -1.30 (kênh này đạt P_conf 100%, xác nhận rủi ro).  
+5. **(Lưu ý)** Kênh inflation dao động không quyết đoán (P_conf thấp), không tạo driver tin cậy.
+
+---
+
+**4. Kết luận tác động Lớp Vĩ Mô & Market-Internal của AI CIO**
+
+- **Hỗ trợ mạnh mẽ (supports):** Chế độ news sentiment “strong_risk_on” với xác suất cùng chiều 100% củng cố tín hiệu macro-layer (tăng trưởng, lợi nhuận, tỷ giá ổn). Các kênh earnings, growth, credit đồng thuận tuyệt đối. Đây là pha tin tức **ủng hộ risk-on phân bổ**, đồng pha với các tools nội bộ thị trường đang ở trạng thái ưa thích rủi ro.
+- **Xung đột nhẹ (partial conflicts):** Sự suy yếu dai dẳng của giá hàng hóa đầu vào (quặng sắt, nhựa PVC) và xu hướng hút ròng thanh khoản OMO tạo ra tín hiệu cảnh báo ở rìa. Các tín hiệu này **không đảo ngược được xu hướng chung** nhưng có thể là early-warning cho lợi nhuận công nghiệp cuối chu kỳ hoặc giảm phát chi phí.
+- **Trung tính / Nhiễu:** Kênh lạm phát và fiscal chưa có dữ liệu đáng tin cậy (P_conf ≤50%), không tác động định hướng.
+- **Khuyến nghị AI CIO:** **Duy trì overweight risk-on**, theo sát driver commodity và liquidity. Nếu P_conf của các kênh tiêu cực tăng lên >85% và/hoặc kênh earnings bắt đầu suy yếu, cần giảm dần.
+
+---
+
+**5. Caveat (Lưu ý về dữ liệu và rủi ro)**
+
+- **Nguồn tin thiên vị:** Hơn 50% tin đến từ Mozyfin (tài chính), có thể ưu tiên các thông tin tích cực; WiData cung cấp giá/dữ liệu thô nên độ bao phủ kênh commodity khá đầy. Kênh inflation có P_conf thấp phản ánh nguồn tin mỏng/nhiễu.
+- **Dữ liệu mới:** Feed được tạo lúc 16:30 ngày 08/07/2026, không có độ trễ đáng kể.
+- **Rủi ro headline noise:** Một số driver được gán điểm từ biến động dữ liệu đơn lẻ (VD: lợi suất 1 ngày tăng 10 bps) – tín hiệu có thể nhiễu nếu không đi kèm xác nhận đa chiều. Nhà đầu tư chỉ nên dùng sentiment này như lớp phủ mềm, không thay thế phân tích cơ bản.

@@ -1,0 +1,28 @@
+## 1. Observations
+- VN30 Stress Index ở mức 0.00%, không có mã nào vi phạm VaR 95% (0/30).
+- Top 3 breach sâu nhất: Không có — thị trường không ghi nhận cú sốc cổ phiếu đáng kể.
+- Complacency Index thấp (7.41%), với 8 mã bị nén spread, dẫn đầu là AGR, TCB, VDS.
+
+## 2. Contagion Assessment (Module B)
+Không có dấu hiệu lây lan hệ thống. Stress Index bằng 0% phản ánh tất cả các cổ phiếu VN30 đều đang giao dịch trong biên độ rủi ro kỳ vọng, không có cú thủng VaR nào kích hoạt domino. Đây là trạng thái “clean” về mặt lây lan — chưa có điểm gãy để đánh giá tính chất cục bộ hay hệ thống. Nhưng chính sự vắng bóng của breach khiến không thể loại trừ một pha căng thẳng bất ngờ trong tương lai; chỉ là hiện tại chưa có chỉ báo nào từ Module B.
+
+## 3. Complacency Assessment (Module C)
+Complacency 7.41% (<80%) khẳng định thị trường **không** ở chế độ ngủ quên định giá rủi ro hàng loạt. Điều này **không** có nghĩa thị trường ổn định hay vận hành an toàn — nó chỉ loại bỏ xác suất cao về một pha phân phối đỉnh cận kề do định giá sai lan rộng. Thực tế, chỉ số complacency thấp vẫn có thể đồng hành với uptrend mạnh hoặc điều chỉnh gấp, tùy thuộc vào cấu trúc giá và dòng tiền. Với Stress Index 0% hiện tại, ta đang quan sát một giai đoạn tương đối tĩnh, nhưng sự tồn tại của 8 mã mispriced (trong đó AGR, TCB, VDS có spread nén chặt nhất) cho thấy một số tên riêng lẻ bị định giá bù rủi ro quá thấp — đây có thể là mầm mống điều chỉnh đột ngột nếu tâm lý thị trường đảo chiều.
+
+## 4. Stock-Level Risk Calls
+- Top 3 breach: Không có — không phát lệnh bán/giảm tỷ trọng từ Module B.
+- Top 3 mispriced: AGR, TCB, VDS. Cảnh báo dựa trên chênh lệch giá mua – bán bị nén bất thường; những mã này đang thiếu phần bù rủi ro đáng kể. Khuyến nghị giám sát chặt các tín hiệu kỹ thuật: nếu xuất hiện phá vỡ hỗ trợ động (ví dụ MA20 phiên ngày) hoặc dải Bollinger co hẹp rồi bung mạnh, cân nhắc giảm tỷ trọng linh hoạt. Không đưa ra mức cắt lỗ tuyệt đối.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 7.41,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["AGR", "TCB", "VDS"],
+  "confidence": "medium"
+}
+```
