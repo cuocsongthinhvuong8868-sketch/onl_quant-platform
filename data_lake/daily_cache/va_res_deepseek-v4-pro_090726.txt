@@ -1,0 +1,31 @@
+## 1. Observations
+- VN30 Stress Index ngày 09/07/2026: **3.33%** (dưới ngưỡng cảnh báo 40% rất xa)
+- Số mã thủng VaR 95% trong rổ VN30: **1/30**, duy nhất POW vi phạm
+- Market Complacency Index: **7.41%** – thị trường không nằm trong regime “ngủ quên”
+- Tổng số mã mispriced toàn thị trường: **8**, top spread nén: CTS, AGR, TCB
+
+## 2. Contagion Assessment (Module B)
+Stress index ở mức 3.33% – rủi ro lây lan real-time trong VN30 gần như không tồn tại. Sự cố POW thủng VaR là trường hợp cá biệt, đơn lẻ, không có dấu hiệu lan sang các cổ phiếu vốn hóa lớn khác. Chưa xuất hiện đầu sóng hệ thống; các mã đầu ngành không ghi nhận breach nào, xác nhận contagion hiện không phải kịch bản chính.
+
+## 3. Complacency Assessment (Module C)
+Complacency 7.41% – cực kỳ thấp so với ngưỡng nguy hiểm 80%. Điều này chỉ mang ý nghĩa duy nhất: thị trường **không ở trạng thái ngủ quên**, tức spread không bị nén trên diện rộng, định giá rủi ro không bị méo mó toàn thị trường. Tuyệt đối **không** suy diễn thị trường “bình thường” hay “ổn định”; chỉ đơn giản là không có dấu hiệu Distribution Top hoặc Sideways kéo dài gây mất cảnh giác.
+
+Tuy nhiên, với 8 mã mispriced (spread nén bất thường), vẫn tồn tại các điểm nóng cục bộ – chất lượng bù rủi ro bị nén ở một số cổ phiếu nhất định. Hệ số stress thấp kết hợp với complacency thấp tạo ra bức tranh: không có lây lan cấp tính, không có ngủ quên tập thể, nhưng vẫn có những tài sản định giá sai rủi ro, tiềm ẩn điều chỉnh nếu vol tăng đột biến.
+
+## 4. Stock-Level Risk Calls
+- **POW (Module B breach):** tín hiệu breach VaR 95% duy nhất. Khuyến nghị giảm tỷ trọng hoặc thoát vị thế nếu giá đóng cửa dưới đường MA20 ngày (stop loss động, không dùng mức giá tuyệt đối).
+- **CTS, AGR, TCB (Top mispriced):** spread nén sâu bất thường – định giá rủi ro bị bóp méo. Cảnh báo: nếu vol thị trường mở rộng, các mã này dễ bị giãn spread mạnh kèm biến động giá lớn. Theo dõi sát; đặt stop loss chặt dưới MA20/MA50 D1, ưu tiên trailing stop để bảo vệ lợi nhuận nếu có.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 7.41,
+  "mispriced_count": 8,
+  "regime": "spread_normal",
+  "watchlist_short": ["POW", "CTS", "AGR", "TCB"],
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,28 @@
+## 1. Scenario Assessment
+K = 1.0, CoE = 14% là bộ tham số trung lập cho ngành ngân hàng Việt Nam, không áp thêm stress test. Dù không khắc nghiệt, mặt bằng các mã đều ghi nhận Economic Alpha âm trừ SHB. Điều này cảnh báo rằng toàn ngành đang **đốt vốn cổ đông** ở mức giá hiện tại, dù nhiều bank có ROE khá cao. Chỉ nhà đầu tư giá trị cực kỳ chọn lọc mới có thể tìm thấy cổ phiếu đáng nắm giữ.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +1.7%)** – Pháo đài (**Fortress**) hiếm hoi. Driver chính là **P/B rẻ (0.91)** kết hợp ROE duy trì cao (17.5%) và σ(ROE) cực thấp (1.9%). Payout chỉ 8.6% giúp tái đầu tư mạnh, giảm rủi ro pha loãng lợi nhuận. Disciplined Return đạt 15.7%, vượt CoE 14%, tạo giá trị thặng dư bền vững.
+- **ACB (Alpha -1.2%) & MBB (Alpha -1.7%)** – Chất lượng cao nhưng **định giá không còn rẻ**. Cả hai có ROE >21% và σ thấp, nhưng P/B 1.24–1.46 đã bào mòn lợi thế. Phân loại: **Premium Burn** nhẹ, không phải bẫy nhưng chưa đủ Alpha để mua. Nếu P/B giảm về 1.0–1.1, chúng có thể trở thành Fortress.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.7%)** – **Premium Burn nặng**: P/B 3.32 quá đắt so với ROE 21% và σ 3.8%. Risk Penalty cao và định giá ảo tưởng là nguyên nhân chính.
+- **EIB (Alpha -11.1%)** – **Cheap Trap**: P/B 1.43 tưởng rẻ nhưng ROE chỉ 10%, không đủ bù đắp chi phí vốn dù payout thấp. σ cao (3.8%) càng làm trầm trọng thêm.
+- **VPB (Alpha -10.5%)** – **Growth Trap** điển hình: ROE 14.1% chỉ ngang CoE, nhưng σ lên tới 4.7% và payout 24.6% khiến Disciplined Return tụt sâu.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress): SHB** – Tỷ trọng đề xuất 100% cho phân bổ ngân hàng nếu bắt buộc phải có cổ phiếu bank. Đây là lựa chọn duy nhất tạo giá trị thặng dư.
+- **Tactical (Cheap-but-not-trap): Không có** – Các mã còn lại đều Alpha âm, không đáp ứng tiêu chí giá trị.
+- **Cấm mua / underweight**: LPB, EIB, VPB, và cả ACB, MBB ở mức P/B hiện tại. Chỉ xem xét lại nếu P/B điều chỉnh mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "ACB", "MBB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

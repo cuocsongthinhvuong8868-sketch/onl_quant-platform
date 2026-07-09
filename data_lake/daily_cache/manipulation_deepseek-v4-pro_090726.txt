@@ -1,0 +1,31 @@
+## 1. Observations
+- OLS Slope cực thấp (0.15) nằm ở phân vị 1.6th — xác nhận mối liên kết giữa composite VIN và VN30F1M gần như không tồn tại, market hoàn toàn rời bỏ nhóm Vingroup.
+- Correlation 0.53 ở phân vị 31.7th, ở mức lỏng lẻo, cho thấy tương quan chỉ còn ở ngưỡng trung bình thấp, không đủ độ tin cậy để dùng VIN dự báo F1.
+- Regime hiện tại là **DECOUPLING** (ΔCorr = -0.68, ΔSlope = -0.95 từ 14/04/2026) — Vingroup mất hoàn toàn quyền dẫn dắt chỉ số futures.
+
+## 2. Microstructure Read
+- Vai trò của VIC, VHM, VRE lên VN30F1M lúc này **gần như mất hẳn**. Slope ở ngưỡng cực thấp (<20th percentile) chứng tỏ không còn lực đẩy giá từ nhóm VIN sang chỉ số. Nhà tạo lập (MM) không còn sử dụng Vingroup để điều hướng VN30F1M. 
+- Các chỉ báo phân vị đều không nằm ở mức can thiệp (>80th) hay cực đoan hoàn toàn cả slope lẫn corr cùng dưới 20th, nhưng với slope ở 1.6th, thị trường rõ ràng đã “quay lưng” với VIN, dòng tiền đang vận hành ở nhóm ngành khác.
+
+## 3. Event Study Interpretation
+- Sự kiện DECOUPLING kéo dài từ giữa tháng 4 cho thấy đây là xu hướng có cấu trúc, không phải nhiễu ngắn hạn.
+- **Intraday**: không có edge từ việc theo dõi diễn biến VIC/VHM/VRE để đánh F1. Nếu muốn giao dịch cần chuyển sang theo dõi nhóm dẫn dắt thay thế (Bank/Chứng/Thép).
+- **Overnight**: không nên giữ vị thế nếu chỉ dựa vào composite VIN, vì mẫu hình đã mất hiệu lực dự báo. Giữ trạng thái qua đêm chỉ khi có signal rõ ràng từ nhóm khác, điều hiện tại chưa được xác nhận.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** dựa trên composite Vingroup. Không có cơ sở để Long hay Short F1 khi mô hình phân ly mạnh. Spread VIN-vs-Bank có thể xem xét nếu có dữ liệu bổ sung, nhưng trong khuôn khổ hiện tại chưa đủ tín hiệu.
+- **Leading indicator cần theo dõi**: chuyển trọng tâm sang cổ phiếu ngân hàng (VCB, BID, CTG) hoặc chứng khoán (SSI, VND) – nhóm đang thay Vingroup dẫn dắt VN30.
+- Stop-loss: không áp dụng vì không mở vị thế. Nếu phải tham chiếu một mức giá, có thể dùng VN30F1M 1,994.30 điểm – mất 1% nội phiên xuống dưới ≈ 1,974 điểm là tín hiệu xác nhận phá vỡ hỗ trợ, nhưng điều này nằm ngoài kế hoạch hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "09/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.6,
+  "corr_percentile": 31.7,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

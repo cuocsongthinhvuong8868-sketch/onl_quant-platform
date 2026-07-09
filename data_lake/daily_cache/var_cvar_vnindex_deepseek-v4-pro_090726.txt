@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_mcmc_interval_v2 -->
+## 1. Observations  
+- Historical VaR 95% đạt -1.65%, gần với parametric VaR -1.42% nhưng ES 95% kéo sâu tới -3.02% – dấu hiệu tổn thất ngoài đuôi trái nặng nề.  
+- EVT VaR 99% (1/100 phiên) = -3.69%, sâu hơn rõ rệt so với VaR 95%, cho thấy mức lỗ cực đoan nghiêm trọng hơn dự báo thông thường.  
+- Tham số hình dạng đuôi ξ ước lượng MLE = +0.345, MCMC p50 = +0.423 – đều >0.30, nằm trong vùng FAT TAIL.  
+- Chỉ số Hill = +0.447, cùng chiều và có biên độ tương đương, củng cố tín hiệu đuôi cực dày.  
+
+## 2. Tail Thickness Diagnosis  
+- ξ MLE = 0.345 -> FAT TAIL (rủi ro cực đoan, ES có thể không ổn định). Tuy nhiên, phân tích độ nhạy ngưỡng POT cho thấy ξ dao động từ 0.168 đến 0.382, và khoảng hậu nghiệm MCMC 90% CI của ξ kéo từ 0.201 đến 0.651, bao trùm cả vùng “heavy tail”. Vì vậy, đây là **“threshold‑sensitive fat‑tail warning”** – phân loại đuôi chưa ổn định hoàn toàn. VaR99 thay đổi rất hẹp (0.11pp) chứng tỏ mức lỗ cực đoan ổn định; sự bất định chủ yếu nằm ở phân loại hình dạng đuôi.  
+- Hill = +0.447 xác nhận tín hiệu cùng dấu và magnitude tương đương – tăng độ tin cậy báo hiệu đuôi dày.  
+- Chênh lệch ES‑VaR = -1.37%, lớn hơn σ₃₀ = 0.84% -> xác nhận thực nghiệm đuôi dày hơn phân phối chuẩn.  
+
+## 3. Gaussian Gap  
+- Ước lượng Gaussian VaR 99% ≈ -2.00% (giả định μ ≈ -0.04%/ngày, σ = 0.84%). So với EVT VaR 99% = -3.69%, chênh lệch lên tới **1.69 điểm phần trăm**, vượt xa ngưỡng 1pp. Gaussian hoàn toàn đánh giá thấp rủi ro đuôi, không phù hợp để phân bổ vốn rủi ro hay định cỡ vị thế đơn thuần dựa trên σ.  
+
+## 4. Verdict — Hedging Implications  
+- Với ξ > 0.30, khuyến nghị mạnh: tránh chiến lược động lượng, mua put ITM và hedge bằng short hợp đồng tương lai chỉ số. Do tính chất threshold‑sensitive và khoảng tin cậy MCMC còn trải dài từ heavy đến fat, mức độ tự tin là trung bình; nhưng rủi ro đuôi dày là rõ ràng và cần phòng vệ tích cực.  
+- Hành động ưu tiên: **mua put ITM** để bảo vệ trước các sự kiện cực đoan.  
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "09/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.382,
+  "xi_range": 0.214,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.69,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.382
+- EVT Xi Range: 0.214
+- EVT VaR99 Range: 0.11pp
+- EVT ES99 Range: 0.75pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.1%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.201
+- EVT Xi P50: +0.423
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.85%
+- EVT VaR99 P50: -3.75%
+- EVT VaR99 P95: -3.10%
+- EVT ES99 P05: -12.92%
+- EVT ES99 P50: -6.79%
+- EVT ES99 P95: -4.83%

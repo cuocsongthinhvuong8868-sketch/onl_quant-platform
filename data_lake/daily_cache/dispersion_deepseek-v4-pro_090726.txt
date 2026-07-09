@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread năm hóa 9.60%, Z‑score –0.76σ – độ phân tán nằm dưới trung bình 60 phiên, không có dấu hiệu căng thẳng lan tỏa.
+- DPI 43.3% < 70% – phiên phân hóa hôm nay không nằm trong chế độ phân tán kéo dài.
+- Tương quan bình quân (Ledoit‑Wolf) 0.008 – gần bằng 0, các cổ phiếu di chuyển gần như độc lập, môi trường phân hóa rất mạnh.
+- Skewness và Kurtosis không có dữ liệu – không đo được bất đối xứng và độ dày đuôi phân phối lợi suất mặt cắt ngang.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không bị stress hệ thống. Spread‑Z âm cho thấy cấu trúc phân tán hiện tại không bị kéo giãn quá mức so với quá khứ gần; DPI trung bình xác nhận không có chế độ phân tán kéo dài. Nếu có căng thẳng, nó chỉ mang tính **cục bộ** ở một vài cổ phiếu riêng lẻ, không hình thành rủi ro vĩ mô diện rộng.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu số liệu Cross‑Sectional Skewness và Kurtosis, không thể xác nhận đuôi bên nào đang biến dạng. Tuy nhiên, với tương quan cực thấp và Spread‑Z âm, có thể suy đoán phân phối lợi suất mặt cắt ngang không có độ lệch cực đoan (cú sập cá biệt hay cú đẩy điên rồ). Rủi ro fat‑tail gần như vắng bóng khi Kurtosis chưa được báo cáo, mô hình giả định phân phối chuẩn tạm thời vẫn có thể ứng dụng.
+
+## 4. Regime Mapping
+DPI thấp (43.3%) + Tương quan thấp (0.008) đối chiếu trực tiếp vào ô **Healthy Stock‑Picking** trên bản đồ 2 chiều. Đây là chế độ mà các cổ phiếu phân hóa rõ nét, biến động riêng lẻ quyết định danh mục, không tồn tại hiệu ứng bầy đàn hay phân phối đỉnh. Rủi ro lớn nhất đối với Portfolio Manager lúc này là **concentration risk** – tập trung vị thế vào một số cổ phiếu riêng lẻ có thể khiến danh mục chịu tổn thất đột biến nếu các cổ phiếu đó biến động mạnh, trong khi thị trường tổng thể vẫn bình lặng. Rủi ro thanh khoản hệ thống (liquidity dry‑up) và sụp đổ đồng thuận (herding crash) ở mức thấp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "09/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.76,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "low"
+}
+```

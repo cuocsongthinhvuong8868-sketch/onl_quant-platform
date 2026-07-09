@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- **Delta so với kỳ vọng dài hạn:** Lực cầu chỉ đạt 7.06% so với Mu 12.35% (–5.29pp), trong khi lực cung vọt lên 13.65% so với Mu 12.92% (+0.73pp). Áp lực bán đang trội hơn hẳn.
+- **Chế độ động lượng:** Cả hai chiều đều có Phi > 0.10 (Cầu: 0.237, Cung: 0.207) → thị trường đang trong trạng thái momentum, xu hướng hiện tại (cầu yếu, cung mạnh) có xác suất cao tiếp diễn thay vì đảo chiều.
+- **So sánh độ bền:** |Phi cầu| nhỉnh hơn |Phi cung| (0.237 vs 0.207), cho thấy sự thiếu hụt lực mua còn dai dẳng hơn đà bán ra – một tín hiệu tiêu cực cho sức khỏe thị trường.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền:** Dựa trên quy tắc “Current vs Mu”, lực cầu << mu và lực cung >> mu khẳng định đây là pha **phân phối (distribution)** – dòng tiền đang rút khỏi thị trường một cách có tổ chức.
+- **Bên giữ momentum thực sự:** Với |Phi| = 0.237, lực cầu (upside breadth) giữ momentum về mặt thống kê, nhưng trớ trêu thay, đó là động lượng của một nền cầu èo uột. Điều này đồng nghĩa với việc tỉ lệ cổ phiếu tăng mạnh sẽ tiếp tục duy trì ở mức thấp, kéo dài trạng thái suy yếu.
+
+## 3. Stress-Test Read
+- **Kịch bản panic sell:** P95 Downside đạt 25.13% – tức trong 5% kịch bản xấu nhất sau 19 phiên, cứ 4 cổ phiếu thì hơn 1 mã giảm >2% mỗi phiên, biên độ rủi ro rất lớn.
+- **Bất đối xứng tail risk:** P95 Downside (25.13%) trội hơn rõ rệt so với P95 Upside (22.37%). Phần đuôi rủi ro giảm giá vừa dày vừa xa hơn, cho thấy thị trường dễ bị tổn thương trước các cú sốc tiêu cực.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất:** 10% (ưu tiên phòng thủ, nắm giữ tiền mặt).
+- **Chiến lược:** **Phòng thủ** (defensive). Không nên bắt đáy khi momentum cung – cầu đều đang chống lại, cũng không có cơ sở để mua đuổi. Rủi ro giảm tiếp vẫn chiếm ưu thế.
+- **Đánh giá:** Hành động được (các Phi đều có tín hiệu rõ ràng), nhưng tín hiệu đó hướng đến sự thận trọng cao độ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 25.13,
+  "p95_upside_pct": 22.37,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

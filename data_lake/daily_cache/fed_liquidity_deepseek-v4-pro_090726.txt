@@ -1,0 +1,44 @@
+## 1. Mechanical Decomposition
+Trong tuần 2026-07-01, Net Liquidity đạt $5,843.3 tỷ, tăng +$30.9 tỷ so với tuần trước. Diễn biến các cấu phần:
+
+- **WALCL (Fed Balance Sheet):** $6,724.6 tỷ. Đây là động lực bơm thanh khoản chính khi Fed vẫn đang tái đầu tư hoặc mở rộng nhẹ bảng cân đối.
+- **WTREGEN (TGA):** $880.2 tỷ. **Hút ròng** lớn khỏi hệ thống ngân hàng. TGA đang neo ở mức cao, phản ánh Treasury tập trung tích lũy tiền mặt thay vì xả ra nền kinh tế.
+- **RRPONTSYD (Reverse Repo):** Chỉ còn $1 tỷ, **gần như bằng 0**. Van hút thanh khoản truyền thống từ quỹ thị trường tiền tệ (MMF) đã cạn kiệt, không còn là yếu tố chi phối.
+
+**Kết luận cơ học:** Biến động tuần này chủ yếu do TGA tăng (lực hút) được bù đắp một phần bởi WALCL tăng (lực bơm). RRP ở mức cạn kiệt khiến thanh khoản biên phụ thuộc hoàn toàn vào "ván bài" giữa Fed và Treasury.
+
+## 2. Cycle Positioning
+- **Pha thanh khoản:** Hệ thống đang trong pha **trung tính** (không hẳn QT vì RRP đã hết tác dụng, cũng chưa phải QE ròng mạnh do TGA neo cao). Đây là hậu kỳ của chu kỳ thắt chặt, nơi dư địa hút từ RRP không còn.
+- **RRP:** Đã cạn hoàn toàn ($1 tỷ so với mức đỉnh >$2,500 tỷ). Dòng tiền từ MMF đã chảy hết vào T-bills và hệ thống ngân hàng, đánh dấu sự kết thúc của "van xả" QT mềm.
+- **TGA:** Treasury đang chiếm ưu thế trong cuộc chiến giằng co. Mức $880 tỷ cho thấy Treasury đang tích lũy dự trữ, gây áp lực hút ròng lên dự trữ ngân hàng.
+- **So sánh lịch sử:** Net Liquidity ~$5,843 tỷ thấp hơn nhiều so với đỉnh 2022 (~$6,500 tỷ) nhưng cao hơn đáy 2024. Hệ thống không còn dồi dào như thời kỳ đại dịch, nhưng đã thoát khỏi vùng nguy hiểm.
+
+## 3. Signal Strength
+- **Tín hiệu:** **HOLD**. Hệ thống đang ở vùng trung tính rõ rệt.
+- **Z-Score +0.57:** Xác nhận mức độ lệch chuẩn rất yếu. Thanh khoản chỉ nhỉnh hơn trung bình 52 tuần một chút, chưa đạt ngưỡng bùng nổ (+1σ) hay suy yếu (-1σ).
+- **Impulse_EMA +$440 triệu:** Xung lượng dương nhưng cực kỳ mỏng manh, khớp với tín hiệu HOLD. Không đủ lực để kích hoạt rủi ro theo hướng ADD.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **SPX/NDX:** Bias **trung tính**. Với xung lượng thanh khoản bằng phẳng và pha HOLD, không có lực đẩy vĩ mô đủ mạnh để định hướng chỉ số. Thị trường sẽ vận động theo yếu tố vi mô (lợi nhuận, định giá).
+- **DXY/Gold/Crypto:** DXY có xu hướng đi ngang trong môi trường thanh khoản không đổi. Gold và crypto thiếu chất xúc tác từ đồng USD yếu hoặc bơm tiền mới, bias **trung tính**.
+- **VN-Index:** Với lag 4-8 tuần, tín hiệu HOLD từ Fed liquidity hàm ý **không có lực đẩy ròng** từ dòng vốn ngoại. RRP cạn khiến kênh truyền dẫn qua EM FX yếu đi. Bias cho VN-Index là **trung tính**, thị trường sẽ phụ thuộc vào câu chuyện nội tại (tăng trưởng tín dụng, KQKD quý 2).
+
+## 5. Risk Factors (Tín hiệu có thể sai vì)
+- **RRP cạn kiệt:** Khi RRP về 0, tín hiệu CUT truyền thống mất độ nhạy do không còn dư địa hút từ MMF. Bất kỳ cú sốc thanh khoản nào giờ đây sẽ trực tiếp ảnh hưởng đến dự trữ ngân hàng (Reserves), gây biến động mạnh hơn.
+- **TGA mùa thuế:** TGA tăng có thể mang tính mùa vụ (tháng 6 - cuối quý 2), gây nhiễu. Nếu Treasury bất ngờ xả mạnh trong tháng 7, tín hiệu có thể chuyển nhanh sang ADD.
+- **Fed buyback/Emergency:** Các chương trình cho vay khẩn cấp hoặc mua lại trái phiếu đặc biệt có thể bất ngờ thổi phồng WALCL.
+
+## 6. KẾT LUẬN
+Hệ thống trong pha trung tính, RRP đã cạn kiệt khiến cuộc chiến thanh khoản tập trung vào Fed và Treasury. Net liquidity sideway cho thấy rủi ro tài sản sẽ thiếu vắng xung lực vĩ mô rõ rệt trong 2-4 tuần tới, VN-Index vận động theo yếu tố nội tại.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5843.3,
+  "signal": "HOLD",
+  "z_score": 0.57,
+  "regime": "neutral",
+  "spillover_vnindex": "neutral",
+  "confidence": "high"
+}
+```

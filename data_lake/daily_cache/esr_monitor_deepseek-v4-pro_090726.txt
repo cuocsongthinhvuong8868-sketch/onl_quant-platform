@@ -1,0 +1,48 @@
+# BÁO CÁO HỆ THỐNG RỦI RO (ESR Monitor)
+**Ngày:** 09/07/2026  
+**Trạng thái:** EUPHORIC RISK – Cảnh báo stress ngầm
+
+---
+
+## 1. Observations
+- **SSI:** 63.2% — chạm ngưỡng WARNING, rủi ro hệ thống đang tích lũy
+- **Market State (HMM):** EUPHORIC RISK — uptrend đi kèm stress cao (bull‑trap risk)
+- **Pillar dẫn dắt:** Thanh khoản khô cạn (S_LIQ 36%), Định giá căng (S_VAL 31%), Tương quan hệ thống (S_COR 18%)
+- **PCA Concentration:** EVR PC1 đạt 38.2%, phản ánh mức độ đồng pha cao giữa các cổ phiếu
+
+## 2. Risk Decomposition (Bóc tách)
+**Driver chính: S_LIQ (36%) — Volume Dry-Up**  
+Chỉ số này đo lường mức độ sụt giảm thanh khoản so với trung bình 1 năm. Giá trị cao cho thấy dòng tiền đang rút dần khỏi thị trường dù VN30 vẫn neo trên MA125. Khi volume cạn kiệt, những nhịp tăng trở nên thiếu xác nhận, dễ dẫn đến bull trap.
+
+**S_VAL (31%) — Valuation Tension**  
+Lợi nhuận 252 ngày của VN30 trừ lãi suất tiền gửi đang ở mức cao, hàm ý định giá đã giãn ra đáng kể so với chi phí vốn. Trong bối cảnh upside dựa trên momentum, mức định giá này trở thành “lực cản ngầm” nếu tâm lý đảo chiều.
+
+**S_COR (18%) — Systemic Correlation**  
+Mức độ giải thích của thành phần chính thứ nhất vượt 38%, các mã di chuyển gần như đồng loạt. Sự đồng pha cao thường là signature của trạng thái herding – khi niềm tin tập thể chi phối, rủi ro đảo chiều bất ngờ tăng lên.
+
+**Tóm tắt:** Bộ ba S_LIQ + S_VAL + S_COR cùng hoạt động mạnh trong phiên giảm (downside mode) là dấu hiệu cổ điển của bull‑trap: giá có thể lập đỉnh mới nhưng lực mua không bền vững, thanh khoản khô cạn và định giá căng, trong khi tương quan cao làm giảm khả năng phòng ngự bằng đa dạng hóa.
+
+## 3. Cross-Check
+- **Price Action vs SSI:** VN30 đang trên MA125, giữ xu hướng tăng, nhưng SSI đã tiến sâu vào vùng WARNING (63.2%). Sự phân kỳ âm này flag rủi ro bull‑trap, tương tự các pha tích lũy stress trước những cú sụt giảm đột ngột.
+- **HMM Regime:** Mô hình HMM cũng xác nhận EUPHORIC RISK, hoàn toàn nhất quán với mức SSI hiện tại. Không có mâu thuẫn lớn, vì vậy tín hiệu đáng tin cậy.
+
+## 4. Verdict
+Dựa trên chế độ EUPHORIC RISK và cấu trúc stress từ thanh khoản + định giá, tôi khuyến nghị nâng tỷ trọng tiền mặt lên **40%** danh mục. Đây là mức phòng thủ vừa phải để giảm thiểu rủi ro bull‑trap mà vẫn giữ một phần tiếp xúc nếu xu hướng kéo dài thêm. Hành động phòng ngừa: **giảm beta tổng thể** của danh mục (cắt giảm các vị thế nhạy với VN30) thay vì vội vàng mở short futures hay mua put – thị trường chưa vào CRITICAL, việc hedge chủ động có thể gây slippage không cần thiết. Nếu SSI vượt 80% trong các phiên tới, lúc đó mới đánh giá lại khả năng short futures.
+
+*NO ACTIONABLE SIGNAL:* không xuất hiện mâu thuẫn giữa các driver (tất cả cùng hướng stress), hành động phòng ngừa là phù hợp.
+
+---
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.2,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái tâm lý (News Sentiment Regime) theo từng khung thời gian**
+
+- **Ngắn hạn (1 ngày): Nghiêng về Risk‑On (Leaning).**  
+  P_conf = 83%, tín hiệu chưa đủ mạnh để khẳng định chắc chắn (chưa vượt 85%). Mặc dù tâm lý nghiêng về phía tích cực, nhưng mức độ nhiễu từ mạng xã hội cao (51% nguồn là mozyfin_social) khiến độ tin cậy bị giảm.  
+- **Trung hạn (7 ngày): Khẳng định chắc chắn Strong Risk‑On.**  
+  P_conf = 100%, tín hiệu đồng thuận tuyệt đối về chiều tích cực. Dữ liệu từ kênh tài chính truyền thống (WiData) và tin phân tích (mozyfin) chiếm ưu thế, dù vẫn có yếu tố xã hội (mozyfin_social).  
+- **Dài hạn (30 ngày): Khẳng định chắc chắn Strong Risk‑On.**  
+  P_conf = 100%, tâm lý vĩ mô lạc quan kéo dài và nhất quán. Tuy nhiên, tỉ trọng nguồn xã hội rất lớn (mozyfin + mozyfin_social chiếm ~82% tổng tin), cần lưu ý giảm trọng số.
+
+**2. Các kênh đang kéo Risk‑On / Risk‑Off mạnh nhất**
+
+*Khung 1d:*  
+- **Kéo Risk‑On:** fx_external (tỷ giá, P_conf 100%), earnings (lợi nhuận, 100%), credit_stress (tín dụng, 99%).  
+- **Kéo Risk‑Off:** liquidity (thanh khoản, P_conf 90%) với điểm số âm rõ rệt; các kênh khác như growth, inflation có P_conf chỉ 50% (không có ý nghĩa thống kê).
+
+*Khung 7d:*  
+- **Kéo Risk‑On:** fx_external, earnings, credit_stress, banking_system, growth (tất cả P_conf 100%).  
+- **Kéo Risk‑Off:** commodity (hàng hóa, P_conf 99%) và liquidity (thanh khoản, P_conf 97%); inflation (84%) nghiêng về tiêu cực nhưng độ tin cậy chưa cao.
+
+*Khung 30d:*  
+- **Kéo Risk‑On:** monetary_policy (chính sách tiền tệ, P_conf 100%), credit_stress, earnings, banking_system, fiscal_public_investment.  
+- **Kéo Risk‑Off:** commodity (99%) và liquidity (99%); inflation (84%) tiếp tục là rủi ro tiêu cực ở mức độ tin cậy thấp hơn.
+
+**3. Các yếu tố dẫn dắt quan trọng (Top Drivers)**
+
+**Tích cực:**  
+- Tỷ giá trung tâm liên tục tăng nhẹ qua các phiên gần đây (25.211 ngày 09/07, tăng 5đ) → phản ánh kỳ vọng ổn định, dòng vốn ngoại tích cực (kênh fx_external).  
+- Lợi suất trái phiếu Chính phủ đi ngang, không có dấu hiệu căng thẳng tín dụng (credit_stress tích cực).  
+- Lãi suất liên ngân hàng tăng (ON lên 6.01%) được thuật toán xem là tín hiệu tích cực cho kênh monetary_policy, có thể phản ánh nhu cầu tín dụng mạnh.  
+- ECB tăng lãi suất (tháng 06/2026) – tín hiệu đồng thuận chính sách thế giới, hỗ trợ tài sản rủi ro qua kênh tiền tệ.
+
+**Tiêu cực:**  
+- NHNN hút ròng mạnh qua OMO (6.521,5 tỷ phiên 09/07; 15.964,1 tỷ phiên 07/07) → thanh khoản hệ thống bị thắt chặt (kênh liquidity âm).  
+- Giá hàng hóa Trung Quốc lao dốc: quặng sắt đáy 1 năm, thép HRC đáy mới, nhựa PVC đáy 10 năm – gây lo ngại về sức cầu toàn cầu (kênh commodity âm).  
+- Giá heo hơi Việt Nam giảm xuống đáy một tháng, phản ánh áp lực lạm phát thấp hoặc nhu cầu tiêu dùng yếu, nhưng kênh inflation có độ tin cậy 84% nên cần theo dõi thêm.
+
+**4. Kết luận tác động đến AI CIO**
+
+- **Hỗ trợ (Supports) tầng vĩ mô:** Tâm lý Risk‑On mạnh ở khung 7d và 30d đồng nhất với quan điểm tích cực về tài sản rủi ro. Các kênh chính sách tiền tệ, tín dụng, thu nhập doanh nghiệp đều cho tín hiệu lạc quan.  
+- **Cần giám sát (Conflicts):** Thanh khoản bị hút ròng mạnh và giá hàng hóa suy yếu là những tín hiệu đối nghịch, có thể trở thành rủi ro đảo chiều nếu kéo dài. Tuy nhiên, các yếu tố này chưa đủ để lấn át tâm lý tích cực tổng thể.  
+- **Trung lập/Thận trọng (Neutral with caution):** Khung 1d chỉ dừng ở mức “nghiêng về”, không đủ khẳng định xu hướng. Tỉ trọng nguồn xã hội (mozyfin_social) quá lớn ở mọi khung thời gian làm giảm độ tin cậy của tín hiệu. AI CIO nên dùng feed này như một lớp phủ tâm lý mềm, không thay đổi phân bổ cứng nếu các tầng macro và market‑internal không xác nhận đồng bộ.
+
+**5. Cảnh báo (Caveats)**
+
+- **Nguồn tin xã hội chi phối:** Tại 1d, mozyfin_social chiếm 51% tổng số quan sát; tại 7d và 30d, mozyfin + mozyfin_social chiếm gần 80%. Đây là bằng chứng thuộc dạng ý kiến/xã hội, độ tin cậy thấp hơn dữ liệu thị trường (WiData). Cường độ tín hiệu cần được chiết khấu phù hợp.  
+- **Sai lệch kênh:** Một số kênh như growth, inflation có P_conf 50% (1d) – thực tế không mang thông tin, cần loại bỏ khỏi quyết định.  
+- **Nhiễu tiêu đề (Headline noise):** Dữ liệu 1d dễ bị ảnh hưởng bởi các bài đăng đơn lẻ, mang tính thời điểm, không phản ánh xu hướng bền vững.  
+- **Dữ liệu không lỗi thời:** Feed được tạo ngày 09/07/2026, còn tươi, kịp thời cho phiên giao dịch tiếp theo.  
+
+Tóm lại, tâm lý tin tức hiện tại đang ủng hộ trạng thái rủi ro, nhưng mức độ tin cậy bị pha loãng bởi nguồn xã hội và cần theo dõi sát diễn biến thanh khoản nội địa cũng như giá hàng hóa cơ bản.
