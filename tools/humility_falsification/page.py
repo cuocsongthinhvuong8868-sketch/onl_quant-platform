@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import hashlib
 import json
 import re
 from datetime import date, datetime, timedelta
@@ -90,46 +91,53 @@ def render() -> None:
         st.cache_data.clear()
         st.rerun()
 
-    with st.spinner("Dang tinh du lieu hien tai tu cac cong cu..."):
-        current_metrics = _compute_current_metrics()
-
-    t_data_date = _effective_t_data_date(current_metrics)
-    if t_data_date is None:
-        st.error("Khong xac dinh duoc ngay T tu du lieu hien tai cua cac cong cu.")
-        _render_metric_quality(current_metrics, None)
-        return
-
     reports_by_provider = _reports_by_provider()
     if not any(reports_by_provider.values()):
         st.warning("Chua tim thay bao cao AI CIO trong data_lake/daily_cache.")
         return
 
     provider_key = _provider_selector(reports_by_provider)
-    report_path, target_report_date, report_match = _auto_tminus_report(
-        reports_by_provider[provider_key],
-        t_data_date,
-    )
-    if report_path is None:
-        st.error(f"Khong tim thay AI CIO report cho T-1 = {target_report_date.isoformat()}.")
-        _render_metric_quality(current_metrics, t_data_date)
-        return
 
-    _render_auto_report_note(report_path, target_report_date, report_match)
-
-    with st.spinner("Dang tai hoac tinh ket qua falsification..."):
+    with st.spinner("Dang tai cache gan nhat hoac tinh ket qua falsification..."):
         payload = build_humility_falsification_payload(
             provider_key=provider_key,
-            current_metrics=current_metrics,
             force=force_result,
+            allow_latest_cache=True,
         )
+
+    current_metrics = payload.get("current_metrics", {})
+    t_data_date = _payload_date(payload.get("t_data_date")) or _effective_t_data_date(current_metrics)
 
     if payload.get("error"):
         st.error(str(payload["error"]))
         _render_metric_quality(current_metrics, t_data_date)
         return
 
+    target_report_date = _payload_date(payload.get("target_report_date"))
+    if target_report_date is None and t_data_date is not None:
+        target_report_date = t_data_date - timedelta(days=1)
+    report_path = _resolve_report_path_for_render(
+        provider_key,
+        str(payload.get("report_path", "")),
+        reports_by_provider.get(provider_key, []),
+    )
+    report_match = str(payload.get("report_match", "cache"))
+
+    if target_report_date is not None:
+        _render_auto_report_note(report_path, target_report_date, report_match)
+    if t_data_date is None or target_report_date is None:
+        st.error("Cache humility khong co ngay du lieu hop le.")
+        _render_metric_quality(current_metrics, t_data_date)
+        return
+
     if payload.get("cache_hit"):
-        st.success(f"Dung cache ket qua cung ngay: {payload.get('cache_path')}")
+        if payload.get("cache_stale"):
+            st.warning(
+                f"Dang dung cache gan nhat: {payload.get('cache_path')} "
+                f"(T data cache = {payload.get('t_data_date')})."
+            )
+        else:
+            st.success(f"Dung cache ket qua: {payload.get('cache_path')}")
     else:
         st.success(f"Da tinh moi va luu cache ket qua: {payload.get('cache_path')}")
 
@@ -159,12 +167,13 @@ def build_humility_falsification_payload(
     provider_key: str = "deepseek-v4-pro",
     current_metrics: dict[str, dict[str, Any]] | None = None,
     force: bool = False,
+    allow_latest_cache: bool = False,
 ) -> dict[str, Any]:
     """Build or load the same-day falsification result payload.
 
-    Cache identity is provider + T data date + exact T-1 report path/mtime. That
-    keeps the dashboard fast while still invalidating if the source AI CIO report
-    for the same date is regenerated.
+    Cache identity is provider + T data date + T-1 report name/content. This is
+    intentionally portable across GitHub Actions, local Windows paths, and
+    Streamlit Cloud paths.
     """
 
     t_data_date = _effective_t_data_date(current_metrics) if current_metrics is not None else _latest_close_data_date()
@@ -174,12 +183,26 @@ def build_humility_falsification_payload(
         report_path, target_report_date, report_match = _auto_tminus_report(reports, t_data_date)
         if report_path is not None and not force:
             cache_path = _humility_cache_path(provider_key, t_data_date)
-            report_mtime = _rule_source_mtime(report_path)
-            cached = _read_humility_cache(cache_path, provider_key, t_data_date, report_path, report_mtime)
+            report_signature = _rule_source_signature(report_path)
+            cached = _read_humility_cache(
+                cache_path,
+                provider_key,
+                t_data_date,
+                report_path,
+                report_signature,
+                target_report_date,
+            )
             if cached:
                 cached["cache_hit"] = True
                 cached["cache_path"] = str(cache_path)
+                cached["cache_mode"] = "exact"
+                cached["cache_stale"] = False
                 return cached
+
+    if allow_latest_cache and not force:
+        cached = _read_latest_humility_cache(provider_key, max_t_data_date=t_data_date)
+        if cached:
+            return cached
 
     current_metrics = current_metrics or _compute_current_metrics_uncached()
     t_data_date = _effective_t_data_date(current_metrics)
@@ -210,6 +233,7 @@ def build_humility_falsification_payload(
 
     cache_path = _humility_cache_path(provider_key, t_data_date)
     report_mtime = _rule_source_mtime(report_path)
+    report_signature = _rule_source_signature(report_path)
 
     parsed = _load_report_rules(report_path)
     rows = [_evaluate_rule(rule, current_metrics) for rule in parsed["rules"]]
@@ -227,7 +251,9 @@ def build_humility_falsification_payload(
             "target_report_date": target_report_date.isoformat(),
             "report_match": report_match,
             "report_path": str(report_path),
+            "report_name": report_path.name,
             "report_mtime": report_mtime,
+            "report_signature": report_signature,
             "parsed": _parsed_for_cache(parsed),
             "rows": rows,
             "current_metrics": current_metrics,
@@ -241,6 +267,8 @@ def build_humility_falsification_payload(
     _write_humility_cache(cache_path, payload)
     payload["cache_hit"] = False
     payload["cache_path"] = str(cache_path)
+    payload["cache_mode"] = "refreshed"
+    payload["cache_stale"] = False
     return payload
 
 
@@ -258,7 +286,7 @@ def format_humility_payload_markdown(payload: dict[str, Any]) -> str:
     lines = [
         f"- Provider: {payload.get('provider_key', 'N/A')}",
         f"- T data date: {payload.get('t_data_date', 'N/A')}",
-        f"- AI CIO report checked: {Path(str(payload.get('report_path', ''))).name}",
+        f"- AI CIO report checked: {_portable_path_name(payload.get('report_path', ''))}",
         f"- Report match: {payload.get('report_match', 'N/A')}",
         f"- Thesis status: {payload.get('status_label', 'N/A')}",
         f"- Rules triggered: {payload.get('falsified', 0)}/{payload.get('total', 0)}",
@@ -297,6 +325,47 @@ def _humility_cache_path(provider_key: str, t_data_date: date) -> Path:
     return DATA_LAKE / "daily_cache" / f"{RESULT_CACHE_PREFIX}_{provider_key}_{date_key}.json"
 
 
+def _humility_cache_date(path: Path) -> date | None:
+    match = re.match(
+        rf"{re.escape(RESULT_CACHE_PREFIX)}_.+_(\d{{6}})\.json$",
+        path.name,
+    )
+    if not match:
+        return None
+    raw = match.group(1)
+    try:
+        return date(2000 + int(raw[4:6]), int(raw[2:4]), int(raw[:2]))
+    except ValueError:
+        return None
+
+
+def _read_latest_humility_cache(
+    provider_key: str,
+    max_t_data_date: date | None = None,
+) -> dict[str, Any] | None:
+    cache_dir = DATA_LAKE / "daily_cache"
+    candidates = sorted(
+        cache_dir.glob(f"{RESULT_CACHE_PREFIX}_{provider_key}_*.json"),
+        key=lambda path: (_humility_cache_date(path) or date.min, path.name),
+        reverse=True,
+    )
+    for cache_path in candidates:
+        payload = _read_humility_cache_payload(cache_path, provider_key)
+        if not payload:
+            continue
+        payload_date = _payload_date(payload.get("t_data_date")) or _humility_cache_date(cache_path)
+        if payload_date is None:
+            continue
+        if max_t_data_date is not None and payload_date > max_t_data_date:
+            continue
+        payload["cache_hit"] = True
+        payload["cache_path"] = str(cache_path)
+        payload["cache_mode"] = "latest"
+        payload["cache_stale"] = bool(max_t_data_date is not None and payload_date != max_t_data_date)
+        return payload
+    return None
+
+
 def _latest_close_data_date() -> date | None:
     path = DATA_LAKE / "market_data.csv"
     if not path.exists():
@@ -323,28 +392,63 @@ def _rule_source_mtime(report_path: Path) -> str:
     return "|".join(parts)
 
 
-def _read_humility_cache(
-    cache_path: Path,
-    provider_key: str,
-    t_data_date: date,
-    report_path: Path,
-    report_mtime: str,
-) -> dict[str, Any] | None:
+def _file_sha1(path: Path) -> str:
+    try:
+        return hashlib.sha1(path.read_bytes()).hexdigest()
+    except OSError:
+        return ""
+
+
+def _rule_source_signature(report_path: Path) -> str:
+    parts = [f"report:{report_path.name}:{_file_sha1(report_path)}"]
+    sidecar_path = _sidecar_path_for_report(report_path)
+    if sidecar_path and sidecar_path.exists():
+        parts.append(f"sidecar:{sidecar_path.name}:{_file_sha1(sidecar_path)}")
+    return "|".join(parts)
+
+
+def _read_humility_cache_payload(cache_path: Path, provider_key: str) -> dict[str, Any] | None:
     if not cache_path.exists():
         return None
     try:
         payload = json.loads(cache_path.read_text(encoding="utf-8"))
     except Exception:
         return None
-
     if payload.get("provider_key") != provider_key:
+        return None
+    return payload
+
+
+def _read_humility_cache(
+    cache_path: Path,
+    provider_key: str,
+    t_data_date: date,
+    report_path: Path,
+    report_signature: str,
+    target_report_date: date | None = None,
+) -> dict[str, Any] | None:
+    payload = _read_humility_cache_payload(cache_path, provider_key)
+    if not payload:
         return None
     if payload.get("t_data_date") != t_data_date.isoformat():
         return None
-    if payload.get("report_path") != str(report_path):
+    if target_report_date is not None and payload.get("target_report_date") not in (
+        None,
+        target_report_date.isoformat(),
+    ):
         return None
-    if payload.get("report_mtime") != report_mtime:
+
+    cached_report_name = payload.get("report_name") or _portable_path_name(payload.get("report_path", ""))
+    if cached_report_name != report_path.name:
         return None
+
+    cached_signature = payload.get("report_signature")
+    if cached_signature:
+        return payload if cached_signature == report_signature else None
+
+    # Legacy caches saved absolute runner paths and mtimes. If the provider,
+    # data date, target report date, and report file name match, accept them as
+    # portable cache hits so UI does not recompute heavy metrics unnecessarily.
     return payload
 
 
@@ -425,6 +529,21 @@ def _provider_display_name(provider_key: str) -> str:
     if isinstance(provider_meta, dict):
         return str(provider_meta.get("display") or provider_key)
     return str(provider_meta or provider_key)
+
+
+def _portable_path_name(value: Any) -> str:
+    text = str(value or "").replace("\\", "/").rstrip("/")
+    return text.rsplit("/", 1)[-1] if text else ""
+
+
+def _resolve_report_path_for_render(provider_key: str, raw_path: str, reports: list[Path]) -> Path:
+    report_name = _portable_path_name(raw_path)
+    for path in reports:
+        if path.name == report_name:
+            return path
+    if raw_path:
+        return Path(raw_path)
+    return DATA_LAKE / "daily_cache" / f"executive_summary_{provider_key}_unknown.txt"
 
 
 def _auto_tminus_report(paths: list[Path], t_data_date: date) -> tuple[Path | None, date, str]:
