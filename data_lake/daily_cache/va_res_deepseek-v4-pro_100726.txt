@@ -1,0 +1,29 @@
+## 1. Observations
+- VN30 Stress Index ở mức 3.33% – rất thấp so với ngưỡng cảnh báo 40%
+- Số mã trong VN30 thủng VaR 95%: 1/30 (duy nhất BCM)
+- Market Complacency Index chỉ 6.48% – cách xa ngưỡng nguy hiểm 80%
+- Có 7 mã bị mispricing (spread bị nén), dẫn đầu: AGR, MSB, GMD
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress ở mức không đáng kể (3.33%), cho thấy rủi ro lây lan real-time từ các cú sốc riêng lẻ gần như không tồn tại. Sự kiện BCM thủng VaR 95% mang tính cá biệt, không kéo theo hiệu ứng domino lên các cổ phiếu khác trong rổ. Chỉ số thấp với 1 breach không đủ để kết luận về đầu sóng systemic; đây là nhiễu kỹ thuật hơn là tín hiệu.
+
+## 3. Complacency Assessment (Module C) — Đúng Bản Chất
+Complacency Index 6.48% xác nhận thị trường KHÔNG ở regime “ngủ quên” (không có hiện tượng nén spread trên diện rộng, mất cảnh giác). Tuy nhiên, **điều này không đồng nghĩa với ổn định hay “bình thường”** – nó chỉ phủ định trạng thái tự mãn. Không thể loại trừ các kịch bản thị trường giằng co mạnh, uptrend có phân kỳ, hoặc áp lực bán cục bộ. Kết hợp với Stress Index cực thấp, ta không có bằng chứng cho sự hoảng loạn hay sụp đổ, nhưng cũng không thể tuyên bố thị trường an toàn. Sự tồn tại của 7 mã bị mispriced là những điểm nóng cần theo dõi riêng lẻ.
+
+## 4. Stock-Level Risk Calls
+- **BCM (breach)**: Là diễn biến bất thường duy nhất; khuyến nghị giảm tỷ trọng nếu cổ phiếu tiếp tục thủng đường trung bình động 20 ngày (MA20) trên D1, không bắt đáy.
+- **AGR, MSB, GMD (mispriced)**: Ba mã có spread bị nén chặt nhất, tiềm ẩn rủi ro điều chỉnh khi thị trường định giá lại phần bù rủi ro. Hạn chế mở thêm vị thế mua mới; đặt cảnh báo giảm -5% từ giá hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["BCM", "AGR", "MSB", "GMD"],
+  "confidence": "low"
+}
+```

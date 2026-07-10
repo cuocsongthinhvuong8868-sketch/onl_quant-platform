@@ -1,0 +1,34 @@
+## 1. Observations
+- SSI: **63.0%** – WARNING, rủi ro hệ thống đang tích lũy ngầm.
+- Market State: **EUPHORIC RISK** (high stress + uptrend theo HMM), dù VN30 đóng cửa dưới MA125.
+- Top 3 driver: **S_LIQ (36%)**, **S_VAL (31%)**, **S_COR (18%)** – chế độ downside (chỉ đo trên phiên giảm).
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ** dẫn dắt với trọng số vượt trội – phản ánh **volume khô cạn nghiêm trọng so với trung bình 1 năm** trong các phiên giảm. Thanh khoản biến mất khi thị trường điều chỉnh là tín chỉ phân phối, không phải hấp thụ cung.
+- **S_VAL** đứng thứ hai: định giá kéo căng (252d return – deposit rate) ở mức cao, gợi ý phần bù rủi ro đang bị nén, dễ tổn thương trước cú sốc vĩ mô.
+- **S_COR** ở mức 18% (PC1 EVR 38.1% toàn thị trường) cho thấy tương quan hệ thống vừa phải nhưng đủ để khuếch đại bất kỳ đợt bán tháo nào.
+
+Tổ hợp **S_LIQ khô cạn + S_VAL cao + S_COR không nhỏ** là cấu trúc “bull‑trap” kinh điển: thanh khoản biến mất đúng lúc trạng thái EUPHORIC RISK còn hiện hữu, báo hiệu dòng tiền thông minh đã rút lui.
+
+## 3. Cross-Check
+- **Divergence VN30 – SSI**: Giá đóng cửa nằm dưới MA125 trong khi HMM vẫn gán nhãn EUPHORIC RISK (uptrend) – lệch pha đáng lưu ý. Nếu MA125 bị xuyên thủng thêm (% delta từ đây), uptrend kỹ thuật có thể bị phủ định, đẩy hệ thống sang ACTIVE STRESS.
+- **HMM vs. SSI**: HMM cho kết quả EUPHORIC RISK trong khi SSI đã ở mức WARNING cao (63%), phù hợp với pha cuối của chu kỳ hưng phấn, chưa có mâu thuẫn nội tại nhưng cần giám sát khả năng chuyển trạng thái.
+
+## 4. Verdict
+- **Cash weight đề xuất: 40%** danh mục – tăng nắm giữ tiền mặt lên vùng phòng thủ rõ rệt, phản ánh rủi ro đuôi tăng.
+- **Hedge action: reduce beta** – chủ động giảm đòn bẩy beta (hạ tỷ trọng cổ phiếu vốn hóa lớn có S_LIQ cao, hoặc hedging qua VN30F1M). Không khuyến nghị đòn bẩy hay margin. Mua put bảo vệ cũng có thể cân nhắc nếu biến động thực tế chưa phản ánh căng thẳng ngầm.
+- Lý do: Driver S_LIQ khô cạn trong phiên giảm + định giá căng + WARNING SSI là tín hiệu đủ mạnh để hành động hạ rủi ro danh mục, chưa đến mức CRITICAL nhưng không thể duy trì trạng thái rủi ro như giai đoạn an toàn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

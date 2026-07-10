@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## 1. Chế độ News Sentiment – Trạng thái hiện tại
+
+**1d, 7d, 30d: đồng loạt strong_risk_on – Khẳng định chắc chắn**  
+- Xác suất hậu định cùng chiều P_conf = 100% ở tất cả khung, vượt ngưỡng 85% → giọng điệu “Khẳng định chắc chắn”.  
+- Trung bình tiềm ẩn của sentiment vĩ mô: +0.39 (1d), +0.59 (7d), +0.55 (30d) với độ rộng 90% CI đều dương → môi trường tin tức đang ủng hộ rủi ro rõ rệt.
+
+## 2. Kênh dẫn dắt Risk-On / Risk-Off mạnh nhất
+
+**Kênh kéo risk‑on (dẫn dắt tăng)**  
+- `fx_external` (+2.00, P_conf 100%) – tín hiệu ngoại hối cực mạnh.  
+- `earnings` (+1.26, 100%) – lợi nhuận doanh nghiệp được phản ánh tích cực.  
+- `growth` (+0.80, 100%) – tăng trưởng nội địa (các tin Bắc Ninh, động lực kinh tế).  
+- `banking_system` (+0.46, P_conf 98%) – hệ thống ngân hàng vẫn là yếu tố hỗ trợ (dù xuất hiện tiêu cực đơn lẻ).  
+- `real_estate_collateral` (+0.57, P_conf 84%) – nghiêng về tích cực nhưng chưa đủ tự tin để khẳng định chắc chắn.
+
+**Kênh kéo risk‑off (cản trở, trái chiều)**  
+- `inflation` (-0.67, P_conf 88%) – áp lực lạm phát được xác nhận chắc chắn ở chiều tiêu cực.  
+- `liquidity` (-0.42, P_conf 97%) – thanh khoản thắt chặt, tín hiệu tiêu cực rõ rệt.  
+- `risk_appetite` (-0.24, P_conf 91%) – khẩu vị rủi ro giảm đáng kể.  
+- Các kênh `commodity`, `fiscal_public_investment` có P_conf ≤ 65%, coi là giằng co/nhiễu loạn, không kết luận xu hướng.
+
+Mặc dù tổng thể sentiment vẫn risk‑on mạnh, các kênh inflation, liquidity, risk_appetite đang đưa ra cảnh báo đối nghịch với độ tin cậy cao.
+
+## 3. Các yếu tố dẫn dắt quan trọng (1d – cập nhật nhất)
+
+**Tích cực**  
+- Tỷ giá trung tâm 10/07 tăng 3 đồng (USD/VND) – `fx_external` (+1.45).  
+- Bắc Ninh vào nhóm 9 tỉnh tăng trưởng 2 chữ số, GRDP 6 tháng 10.56% – `growth` (+0.17).  
+- Bắc Ninh chuyển dịch thành trung tâm CNC – `growth` (+0.17).  
+- Lợi suất TPCP đi ngang – `credit_stress` (ghi nhận như yếu tố hỗ trợ +0.35).  
+
+**Tiêu cực**  
+- NHNN hút ròng 3,275.9 tỷ qua OMO 10/07 – `liquidity` (-0.21).  
+- Thanh khoản NH “căng”: huy động 100 đồng, cho vay 117 đồng – `banking_system` (-0.17).  
+- Lợi suất JGB 20Y Nhật giảm mạnh 11 bps – `credit_stress` (-0.35, phản ánh lo ngại toàn cầu).
+
+## 4. Kết luận tác động lên AI CIO
+
+News sentiment **hỗ trợ (supports)** một nền tảng vĩ mô risk‑on. Các kênh tăng trưởng, thu nhập và tỷ giá đều mạnh, xác nhận tâm lý thị trường tích cực. Tuy nhiên, xuất hiện **xung đột (conflict)** từ ba kênh phòng thủ: thanh khoản thắt chặt, lạm phát và khẩu vị rủi ro giảm.  
+- Hành động: Duy trì overweight tài sản rủi ro (cổ phiếu) nhưng cần mở phòng hộ nhẹ hoặc giám sát chặt các tín hiệu đảo chiều từ thanh khoản/lạm phát. Bộ phận Market‑Internal Tools nên chú ý đến độ phân kỳ này.
+
+## 5. Cảnh báo (Caveat)
+
+- **Nguồn tin**: Trong 300 tin 1 ngày, Mozyfin Social chiếm 77 (25.7%) – đây là lớp phủ ý kiến mạng xã hội, mức tin cậy thấp hơn so với dữ liệu cứng. Tin từ Data Wi (92/300) và Mozyfin news (131/300) là các nguồn dữ liệu đáng tin cậy hơn. Tín hiệu tổng vẫn đủ mạnh nhờ sự áp đảo của dữ liệu định lượng.  
+- **Tính thời sự**: Feed được tạo ngày 10/07/2026, không có hiện tượng trễ (stale).  
+- **Rủi ro nhiễu tiêu đề**: Một số driver đơn lẻ (OMO hút ròng, chỉ số giá hàng hóa quốc tế giảm sâu) có thể gây ảnh hưởng tức thời mà không phản ánh xu hướng nền. Nhà đầu tư nên kết hợp với lớp vĩ mô và công cụ nội bộ thị trường để tránh phản ứng thái quá.

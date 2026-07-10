@@ -1,0 +1,41 @@
+## 1. Scenario Assessment  
+Bộ tham số trung lập (K=1.0, CoE=14%) phản ánh chi phí vốn điển hình cho ngành ngân hàng Việt Nam, không quá khắc nghiệt. Tuy nhiên, phần lớn cổ phiếu đều có Economic Alpha âm – ngay trong Top 3, chỉ SHB có Alpha dương yếu (+2.0%), ACB và MBB đều âm nhẹ. Toàn cảnh ngành đang “đốt vốn” trên cơ sở risk-adjusted, báo hiệu thị trường định giá quá cao so với chất lượng lợi nhuận bền vững.
+
+## 2. Top Alpha Decomposition  
+
+**SHB – Fortress hiếm hoi**  
+- Driver chính: P/B rẻ (0.90) kết hợp ROE 17.5% ổn định, σROE thấp nhất nhóm (1.9%) và payout chỉ 8.6% → phần lớn lợi nhuận được giữ lại tái đầu tư. Disciplined Return vượt CoE nhẹ (15.9% → Alpha +2.0%). Đây là mẫu “pháo đài” bền vững.  
+
+**ACB – Growth Trap cận biên**  
+- ROE rất cao (23.0%) nhưng P/B đã phản ánh kỳ vọng (1.23) và σROE 2.7% ăn mòn lợi thế. Dù payout trung bình (15.9%), Disciplined Return chỉ đạt 13.0% → Alpha ‑1.0%. Chất lượng cao nhưng không đủ bù đắp chi phí vốn – bẫy tăng trưởng định giá cao.  
+
+**MBB – Premium Burn**  
+- Chất lượng vượt trội: ROE 21.8%, σROE chỉ 1.6% (thấp nhất nhóm), payout rất thấp (6.7%). Nhưng P/B 1.46 đã đẩy Disciplined Return xuống 12.3% (Alpha ‑1.7%). Đây là trường hợp “đốt vốn do premium” – ngân hàng tốt nhưng giá quá đắt.
+
+## 3. Value Traps Warning  
+
+Cả ba mã cuối bảng đều có Alpha âm sâu:
+
+- **LPB (‑12.8%)**: P/B 3.38 vô cùng đắt, σROE cao (3.8%) khiến risk penalty lớn – Premium Burn kết hợp Growth Trap.  
+- **EIB (‑11.1%)**: ROE chỉ 10.0% (thấp hơn cả CoE), σROE lại cao → Cheap Trap điển hình. Dù P/B không quá cao (1.41), lợi nhuận yếu không tạo ra giá trị.  
+- **VPB (‑10.3%)**: σROE 4.7% (cao nhất nhóm) + payout 24.6% → risk penalty và leakage lớn; dù ROE 14.1% khá, Disciplined Return vỏn vẹn 3.7%. Bẫy rủi ro thuần túy.
+
+## 4. Portfolio Construction  
+
+- **Core Holding (60‑70%)**: **SHB** – Fortress duy nhất có Alpha > 0, P/B rẻ, biến động lợi nhuận thấp.  
+- **Tactical (0%)**: Không có mã “cheap-but-not-trap” nào khác trong Top 3 đạt Alpha dương. ACB và MBB đều quá đắt, chỉ nên cân nhắc khi P/B điều chỉnh về vùng hấp dẫn hơn.  
+- **Cấm mua/Underweight**: LPB, EIB, VPB – tránh hoàn toàn. ACB, MBB cũng không nên góp mặt ở tỷ trọng lớn.  
+- Nhìn chung, phân bổ ngành ngân hàng nên tập trung vào SHB, phần còn lại ưu tiên tiền mặt hoặc lĩnh vực khác.
+
+## 5. Structured Tail  
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

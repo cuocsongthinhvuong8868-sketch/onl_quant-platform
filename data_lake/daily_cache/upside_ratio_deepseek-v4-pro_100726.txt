@@ -1,0 +1,37 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Lực cầu hiện tại 3.76%, thấp hơn hẳn trung bình dài hạn 12.23% (Δ = -8.47pp), phản ánh phe mua đang bị áp đảo nghiêm trọng.
+- Lực cung 19.76% vượt xa Mu 12.92% (Δ = +6.84pp), xác nhận áp lực bán chiếm ưu thế rõ rệt.
+- Cả hai chiều đều trong chế độ momentum: Phi cầu 0.241 (đà mua tự tương quan) và Phi cung 0.200 (đà bán tự tương quan), cho thấy xu hướng nào hình thành cũng có sức ỳ lớn.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại: **distribution** (phân phối), khi up << mu và down >> mu đồng thời xảy ra, báo hiệu cổ phiếu đang bị xả hàng.  
+So sánh trị tuyệt đối Phi: |Phi_up| = 0.241 > |Phi_dn| = 0.200, nghĩa là nếu lực cầu bùng phát, nó có thể tự duy trì đà tăng mạnh hơn đà giảm hiện tại. Tuy nhiên, điểm xuất phát của cầu quá thấp (3.76%), nên đà mua tiềm tàng đó chưa thể lấn át lực cung đang thống trị.
+
+## 3. Stress-Test Read
+P95 Downside 24.99% cho thấy biên độ panic kỳ vọng khi thị trường gãy đuôi. Asymmetry hơi nghiêng về downside: đuôi rủi ro giảm dày hơn đuôi tăng (P95 Upside chỉ 22.31%), xác nhận kịch bản bán tháo vẫn có xác suất cực đoan cao hơn bùng nổ mua.
+
+## 4. Verdict
+Tỷ trọng giải ngân đề xuất: **20%**.  
+Chiến lược: **rình bắt đáy (bottom_fishing)** – tận dụng momentum cầu cao để đón nhịp hồi kỹ thuật, nhưng chỉ giải ngân nhỏ giọt vì thị trường đang trong pha phân phối và đuôi rủi ro giảm dày hơn. Nếu phe mua quay lại, đà có thể bền nhờ Phi_up=0.241; ngược lại cần cắt lỗ nghiêm ngặt khi lực cung tiếp tục mở rộng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 24.99,
+  "p95_upside_pct": 22.31,
+  "deployment_pct": 20,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

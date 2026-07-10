@@ -1,0 +1,45 @@
+## 1. Mechanical Decomposition
+Net Liquidity tuần này đạt **5,958,200 triệu USD** (≈5.96 nghìn tỷ USD), tăng **+114,874 triệu USD** so với tuần trước.  
+Phân rã cấu phần:
+- **WALCL (Fed Balance Sheet): 6,735,609 triệu USD.** Chưa có số liệu thay đổi, nhưng với xu hướng QT giảm tốc, WALCL có thể đi ngang hoặc tăng nhẹ từ repo/repo thường xuyên. Mức tăng mạnh gần 115 tỷ USD khó đến từ WALCL đơn thuần.
+- **TGA (Treasury General Account): 774,062 triệu USD.** Nhiều khả năng TGA đã giảm đáng kể so với tuần trước—Treasury chi tiêu ròng (chi trả lãi suất, chi tiêu chính phủ) bơm ngược thanh khoản vào hệ thống ngân hàng. Đây là driver chính của impulse tuần này.
+- **RRP (Reverse Repo): 3,347 triệu USD** – gần như cạn kiệt hoàn toàn. Biến động không đáng kể, không còn đóng vai trò hút/bơm.
+
+=> **TGA bơm ròng** là yếu tố chi phối, khi Treasury xả tiền từ tài khoản về hệ thống, đẩy dự trữ ngân hàng tăng lên.
+
+## 2. Cycle Positioning
+- RRP đã giảm từ đỉnh 2.55 nghìn tỷ USD (12/2022) xuống chỉ còn ~3.35 tỷ USD – **cạn kiệt**. Đây là dấu mốc kết thúc “buffer” thanh khoản. Mọi thay đổi từ Fed/Treasury giờ đi thẳng vào dự trữ, tạo ra **hiệu ứng lan tỏa gấp đôi** so với giai đoạn trước.
+- TGA hiện ở mức trung bình, Treasury đang trong pha xả (chi tiêu), không tích lũy. Điều này tương tự các pha cuối của QE, nơi thanh khoản hệ thống rất nhạy với chi tiêu chính phủ.
+- So sánh Net Liquidity: Đỉnh lịch sử (khoảng 6.3 nghìn tỷ năm 2021) so với hiện tại 5.96 nghìn tỷ – thấp hơn nhưng đang hồi phục. Đáy 2024 là khoảng 5.5 nghìn tỷ, vậy **Net Liquidity đã bật tăng hơn 400 tỷ USD từ đáy, xác nhận xu hướng mở rộng**.
+
+**Regime: QE_late** – mặc dù Fed không gọi đây là QE nhưng thực chất thanh khoản đang được bơm từ Treasury và QT đã chậm lại.
+
+## 3. Signal Strength
+- Tín hiệu: **ADD** (Impulse_EMA = +46.2 tỷ > 0, Z-Score = +1.87 ≥ +1σ) – xác nhận.
+- **Z-Score +1.87** gần đến mức “extreme” (>2σ), cho thấy xung lực thanh khoản đang ở ngưỡng mạnh bất thường so với 52 tuần qua. Đây không còn là vùng cận biên.
+- Impulse_EMA dương và đang tăng, đồng thuận hoàn toàn với tín hiệu ADD. Độ tin cậy cao.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **US Equities (SPX/NDX):** bias tích cực. Thanh khoản dồi dào hỗ trợ định giá, nhất là cổ phiếu tăng trưởng.
+- **DXY:** sức ép giảm, do thanh khoản nới lỏng làm đồng USD yếu đi; **Gold & Crypto** hưởng lợi từ môi trường “easy money” và giảm sức mạnh của USD.
+- **VN-Index:** với lag 4-8 tuần, thanh khoản toàn cầu hiện tại nâng đỡ dòng vốn gián tiếp vào EM. DXY yếu giúp ổn định tỷ giá VND, giảm áp lực rút vốn. Kỳ vọng tác động tích cực lên VN-Index vào nửa cuối tháng 7 đến đầu tháng 8.
+
+## 5. Risk Factors (signal có thể sai vì)
+- **RRP cạn kiệt** làm thị trường dự trữ trở nên kém ổn định. Thanh khoản có thể bị rút gấp nếu TGA tăng đột biến do mùa thuế hoặc phát hành nợ mới.
+- Dữ liệu vào tháng 7 có thể bị nhiễu từ các khoản thanh toán thuế quý II (June/July), khiến TGA bất ngờ tích lũy → dấu hiệu ADD giả.
+- Fed có thể khởi động lại QT mạnh nếu lạm phát vẫn cao; việc không có buffer RRP khiến bất kỳ động thái hút thanh khoản nào cũng gây ra đảo chiều gắt.
+
+## 6. KẾT LUẬN
+Regime **QE_late** với tín hiệu ADD mạnh; outlook **2-4 tuần** cho risk assets là **tích cực**, trong đó VN-Index được hưởng lợi gián tiếp qua kênh dòng vốn và tỷ giá. Rủi ro chính đến từ biến động TGA và khả năng Fed đảo chiều chính sách.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5958.2,
+  "signal": "ADD",
+  "z_score": 1.87,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

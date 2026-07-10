@@ -1,0 +1,30 @@
+## 1. Observations
+- **OLS Slope (0.16, Percentile 1.7th – cực thấp)**: Hệ số góc gần như nằm ngang, xác nhận chùm VIC/VHM/VRE gần như không còn tác động biên lên chỉ số VN30F1M.
+- **Correlation (0.53, Percentile 30.1th – trung bình thấp)**: Mối liên kết tương quan còn ở mức lỏng lẻo, dưới trung vị lịch sử, cho thấy độ tin cậy suy yếu.
+- **Regime hiện tại: DECOUPLING** (ΔCorr = -0.72, ΔSlope = -0.90 < -0.15) – Vingroup mất hoàn toàn vai trò dẫn dắt, thị trường chuyển hướng tìm trụ đỡ từ các nhóm ngành khác.
+
+## 2. Microstructure Read
+Tại thời điểm đóng cửa (VIC 223, VHM 147, VRE 26.35, VN30F1M 1976.5), bộ ba Vingroup không còn khả năng chi phối hợp đồng tương lai. Slope ở phân vị 1.7th phản ánh tình trạng “decoupling cực đoan” – dao động của nhóm VIN không giải thích được biến động VN30F1M. Correlation 30.1th tuy chưa rơi xuống vùng <20th nhưng đủ yếu để củng cố nhận định thị trường đã “rời bỏ” họ Vingroup. Không có dấu hiệu can thiệp (percentile không >80th), thị trường đang tự điều chỉnh thanh khoản sang Bank/Chứng/Thép.
+
+## 3. Event Study Interpretation
+Sự kiện **DECOUPLING** với ΔCorr = -0.72 và ΔSlope = -0.90 cho thấy động lượng sụt giảm mạnh trong mối quan hệ VIN–VN30F1M.  
+- **Intraday**: Tín hiệu từ VIC/VHM/VRE không còn giá trị dự báo cho hướng F1; nếu giao dịch phải dựa trên động thái nhóm ngân hàng (BID, CTG, VCB) hoặc chứng khoán (SSI, VND).  
+- **Overnight**: Không có edge rõ ràng, vị thế qua đêm bị hạn chế; ưu tiên đứng ngoài nếu không có tín hiệu dẫn mới.
+
+## 4. Verdict
+- **Trade plan**: **NO TRADE** trên mô hình VIN–VN30F1M. Hành động decoupling quá mạnh, hệ số góc không đáng kể, không đủ tự tin vào Long/Short F1 dựa trên composite này.
+- **Leading indicator cần theo dõi**: Chỉ số ngành Ngân hàng (BID, CTG, VCB) hoặc cổ phiếu trụ thay thế như HPG, SSI. Một khi Banking xuất hiện momentum rõ ràng, có thể xem xét Short F1 nếu nhóm này yếu.
+- **Stop-loss tham khảo**: Không áp dụng do không có lệnh. Nếu chuyển sang giao dịch spread, điểm dừng sẽ tính theo giá đóng cửa hiện tại (ví dụ: short VIC ở 223.00, stop-loss trên MA20 ngày ~230.00 sau khi xác nhận phân phối).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "10/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.7,
+  "corr_percentile": 30.1,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

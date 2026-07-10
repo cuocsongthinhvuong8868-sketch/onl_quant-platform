@@ -1,0 +1,32 @@
+## 1. Observations
+- Tỷ lệ mã > MA20: 20.5% – thấp, sát ngưỡng oversold (<20%), phản ánh áp lực bán diện rộng trong ngắn hạn.
+- Tỷ lệ mã > MA60: 24.9% – thấp, xác nhận trung hạn chưa thoát khỏi trạng thái suy yếu.
+- Tỷ lệ mã > MA125: 21.4% – thấp, chu kỳ nửa năm vẫn nằm trong vùng tiêu cực.
+- Tỷ lệ mã > MA252: 22.4% – thấp, xu hướng dài hạn hoàn toàn nằm dưới ngưỡng 50%, mất động lực tăng trưởng.
+
+## 2. Structural Health
+Cả bốn đường MA đều ở mức thấp, không xảy ra phân kỳ. Mẫu hình khớp với **Bear Confirmed**: MA20 < 30% và MA252 < 40% → thị trường trong pha suy yếu kéo dài, không có tín hiệu đảo chiều. Đồng thuận giảm điểm trên mọi khung thời gian, cấu trúc kỹ thuật yếu.
+
+## 3. Money Flow Leadership
+- Nhóm dẫn dắt volume MA20 (ngắn hạn) nghiêng về tài chính – ngân hàng (ABB, ACB) và chứng khoán (ASP), cho thấy dòng tiền đầu cơ vẫn co cụm vào các bluechip thanh khoản cao.
+- Nhóm dẫn dắt MA252 (dài hạn) mở rộng thêm tiện ích (BWE), năng lượng (BSR) cùng với các mã trùng lặp như ABB, ASP, BCA, BMS. Sự chồng lấn này chỉ ra dòng tiền thông minh ưu tiên các cổ phiếu có tính phòng thủ cao (ngân hàng lớn, nước, bảo hiểm) thay vì nhóm tăng trưởng rủi ro.
+- Sector lãnh đạo: **mixed** – thiên về phòng thủ, không có tín hiệu chấp nhận rủi ro (aggressive) như thép hay môi giới đầu cơ.
+
+## 4. Verdict
+Chiến lược **phòng thủ** là tối ưu: ưu tiên nắm giữ tiền mặt, hạn chế mở mới. Không sử dụng margin (0%) do MA252 quá thấp. Thị trường đã xác nhận downtrend, không có phân kỳ nên không cần chờ thêm tín hiệu; các nhịp hồi T+ có rủi ro cao, chỉ nên quan sát.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 20.5,
+  "ma60_pct": 24.9,
+  "ma125_pct": 21.4,
+  "ma252_pct": 22.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

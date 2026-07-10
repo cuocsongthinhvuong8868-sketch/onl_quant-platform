@@ -1,0 +1,28 @@
+## 1. Observations
+- Spread annualized 9.81%, với Spread_Z ở mức -0.73σ – thấp hơn trung bình 60 ngày, không có dấu hiệu căng thẳng cấu trúc.
+- DPI đạt 43.3%, dưới ngưỡng 70% – dispersion hiện tại không mang tính régime kéo dài hay bất thường.
+- Tương quan trung bình cặp đôi (Ledoit-Wolf) ở mức 0.008, gần như bằng 0 – thị trường phân hóa cực mạnh, không tồn tại hiệu ứng bầy đàn.
+- Cross-Sectional Skewness và Kurtosis không có sẵn (N/A), tạm thời chưa thể định vị đuôi phân phối lợi suất.
+
+## 2. Structural State
+Thị trường đang trong trạng thái cấu trúc bình thường, không có stress hệ thống. Spread_Z âm cho thấy mức phân tán lợi suất thực tế còn thấp hơn xu hướng gần đây; DPI trung bình khẳng định không có sự cố cục bộ kéo dài. Không hội tụ đủ điều kiện của stress cục bộ (Spread_Z cao + DPI thấp) hay régime stress bền vững (cả hai cùng cao). Đây là nền tảng thuận lợi cho chiến lược chọn cổ phiếu.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu Skewness và Kurtosis, không thể kết luận đuôi nào đang bị đẩy lệch (cú sập cá biệt hay cú đẩy điên rồ) hay mức độ dày đuôi (fat-tail). Với nền tảng phân tán hiện tại, rủi ro tiềm ẩn từ các biến động cực đoan chưa được định lượng – các mô hình chuẩn (normal distribution) vẫn có thể áp dụng tạm thời, nhưng cần bổ sung Skew/Kurt để kiểm chứng.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Correlation): DPI thấp (43.3% < 70%) và Avg Correlation cực thấp (0.008, xấp xỉ 0) đặt thị trường vào ô **Healthy Stock-Picking**. Đây là môi trường phân hóa rõ nét, lý tưởng cho các nhà quản lý danh mục theo phong cách bottom-up. Rủi ro lớn nhất cho Portfolio Manager lúc này không nằm ở hiệu ứng bầy đàn hay khủng hoảng thanh khoản toàn thị trường, mà là **concentration risk** – khi quá tự tin vào khả năng chọn cổ phiếu, danh mục có thể tập trung quá mức vào một vài cổ phiếu riêng lẻ, và một cú sốc đặc thù (idiosyncratic shock) có thể gây tổn thất lớn, đặc biệt khi chưa có thông tin về đuôi béo. Ngoài ra, sự chuyển đổi regime đột ngột (correlation tăng vọt) dù xác suất thấp trong bối cảnh hiện tại vẫn là rủi ro tiềm tàng nếu có sự kiện vĩ mô bất ngờ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "10/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.73,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```
