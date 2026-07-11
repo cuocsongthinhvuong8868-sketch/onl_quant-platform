@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-11",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Funding stress khong con du dai de duy tri luan diem phong thu"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 20.5,
+      "unit": "%",
+      "description": "Do rong phuc hoi du manh de phu dinh PRE-CRASH market internal"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.0,
+      "unit": "%",
+      "description": "Systemic stress thoat vung warning"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.382,
+      "unit": "",
+      "description": "Tail-shape grid ha nhiet dong bo"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": null,
+      "unit": "th pct",
+      "description": "Coupling idiosyncratic ha nhiet va khong con la risk overlay"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "Global stress khong phai nguon bearish chinh; rule nay chi phu dinh neu truoc do CQS stress cao"
+    }
+  ],
+  "provider_key": "chatgpt-local",
+  "saved_at": "2026-07-11",
+  "source": "ai_cio_executive_summary"
+}

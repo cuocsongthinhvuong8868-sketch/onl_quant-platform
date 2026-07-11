@@ -51,6 +51,12 @@ AI_PROVIDER_MAP = {
         "temperature": float(os.getenv("KIMI_LOCAL_TEMPERATURE", "0.4")),
         "timeout": float(os.getenv("KIMI_LOCAL_TIMEOUT", "600")),
     },
+    "chatgpt-local": {
+        "display": "ChatGPT Local",
+        "api_model": os.getenv("CHATGPT_LOCAL_MODEL", "gpt-5.5"),
+        "base_url": os.getenv("CHATGPT_LOCAL_BASE_URL", "http://127.0.0.1:5003/v1"),
+        "temperature": float(os.getenv("CHATGPT_LOCAL_TEMPERATURE", "0.2")),
+    },
     "deepseek-v4-pro": {
         "display": "DeepSeek V4 Pro",
         "api_model": "deepseek-v4-pro",

@@ -1,0 +1,39 @@
+## 1. Observations
+
+- Spread annualized: **9.81%**; Spread_Z: **-0.73σ**.
+- DPI: **43.3%**.
+- Avg Pairwise Correlation Ledoit-Wolf: **0.008**.
+- Cross-Sectional Skewness: **N/A**; Kurtosis: **N/A**.
+
+## 2. Structural State
+
+DPI ở **43.3%**, thấp hơn rõ ngưỡng 70%, cho thấy dispersion chưa phải regime kéo dài. Spread_Z **-0.73σ** cũng không cho thấy cấu trúc bị kéo căng so với rolling 60 ngày.
+
+Vì cả Spread_Z lẫn DPI đều không cao, trạng thái hiện tại nghiêng về **bình thường / không stressed**. Không có bằng chứng về stress cục bộ, vì Spread_Z không vượt +1σ. Cũng không có bằng chứng về regime persistent, vì DPI chưa cao.
+
+## 3. Cross-Check & Tail Direction
+
+Spread dương cho thấy CSSD lớn hơn CSAD, tức vẫn có yếu tố outlier trong mặt cắt cổ phiếu. Tuy nhiên, do **CS Skewness = N/A**, không thể xác định tail đang lệch về phía cú sập cá biệt hay cú kéo tăng cực đoan.
+
+Kurtosis cũng **N/A**, nên không thể xác nhận mức độ fat-tail hay loại bỏ giả định normal từ dữ liệu này. Tail direction vì vậy nên được xem là **chưa xác định / gần symmetric theo dữ liệu quan sát được**, với độ tin cậy thấp cho phần tail.
+
+## 4. Regime Mapping
+
+DPI thấp + Corr rất thấp gần 0 đưa thị trường vào ô **Healthy Stock-Picking** trong 2D Regime Map.
+
+Điểm đáng chú ý là correlation gần như bằng 0, tức hành vi đồng pha yếu và phân hóa rõ. Rủi ro lớn nhất cho Portfolio Manager không phải herding crash hay liquidity dry-up toàn thị trường, mà là **concentration risk**: hiệu suất danh mục có thể bị chi phối bởi vài vị thế, ngành, hoặc outlier đơn lẻ trong môi trường phân hóa.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "10/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.73,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

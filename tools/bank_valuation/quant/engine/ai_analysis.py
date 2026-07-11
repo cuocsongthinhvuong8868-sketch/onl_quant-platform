@@ -22,6 +22,18 @@ AI_PROVIDER_MAP = {
         "base_url": "https://api.moonshot.ai/v1",
         "temperature": 1.0,
     },
+    "kimi-2.6-local": {
+        "display": "Kimi 2.6 Local",
+        "api_model": "kimi-k2.6",
+        "base_url": "http://127.0.0.1:5001/v1",
+        "temperature": 0.4,
+    },
+    "chatgpt-local": {
+        "display": "ChatGPT Local",
+        "api_model": "gpt-5.5",
+        "base_url": "http://127.0.0.1:5003/v1",
+        "temperature": 0.2,
+    },
 }
 
 
@@ -101,25 +113,25 @@ def _top_line(data: pd.DataFrame, column: str, ascending: bool, label: str) -> s
 def _regime_context(data: pd.DataFrame) -> str:
     regime = calculate_bank_valuation_regime(data)
     if regime.eligible_banks == 0:
-        return "Chưa đủ dữ liệu hợp lệ để phân loại trạng thái thị trường theo định giá nhóm ngân hàng."
+        return "ChÆ°a Ä‘á»§ dá»¯ liá»‡u há»£p lá»‡ Ä‘á»ƒ phÃ¢n loáº¡i tráº¡ng thÃ¡i thá»‹ trÆ°á»ng theo Ä‘á»‹nh giÃ¡ nhÃ³m ngÃ¢n hÃ ng."
 
     return f"""
-Phân loại regime: {regime.regime_label}
-Mã hợp lệ: {regime.eligible_banks}
-Định giá cao: {regime.overvalued_count} ({_format_pct(regime.overvalued_breadth)})
-Hợp lý: {regime.fair_count} ({_format_pct(regime.fair_breadth)})
-Rẻ rõ rệt: {regime.strong_undervalued_count}
-Rẻ nhưng rủi ro: {regime.risky_undervalued_count}
-Điểm độ rộng định giá: {_format_pct(regime.bank_valuation_breadth_score)}
-Gap trung vị: {_format_pct(regime.median_valuation_gap)}
+PhÃ¢n loáº¡i regime: {regime.regime_label}
+MÃ£ há»£p lá»‡: {regime.eligible_banks}
+Äá»‹nh giÃ¡ cao: {regime.overvalued_count} ({_format_pct(regime.overvalued_breadth)})
+Há»£p lÃ½: {regime.fair_count} ({_format_pct(regime.fair_breadth)})
+Ráº» rÃµ rá»‡t: {regime.strong_undervalued_count}
+Ráº» nhÆ°ng rá»§i ro: {regime.risky_undervalued_count}
+Äiá»ƒm Ä‘á»™ rá»™ng Ä‘á»‹nh giÃ¡: {_format_pct(regime.bank_valuation_breadth_score)}
+Gap trung vá»‹: {_format_pct(regime.median_valuation_gap)}
 Gap trimmed mean: {_format_pct(regime.trimmed_mean_valuation_gap)}
-Gap theo vốn hóa: {_format_pct(regime.market_cap_weighted_gap)}
-Gap theo chất lượng dữ liệu: {_format_pct(regime.confidence_weighted_gap)}
-Điểm định giá tương đối theo peer labels: {_format_pct(regime.relative_value_breadth_score)}
+Gap theo vá»‘n hÃ³a: {_format_pct(regime.market_cap_weighted_gap)}
+Gap theo cháº¥t lÆ°á»£ng dá»¯ liá»‡u: {_format_pct(regime.confidence_weighted_gap)}
+Äiá»ƒm Ä‘á»‹nh giÃ¡ tÆ°Æ¡ng Ä‘á»‘i theo peer labels: {_format_pct(regime.relative_value_breadth_score)}
 
-Phương pháp: {regime.methodology_note}
-Công thức điểm độ rộng: (Rẻ rõ rệt + 0.5 x Rẻ nhưng rủi ro - Định giá cao) / số mã hợp lệ.
-Ngưỡng đọc regime: >= +25% là Rẻ trên diện rộng; 0% đến +25% là Tương đối rẻ; -25% đến 0% là Trung tính; -50% đến -25% là Định giá cao, cần chọn lọc; dưới -50% là Định giá cao trên diện rộng.
+PhÆ°Æ¡ng phÃ¡p: {regime.methodology_note}
+CÃ´ng thá»©c Ä‘iá»ƒm Ä‘á»™ rá»™ng: (Ráº» rÃµ rá»‡t + 0.5 x Ráº» nhÆ°ng rá»§i ro - Äá»‹nh giÃ¡ cao) / sá»‘ mÃ£ há»£p lá»‡.
+NgÆ°á»¡ng Ä‘á»c regime: >= +25% lÃ  Ráº» trÃªn diá»‡n rá»™ng; 0% Ä‘áº¿n +25% lÃ  TÆ°Æ¡ng Ä‘á»‘i ráº»; -25% Ä‘áº¿n 0% lÃ  Trung tÃ­nh; -50% Ä‘áº¿n -25% lÃ  Äá»‹nh giÃ¡ cao, cáº§n chá»n lá»c; dÆ°á»›i -50% lÃ  Äá»‹nh giÃ¡ cao trÃªn diá»‡n rá»™ng.
 """
 
 
@@ -162,7 +174,7 @@ def build_bank_valuation_ai_prompt(
 # INPUT DATA
 
 ## Universe
-- Ngày báo cáo AI: {report_date_text}
+- NgÃ y bÃ¡o cÃ¡o AI: {report_date_text}
 - Tickers: {len(data)}
 - Overvalued: {counts["overvalued"]}
 - Fair value: {counts["fair"]}
@@ -170,7 +182,7 @@ def build_bank_valuation_ai_prompt(
 - Other / need more data: {counts["other"]}
 - OHLCV source: {ohlcv_source}
 
-## Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng
+## Tráº¡ng thÃ¡i thá»‹ trÆ°á»ng hÃ m Ã½ tá»« Ä‘á»‹nh giÃ¡ nhÃ³m ngÃ¢n hÃ ng
 {_regime_context(data)}
 
 ## Market confirmation labels for fair + undervalued watchlist
@@ -250,12 +262,12 @@ def build_bank_valuation_ai_prompt(
 {warnings_text}
 
 # REQUIRED OUTPUT
-1. Dòng mở đầu: ghi rõ "Ngày báo cáo AI: {report_date_text}".
-2. Phân loại regime: nêu rõ nhãn "Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng", điểm độ rộng, số mã định giá cao / hợp lý / rẻ, và kết luận biên an toàn hiện tại.
-3. Luận điểm chính: 3-5 bullets giải thích vì sao regime đó được suy ra từ valuation breadth của nhóm ngân hàng.
-4. Kiểm tra chéo: định giá tương đối và xác nhận giá đang củng cố hay phủ định kết luận regime.
-5. Tín hiệu theo mã: mã nào đáng theo dõi trong nhóm hợp lý/rẻ, mã nào là rủi ro hoặc đang bị thị trường xác nhận yếu.
-6. Rủi ro dữ liệu và bước tiếp theo: data quality, CAR/beta/provision/credit-cycle, và điều cần kiểm tra trước khi dùng tín hiệu.
+1. DÃ²ng má»Ÿ Ä‘áº§u: ghi rÃµ "NgÃ y bÃ¡o cÃ¡o AI: {report_date_text}".
+2. PhÃ¢n loáº¡i regime: nÃªu rÃµ nhÃ£n "Tráº¡ng thÃ¡i thá»‹ trÆ°á»ng hÃ m Ã½ tá»« Ä‘á»‹nh giÃ¡ nhÃ³m ngÃ¢n hÃ ng", Ä‘iá»ƒm Ä‘á»™ rá»™ng, sá»‘ mÃ£ Ä‘á»‹nh giÃ¡ cao / há»£p lÃ½ / ráº», vÃ  káº¿t luáº­n biÃªn an toÃ n hiá»‡n táº¡i.
+3. Luáº­n Ä‘iá»ƒm chÃ­nh: 3-5 bullets giáº£i thÃ­ch vÃ¬ sao regime Ä‘Ã³ Ä‘Æ°á»£c suy ra tá»« valuation breadth cá»§a nhÃ³m ngÃ¢n hÃ ng.
+4. Kiá»ƒm tra chÃ©o: Ä‘á»‹nh giÃ¡ tÆ°Æ¡ng Ä‘á»‘i vÃ  xÃ¡c nháº­n giÃ¡ Ä‘ang cá»§ng cá»‘ hay phá»§ Ä‘á»‹nh káº¿t luáº­n regime.
+5. TÃ­n hiá»‡u theo mÃ£: mÃ£ nÃ o Ä‘Ã¡ng theo dÃµi trong nhÃ³m há»£p lÃ½/ráº», mÃ£ nÃ o lÃ  rá»§i ro hoáº·c Ä‘ang bá»‹ thá»‹ trÆ°á»ng xÃ¡c nháº­n yáº¿u.
+6. Rá»§i ro dá»¯ liá»‡u vÃ  bÆ°á»›c tiáº¿p theo: data quality, CAR/beta/provision/credit-cycle, vÃ  Ä‘iá»u cáº§n kiá»ƒm tra trÆ°á»›c khi dÃ¹ng tÃ­n hiá»‡u.
 """
     return system_prompt, user_prompt.strip()
 

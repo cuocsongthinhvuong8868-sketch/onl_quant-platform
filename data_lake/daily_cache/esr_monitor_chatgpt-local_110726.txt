@@ -1,0 +1,36 @@
+## 1. Observations
+- SSI: **63.0%**, thuộc vùng **WARNING**.
+- Market State: **EUPHORIC_RISK**.
+- Top driver #1: **S_LIQ 36%**.
+- Top driver #2-3: **S_VAL 31%**, **S_COR 18%**.
+
+## 2. Risk Decomposition
+Rủi ro đang được dẫn dắt bởi **S_LIQ**: tín hiệu **volume khô cạn vs 1Y norm**. Đây là cấu phần đáng chú ý vì thanh khoản suy yếu trong khi stress hệ thống đã vào vùng WARNING, làm giảm khả năng hấp thụ cung nếu áp lực bán mở rộng.
+
+**S_VAL** đứng thứ hai cho thấy định giá đang căng so với nền lãi suất tiền gửi, tức phần bù rủi ro không còn rộng. Khi valuation tension đi cùng thanh khoản khô, thị trường dễ nhạy với tin xấu hoặc dòng tiền rút nhẹ.
+
+**S_COR** ở mức đóng góp 18%, với PCA PC1 EVR 38.1%, hàm ý mức đồng pha hệ thống đang tăng. Bộ ba **S_LIQ + S_VAL + S_COR** nghiêng về cấu trúc bull-trap/stress tích lũy: dòng tiền mỏng, định giá căng, và cổ phiếu có xu hướng vận động cùng nhau khi rủi ro bật lên.
+
+## 3. Cross-Check
+VN30 đang **dưới MA125**, nên không phải mẫu hình “giá tạo đỉnh mới trong khi SSI vào WARNING”. Đây không phải divergence tích cực; ngược lại, price action đang xác nhận rằng stress đã bắt đầu ảnh hưởng tới trend filter.
+
+HMM **EUPHORIC RISK** khớp với SSI WARNING ở phần “high stress”. Tuy nhiên, nhãn EUPHORIC_RISK thường gắn với uptrend, trong khi dữ liệu trend hiện tại dưới MA125. Flag: trạng thái có rủi ro chuyển sang **ACTIVE_STRESS** nếu áp lực bán duy trì.
+
+## 4. Verdict
+Cash target đề xuất: **55% danh mục**.
+
+Hedge action: **reduce_beta** là hành động nền; có thể cân nhắc **short VN30F1M quy mô nhỏ** nếu VN30 tiếp tục nằm dưới MA125 và SSI không hạ nhiệt. Không tăng beta.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 55,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -115,6 +115,12 @@ except ImportError:
             "temperature": 0.4,
             "timeout": 600,
         },
+        "chatgpt-local": {
+            "display": "ChatGPT Local",
+            "api_model": "gpt-5.5",
+            "base_url": "http://127.0.0.1:5003/v1",
+            "temperature": 0.2,
+        },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
             "api_model": "deepseek-v4-pro",
@@ -531,23 +537,23 @@ if st.session_state.show_cio_input:
 
 st.markdown("---")
 
-# ── About this platform (Download Methodology PDF) ──
-pdf_path = r"C:\Users\ADMIN\Downloads\Tóm tắt methodology của onl_quant-platform.pdf"
-if os.path.exists(pdf_path):
+# ── About this platform (Methodology summary) ──
+_about_path = ROOT_DIR / "docs" / "about_this_platform.md"
+with st.expander("📖 About this platform (Tóm tắt Methodology)", expanded=False):
     try:
-        with open(pdf_path, "rb") as f:
-            pdf_data = f.read()
+        _about_text = _about_path.read_text(encoding="utf-8")
+        st.markdown(_about_text)
         st.download_button(
-            label="📖 About this platform (Tóm tắt Methodology)",
-            data=pdf_data,
-            file_name="Tóm tắt methodology của onl_quant-platform.pdf",
-            mime="application/pdf",
+            label="⬇️ Tải tóm tắt Methodology (.md)",
+            data=_about_text.encode("utf-8"),
+            file_name="about_this_platform.md",
+            mime="text/markdown",
             use_container_width=True,
-            type="secondary"
+            type="secondary",
         )
+    except FileNotFoundError:
+        st.warning("Chưa tìm thấy `docs/about_this_platform.md` trong repository.")
     except Exception as e:
-        st.caption(f"📖 About this platform (Không thể đọc tệp PDF: {e})")
-else:
-    st.caption("📖 About this platform (Tệp tóm tắt methodology chưa sẵn sàng tại thư mục Downloads)")
+        st.warning(f"Không thể đọc tóm tắt methodology: {e}")
 
 st.caption("© Quant Platform — 3 nhánh phân tích: Macro Analysis • Micro Analysis • Behavioral Finance")

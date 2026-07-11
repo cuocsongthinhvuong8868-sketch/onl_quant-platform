@@ -1,0 +1,45 @@
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần 2026-07-08 đạt **$5,958.2bn**, tăng **$114.9bn w/w**. Vì **RRPONTSYD chỉ còn $3.3bn**, gần như đã cạn, phần “bơm” từ RRP không còn là động lực lớn. Cấu phần chi phối tuần này nhiều khả năng đến từ **TGA giảm / Treasury chi ra hệ thống** hoặc biến động WALCL ít âm hơn kỳ trước. Với TGA ở **$774.1bn**, mức này vẫn cao, nên nếu TGA giảm trong tuần thì tác động bơm thanh khoản sẽ rất rõ.
+
+## 2. Cycle Positioning
+
+Đây không phải QE thuần túy theo nghĩa Fed mở rộng bảng cân đối chủ động. WALCL vẫn ở vùng sau-QT, nhưng **net liquidity impulse đang giống pha “QE-like” do Treasury/RRP plumbing**, tức thanh khoản tư nhân tăng dù Fed chưa nhất thiết quay lại QE.
+
+RRP đã **gần zero** vì dưới ngưỡng $100bn rất xa. Điều này quan trọng: nguồn đệm giúp hấp thụ phát hành Treasury đã gần hết, nên các biến động TGA sau này có thể tác động trực tiếp hơn lên reserves/banking liquidity. TGA ở $774bn cho thấy Treasury vẫn đang giữ lượng cash lớn; nếu tiếp tục xả, liquidity được bơm thêm, nếu tái tích lũy thì sẽ hút mạnh.
+
+So với đỉnh 2022, Net Liquidity hiện tại vẫn thấp hơn vùng cực kỳ dư thừa sau QE. Nhưng so với đáy 2024, mức hiện tại đã phục hồi đáng kể, phản ánh một chu kỳ liquidity rebound khá rõ.
+
+## 3. Signal Strength
+
+Signal hiện tại là **ADD**: **Impulse EMA(4) +$46.2bn** lớn hơn 0 và **Z-score +1.87σ** cao hơn ngưỡng +1σ. Đây là tín hiệu mạnh hơn vùng cận biên 1.0-1.5σ, nhưng chưa phải extreme vì vẫn dưới +2σ.
+
+Điểm quan trọng là impulse ngắn hạn và impulse làm mượt đều cùng chiều: tuần tăng mạnh, EMA cũng dương. Vì vậy signal không chỉ là nhiễu một tuần.
+
+## 4. Cross-Asset Spillover
+
+**SPX/NDX:** bias 1-4 tuần là risk-on, đặc biệt hỗ trợ nhóm duration/mega-cap growth nếu yields và DXY không tăng ngược.
+
+**DXY/Gold/Crypto:** liquidity tăng thường tạo áp lực mềm lên DXY, hỗ trợ gold nếu real yields không bật mạnh. Crypto có bias tích cực vì nhạy với USD liquidity và beta tài sản rủi ro.
+
+**VN-Index:** bias tích cực nhưng có lag **4-8 tuần**. Kênh truyền dẫn là DXY → EM FX → foreign flows/risk appetite. Tác động không tuyến tính và có thể bị lấn át bởi yếu tố trong nước.
+
+## 5. Risk Factors
+
+RRP quá thấp khiến khả năng “bơm thêm” từ kênh này gần như hết, nên các ADD signal sau này phụ thuộc nhiều hơn vào TGA/WALCL. TGA quanh các mùa thuế **April/June/Sep/Dec** có thể tạo nhiễu lớn. Ngoài ra, các buyback đặc biệt hoặc emergency facilities có thể làm dữ liệu liquidity méo tạm thời.
+
+## 6. KẾT LUẬN
+
+Regime hiện tại là **QE-like late liquidity rebound**: risk assets có outlook tích cực trong 2-4 tuần, nhưng chất lượng tín hiệu phụ thuộc lớn vào TGA vì RRP đã cạn.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5958.2,
+  "signal": "ADD",
+  "z_score": 1.87,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

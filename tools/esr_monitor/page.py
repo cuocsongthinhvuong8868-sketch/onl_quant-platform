@@ -24,10 +24,15 @@ except ImportError:
             "api_model": "kimi-k2.6",
             "base_url": "https://api.moonshot.ai/v1",
         },
-        "deepseek-v4-pro": {
-            "display": "DeepSeek V4 Pro",
-            "api_model": "deepseek-v4-pro",
-            "base_url": "https://api.deepseek.com/v1",
+        "kimi-2.6-local": {
+            "display": "Kimi 2.6 Local",
+            "api_model": "kimi-k2.6",
+            "base_url": "http://127.0.0.1:5001/v1",
+        },
+        "chatgpt-local": {
+            "display": "ChatGPT Local",
+            "api_model": "gpt-5.5",
+            "base_url": "http://127.0.0.1:5003/v1",
         },
     }
 

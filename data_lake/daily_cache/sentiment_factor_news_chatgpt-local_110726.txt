@@ -1,0 +1,43 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Regime sentiment**
+
+- **1d:** `neutral`, nhưng mean âm `-0.135`; `P_conf 70%` ⇒ chỉ **nghiêng nhẹ risk-off / tín hiệu ban đầu**, chưa đủ chắc để kết luận xu hướng rõ.
+- **7d:** `strong_risk_on`, mean `+0.626`; `P_conf 100%`, CI dương hoàn toàn ⇒ **risk-on được xác nhận mạnh**.
+- **30d:** `strong_risk_on`, mean `+0.548`; `P_conf 100%`, CI dương hoàn toàn ⇒ **risk-on nền vẫn rất chắc**.
+
+**Channel kéo chính**
+
+Risk-on mạnh:
+- `fx_external`: rất mạnh trong 7d `+2.000`, `P_conf 100%`.
+- `earnings`: tích cực nhất quán 1d/7d/30d, `P_conf 100%`.
+- `credit_stress`: tích cực ở 7d/30d, `P_conf 100%`.
+- `monetary_policy`: rất tích cực 30d `+1.806`, nhưng 1d lại âm `-0.672`.
+
+Risk-off ngắn hạn:
+- `liquidity`: âm ở cả 1d/7d/30d, đặc biệt 1d `-0.541`, `P_conf 96%`.
+- `inflation`: âm nhất quán, 1d `-0.668`, 7d `-0.668`, 30d `-0.728`.
+- `risk_appetite`: 1d âm `-0.360`, `P_conf 97%`.
+
+**Drivers đáng chú ý**
+
+Positive:
+- Tỷ giá trung tâm tăng các ngày 08/07, 09/07, 10/07 kéo `fx_external` tích cực.
+- `earnings` là channel hỗ trợ mạnh nhất trong 1d và 7d.
+- `credit_stress` tích cực trong 7d/30d.
+- Chính sách tiền tệ tích cực trong 30d, dù 1d đang đảo âm.
+
+Negative:
+- NHNN hút ròng `15,964.1 tỷ` qua OMO ngày 07/07 kéo `liquidity` âm.
+- `inflation` âm và có độ tin cậy cao.
+- Giá quặng sắt, HRC, PVC, heo hơi giảm tạo áp lực `commodity`.
+- `risk_appetite` 1d âm với xác nhận cao.
+
+**Tác động cho AI CIO**
+
+News layer hiện **supports macro layer nếu macro layer đang risk-on trung hạn**, vì 7d và 30d đều strong risk-on rất chắc. Tuy nhiên, **conflicts hoặc cảnh báo với market-internal tools nếu các tín hiệu nội tại thị trường đang yếu ngắn hạn**, do 1d chuyển neutral/âm nhẹ và liquidity, inflation, risk appetite đang gây sức ép.
+
+Hành động hợp lý: giữ thiên hướng risk-on trung hạn, nhưng giảm độ tự tin ngắn hạn; không dùng feed này làm tín hiệu tăng tỷ trọng độc lập.
+
+**Caveat**
+
+Feed generated lúc `2026-07-11 12:34:34 +07`, chưa stale trong bối cảnh input. `mozyfin_social` chiếm đáng kể, đặc biệt 1d là `52/167`, nên phần này phải xem là **bằng chứng social/opinion độ tin cậy thấp hơn**. Rủi ro headline noise cao; đây chỉ là overlay sentiment nhanh, không phải rule phân bổ cứng.

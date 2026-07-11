@@ -417,6 +417,12 @@ except ImportError:
             "temperature": 0.4,
             "timeout": 600,
         },
+        "chatgpt-local": {
+            "display": "ChatGPT Local",
+            "api_model": "gpt-5.5",
+            "base_url": "http://127.0.0.1:5003/v1",
+            "temperature": 0.2,
+        },
         "deepseek-v4-pro": {
             "display": "DeepSeek V4 Pro",
             "api_model": "deepseek-v4-pro",

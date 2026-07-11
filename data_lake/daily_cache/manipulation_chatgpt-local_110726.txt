@@ -1,0 +1,30 @@
+## 1. Observations
+- OLS slope = `0.16`, percentile `1.7th`: rất thấp, VIN basket gần như không còn beta dẫn VN30F1M.
+- Correlation = `0.53`, percentile `30.1th`: còn liên hệ nhưng lỏng, chưa đủ để dùng VIC/VHM/VRE làm tracking chính.
+- Regime = `DECOUPLING`: ΔCorr `-0.72`, ΔSlope `-0.90`, xác nhận VIN đang mất quyền dẫn.
+
+## 2. Microstructure Read
+VIC/VHM/VRE lúc này vai trò **giảm mạnh**, gần trạng thái “market đã rời VIN” hơn là chi phối F1. Slope percentile dưới `20th` là decoupling extreme; corr percentile chưa cực thấp nhưng chỉ ở vùng lỏng, nên không nên lấy nhịp VIN để suy ra hướng VN30F1M.
+
+## 3. Event Study Interpretation
+DECOUPLING từ 15/04/2026 nghĩa là intraday nên nhìn dòng tiền ở **Bank / Chứng / Thép** để xác nhận hướng F1. Không nên giữ overnight chỉ vì VIN xanh hoặc đỏ; nếu không có confirmation từ nhóm dẫn mới, giảm sizing hoặc đóng trong ngày.
+
+## 4. Verdict
+Trade plan: **Spread VIN-vs-Bank**, ưu tiên short/underweight VIN leg và chỉ Long F1 khi Bank xác nhận kéo chỉ số.
+
+Leading indicators: `VCB`, `TCB`, `MBB`, `SSI`, `HPG`.
+
+Stop-loss reference cho VIN leg: nếu short VIN basket, cắt khi VIN đồng loạt hồi trên mốc +3% từ close: VIC `223.00 × 1.03 ≈ 229.69`, VHM `147.00 × 1.03 ≈ 151.41`, VRE `26.35 × 1.03 ≈ 27.14`.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "10/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.7,
+  "corr_percentile": 30.1,
+  "trade_signal": "spread",
+  "confidence": "medium"
+}
+```

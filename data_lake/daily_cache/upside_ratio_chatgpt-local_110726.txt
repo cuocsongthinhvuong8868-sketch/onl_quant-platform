@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+
+- Upside breadth hiện tại 3.76% thấp hơn mu 12.23%: delta **-8.47 điểm %**, lực cầu đang bị nén mạnh.
+- Downside breadth hiện tại 19.76% cao hơn mu 12.92%: delta **+6.84 điểm %**, lực cung đang vượt nền dài hạn.
+- Phi_up = **+0.241** và Phi_dn = **+0.200** đều thuộc momentum regime; cả đà mua và đà bán đều có tính tiếp diễn, không phải random walk.
+
+## 2. Supply-Demand Dynamics
+
+Trạng thái hiện tại là **distribution**: upside thấp hơn mu rõ rệt trong khi downside cao hơn mu rõ rệt. Nghĩa là độ rộng tăng yếu, độ rộng giảm mở rộng; dòng tiền chưa cho tín hiệu tích lũy.
+
+So sánh momentum thuần theo trị tuyệt đối: `|Phi_up| = 0.241` > `|Phi_dn| = 0.200`, nên **cầu giữ momentum mạnh hơn về mặt động lượng**. Tuy nhiên, cầu đang xuất phát từ nền rất thấp, còn cung đang ở trạng thái đã mở rộng.
+
+## 3. Stress-Test Read
+
+P95 Downside = **24.99%** là biên panic kỳ vọng nếu thị trường gãy: gần 1/4 số mã có thể rơi dưới ngưỡng -2% trong phiên stress T+19.
+
+Asymmetry nghiêng về rủi ro cung: P95 Downside **24.99%** cao hơn P95 Upside **22.31%** khoảng **2.68 điểm %**. Tail risk phía bán dày hơn.
+
+## 4. Verdict
+
+Tỷ trọng giải ngân đề xuất: **20%**.
+
+Strategy: **phòng thủ**. Không phù hợp mua đuổi vì cấu trúc breadth là distribution. Có thể giữ phần giải ngân thấp để quan sát phản ứng cầu, nhưng allocation chính nên ưu tiên kiểm soát rủi ro.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 24.99,
+  "p95_upside_pct": 22.31,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

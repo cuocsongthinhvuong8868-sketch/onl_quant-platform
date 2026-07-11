@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+
+Phiên 2026-07-08, lãi suất qua đêm ON ở 4,68%, giảm 0,60 điểm % so với phiên trước. Đây là nhịp hạ nhiệt rõ trên dữ liệu thô trong ngày, nhưng mức ON vẫn nằm sát vùng cao của dải trung tính và chưa quay lại trạng thái dễ chịu.
+
+Cấu trúc kỳ hạn không đảo ngược: 1W-ON ở +0,55 điểm %, 2W-ON ở +1,36 điểm %. Điều này cho thấy không có squeeze cực ngắn hạn tại overnight trong phiên hiện tại. Tuy nhiên, đường cong vẫn phản ánh chi phí vốn kỳ hạn ngắn cao hơn ON, nghĩa là hệ thống chưa trở lại trạng thái thanh khoản dồi dào.
+
+## 2. Trend 20 phiên
+
+Trend 20 phiên nên được phân loại là **liquidity_squeeze / stress building**, dù snapshot hiện tại đã hạ nhiệt. ON tăng 1,17 điểm % trong 20 phiên, ON trung bình ở 5,03%, và cụm 2026-06-29 đến 2026-07-05 ghi nhận nhiều phiên căng, gồm spike ON lên 12,49% và 5 phiên STRESS/WARNING.
+
+Điểm cần lưu ý là ON MA5 thay đổi -0,07 điểm % nếu so đầu-cuối kỳ, nhưng slope MA5 vẫn dương +0,124 điểm %/phiên, phản ánh quá trình tích tụ stress trong phần giữa/cuối chuỗi. Số phiên ON tăng/giảm là 9/11, không nghiêng tuyệt đối về một chiều, và chỉ có 1 phiên curve đảo ngược. Vì vậy, phiên hiện tại đang hạ nhiệt, nhưng trend 20 phiên vẫn mang di sản stress, chưa đủ bằng chứng để gọi là easing bền vững.
+
+## 3. Regime & Z-Score
+
+Z-score ON MA5 ở +0,10 và percentile 0,595 cho thấy lãi suất qua đêm đã mượt nằm cao hơn nhẹ so với mặt bằng 1 năm, khoảng phân vị 59,5%. Đây không phải vùng cực đoan, nhưng cũng không còn là vùng hỗ trợ thanh khoản mạnh.
+
+Regime hiện tại là **ELEVATED**, phản ánh điều kiện vốn ngắn hạn vẫn có độ căng nhất định theo dữ liệu VNIBOR. Signal là **NEUTRAL**, nghĩa là phiên hiện tại không phát tín hiệu stress mới. Input hiện tại không đủ dữ liệu để kết luận nguyên nhân từ OMO, tín phiếu, tỷ giá, mùa vụ thuế hay hành vi của nhóm ngân hàng cụ thể.
+
+## 4. Spillover Tới VN-Index
+
+Tác động sang VN-Index trong 2-4 tuần tới nghiêng **tiêu cực vừa phải**. Snapshot ngày 2026-07-08 giảm áp lực nhờ ON hạ 0,60 điểm %, signal NEUTRAL và không đảo ngược curve. Tuy vậy, trend 20 phiên cho thấy thị trường vừa đi qua một pha căng thanh khoản, với nhiều phiên STRESS/WARNING và ON trung bình 20 phiên trên 5%.
+
+Cơ chế truyền dẫn chính là chi phí sử dụng vốn ngắn hạn cao hơn làm giảm độ hấp dẫn của đòn bẩy và dòng tiền rủi ro. Với chứng khoán, điều này có thể khiến dòng tiền nội thận trọng hơn, margin khó mở rộng mạnh, và nhóm cổ phiếu nhạy với thanh khoản chịu chiết khấu định giá cao hơn. Một phiên ON giảm đơn lẻ giúp cải thiện tâm lý ngắn hạn, nhưng chưa đủ để đảo chiều tác động nếu ON MA5 không tiếp tục giảm.
+
+## 5. Rủi ro & Điều Kiện Theo Dõi
+
+Các ngưỡng cần theo dõi là: ON có duy trì dưới vùng 5,0-6,0% hay quay lại vùng căng; ON MA5 có giảm liên tục hay tiếp tục có slope dương; spread 1W-ON và 2W-ON có còn dương hay xuất hiện đảo ngược; số phiên STRESS/WARNING có giảm rõ trong các phiên tới hay không.
+
+Các biến như SBV, tỷ giá, tín phiếu, OMO, Kho bạc hoặc mùa vụ là dữ liệu ngoài phạm vi input và cần kiểm chứng riêng, không thể dùng làm kết luận từ VNIBOR hiện tại.
+
+## 6. KẾT LUẬN & KHUYẾN NGHỊ
+
+Thanh khoản đang hạ nhiệt theo snapshot nhưng chưa xác nhận easing bền vững; nên giữ quan điểm thận trọng với tài sản rủi ro cho đến khi ON MA5 và số phiên stress giảm rõ hơn.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 4.68,
+  "trend_20d": "liquidity_squeeze",
+  "regime": "ELEVATED",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
