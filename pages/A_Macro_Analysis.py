@@ -62,6 +62,13 @@ TOOLS = [
         "page_module": "tools.vn100_earnings_health.page",
         "render_func": "render",
     },
+    {
+        "id": "credit_spread",
+        "name": "💳 Credit Spread Bank vs BĐS",
+        "desc": "So sánh lãi suất phát hành trái phiếu Bank và BĐS, spread theo kỳ, kỳ hạn và phần bù so với TPCP Việt Nam",
+        "page_module": "tools.credit_spread.page",
+        "render_func": "render",
+    },
 ]
 
 # ── Khởi tạo session_state ─────────────────────────────────────────

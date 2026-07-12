@@ -29,6 +29,17 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 - Methodology control: PCA is fit on expanding information sets with periodic refits; it is not fit once on the full future-inclusive history.
 - Limit: short-term news sentiment must not offset hard credit stress.
 
+## Credit Spread Bank vs Real Estate
+
+- Domain: domestic primary credit risk premium.
+- Horizon: weeks to months.
+- Primary signal: real-estate minus bank primary-issuance yield, its 1-period/3-period change, and percentile within the matched sample.
+- Interpretation: high and widening real-estate premium is a domestic credit headwind; sustained narrowing reduces that relative pressure.
+- Methodology control: canonical AI input is equal-weight per fixed-coupon issue, all maturity buckets, with only dates containing both sectors.
+- Thin-data guard: fewer than 8 matched periods or fewer than 2 latest issues in either sector neutralizes the adapter rather than creating a strong signal.
+- Limit: issuer mix, maturity mix and excluded floating coupons can move the spread. This is not secondary-market OAS or default probability.
+- Authority: structured metrics and deterministic adapter are authoritative; LLM prose cannot relabel the signal.
+
 ## US Margin Debt / M2 Overlay
 
 - Domain: speculative leverage.

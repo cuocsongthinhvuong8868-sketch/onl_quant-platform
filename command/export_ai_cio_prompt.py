@@ -101,6 +101,7 @@ def build_ai_cio_prompt_payload(provider_key: str) -> dict[str, Any]:
 
     fed_date, fed_rep = ai_cio._get_fed_liquidity_context(provider_key)
     gfcm_date, gfcm_rep = ai_cio._get_gfcm_context(provider_key)
+    credit_spread_date, credit_spread_rep = ai_cio._get_credit_spread_context(provider_key)
     margin_m2_date, margin_m2_rep = ai_cio._build_margin_m2_structured_snapshot()
     vnibor_date, vnibor_rep = ai_cio._get_vnibor_context(provider_key)
     ltmm_date, ltmm_rep = ai_cio._build_ltmm_structured_context(provider_key)
@@ -117,6 +118,7 @@ def build_ai_cio_prompt_payload(provider_key: str) -> dict[str, Any]:
         ai_cio._build_evidence_packet("historical_trend", historical_block, "history", max_excerpt_chars=900),
         ai_cio._build_evidence_packet("fed_liquidity", fed_rep, "macro", fed_date, max_excerpt_chars=900),
         ai_cio._build_evidence_packet("global_financial_conditions", gfcm_rep, "macro", gfcm_date, max_excerpt_chars=900),
+        ai_cio._build_evidence_packet("credit_spread", credit_spread_rep, "macro", credit_spread_date, max_excerpt_chars=1100),
         ai_cio._build_evidence_packet("margin_m2_overlay", margin_m2_rep, "macro", margin_m2_date, max_excerpt_chars=700),
         ai_cio._build_evidence_packet("vnibor", vnibor_rep, "macro", vnibor_date, max_excerpt_chars=1000),
         ai_cio._build_evidence_packet("ltmm", ltmm_rep, "macro", ltmm_date, max_excerpt_chars=2400),

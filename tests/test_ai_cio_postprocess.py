@@ -432,7 +432,7 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
     master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
 
-    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v3"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v4_credit_spread"
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
     assert "mozyfin_social" in card["limits"]
     assert "source_counts" in card["authority"]

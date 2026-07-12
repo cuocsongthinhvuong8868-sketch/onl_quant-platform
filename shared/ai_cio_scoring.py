@@ -214,6 +214,79 @@ def score_tool_packet(tool_id: str, metrics: dict[str, Any]) -> dict[str, Any] |
             reason = f"CQS not in stress zone ({cqs:.1f})"
         return _tool_score(tool, score, reason)
 
+    if tool == "credit_spread":
+        premium = _as_float(metrics.get("credit_spread_risk_premium_bps"))
+        change = _as_float(metrics.get("credit_spread_change_bps"))
+        change_3p = _as_float(metrics.get("credit_spread_3p_change_bps"))
+        percentile = _as_float(metrics.get("credit_spread_percentile"))
+        matched_periods = _as_float(metrics.get("credit_spread_matched_periods"))
+        bank_count = _as_float(metrics.get("credit_spread_bank_count"))
+        real_estate_count = _as_float(metrics.get("credit_spread_real_estate_count"))
+        if premium is None or percentile is None:
+            return None
+
+        if (
+            (matched_periods is not None and matched_periods < 8)
+            or (bank_count is not None and bank_count < 2)
+            or (real_estate_count is not None and real_estate_count < 2)
+        ):
+            return {
+                "tool_score": 50,
+                "tool_regime": "CREDIT SPREAD THIN DATA",
+                "tool_bias": "neutral_or_mixed",
+                "score_reason": "Credit Spread sample too thin for a directional score",
+            }
+
+        score = 55.0
+        reasons = [f"risk premium {premium:.1f} bps at matched-history percentile {percentile:.1f}"]
+        if percentile >= 85:
+            score = min(score, 32.0)
+        elif percentile >= 70:
+            score = min(score, 38.0)
+        elif percentile >= 55:
+            score = min(score, 45.0)
+        elif percentile >= 40:
+            score = min(score, 50.0)
+
+        if premium >= 400:
+            score = min(score, 35.0)
+            reasons.append("absolute premium >=400 bps")
+        elif premium >= 300:
+            score = min(score, 45.0)
+            reasons.append("absolute premium >=300 bps")
+
+        if change is not None:
+            if change >= 25:
+                score -= 6.0
+                reasons.append(f"latest widening {change:+.1f} bps")
+            elif change <= -25:
+                score += 4.0
+                reasons.append(f"latest narrowing {change:+.1f} bps")
+        if change_3p is not None:
+            if change_3p >= 50:
+                score -= 5.0
+                reasons.append(f"3P widening {change_3p:+.1f} bps")
+            elif change_3p <= -50:
+                score += 4.0
+                reasons.append(f"3P narrowing {change_3p:+.1f} bps")
+
+        score_int = _bounded(score)
+        if score_int <= 35:
+            regime = "CREDIT SPREAD STRESSED / WIDENING"
+            bias = "bearish"
+        elif score_int <= 48:
+            regime = "CREDIT SPREAD ELEVATED"
+            bias = "bearish"
+        else:
+            regime = "CREDIT SPREAD NORMALIZING / CONTAINED"
+            bias = "neutral_or_mixed"
+        return {
+            "tool_score": score_int,
+            "tool_regime": regime,
+            "tool_bias": bias,
+            "score_reason": "; ".join(reasons),
+        }
+
     if tool == "vnibor":
         overnight = _as_float(metrics.get("vnibor_on"))
         if overnight is None:

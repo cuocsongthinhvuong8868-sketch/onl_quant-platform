@@ -27,12 +27,13 @@ AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
 AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "feargreed": "pca_point_in_time_v1",
     "global_financial_conditions": "indicator_pr3y_pca_point_in_time_v1",
+    "credit_spread": "primary_issuance_equal_weight_v1",
     "vnibor": "structured_20d_trend_v1",
     "vn100_earnings_health": "structured_yoy_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
-    "executive_summary": "ai_cio_methodology_v3",
+    "executive_summary": "ai_cio_methodology_v4_credit_spread",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -50,6 +51,14 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "score_direction": "Higher 3Y CQS percentile is worse for risk assets.",
         "limits": "Indicator percentiles are 3Y max with 1Y warm-up; PC1 regime percentile remains 1Y. PCA is expanding point-in-time with periodic refits; no full-history PCA backfit or look-ahead revision. Do not offset high credit stress with short-term news sentiment.",
         "authority": "Adapter score/regime/bias are authoritative when available.",
+    },
+    "credit_spread": {
+        "domain": "domestic_primary_credit_risk_premium",
+        "horizon": "weeks_to_months",
+        "primary_metric": "real_estate_minus_bank_primary_issuance_yield_bps",
+        "score_direction": "Higher and widening real-estate risk premium is worse for domestic risk assets.",
+        "limits": "Primary-issuance fixed-coupon sample only; issuer mix, maturity mix and missing floating coupons can move the spread. It is not secondary-market OAS or default probability.",
+        "authority": "Use canonical equal-weight/all-maturity structured metrics and deterministic adapter; AI prose is supporting interpretation only.",
     },
     "margin_m2_overlay": {
         "domain": "speculative_leverage_overlay",
@@ -1052,7 +1061,7 @@ def _compact_text(text: str, max_chars: int = 1400) -> str:
         "equity", "hedge", "falsification", "watch", "falsified", "confidence",
         "macro", "market", "alpha", "valuation", "cqs", "pc1", "ltmm",
         "fli", "mli", "fri", "transmission", "bottleneck", "trigger",
-        "overlay",
+        "overlay", "credit spread", "risk premium", "bank yield", "real estate yield",
     )
     selected: list[str] = []
     for line in lines:
@@ -1172,6 +1181,27 @@ def _build_evidence_packet(
         "ltmm_fri_collateral": [r"LTMM\s+FRI_collateral\s*:\s*([-+]?\d+(?:\.\d+)?)"],
         "ltmm_fire_trigger_count": [r"LTMM\s+Fire\s+Trigger\s+Count\s*:\s*(\d+)"],
         "ltmm_transmission_breakdown_fire": [r"(?:LTMM\s+)?transmission_breakdown\s+FIRE\s*:\s*(\d+)"],
+        "credit_spread_risk_premium_bps": [
+            r"Credit\s+Spread\s+Risk\s+Premium\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
+        ],
+        "credit_spread_change_bps": [
+            r"Credit\s+Spread\s+Risk\s+Premium\s+Change\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
+        ],
+        "credit_spread_3p_change_bps": [
+            r"Credit\s+Spread\s+Risk\s+Premium\s+3P\s+Change\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
+        ],
+        "credit_spread_percentile": [
+            r"Credit\s+Spread\s+Risk\s+Premium\s+Percentile\s*:\s*([-+]?\d+(?:\.\d+)?)",
+        ],
+        "credit_spread_matched_periods": [
+            r"Credit\s+Spread\s+Matched\s+Periods\s*:\s*(\d+)",
+        ],
+        "credit_spread_bank_count": [
+            r"Credit\s+Spread\s+Bank\s+Issuance\s+Count\s*:\s*(\d+)",
+        ],
+        "credit_spread_real_estate_count": [
+            r"Credit\s+Spread\s+Real\s+Estate\s+Issuance\s+Count\s*:\s*(\d+)",
+        ],
     }
     for metric, patterns in metric_patterns.items():
         value = _extract_first_number(patterns, text)
@@ -1727,7 +1757,7 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
         "feargreed", "manipulation", "dispersion", "upside_ratio",
         "bank_valuation_ai", "sentiment_factor_news", "market_breadth", "esr_monitor",
         "va_res", "var_cvar_vnindex",
-        "fed_liquidity", "global_financial_conditions", "vnibor",
+        "fed_liquidity", "global_financial_conditions", "vnibor", "credit_spread",
         "executive_summary", "telegram_summary", "historical_trend"
     ]
     for tool in tool_names:
@@ -2466,6 +2496,9 @@ def _get_latest_report_for_macro(tool_id: str, provider_key: str = "kimi-2.6") -
     elif tool_id == "vnibor":
         pattern = f"vnibor_{provider_key}_*.txt"
         fallback_pattern = "vnibor_*.txt"
+    elif tool_id == "credit_spread":
+        pattern = f"credit_spread_{provider_key}_*.txt"
+        fallback_pattern = "credit_spread_*.txt"
     else:
         return "N/A", "*Không xác định được công cụ*"
         
@@ -2886,6 +2919,55 @@ def run_global_financial_conditions_child_report(
 def _get_gfcm_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
     """Read the latest Global FCI child AI report."""
     return _get_latest_report_for_macro("global_financial_conditions", provider_key)
+
+
+def run_credit_spread_child_report(
+    client,
+    provider_key: str = "kimi-2.6",
+    model: str = None,
+    force: bool = False,
+) -> str:
+    """Generate the canonical Credit Spread child report for AI CIO."""
+    try:
+        from tools.credit_spread.ai_analysis import is_report_current, load_canonical_snapshot, run_ai_analysis
+
+        snapshot = load_canonical_snapshot()
+        cached = None if force else _read_cache("credit_spread", provider_key)
+        if cached and is_report_current(cached, snapshot["date"]):
+            return cached
+        result = run_ai_analysis(
+            snapshot=snapshot,
+            provider_key=provider_key,
+            client=client,
+            model=model,
+        )
+    except Exception as e:
+        result = f"DATA INSUFFICIENT: Không generate được Credit Spread child report ({e})"
+
+    _write_cache("credit_spread", result, provider_key)
+    return result
+
+
+def _get_credit_spread_context(provider_key: str = "kimi-2.6") -> tuple[str, str]:
+    """Combine canonical Credit Spread metrics with a current AI interpretation."""
+    try:
+        from tools.credit_spread.ai_analysis import build_structured_context, is_report_current, load_canonical_snapshot
+
+        snapshot = load_canonical_snapshot()
+        _, ai_report = _get_latest_report_for_macro("credit_spread", provider_key)
+        has_current_report = (
+            ai_report
+            and not ai_report.startswith("*Chưa có")
+            and not ai_report.startswith("*No current-methodology")
+            and not ai_report.startswith("DATA INSUFFICIENT")
+            and is_report_current(ai_report, snapshot["date"])
+        )
+        context = build_structured_context(snapshot, ai_report if has_current_report else None)
+        if not has_current_report:
+            context += "\n\nCredit Spread AI Cache: unavailable or stale; use canonical metrics above."
+        return snapshot["date"], context
+    except Exception as e:
+        return "N/A", f"DATA INSUFFICIENT: Credit Spread structured context unavailable ({e})"
 
 
 def _build_margin_m2_structured_snapshot() -> tuple[str, str]:
@@ -3647,6 +3729,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)
+    run_credit_spread_child_report(client, provider_key, model, force=force)
     run_vnibor_child_report(client, provider_key, model, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
@@ -3664,6 +3747,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     # Tải các báo cáo vĩ mô gần nhất (Lớp Vĩ mô - Macro Layer)
     fed_date, fed_rep = _get_fed_liquidity_context(provider_key)
     gfcm_date, gfcm_rep = _get_gfcm_context(provider_key)
+    credit_spread_date, credit_spread_rep = _get_credit_spread_context(provider_key)
     margin_m2_date, margin_m2_rep = _build_margin_m2_structured_snapshot()
     vnibor_date, vnibor_rep = _get_vnibor_context(provider_key)
     ltmm_date, ltmm_rep = _build_ltmm_structured_context(provider_key)
@@ -3674,6 +3758,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         _build_evidence_packet("historical_trend", historical_block, "history", max_excerpt_chars=900),
         _build_evidence_packet("fed_liquidity", fed_rep, "macro", fed_date, max_excerpt_chars=900),
         _build_evidence_packet("global_financial_conditions", gfcm_rep, "macro", gfcm_date, max_excerpt_chars=900),
+        _build_evidence_packet("credit_spread", credit_spread_rep, "macro", credit_spread_date, max_excerpt_chars=1100),
         _build_evidence_packet("margin_m2_overlay", margin_m2_rep, "macro", margin_m2_date, max_excerpt_chars=700),
         _build_evidence_packet("vnibor", vnibor_rep, "macro", vnibor_date, max_excerpt_chars=1000),
         _build_evidence_packet("ltmm", ltmm_rep, "macro", ltmm_date, max_excerpt_chars=2400),
