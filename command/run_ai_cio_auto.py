@@ -19,9 +19,7 @@ Usage:
     python command/run_ai_cio_auto.py           # force mode (xoá cache cũ, gọi API mới)
     python command/run_ai_cio_auto.py --force   # giống default (luôn force)
 """
-import csv
 import os
-import re
 import sys
 from datetime import date
 from pathlib import Path
@@ -30,20 +28,18 @@ from pathlib import Path
 ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT))
 
-from config import DATA_LAKE, ROOT_DIR
+from config import DATA_LAKE
 from shared.ai_cio import (
-    run_executive_summary, _read_cache, _clear_all_tool_caches,
+    run_executive_summary, _clear_all_tool_caches,
     parse_score_regime, summarize_executive_report_for_telegram,   # re-export từ shared
 )
+from shared.pdf_export import create_ai_cio_pdf
 
 # ── Config ──
 PROVIDER_KEY = "deepseek-v4-pro"
 TODAY_STR = date.today().strftime('%d%m%y')
-CACHE_PATH = DATA_LAKE / "daily_cache" / f"executive_summary_{PROVIDER_KEY}_{TODAY_STR}.txt"
 REPORTS_DIR = ROOT / "reports"
 REPORTS_DIR.mkdir(parents=True, exist_ok=True)
-
-CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
 
 PDF_PATH = REPORTS_DIR / f"{TODAY_STR}_{PROVIDER_KEY.replace('-', '_')}_executive_summary.pdf"
 
@@ -82,46 +78,6 @@ def _get_report_text() -> str:
         sys.exit(1)
 
     return report_text
-
-
-def _create_pdf(text: str, path: str):
-    from fpdf import FPDF
-    pdf = FPDF(format="A4")
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_margins(10, 10, 10)
-    font_dir = ROOT_DIR / "fonts"
-    pdf.add_font("DejaVu", "", str(font_dir / "DejaVuSans.ttf"), uni=True)
-    pdf.add_font("DejaVu", "B", str(font_dir / "DejaVuSans-Bold.ttf"), uni=True)
-
-    text_width = int(pdf.w - 20)
-
-    pdf.set_font("DejaVu", "B", 16)
-    pdf.set_xy(10, 10)
-    pdf.cell(text_width, 10, f"Executive Summary Report — {date.today().strftime('%d/%m/%Y')}", border=0, ln=1, align="C")
-    pdf.ln(5)
-
-    pdf.set_font("DejaVu", "", 11)
-    for raw_line in text.split('\n'):
-        line = raw_line.strip().replace('\t', ' ')
-        line = re.sub(r'  +', ' ', line)
-        if not line:
-            pdf.ln(2)
-            continue
-
-        pdf.set_x(10)
-
-        if line.startswith('#'):
-            pdf.set_font("DejaVu", "B", 12)
-            pdf.multi_cell(text_width, 7, line.lstrip('#').strip())
-            pdf.set_font("DejaVu", "", 11)
-        elif line.startswith('**') and line.endswith('**'):
-            pdf.set_font("DejaVu", "B", 11)
-            pdf.multi_cell(text_width, 6, line.replace('**', ''))
-            pdf.set_font("DejaVu", "", 11)
-        else:
-            pdf.multi_cell(text_width, 6, line.replace('**', ''))
-    pdf.output(path)
 
 
 # NOTE: _parse_score_regime + _append_to_csv đã move sang shared/ai_cio.py
@@ -184,7 +140,12 @@ if __name__ == "__main__":
     # 2. Tạo PDF
     print("[PDF] Creating PDF...")
     try:
-        _create_pdf(report_text, str(PDF_PATH))
+        create_ai_cio_pdf(
+            report_text,
+            PDF_PATH,
+            report_date=TODAY_STR,
+            provider_key=PROVIDER_KEY,
+        )
         print(f"[PDF] Saved: {PDF_PATH}")
     except ImportError:
         print("[ERROR] fpdf2 not installed. Please install: pip install fpdf2>=2.7.0")

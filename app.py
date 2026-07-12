@@ -224,48 +224,7 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
         st.error(f"❌ Không kiểm tra được GitHub: {gh_debug_err}")
 
 # ── Import PDF generator ──
-from fpdf import FPDF
-
-def _create_pdf(text: str, path: str):
-    import re
-    pdf = FPDF(format="A4")
-    pdf.set_auto_page_break(auto=True, margin=15)
-    pdf.add_page()
-    pdf.set_margins(10, 10, 10)
-    font_dir = ROOT_DIR / "fonts"
-    pdf.add_font("DejaVu", "", str(font_dir / "DejaVuSans.ttf"), uni=True)
-    pdf.add_font("DejaVu", "B", str(font_dir / "DejaVuSans-Bold.ttf"), uni=True)
-    
-    text_width = int(pdf.w - 20)
-    
-    pdf.set_font("DejaVu", "B", 16)
-    pdf.set_xy(10, 10)
-    pdf.cell(text_width, 10, f"Executive Summary Report — {date.today().strftime('%d/%m/%Y')}", border=0, ln=1, align="C")
-    pdf.ln(5)
-    
-    pdf.set_font("DejaVu", "", 11)
-    for raw_line in text.split('\n'):
-        line = raw_line.strip().replace('\t', ' ')
-        line = re.sub(r'  +', ' ', line)
-        if not line:
-            pdf.ln(2)
-            continue
-        if line.startswith("<!--") and line.endswith("-->"):
-            continue
-        
-        pdf.set_x(10)
-        
-        if line.startswith('#'):
-            pdf.set_font("DejaVu", "B", 12)
-            pdf.multi_cell(text_width, 7, line.lstrip('#').strip())
-            pdf.set_font("DejaVu", "", 11)
-        elif line.startswith('**') and line.endswith('**'):
-            pdf.set_font("DejaVu", "B", 11)
-            pdf.multi_cell(text_width, 6, line.replace('**', ''))
-            pdf.set_font("DejaVu", "", 11)
-        else:
-            pdf.multi_cell(text_width, 6, line.replace('**', ''))
-    pdf.output(path)
+from shared.pdf_export import create_ai_cio_pdf
 
 
 def _normalize_cio_report_text(text: str) -> str:
@@ -385,7 +344,12 @@ if st.session_state.cio_pdf_choice and st.session_state.cio_pdf_choice != "__cho
                 reports_dir.mkdir(parents=True, exist_ok=True)
                 provider_prefix = cio_provider.replace("-", "_")
                 pdf_path = reports_dir / f"{_pdf_date_str}_{provider_prefix}_executive_summary.pdf"
-                _create_pdf(report_text, str(pdf_path))
+                create_ai_cio_pdf(
+                    report_text,
+                    pdf_path,
+                    report_date=_pdf_date_str,
+                    provider_key=cio_provider,
+                )
                 st.success(f"Đã tạo PDF: {pdf_path.name}")
                 with open(pdf_path, "rb") as f:
                     st.download_button(
