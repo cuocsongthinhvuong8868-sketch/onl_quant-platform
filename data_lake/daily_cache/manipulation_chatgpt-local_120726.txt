@@ -1,0 +1,28 @@
+## 1. Observations
+- **OLS slope = 0.16**, percentile **1.7th**: rất thấp, VIN composite gần như không còn beta hiệu quả lên VN30F1M.
+- **Correlation = 0.53**, percentile **30.1th**: tương quan còn nhưng lỏng, không đủ để dùng VIC/VHM/VRE làm tín hiệu dẫn.
+- **Regime = DECOUPLING**, với ΔCorr = -0.72 và ΔSlope = -0.90: VIN đang mất quyền chi phối futures.
+
+## 2. Microstructure Read
+VIC/VHM/VRE lúc này **giảm mạnh vai trò dẫn dắt** VN30F1M. Slope percentile dưới 20th cho thấy market đã rời VIN; correlation chưa cực thấp nhưng không còn đủ “chặt” để tracking intraday. Không có dấu hiệu coupling extreme hay can thiệp kiểu cả hai percentile > 80th.
+
+## 3. Event Study Interpretation
+DECOUPLING nghĩa là intraday không nên lấy nhịp VIC/VHM/VRE làm kim chỉ nam cho F1. Dòng tiền nhiều khả năng đang định giá futures qua nhóm khác, ưu tiên **Bank / Chứng / Thép**. Overnight không hấp dẫn nếu chỉ dựa vào VIN, vì tín hiệu mất độ bám và dễ nhiễu.
+
+## 4. Verdict
+**Trade plan: Spread VIN-vs-Bank.** Không ưu tiên Long F1 hay Short F1 thuần từ tín hiệu VIN. Theo dõi leading indicators: **VCB, BID, CTG, TCB, MBB** cho Bank; **SSI, VND, HCM** cho Chứng; **HPG** cho Thép.
+
+Stop-loss reference: nếu dùng VIC làm proxy rủi ro spread, đặt ngưỡng invalidation khi VIC hồi mạnh **223.00 × (1 + 3%) ≈ 229.69**. Với F1, dùng stop theo vị thế: đóng nếu VN30F1M đi ngược **0.35%-0.50% từ entry**.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "10/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.7,
+  "corr_percentile": 30.1,
+  "trade_signal": "spread",
+  "confidence": "medium"
+}
+```

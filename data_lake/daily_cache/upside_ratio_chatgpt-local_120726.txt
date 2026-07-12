@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+
+- Upside Breadth hiện tại 3.76% thấp hơn mu 12.23%: delta = -8.47 điểm %, cho thấy lực cầu đang bị nén mạnh so với nền dài hạn.
+- Downside Breadth hiện tại 19.76% cao hơn mu 12.92%: delta = +6.84 điểm %, cho thấy lực cung đang mở rộng vượt chuẩn.
+- Phi_up = +0.241 và Phi_down = +0.200 đều thuộc momentum regime; cả đà mua và đà bán đều có tính tiếp diễn, không phải random walk.
+
+## 2. Supply-Demand Dynamics
+
+Trạng thái dòng tiền hiện tại là **distribution**: cầu thấp hơn xa mu trong khi cung cao hơn mu. Đây là cấu trúc nghiêng về phân phối, chưa phải tích lũy, vì áp lực giảm đang hiện diện rộng hơn mức cân bằng dài hạn.
+
+So sánh momentum thuần: `|Phi_up| = 0.241` lớn hơn `|Phi_down| = 0.200`, nên **demand giữ momentum nhỉnh hơn**. Tuy nhiên lợi thế này mỏng và xuất phát từ nền cầu rất thấp, nên chưa đủ để đảo kết luận rủi ro.
+
+## 3. Stress-Test Read
+
+P95 Downside = **24.99%** là biên panic kỳ vọng nếu thị trường gãy theo nhánh cung. Đây là mức stress cao hơn trạng thái hiện tại 19.76%, hàm ý cung vẫn còn dư địa mở rộng.
+
+Asymmetry nghiêng về downside: P95_Dn 24.99% cao hơn P95_Up 22.31%, chênh **+2.68 điểm %**. Tail risk phía bán dày hơn, nên rủi ro gap-down breadth vẫn lớn hơn xác suất bùng nổ mua.
+
+## 4. Verdict
+
+Tỷ trọng giải ngân đề xuất: **20%**.
+
+Strategy: **phòng thủ**. Không mua đuổi. Nếu tham gia, chỉ nên coi là giải ngân thăm dò/rình bắt đáy có kiểm soát, vì cấu trúc chính vẫn là distribution và downside tail dày hơn. Không kích hoạt “NO ACTIONABLE” vì cả hai Phi đều vượt +0.10.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 24.99,
+  "p95_upside_pct": 22.31,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

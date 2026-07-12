@@ -1,0 +1,44 @@
+## 1. Scenario Assessment
+
+K=1.0 và CoE=14.0% là baseline, không phải kịch bản khắc nghiệt. Stress test cũng trung tính: BVPS không bị haircut, P/B không bị phạt thêm. Vì vậy Alpha âm chủ yếu đến từ chính nội tại: định giá P/B, ROE sau retention, và biến động ROE.
+
+Mặt bằng ngành trong mẫu này nghiêng về **đốt vốn**: chỉ SHB có Alpha dương 2.0%; ACB và MBB đã âm nhẹ, nhóm đội sổ âm rất sâu.
+
+## 2. Top Alpha Decomposition
+
+**SHB** là mã duy nhất tạo Economic Alpha dương. Driver chính là **P/B rẻ 0.90** kết hợp ROE 17.5%, σROE thấp 1.9%, payout thấp 8.6%. Đây là profile **Fortress**: không phải ROE cao nhất, nhưng giá trả cho vốn chủ thấp và rủi ro ROE được kiểm soát.
+
+**ACB** có ROE rất cao 23.0%, nhưng P/B 1.23 và σROE 2.7% khiến Alpha còn -1.0%. Đây là **quality tactical**, gần Fortress nhưng chưa vượt CoE sau điều chỉnh rủi ro.
+
+**MBB** có ROE 21.8%, σROE rất thấp 1.6%, payout thấp 6.7%, nhưng P/B 1.46 làm Disciplined Return không đủ vượt CoE. Phân loại: **quality compounder bị valuation drag**, phù hợp tactical hơn core nếu chỉ xét Alpha.
+
+## 3. Value Traps Warning
+
+**LPB** là **Premium Burn** rõ nhất: ROE 21.1% không thấp, nhưng P/B 3.38 quá đắt, khiến Alpha -12.8%.
+
+**EIB** là **Cheap Trap / low-ROE burn**: ROE 10.0% thấp, σROE 3.8% cao so với nền lợi nhuận, nên Alpha -11.1%.
+
+**VPB** là **Growth Trap**: ROE 14.1% chỉ ngang CoE trước điều chỉnh, σROE 4.7% và payout 24.6% làm risk penalty ăn mòn mạnh.
+
+## 4. Portfolio Construction
+
+**Core Holding 60-70% bank allocation:** SHB.
+
+**Tactical 20-30%:** ACB, MBB; chỉ dùng như vị thế chất lượng nhưng chưa tạo Alpha dương.
+
+**Cấm mua / underweight:** LPB, EIB, VPB.
+
+Sector không đến mức “AVOID SECTOR” vì SHB vẫn Alpha dương, nhưng view tổng thể là **bearish**.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

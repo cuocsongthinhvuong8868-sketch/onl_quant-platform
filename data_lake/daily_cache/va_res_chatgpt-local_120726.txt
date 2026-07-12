@@ -1,0 +1,32 @@
+## 1. Observations
+- VN30 Stress Index: **3.33%**, rất thấp so với ngưỡng cảnh báo **40%**.
+- Số mã thủng VaR 95%: **1/30**, breach sâu nhất: **BCM**.
+- Complacency Index: **6.48%**, thấp xa ngưỡng nguy hiểm **80%**; số mã mispriced: **7**, gồm **AGR, MSB, GMD** nổi bật nhất.
+
+## 2. Contagion Assessment (Module B)
+Stress VN30 hiện ở mức thấp: chỉ **1 mã trong rổ VN30** thủng VaR 95%, nên chưa thấy bằng chứng lây lan real-time trên diện rộng. Với Stress Index **3.33%**, xác suất đây là một pha contagion active còn thấp.
+
+BCM là điểm breach chính. Ở trạng thái hiện tại, tín hiệu nghiêng về **sự cố cá biệt** hơn là đầu sóng systemic. Tuy nhiên, cần theo dõi nếu breach lan sang nhóm vốn hóa lớn hoặc các cổ phiếu cùng ngành trong 1-3 phiên tới.
+
+## 3. Complacency Assessment (Module C)
+Complacency **6.48%** là mức thấp. Diễn giải đúng: thị trường **KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định**.
+
+Vì Stress Index cũng thấp, cấu trúc hiện tại chưa cho thấy đồng thời hai điều kiện nguy hiểm: lây lan VaR trên VN30 và nén spread diện rộng. Regime phù hợp hơn là **spread_normal**, nhưng chỉ theo nghĩa spread không bị nén bất thường, không phải kết luận an toàn tuyệt đối.
+
+## 4. Stock-Level Risk Calls
+- **BCM**: giảm tỷ trọng hoặc bán phần rủi ro nếu đang nắm giữ; stop-loss nên đặt theo nguyên tắc động như thủng MA20/MA50 trên D1 hoặc lỗ thêm theo % từ giá hiện tại.
+- **AGR, MSB, GMD**: chưa phải crash signal, nhưng là nhóm có spread bị nén chặt. Không tăng tỷ trọng đuổi giá; theo dõi đảo chiều vol/spread và phản ứng khi thị trường chung yếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 6.48,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["BCM", "AGR", "MSB", "GMD"],
+  "confidence": "medium"
+}
+```

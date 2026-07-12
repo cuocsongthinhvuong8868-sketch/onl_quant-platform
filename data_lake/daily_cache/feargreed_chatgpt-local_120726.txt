@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 55.8/100, +1.6 phiên trước; nằm trong vùng 40-60, cách ngưỡng GREED 60 là 4.2 điểm.
+- EGARCH Vol chuẩn hóa 34.9%, +2.8%; không khớp mẫu low-vol của GREED.
+- Rolling Skewness 0.08; dương nhẹ, không thuộc vùng skew âm sâu.
+- Downside Correlation 2.4% thấp; Upside Correlation 19.8% cao hơn downside, nhưng chưa đi kèm Score >60.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, pha thị trường xác suất cao vẫn là **NEUTRAL / STOCK-PICKING**, sát nửa trên của vùng trung tính. Chưa có tín hiệu đủ mạnh để phân loại sang GREED hoặc FEAR.
+
+## 3. Cross-Check
+Score tăng lên 55.8 nhưng EGARCH Vol cũng tăng +2.8%, tạo divergence nhẹ giữa cải thiện risk appetite và nền biến động cao hơn. Skewness dương nhẹ cùng Upside Correlation cao hơn Downside Correlation là tương đối consistent, nhưng cường độ chưa đủ xác nhận crowded-long.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.55-0.60** cho danh mục VN-Index.
+
+Hành động: duy trì beta quanh trung tính, ưu tiên stock-picking và kiểm soát sizing; chưa mở rộng beta theo hướng tấn công vì Score còn dưới 60 và vol đang tăng. Giảm tỷ trọng ở các vị thế có beta cao nếu tương quan upside tiếp tục tăng nhưng Score không vượt vùng GREED.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "10/07/2026",
+  "regime": "NEUTRAL",
+  "score": 55.8,
+  "confidence": "medium",
+  "beta_target": 0.58,
+  "key_signals": [
+    "Score 55.8 nằm trong vùng 40-60, nghiêng nửa trên của NEUTRAL",
+    "EGARCH Vol tăng +2.8% trong khi Score chưa vượt 60, tạo divergence nhẹ"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 55.8
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

@@ -1,0 +1,39 @@
+## 1. Observations
+
+- Spread annualized: **9.81%**; Spread_Z: **-0.73σ**.
+- DPI: **43.3%**.
+- Avg Pairwise Correlation Ledoit-Wolf: **0.008**.
+- Cross-Sectional Skewness: **N/A**; Kurtosis: **N/A**.
+
+## 2. Structural State
+
+Cấu trúc hiện tại **không nằm trong trạng thái stressed** theo tiêu chí dispersion. Spread_Z âm **-0.73σ** cho thấy mức tail-driven dispersion không bị kéo căng so với phân phối 60 ngày. DPI **43.3%** cũng thấp hơn ngưỡng persistence **70%**, nên dispersion chưa cho thấy đặc tính kéo dài theo regime.
+
+Do đó, không đủ điều kiện để gọi đây là stress cục bộ hay regime persistent. Stress cục bộ cần Spread_Z cao nhưng DPI thấp; regime persistent cần cả Spread_Z và DPI cùng cao. Snapshot này nghiêng về trạng thái bình thường, phân hoá nhẹ nhưng chưa cực đoan.
+
+## 3. Cross-Check & Tail Direction
+
+Không có dữ liệu Cross-Sectional Skewness nên chưa xác định được tail đang lệch về phía cú sập cá biệt hay cú đẩy cá biệt. Spread dương cho biết outliers có đóng góp vào dispersion, nhưng **không nói được hướng tail** nếu thiếu skew.
+
+Kurtosis cũng N/A, nên chưa thể kết luận có fat-tail outliers ở mức khiến giả định normal mất hiệu lực. Phần tail check vì vậy có độ tin cậy thấp.
+
+## 4. Regime Mapping
+
+DPI thấp + Corr rất thấp đưa trạng thái hiện tại vào ô **Healthy Stock-Picking / STOCK_PICKING**. Tương quan trung bình gần 0 cho thấy hành vi bầy đàn yếu, thị trường đang phân hoá rõ hơn là đồng pha.
+
+Risk lớn nhất cho Portfolio Manager là **concentration risk**: sai lệch ở một số vị thế đơn lẻ có thể chi phối kết quả danh mục hơn là beta thị trường chung. Herding crash và liquidity dry-up chưa phải tín hiệu nổi bật từ snapshot này.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "10/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.73,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

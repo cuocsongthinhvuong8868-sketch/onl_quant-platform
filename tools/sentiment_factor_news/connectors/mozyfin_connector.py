@@ -295,6 +295,32 @@ def _refresh_mozyfin_token_via_cookie(cookie_file_path: str) -> str:
     return ""
 
 
+def _get_anonymous_token() -> str:
+    """Fetch an anonymous access token from Mozyfin API."""
+    try:
+        url = "https://api.mozyfin.com/api/v1/auth/anonymous"
+        headers = {
+            "Content-Type": "application/json",
+            "Origin": "https://research.mozyfin.com",
+            "Referer": RESEARCH_NEWS_URL,
+            "User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36",
+        }
+        r = requests.post(url, headers=headers, json={"fingerprint": "quant-platform-sentiment-bot"}, timeout=15)
+        if r.status_code in (200, 201):
+            token = r.json().get("data", {}).get("token") or ""
+            if token:
+                anon_file = DATA_DIR / "mozyfin_anon_token.txt"
+                try:
+                    anon_file.parent.mkdir(parents=True, exist_ok=True)
+                    anon_file.write_text(token, encoding="utf-8")
+                except Exception:
+                    pass
+                return token
+    except Exception as e:
+        logger.error(f"Failed to fetch anonymous Mozyfin token: {e}")
+    return ""
+
+
 def _refresh_from_available_cookies() -> str:
     cookie_paths = ["mozyfin_cookies.json", str(DATA_DIR / "mozyfin_cookies.json")]
     for cookie_path in cookie_paths:
@@ -325,6 +351,26 @@ def _resolve_access_token() -> str:
                 stale_candidates.append(cached)
         except Exception:
             pass
+
+    anon_file = DATA_DIR / "mozyfin_anon_token.txt"
+    if anon_file.exists():
+        try:
+            cached_anon = anon_file.read_text(encoding="utf-8").strip()
+            if _token_is_fresh(cached_anon, now):
+                return cached_anon
+        except Exception:
+            pass
+
+    # Tự động lấy anonymous token mới trước tiên
+    logger.info("Attempting to get anonymous Mozyfin token...")
+    anon_token = _get_anonymous_token()
+    if anon_token:
+        logger.info("Successfully fetched anonymous Mozyfin token.")
+        try:
+            TOKEN_CACHE_FILE.write_text(anon_token, encoding="utf-8")
+        except Exception:
+            pass
+        return anon_token
 
     refreshed = _refresh_from_available_cookies()
     if refreshed:
@@ -400,8 +446,20 @@ def _request_mozyfin_endpoint(url: str, params: dict, label: str):
 
     response = requests.get(url, headers=headers, params=params, timeout=20)
     if response.status_code == 401:
-        logger.warning(f"Mozyfin {label} API unauthorized; attempting one cookie refresh retry.")
-        refreshed = _refresh_from_available_cookies()
+        logger.warning(f"Mozyfin {label} API unauthorized; attempting to refresh token.")
+        
+        # 1. Thử lấy anonymous token mới trước tiên
+        refreshed = _get_anonymous_token()
+        if refreshed:
+            logger.info("Successfully refreshed Mozyfin token via anonymous flow.")
+            try:
+                TOKEN_CACHE_FILE.write_text(refreshed, encoding="utf-8")
+            except Exception:
+                pass
+        else:
+            # 2. Thử cookie refresh
+            refreshed = _refresh_from_available_cookies()
+            
         if refreshed:
             retry_headers = dict(API_HEADERS)
             retry_headers["Authorization"] = (

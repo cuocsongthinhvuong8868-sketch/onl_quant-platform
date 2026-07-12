@@ -1,0 +1,76 @@
+<!-- ai-cio-cache-version: indicator_pr3y_pca_point_in_time_v1 -->
+## 1. Cross-Asset Snapshot
+
+**Academic.** Dữ liệu 2026-07-10 cho thấy stress không lan rộng, nhưng có một điểm nóng rất rõ ở junk credit. Theo percentile 3Y max: **Credit:** CCC OAS 89% **HIGH**, IG OAS 10% **LOW**, HY OAS 8% **LOW**, EM OAS 4% **LOW**. **Volatility:** OVX 79% **ELEVATED**, SKEW 47% **LOW**, VIX 41% **LOW**, VVIX 25% **LOW**, MOVE 13% **LOW**. **Macro:** 2s10s 55% **ELEVATED**, DXY 44% **LOW**. Mức tuyệt đối chưa phải khủng hoảng hệ thống: VIX 15.84 thấp xa vùng 30+, MOVE 69.5 thấp xa vùng 120+, HY 2.70% dưới ngưỡng cảnh báo 5%, IG 0.76% dưới 1.5%. Tuy nhiên CCC 9.74% sát vùng deep distress 10%, còn OVX 44.67 gần vùng oil-shock 50.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Thị trường tổng thể chưa “cháy nhà”, nhưng tầng doanh nghiệp yếu nhất đang bị siết mạnh. Dầu cũng đang rung lắc cao, như một cơn gió ngược tiềm ẩn cho lạm phát và tâm lý rủi ro.
+
+## 2. PCA Composite Interpretation
+
+**Academic.** PC1 smoothed ở -0.07σ, percentile 1Y là 48%, phù hợp regime **CALM**. Điều này nói rằng 6-core stress breadth gồm VIX, MOVE, SKEW, HY, CCC, IG chưa thắt chặt đồng loạt. Nhưng driver là **CCC_CREDIT_DRIVEN**, nghĩa là stress biên tập trung ở phân khúc deep junk. PC1 raw +0.10σ và PC1 5-day change +0.50σ cho thấy áp lực mới nhích lên, dù chưa đủ đổi regime. PC2 +1.30σ hàm ý phân kỳ đáng chú ý; khi đối chiếu với dữ liệu, phân kỳ này nhiều khả năng là CCC stress nổi bật trong khi equity vol, rates vol, HY và IG vẫn bình thường.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Áp lực thanh khoản toàn hệ thống vẫn thấp. Nhưng “kẻ gây rối” hiện là nhóm nợ xấu nhất, không phải cổ phiếu hay trái phiếu chính phủ.
+
+## 3. Credit Cycle Read
+
+**Academic.** Credit Quality Spread, CCC trừ HY, ở 7.04% và percentile 100% là tín hiệu rất quan trọng: thị trường đang phân biệt cực mạnh giữa doanh nghiệp yếu và phần còn lại. CCC OAS 89% **HIGH**, trong khi HY OAS 8% và IG OAS 10% đều **LOW**. Đây không phải broad credit repricing; đây là deterioration confined to junk tier. EM OAS 1.45%, percentile 4%, cho thấy EM corporate credit chưa bị contagion trực tiếp. Vì vậy credit cycle signal là **deteriorating**, nhưng tính hệ thống còn hạn chế.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Các công ty yếu nhất đang phải vay với chi phí rất đắt, nhưng nhóm doanh nghiệp khỏe hơn chưa bị kéo xuống theo. Dòng tiền quốc tế chưa tháo chạy khỏi nợ EM, nhưng nếu nợ rác tiếp tục xấu đi, nhà đầu tư sẽ bắt đầu giảm ham muốn với tài sản rủi ro.
+
+## 4. Volatility Breadth
+
+**Academic.** VIX 41%, MOVE 13%, SKEW 47% không xác nhận một volatility shock đồng thuận. Equity vol thấp, rates vol thấp, tail-risk premium gần trung tính nhưng SKEW 144.3 sát ngưỡng 145, cần theo dõi. OVX 79% là điểm lệch quan trọng ngoài PC1: oil volatility elevated nhưng chưa vượt vùng oil shock 50. VVIX 25% chưa báo hiệu derivatives stress. Do đó vol breadth là **divergent/narrow**, không broad.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Nỗi sợ chưa lan khắp cổ phiếu, trái phiếu và phái sinh. Nhưng thị trường dầu đang dao động mạnh hơn bình thường, giống một đốm lửa riêng có thể làm nóng lạm phát nếu bùng lên.
+
+## 5. Macro Overlay
+
+**Academic.** 2s10s ở +0.35%, percentile 55%, nghĩa là curve đã dương, không còn inverted. Đây là trạng thái normal hoặc re-normalized, không phải tín hiệu recession mới từ inversion. Tuy vậy, nếu steepening xuất hiện sau một giai đoạn đảo ngược kéo dài, cần theo dõi rủi ro chu kỳ muộn. DXY 100.96, percentile 44%, chưa phải USD strength extreme; áp lực FX lên EM và VND từ USD hiện không phải kênh stress chính.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Đường cong lợi suất Mỹ không còn phát tín hiệu đỏ rõ ràng. Đồng USD cũng chưa quá mạnh, nên hiện chưa tạo “gọng kìm” lớn lên tỷ giá và dòng vốn vào Việt Nam.
+
+## 6. Momentum
+
+**Academic.** PC1 raw tăng +0.50σ trong 5 ngày cho thấy stress đang **accelerate nhẹ**, nhưng smoothed PC1 vẫn quanh trung tính. Đây là mẫu early warning: chỉ báo nhanh bắt đầu nhích lên, còn regime tổng thể chưa đổi. Sự lệch pha chủ yếu đến từ CCC OAS và CQS, trong khi HY, IG, VIX, MOVE chưa xác nhận.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+Căng thẳng chưa lan rộng, nhưng kim đồng hồ đã bắt đầu nhích. Nếu vài tuần tới HY, IG hoặc VIX cùng tăng, câu chuyện sẽ chuyển từ “vấn đề cục bộ” sang “rủi ro thị trường rộng hơn”.
+
+## 7. Spillover to VN-Index (4-8 tuần)
+
+**Academic.** Với regime **CALM** nhưng driver **CCC_CREDIT_DRIVEN**, spillover sang VN-Index trong 4-8 tuần là **neutral to mildly negative**. Kênh tiêu cực chính là late-cycle credit warning: khi deep junk stress tăng, nhà đầu tư toàn cầu thường giảm beta ở EM equities. Tuy nhiên EM OAS 4%, DXY 44%, VIX 41% và MOVE 13% đều chưa xác nhận dòng vốn EM bị ép mạnh. Rủi ro riêng cần theo dõi là OVX 79%: nếu oil volatility chuyển thành cú sốc giá dầu, CPI và kỳ vọng chính sách tiền tệ tại các nền kinh tế nhập khẩu năng lượng có thể bị ảnh hưởng.
+
+### 💡 Diễn giải bình dân (Layman's terms)
+VN-Index chưa bị một “gọng kìm” toàn cầu hoàn chỉnh. Nhưng có hai lực cản cần để ý: nợ rác Mỹ xấu đi làm nhà đầu tư bớt thích rủi ro, và dầu biến động mạnh có thể gây áp lực lạm phát. USD hiện chưa phải lực ép lớn.
+
+## 8. KẾT LUẬN
+
+Regime vĩ mô hiện là **CALM**, nhưng chất lượng tín dụng đang xấu đi ở đáy thang rủi ro. Trong 2-4 tuần tới, dòng tiền có thể vẫn chọn lọc, chưa risk-off toàn diện, nhưng bias phòng thủ tăng nếu CCC/CQS tiếp tục leo thang.
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 48,
+  "regime": "CALM",
+  "driver": "CCC_CREDIT_DRIVEN",
+  "credit_cycle_signal": "deteriorating",
+  "vol_breadth": "divergent",
+  "macro_overlay": "benign",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: global_financial_conditions_methodology ===
+- CQS Percentile 3Y: 99.8
+- PC1 Regime Percentile 1Y: 47.6
+- Indicator Percentile Window: 756 sessions max, 252 sessions min
+- Z-Score Window: 252 sessions
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

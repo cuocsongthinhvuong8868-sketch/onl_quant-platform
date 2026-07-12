@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+
+Ngày 2026-07-08, lãi suất qua đêm ON ở **4.68%**, giảm **0.60 điểm %** so với phiên trước. Đây là tín hiệu hạ nhiệt ngắn hạn sau giai đoạn ON duy trì quanh vùng cao, nhưng mức tuyệt đối vẫn chưa quay lại trạng thái dễ chịu rõ ràng.
+
+Cấu trúc kỳ hạn **không đảo ngược**: 1W-ON ở **+0.55%**, 2W-ON ở **+1.36%**. ON không vượt 1W/2W, nên dữ liệu không cho thấy squeeze cực ngắn hạn tại riêng overnight trong phiên này. Tuy nhiên, spread dương khá rộng ở 2W cho thấy thị trường vẫn định giá chi phí vốn kỳ hạn ngắn cao hơn ON, hàm ý nhu cầu phòng thủ thanh khoản chưa biến mất.
+
+## 2. Trend 20 phiên
+
+Trend 20 phiên nên được phân loại là **liquidity squeeze / stress building**, dù phiên hiện tại đã hạ nhiệt. ON tăng **+1.17 điểm %** trong 20 phiên, số phiên STRESS/WARNING là **5**, và giai đoạn cuối tháng 6 đến đầu tháng 7 xuất hiện cụm ON cao, có lúc đạt **12.49%**.
+
+Điểm cần lưu ý là ON MA5 hiện giảm nhẹ so với đầu cửa sổ **-0.07 điểm %**, nhưng slope MA5 vẫn dương **+0.124 điểm %/phiên** và số phiên TIGHT/ELEVATED cộng lại chiếm **9/20 phiên**. Vì vậy, snapshot hiện tại đang cho thấy **hạ nhiệt trong ngày**, nhưng trend 20 phiên vẫn phản ánh di sản stress thanh khoản chưa được xóa hoàn toàn.
+
+## 3. Regime & Z-Score
+
+Z-score ON MA5 ở **+0.10**, percentile **0.595**, tức lãi suất ON đã mượt đang quanh vùng hơi cao hơn trung vị 1 năm nhưng chưa nằm trong vùng cực đoan. Regime hiện tại là **ELEVATED**, phản ánh điều kiện vốn ngắn hạn vẫn căng hơn bình thường, dù chưa ở mức TIGHT như các phiên 2026-07-01 đến 2026-07-06.
+
+Input hiện tại không đủ dữ liệu để kết luận nguyên nhân của regime. Do đó, chỉ có thể kết luận từ VNIBOR rằng áp lực thanh khoản ngắn hạn đã giảm so với đỉnh stress gần đây, nhưng mặt bằng chi phí vốn vẫn còn cao.
+
+## 4. Spillover Tới VN-Index
+
+Tác động tới VN-Index trong 2-4 tuần tới nghiêng **tiêu cực vừa phải**. Lý do là phiên hiện tại giảm ON và tín hiệu NEUTRAL giúp giảm áp lực tức thời, nhưng trend 20 phiên vẫn là stress building hơn là easing bền vững.
+
+Khi VNIBOR duy trì ở vùng elevated/tight trong nhiều phiên, chi phí cơ hội của dòng tiền cổ phiếu tăng lên. Dòng vốn margin và dòng tiền cá nhân có xu hướng thận trọng hơn vì chi phí vốn ngắn hạn không còn rẻ. Điều này thường làm giảm độ rộng thị trường, khiến nhóm cổ phiếu phụ thuộc dòng tiền đầu cơ dễ nhạy cảm hơn với nhịp điều chỉnh.
+
+## 5. Rủi ro & Điều kiện Theo Dõi
+
+Các ngưỡng cần theo dõi tiếp là: ON có quay lại trên **5.0-6.0%** không; ON MA5 có tiếp tục giảm khỏi vùng cao hay tăng trở lại; spread 1W-ON có đảo ngược âm không; và số phiên STRESS/WARNING có giảm rõ trong các phiên kế tiếp không.
+
+Các yếu tố như OMO, tín phiếu, tỷ giá, Kho bạc hoặc mùa vụ là dữ liệu ngoài phạm vi input và cần kiểm chứng riêng, không thể dùng làm kết luận từ bộ VNIBOR này.
+
+## 6. KẾT LUẬN & KHUYẾN NGHỊ
+
+Thanh khoản đã hạ nhiệt trong phiên nhưng chưa xác nhận easing bền vững. Phân bổ tài sản nên giữ thiên hướng phòng thủ, ưu tiên kiểm soát rủi ro dòng tiền và đòn bẩy.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 4.68,
+  "trend_20d": "liquidity_squeeze",
+  "regime": "ELEVATED",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```

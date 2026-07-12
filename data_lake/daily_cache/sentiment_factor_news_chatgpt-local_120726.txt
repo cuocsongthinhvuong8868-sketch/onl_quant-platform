@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Regime News Sentiment**
+
+- **1d:** `risk_off`, posterior mean `-0.224`, **P_conf 76%** → **nghiêng risk-off / dấu hiệu ban đầu**, chưa đủ để kết luận mạnh. P(mean > 0) chỉ 24%, nhưng đây là xác suất sentiment latent, **không phải xác suất VNINDEX tăng/giảm**.
+- **7d:** `strong_risk_on`, mean `+0.626`, **P_conf 100%** → **khẳng định chắc chắn risk-on**.
+- **30d:** `strong_risk_on`, mean `+0.549`, **P_conf 100%** → **khẳng định chắc chắn risk-on**.
+
+**Channel Kéo Chính**
+
+- **Risk-on mạnh:**  
+  `fx_external` 7d `+2.000`, P_conf 100%; `earnings` 7d/30d đều rất mạnh, P_conf 100%; `credit_stress` tích cực, P_conf 100%; `monetary_policy` 30d `+1.806`, P_conf 100%.
+- **Risk-off ngắn hạn:**  
+  `liquidity` 1d `-0.786`, P_conf 97%; `monetary_policy` 1d `-0.672`, P_conf 89%; `risk_appetite` 1d `-0.215`, P_conf 79%.  
+  Đây là điểm cần chú ý: **ngắn hạn đang xấu đi dù nền 7d/30d vẫn risk-on mạnh**.
+- **Áp lực trung hạn:**  
+  `inflation` âm ở 7d/30d; `commodity` 30d `-0.561`, P_conf 100%.
+
+**Drivers Đáng Chú Ý**
+
+Positive:
+- Tỷ giá trung tâm tăng các ngày 08/07, 09/07, 10/07 kéo `fx_external` tích cực.
+- Lãi suất ON 06/07 tăng 34 bps, được feed chấm tích cực cho `monetary_policy`.
+- Earnings duy trì điểm rất cao ở cả 1d/7d/30d.
+- Credit stress cải thiện trong 7d/30d.
+
+Negative:
+- NHNN hút ròng `15,964.1 tỷ` qua OMO ngày 07/07 kéo `liquidity` âm.
+- 1d liquidity và monetary policy đồng thời chuyển risk-off.
+- Giá quặng sắt, HRC, PVC, heo hơi giảm mạnh kéo `commodity` âm.
+- Inflation vẫn là kênh âm trong 7d/30d.
+
+**Kết Luận Cho AI CIO**
+
+News sentiment **supports macro risk-on layer ở khung 7d/30d**, nhưng **conflicts với tín hiệu ngắn hạn 1d** do liquidity/monetary policy xấu đi. Với market-internal tools: xem là **neutral-to-supportive** nếu breadth/flow/price xác nhận; nếu market internals yếu, feed này không đủ để override vì 1d đã chuyển risk-off.
+
+**Caveat**
+
+Feed generated lúc `2026-07-11 15:53 +07`, trong khi hiện tại là `2026-07-12`, nên có rủi ro stale. `mozyfin_social` khá nhiều ở 1d `40/130` và 7d `270/997`: đây là **social/opinion evidence độ tin cậy thấp hơn**, cần discount. Đây chỉ là overlay sentiment nhanh, dễ nhiễu headline, không phải rule phân bổ cứng.

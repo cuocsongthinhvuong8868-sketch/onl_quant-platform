@@ -1,0 +1,36 @@
+## 1. Observations
+- SSI: **63.0%**, nằm trong vùng **WARNING**.
+- Market State: **EUPHORIC_RISK**.
+- PCA Concentration PC1 EVR: **38.1%**.
+- Top drivers: **S_LIQ 36%**, **S_VAL 31%**, **S_COR 18%**.
+
+## 2. Risk Decomposition
+Driver chính là **S_LIQ**: tín hiệu **volume khô cạn vs 1Y norm** đang đóng góp lớn nhất vào stress. Đây không phải Amihud, mà là trạng thái thanh khoản thị trường thấp hơn chuẩn 1 năm, khiến lực đỡ giá kém bền nếu xuất hiện bán chủ động.
+
+**S_VAL** đứng thứ hai cho thấy valuation tension vẫn cao: lợi suất thị trường 252 ngày so với lãi suất tiền gửi đang tạo áp lực định giá. **S_COR** ở nhóm ba hàm ý mức đồng pha hệ thống tăng; khi nhiều mã VN30 cùng phản ứng theo một hướng, rủi ro lan truyền tăng.
+
+Tổ hợp **S_LIQ + S_COR** là cấu hình cần phòng thủ: thanh khoản khô cạn trong khi tương quan hệ thống tăng thường tạo “bull-trap signature”, đặc biệt nếu giá hồi nhưng breadth và dòng tiền không xác nhận.
+
+## 3. Cross-Check
+VN30 đang **dưới MA125**, trong khi SSI đã vào **WARNING**. Đây không phải phân kỳ tích cực; price action đang yếu đi cùng lúc stress hệ thống tích lũy.
+
+HMM báo **EUPHORIC_RISK**, khớp với SSI ở góc “high stress/risk-on behavior”. Tuy nhiên nhãn EUPHORIC_RISK thường giả định uptrend, còn việc nằm dưới MA125 tạo **trend-filter tension**. Không nên dùng trạng thái risk-on để xác nhận bullish view.
+
+## 4. Verdict
+Đề xuất **cash target: 50% danh mục**.
+
+Hedge action: **giảm beta** là hành động cơ sở; với danh mục còn beta cao, có thể dùng **Short VN30F1M** quy mô nhỏ để trung hòa rủi ro thay vì tăng exposure. Pillar drivers không mâu thuẫn: S_LIQ, S_VAL và S_COR cùng nghiêng về tích lũy rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "EUPHORIC_RISK",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 50,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
