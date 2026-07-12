@@ -19,12 +19,16 @@ COLORS = {
 def plot_yields_and_spread(spread: pd.DataFrame) -> go.Figure:
     """Two-row view of sector yields and the positive BDS risk premium."""
     fig = make_subplots(
-        rows=2,
+        rows=3,
         cols=1,
         shared_xaxes=True,
-        vertical_spacing=0.11,
-        row_heights=[0.58, 0.42],
-        subplot_titles=("Lãi suất phát hành", "Phần bù rủi ro BĐS so với Bank (Spread)"),
+        vertical_spacing=0.09,
+        row_heights=[0.44, 0.31, 0.25],
+        subplot_titles=(
+            "Lãi suất phát hành",
+            "Phần bù rủi ro BĐS so với Bank (Spread)",
+            "Phân vị phần trăm của Spread",
+        ),
     )
     fig.add_trace(
         go.Scatter(
@@ -79,12 +83,30 @@ def plot_yields_and_spread(spread: pd.DataFrame) -> go.Figure:
         row=2,
         col=1,
     )
+    fig.add_trace(
+        go.Scatter(
+            x=spread.index,
+            y=spread["risk_premium_percentile"],
+            name="Spread percentile",
+            mode="lines+markers",
+            line={"color": COLORS["government"], "width": 2.4},
+            marker={"color": COLORS["government"], "size": 7},
+            hovertemplate=(
+                "%{x|%d/%m/%Y}<br>Spread percentile: %{y:.1f}%<extra></extra>"
+            ),
+        ),
+        row=3,
+        col=1,
+    )
     fig.add_hline(y=0, line_color="#94A3B8", line_width=1, row=2, col=1)
+    fig.add_hline(y=50, line_color="#94A3B8", line_width=1, line_dash="dot", row=3, col=1)
+    fig.add_hline(y=80, line_color="#B42318", line_width=1, line_dash="dot", row=3, col=1)
     fig.update_yaxes(title_text="Lãi suất (%)", ticksuffix="%", row=1, col=1)
     fig.update_yaxes(title_text="Basis points", ticksuffix=" bps", row=2, col=1)
-    fig.update_xaxes(title_text="Ngày báo cáo", row=2, col=1)
+    fig.update_yaxes(title_text="Percentile", ticksuffix="%", range=[0, 105], row=3, col=1)
+    fig.update_xaxes(title_text="Ngày báo cáo", row=3, col=1)
     fig.update_layout(
-        height=650,
+        height=820,
         margin={"l": 20, "r": 20, "t": 70, "b": 25},
         hovermode="x unified",
         legend={"orientation": "h", "y": 1.08, "x": 0},

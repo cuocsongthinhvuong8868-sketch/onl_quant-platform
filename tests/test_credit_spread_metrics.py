@@ -36,8 +36,10 @@ def test_equal_weight_spread_and_return_follow_supplied_formula():
     assert first["real_estate_yield_pct"] == pytest.approx(11.0)
     assert first["signed_spread_pct"] == pytest.approx(-4.0)
     assert first["risk_premium_bps"] == pytest.approx(400.0)
+    assert first["risk_premium_percentile"] == pytest.approx(100.0)
     assert second["signed_spread_pct"] == pytest.approx(-3.0)
     assert second["spread_return_pct"] == pytest.approx(25.0)
+    assert second["risk_premium_percentile"] == pytest.approx(50.0)
     assert second["direction"] == "NARROWING"
 
 

@@ -47,6 +47,7 @@ SPREAD_COLUMNS = [
     "risk_premium_pct",
     "signed_spread_bps",
     "risk_premium_bps",
+    "risk_premium_percentile",
     "spread_change_bps",
     "spread_return_pct",
     "direction",
@@ -137,6 +138,18 @@ def _aggregate_group(group: pd.DataFrame, weighting: WeightingMethod) -> pd.Seri
     )
 
 
+def _last_value_percentile(values: pd.Series) -> float:
+    """Average-rank percentile of the last value within an expanding window."""
+    array = pd.to_numeric(values, errors="coerce").dropna().to_numpy(dtype=float)
+    if array.size == 0:
+        return np.nan
+    latest = array[-1]
+    less = int(np.count_nonzero(array < latest))
+    equal = int(np.count_nonzero(array == latest))
+    average_rank = less + (equal + 1.0) / 2.0
+    return average_rank / array.size * 100.0
+
+
 def calculate_credit_spread(
     issuance: pd.DataFrame,
     *,
@@ -190,6 +203,10 @@ def calculate_credit_spread(
     result["risk_premium_pct"] = -result["signed_spread_pct"]
     result["signed_spread_bps"] = result["signed_spread_pct"] * 100.0
     result["risk_premium_bps"] = result["risk_premium_pct"] * 100.0
+    result["risk_premium_percentile"] = result["risk_premium_bps"].expanding(min_periods=1).apply(
+        _last_value_percentile,
+        raw=False,
+    )
     result["spread_change_bps"] = result["signed_spread_pct"].diff() * 100.0
 
     lag = result["signed_spread_pct"].shift()
