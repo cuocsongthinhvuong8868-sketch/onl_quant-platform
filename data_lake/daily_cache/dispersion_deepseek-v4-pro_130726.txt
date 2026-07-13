@@ -1,0 +1,32 @@
+## 1. Observations
+- Spread_Z = -0.92σ: mức phân tán thấp hơn đáng kể so với trung bình 60 phiên, phản ánh biến động dị biệt giữa các cổ phiếu co cụm.
+- DPI = 43.3%: dưới ngưỡng 70%, phủ nhận kịch bản dispersion regime kéo dài – thị trường không trong trạng thái căng thẳng hệ thống.
+- Avg Pairwise Correlation = 0.008: xấp xỉ 0, hàm ý phân hóa cực mạnh, hành vi bầy đàn gần như không tồn tại.
+- CS Skewness và Kurtosis không có dữ liệu (N/A), chưa thể định lượng rủi ro đuôi.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **bình thường**, không ghi nhận bất kỳ tín hiệu căng thẳng cấu trúc nào. Cả DPI và Spread_Z đều thấp (dưới ngưỡng kích hoạt) cho thấy:
+- Không có stress cục bộ (Spread_Z cao đi kèm DPI thấp) lẫn stress regime bền vững (cả hai cùng cao).
+- Phân tán ngang hàng co hẹp dưới mức lịch sử gần đây có thể là biểu hiện của một thị trường tĩnh lặng, nơi các outlier không chi phối.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu Cross-Sectional Skewness và Kurtosis, không thể xác nhận hướng gãy đuôi hay sự hiện diện của fat-tail outliers. Trong điều kiện dữ liệu khuyết, giả định phân phối cân đối (symmetric) là hợp lý tạm thời, nhưng **cần cập nhật ngay** hai chỉ báo này nếu xuất hiện để kiểm tra liệu có hiện tượng cú sập cá biệt (skew âm) hoặc cú đẩy điên rồ (skew dương). Kurtosis > 5 sẽ phá vỡ tiền đề mô hình normal, hiện tại chưa có bằng chứng.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Corr):  
+- DPI thấp (43.3%) + Tương quan cực thấp (0.008) đặt thị trường vào ô **Healthy Stock-Picking**.  
+Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu (bottom-up), nơi lợi nhuận riêng lẻ phân tán mạnh, alpha từ phân tích cơ bản có không gian hoạt động tối đa. Rủi ro lớn nhất cho Portfolio Manager tại thời điểm này **không đến từ concentration risk hay herding crash**, mà là **sự tự mãn về mức phân hóa thấp** – nếu xảy ra cú sốc khiến tương quan đột ngột tăng vọt, mô hình định vị rủi ro hiện tại có thể bị phá vỡ. Cần theo dõi sát biến động của DPI và Corr để phát hiện sớm dấu hiệu chuyển pha.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "13/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.92,
+  "dpi_pct": 43.3,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,43 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái cảm xúc tin tức vĩ mô hiện tại**  
+- **1 ngày (1d)**: **Risk-On mạnh** – xác suất posterior > 0 đạt 100%, CI 90% [+0.33, +0.82] → **Khẳng định chắc chắn** (Strongly Confirmed).  
+- **7 ngày (7d)**: **Risk-On mạnh** – P_conf 100%, CI [+0.52, +0.76] → **Khẳng định chắc chắn**.  
+- **30 ngày (30d)**: **Risk-On mạnh** – P_conf 100%, CI [+0.51, +0.61] → **Khẳng định chắc chắn**.  
+Cả ba khung thời gian đồng thuận tuyệt đối về trạng thái lạc quan, không có dấu hiệu đảo chiều.
+
+**2. Các kênh dẫn dắt Risk-On / Risk-Off mạnh nhất**  
+*Kéo Risk-On* (độ tin cậy cao):  
+- **fx_external** (+2.00, P_conf 100% ở 1d & 7d, 30d cũng xuất hiện driver tỷ giá) – tỷ giá trung tâm liên tục tăng mạnh.  
+- **monetary_policy** (+1.82 ở 1d, +1.34 ở 7d, +1.83 ở 30d, P_conf đều 100%) – mặt bằng lãi suất huy động nhích lên, chính sách tiền tệ được đánh giá tích cực.  
+- **earnings** (+1.34 ở 1d, +1.16 ở 7d, P_conf 100%) – kỳ vọng lợi nhuận doanh nghiệp cải thiện.  
+- **credit_stress** (+1.11 ở 1d, +1.20 ở 7d, P_conf 100%) – lợi suất trái phiếu chính phủ đi ngang, không có dấu hiệu căng thẳng tín dụng.  
+- **banking_system** (+0.60 ở 1d, +0.62 ở 7d, P_conf 99‑100%) – hệ thống ngân hàng lành mạnh.
+
+*Kéo Risk-Off* (nhưng chưa lấn át):  
+- **liquidity** (−0.94 ở 1d, −0.58 ở 7d, P_conf 100%) – NHNN hút ròng mạnh qua OMO, dấu hiệu thắt chặt nhẹ thanh khoản.  
+- **commodity** (chỉ rõ ở 7d & 30d, −0.09 đến −0.71, P_conf 74‑100%) – giá hàng hóa Trung Quốc (thép, PVC, quặng sắt) giảm sâu, phản ánh lo ngại cầu yếu.  
+- **inflation** (trung lập ở 1d, −0.67 ở 7d, P_conf 88%) – dữ liệu lạm phát chưa rõ ràng nhưng hơi nghiêng về phòng thủ trong ngắn hạn.
+
+**3. Tóm tắt driver quan trọng (chỉ từ input)**  
+*Tích cực*  
+- Tỷ giá trung tâm 13/07: 25.220, tăng 6 đồng; liên tiếp các phiên trước đó đều tăng (08‑13/07).  
+- Lãi suất huy động 1‑3 tháng nhóm NHTM Khác tăng 1 bps (13/07).  
+- Lợi suất TPCP đi ngang phiên 13/07 – không áp lực nợ công.  
+- Tăng trưởng GDP 6 tháng được nhấn mạnh về chất lượng (Báo Đầu Tư).  
+- Doanh nghiệp Canada tìm nguồn cung thực phẩm, dệt may tại Việt Nam – tín hiệu mở rộng thương mại.  
+
+*Tiêu cực*  
+- NHNN hút ròng 11.729 tỷ đồng qua OMO phiên 13/07 (và liên tục hút ròng các phiên trước).  
+- Dự báo nợ xấu tăng từ quý II/2026 do lãi suất cao (VnEconomy).  
+- Giá quặng sắt Trung Quốc xuống đáy 1 năm, giá thép HRC, PVC cũng lao dốc (7d‑30d).  
+- Doanh nghiệp vẫn “ngóng gỡ điểm nghẽn” và lo ngại thặng dư thương mại khó duy trì (Báo Đầu Tư, Thời báo Tài chính).
+
+**4. Kết luận tác động lên AI CIO**  
+- **Hỗ trợ mạnh** cho nhận định vĩ mô và các công cụ nội tại thị trường đang nghiêng về risk‑on. Tin tức vĩ mô đồng thuận cao, gần như không có kênh nào đủ sức lật ngược xu hướng.  
+- Duy nhất **liquidity** và **commodity** tạo điểm trừ, nhưng vẫn nằm trong bối cảnh hút ròng kiểm soát, chưa phải thắt chặt toàn diện. Có thể dùng làm tín hiệu cảnh báo sớm, không phải trigger giảm rủi ro ngay.  
+- Nếu macro layer và các tín hiệu nội tại khác cùng chiều → sentiment này **củng cố quyết định duy trì/tăng cường vị thế rủi ro**.
+
+**5. Caveat**  
+- **Nguồn thông tin**: Ở khung 1d và 7d, tỷ trọng `mozyfin_social` tương đối cao (28‑34%) → **tín hiệu từ mạng xã hội có độ tin cậy thấp**, cần chiết khấu tín hiệu dẫn xuất từ các nguồn này. Khung 30d ít phụ thuộc social (~8%), nên xu hướng dài hạn vững hơn.  
+- **Dữ liệu không trễ**: Generated_at 13/07/2026, đồng bộ với ngày phân tích, không có stale feed.  
+- **Rủi ro nhiễu tiêu đề**: Tin tức ngắn hạn như biến động giá hàng hóa Trung Quốc, OMO có thể bị phóng đại; cần trọng số hoá theo kênh và khung thời gian để tránh phản ứng quá mức.

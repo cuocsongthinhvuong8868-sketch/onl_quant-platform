@@ -1,0 +1,35 @@
+## 1. Observations
+- MA20: 14.1% (oversold, <20%). Đầu cơ ngắn hạn gần như tê liệt.
+- MA60: 18.8% (cực thấp). Xác nhận xu hướng trung hạn suy yếu nghiêm trọng, điều chỉnh chưa có dấu hiệu kết thúc.
+- MA125: 20.5% (cực thấp). Chu kỳ kinh doanh nửa năm mất động lực trên diện rộng.
+- MA252: 21.6% (cực thấp). Xu hướng dài hạn (secular trend) đang trong vùng Bear regime rõ rệt.
+
+## 2. Structural Health
+Bốn đường MA đồng thuận ở vùng giá trị cực thấp, không có dấu hiệu phân kỳ (divergence). Cả MA20 và MA252 đều dưới ngưỡng 30% và 40%.
+- **Pattern khớp:** **Bear Confirmed**. Đây là trạng thái suy yếu mang tính cấu trúc, không phải Bear Trap (vì MA252 không >50%). Toàn bộ các khung thời gian từ ngắn hạn đến dài hạn đều xác nhận thị trường đang vận hành trong downtrend kéo dài.
+
+## 3. Money Flow Leadership
+- **Top volume ngắn hạn (MA20):** ABS, APH, ASM, ASP, BAF (Nông nghiệp/Thủy sản); BWE (Nước - Utilities); BSR (Lọc hóa dầu). Dòng tiền chủ yếu co cụm vào nhóm Thủy sản, Tiện ích và Năng lượng mang tính chất phòng thủ.
+- **Top volume dài hạn (MA252):** Có sự trùng khớp (overlap) lớn với danh sách ngắn hạn (ABS, ASP, BMS, BSR, BVS, BWE). Điều này cho thấy dòng tiền thông minh (Smart money) không mở rộng sang các nhóm mới mà chỉ tập trung củng cố ở một số ít cổ phiếu đơn lẻ còn giữ được xu hướng.
+- **Kết luận:** Dòng tiền ưu tiên **defensive** tuyệt đối, trú ẩn trong các mã có câu chuyện riêng (Thủy sản, Nước). Không có tín hiệu dòng tiền chảy vào nhóm Chu kỳ (Thép) hay Đầu cơ (Chứng khoán, BĐS).
+
+## 4. Verdict
+- **Strategy:** **Defensive cash-up**. Ưu tiên bảo toàn vốn, giảm thiểu rủi ro danh mục trong môi trường Bear Confirmed biên độ rộng.
+- **Đòn bẩy:** **0% margin**. Tuyệt đối không sử dụng đòn bẩy khi xu hướng dài hạn suy yếu (MA252 < 25%) và không có phân kỳ tạo đáy.
+- **Diagnostic:** Xu hướng giảm có xác nhận đồng thuận, không cần chờ đợi tín hiệu (Không phải trường hợp WAIT FOR CONFIRMATION vì MA20 và MA252 không trái chiều).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 14.1,
+  "ma60_pct": 18.8,
+  "ma125_pct": 20.5,
+  "ma252_pct": 21.6,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

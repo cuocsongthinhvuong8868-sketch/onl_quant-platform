@@ -1,0 +1,28 @@
+## 1. Observations
+- Stress Index VN30: 23.33% (dưới ngưỡng cảnh báo 40%)
+- Số mã thủng VaR 95%: 7/30 (tỷ lệ breach cao hơn trung vị lịch sử)
+- Complacency Index toàn thị trường: 8.33% (thấp xa ngưỡng nguy hiểm 80%), số mispriced: 9 mã
+
+## 2. Contagion Assessment (Module B)
+Chỉ số VN30 Stress ở mức 23.33%, chưa kích hoạt ngưỡng báo động lây lan hệ thống. Tuy nhiên, 7/30 mã thủng VaR 95% là con số đáng lưu ý, cho thấy áp lực bán real‑time không lan rộng đồng đều mà tập trung ở nhóm cổ phiếu riêng lẻ. Top 3 breach sâu nhất (BCM, SHB, SSB) hiện chưa có dấu hiệu lây lan sang phần còn lại của rổ VN30; đây là sự cố cá biệt hơn là khởi đầu của một đợt bán tháo hệ thống. Cần theo dõi sát nếu số breach tăng thêm, nhưng hiện tại chưa hình thành chế độ “contagion active”.
+
+## 3. Complacency Assessment (Module C)
+Complacency 8.33% khẳng định **thị trường không ở regime “ngủ quên”** (không có hiện tượng spread bị nén trên diện rộng). Tuy nhiên, cần hiểu đúng: mức thấp này **không đồng nghĩa với “thị trường ổn định” hay “vận hành bình thường”**. Thực tế, với áp lực breach tại VN30, thị trường đang có biến động, spread giãn tự nhiên khiến complacency thấp – đó có thể là uptrend mạnh, hoặc cũng có thể là giai đoạn bất ổn, phân hóa cao. Không có cơ sở để tuyên bố “an toàn” chỉ vì complacency thấp.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B): BCM, SHB, SSB** – Đề xuất giảm tỷ trọng hoặc đặt stop‑loss chặt (ví dụ -6% so với giá hiện tại hoặc kỷ luật cắt khi thủng MA20 trên khung D1). Biến động riêng lẻ có thể tiếp tục mở rộng nếu thanh khoản yếu.
+- **Top 3 Mispriced (Module C): MSB, HCM, GMD** – Spread đang bị nén bất thường so với rủi ro thực tế. Đây chưa phải tín hiệu bán, nhưng tiềm ẩn rủi ro “điều chỉnh bất ngờ” khi có tin tức tiêu cực. Giám sát chặt chẽ và sẵn sàng thoát nếu vol mở rộng đột biến.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 23.33,
+  "breach_count": 7,
+  "complacency_pct": 8.33,
+  "mispriced_count": 9,
+  "regime": "spread_normal",
+  "watchlist_short": ["BCM", "SHB", "SSB", "MSB", "HCM", "GMD"],
+  "confidence": "medium"
+}
+```

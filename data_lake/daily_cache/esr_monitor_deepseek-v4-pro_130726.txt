@@ -1,0 +1,34 @@
+## 1. Observations
+- SSI = 63.0% – regime **WARNING** (tích lũy rủi ro ngầm)
+- HMM Market State: **CALM CORRECTION** (low-stress + downtrend) – VN30 đóng cửa dưới MA125
+- Top 3 pillar drivers: **S_LIQ (36%)**, **S_VAL (31%)**, **S_COR (18%)**
+- PCA Concentration (EVR PC1): 38.1%, upside systemic correlation chưa đột biến
+
+## 2. Risk Decomposition
+Pillar dẫn dắt chính là **S_LIQ – Volume Dry-Up**. Chỉ số này đo lường mức độ thanh khoản teo tóp so với chuẩn 1 năm (MA20/MA252 của tổng dollar volume). Trên nền *downside mode* (chỉ tính phiên giảm), S_LIQ đóng góp 36% cho thấy khối lượng giao dịch thu hẹp mạnh trong các nhịp đỏ, báo hiệu dòng tiền lớn đứng ngoài quan sát. Hiện tượng này có thể là dấu hiệu của một đợt điều chỉnh “cạn kiệt cung” nhưng cũng đồng thời làm tăng **rủi ro thanh khoản** nếu xuất hiện cú sốc bất ngờ.
+
+Pillar thứ hai là **S_VAL – Valuation Tension** (lợi nhuận 252d của VN30 trừ lãi suất tiền gửi). Mức đóng góp 31% cho thấy mặt bằng giá vẫn còn căng về định giá, dù chỉ số đã lùi sâu hơn MA125. Điều này làm giảm không gian lỗi (margin of safety) và gia tăng tổn thương nếu xảy ra cú sốc vĩ mô.
+
+Pillar thứ ba **S_COR – Systemic Correlation** ở 18% (EVR PC1 38.1%). Đồng pha hệ thống chưa vượt ngưỡng nguy hiểm, chưa có dấu hiệu “herding” bán tháo đồng loạt. Tuy nhiên cấu trúc rủi ro đang bị **S_LIQ + S_VAL** thắt chặt, tạo điều kiện cho một đợt định giá lại nếu thanh khoản tiếp tục xói mòn.
+
+## 3. Cross-Check
+HMM gắn nhãn **CALM CORRECTION** (low-stress), nhưng SSI đang ở **63% (WARNING)**. Đây là sự lệch pha đáng lưu ý: mô hình sóng ẩn Markov có thể đang “đánh giá thấp” cường độ stress ngầm do trọng số SSI đến từ những ngày giảm. VN30 nằm dưới MA125 (xu hướng giảm) làm giảm khả năng của HMM trong việc phát hiện sớm rủi ro thanh khoản. Không có tín hiệu phân kỳ giá tăng mạnh – SSI vọt lên, nhưng việc thị trường đi xuống trong thanh khoản cạn kèm định giá cao là tổ hợp dễ tổn thương.
+
+## 4. Verdict
+**Cash weight đề xuất: 40% danh mục.**  
+Hành động Hedge: **giảm beta tổng thể** (hạ tỷ trọng cổ phiếu có hệ số beta cao, hoặc sử dụng hợp đồng tương lai để giảm rủi ro danh mục một cách thận trọng).  
+Lý do: SSI đang vùng WARNING, chưa tới CRITICAL, nhưng kết cấu rủi ro dẫn dắt bởi thanh khoản khô và định giá cao là điềm báo cho những đợt sụt giảm sâu nếu dòng tiền lớn bắt đầu xả hàng. Không hành động short mạnh vì S_COR chưa cao, nhưng phòng vệ là bắt buộc.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

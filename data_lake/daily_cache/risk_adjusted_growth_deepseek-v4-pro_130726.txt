@@ -1,0 +1,30 @@
+## 1. Scenario Assessment  
+Tham số hiện tại (K=1.0, CoE=14%) là mức nền chuẩn cho ngành ngân hàng VN, không khắc nghiệt nhưng đủ để bộc lộ chất lượng nội tại. Mặt bằng chung, chỉ 1/6 cổ phiếu khảo sát tạo ra Alpha dương, phần lớn đang đốt vốn cổ đông trên cơ sở rủi ro. Bức tranh cho thấy ngành vẫn còn “bẫy giá trị” và “bỏng định giá” – chỉ những ngân hàng có P/B rẻ + ROE bền vững + biến động thấp mới sống sót qua bài kiểm tra K = 1.0.
+
+## 2. Top Alpha Decomposition  
+- **SHB** (Alpha +2.8%): Là trường hợp duy nhất xếp vào **Fortress**. Động lực chính đến từ P/B siêu rẻ (0.86) kết hợp ROE khá (17.5%), σROE siêu thấp (1.9%) và payout thấp (8.6%) → tỷ lệ tái đầu tư cao. Công thức Disciplined Return = (ROE×retention)/(P/B) – K×σ cho ra ~16.7%, vượt CoE thoải mái.  
+- **ACB** (Alpha -0.9%): ROE 23% rất hấp dẫn, nhưng P/B 1.23 không còn rẻ; risk penalty 2.7% ăn mòn lợi nhuận đã điều chỉnh. Có thể xem như “Growth Trap” nhẹ, chỉ cần P/B giảm nhẹ hoặc σ giảm thêm là Alpha có thể về dương.  
+- **MBB** (Alpha -1.6%): ROE 21.8% và σ cực thấp (1.6%) cho thấy chất lượng tốt, nhưng P/B 1.45 đẩy tỷ suất lợi nhuận trên giá sổ sách xuống, khiến toàn bộ cấu phần tăng trưởng không đủ bù CoE. Cũng là một “Growth Trap” đáng tiếc.
+
+## 3. Value Traps Warning  
+Ba mã đội sổ đều phản ánh những cái bẫy điển hình:  
+- **LPB**: P/B 3.26, thuộc loại “Premium Burn” cực đoan. ROE 21.1% là cao nhưng hệ số định giá phình to và σ 3.8% khiến lợi nhuận điều chỉnh rủi ro chỉ còn 1.3%, thua xa chi phí vốn.  
+- **EIB**: “Cheap Trap” kinh điển – P/B 1.38 không đủ rẻ để bù cho ROE chỉ 10% và σ 3.8%. Nhà đầu tư trả giá trung bình cho một ngân hàng kém chất lượng.  
+- **VPB**: ROE 14.1% khá, nhưng σ cao nhất nhóm (4.7%) và payout 24.6% khiến lợi nhuận giữ lại thấp. P/B 1.24 không rẻ trước rủi ro cao – đây là “Growth Trap” mong manh.
+
+## 4. Portfolio Construction  
+- **Core Holding (Fortress): SHB** – đề xuất tỷ trọng 70% trong phân bổ ngân hàng. Đây là lựa chọn duy nhất có Alpha dương, P/B rẻ và rủi ro thấp.  
+- **Tactical (Cheap‑but‑not‑trap):** không mã nào trong Top3/Bottom3 đáp ứng tiêu chí này. ACB và MBB dù chất lượng khá nhưng Alpha âm, chưa thể xếp vào tactical.  
+- **Cấm mua / underweight:** LPB, EIB, VPB (đốt vốn nặng). ACB và MBB cũng nên underweight cho đến khi P/B điều chỉnh hoặc σ cải thiện.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

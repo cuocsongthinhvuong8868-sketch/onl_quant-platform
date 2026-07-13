@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score: 56.5/100 (Δ +0.7), tiệm cận biên GREED (60) nhưng vẫn trong vùng NEUTRAL.
+- EGARCH Vol (chuẩn hóa): 43.3% (Δ +8.3%), mức trung bình và đang tăng, không phải vol thấp đặc trưng của Greed.
+- Rolling Skewness: 0.05, gần như không thiên lệch, không cho thấy đuôi âm sâu hay dương mạnh.
+- Downside Correlation (norm): 3.0% so với Upside Correlation (norm): 20.0%, chênh lệch lớn.
+
+## 2. Interpretation
+Thị trường duy trì pha NEUTRAL / STOCK-PICKING với mức độ phân hóa cao. Rủi ro hệ thống nhìn chung thấp, nhưng biến động ngầm gia tăng có thể khuếch đại rủi ro tại từng cổ phiếu riêng lẻ nếu không chọn lọc kỹ.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol:** Score tăng nhẹ trong khi vol cũng tăng (+8.3%), lệch khỏi kịch bản GREED cổ điển (vol thấp). Đây là tín hiệu cần lưu ý, nhưng chưa đủ để kết luận đảo chiều rủi ro.
+- **Skewness vs Correlation:** Skew gần 0 nhưng Upside Correlation vượt trội, phù hợp với trạng thái tăng điểm có tính lan tỏa không đồng đều – không phải đám đông bán tháo. Tổng thể consistent với Stock-Picking.
+
+## 4. Verdict
+- **Beta exposure:** ~0.7 trên danh mục VN-Index.
+- **Hành động:** Duy trì trạng thái trung tính, tập trung chọn cổ phiếu có yếu tố đặc thù (alpha). Sử dụng hợp đồng tương lai hoặc ETF linh hoạt để giảm beta tổng nếu phòng thủ, nhưng chưa cần hành động giảm beta khẩn cấp. Tránh tăng đòn bẩy quá mức do vol đang có xu hướng tăng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "13/07/2026",
+  "regime": "NEUTRAL",
+  "score": 56.5,
+  "confidence": "medium",
+  "beta_target": 0.7,
+  "key_signals": [
+    "Upside correlation cao hơn rõ rệt so với downside correlation",
+    "EGARCH vol ở mức trung bình và đang tăng, chưa rơi vào vùng low vol của Greed"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 56.5
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

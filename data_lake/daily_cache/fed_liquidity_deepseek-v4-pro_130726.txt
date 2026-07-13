@@ -1,0 +1,51 @@
+## 1. Mechanical Decomposition
+
+Thanh khoản ròng (Net Liquidity) tuần này tăng mạnh thêm **+114.9 tỷ USD**, đạt **5,958.2 tỷ USD**.  
+Phân rã cấu phần:
+- **WALCL** (bảng cân đối Fed): gần như đi ngang (quanh 6,735.6 tỷ USD), phản ánh đà QT vẫn đang vận hành nhưng với tốc độ thấp, không gây áp lực hút ròng.
+- **RRPONTSYD** (Reverse Repo): chỉ còn **3.35 tỷ USD**, coi như cạn kiệt hoàn toàn. Biến động tuần qua không đáng kể.
+- **WTREGEN** (TGA): giảm mạnh từ mức ước tính ~888 tỷ USD xuống còn **774.1 tỷ USD**.  
+→ Động lực chính của cú bơm thanh khoản tuần này là **Kho bạc Mỹ chi tiêu mạnh từ TGA**, đưa tiền trở lại hệ thống ngân hàng. RRP đã cạn nên không còn vùng đệm hấp thụ, khiến toàn bộ lượng tiền từ TGA đi thẳng vào dự trữ – đẩy Net Liquidity lên cao.
+
+## 2. Cycle Positioning
+
+- **Pha thanh khoản**: Về lý thuyết Fed vẫn đang QT, nhưng do RRP đã về zero và TGA xả, thanh khoản thực tế đang **mở rộng mạnh**, tương tự pha “QE ngầm” giai đoạn cuối (QE_late). Không còn vùng đệm từ hợp đồng repo ngược, mọi biến động TGA hay quyết định bảng cân đối của Fed giờ tác động trực tiếp vào dự trữ ngân hàng.
+- **RRP** gần như bằng 0 (< 100 tỷ), đánh dấu **chấm dứt kỷ nguyên hút thanh khoản giả từ MMF**.
+- **TGA** đang trong pha xả (chi tiêu > thu thuế), bơm ròng tiền ra.  
+- **So sánh lịch sử**: Net Liquidity hiện tại (~5,958 tỷ USD) **tiệm cận đỉnh mọi thời đại** (~6,100 tỷ năm 2021) và vượt xa đáy 2024 (khi QT + RRP cao từng đẩy thanh khoản xuống ~5,200 tỷ). Hệ thống tài chính đang “ngập” thanh khoản dù Fed vẫn giảm tài sản trên giấy tờ.
+
+## 3. Signal Strength
+
+- Tín hiệu: **ADD** (Impulse EMA > 0 và Z ≥ +1σ).
+- Z-Score: **+1.87σ** – ở ngưỡng mạnh, sát mức cực đoan (2σ). Thanh khoản đang tăng với vận tốc cao bất thường so với 52 tuần.
+- Impulse EMA(4) = **+46.2 tỷ USD/tuần**, đồng pha với tín hiệu và xác nhận xu hướng bơm ròng đang lan rộng.
+→ Tín hiệu không nhiễu, có độ tin cậy cao về mặt thống kê.
+
+## 4. Cross-Asset Spillover (1–4 tuần)
+
+- **US Equities (SPX/NDX)**: Bias tích cực trong 1–4 tuần. Thanh khoản dư thừa thường chảy vào tài sản rủi ro, đặc biệt khi RRP không còn là giếng hấp thụ.
+- **DXY**: Áp lực giảm. TGA xả → tăng cung USD thực tế trong hệ thống → đồng đô-la yếu đi.
+- **Gold/Crypto**: Bias tăng. Vàng hưởng lợi từ USD yếu + thanh khoản dồi dào; Crypto nhạy cảm với mở rộng thanh khoản toàn cầu, khả năng tích cực.
+- **VN-Index** (lag 4–8 tuần): Bias tích cực. Dòng vốn ngoại vào EM thường phản ứng sau khi DXY suy yếu và thanh khoản Fed tăng 4–8 tuần. Tương quan lịch sử ~0.25–0.35 cho thấy xác suất nâng đỡ thị trường chứng khoán Việt Nam đang tăng.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)
+
+- **TGA đảo chiều**: Kho bạc có thể tái xây dựng số dư (đặc biệt nếu dòng thu thuế mạnh lên hoặc phát hành nợ mới) – lúc đó thanh khoản bị hút mạnh, đảo ngược tín hiệu ADD.
+- **RRP tăng trở lại?**: Cực kỳ thấp, nhưng nếu lãi suất repo kỹ thuật tăng vọt, MMF có thể quay lại gửi Fed, đây là rủi ro đuôi nhỏ.
+- **QT tăng tốc bất ngờ**: Nếu Fed quyết định đẩy nhanh thu hẹp bảng cân đối, tác động sẽ trực tiếp lên dự trữ (do không còn RRP đệm), gây sốc thanh khoản.
+
+## 6. KẾT LUẬN
+
+Regime “QE_late” – thanh khoản mở rộng mạnh nhờ cú xả TGA khi RRP đã cạn kiệt. Trong 2–4 tuần tới, rủi ro ngắn hạn nghiêng về risk-on cho cả US equities lẫn EM equities (bao gồm VN-Index), nhưng cần đề cao cảnh giác nếu TGA đột ngột bị tái lập.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5958.2,
+  "signal": "ADD",
+  "z_score": 1.87,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```
