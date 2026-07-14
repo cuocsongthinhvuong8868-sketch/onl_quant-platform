@@ -265,14 +265,15 @@ def load_ai_cio_history(
 
 def _extract_tail_risk(report_text: str) -> str:
     patterns = [
-        r"Mức rủi ro đuôi\s*\(Tail Risk\)\*\*:\s*\*\*?([^*\n]+)",
-        r"Tail Risk\*\*:\s*\*\*?([^*\n]+)",
-        r"Tail risk\s*[:\-]\s*([A-Za-z ]+)",
+        r"\**Mức rủi ro đuôi(?:\s*\(Tail Risk\))?\**\s*:\s*\**([^\n*]+)",
+        r"\**Tail Risk(?:\s+level|\s+classification)?\**\s*[:\-]\s*\**([A-Za-z][A-Za-z /\-]+)",
     ]
     for pattern in patterns:
         match = re.search(pattern, report_text, flags=re.IGNORECASE)
         if match:
-            return _sanitize_text(match.group(1)).upper()
+            value = _sanitize_text(match.group(1)).upper()
+            if value:
+                return value
     return "DATA GAP"
 
 
@@ -414,6 +415,41 @@ def _tool_scores(context_state: dict[str, Any], metrics: dict[str, Any]) -> list
     return rows
 
 
+def _metrics_tools(context_state: dict[str, Any], metrics: dict[str, Any]) -> dict[str, Any]:
+    tools: dict[str, Any] = {}
+    raw_tools = metrics.get("tools")
+    if isinstance(raw_tools, dict):
+        for name, payload in raw_tools.items():
+            if isinstance(payload, dict):
+                tools[str(name)] = dict(payload)
+
+    flat_values = context_state.get("metric_values")
+    if isinstance(flat_values, dict):
+        for flat_key, value in flat_values.items():
+            if "." not in str(flat_key):
+                continue
+            tool, metric = str(flat_key).split(".", 1)
+            payload = tools.setdefault(tool, {})
+            key_metrics = payload.setdefault("key_metrics", {})
+            if isinstance(key_metrics, dict):
+                key_metrics.setdefault(metric, value)
+
+    raw_scores = context_state.get("tool_scores")
+    if isinstance(raw_scores, list):
+        for item in raw_scores:
+            if not isinstance(item, dict):
+                continue
+            tool = str(item.get("tool") or "")
+            if not tool:
+                continue
+            payload = tools.setdefault(tool, {})
+            for key in ("tool_score", "tool_regime", "tool_bias", "score_reason"):
+                if key in item and key not in payload:
+                    payload[key] = item[key]
+
+    return tools
+
+
 def _tool_payload(metrics_tools: dict[str, Any], tool: str) -> dict[str, Any]:
     payload = metrics_tools.get(tool, {}) if isinstance(metrics_tools, dict) else {}
     return payload if isinstance(payload, dict) else {}
@@ -487,7 +523,7 @@ def _build_model(
         "score_band_reason": _score_band_reason(context_state, metrics),
         "hard_constraints": _hard_constraints(context_state, metrics),
         "tool_scores": _tool_scores(context_state, metrics),
-        "metrics_tools": metrics.get("tools", {}) if isinstance(metrics.get("tools"), dict) else {},
+        "metrics_tools": _metrics_tools(context_state, metrics),
         "data_gaps": _extract_data_gaps(report_text),
         "metrics_provider": metrics.get("provider", ""),
         "data_date": context_state.get("data_date") or metrics.get("data_date", ""),
