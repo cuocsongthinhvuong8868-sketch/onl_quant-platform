@@ -12,7 +12,8 @@ from shared.github_sync import render_sync_button
 from shared.page_layout import render_signal_card, tone_for_signal
 from tools.esr_monitor.quant.metrics import (
     run_esr_pipeline, SSIResult, MARKET_STATES, VN30_TICKERS,
-    PRODUCTION_REGIME_METHOD,
+    PRODUCTION_DEPOSIT_RATE, PRODUCTION_PILLAR_MODE, PRODUCTION_PCA_WARMUP,
+    PRODUCTION_EMA_SPAN, PRODUCTION_REGIME_METHOD,
 )
 from tools.esr_monitor.ui.charts import render_esr_chart, render_pillar_diagnostics
 try:
@@ -46,13 +47,30 @@ def render():
 
     # ── Sidebar ──
     ma_period = st.sidebar.slider("VN30 MA Period", 20, 252, 125)
-    pca_warmup = st.sidebar.number_input("PCA Warmup (ngày)", value=252, min_value=100, max_value=500, step=10)
-    ema_span = st.sidebar.number_input("EMA Smoothing (span)", value=60, min_value=1, max_value=200, step=1)
-    deposit_rate = st.sidebar.number_input("Deposit Rate (%)", value=6.0, step=0.1) / 100
+    pca_warmup = st.sidebar.number_input(
+        "PCA Warmup (ngày)",
+        value=PRODUCTION_PCA_WARMUP,
+        min_value=100,
+        max_value=500,
+        step=10,
+    )
+    ema_span = st.sidebar.number_input(
+        "EMA Smoothing (span)",
+        value=PRODUCTION_EMA_SPAN,
+        min_value=1,
+        max_value=200,
+        step=1,
+    )
+    deposit_rate = st.sidebar.number_input(
+        "Deposit Rate (%)",
+        value=PRODUCTION_DEPOSIT_RATE * 100,
+        step=0.1,
+    ) / 100
+    _pillar_options = ['downside', 'classic']
     pillar_mode = st.sidebar.radio(
         "Pillar Mode",
-        options=['downside', 'classic'],
-        index=1,
+        options=_pillar_options,
+        index=_pillar_options.index(PRODUCTION_PILLAR_MODE),
         help="downside: S_VOL/S_COR/S_LIQ chỉ tính trên phiên giảm. classic: đối xứng.",
     )
     trend_ma_window = st.sidebar.number_input("Trend MA (ngày)", value=200, min_value=50, max_value=500, step=10)

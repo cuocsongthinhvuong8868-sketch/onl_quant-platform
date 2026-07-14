@@ -30,6 +30,7 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "credit_spread": "primary_issuance_equal_weight_v1",
     "vnibor": "structured_20d_trend_v1",
     "vn100_earnings_health": "structured_yoy_v1",
+    "esr_monitor": "production_downside_ema20_v1",
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
@@ -462,7 +463,9 @@ from tools.pvgo.report import build_ai_cio_context as build_pvgo_ai_cio_context
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
 from tools.esr_monitor.quant.metrics import (
-    run_esr_pipeline, VN30_TICKERS, PRODUCTION_REGIME_METHOD,
+    run_esr_pipeline, VN30_TICKERS,
+    PRODUCTION_DEPOSIT_RATE, PRODUCTION_PILLAR_MODE, PRODUCTION_PCA_WARMUP,
+    PRODUCTION_EMA_SPAN, PRODUCTION_REGIME_METHOD,
 )
 # Import logic VaRES Engine
 from tools.va_res.report import snapshot as vares_snapshot
@@ -1585,8 +1588,12 @@ def _build_comprehensive_metrics_table(df_stocks, provider_key: str = "kimi-2.6"
         df_vn30 = load_custom("vn30_cache.csv")
         df_volume = load_volumes()
         _, result_esr, market_states, _ = run_esr_pipeline(
-            df_stocks, df_vn30, df_volume=df_volume, deposit_rate=0.06,
-            pillar_mode='downside', pca_warmup=252, ema_span=20, regime_method=PRODUCTION_REGIME_METHOD
+            df_stocks, df_vn30, df_volume=df_volume,
+            deposit_rate=PRODUCTION_DEPOSIT_RATE,
+            pillar_mode=PRODUCTION_PILLAR_MODE,
+            pca_warmup=PRODUCTION_PCA_WARMUP,
+            ema_span=PRODUCTION_EMA_SPAN,
+            regime_method=PRODUCTION_REGIME_METHOD,
         )
         
         # 6. VaRES & 7. Var-CVaR & RAG (Loop n_past lần vì các hàm này chỉ tính snapshot ngày hiện tại)
@@ -2209,10 +2216,10 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_stocks, df_vn30,
         df_volume=df_volume,
-        deposit_rate=0.06,
-        pillar_mode='downside',
-        pca_warmup=252,
-        ema_span=20,
+        deposit_rate=PRODUCTION_DEPOSIT_RATE,
+        pillar_mode=PRODUCTION_PILLAR_MODE,
+        pca_warmup=PRODUCTION_PCA_WARMUP,
+        ema_span=PRODUCTION_EMA_SPAN,
         regime_method=PRODUCTION_REGIME_METHOD,
     )
 
@@ -2267,7 +2274,7 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     # Extended
     full_prompt = full_prompt.replace("[PCA_EVR]", f"{evr_pct:.1f}%")
     full_prompt = full_prompt.replace("[Market State]", status)
-    full_prompt = full_prompt.replace("[Pillar Mode]", "downside")
+    full_prompt = full_prompt.replace("[Pillar Mode]", PRODUCTION_PILLAR_MODE)
     if "[Threshold]" in full_prompt:
         full_prompt = full_prompt.replace("[Threshold]", f"{threshold:.3f}" if threshold is not None else "N/A")
 

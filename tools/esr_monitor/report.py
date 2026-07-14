@@ -1,6 +1,8 @@
 from shared.data_loader import load_custom, load_volumes
 from tools.esr_monitor.quant.metrics import (
-    run_esr_pipeline, VN30_TICKERS, PRODUCTION_REGIME_METHOD,
+    run_esr_pipeline, VN30_TICKERS,
+    PRODUCTION_DEPOSIT_RATE, PRODUCTION_PILLAR_MODE, PRODUCTION_PCA_WARMUP,
+    PRODUCTION_EMA_SPAN, PRODUCTION_REGIME_METHOD,
 )
 
 
@@ -12,10 +14,10 @@ def snapshot(df_close, _load_custom):
     pillars, result, market_states, threshold = run_esr_pipeline(
         df_close, df_vn30,
         df_volume=df_volume,
-        deposit_rate=0.06,
-        pillar_mode='classic',
-        pca_warmup=252,
-        ema_span=20,
+        deposit_rate=PRODUCTION_DEPOSIT_RATE,
+        pillar_mode=PRODUCTION_PILLAR_MODE,
+        pca_warmup=PRODUCTION_PCA_WARMUP,
+        ema_span=PRODUCTION_EMA_SPAN,
         regime_method=PRODUCTION_REGIME_METHOD,
     )
     last_ssi = result.ssi.dropna().iloc[-1]

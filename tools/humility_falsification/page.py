@@ -819,7 +819,14 @@ def _current_esr_ssi(df_close: pd.DataFrame | None) -> dict[str, Any]:
     try:
         if df_close is None or df_close.empty:
             return _metric(error="Close prices rong.")
-        from tools.esr_monitor.quant.metrics import PRODUCTION_REGIME_METHOD, run_esr_pipeline
+        from tools.esr_monitor.quant.metrics import (
+            PRODUCTION_DEPOSIT_RATE,
+            PRODUCTION_EMA_SPAN,
+            PRODUCTION_PCA_WARMUP,
+            PRODUCTION_PILLAR_MODE,
+            PRODUCTION_REGIME_METHOD,
+            run_esr_pipeline,
+        )
 
         df_vn30 = load_custom("vn30_cache.csv")
         df_volume = load_volumes()
@@ -827,10 +834,10 @@ def _current_esr_ssi(df_close: pd.DataFrame | None) -> dict[str, Any]:
             df_close,
             df_vn30=df_vn30,
             df_volume=df_volume,
-            deposit_rate=0.06,
-            pillar_mode="downside",
-            pca_warmup=252,
-            ema_span=20,
+            deposit_rate=PRODUCTION_DEPOSIT_RATE,
+            pillar_mode=PRODUCTION_PILLAR_MODE,
+            pca_warmup=PRODUCTION_PCA_WARMUP,
+            ema_span=PRODUCTION_EMA_SPAN,
             regime_method=PRODUCTION_REGIME_METHOD,
         )
         ssi = result.ssi.dropna()

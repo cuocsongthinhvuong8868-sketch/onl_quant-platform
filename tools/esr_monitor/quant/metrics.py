@@ -43,11 +43,15 @@ VN30_TICKERS: Tuple[str, ...] = (
 # PRODUCTION regime classifier — single source of truth
 # ──────────────────────────────────────────────
 # Mọi caller production (ESR Monitor LIVE view, AI CIO AUTO/Manual, report.py snapshot)
-# phải dùng cùng setting này để regime hiển thị nhất quán trên toàn hệ thống.
+# phải dùng cùng setting này để SSI/regime hiển thị nhất quán trên toàn hệ thống.
 # Đổi ở đây = toàn bộ production paths đổi theo.
 #
 # Backtest pipeline (composite_signal.py) dùng 'hmm_walk_forward' riêng để
 # look-ahead-free — đó là yêu cầu cho backtest fidelity, không apply cho live.
+PRODUCTION_DEPOSIT_RATE = 0.06
+PRODUCTION_PILLAR_MODE = 'downside'
+PRODUCTION_PCA_WARMUP = 252
+PRODUCTION_EMA_SPAN = 20
 PRODUCTION_REGIME_METHOD = 'hmm'
 
 # ──────────────────────────────────────────────
