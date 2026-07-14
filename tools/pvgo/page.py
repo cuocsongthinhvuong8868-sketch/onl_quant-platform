@@ -71,7 +71,7 @@ def get_pvgo_status(pvgo: float) -> dict[str, str]:
 
 
 @st.cache_data(show_spinner=False)
-def load_pvgo_history(path: str | Path = DATA_PATH) -> pd.DataFrame:
+def load_pvgo_history(path: str | Path = DATA_PATH, file_mtime: float | None = None) -> pd.DataFrame:
     path = Path(path)
     if not path.exists():
         return pd.DataFrame()
@@ -199,7 +199,8 @@ def render() -> None:
     st.title("PVGO Valuation Model")
     st.caption("Present Value of Growth Opportunities for VN-Index. Data-only tool, no AI analysis.")
 
-    df = load_pvgo_history()
+    data_mtime = DATA_PATH.stat().st_mtime if DATA_PATH.exists() else None
+    df = load_pvgo_history(DATA_PATH, data_mtime)
     if df.empty:
         st.warning(
             "Chua co du lieu PVGO. Hay chay `python command/update_pvgo_valuation.py` "
