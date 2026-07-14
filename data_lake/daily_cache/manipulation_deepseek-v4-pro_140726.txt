@@ -1,0 +1,30 @@
+## 1. Observations
+- **Slope cực thấp**: OLS Slope ở phân vị 1.9th – VN30F1M gần như không còn phản ứng với biến động của cụm VIC/VHM/VRE.
+- **Correlation lỏng**: Correlation tại phân vị 23.8th – mối liên kết tuyến tính rất yếu, xác nhận dòng tiền đang rời nhóm Vingroup.
+- **Regime rõ ràng**: Event study từ 17/04/2026 cho thấy trạng thái DECOUPLING với ΔCorr = -0.67 và ΔSlope = -0.83, đúng định nghĩa phân rã mạnh.
+
+## 2. Microstructure Read
+Vai trò dẫn dắt của VIC/VHM/VRE lên VN30F1M đã **mất hoàn toàn** trong phiên hôm nay. Cả hai chỉ số đều ở ngưỡng thấp (slope percentile < 20th, corr < 25th) – đây là tín hiệu thị trường derivatives đã dịch chuyển sự chú ý khỏi họ VIN. Thanh khoản và biến động của hợp đồng tương lai hiện nhiều khả năng bị chi phối bởi nhóm ngân hàng, chứng khoán hoặc thép; việc dùng VIN làm proxy dự báo cho F1 lúc này sẽ cho tín hiệu nhiễu. Đây không phải can thiệp (không có percentile nào >80th), mà là một sự “bỏ rơi” tự nhiên từ dòng tiền.
+
+## 3. Event Study Interpretation
+Trạng thái **DECOUPLING** kéo dài từ giữa tháng 4 đến nay cho thấy quá trình phân rã đã ổn định.
+- **Intraday**: Không thể giao dịch F1 dựa trên diễn biến giá VIC/VHM/VRE. Cần ưu tiên đọc lực từ các bluechip ngân hàng (VCB, BID, CTG) hoặc các mã dẫn dắt thay thế.
+- **Overnight**: Mô hình không đưa ra tín hiệu định hướng nào, vì vậy việc giữ vị thế qua đêm dựa trên VIN là không có cơ sở – rủi ro cao do mất kết nối.
+
+## 4. Verdict
+- **Trade plan**: `NO TRADE` đối với VN30F1M từ góc nhìn của cụm Vingroup. Không có edge định hướng rõ ràng: decoupling extreme nhưng nhóm Bank chưa nằm trong snapshot hiện tại để xác nhận xu hướng bền vững.
+- **Leading indicator cần theo dõi**: Biến động giá và khối lượng của các mã ngân hàng lớn (VCB, BID, CTG) – nếu các mã này bứt phá cùng thanh khoản cao sẽ là dấu hiệu cho xu hướng của VN30F1M.
+- **Stop-loss reference**: Không áp dụng do không mở vị thế.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "14/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 1.9,
+  "corr_percentile": 23.8,
+  "trade_signal": "no_trade",
+  "confidence": "low"
+}
+```

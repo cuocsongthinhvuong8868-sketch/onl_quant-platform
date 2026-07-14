@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Upside Breadth chênh +1.66pp so với Mu (13.88% vs 12.22%), Downside Breadth chênh –7.36pp so với Mu (5.41% vs 12.77%) → cả hai mặt đều cho tín hiệu thị trường đang ở trạng thái “ngược chiều” (cầu vượt, cung nén).
+- Cả hai chiều đều có Phi > 0.10 (Upside Phi=0.241, Downside Phi=0.176) → momentum regime kép, trạng thái hiện tại có xu hướng tiếp diễn.
+- Phi bên cầu lớn hơn bên cung (0.241 > 0.176) cho thấy đà mua bền hơn đà bán dù vẫn có risk-off tiềm ẩn.
+
+## 2. Supply-Demand Dynamics
+- Trạng thái dòng tiền: **tích lũy (accumulation)** – điển hình với up > mu và down << mu, chứng tỏ dòng tiền thông minh đang gom hàng, lực cung yếu đi rõ rệt.
+- Bên nắm momentum thực sự là **cầu (demand)**, khi |Phi up| vượt trội, đồng thời down side breadth đang bị kìm hãm, xác nhận lực cầu là động lực dẫn dắt.
+
+## 3. Stress-Test Read
+- P95 Downside = 24.94%: nếu kịch bản panic xảy ra trong 19 phiên, lan rộng giảm trên 2% có thể bùng phát lên đến ~1/4 danh mục – một cú sốc thanh khoản đáng kể.
+- Bất đối xứng đuôi: P95 Downside (24.94%) > P95 Upside (22.57%) → tail risk nghiêng về phía downside nặng hơn, thị trường không miễn nhiễm với rủi ro sụt giảm đột ngột.
+
+## 4. Verdict
+- Đề xuất tỷ trọng giải ngân: **50%**.
+- Chiến lược: **rình bắt đáy** – tận dụng những nhịp rung lắc trong quá trình tích lũy để mua, nhưng chưa mua đuổi bằng đòn bẩy vì đuôi downside vẫn dày. Không chuyển sang phòng thủ hoàn toàn vì nền tích lũy đang hiệu lực và momentum cầu chưa gãy.
+- Đây là vùng có thể hành động được, không rơi vào nhiễu random walk.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 24.94,
+  "p95_upside_pct": 22.57,
+  "deployment_pct": 50,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

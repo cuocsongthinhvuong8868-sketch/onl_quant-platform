@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 56.4/100, vùng NEUTRAL (40–60), thay đổi không đáng kể (-0.4 điểm).
+- EGARCH Vol (chuẩn hóa) 62.7%, tăng mạnh +21.8% so với phiên trước – mức cao vượt trung bình.
+- Rolling Skewness 0.01 – gần như đối xứng, không lệch âm hay dương đáng kể.
+- Downside Correlation 3.0% (rất thấp), Upside Correlation 22.6% (cao hơn rõ rệt).
+
+## 2. Interpretation
+Dữ liệu hiện tại phản ánh pha NEUTRAL điển hình, nhưng với biến động gia tăng đột biến. Skewness trung tính và tương quan tăng cao hơn tương quan giảm cho thấy phân hóa mạnh giữa các cổ phiếu, không có dấu hiệu bán tháo đồng loạt. Trên dữ liệu hiện tại, đây là môi trường “stock-picking” với rủi ro hệ thống còn thấp nhưng dao động riêng lẻ lớn.
+
+## 3. Cross-Check
+- **Divergence**: Score NEUTRAL trong khi EGARCH Vol tăng vọt (+21.8%). Nếu thị trường thực sự sợ hãi, score đã giảm sâu vào vùng FEAR, nhưng không xảy ra → cảnh báo vol tăng không đến từ tâm lý bán tháo.
+- **Skew vs Correlation**: Skewness ~0 và Upside Correlation vượt trội hơn Downside Correlation (22.6% so với 3.0%) – consistent với môi trường phân hóa, dòng tiền chọn lọc. Không có mâu thuẫn bất thường ngoài divergence vol-score đã nêu.
+
+## 4. Verdict
+Beta exposure đề xuất cho danh mục VN-Index: **0.5** (dưới trung lập).  
+Hành động cụ thể: giảm quy mô vị thế chỉ số, hạ đòn bẩy; chuyển trọng tâm sang chọn cổ phiếu riêng lẻ có alpha cao, ưu tiên các nhóm đang được dòng tiền hỗ trợ (upside correlation cao). Không tăng phòng thủ toàn diện vì tương quan giảm quá thấp, risk-off chưa lan rộng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "14/07/2026",
+  "regime": "NEUTRAL",
+  "score": 56.4,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "EGARCH Vol tăng +21.8% lên 62.7%",
+    "Downside Correlation thấp 3.0%, Upside Correlation cao hơn 22.6%",
+    "Skewness trung tính 0.01"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 56.4
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

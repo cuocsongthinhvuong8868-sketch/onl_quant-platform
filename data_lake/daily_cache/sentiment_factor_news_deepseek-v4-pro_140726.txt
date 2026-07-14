@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái tin tức (News Sentiment Regime)**
+
+- **1 ngày:** Risk‑on, **khẳng định chắc chắn** (P_conf = 92%, sentiment mean +0.28, đáng tin cậy).
+- **7 ngày:** Strong Risk‑on, **khẳng định chắc chắn** (P_conf = 100%, sentiment mean +0.58).
+- **30 ngày:** Strong Risk‑on, **khẳng định chắc chắn** (P_conf = 100%, sentiment mean +0.55).
+
+> P_conf phản ánh xác suất giá trị trung bình của chỉ báo tin tức nằm cùng chiều với regime, không phải xác suất VN‑Index tăng.
+
+**2. Kênh tác động mạnh nhất (có kiểm soát độ tin cậy)**
+
+- **Kéo Risk‑on mạnh:**
+  - `fx_external` (+2.00, P_conf 100%): tỷ giá trung tâm tăng bền vững, phản ánh dòng vốn ngoại/ổn định tỷ giá.
+  - `earnings` (+1.31 đến +1.11, P_conf 100%): kỳ vọng lợi nhuận doanh nghiệp tích cực.
+  - `credit_stress` (+1.22 đến +1.11, P_conf 99‑100%): lợi suất TPCP ổn định/đi ngang, căng thẳng tín dụng thấp.
+  - `monetary_policy` (+0.90 ở 7d, +1.70 ở 30d, P_conf 100%) – chủ yếu từ tăng nhẹ lãi suất huy động ngắn hạn nhóm NHTM khác, tín hiệu hỗ trợ biên lãi ròng.
+- **Kéo Risk‑off nổi bật:**
+  - `liquidity` (−0.81 đến −0.59, P_conf 99‑100%): NHNN hút ròng mạnh qua OMO liên tục → thanh khoản hệ thống bị thắt chặt.
+  - `monetary_policy` (ngắn hạn 1d: −0.72, P_conf 95%) – vàng trong nước giảm sâu, có thể phản ánh áp lực lên kỳ vọng lạm phát/tiền tệ.
+  - `commodity` (−0.69 ở 30d, P_conf 100%): giá thép, PVC Trung Quốc xuống đáy, phản ánh nhu cầu toàn cầu yếu.
+
+**3. Động lực chính (top drivers)**
+
+*Tích cực:*
+- Tỷ giá trung tâm tăng đều đặn hàng ngày (25.183 → 25.225), tín hiệu ổn định vĩ mô.
+- Lợi suất TPCP đi ngang phiên 14/07, giảm áp lực lên chi phí vốn.
+- Lãi suất huy động 1‑3 tháng nhóm NHTM khác tăng 1 bps (13/07), có lợi cho biên NIM.
+- Kỳ vọng earnings tích cực (kênh `earnings` duy trì điểm cao).
+
+*Tiêu cực:*
+- NHNN hút ròng 11.7k tỷ qua OMO phiên 13/07, 3.48k tỷ phiên 14/07 → thanh khoản bị rút.
+- Giá vàng trong nước giảm sâu (SGGP 14/07), có thể phản ánh bất ổn ngắn hạn.
+- Cảnh báo doanh nghiệp Việt đối mặt điều tra phòng vệ thương mại từ Hoa Kỳ (tác động lên `growth`).
+- Giá thép HRC, PVC Trung Quốc liên tục lập đáy mới (30d), gây áp lực lên hàng hóa cơ bản.
+
+**4. Hàm ý cho AI CIO**
+
+- Tổng thể sentiment **hỗ trợ mạnh** tư thế risk‑on trên khung 7‑30 ngày. Tín hiệu từ tỷ giá, tín dụng và lợi nhuận tạo nền tảng vững.
+- Tuy nhiên, **xung đột cục bộ** từ thanh khoản (OMO hút ròng) và giá vàng/hàng hóa. Đây là rủi ro ngắn hạn cần theo dõi, có thể gây áp lực lên thị trường tiền tệ nếu tiếp diễn.
+- Khuyến nghị: duy trì thiên về tài sản rủi ro, nhưng sẵn sàng giảm tỷ trọng nếu OMO hút ròng kéo dài và kênh `liquidity` không cải thiện. Nên kết hợp với dữ liệu thanh khoản liên ngân hàng và tín hiệu từ NHNN.
+
+**5. Cảnh báo & hạn chế dữ liệu**
+
+- **Nguồn mạng xã hội chiếm tỷ trọng cao:** Tại 1d, `mozyfin_social` = 80/283 (~28%); 7d: 479/1244 (~39%). Đây là các nguồn ý kiến/xã hội có độ tin cậy thấp, có thể khuếch đại tín hiệu (over‑optimism) → **mức độ risk‑on thực tế có thể thấp hơn** so với chỉ báo. Nên chiết khấu cường độ tín hiệu.
+- Nguồn `widata` (dữ liệu thị trường) đáng tin cậy hơn nhưng chỉ chiếm ~30% (1d) và ~13% (7d). Điều này khiến bức tranh thiên về “cảm tính” hơn là xác nhận từ dữ liệu cứng.
+- Phân tích chỉ dựa trên luật từ tiêu đề tin tức, có thể chịu nhiễu headline noise (ví dụ tin tiêu cực được gán trọng số mạnh dù nội dung có thể không đáng kể). Không thay thế cho mô hình phân bổ tài sản định lượng chính thức.

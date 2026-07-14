@@ -1,0 +1,33 @@
+## 1. Observations
+- **Spread_Z = -0.43σ**: Độ phân tán (spread) đang thấp hơn trung bình 60 phiên, không bị kéo căng.
+- **DPI = 45.0%**: Chỉ số bền vững phân tán ở mức trung bình, chưa đạt ngưỡng 70% để xác lập chế độ phân tán kéo dài.
+- **Avg Pairwise Correlation = 0.008**: Tương quan nội bộ cực thấp, gần như bằng 0 – môi trường phân hóa rất mạnh.
+- **CS Skewness / Kurtosis**: Không có dữ liệu, không thể đánh giá tính bất đối xứng hoặc đuôi béo.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **bình thường, không stress**. Spread Z‑score âm nhẹ cho thấy không có sự kiện outlier nào thống trị phân tán. DPI ở 45% khẳng định phân tán chưa trở thành chế độ liên tục; đây chỉ là mức nền điển hình của một giai đoạn phân hóa. **Không có stress cục bộ hay regime‑persistent.**
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu CS Skewness và Kurtosis, ta không thể xác định hướng gãy đuôi. Với mức tương quan gần 0, nếu có đuôi béo cũng sẽ mang tính cục bộ từng cổ phiếu hơn là toàn thị trường. Trong trường hợp Skew ≈ 0 và Kurtosis < 5 (kịch bản thường gặp khi phân hóa mạnh), mô hình phân phối chuẩn vẫn có thể áp dụng cho mục tiêu ngắn hạn, nhưng cần cảnh giác vì đây chỉ là suy đoán – dữ liệu thực tế vắng mặt.
+
+## 4. Regime Mapping
+Đối chiếu với bản đồ 2D (DPI × Correlation):
+- DPI thấp (45% < 70%) + Correlation cực thấp (0.008 ≈ 0) → Ô **Healthy Stock‑Picking**.
+Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu: độ phân tán cao, tương quan nội bộ không đáng kể, mỗi mã vận động gần như độc lập.
+
+**Rủi ro lớn nhất cho PM:** Sự thay đổi chế độ tương quan đột ngột. Khi Corr từ mức 0.008 bật tăng (ví dụ do một cú sốc vĩ mô), toàn bộ danh mục đang đa dạng hóa cao sẽ đồng loạt tương quan dương, làm mất tác dụng phòng hộ và có thể gây ra herding crash nếu kết hợp với DPI tăng vọt. Hiện tại cảnh báo này ở mức thấp, nhưng cần theo dõi nếu Corr bắt đầu leo thang.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "14/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.43,
+  "dpi_pct": 45.0,
+  "avg_corr": 0.008,
+  "tail_skew_direction": "symmetric",
+  "confidence": "low"
+}
+```
+*Confidence “low” do thiếu dữ liệu thực tế về CS Skewness và Kurtosis để xác nhận tính đối xứng của phân phối đuôi.*

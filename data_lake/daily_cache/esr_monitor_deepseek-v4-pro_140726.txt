@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI ở 62.9% – **WARNING** (vùng tích lũy rủi ro ngầm)
+- Market State: **CALM CORRECTION** (hồi phục có kiểm soát trong xu hướng giảm, VN30 dưới MA125)
+- Top 3 pillar drivers (đo trên phiên giảm): S\_LIQ (35%), S\_VAL (31%), S\_COR (18%)
+- PCA PC1 EVR = 38.1%, thể hiện tương quan hệ thống ở mức trung bình – cao
+
+## 2. Risk Decomposition (Bóc tách)
+Trụ cột dẫn dắt là **S\_LIQ (Volume Dry‑Up)** – chỉ báo thanh khoản khô cạn so với chuẩn 1 năm. Khi thị trường giảm, volume thu hẹp mạnh cho thấy bên bán không còn lực cung lớn, nhưng bên mua cũng rút khỏi thị trường. Đây là hiện tượng “zombie market”: giá vẫn giảm trong môi trường kém thanh khoản, dễ chuyển thành sụt giảm nhanh nếu có biến cố.  
+S\_VAL (31%) – căng thẳng định giá (252-day return vượt xa lãi suất tiền gửi) cho thấy mặt bằng giá vẫn còn độ giãn, dù đã điều chỉnh. Khi thanh khoản cạn, định giá căng sẽ khuếch đại rủi ro khi có cú sốc.  
+S\_COR (18%) – tương quan hệ thống ở ngưỡng đáng chú ý: các cổ phiếu di chuyển đồng pha ngay cả trong phiên giảm, dấu hiệu của hành vi herding tránh rủi ro. Ba trụ cột cùng báo hiệu một pha “dry‑down”, nơi rủi ro thanh khoản và tương quan đang tích tụ bên dưới nhịp chỉnh bình tĩnh.
+
+## 3. Cross-Check
+VN30 đang dưới MA125, không tạo đỉnh mới – loại trừ kịch bản bull‑trap từ price action. Tuy nhiên, **HMM gán trạng thái CALM CORRECTION (stress thấp) nhưng SSI đã ở vùng WARNING (62.9%)** → có sự lệch pha. Điều này có thể do ngưỡng phân loại HMM (0.537) vẫn thiên về chế độ stress thấp ở biên, nhưng thực tế rủi ro hệ thống đã leo lên rõ rệt. Cần theo dõi nếu HMM chuyển sang ACTIVE\_STRESS trong các phiên tới.
+
+## 4. Verdict
+Với SSI WARNING, cấu trúc CALM CORRECTION khô cạn thanh khoản, tôi đánh giá rủi ro danh mục đã tăng lên mức cần phòng thủ. Đề xuất **tăng tỉ trọng tiền mặt lên 45%** (từ mức thấp hơn) để giảm thiệt hại nếu stress chuyển sang CRITICAL. Hành động phòng hộ: **giảm beta** danh mục (bán bớt các vị thế có độ nhạy cao với VN30). Không khuyến nghị short hay mua put tại thời điểm này do chưa đủ tín hiệu ACTIVE\_STRESS hoặc SSI > 80%. Nếu S\_LIQ tiếp tục tăng vượt ngưỡng lịch sử và HMM xác nhận stress cao, lúc đó xem xét phòng hộ mạnh tay hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 62.9,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

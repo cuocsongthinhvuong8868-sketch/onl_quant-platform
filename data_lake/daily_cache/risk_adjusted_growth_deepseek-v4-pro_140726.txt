@@ -1,0 +1,33 @@
+## 1. Scenario Assessment  
+Bộ tham số K = 1.0, CoE = 14% là baseline khá khách quan cho mặt bằng ngân hàng Việt Nam – không quá hà khắc nhưng yêu cầu chất lượng ROE thực sự bền vững. Nhìn vào 6 cổ phiếu được cung cấp, chỉ duy nhất **SHB tạo ra alpha dương (2.5%)**; 5 mã còn lại đều có alpha âm, trong đó 3 mã đáy sâu dưới -10%. Điều này phản ánh một bức tranh đáng lo: phần lớn vốn cổ đông đang bị đốt, ngay cả khi một số ngân hàng có ROE kế toán cao. Tôi đánh giá mặt bằng chung của ngành đang trong trạng thái **đốt vốn (alpha âm)** dưới góc nhìn risk-adjusted.
+
+## 2. Top Alpha Decomposition  
+
+- **SHB (Alpha +2.5%)** – **Fortress**: Động lực chính là P/B rẻ (0.87) kết hợp ROE ở mức khá (17.5%) và σROE cực thấp (1.9%). Payout chỉ 8.6% giúp phần lớn lợi nhuận được tái đầu lư, cải thiện compounding. Định giá thấp hơn giá trị sổ sách tạo biên an toàn, đưa SHB trở thành lựa chọn hiếm hoi kiếm được economic spread dương.  
+- **ACB (Alpha -1.2%)** – **Cận Fortress / Nhạy cảm định giá**: ROE ấn tượng 23% và σROE 2.7% vẫn ở vùng kiểm soát. Tuy nhiên P/B 1.25 đã phản ánh kỳ vọng, đẩy Disciplined Return xuống dưới CoE. Payout trung bình (15.9%) không tận dụng hết năng lực tái đầu tư. Alpha âm nhẹ, có thể hồi phục nếu định giá điều chỉnh hoặc ROE cải thiện biên.  
+- **MBB (Alpha -1.6%)** – **Premium Burn** điển hình: ROE 21.8% và σROE (1.6%) cực kỳ ổn định, chất lượng lợi nhuận tốt, nhưng P/B 1.46 lại quá cao so với mức return trên vốn hóa. Dù risk penalty thấp, định giá đã bào mòn toàn bộ lợi thế, khiến alpha vẫn âm ngay cả trong kịch bản trung lập.
+
+## 3. Value Traps Warning  
+
+- **LPB (-12.6%)** – **Premium Burn trầm trọng**: P/B 3.26 là mức định giá phi lý với một ngân hàng có σROE 3.8% (biến động cao). ROE 21% không thể bù đắp cả risk penalty lớn và hệ số giá quá đắt.  
+- **EIB (-11.0%)** – **Low‑ROE Trap**: Dù P/B không quá cao (1.39), ROE chỉ 10% – quá thấp so với chi phí vốn. Cộng thêm σROE 3.8% khiến Disciplined Return gần như bằng không trước khi trừ CoE. Đây là bẫy giá trị điển hình: tưởng rẻ nhưng thực chất đốt vốn vì sinh lời kém.  
+- **VPB (-10.2%)** – **High‑Risk Trap**: ROE khiêm tốn 14.1% nhưng σROE lên tới 4.7%, mức phạt rủi ro rất nặng. Payout cao (24.6%) hạn chế tích lũy vốn khiến chất lượng tăng trưởng kém. Không có yếu tố nào bù đắp, dẫn đến alpha âm sâu.
+
+## 4. Portfolio Construction  
+
+- **Core Holding (60–70% phân bổ ngành)**: **SHB** – Fortress duy nhất với alpha dương và định giá rẻ hơn sổ sách. Chất lượng ROE ổn định, rủi ro thấp, phù hợp nắm giữ dài hạn.  
+- **Tactical (cân nhắc hạn chế)**: **ACB** có thể xem xét với tỷ trọng nhỏ nếu định giá điều chỉnh về gần 1.1x P/B, hiện tại chưa đủ hấp dẫn.  
+- **Cấm mua / Underweight**: **LPB, EIB, VPB, MBB** – tất cả đều có alpha âm rõ rệt, không tạo giá trị thặng dư, nhiều mã tiềm ẩn rủi ro định giá hoặc rủi ro kinh doanh cao.  
+- Do toàn bộ nhóm (trừ SHB) đều alpha âm, nhà đầu tư nên thận trọng, chỉ giữ vị thế nhẹ nếu buộc phải có bank.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "MBB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

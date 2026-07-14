@@ -1,0 +1,33 @@
+## 1. Observations
+- VN30 Stress Index: **0.00%**, hoàn toàn không ghi nhận áp lực lây lan real‑time trên các cổ phiếu vốn hóa lớn.  
+- Số mã thủng VaR 95%: **0/30** – không có cú sập biên độ bất thường nào trong rổ bluechips.  
+- Complacency Index: **8.33%**, thấp xa ngưỡng nguy hiểm 80%; phát hiện **9 mã** có spread bị nén (định giá sai rủi ro), dẫn đầu là **MSB, HCM, GMD**.
+
+## 2. Contagion Assessment (Module B)
+- VN30 Stress đang ở mức 0.00%, tức **không có tín hiệu lây lan hệ thống**. Không mã nào phá vỡ VaR 95%, toàn bộ 30 cổ phiếu vận động trong biên độ rủi ro dự kiến.  
+- Không có Top 3 breach sâu nhất → không thể suy diễn thành sự cố cá biệt hay đầu sóng systemic. Hiện tượng vỡ biên độ trên diện rộng **chưa xuất hiện**.
+
+## 3. Complacency Assessment (Module C)
+- Complacency 8.33% cho thấy thị trường **không ở regime “ngủ quên”**, tức vol không bị nén một cách bất thường, spread chưa bị ép chặt trên toàn thị trường.  
+- **Cảnh báo then chốt**: Điều này **không đồng nghĩa** với “thị trường ổn định”, “vận hành an toàn” hay “không có áp lực bán”. Khi Complacency thấp, thị trường có thể đang trong trạng thái hoảng loạn, tăng mạnh, hoặc giằng co với spread giãn rộng tự nhiên.  
+- Kết hợp Stress Index = 0%, ta thấy hiện tại không có dấu hiệu vỡ lây mà cũng không có mất cảnh giác toàn thị trường. Cấu trúc rủi ro tạm thời thuộc chế độ **spread_normal**, cần theo dõi tiếp diễn biến.
+
+## 4. Stock‑Level Risk Calls
+- **Module B**: Không có mã breach → không phát sinh khuyến nghị bán/giảm tỷ trọng từ kênh này.  
+- **Module C (cảnh báo mispriced)**:  
+  * **MSB, HCM, GMD** có spread nén chặt nhất, phần bù rủi ro của ba cổ phiếu này đang bị định giá thấp hơn thực tế. Nếu mặt bằng chung đảo chiều, các vị thế này dễ bị tổn thương do cú giãn spread đột ngột.  
+  * Khuyến nghị: cân nhắc **thu hẹp vị thế mua**, đặt stop‑loss linh hoạt (ví dụ: -7% so với giá đóng cửa gần nhất hoặc thủng MA20 trên D1), **không dùng mức giá tuyệt đối** do dữ liệu quá khứ không đảm bảo độ chính xác hiện tại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 8.33,
+  "mispriced_count": 9,
+  "regime": "spread_normal",
+  "watchlist_short": ["MSB", "HCM", "GMD"],
+  "confidence": "medium"
+}
+```
