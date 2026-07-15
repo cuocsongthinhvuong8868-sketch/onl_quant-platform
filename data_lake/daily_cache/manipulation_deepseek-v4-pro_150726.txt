@@ -1,0 +1,28 @@
+## 1. Observations
+- **OLS Slope 0.17** nằm ở phân vị **2.6th** – cực thấp, cho thấy VN30F1M gần như miễn nhiễm với biến động của composite Vingroup.
+- **Correlation 0.53** tương ứng phân vị **31.5th** – mức tương quan yếu và đang có xu hướng giảm mạnh.
+- Trạng thái áp đảo hiện tại là **DECOUPLING** (ΔCorr = -0.57, ΔSlope = -0.78), xác nhận nhóm VIC/VHM/VRE đã mất quyền dẫn dắt chỉ số.
+
+## 2. Microstructure Read
+VIC, VHM, VRE không còn giữ vai trò chi phối lên hợp đồng VN30F1M. Với slope ở mức thấp kỷ lục (2.6th percentile), mỗi đơn vị thay đổi của PC1 Vingroup chỉ làm dịch chuyển chỉ số khoảng **0.17 điểm** – không đủ tạo edge cho giao dịch. Correlation 0.53 ở mức “lỏng” và vẫn đang suy yếu (phân vị 31.5th). Cả hai chỉ số đều dưới ngưỡng can thiệp (>80th) và slope dưới 20th củng cố nhận định thị trường đã tự nhiên rời bỏ Vingroup, dòng tiền hướng về các nhóm dẫn dắt khác (Ngân hàng, Chứng khoán, Thép). Không có dấu hiệu can thiệp bất thường.
+
+## 3. Event Study Interpretation
+Event decoupling từ 20/04/2026 duy trì momentum tiêu cực kéo dài. Trong phiên ngắn hạn: mọi tín hiệu mua/bán dựa trên biến động Vingroup sẽ kém tin cậy, dễ sinh false breakout. Giữ vị thế qua đêm dựa trên mối liên kết này là đặc biệt rủi ro vì correlation/slope tiếp tục suy giảm. Ngược lại, nếu xuất hiện dấu hiệu tái ghép (ví dụ ΔCorr đảo chiều dương) cần được xác nhận bằng cả hai metric.
+
+## 4. Verdict
+- **Trade plan: NO TRADE** đối với các tín hiệu liên kết Vingroup – VN30F1M. Không long hay short hợp đồng chỉ dựa vào diễn biến VIC/VHM/VRE trong phiên 15/07/2026.
+- **Leading indicator cần theo dõi**: nhóm Ngân hàng (theo dõi diễn biến BID, CTG, VCB), hoặc Chứng khoán (SSI, VND) – nơi dòng tiền đang thay thế vai trò dẫn dắt VN30.
+- **Stop-loss reference**: không áp dụng do không mở vị thế. Nếu thị trường tái lập mối tương quan (COUPLING), stop-loss có thể tính dựa trên giá đóng cửa hiện tại của các cổ phiếu thành phần, ví dụ: VIC 217.00 × (1 – 1.5%) ≈ 213.7; VHM 136.00 × (1 – 1.5%) ≈ 133.9; VRE 24.80 × (1 – 1.5%) ≈ 24.43.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "15/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 2.6,
+  "corr_percentile": 31.5,
+  "trade_signal": "no_trade",
+  "confidence": "high"
+}
+```

@@ -1,0 +1,153 @@
+<!-- ai-cio-cache-version: indicator_pr3y_pca_point_in_time_v1 -->
+# Global Financial Conditions & Spillover Report
+**Date: 2026-07-14** – Regime: ELEVATED – Driver: CCC_CREDIT_DRIVEN
+
+---
+
+## 1. Cross-Asset Snapshot
+
+**Academic Analysis**
+Phân nhóm theo percentile rank 3-year max (HIGH ≥80%, ELEVATED 50‑80%, LOW <50%):
+
+| Volatility | Percentile | Tín hiệu |
+|---|---|---|
+| OVX (Oil ETF Vol) | **90% HIGH** | 59.89 – vượt ngưỡng 50, báo hiệu cú sốc năng lượng đang hiện hữu |
+| VIX (Equity Vol) | 58% ELEVATED | 17.16 – còn khá thấp, chưa phải risk‑off diện rộng |
+| SKEW (Tail Risk) | 51% ELEVATED | 145.1 – sát ngưỡng >145, nhưng chưa có tín hiệu hedging thiên‑tai‑đen rõ rệt |
+| VVIX (Vol‑of‑Vol) | 44% LOW | 93.5 – không có stress phái sinh |
+| MOVE (Bond Vol) | 20% LOW | 75 bps – kỳ vọng lãi suất ổn định |
+
+| Credit | Percentile | Tín hiệu |
+|---|---|---|
+| CCC OAS (Deep Junk) | **89% HIGH** | 9.72% – tiệm cận ngưỡng khủng hoảng vỡ nợ (10%) |
+| IG OAS (Inv. Grade) | 16% LOW | 0.78% – chưa có flight‑to‑quality |
+| HY OAS (Broad High Yield) | 8% LOW | 2.69% – bình thường |
+| EM OAS (EM Corp) | 1% LOW | 1.41% – dòng vốn vào EM chưa áp lực |
+| **CQS (CCC – HY)** | **100% HIGH** | 7.03% – phân hoá chất lượng tín dụng cực đoan |
+
+| Macro Overlay | Percentile | Tín hiệu |
+|---|---|---|
+| 2s10s Curve | 58% ELEVATED | +0.40% – đường cong bình thường, không suy thoái |
+| DXY (USD Index) | 44% LOW | 100.94 – USD chưa mạnh, chưa áp lực tỷ giá |
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Bức tranh tổng thể: căng thẳng tài chính chỉ mới bùng lên ở **hai điểm nóng riêng biệt** – giá dầu biến động dữ dội (OVX) và nợ rác cấp thấp nhất (CCC rất đắt đỏ). Còn lại thị trường cổ phiếu, trái phiếu chính phủ Mỹ, trái phiếu doanh nghiệp hạng đầu tư hay rủi ro vỡ nợ lan sang các nước mới nổi (EM) vẫn đang khá bình thản. Tín hiệu đáng sợ nhất là khoảng cách giữa lãi suất trái phiếu siêu rác (CCC) và rác thường (HY) đang ở mức kỷ lục 3 năm – giống như bệnh nhân sốt cao ở một bộ phận, chưa lan toàn thân.
+
+---
+
+## 2. PCA Composite Interpretation
+
+**Academic Analysis**
+- **PC1 EMA(5) smoothed**: +0.22σ, **55% percentile (1Y)** → phân loại **ELEVATED** (ranh giới 50‑80%). Chưa đạt STRESS (≥80%), nhưng không còn CALM.
+- **PC1 raw hôm nay**: +0.48σ, cao hơn smoothed đáng kể; **PC1 5‑day change**: +0.61σ → sóng căng thẳng mới đang dâng nhanh, smoothed chưa kịp thích nghi (early warning).
+- **PC2** (+0.65σ) xác nhận **divergence**: stress hiện tại lệch hẳn sang phía **credit (CCC)** trong khi vol truyền thống (VIX/MOVE/SKEW) lại thấp. Đây là dạng ELEVATED không đối xứng: hệ thống tài chính bị chấn động từ kênh tín dụng rác, không phải từ sụt giảm thanh khoản trên thị trường cổ phiếu hay trái phiếu chính phủ.
+- Driver flag **CCC_CREDIT_DRIVEN** khớp với dữ liệu: CCC OAS là chỉ báo có percentile cao nhất trong 6‑core.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> “Sức nóng” chung của thị trường tài chính đang ở mức trung bình – vừa đủ để cảnh giác, chưa đến đỏ lửa. Nhưng kẻ châm ngòi chính lại là **nhóm doanh nghiệp “yếu xìu” nhất của Mỹ**, nơi chi phí vay đã tăng vọt lên gần 10%/năm. Trong khi chứng khoán Mỹ hay trái phiếu chính phủ vẫn khá bình yên, thì vết rạn nứt này là kiểu “sét đánh ngang tai” – nó không ồn ào ngay lập tức, nhưng thường báo hiệu những cơn bão tín dụng tiềm ẩn về sau.
+
+---
+
+## 3. Credit Cycle Read
+
+**Academic Analysis**
+- **CCC OAS** 89% percentile, **HY OAS** chỉ 8% percentile, **IG OAS** 16% percentile → stress tập trung hoàn toàn ở phân khúc deep‑junk. Đây là **credit deterioration confined to weakest tier**, chưa lan rộng thành **broad credit repricing**.
+- **Credit Quality Spread (CCC – HY)** đạt **100% percentile** – dấu hiệu kinh điển của late‑cycle dispersion. Kinh nghiệm lịch sử: khi CQS mở rộng kỷ lục trong khi HY còn thấp, thị trường đang định giá rủi ro vỡ nợ chỉ dành cho các doanh nghiệp “zombie”, chưa phải suy thoái toàn diện.
+- **EM OAS 1% percentile** cực thấp → dòng vốn EM chưa bị stress, tương phản với bối cảnh deep‑junk Mỹ. Điều này gợi ý nhà đầu tư quốc tế vẫn chưa coi khủng hoảng tín dụng là nguy cơ hệ thống (systemic), do đó chưa rút vốn khỏi EM trên diện rộng.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Tình hình nợ nần giống như một toà nhà đang có cháy ở tầng hầm (các công ty rác nhất), trong khi các tầng trên (công ty tử tế, các nước mới nổi) vẫn chưa có khói. Đây là giai đoạn “nguy cơ khu trú” – chỉ những ai đang vay nợ với lãi suất cắt cổ mới thấy lửa, còn dòng tiền lớn vào Việt Nam hay các nước EM khác chưa bỏ chạy. Nhưng lịch sử cho thấy, lửa tầng hầm để lâu sẽ lan lên – nên đây là tín hiệu cần theo dõi sát sao.
+
+---
+
+## 4. Volatility Breadth
+
+**Academic Analysis**
+- **VIX** (58% percentile, -0.29σ), **MOVE** (20%), **SKEW** (51%) – cả ba chỉ báo biến động nằm trong ngưỡng bình thường. Không có đồng thuận về risk‑off trên equity và rates.
+- **OVX** ngoại lệ ở 90% percentile, báo hiệu **cú sốc năng lượng/địa chính trị** (giá dầu biến động mạnh). Tuy nhiên, OVX không thuộc bộ 6‑core của PC1, do đó stress này **chưa được capture** vào chỉ số tổng hợp.
+- **VVIX** (44%) thấp → không có tín hiệu bất ổn từ thị trường phái sinh, loại trừ khả năng khủng hoảng thanh khoản ẩn.
+- Tổng thể, **volatility breadth được đánh giá là divergent** – thị trường tài chính truyền thống yên ắng, chỉ riêng dầu mỏ đang náo loạn.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Thị trường tài chính đang như một ngày hè oi bức – trời quang mây tạnh (cổ phiếu, trái phiếu chính phủ yên ổn), nhưng bỗng có một cơn giông dữ dội từ… dầu mỏ. Giá dầu nhảy múa điên cuồng (OVX tăng vọt) có thể là do căng thẳng địa chính trị hoặc cắt giảm nguồn cung. Nhà đầu tư Việt Nam cần để ý: cơn giông dầu này chưa làm sập cả “căn nhà” tài chính toàn cầu, nhưng có thể tạt mưa vào nền kinh tế nhập khẩu dầu như nước ta.
+
+---
+
+## 5. Macro Overlay
+
+**Academic Analysis**
+- **2s10s curve = +0.40%**, percentile 58% → đường cong lợi suất dương, **không suy thoái** (inversion không xuất hiện). Đây là môi trường bình thường, không có tín hiệu hạ cánh cứng từ nền kinh tế Mỹ.
+- **DXY = 100.94**, percentile 44% → chỉ số USD dưới trung vị 3 năm, **không có áp lực tăng giá đồng bạc xanh** lên tỷ giá VND hay dòng vốn FDI. Trong bối cảnh này, carry trade và dòng vốn EM vẫn còn không gian thở.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Kinh tế Mỹ chưa có dấu hiệu suy thoái (lãi suất dài hạn vẫn cao hơn lãi suất ngắn hạn, điều bình thường). Đồng thời, đồng USD chưa mạnh lên – không gây áp lực phá giá tiền đồng hay tháo vốn ra khỏi Việt Nam. Đây là hai điểm sáng hiếm hoi, giúp “giảm nhiệt” cho căng thẳng tín dụng từ Mỹ.
+
+---
+
+## 6. Momentum
+
+**Academic Analysis**
+- **PC1 5‑day change = +0.61σ** – tốc độ gia tăng stress rất nhanh, cho thấy CCC OAS leo thang và OVX spike đang đẩy nhân tố tổng hợp lên.
+- **PC1_raw (0.48σ) > PC1_smoothed (0.22σ)** → early warning kinh điển: smoothed chưa kịp phản ánh đợt sóng căng thẳng mới. Nếu trend tiếp tục, PC1 smoothed có thể sớm vượt qua ngưỡng 70‑80%, đẩy regime vào STRESS trong 1‑2 tuần tới.
+- **VVIX** vẫn thấp, tạm thời chưa xác nhận khủng hoảng thanh khoản phái sinh – diễn biến sẽ cần theo dõi nếu VIX/MOVE bắt đầu hưởng ứng.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Căng thẳng tài chính đang “chạy nước rút” – tăng nhanh trong vài ngày gần đây, dù con số tổng hợp (đã làm mượt) mới chỉ ở mức vàng nhạt. Điều này giống như kim đo nhiệt kế chưa kịp nhảy lên dù lửa đã bùng to hơn. Nếu vài tuần tới CCC và OVX không hạ nhiệt, gần như chắc chắn chúng ta sẽ thấy đèn cảnh báo chuyển sang màu đỏ.
+
+---
+
+## 7. Spillover to VN-Index (4‑8 tuần)
+
+**Academic Analysis**
+Các kênh truyền dẫn chính với độ trễ 4‑8 tuần:
+
+1. **CCC OAS ↑ (89% percentile) → Negative**  
+   Cơ chế: CCC stress làm dấy lên lo ngại chu kỳ vỡ nợ, thúc đẩy các quỹ toàn cầu hạ tỷ trọng rủi ro, đặc biệt là EM carry trades. Dòng vốn gián tiếp vào Việt Nam có thể sụt giảm, gây áp lực bán ròng trên HOSE.
+
+2. **OVX ↑ (90% percentile, >50 absolute) → Negative**  
+   Việt Nam là nước nhập khẩu ròng năng lượng. Giá dầu biến động mạnh → chi phí đầu vào tăng, CPI nhích lên → Ngân hàng Nhà nước có thể phải thắt chặt tiền tệ (tăng lãi suất, hút thanh khoản). Hệ quả kép: lợi nhuận doanh nghiệp suy yếu (vận tải, sản xuất) + định giá cổ phiếu giảm do lãi suất chiết khấu cao.
+
+3. **CQS 100% percentile (Late‑cycle dispersion) → Negative**  
+   Tín hiệu phòng thủ: nhà đầu tư tổ chức thường giảm overweight EM trong giai đoạn phân hoá chất lượng tín dụng, chuyển sang safe haven, tạo thêm headwind cho VN-Index.
+
+4. **Mitigants (giảm nhẹ)**  
+   - EM OAS 1% → dòng vốn EM chưa bị stress trực tiếp.  
+   - DXY 44% → không có cú sốc tỷ giá.  
+   - 2s10s dương → không có suy thoái Mỹ cận kề.  
+
+Tổng hợp: **Spillover được đánh giá là negative**, nhưng cường độ vừa phải do các mitigating factors.
+
+> **`💡 Diễn giải bình dân (Layman's terms)`**  
+> Đối với người quan tâm chứng khoán Việt Nam: trong vòng 1‑2 tháng tới, có hai **gọng kìm** đè lên thị trường.  
+> **Gọng thứ nhất**: nợ rác Mỹ đắt đỏ kỷ lục khiến giới đầu tư quốc tế co lại, bớt tiền đổ vào các thị trường như Việt Nam.  
+> **Gọng thứ hai**: giá dầu đang “nhảy múa” làm tăng chi phí cho doanh nghiệp trong nước, đồng thời có thể khiến Ngân hàng Nhà nước phải thắt chặt tiền tệ, giống như thời kỳ lãi suất tăng.  
+> May mắn là đồng đô‑la chưa mạnh, và các nước mới nổi cũng chưa bị rút vốn ồ ạt. Vì thế áp lực có thể chỉ ở mức “gió ngược” chứ chưa phải “bão tố”. Tuy nhiên, nếu đà căng thẳng leo thang thêm, VN-Index khó có sóng tăng bền vững trong ngắn hạn.
+
+---
+
+## 8. KẾT LUẬN
+
+**Regime ELEVATED với driver CCC_CREDIT_DRIVEN**; vết nứt tập trung ở junk credit và cú sốc dầu, trong khi các mảng còn lại của hệ thống tài chính vẫn yên ắng. Momentum stress đang tăng nhanh, cảnh báo sớm khả năng leo lên STRESS. Dòng vốn toàn cầu đang đứng trước ngã rẽ phòng thủ, tạo headwind trung hạn cho VN-Index.
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 55,
+  "regime": "ELEVATED",
+  "driver": "CCC_CREDIT_DRIVEN",
+  "credit_cycle_signal": "deteriorating",
+  "vol_breadth": "divergent",
+  "macro_overlay": "benign",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: global_financial_conditions_methodology ===
+- CQS Percentile 3Y: 99.7
+- PC1 Regime Percentile 1Y: 54.8
+- Indicator Percentile Window: 756 sessions max, 252 sessions min
+- Z-Score Window: 252 sessions
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

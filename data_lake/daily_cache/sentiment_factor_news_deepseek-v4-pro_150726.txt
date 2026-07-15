@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## Báo cáo Sentiment Tin tức Vĩ mô Việt Nam  
+**Thời điểm cập nhật:** 15/07/2026 16:14 ICT  
+**Khung nhìn:** Rule‑based news sentiment, phủ bởi social overlay từ Mozyfin.
+
+### 1. Trạng thái Tin tức (News Regime)
+- **1 ngày:** `risk_on` – **Nghiêng về rủi ro ƣu** (P_conf = 81%, 90% CI: -0.14 ÷ +0.46). Tín hiệu cùng chiều có xác suất 81%, đủ để dùng giọng điệu “nghiêng về” nhưng chưa đạt ngưỡng khẳng định mạnh.  
+- **7 ngày:** `strong_risk_on` – **Khẳng định chắc chắn** rủi ro ƣu (P_conf = 100%, 90% CI: +0.37 ÷ +0.63). Toàn bộ phân phối posterior nằm trên 0.  
+- **30 ngày:** `strong_risk_on` – **Khẳng định chắc chắn** (P_conf = 100%, 90% CI: +0.47 ÷ +0.58). Xu hướng đồng thuận cao nhất.
+
+### 2. Kênh Dẫn dắt Chính
+**Tích cực (kéo risk-on):**  
+- `earnings` (1d: +1.287, P_conf 100%) – lợi nhuận doanh nghiệp.  
+- `banking_system` (1d: +0.889, P_conf 98%).  
+- `monetary_policy` (7d: +0.771, 30d: +1.572, đều P_conf 100%) – chính sách tiền tệ hỗ trợ.  
+- `fx_external` (7d: +2.000, 30d: +0.493, P_conf 100%) – tỷ giá ổn định/tăng.  
+
+**Tiêu cực (kéo risk-off):**  
+- `commodity` (1d: -2.000, P_conf 100%; 7d: -0.280, 30d: -0.726, P_conf rất cao) – giá hàng hóa cơ bản Trung Quốc giảm sâu.  
+- `liquidity` (7d: -0.531, 30d: -0.150, P_conf 100%) – thanh khoản hệ thống bị hút ròng qua OMO.  
+- `credit_stress` (1d: -0.352, P_conf 87%) – áp lực tín dụng (lợi suất TPCP Nhật giảm mạnh, phát hành trái phiếu doanh nghiệp lớn, vi phạm thông tin trái phiếu).
+
+### 3. Động lực Quan trọng (Drivers)
+*Tóm lược 3‑5 tin chính từ dữ liệu đầu vào:*
+
+**Tích cực**  
+- Tỷ giá trung tâm liên tục tăng (15/07: 25,233; các ngày trước đó đều đi lên), phản ánh sức khỏe VND và hỗ trợ tâm lý thị trường.  
+- Lãi suất huy động kỳ hạn ngắn nhóm NHTM khác tăng 1 bps (13/07), củng cố kênh `monetary_policy` và lợi nhuận ngân hàng.  
+- Trung Quốc vượt Mỹ trở thành nhà tiêu thụ thủy sản lớn nhất của Việt Nam (15/07), thúc đẩy tăng trưởng xuất khẩu.  
+- Hà Nội xác định đòn bẩy đạt mục tiêu tăng trưởng (15/07); Chính phủ họp giao ban 6 tháng với tín hiệu triển khai quyết liệt.
+
+**Tiêu cực**  
+- Giá phân Ure Trung Quốc giảm chạm đáy tháng (1,775 CNY/tấn, 15/07), gây áp lực lên kênh `commodity` (score -1.306).  
+- Lợi suất TPCP Nhật Bản 20Y giảm 12 bps (15/07), tín hiệu suy yếu toàn cầu lan sang `credit_stress` (-0.348).  
+- NHNN hút ròng 2,561.9 tỷ đồng qua OMO phiên 15/07, tiếp nối chuỗi hút ròng lớn trong tuần (11,729.4 tỷ ngày 13/07), siết thanh khoản.  
+- CVS Holdings bị phạt lần 2 vì mập mờ thông tin nợ trái phiếu, phản ánh rủi ro tín dụng doanh nghiệp.
+
+### 4. Kết luận Tác động lên AI CIO
+- **Hỗ trợ lớp vĩ mô (Macro Layer):** Cả 3 khung thời gian đều xác nhận xu hướng risk‑on (30d mạnh nhất), đồng pha với triển vọng tích cực từ chính sách tiền tệ, hệ thống ngân hàng và tỷ giá. Tầm nhìn triển khai danh mục vẫn thuận lợi.  
+- **Xung đột nhẹ ở ngắn hạn (1d):** Kênh `commodity` giảm sâu và `liquidity` bị hút ròng liên tục tạo ra nhiễu; `monetary_policy` trên khung 1d đột ngột âm (‑0.648, P_conf 88%) khác với xu hướng dài hạn, cần theo dõi thêm.  
+- **Công cụ thị trường nội bộ:** Nếu AI CIO đang dùng tín hiệu kỹ thuật/xu hướng thị trường, tin tức cũng gợi ý duy trì thiên về rủi ro, nhưng nên cân nhắc phòng vệ nhẹ trước các cú giật từ hàng hóa cơ bản và thắt chặt OMO.
+
+### 5. Caveat (Lưu ý)
+- **Nguồn tin xã hội (Social Overlay):** Trong 1d, 85/275 (31%) bài là từ `mozyfin_social`; trong 7d, 551/1307 (42%) là social. Đây là luồng ý kiến/lan truyền có độ tin cậy thấp hơn hẳn so với dữ liệu cứng (widata). Tín hiệu 30d ít phụ thuộc social hơn (chỉ ~11%). Do đó, nhịp risk‑on ngắn hạn phải được diễn giải với một lớp “nhiễu xã hội”.  
+- **Headline noise:** Các tin như “lợi suất đi ngang”, “tỷ giá tăng vài đồng” có thể gây nhiễu nếu nhìn đơn lẻ, nhưng tổng hợp posterior vẫn cho tín hiệu rõ ràng.  
+- **Tính thời sự:** Feed được sinh lúc 16:14 cùng ngày, không có độ trễ.  
+- **Không phải tín hiệu phân bổ cứng:** Đây là lớp tâm lý mềm, không thay thế mô hình định lượng hay phân tích cơ bản; dùng để kiểm tra chéo xu hướng.

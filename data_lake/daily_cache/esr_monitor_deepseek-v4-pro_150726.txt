@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- **SSI**: 63.0% → **WARNING** (tích lũy rủi ro hệ thống, cận trên ngưỡng 0.50–0.80)
+- **Market State**: **CALM CORRECTION** (HMM ghi nhận stress thấp, nhưng xu hướng giảm)
+- **Top 3 Pillar Drivers**: S_LIQ (35%), S_VAL (31%), S_COR (18%)
+- **VN30**: đóng cửa dưới MA125, phù hợp với downtrend có trật tự
+
+## 2. Risk Decomposition (Bóc tách)
+Hai trụ cột dẫn dắt rủi ro hiện tại:
+- **S_LIQ (35%) – Volume khô cạn so với chuẩn 1 năm**  
+  Tín hiệu rõ: thanh khoản dollar volume trung bình 20 phiên sụt giảm mạnh so với trung bình 252 phiên. Chiều *downside mode* (chỉ xét phiên giảm) cho thấy dòng tiền rút ra khi thị trường cần thanh khoản nhất, khiến mức sụt giảm thêm trầm trọng.
+- **S_VAL (31%) – Căng thẳng định giá**  
+  Lợi suất 1 năm của VN30 vượt xa lãi suất tiền gửi, phản ánh định giá cao trong bối cảnh dòng tiền đang teo lại. Đây là tổ hợp rủi ro kép: tài sản đắt + room dòng tiền hẹp.
+- **S_COR (18%)** – Tương quan hệ thống (PC1 EVR 38.1%) chưa cực đoan, xác nhận thị trường chưa rơi vào trạng thái đồng loạt bán tháo (herding). Rủi ro hiện tại là rủi ro ngầm, chưa lan toả diện rộng.
+
+Không có mâu thuẫn: S_LIQ + S_VAL dẫn dắt cho thấy pha điều chỉnh có kiểm soát nhưng dễ trượt sâu nếu thanh khoản tiếp tục khô.
+
+## 3. Cross-Check
+- **HMM vs SSI**: HMM dán nhãn “low stress” (CALM CORRECTION), song SSI ở 63% (WARNING, gần ngưỡng high stress). Đây là **divergence** cần lưu ý – mô hình Markov có độ trễ nhất định; SSI đã báo động sớm hơn. Do đó, không nên chủ quan với trạng thái CALM CORRECTION.
+- **Price action vs SSI**: VN30 nằm dưới MA125, không tạo đỉnh mới, nên chưa xuất hiện bull-trap signature điển hình (giá cao + stress ngầm). Sự phân kỳ nằm ở nội tại mô hình, chưa phản ánh qua hành động giá.
+
+## 4. Verdict
+- **Cash weight đề xuất: 70%** danh mục. Rủi ro thanh khoản cạn là tín hiệu tiên lượng, thị trường có thể tiếp tục trượt trong trật tự nhưng biên độ rủi ro đang nới rộng.
+- **Hedge action**: **Giảm beta** danh mục – cắt bớt cổ phiếu có beta cao, nâng tiền mặt. Chưa cần short index ngay vì SSI chưa vào CRITICAL, nhưng đòn bẩy margin bị cấm tuyệt đối.
+- Lý do: S_LIQ dẫn đầu + HMM trễ pha = rủi ro giảm điểm ngoài dự kiến, ưu tiên phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

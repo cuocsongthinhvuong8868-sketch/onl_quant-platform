@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Lực cầu hiện tại (3.06%) thấp hơn nhiều so với trung bình dài hạn (Mu 12.18%), trong khi lực cung (25.18%) cao gần gấp đôi Mu (12.73%) → trạng thái **phân phối** rõ nét (cùng chiều: up << mu, down >> mu).
+- Hệ số tự tương quan cầu Phi = 0.233 > 0.10 → **momentum duy trì mức yếu**; cung Phi = 0.071 (|Φ| < 0.10) → **nhiễu thuần túy**, không có tín hiệu xu hướng.
+- Kịch bản đuôi: P95 Upside = 22.38% (đuôi phải dày – bùng nổ mua), P95 Downside = 19.83% (đuôi trái mỏng hơn, kỳ vọng lực cung hạ nhiệt từ mức cực đoan hiện tại).
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền: **phân phối** – bên bán đang áp đảo nhưng không có quán tính, bên mua yếu nhưng lại có momentum (tiếp tục ảm đạm). So sánh |Φ_up| = 0.233 với |Φ_dn| = 0.071 cho thấy **lực cầu giữ momentum thực sự**, tức mức độ thấp của breadth mua có xu hướng kéo dài sẽ là yếu tố chi phối ngắn hạn.
+
+## 3. Stress-Test Read
+P95 Downside 19.83% (thấp hơn hiện tại 25.18%) cho thấy trong 95% mô phỏng, cung sẽ không vượt ngưỡng này sau 19 phiên – tín hiệu giảm áp lực bán. Bất đối xứng đuôi: P95 Upside (22.38%) > P95 Downside, đuôi phải dày hơn → **rủi ro bùng nổ mua bất ngờ** lớn hơn rủi ro sụt giảm thêm từ mức hiện tại.
+
+## 4. Verdict
+Đề xuất tỷ trọng giải ngân: **25%**. Chiến lược: **rình bắt đáy** (bottom fishing) – tận dụng kỳ vọng lực cung nhiễu sớm hạ nhiệt và đuôi phải dày, dù đà yếu của cầu có thể duy trì. Hành động dựa trên tín hiệu phân phối nhưng có bất đối xứng đuôi tích cực, không đủ điều kiện NO ACTIONABLE vì một chiều Phi > 0.10.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 19.83,
+  "p95_upside_pct": 22.38,
+  "deployment_pct": 25,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

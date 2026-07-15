@@ -1,0 +1,29 @@
+## 1. Observations
+- VN30 Stress Index: **10.00%** (dưới ngưỡng cảnh báo 40%)
+- Số mã VN30 thủng VaR 95%: **3 / 30**
+- Complacency Index toàn thị trường: **9.26%** (dưới ngưỡng nguy hiểm 80%), số mã bị định giá sai (spread nén) là **10**
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress Index 10% cho thấy **không có hiện tượng lây lan hệ thống real‑time**. Ba mã breach sâu nhất (FPT, BCM, MBB) hiện là các sự cố cá biệt, chưa lan sang nhóm cổ phiếu cùng ngành hay toàn chỉ số. Tỷ lệ breach 10% (3/30) nằm trong giới hạn thống kê thông thường của VaR 95% – không đủ bằng chứng để kết luận sóng bán tháo đồng loạt. Tuy vậy, cần theo dõi nếu số mã breach gia tăng đột biến trong phiên tới.
+
+## 3. Complacency Assessment (Module C)
+Complacency 9.26% **cực thấp**, chỉ báo duy nhất một điều: **thị trường hiện không ở regime “ngủ quên”** (không có tình trạng nén spread, vol thấp kéo dài, định giá sai rủi ro trên diện rộng).  
+Điều này **không** đồng nghĩa thị trường ổn định hay không có áp lực bán. Kết hợp với Stress Index thấp, bức tranh hiện tại nghiêng về một môi trường biến động ở mức trung bình, không có cấu trúc rủi ro bị che giấu hàng loạt. Tuy nhiên, sự tồn tại của 10 mã bị mispriced (dù chỉ số tổng thấp) cảnh báo vẫn có những điểm nén cục bộ – cần xử lý riêng lẻ, không ngoại suy thành “an toàn vĩ mô”.
+
+## 4. Stock‑Level Risk Calls
+- **Top 3 Crash (Module B)** – FPT, BCM, MBB: Đã xuyên thủng VaR 95%, động lượng giảm mạnh bất thường. Khuyến nghị **giảm tỷ trọng**, điểm dừng lỗ tham chiếu theo % từ giá hiện tại (ví dụ -5% so với giá đóng cửa hôm nay) hoặc phá vỡ MA20 trên khung D1. Không chờ phục hồi kỹ thuật nếu thanh khoản tiếp tục co hẹp.
+- **Top 3 Mispriced (Module C)** – MSB, HCM, POW: Spread bị nén chặt nhất thị trường, tiềm ẩn rủi ro giãn spread đột ngột khi có tin tức hoặc biến động chung. Chưa phải tín hiệu bán ngay, nhưng **cảnh báo không gia tăng vị thế** và đặt lệnh dừng lỗ chặt chẽ (theo ATR hoặc MA ngắn hạn) để phòng vol expansion.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 10.0,
+  "breach_count": 3,
+  "complacency_pct": 9.26,
+  "mispriced_count": 10,
+  "regime": "spread_normal",
+  "watchlist_short": ["FPT", "BCM", "MBB", "MSB", "HCM", "POW"],
+  "confidence": "medium"
+}
+```

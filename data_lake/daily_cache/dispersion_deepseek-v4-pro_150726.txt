@@ -1,0 +1,29 @@
+## 1. Observations
+- Spread_Z = –0.97σ → mức phân tán hiện tại gần như thấp hơn 1 độ lệch chuẩn so với trung bình 60 phiên, không có dấu hiệu căng cấu trúc.
+- DPI = 45.0% → chế độ phân tán chưa duy trì dai dẳng (dưới ngưỡng 70%), thể hiện sự biến động phân hóa chỉ mang tính tạm thời.
+- Avg Pairwise Correlation = 0.014 → tương quan chéo gần như bằng không, các cổ phiếu di chuyển rất độc lập với nhau.
+- CS Skewness & Kurtosis không có dữ liệu, chưa thể đánh giá đuôi phân phối.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không bị stress. Spread thấp hơn mức kỳ vọng gần đây (Z âm) kết hợp với DPI trung bình cho thấy không có cú sốc phân hóa cực đoan nào đang chi phối. Đây không phải là stress regime — không có tín hiệu của một phiên bất thường lan rộng hay một đợt phân phối đỉnh kéo dài.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu cross-sectional skewness và kurtosis, không thể xác định đuôi nào đang gãy hay có fat-tail outliers. Từ bối cảnh tương quan thấp và DPI vừa phải, có thể suy đoán đuôi phân phối vẫn cân đối, nhưng cần xác nhận từ số liệu thực tế trước khi kết luận.
+
+## 4. Regime Mapping
+Trên bản đồ 2D (DPI × Correlation), trạng thái DPI thấp (45%) và Correlation cực thấp (0.014) rơi chính xác vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu, nơi các yếu tố riêng lẻ quyết định biến động thay vì xu hướng vĩ mô hay tâm lý bầy đàn.  
+Rủi ro lớn nhất cho PM trong chế độ này không phải là herding crash hay thanh khoản cạn kiệt đột ngột, mà là **concentration risk do phân hóa quá mức**: nếu mô hình định giá/alpha bị sai, danh mục sẽ chịu drawdown đáng kể vì không còn vỏ bọc tương quan để giảm thiệt hại. Ngoài ra, việc chuyển đổi đột ngột sang regime tương quan cao có thể gây ra whipsaw nếu PM không nhanh chóng phòng hộ danh mục.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "15/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.97,
+  "dpi_pct": 45.0,
+  "avg_corr": 0.014,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

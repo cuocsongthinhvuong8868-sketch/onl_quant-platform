@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-15",
+  "composite_score": 30,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING giảm dưới 5 thì thanh khoản hạ nhiệt, bác bỏ luận điểm thắt chặt."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 30.0,
+      "unit": "%",
+      "description": "Độ rộng MA20 vượt 45% thì phân phối chấm dứt, thị trường trở lại xu hướng tăng."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.0,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% thì rủi ro hệ thống giảm đáng kể, an toàn để nâng equity."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.367,
+      "unit": "",
+      "description": "EVT Xi Max dưới 0.25 thì phân phối lợi nhuận trở về bình thường, hết đuôi béo."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 13.3,
+      "unit": "th pct",
+      "description": "Slope percentile duy trì dưới 70 thì rủi ro thao túng/thao túng chỉ số vẫn được loại bỏ."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 80.0,
+      "unit": "th pct",
+      "description": "CQS Percentile giảm dưới 80 thì căng thẳng tín dụng toàn cầu giảm, hỗ trợ định giá tài sản rủi ro."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-15",
+  "source": "ai_cio_executive_summary"
+}

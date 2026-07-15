@@ -1,0 +1,29 @@
+## 1. Scenario Assessment  
+Kịch bản Trung lập (K=1.0, CoE=14.0%, không stress) là baseline đủ khắc nghiệt cho ngành ngân hàng VN khi mặt bằng lợi nhuận sinh lời yếu. Chỉ duy nhất **SHB** tạo Alpha dương (+2.8%), trong khi hai mã đứng ngay sau (MBB, ACB) đã âm nhẹ và nhóm cuối bảng âm sâu. Phần lớn ngành đang đốt vốn (Alpha < 0), phản ánh định giá chưa đủ rẻ để bù đắp rủi ro và chi phí vốn chủ sở hữu. Đây là dấu hiệu thị trường định giá cổ phiếu ngân hàng ở mức kỳ vọng cao, chỉ một thiểu số có biên an toàn thực sự.
+
+## 2. Top Alpha Decomposition  
+- **SHB (Alpha +2.8%, PB 0.86, ROE 17.5%, σ 1.9%)** – Pháo đài (Fortress) duy nhất. Driver chính là **P/B siêu rẻ** giúp tỷ suất lợi nhuận giữ lại trên vốn (Disciplined Return ~16.7%) vượt CoE. ROE khá cao, biến động ROE thấp cho thấy chất lượng ổn định, rủi ro bị phạt ít. Payout 8.6% thấp, giữ lợi nhuận để compound.  
+- **MBB (Alpha -1.3%, PB 1.42, ROE 21.8%, σ 1.6%)** – Chất lượng rất cao (ROE vượt trội, σ thấp nhất bảng) nhưng **P/B không đủ hời** (1.42) khiến Disciplined Return chỉ đạt ~12.7%, thấp hơn CoE. Đây không phải bẫy, nhưng cũng chưa phải Pháo đài vì định giá chưa cho Alpha dương.  
+- **ACB (Alpha -1.4%, PB 1.26, ROE 23.0%, σ 2.7%)** – ROE cao nhất nhóm, nhưng mức biến động ROE khá lớn (σ=2.7%) cùng P/B trên 1 khiến bị phạt rủi ro đáng kể. Disciplined Return ~12.7%, vẫn dưới CoE. Định vị: ngân hàng tốt nhưng **định giá chưa đủ hấp dẫn** để tạo giá trị thặng dư.
+
+## 3. Value Traps Warning  
+- **LPB (Alpha -12.6%, PB 3.26)** – “Premium Burn” cực đoan: P/B đắt đỏ nhất bảng, ROE cao 21% nhưng không bù được Risk Penalty 3.8% và chiết khấu valuation. Cổ phiếu đốt vốn dữ dội ngay cả khi lợi nhuận tốt.  
+- **EIB (Alpha -11.0%, PB 1.39, ROE 10.0%)** – “Cheap Trap”: ROE quá thấp, biến động cao (σ=3.8%) hủy hoại phần lớn lợi suất còn lại. P/B 1.39 không thực sự rẻ nếu nhìn vào khả năng sinh lời kém bền vững.  
+- **VPB (Alpha -10.0%, PB 1.21, ROE 14.1%)** – “Growth Trap” điển hình: ROE trung bình nhưng σ phình to 4.7% (rủi ro lợi nhuận rất bấp bênh) khiến Risk Penalty ăn mòn gần hết lợi nhuận giữ lại. Payout cao 24.6% càng làm giảm khả năng compound.
+
+## 4. Portfolio Construction  
+- **Core Holding (Fortress): SHB** – Đề xuất tỷ trọng 60–70% cho phân bổ ngân hàng, là lựa chọn duy nhất có Alpha dương trong kịch bản này.  
+- **Tactical:** Không có mã nào trong nhóm Top/Bottom 3 thỏa mãn “cheap-but-not-trap” với P/B đủ rẻ và chất lượng khá. MBB và ACB chất lượng cao nhưng P/B >1 chưa tạo biên an toàn, do đó **tạm thời không thêm vào danh mục chiến thuật**.  
+- **Cấm mua / Underweight:** LPB, EIB, VPB (cả 3 đều Alpha âm rất sâu), và hạn chế MBB, ACB (vẫn đốt vốn dù nhẹ). Nếu buộc phải nắm giữ, chỉ nên underweight với tỷ trọng nhỏ.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "MBB", "ACB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

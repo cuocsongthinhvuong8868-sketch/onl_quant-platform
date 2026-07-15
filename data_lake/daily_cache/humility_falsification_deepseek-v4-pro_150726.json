@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-15T13:07:24",
+  "t_data_date": "2026-07-15",
+  "target_report_date": "2026-07-14",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_140726.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_140726.txt",
+  "report_mtime": "report:2026-07-15T12:58:40|sidecar:2026-07-15T12:58:40",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_140726.txt:d832c5df640ba644ca8233d11fabece1603b89ae|sidecar:ai_cio_humility_rules_deepseek-v4-pro_140726.json:7593ebc95d354f4846d604320f8ce7d884cc6da0",
+  "parsed": {
+    "report_date": "2026-07-14",
+    "composite_score": 27.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Nếu số phiên STRESS/WARNING giảm dưới 5, thanh khoản hạ nhiệt đáng kể, phủ định luận điểm bearish về funding stress."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 17.6,
+        "unit": "%",
+        "description": "Nếu tỷ lệ mã >MA20 vượt 45%, thị trường có sự tham gia rộng, phủ định suy yếu nội tại."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 62.9,
+        "unit": "%",
+        "description": "Nếu SSI về dưới 55%, rủi ro hệ thống giảm, phủ định luận điểm stress tích tụ."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.367,
+        "unit": "",
+        "description": "Nếu EVT Xi Max toàn bộ lưới hạ về dưới 0.25, đuôi béo bị loại bỏ, phủ định rủi ro đuôi cực đoan."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 10.0,
+        "unit": "th pct",
+        "description": "Nếu Vingroup duy trì decoupling (percentile <70), rủi ro tập trung giảm, phủ định một phần luận điểm lôi kéo chỉ số. (Hiện đã thỏa mãn)"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 3.0,
+        "unit": "th pct",
+        "description": "Nếu CQS percentile toàn cầu duy trì dưới 80, điều kiện tài chính không căng thẳng, phủ định rủi ro ngoại sinh nghiêm trọng. (Hiện đã thỏa mãn)"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-14",
+      "composite_score": 27,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Nếu số phiên STRESS/WARNING giảm dưới 5, thanh khoản hạ nhiệt đáng kể, phủ định luận điểm bearish về funding stress."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 17.6,
+          "unit": "%",
+          "description": "Nếu tỷ lệ mã >MA20 vượt 45%, thị trường có sự tham gia rộng, phủ định suy yếu nội tại."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 62.9,
+          "unit": "%",
+          "description": "Nếu SSI về dưới 55%, rủi ro hệ thống giảm, phủ định luận điểm stress tích tụ."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.367,
+          "unit": "",
+          "description": "Nếu EVT Xi Max toàn bộ lưới hạ về dưới 0.25, đuôi béo bị loại bỏ, phủ định rủi ro đuôi cực đoan."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 10,
+          "unit": "th pct",
+          "description": "Nếu Vingroup duy trì decoupling (percentile <70), rủi ro tập trung giảm, phủ định một phần luận điểm lôi kéo chỉ số. (Hiện đã thỏa mãn)"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 3.0,
+          "unit": "th pct",
+          "description": "Nếu CQS percentile toàn cầu duy trì dưới 80, điều kiện tài chính không căng thẳng, phủ định rủi ro ngoại sinh nghiêm trọng. (Hiện đã thỏa mãn)"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-14",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 5.0,
+      "T actual display": "5 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-07-13",
+      "Description": "Nếu số phiên STRESS/WARNING giảm dưới 5, thanh khoản hạ nhiệt đáng kể, phủ định luận điểm bearish về funding stress.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "17.6%",
+      "T actual": 12.470588235294118,
+      "T actual display": "12.5%",
+      "Delta": -5.129411764705884,
+      "Delta display": "-5.129%",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Nếu tỷ lệ mã >MA20 vượt 45%, thị trường có sự tham gia rộng, phủ định suy yếu nội tại.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "62.9%",
+      "T actual": 63.00191963513663,
+      "T actual display": "63.0%",
+      "Delta": 0.10191963513663183,
+      "Delta display": "+0.102%",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Nếu SSI về dưới 55%, rủi ro hệ thống giảm, phủ định luận điểm stress tích tụ.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.367",
+      "T actual": 0.3674303770316354,
+      "T actual display": "0.367",
+      "Delta": 0.0004303770316353983,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Nếu EVT Xi Max toàn bộ lưới hạ về dưới 0.25, đuôi béo bị loại bỏ, phủ định rủi ro đuôi cực đoan.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "10.0 th pct",
+      "T actual": 13.333333333333334,
+      "T actual display": "13.3 th pct",
+      "Delta": 3.333333333333334,
+      "Delta display": "+3.333 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-15",
+      "Description": "Nếu Vingroup duy trì decoupling (percentile <70), rủi ro tập trung giảm, phủ định một phần luận điểm lôi kéo chỉ số. (Hiện đã thỏa mãn)",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "3 th pct",
+      "T actual": 99.66931216931218,
+      "T actual display": "99.7 th pct",
+      "Delta": 96.66931216931218,
+      "Delta display": "+96.7 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-14",
+      "Description": "Nếu CQS percentile toàn cầu duy trì dưới 80, điều kiện tài chính không căng thẳng, phủ định rủi ro ngoại sinh nghiêm trọng. (Hiện đã thỏa mãn)",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 5,
+      "date": "2026-07-13",
+      "error": ""
+    },
+    "breadth": {
+      "value": 12.470588235294118,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.00191963513663,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3674303770316354,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "coupling": {
+      "value": 13.333333333333334,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.66931216931218,
+      "date": "2026-07-14",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}
