@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-16",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING trong 20D còn dưới 5 báo hiệu áp lực thanh khoản hạ nhiệt đủ để nghi ngờ kịch bản thắt chặt."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 16.2,
+      "unit": "%",
+      "description": "Độ rộng vượt 45% cho thấy dòng tiền phân phối rộng, bác bỏ trạng thái suy yếu toàn thị trường."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.0,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% xác nhận rủi ro hệ thống đã giảm đáng kể, cho phép tăng rủi ro danh mục."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.367,
+      "unit": "",
+      "description": "Xi max < 0.25 chỉ ra đuôi phân phối không còn dày, rủi ro cực đoan giảm mạnh."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 15.0,
+      "unit": "th pct",
+      "description": "Vingroup slope percentile duy trì dưới 70 cho thấy rủi ro tập trung nhóm VIC ở mức thấp, giảm thiểu nguy cơ thao túng chỉ số."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "CQS percentile (3Y) dưới 80th bác bỏ luận điểm tín dụng toàn cầu thắt chặt đồng loạt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-16",
+  "source": "ai_cio_executive_summary"
+}

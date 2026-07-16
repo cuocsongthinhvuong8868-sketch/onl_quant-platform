@@ -1,0 +1,41 @@
+## 1. Scenario Assessment
+
+Kịch bản trung lập (K=1.0, CoE=14%) là baseline chuẩn cho ngành ngân hàng Việt Nam – không hề khắc nghiệt. Dù vậy, trong số các mã được quét, chỉ duy nhất SHB tạo ra Economic Alpha dương (+2.6%). Toàn bộ phần còn lại (kể cả Top 2 và 3) đều đốt vốn, phản ánh một mặt bằng chất lượng kém: giá đã phản ánh quá nhiều kỳ vọng, hoặc rủi ro bị chiết khấu quá nặng. Ngành đang ở trạng thái “value-destroying” trên diện rộng, ngoại trừ một ngoại lệ rẻ và ổn định duy nhất.
+
+## 2. Top Alpha Decomposition
+
+- **SHB (Alpha +2.6%) – Fortress thuần khiết.** Bộ ba driver: P/B rẻ (0.87), ROE bền vững (17.5%) và σROE cực thấp (1.9%). Payout chỉ 8.6% giúp giữ lại lợi nhuận để tái đầu tư compound. Đây là cỗ máy tạo giá trị thực sự với giá định giá hấp dẫn.
+
+- **MBB (Alpha -1.4%) – Chất lượng cao nhưng không rẻ.** ROE 21.8%, σROE thấp 1.6%, tuy nhiên P/B 1.43 đã định giá gần hết tiềm năng. Dù an toàn, cổ phiếu chưa đem lại phần thưởng vượt chi phí vốn.
+
+- **ACB (Alpha -1.8%) – Tương tự MBB nhưng nhiễu hơn.** ROE 23.0% vượt trội nhưng σROE 2.7% và payout cao hơn (15.9%) khiến return trên giá kém hơn. P/B 1.30 vẫn ở vùng fair-value, không có margin an toàn.
+
+Cả MBB và ACB đều thuộc diện “Premium Burn” nhẹ – định giá không quá đắt nhưng không còn dư địa cho alpha dương.
+
+## 3. Value Traps Warning
+
+- **LPB (Alpha -12.7%) – Premium Burn nặng.** P/B 3.29 cao gấp ba lần SHB, σROE 3.8% và payout 21% bào mòn lợi nhuận giữ lại. ROE 21% nhưng không đủ bù rủi ro, cổ phiếu là bẫy định giá.
+
+- **EIB (Alpha -10.8%) – Cheap Trap điển hình.** P/B 1.36 tưởng rẻ nhưng ROE chỉ 10% – quá yếu so với chi phí vốn 14%. Cộng thêm σROE 3.8%, bank này triền miên phá hủy giá trị.
+
+- **VPB (Alpha -10.1%) – Rủi ro cao, vận hành kém.** ROE 14.1% chỉ ngang chi phí vốn, payout 24.6% cao và σROE 4.7% khiến risk-adjusted return rất thấp. P/B 1.22 không phải “rẻ” mà là phản ánh đúng rủi ro.
+
+## 4. Portfolio Construction
+
+- **Core Holding (Fortress):** **SHB** – phân bổ 60–70% tỷ trọng cổ phiếu ngân hàng trong danh mục.  
+- **Tactical:** Không có mã nào đạt alpha dương ngoài SHB. MBB và ACB nằm trong vùng theo dõi nhưng không khuyến nghị mua mới.  
+- **Cấm mua / Underweight:** LPB, EIB, VPB – né tuyệt đối. MBB, ACB nên underweight nếu đang nắm giữ.  
+- Nhìn chung, chỉ nên duy trì SHB và giảm tổng phân bổ vào ngành ngân hàng nếu không còn cổ phiếu nào khác tạo alpha.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```

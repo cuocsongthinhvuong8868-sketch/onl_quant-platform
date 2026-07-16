@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại  
+Lãi suất qua đêm (ON) ngày 14/07 ở mức 4.20%, tăng nhẹ 0.02 điểm phần trăm so với phiên trước đó – biến động không đáng kể, cho thấy trạng thái ổn định sau giai đoạn biến động mạnh. Đường cong lãi suất liên ngân hàng có hình dáng dốc lên thông thường: chênh lệch 1 tuần – ON là +0.60%, 2 tuần – ON là +1.70%. Không xảy ra đảo ngược đường cong, tức hệ thống không chịu áp lực squeeze cực ngắn hạn nào. Mức ON thô 4.20% nằm ở cận dưới của dải trung tính (2.0%–4.5%), hàm ý thanh khoản đang khá dễ chịu.
+
+## 2. Xu hướng 20 phiên – Stress Unwinding  
+Dữ liệu 20 phiên gần nhất cho thấy một giai đoạn stress building rõ nét từ 21/06 đến 05/07: ON bật lên đỉnh 12.49% (29/06), ON MA5 chạm 7.35% (05/07), số phiên có tín hiệu STRESS/WARNING xuất hiện 5 lần và một phiên đường cong đảo ngược (1W–ON âm). Tuy nhiên, xu hướng từ 06/07 đến nay đảo chiều nhanh sang easing mạnh: ON MA5 giảm liên tục từ 6.02% (06/07) xuống 4.31% (14/07) – tương đương mức sụt 1.71 điểm phần trăm chỉ trong 5 phiên. Tần suất STRESS/WARNING trở về 0 trong 5 phiên gần nhất. Như vậy, giai đoạn này mang đặc trưng “stress unwinding” (giải tỏa căng thẳng sau sốc), dù di sản 20 phiên vẫn còn các chỉ số trung bình cao (ON bình quân 5.14%, ON MA5 change 20 phiên +0.58%).
+
+## 3. Đánh giá trạng thái thanh khoản  
+Regime hiện tại là **EASY** – phản ánh điều kiện vốn ngắn hạn dễ tiếp cận. Z‑score (MA5, 252 phiên) đạt -0.79, tương ứng với percentile 22.2%: lãi suất qua đêm sau làm mượt đang ở vùng thấp hơn đáng kể so với mặt bằng một năm. Lưu ý rằng mức Z‑score này có thể bị kéo thấp do MA5 đang suy giảm từ vùng cao sau sốc; dù vậy, bức tranh hiện tại thể hiện thanh khoản dồi dào rõ rệt so với trung vị lịch sử.
+
+## 4. Tác động lan tỏa tới VN‑Index  
+Trạng thái thanh khoản EASY kết hợp xu hướng stress unwinding tạo lực đỡ cho thị trường chứng khoán trong vòng 2–4 tuần tới. Chi phí vốn ngắn hạn giảm (ON MA5 về gần 4%) làm hạ chi phí cơ hội của dòng vốn margin và hỗ trợ dòng tiền cá nhân quay trở lại chứng khoán. Đợt căng thẳng vừa qua tuy có gây gián đoạn tâm lý nhưng diễn biến hạ nhiệt nhanh làm giảm lo ngại về rủi ro hệ thống kéo dài. Tương quan nghịch lịch sử giữa VNIBOR và VN‑Index cho thấy tín hiệu tích cực; với ON liên tục duy trì dưới 5% và không còn đảo ngược đường cong, môi trường thanh khoản hiện tại có lợi cho sự phục hồi của VN‑Index.
+
+## 5. Rủi ro & Điều kiện cần theo dõi  
+Dữ liệu VNIBOR không đủ để kết luận nguyên nhân của cú sốc hay chính sách của SBV. Cần chú ý theo dõi: (1) ON có duy trì được dưới ngưỡng 5.0% hay không; (2) ON MA5 có tiếp tục giảm hoặc ổn định quanh 4.2–4.5% – nếu bật tăng trở lại sẽ phá vỡ kịch bản unwinding; (3) spread 1 tuần – ON không bị đảo ngược (dương bền vững); (4) số phiên STRESS/WARNING giữ ở mức 0. Các yếu tố ngoài phạm vi input như can thiệp tỷ giá, lượng tín phiếu đáo hạn hay mùa vụ thuế cần được kiểm chứng từ nguồn khác nếu muốn đánh giá đầy đủ hơn.
+
+## 6. Kết luận & Khuyến nghị ngắn hạn  
+Thanh khoản liên ngân hàng đang trong pha stress unwinding rõ nét, điều kiện vốn đã trở về trạng thái EASY. Bối cảnh này tạo thuận lợi cho sự ổn định và phục hồi của VN‑Index trong ngắn hạn; nhà đầu tư có thể duy trì quan sát tích cực trên các tài sản rủi ro, nhưng cần cảnh giác nếu các ngưỡng cảnh báo kể trên bị xâm phạm trở lại.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 4.20,
+  "trend_20d": "stress_unwinding",
+  "regime": "EASY",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

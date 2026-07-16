@@ -1,0 +1,47 @@
+## 1. Phân Rã Cơ Học (Mechanical Decomposition)
+Thanh khoản ròng tuần kết thúc 15/07/2026 đạt **5,961.4 tỷ USD**, tăng nhẹ +3.2 tỷ so với tuần trước.  
+- **WALCL (tài sản Fed):** 6,735.6 tỷ USD, gần như đi ngang – không có hoạt động QE hay QT ròng đáng kể.  
+- **TGA (kho bạc):** 774.1 tỷ USD, ở vùng trung bình mục tiêu (~600-750 tỷ). Biến động tuần không lớn, không tạo ra bơm/hút đột biến.  
+- **RRP (reverse repo):** Chỉ còn 0.15 tỷ USD (~151 triệu), coi như **cạn kiệt** – bộ đệm thanh khoản từ quỹ thị trường tiền tệ không còn ảnh hưởng được nữa.  
+
+Tổng hòa, Net Liquidity dao động rất thấp, phản ánh trạng thái **đi ngang** của hệ thống thanh khoản.
+
+## 2. Định Vị Chu Kỳ (Cycle Positioning)
+- **Pha chính sách:** Fed không mở rộng bảng cân đối; RRP đã về 0 đồng nghĩa **QT đã ở giai đoạn cuối** – không còn van giảm áp từ tiền đọng reverse repo. Nếu Fed tiếp tục để tài sản đáo hạn mà không tái đầu tư, thanh khoản sẽ bị siết trực tiếp vào dự trữ ngân hàng.  
+- **TGA:** Ở mức 774 tỷ, không cho thấy Treasury chủ động bơm mạnh (xả) hay tích lũy cực đoan (hút). Nhiều khả năng đang dao động theo dòng thu – chi thường xuyên.  
+- **So sánh lịch sử:**  
+  - Đỉnh thanh khoản ròng 2022 ước tính ~6.4-6.6 nghìn tỷ (khi WALCL ~8.9T, RRP lớn). Hiện tại 5.96 nghìn tỷ, thấp hơn đỉnh khoảng 7-8%.  
+  - Đáy 2024 có thể thấp hơn do QT mạnh và TGA tăng; mức hiện tại không phải vùng thắt chặt cực đoan, nhưng **dễ tổn thương** nếu tiếp tục thu hẹp bảng cân đối.  
+
+Kết luận chu kỳ: **trung tính với thiên hướng giảm dần dự trữ**, nếu Fed không tạm dừng QT.
+
+## 3. Độ Mạnh Tín Hiệu (Signal Strength)
+- Tín hiệu hệ thống: **HOLD**.  
+- Z-Score: **+0.11σ** – gần như nằm sát trung bình 52 tuần, không phải vùng cực biên (>1σ).  
+- Impulse EMA(4) dương +29 tỷ/tuần nhưng quá nhỏ so với quy mô 6 nghìn tỷ, chưa đủ kích hoạt ADD.  
+→ Thanh khoản không có đà bùng nổ cũng không co rút mạnh; tín hiệu **yếu và thiếu thuyết phục**.
+
+## 4. Tác Động Lan Tỏa Đến Các Tài Sản Rủi Ro (1-4 tuần)
+- **SPX/NDX:** Thiếu xung lực bơm thanh khoản, dòng tiền lớn khó gia tăng vị thế rủi ro mạnh. Bias **trung tính**.  
+- **DXY / Gold / Crypto:** DXY có thể không biến động lớn do chênh lệch lãi suất ổn định, không có cú sốc thanh khoản. Gold và crypto không được tiếp sức từ bơm USD, bias **trung tính**.  
+- **VN-Index (lag 4-8 tuần):** Tương quan Fed liquidity – VN-Index dương nhưng thấp (0.25-0.35). Hiện không có xung lực thanh khoản ròng, kỳ vọng dòng vốn ngoại không tăng mạnh. Bias **trung tính**, thị trường chịu chi phối bởi yếu tố nội tại và tâm lý hơn là thanh khoản toàn cầu.
+
+## 5. Yếu Tố Rủi Ro (Tín Hiệu Có Thể Sai)
+- **RRP cạn kiệt:** Khi RRP < 0.1 tỷ, các tín hiệu CUT trước đây sẽ yếu hơn vì không còn kho dự phòng; thanh khoản dễ rơi mạnh nếu Fed tiếp tục QT.  
+- **Mùa thuế:** Tháng 9 sắp tới, TGA có thể tăng đột biến do nộp thuế doanh nghiệp, gây hút thanh khoản trong ngắn hạn, tạo tín hiệu giả nhiễu.  
+- **Khủng hoảng bất ngờ:** Fed có thể can thiệp khẩn cấp (buyback, facility mới) đảo ngược hoàn toàn bức tranh.  
+
+## 6. Kết Luận
+Chế độ thanh khoản **trung tính**, động lượng quá thấp để tạo đột phá cho tài sản rủi ro. Với thanh khoản đi ngang và RRP cạn, thị trường đang ở vùng “chờ” – Fed chưa nới lỏng cũng chưa siết thêm. Outlook 2-4 tuần: rủi ro phân phối đi ngang, ưu tiên quan sát thay vì hành động.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5961.4,
+  "signal": "HOLD",
+  "z_score": 0.11,
+  "regime": "neutral",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```

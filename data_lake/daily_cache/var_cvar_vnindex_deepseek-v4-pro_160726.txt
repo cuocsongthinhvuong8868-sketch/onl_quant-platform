@@ -1,0 +1,63 @@
+<!-- ai-cio-cache-version: evt_threshold_sensitivity_mcmc_interval_v2 -->
+## 1. Observations
+- Historical VaR 95% (3Y rolling) ở mức –1.65%, sát với VaR tham số Gaussian –1.54%, cho thấy rủi ro thông thường chưa có gì đột biến.
+- EVT VaR 99% ước tính từ phương pháp POT/GPD là –3.69%, nằm sâu hơn đáng kể so với VaR 95% (–1.65%), báo hiệu rủi ro đuôi bị đánh giá thấp nếu chỉ dùng công cụ cổ điển.
+- Hệ số hình dạng đuôi (ξ) theo MLE đạt +0.345; MCMC posterior p50 lên +0.430, vượt ngưỡng 0.30, thuộc chế độ **fat tail** (đuôi cực dày) và ES có thể dao động mạnh.
+- Chỉ số Hill bằng +0.447, cùng dấu và cùng cấp độ với ξ, củng cố thêm tín hiệu đuôi dày — không có dấu hiệu phân kỳ đáng lo ngại.
+
+## 2. Chẩn đoán độ dày đuôi (Tail Thickness)
+- ξ điểm (MLE = 0.345, posterior p50 = 0.430) nằm rõ trong vùng **fat tail (>0.30)**, nơi mô hình Gaussian đánh giá thấp rủi ro đáng kể, ES có thể không ổn định nếu ξ tiến gần 1.
+- Hill index = 0.447 xác nhận cùng hướng và quy mô, tín hiệu robust. ES – VaR spread tại 95% (–1.37%) vượt hẳn σ₃₀ (0.91%), thực nghiệm khẳng định đuôi dày.
+- Tuy nhiên, EVT cho thấy **nhạy ngưỡng**: ξ dao động từ +0.168 (heavy) đến +0.367 (fat) khi thay đổi ngưỡng POT; khoảng posterior 90% của ξ (+0.219 đến +0.658) cắt qua ranh giới heavy/fat. Do đó, dù ước lượng điểm là fat, phân loại vẫn kém chắc chắn — coi như **“fat‑tail warning nhạy với ngưỡng”**, không phải fat‑tail mạnh mẽ tuyệt đối. Mức độ tin cậy: trung bình.
+
+## 3. Khoảng cách Gaussian (Gaussian Gap)
+- Với σ = 0.91% và μ suy từ VaR 95% (μ ≈ –0.043%), Gaussian VaR 99% (z₀.₀₁ = –2.33) ≈ –2.16%. EVT VaR 99% là –3.69%, tạo ra **gap 1.53 điểm phần trăm**, vượt quá ngưỡng 1pp.  
+- Mô hình Gaussian bị vỡ hoàn toàn trong việc ước lượng rủi ro đuôi; không nên dùng Gaussian làm cơ sở phân bổ vốn theo rủi ro tại thời điểm này.
+
+## 4. Phán quyết – Hàm ý phòng hộ (Hedging)
+- Với ξ > 0.30 (fat tail), nguyên tắc: **tránh chiến lược momentum**, mua quyền chọn bán **ITM** để bảo vệ trực tiếp và phòng hộ qua bán hợp đồng tương lai chỉ số.  
+- Do tham số ξ nhạy ngưỡng và khoảng posterior chưa hoàn toàn loại bỏ chế độ heavy, khuyến nghị phòng hộ vẫn ở mức cao nhưng duy trì theo dõi. Ưu tiên hành động: **buy_puts_itm**.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "16/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.168,
+  "xi_max": 0.367,
+  "xi_range": 0.200,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 1.53,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.168
+- EVT Xi Max: +0.367
+- EVT Xi Range: 0.200
+- EVT VaR99 Range: 0.12pp
+- EVT ES99 Range: 0.61pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.3%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.219
+- EVT Xi P50: +0.430
+- EVT Xi P95: +0.658
+- EVT VaR99 P05: -4.78%
+- EVT VaR99 P50: -3.76%
+- EVT VaR99 P95: -3.10%
+- EVT ES99 P05: -12.66%
+- EVT ES99 P50: -6.85%
+- EVT ES99 P95: -4.86%

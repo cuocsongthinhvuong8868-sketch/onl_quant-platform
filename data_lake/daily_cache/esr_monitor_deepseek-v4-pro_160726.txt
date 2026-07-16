@@ -1,0 +1,29 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: 63.0% → chế độ **WARNING**
+- Market State (HMM): **CALM CORRECTION**
+- Top 3 trụ cột dẫn dắt: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**
+- VN30 đóng cửa dưới MA125, pillar mode đang tính trên phiên giảm (downside)
+
+## 2. Risk Decomposition (Bóc tách)
+Trụ cột **S_LIQ (Volume Dry‑Up)** đang dẫn dắt toàn bộ mặt bằng rủi ro, chiếm tỉ trọng cao nhất. Đây là tín hiệu thanh khoản khô cạn rõ rệt so với chuẩn một năm — dòng tiền lớn đứng ngoài, thị trường thiếu lực đỡ để hấp thụ cung. **S_VAL** đứng thứ hai với 31% phản ánh căng thẳng định giá: lợi nhuận 252 ngày của VN30 trừ đi lãi suất tiền gửi vẫn neo cao, dù chỉ số đã rớt xuống dưới MA125. Điều này hàm ý mặt bằng giá chưa chiết khấu đủ so với chi phí vốn. **S_COR** (EVR PC1 38.1%) tăng lên 18%, cho thấy mức độ đồng pha giữa các cổ phiếu đang xiết lại — hiệu ứng herding gia tăng trong bối cảnh volume teo hẹp tạo kịch bản thị trường dễ vỡ: một cú sốc nhỏ có thể kích hoạt bán tháo lan toả khi sổ lệnh mỏng.
+
+## 3. Cross-Check
+Có **xung đột** giữa SSI và HMM: SSI 63% thuộc vùng WARNING (stress cao), trong khi Market State được gán CALM CORRECTION – định nghĩa đòi hỏi stress thấp. Nhiều khả năng HMM chưa kịp nhận diện sự leo thang của áp lực từ S_LIQ và S_VAL, hoặc mô hình đang bị nhiễu bởi các pha sideway gần đây. Giá VN30 nằm dưới MA125, không có đỉnh mới nên chưa thấy phân kỳ bull-trap, nhưng sự lệch pha này khiến tôi hạ mức tin cậy vào tín hiệu regimes hiện tại.
+
+## 4. Verdict
+Tăng tỉ trọng tiền mặt lên **40%** danh mục. Hành động phòng hộ: **giảm beta** — cắt giảm các vị thế nhạy với chỉ số, chưa khuyến nghị short hợp đồng tương lai khi SSI còn ở WARNING. Nếu S_LIQ tiếp tục tăng nhanh trong các phiên tới, tôi sẽ cân nhắc nâng lên mức hedge mạnh hơn. Không có tín hiệu mâu thuẫn giữa các pillar; tuy nhiên, mâu thuẫn HMM–SSI khiến tôi duy trì confidence ở mức medium.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 40,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

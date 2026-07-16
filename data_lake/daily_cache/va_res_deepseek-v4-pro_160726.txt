@@ -1,0 +1,29 @@
+## 1. Observations
+- VN30 Stress Index ở mức 0.00% – không có mã nào thủng VaR 95%, hoàn toàn dưới ngưỡng cảnh báo lây lan.
+- Breached count: 0 / 30, không ghi nhận biến động cực đoan trên nhóm bluechip.
+- Complacency Index toàn thị trường đạt 8.33% (thấp), nhưng vẫn tồn tại 9 mã bị mispriced, trong đó MSB, ACB, GMD có spread bị nén chặt nhất.
+
+## 2. Contagion Assessment (Module B)
+Stress Index 0.00% cho thấy không có hiện tượng lây lan rủi ro real‑time trong VN30. Việc không có mã nào thủng VaR 95% củng cố nhận định: các cú sốc riêng lẻ chưa lan truyền thành hệ thống. Hiện tại, chưa xuất hiện “đầu sóng” systemic. Tuy nhiên, điều này không loại trừ các rủi ro tiềm ẩn ở cấp độ cổ phiếu (xem Module C).
+
+## 3. Complacency Assessment (Module C)
+Complacency Index 8.33% – thấp hơn rất nhiều so với ngưỡng nguy hiểm 80% – chỉ xác nhận thị trường **không** ở regime “ngủ quên”. Điều này **không** đồng nghĩa thị trường ổn định hay bình thường. Thị trường có thể đang trong trạng thái biến động mạnh (hoảng loạn, sụp đổ, hoặc uptrend nóng) – những regime tự thân có spread giãn rộng, kéo Complacency xuống thấp.  
+Kết hợp với Stress = 0%, tạm thời không có áp lực bán lan tỏa cấp tính, cũng không có sự tự mãn nguy hiểm trên diện rộng. Tuy nhiên, sự xuất hiện 9 mã mispriced (đặc biệt top 3: MSB, ACB, GMD) là tín hiệu cần lưu ý: cấu trúc bù rủi ro tại các mã này đang bị định giá sai (spread nén bất thường), tiềm ẩn điều chỉnh khi thị trường nhận ra sai lệch. Đây là rủi ro vi mô, không phải hệ thống.
+
+## 4. Stock‑Level Risk Calls
+- **Module B**: Không có mã breach → không có tín hiệu bán hay giảm tỷ trọng từ stress lây lan.
+- **Module C**: MSB, ACB, GMD bị cảnh báo mispricing. Nhà đầu tư nên theo dõi sát diễn biến spread: nếu spread bất ngờ mở rộng kèm khối lượng đột biến, đây có thể là dấu hiệu điều chỉnh giá. Không đưa ra mức giá tuyệt đối; cân nhắc quản trị rủi ro bằng cách đặt stop‑loss khi giá thủng MA20 hoặc MA50 trên khung D1.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 8.33,
+  "mispriced_count": 9,
+  "regime": "spread_normal",
+  "watchlist_short": ["MSB", "ACB", "GMD"],
+  "confidence": "medium"
+}
+```

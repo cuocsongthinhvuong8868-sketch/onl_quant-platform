@@ -1,0 +1,41 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Chỉ báo lực cầu (8.71%) đang thấp hơn đáng kể so với trung bình dài hạn (12.26%), tương tự lực cung (8.00% vs 11.80%) – cả hai chiều đều bị nén, phản ánh thanh khoản hẹp.
+- Autocorrelation lực cầu Phi = +0.274 > 0.10 → chế độ Momentum (đà mua tiếp diễn); lực cung Phi = +0.124 cũng > 0.10 nhưng yếu hơn, xác nhận đà bán vẫn còn.
+- So sánh absolute Phi cho thấy lực cầu giữ quán tính mạnh hơn hẳn, dù trong bối cảnh breadth co hẹp.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại: **zombification** – cả % mã tăng mạnh và % mã giảm mạnh đồng loạt nằm dưới kỳ vọng dài hạn. Đây là tín hiệu thanh khoản cạn, thị trường “chết lâm sàng” nhưng không phải vô hướng.  
+Bên giữ momentum thực sự là **lực cầu** (|Phi| 0.274 > 0.124). Dù lực cung vẫn có đà, tương quan cho thấy dòng tiền mua vào có xu hướng tự củng cố rõ rệt hơn đà bán ra.
+
+## 3. Stress-Test Read
+Kịch bản cực đoan theo mô phỏng Monte Carlo T+19:  
+- P95 Downside = 19.32%: nếu thị trường gãy, gần 1/5 số mã có thể lao dốc mạnh.  
+- P95 Upside = 21.95%: kịch bản bùng nổ mua có biên độ rộng hơn một chút.  
+Bất đối xứng tail: tail phía mua dày hơn (21.95% so với 19.32%), thể hiện tiềm năng bứt phá nếu đà mua thắng thế, dù rủi ro sụt giảm vẫn đáng kể.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 35%**  
+- **Chiến lược: mua đuổi (chase momentum)** – tận dụng đà mua mạnh hơn, nhưng chỉ phân bổ một phần trong bối cảnh thanh khoản cạn và rủi ro đuôi dày.  
+- Với cả hai Phi > 0.10, tín hiệu momentum hợp lệ; loại trừ “NO ACTIONABLE”. Đặt dừng lỗ chặt nếu lực cầu giảm xuống dưới 8% hoặc Phi đảo chiều.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 19.32,
+  "p95_upside_pct": 21.95,
+  "deployment_pct": 35,
+  "strategy": "chase_momentum",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

@@ -1,0 +1,60 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái news sentiment hiện tại**
+
+Cả ba khung thời gian đều xác nhận chế độ **strong_risk_on** với độ tin cậy rất cao (P_conf > 85%), cho phép **khẳng định chắc chắn**:
+
+- **1d**: mean +0.416 (P_conf 97%, CI 90%: +0.064↔+0.769) → risk-on mạnh.
+- **7d**: mean +0.514 (P_conf 100%, CI 90%: +0.387↔+0.641) → risk-on cực kỳ bền vững.
+- **30d**: mean +0.516 (P_conf 100%, CI 90%: +0.464↔+0.569) → risk-on ổn định dài hạn.
+
+**2. Kênh dẫn dắt chính**
+
+**Kênh kéo risk-on mạnh nhất (và P_conf của kênh):**
+
+| Khung | Kênh tích cực nhất | Score | P_conf |
+|-------|-------------------|-------|--------|
+| 1d    | commodity         |+1.956 | 100% (CI hẹp +1.03↔+2.00) |
+| 1d    | earnings          |+1.391 | 100% |
+| 1d    | credit_stress     |+1.218 | 99%  |
+| 7d    | fx_external       |+2.000 | 100% |
+| 7d    | earnings          |+1.220 | 100% |
+| 7d    | monetary_policy   |+0.747 | 100% |
+| 30d   | monetary_policy   |+1.521 | 100% |
+| 30d   | earnings          |+1.101 | 100% |
+| 30d   | credit_stress     |+0.986 | 100% |
+
+**Kênh cản trở risk-on (kéo xuống):**
+
+- 1d: Gần như không có kênh âm rõ rệt; inflation, monetary_policy, real_estate_collateral đều ở mức 0.0 (P_conf 50%) – tín hiệu giằng co, không đe dọa đà risk-on.
+- 7d: liquidity (-0.449, P_conf 100%) và risk_appetite (-0.096, P_conf 93%) là hai lực cản đáng tin cậy, nhưng biên độ nhỏ hơn nhiều so với các kênh tích cực.
+- 30d: commodity (-0.752, P_conf 100%) nổi lên là kênh âm dai dẳng, phản ánh áp lực từ giá nguyên liệu cơ bản Trung Quốc. inflation cũng âm nhẹ (-0.288, P_conf 79%) nhưng còn phân tán.
+
+**3. Các drivers quan trọng (không ngoại suy ngoài dữ liệu)**
+
+*Tích cực:*
+- Giá nhựa LLDPE Trung Quốc vượt đỉnh tháng → kích hoạt mạnh kênh commodity.
+- Tỷ giá trung tâm VND liên tục tăng (các mốc 25.183 – 25.243) → fx_external tích cực xuyên suốt.
+- Lợi suất TPCP đi ngang ổn định → tín hiệu credit_stress thấp, môi trường tín dụng tích cực.
+- Vị thế trung tâm của Việt Nam trong dòng chảy thương mại AI, cùng phát biểu của Tổng Bí thư về quốc gia biển mạnh → hỗ trợ kênh growth.
+- Lãi suất huy động NHTM nhích nhẹ và ECB tăng lãi → phản ánh môi trường chính sách tiền tệ không gây sốc, được phân loại là tích cực trong mô hình.
+
+*Tiêu cực:*
+- NHNN hút ròng ~11.7 nghìn tỷ qua OMO (13/07) → gây áp lực lên liquidity (7d, score âm).
+- Giá thép HRC, phân Ure Trung Quốc liên tục xuống đáy tháng/10 năm → commodity âm sâu dài hạn.
+- Cảnh báo lãi suất tăng từ nguồn social (Chu Hoàng Sơn) và vấn đề pháp lý ngân hàng (An Giang) tạo nhiễu nhỏ cho banking_system, nhưng mức điểm thấp.
+
+**4. Hàm ý cho AI CIO**
+
+News sentiment **hỗ trợ mạnh** cho lớp macro risk-on. Cụ thể:
+- Xác nhận nhất quán trên mọi khung thời gian, giọng khẳng định chắc chắn môi trường tin tức thuận lợi cho tài sản rủi ro.
+- Kênh earnings, credit_stress, fx_external đều có P_conf >99% và score cao → nền tảng vĩ mô vững.
+- Tín hiệu trái chiều đến từ commodity (hàng hóa Trung Quốc giảm) và liquidity bị hút bớt là điểm cần theo dõi, nhưng chưa đủ sức đảo chiều sentiment tổng thể.
+
+Với market‑internal tools: Nếu các lớp mô hình khác cũng xác nhận risk-on, sentiment này có thể dùng để tăng tỷ trọng cổ phiếu, giảm phòng thủ. Ngược lại, nếu có xung đột, cần ưu tiên khung 30d (ít nhiễu social hơn) làm tham chiếu.
+
+**5. Caveat quan trọng**
+
+- **Nhiễu từ social**: Khung 1d có 78/265 nguồn là `mozyfin_social` (29%), khung 7d có 542/1376 (39%). Đây là các bài đăng mạng xã hội, độ tin cậy thấp hơn so với tin từ dữ liệu cứng (widata) hoặc báo chí chính thống (mozyfin). **Cần chiết khấu tín hiệu từ hai khung này**, đặc biệt là các cảnh báo lãi suất từ tài khoản cá nhân.
+- Khung 30d được dẫn dắt chủ yếu bởi mozyfin và widata (social chỉ 13%), đáng tin cậy nhất để đánh giá xu hướng dài hạn.
+- Feed được tạo lúc 16:20 16/07/2026, không bị cũ.
+- Headline noise: Các tiêu đề đơn lẻ (ví dụ giá Ure giảm mạnh) có thể bị mô hình gán trọng số cao về mặt cảm xúc nhưng không phản ánh toàn bộ bức tranh vĩ mô.
