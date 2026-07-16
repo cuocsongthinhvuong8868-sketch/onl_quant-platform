@@ -1,0 +1,47 @@
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần 2026-07-08 đạt **$5,958.2bn**, tăng **+$114.9bn** theo tuần. Vì công thức là **WALCL - TGA - RRP**, lực đẩy tuần này nhiều khả năng đến từ phần “liability-side liquidity”: **TGA giảm/xả tiền** hoặc biến động kỹ thuật quanh Treasury cash balance, hơn là một pha QE thực sự từ Fed. WALCL ở **$6,735.6bn** vẫn phản ánh bảng cân đối đã thu hẹp so với chu kỳ QE trước; nếu WALCL không tăng mạnh, đây không phải bơm tiền kiểu QE truyền thống. RRP chỉ còn **$3.3bn**, về cơ bản đã cạn, nên không còn là nguồn bơm thanh khoản lớn như giai đoạn 2023-2024.
+
+## 2. Cycle Positioning
+
+Về chu kỳ, đây là **QT late / liquidity-positive impulse**, không phải QE full-cycle. Fed balance sheet vẫn ở trạng thái hậu-QT, nhưng tác động rút thanh khoản biên đã yếu đi vì RRP gần zero. TGA ở **$774.1bn** là mức cao, hàm ý Treasury vẫn đang giữ cash balance lớn; nếu TGA giảm trong các tuần tới, thanh khoản tiếp tục được bơm lại vào hệ thống banking/reserve.
+
+So với **đỉnh Net Liquidity năm 2022**, mức hiện tại vẫn thấp hơn, vì khi đó WALCL còn rất lớn sau QE. Nhưng so với **đáy 2024**, Net Liquidity hiện đã phục hồi rõ, chủ yếu nhờ RRP bị rút cạn và dòng tiền quay lại hệ thống thị trường.
+
+## 3. Signal Strength
+
+Tín hiệu hiện tại là **ADD**. Điều kiện cơ học khớp: **Impulse EMA(4) = +$46.2bn > 0** và **Z-score = +1.87**, cao hơn ngưỡng +1σ. Đây là tín hiệu mạnh, nhưng chưa phải “extreme”: **+1.87σ** nằm trên vùng cận biên 1.0-1.5σ, nhưng vẫn dưới ngưỡng cực đoan >2σ.
+
+Điểm quan trọng là impulse không chỉ dương một tuần; EMA(4) cũng dương, cho thấy dòng thanh khoản đang có tính bền hơn một cú nhiễu đơn lẻ.
+
+## 4. Cross-Asset Spillover
+
+**SPX/NDX:** bias 1-4 tuần là **risk-on**, đặc biệt có lợi cho duration equity, growth và tech beta nếu real yields/DXY không tăng ngược chiều.
+
+**DXY/Gold/Crypto:** thanh khoản Fed tăng thường gây áp lực giảm lên DXY ở biên, hỗ trợ crypto và vàng. Crypto nhạy nhất với liquidity impulse, nhưng cũng dễ đảo chiều nếu USD funding stress quay lại.
+
+**VN-Index:** bias **positive**, nhưng lag dài hơn, thường **4-8 tuần**. Kênh truyền dẫn là DXY → EM FX → foreign equity flows. Tín hiệu không đủ để dự báo điểm số, nhưng làm xác suất môi trường thuận lợi cho EM/Vietnam cao hơn.
+
+## 5. Risk Factors
+
+Rủi ro lớn nhất là **RRP đã gần zero**, nên nguồn “bơm” từ RRP unwind gần như hết; các ADD signal sau này phụ thuộc nhiều hơn vào TGA hoặc WALCL.
+
+TGA ở mức cao có thể bị nhiễu bởi tax season và lịch phát hành nợ, đặc biệt quanh **June/September/December**. Nếu TGA spike trở lại, Net Liquidity có thể bị hút nhanh.
+
+Ngoài ra, các facility đặc biệt hoặc buyback kỹ thuật của Fed/Treasury có thể làm tín hiệu tuần bị méo, không phản ánh easing chính sách thực sự.
+
+## 6. KẾT LUẬN
+
+Regime hiện tại là **late-QT nhưng liquidity impulse risk-on**. Outlook 2-4 tuần nghiêng tích cực cho risk assets, với VN-Index hưởng lợi trễ hơn nếu DXY và EM FX không đảo chiều xấu.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5958.2,
+  "signal": "ADD",
+  "z_score": 1.87,
+  "regime": "QE_late",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

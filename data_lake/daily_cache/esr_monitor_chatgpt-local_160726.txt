@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: **63.0%** → vùng **WARNING**.
+- Market State: **CALM_CORRECTION**; VN30 nằm dưới **MA125**.
+- Top driver #1: **S_LIQ 35%**.
+- Top driver #2: **S_VAL 31%**; #3: **S_COR 18%**.
+
+## 2. Risk Decomposition
+Driver chính là **S_LIQ**, phản ánh **volume khô cạn vs 1Y norm**. Đây không phải stress kiểu bán tháo mạnh ngay lập tức, mà là trạng thái thanh khoản suy yếu: lực đỡ thị trường mỏng, nhịp hồi dễ thiếu độ tin cậy nếu không có cải thiện về breadth/volume.
+
+**S_VAL** đứng thứ hai cho thấy định giá còn căng so với nền lãi suất tiền gửi; nghĩa là cushion định giá không rộng khi xu hướng đã dưới MA125. **S_COR** ở vị trí thứ ba cho thấy yếu tố đồng pha hệ thống bắt đầu có vai trò: nếu S_COR tăng cùng S_LIQ, cấu trúc sẽ nghiêng sang “herding + volume dry-up”, một dạng chữ ký bull-trap trong các nhịp hồi kỹ thuật.
+
+## 3. Cross-Check
+Không có tín hiệu divergence kiểu “giá lập đỉnh mới trong khi SSI vào WARNING/CRITICAL”. Ngược lại, price action dưới MA125 đang khớp với thông điệp rủi ro tăng của SSI.
+
+Tuy nhiên, có lệch nhẹ giữa nhãn **CALM_CORRECTION** và SSI **WARNING**: HMM vẫn đọc là điều chỉnh có trật tự, trong khi SSI báo rủi ro ngầm đã tích lũy. Flag: không dùng price action để làm dịu tín hiệu stress.
+
+## 4. Verdict
+Cash target đề xuất: **50% danh mục**.
+
+Hedge action: **giảm beta**. Chưa ưu tiên short VN30F1M mạnh khi HMM chưa chuyển sang ACTIVE_STRESS, nhưng cần hạ exposure ở nhóm beta cao và tránh bắt đáy theo nhịp hồi thiếu thanh khoản.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 50,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score 56.7/100, nằm trong vùng 40-60: NEUTRAL / STOCK-PICKING; Δ +0.3.
+- EGARCH Vol chuẩn hóa 55.6%, trên mốc 50%; Δ -7.5%.
+- Rolling Skewness 0.02, gần ngưỡng trung tính 0.
+- Downside Correlation 2.4% thấp; Upside Correlation 22.8% cao hơn downside nhưng dưới vùng crowded cực đoan.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, VN-Index đang ở pha NEUTRAL với xác suất cao hơn là phân hóa cổ phiếu, chưa chuyển sang GREED vì score vẫn dưới 60 và skewness gần 0. Rủi ro hệ thống không cao, nhưng tín hiệu tấn công beta rộng chưa đủ rõ.
+
+## 3. Cross-Check
+Score 56.7 gần biên trên NEUTRAL trong khi EGARCH-vol giảm -7.5%: directionally consistent với rủi ro hạ nhiệt, nhưng level vol 55.6% vẫn chưa xác nhận low-vol regime.  
+Skewness 0.02 trung tính trong khi upside correlation 22.8% lớn hơn downside correlation 2.4%: lệch nhẹ, vì co-movement phía tăng chưa đi kèm skew dương rõ.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.55-0.60** cho danh mục VN-Index.
+
+Hành động: duy trì beta hơi trên trung tính, ưu tiên stock-picking và kiểm soát tập trung theo nhóm ngành. Chưa tăng beta aggressive; hedge nhẹ chỉ kích hoạt nếu EGARCH-vol quay lên hoặc downside correlation tăng rõ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "15/07/2026",
+  "regime": "NEUTRAL",
+  "score": 56.7,
+  "confidence": "medium",
+  "beta_target": 0.58,
+  "key_signals": [
+    "Risk Score 56.7 nằm trong vùng NEUTRAL 40-60",
+    "EGARCH-vol giảm nhưng vẫn trên 50%; skewness trung tính và upside correlation cao hơn downside"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 56.7
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

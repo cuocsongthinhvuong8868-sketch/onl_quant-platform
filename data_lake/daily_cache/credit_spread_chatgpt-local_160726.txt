@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: primary_issuance_equal_weight_v1 -->
+## 1. Credit snapshot
+
+Tại ngày 03/07/2026, yield sơ cấp nhóm Ngân hàng ở mức 8.39%, trong khi yield sơ cấp nhóm Bất động sản ở mức 11.80%. Risk premium BĐS - Bank là 340.8 bps, tương đương khoảng 3.41 điểm %, còn signed spread Bank - BĐS là -3.41 điểm %. Diễn giải trực tiếp là chi phí huy động sơ cấp của BĐS vẫn cao hơn đáng kể so với Ngân hàng trong mẫu matched hiện có.
+
+## 2. Direction và persistence
+
+Kỳ gần nhất ghi nhận risk premium giảm 32.5 bps, nên direction là NARROWING. Quan trọng hơn, thay đổi trong 3 khoảng matched cũng là -27.2 bps, xác nhận tín hiệu narrowing không chỉ đến từ một quan sát đơn lẻ. Tuy vậy, mức premium hiện tại vẫn nằm tại percentile 65.0 trong lịch sử matched gồm 20 kỳ và z-score là +0.63, tức spread vẫn cao hơn trung vị lịch sử matched hiện có, nhưng chưa ở trạng thái cực đoan.
+
+Vì vậy, tín hiệu hợp lý là áp lực tương đối đang hạ nhiệt, nhưng chưa đủ để gọi là bình thường hóa hoàn toàn. Regime credit tương đối vẫn nghiêng về “elevated”, dù đang có dấu hiệu đảo chiều theo hướng bớt căng.
+
+## 3. Cơ chế truyền dẫn tới tài sản rủi ro
+
+Về cơ chế điều kiện, khi premium BĐS so với Bank widening, điều đó thường là headwind cho điều kiện tài trợ của nhóm rủi ro cao hơn và có thể làm risk appetite thận trọng hơn. Ngược lại, narrowing như kỳ hiện tại cho thấy áp lực chi phí huy động tương đối của BĐS đang giảm so với Ngân hàng, nên tín hiệu này bớt tiêu cực đối với tài sản rủi ro.
+
+Tuy nhiên, đây chỉ nên được dùng như một overlay credit, không phải quan hệ nhân quả trực tiếp và không phải tín hiệu dự báo điểm số VN-Index. Dữ liệu là coupon/yield phát hành sơ cấp, không phải option-adjusted spread thứ cấp, và không trực tiếp đo xác suất vỡ nợ.
+
+## 4. Data quality và falsification
+
+Data quality được đánh giá HIGH. Kỳ gần nhất có 25 đợt Ngân hàng và 15 đợt BĐS, tốt hơn nhiều so với một số kỳ trước như 15/05/2026 chỉ có 3/3 đợt. Coverage coupon cũng khá ổn ở BĐS với 90.5%, nhưng Ngân hàng chỉ 56.0%, nên vẫn cần thận trọng khi so sánh tuyệt đối. Ngoài ra, phương pháp đang bình quân đều từng đợt phát hành có coupon số và gộp tất cả bucket kỳ hạn, vì vậy duration mix, issuer mix và cấu trúc kỳ hạn có thể ảnh hưởng đáng kể. Coupon thả nổi bị loại cũng là một rủi ro diễn giải.
+
+Nhận định hiện tại có thể bị đảo ngược nếu: risk premium quay lại widening trong các kỳ tiếp theo và vượt vùng 390 bps gần đây; narrowing biến mất sau khi điều chỉnh duration hoặc issuer mix; hoặc coverage coupon của Bank tăng mạnh và làm thay đổi yield bình quân đo được. Các dữ liệu ngoài input cần kiểm chứng gồm cơ cấu kỳ hạn, danh sách issuer, tỷ trọng trái phiếu có bảo đảm, coupon cố định/thả nổi và quy mô phát hành theo từng đợt.
+
+## 5. Kết luận
+
+Credit regime tương đối hiện là ELEVATED nhưng đang narrowing. Mức premium 340.8 bps vẫn cao trong lịch sử matched 20 kỳ, với percentile 65.0 và z-score +0.63, nên chưa thể gọi là normal. Tuy nhiên, direction kỳ gần nhất và trend 3 kỳ đều narrowing, cho thấy tín hiệu risk-off từ kênh chi phí huy động BĐS đang giảm cường độ. Overlay cho tài sản rủi ro vì vậy nên được đọc là neutral: bớt tiêu cực hơn, nhưng chưa đủ mạnh để chuyển thành risk-on rõ ràng.
+
+```json
+{
+  "tool": "credit_spread",
+  "risk_premium_bps": 340.8,
+  "direction": "NARROWING",
+  "trend_3p": "NARROWING_3P",
+  "credit_regime": "ELEVATED",
+  "risk_asset_overlay": "neutral",
+  "confidence": "high"
+}
+```
+
+final score & regime : 65 ; regime : ELEVATED
+
+=== AI CIO STRUCTURED METRICS: credit_spread_canonical ===
+Credit Spread Data Date: 03/07/2026
+Credit Spread Risk Premium: 340.8 bps
+Credit Spread Risk Premium Change: -32.5 bps
+Credit Spread Risk Premium 3P Change: -27.2 bps
+Credit Spread Risk Premium Percentile: 65.0
+Credit Spread Matched Periods: 20
+Credit Spread Bank Issuance Count: 25
+Credit Spread Real Estate Issuance Count: 15
+Credit Spread Direction: NARROWING
+Credit Spread Data Quality: HIGH

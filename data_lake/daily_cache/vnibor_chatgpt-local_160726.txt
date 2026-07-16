@@ -1,0 +1,45 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+
+ON ngày 2026-07-13 ở **4.20%**, gần như đi ngang so với phiên trước với **ON Impulse +0.01 điểm %**. Đây là mức nằm trong vùng trung tính theo ngưỡng tuyệt đối, chưa phản ánh cú sốc thanh khoản mới trong ngày.
+
+Cấu trúc kỳ hạn **không đảo ngược**: 1W-ON **+0.60%**, 2W-ON **+1.35%**. Điều này cho thấy áp lực squeeze cực ngắn hạn tại overnight đã không còn hiện diện trong snapshot hiện tại; kỳ hạn dài hơn vẫn cao hơn ON, phản ánh đường cong liên ngân hàng đang ở trạng thái thuận.
+
+## 2. Trend 20 phiên
+
+Trend 20 phiên nên được phân loại là **liquidity squeeze / stress building**, dù phiên hiện tại đã hạ nhiệt. ON tăng **+0.50 điểm %** trong 20 phiên, trong khi **ON MA5 tăng +0.74 điểm %** với slope **+0.099 điểm %/phiên**, cho thấy nền lãi suất ngắn hạn đã bị kéo lên so với đầu kỳ.
+
+Điểm đáng chú ý là 20 phiên có **5 phiên STRESS/WARNING**, gồm 4 STRESS và 1 WARNING; regime cũng chuyển qua nhiều trạng thái căng hơn với **5 ELEVATED và 4 TIGHT**. Tuy chỉ có **1 phiên curve đảo ngược**, cú spike ON lên **12.49%** và giai đoạn ON MA5 duy trì cao quanh đầu tháng 7 cho thấy di sản căng thẳng chưa thể bỏ qua. Vì vậy, snapshot hiện tại bình ổn hơn, nhưng trend 20 phiên vẫn mang dấu vết tightening/squeeze.
+
+## 3. Regime & Z-Score
+
+Z-score ON MA5 hiện tại là **-0.63**, percentile **31.7%** trong rolling 252 ngày. Điều này cho thấy lãi suất ON sau làm mượt đang thấp hơn trung vị lịch sử 1 năm, chưa nằm trong vùng căng theo phân vị.
+
+Regime hiện tại là **NORMAL**, signal **NEUTRAL**. Theo dữ liệu VNIBOR, điều kiện vốn ngắn hạn hiện không còn ở trạng thái TIGHT/ELEVATED như một số phiên trước. Tuy nhiên, input hiện tại không đủ dữ liệu để kết luận nguyên nhân của sự hạ nhiệt hay các cú spike trước đó.
+
+## 4. Spillover tới VN-Index
+
+Tác động tới VN-Index trong 2-4 tuần tới nghiêng về **trung tính đến hơi tiêu cực**, vì snapshot hiện tại đã ổn định nhưng trend 20 phiên vẫn để lại rủi ro thanh khoản. Một phiên ON 4.20% và curve thuận không phải tín hiệu xấu tức thời cho tài sản rủi ro. Tuy nhiên, nền ON MA5 đã tăng trong 20 phiên và số phiên STRESS/WARNING không nhỏ, nên thị trường cổ phiếu vẫn có thể chịu độ trễ từ giai đoạn chi phí vốn ngắn hạn tăng trước đó.
+
+Về cơ chế, khi VNIBOR tăng và duy trì cao, chi phí cơ hội của dòng tiền ngắn hạn tăng, hoạt động margin kém thuận lợi hơn và tâm lý dòng tiền nội thường thận trọng hơn. Với dữ liệu hiện tại, rủi ro không nằm ở cú sốc mới trong ngày, mà nằm ở khả năng thị trường vẫn đang hấp thụ tác động trễ của giai đoạn squeeze trước đó.
+
+## 5. Rủi ro & Điều kiện theo dõi
+
+Các ngưỡng cần theo dõi tiếp là: ON có quay lại vùng **trên 5.0-6.0%** không; ON MA5 tiếp tục giảm hay đảo chiều tăng lại; spread 1W-ON có chuyển âm hay không; số phiên STRESS/WARNING có giảm dần không. Dữ liệu về SBV, tỷ giá, OMO, tín phiếu hoặc mùa vụ là ngoài phạm vi input và cần kiểm chứng riêng.
+
+## 6. Kết luận & Khuyến nghị
+
+Thanh khoản hiện tại đã hạ nhiệt về **NORMAL/NEUTRAL**, nhưng di sản squeeze 20 phiên khiến outlook ngắn hạn vẫn cần thận trọng. Với tài sản rủi ro, ưu tiên quan sát xác nhận ON MA5 tiếp tục giảm trước khi nâng mức chấp nhận rủi ro.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 4.20,
+  "trend_20d": "liquidity_squeeze",
+  "regime": "NORMAL",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```

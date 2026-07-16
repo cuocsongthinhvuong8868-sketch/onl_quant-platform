@@ -1,0 +1,28 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Regime News Sentiment**
+- **1d:** `risk_on`, nhưng chỉ **nghiêng về risk-on**. Macro mean `+0.1595`, `P_conf 81%`, CI còn cắt 0 `-0.142/+0.461`.
+- **7d:** `strong_risk_on`, **khẳng định chắc chắn**. Mean `+0.4975`, `P_conf 100%`, CI dương rõ `+0.368/+0.626`.
+- **30d:** `strong_risk_on`, **khẳng định chắc chắn**. Mean `+0.5266`, `P_conf 100%`, CI dương rõ `+0.474/+0.579`.
+
+**Kênh kéo chính**
+- Risk-on: `earnings` rất mạnh ở cả 1d/7d/30d; `monetary_policy`, `credit_stress`, `banking_system`, `fx_external` xác nhận tốt ở 7d/30d.
+- Risk-off: `commodity` là lực kéo âm rõ nhất, P_conf cao; `liquidity` âm ở 7d/30d; `risk_appetite` âm nhẹ nhưng không đủ lớn để đảo regime.
+
+**Drivers đáng chú ý**
+Positive:
+- Lợi suất TPCP đi ngang phiên 15/07 hỗ trợ `credit_stress`.
+- Tỷ giá trung tâm tăng trong nhiều phiên kéo `fx_external` dương.
+- Tin tăng trưởng: thủy sản Việt Nam sang Trung Quốc, Hà Nội có đủ đòn bẩy tăng trưởng.
+- Lãi suất huy động nhóm NHTM khác tăng nhẹ kéo `monetary_policy` dương theo mô hình.
+
+Negative:
+- Ure Trung Quốc giảm xuống đáy tháng.
+- HRC Trung Quốc thủng đáy tháng.
+- NHNN hút ròng OMO các phiên 13/07 và 15/07, gây áp lực `liquidity`.
+- Một số headline trái phiếu doanh nghiệp/công bố thông tin kéo `credit_stress` âm ngắn hạn.
+
+**Tác động cho AI CIO**
+News layer hiện **supports macro risk-on bias**, đặc biệt ở 7d và 30d. Với 1d chỉ nên coi là **leaning support**, không phải xác nhận mạnh. Nếu macro layer và market-internal tools cũng đang risk-on thì feed này ủng hộ duy trì tilt tích cực; nếu market internals yếu, coi news là hỗ trợ nền nhưng chưa đủ để override tín hiệu thị trường.
+
+**Caveat**
+Feed tạo lúc `2026-07-15 16:14 +07`, đến ngày `2026-07-16` đã có rủi ro stale cho quyết định intraday. `mozyfin_social` khá lớn, đặc biệt 7d `551/1307`, nên đây là bằng chứng social/opinion lower-confidence và cần discount signal strength. Headline noise cao; không diễn giải `P_conf` hay `P(sentiment mean > 0)` thành xác suất VNINDEX tăng.

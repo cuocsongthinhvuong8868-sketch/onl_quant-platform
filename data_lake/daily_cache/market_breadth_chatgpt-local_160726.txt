@@ -1,0 +1,38 @@
+## 1. Observations
+- **MA20: 12.5%** - thấp, vùng oversold ngắn hạn.
+- **MA60: 17.2%** - thấp, chưa xác nhận kết thúc điều chỉnh trung hạn.
+- **MA125: 18.1%** - thấp, sức mạnh chu kỳ nửa năm suy yếu.
+- **MA252: 21.4%** - thấp, secular trend nghiêng Bear regime.
+
+## 2. Structural Health
+Bốn horizon đồng thuận yếu: MA20, MA60, MA125 và MA252 đều dưới 30%, không có lớp trend nào đủ rộng để nâng đỡ rổ. Đây không phải divergence vì ngắn hạn và dài hạn cùng xấu.
+
+Pattern phù hợp: **Bear Confirmed** - MA20 < 30% và MA252 < 40%, cho thấy áp lực không chỉ là nhiễu T+ mà đã lan sang cấu trúc dài hạn.
+
+## 3. Money Flow Leadership
+Top MA20 có pha trộn: **Banks** có ACB, **Brokers** có BVS, **Energy/Utilities** có BSR, ASP, BWE, **Manufacturing/Materials** có BMP, và vài mã mid/small-cap khác. Không thấy ưu thế rõ của nhóm aggressive như Steel hay Brokers trên diện rộng.
+
+Top MA252 overlap khá cao với MA20: **ASP, BCA, BMP, BSR, BVS** cùng xuất hiện ở cả hai danh sách. Điều này cho thấy dòng tiền chỉ bám vào số ít leader còn giữ được cấu trúc, chưa phải sự lan tỏa toàn thị trường.
+
+Smart money đang nghiêng **mixed**, có phần defensive/cash-flow như Banks, Utilities, Energy hơn là risk-on thuần túy.
+
+## 4. Verdict
+Chiến lược phù hợp: **Defensive cash-up**. Mean-reversion T+ chỉ nên áp dụng rất chọn lọc trên các mã overlap có thanh khoản và còn giữ MA dài hạn.
+
+Đòn bẩy đề xuất: **0% margin**. Không có điều kiện để nâng margin vì MA252 chỉ 21.4%.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 12.5,
+  "ma60_pct": 17.2,
+  "ma125_pct": 18.1,
+  "ma252_pct": 21.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

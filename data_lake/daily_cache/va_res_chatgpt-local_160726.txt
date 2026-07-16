@@ -1,0 +1,34 @@
+## 1. Observations
+- VN30 Stress Index: **10.00%**, thấp hơn ngưỡng cảnh báo **40%**.
+- Số mã thủng VaR 95%: **3/30**; breach sâu nhất: **FPT, BCM, MBB**.
+- Complacency Index: **9.26%**, thấp hơn xa ngưỡng nguy hiểm **80%**; số mã mispriced: **10**.
+
+## 2. Contagion Assessment (Module B)
+Stress 10.00% cho thấy rủi ro lây lan real-time trong VN30 hiện **chưa kích hoạt diện rộng**. Với 3/30 mã thủng VaR 95%, breadth của cú gãy còn hẹp, chưa đủ xác suất để gọi là systemic contagion.
+
+FPT, BCM, MBB hiện nên được xem là **sự cố cụm/cá biệt có theo dõi**, chưa phải đầu sóng systemic. Tuy nhiên, nếu số mã breach tăng nhanh từ 3 lên vùng 8-10 mã hoặc Stress Index vượt 40%, đánh giá phải chuyển sang contagion active.
+
+## 3. Complacency Assessment (Module C)
+Complacency 9.26% là mức thấp. Kết luận đúng: thị trường **không ở regime ngủ quên**. Điều này **không đồng nghĩa thị trường ổn định** hay rủi ro thấp tuyệt đối.
+
+Vì Stress Index cũng thấp, regime xác suất cao hơn hiện tại là **spread_normal**: không có bằng chứng đồng thời của lây lan diện rộng và không có tín hiệu spread bị nén nguy hiểm. Nhưng vẫn tồn tại rủi ro cục bộ ở nhóm breach và nhóm mispriced.
+
+## 4. Stock-Level Risk Calls
+- **FPT**: giảm tỷ trọng phần trading; không bình quân giá xuống. Stop-loss theo mức giảm thêm **3-5% từ giá hiện tại** hoặc thủng MA50 D1.
+- **BCM**: ưu tiên bán/giảm tỷ trọng nếu không hồi lại trên MA20 D1; hạn chế mở mới.
+- **MBB**: giảm rủi ro vị thế ngắn hạn; chỉ giữ phần lõi nếu spread hồi phục và không breach tiếp VaR.
+- **MSB, HCM, POW**: không phải crash signal, nhưng spread đang bị nén chặt nhất trong nhóm mispriced; cần cảnh báo cú repricing nếu vol quay lại.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 10.0,
+  "breach_count": 3,
+  "complacency_pct": 9.26,
+  "mispriced_count": 10,
+  "regime": "spread_normal",
+  "watchlist_short": ["FPT", "BCM", "MBB", "MSB", "HCM", "POW"],
+  "confidence": "medium"
+}
+```

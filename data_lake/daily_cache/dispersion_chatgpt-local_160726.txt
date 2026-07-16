@@ -1,0 +1,34 @@
+## 1. Observations
+- Spread annualized: **8.50%**; Spread_Z: **-0.97σ**
+- DPI: **45.0%**
+- Avg Pairwise Correlation Ledoit-Wolf: **0.014**
+- Cross-Sectional Skewness: **N/A**; Kurtosis: **N/A**
+
+## 2. Structural State
+Spread_Z đang dưới ngưỡng **+1σ**, nên cấu trúc dispersion chưa bị kéo căng so với cửa sổ 60 ngày. DPI ở **45.0%**, thấp hơn đáng kể ngưỡng **70%**, cho thấy trạng thái phân tán chưa có tính kéo dài theo regime.
+
+Do đó, thị trường hiện không ở trạng thái stressed theo khung dispersion. Cũng không đủ điều kiện để gọi là stress cục bộ, vì Spread_Z không cao; càng không phải regime persistent, vì cả Spread_Z và DPI đều không đồng thời cao.
+
+## 3. Cross-Check & Tail Direction
+Không có dữ liệu Cross-Sectional Skewness nên chưa xác định được tail đang nghiêng về phía “cú sập cá biệt” hay “cú đẩy điên rồ”. Spread dương cho thấy outliers có đóng góp vào dispersion, nhưng Spread_Z âm cho thấy mức này không bất thường so với lịch sử gần.
+
+Kurtosis cũng N/A, nên không thể xác nhận fat-tail outliers. Vì vậy không nên loại bỏ giả định normal chỉ dựa trên snapshot này.
+
+## 4. Regime Mapping
+DPI thấp / trung bình và Corr gần **0** đưa trạng thái hiện tại vào ô **Healthy Stock-Picking**. Đây là môi trường phân hóa rõ, không phải bầy đàn đồng hướng.
+
+Risk lớn nhất cho Portfolio Manager là **concentration risk** và idiosyncratic selection risk: tương quan thấp làm beta hedge kém hữu ích trước sai lệch từng cổ phiếu hoặc cụm vị thế hẹp. Herding crash và liquidity dry-up chưa phải rủi ro cấu trúc nổi bật trong snapshot này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "15/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.97,
+  "dpi_pct": 45.0,
+  "avg_corr": 0.014,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

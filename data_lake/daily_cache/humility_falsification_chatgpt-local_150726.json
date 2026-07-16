@@ -1,0 +1,271 @@
+{
+  "provider_key": "chatgpt-local",
+  "generated_at": "2026-07-16T14:25:43",
+  "t_data_date": "2026-07-15",
+  "target_report_date": "2026-07-14",
+  "report_match": "fallback:2026-07-12",
+  "report_path": "C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\executive_summary_chatgpt-local_120726.txt",
+  "report_name": "executive_summary_chatgpt-local_120726.txt",
+  "report_mtime": "report:2026-07-12T12:11:08|sidecar:2026-07-12T12:11:08",
+  "report_signature": "report:executive_summary_chatgpt-local_120726.txt:3ebf925ad25eca05e646e51380c4b7b120cabe67|sidecar:ai_cio_humility_rules_chatgpt-local_120726.json:acf338f750215bc143b5f94ddd47fcf29bd6d1a4",
+  "parsed": {
+    "report_date": "2026-07-12",
+    "composite_score": 28.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Funding stress khong con dai dien cho squeeze 20 phien"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 20.5,
+        "unit": "%",
+        "description": "Do rong thi truong phuc hoi du manh de phu dinh PRE-CRASH internals"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.0,
+        "unit": "%",
+        "description": "Systemic stress ha xuong duoi vung warning"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.382,
+        "unit": "",
+        "description": "Toan bo threshold grid ha nhiet, fat-tail risk khong con dang ke"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": null,
+        "unit": "th pct",
+        "description": "Idiosyncratic index-coupling risk khong con la nguon stress"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 3.0,
+        "unit": "th pct",
+        "description": "External financial conditions khong vao stress zone"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-12",
+      "composite_score": 28,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Funding stress khong con dai dien cho squeeze 20 phien"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 20.5,
+          "unit": "%",
+          "description": "Do rong thi truong phuc hoi du manh de phu dinh PRE-CRASH internals"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63,
+          "unit": "%",
+          "description": "Systemic stress ha xuong duoi vung warning"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.382,
+          "unit": "",
+          "description": "Toan bo threshold grid ha nhiet, fat-tail risk khong con dang ke"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": null,
+          "unit": "th pct",
+          "description": "Idiosyncratic index-coupling risk khong con la nguon stress"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 3,
+          "unit": "th pct",
+          "description": "External financial conditions khong vao stress zone"
+        }
+      ],
+      "provider_key": "chatgpt-local",
+      "saved_at": "2026-07-12",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 5.0,
+      "T actual display": "5 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-07-13",
+      "Description": "Funding stress khong con dai dien cho squeeze 20 phien",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "20.5%",
+      "T actual": 12.470588235294118,
+      "T actual display": "12.5%",
+      "Delta": -8.029411764705882,
+      "Delta display": "-8.029%",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Do rong thi truong phuc hoi du manh de phu dinh PRE-CRASH internals",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.0%",
+      "T actual": 63.00480195441237,
+      "T actual display": "63.0%",
+      "Delta": 0.004801954412371856,
+      "Delta display": "+0.005%",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Systemic stress ha xuong duoi vung warning",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.382",
+      "T actual": 0.3674303770316354,
+      "T actual display": "0.367",
+      "Delta": -0.014569622968364615,
+      "Delta display": "-0.015",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "Toan bo threshold grid ha nhiet, fat-tail risk khong con dang ke",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "N/A",
+      "T actual": 13.333333333333334,
+      "T actual display": "13.3 th pct",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-15",
+      "Description": "Idiosyncratic index-coupling risk khong con la nguon stress",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "3 th pct",
+      "T actual": 99.47089947089947,
+      "T actual display": "99.5 th pct",
+      "Delta": 96.47089947089947,
+      "Delta display": "+96.5 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-15",
+      "Description": "External financial conditions khong vao stress zone",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 5,
+      "date": "2026-07-13",
+      "error": ""
+    },
+    "breadth": {
+      "value": 12.470588235294118,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.00480195441237,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3674303770316354,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "coupling": {
+      "value": 13.333333333333334,
+      "date": "2026-07-15",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.47089947089947,
+      "date": "2026-07-15",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 6,
+  "total": 6
+}

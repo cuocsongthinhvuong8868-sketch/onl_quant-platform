@@ -1,0 +1,32 @@
+## 1. Observations
+- **OLS slope = 0.17**, percentile **2.6th**: độ nhạy của VN30F1M với composite VIC/VHM/VRE đang rất thấp, nghiêng về decoupling extreme.
+- **Correlation = 0.53**, percentile **31.5th**: tương quan còn dương nhưng lỏng, không đủ để coi VIN là trục kéo F1.
+- **Regime = DECOUPLING** với ΔCorr = -0.57, ΔSlope = -0.78: VIN đang mất quyền dẫn dắt futures.
+
+## 2. Microstructure Read
+VIC/VHM/VRE lúc này **giảm mạnh vai trò chi phối** lên VN30F1M. Slope percentile dưới 20th cho thấy futures đã rời khỏi nhịp VIN; corr vẫn 31.5th nên chưa phải tách rời tuyệt đối, nhưng tín hiệu từ VIN không còn đủ sạch để đánh outright F1.
+
+Không có dấu hiệu “intervention/coupling extreme” vì cả hai percentile không cùng >80th. Điểm quan trọng là **slope ở 2.6th**, tức VIN tăng/giảm không còn chuyển hóa hiệu quả sang F1.
+
+## 3. Event Study Interpretation
+DECOUPLING từ 20/04/2026 nghĩa là intraday nên ưu tiên đọc dòng tiền ở nhóm khác thay vì dùng VIC/VHM/VRE làm leading signal. Với overnight, không nên giữ vị thế chỉ dựa trên VIN, vì quyền dẫn đã yếu và correlation không đủ chặt.
+
+## 4. Verdict
+**Trade plan: Spread VIN-vs-Bank**, không ưu tiên Long F1/Short F1 thuần theo VIN.
+
+Leading indicators cần theo dõi: **VCB, BID, CTG, TCB, MBB**; phụ là Chứng khoán **SSI, VND, HCM** và Thép **HPG**.
+
+Stop-loss reference cho VIN leg: nếu short/underweight VIN mà VIN bật ngược, dùng ngưỡng **VIC 217.00 × 1.03 ≈ 223.51**, **VHM 136.00 × 1.03 ≈ 140.08**, **VRE 24.80 × 1.03 ≈ 25.54** làm tham chiếu cắt rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "15/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 2.6,
+  "corr_percentile": 31.5,
+  "trade_signal": "spread",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,42 @@
+## 1. Scenario Assessment
+
+K=1.0 và CoE=14% là baseline cho VN bank, không quá khắc nghiệt. Stress test bằng 0 nên kết quả phản ánh trạng thái gốc, không bị ép thêm từ BVPS hay P/B. Tuy nhiên mặt bằng ngành trong mẫu đang yếu: chỉ SHB có Alpha dương, MBB và ACB dù chất lượng cao vẫn âm nhẹ. Đây là thị trường stock-picking, không phải sector-wide bullish.
+
+## 2. Top Alpha Decomposition
+
+**SHB**: Alpha +2.8%, P/B 0.86 là driver chính. ROE 17.5% không phải cao nhất, nhưng σROE 1.9% thấp và payout 8.6% giữ retention tốt. Phân loại: **Fortress**.
+
+**MBB**: ROE 21.8%, σROE 1.6%, payout 6.7% rất mạnh về chất lượng và compounding, nhưng P/B 1.42 kéo Disciplined Return xuống dưới CoE. Phân loại: **Quality Compounder nhưng chưa Fortress**, tactical only.
+
+**ACB**: ROE 23.0% cao nhất top group, payout 15.9% vẫn hợp lý, nhưng σROE 2.7% cao hơn MBB và P/B 1.26 chưa đủ rẻ để tạo Alpha dương. Phân loại: **Quality nhưng Alpha âm nhẹ**, tactical có chọn lọc.
+
+## 3. Value Traps Warning
+
+**LPB**: Alpha -12.6% chủ yếu do P/B 3.26 quá đắt so với disciplined return; đây là **Premium Burn**, không phải rẻ.
+
+**EIB**: ROE 10.0% thấp, σROE 3.8% cao, dù P/B 1.39 không cực đoan. Đây là **Cheap Trap / weak ROE trap**.
+
+**VPB**: ROE 14.1% chỉ quanh CoE, σROE 4.7% rất cao và payout 24.6% làm retention yếu. Đây là **Growth Trap nghiêng risk burn**.
+
+## 4. Portfolio Construction
+
+**Core Holding 60-70% bank allocation**: SHB.
+
+**Tactical 20-30%**: MBB, ACB; ưu tiên MBB do σROE thấp hơn và payout thấp hơn.
+
+**Cấm mua / underweight**: LPB, EIB, VPB.
+
+Sector view: **neutral-to-bearish** vì chỉ một mã tạo Alpha dương, còn phần lớn mẫu đang dưới CoE.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

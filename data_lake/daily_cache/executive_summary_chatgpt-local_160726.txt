@@ -1,0 +1,85 @@
+<!-- ai-cio-cache-version: ai_cio_methodology_v4_credit_spread -->
+### 📊 EXECUTIVE BOTTOM LINE (Tóm tắt nhanh)
+- **Ngày báo cáo (Date)**: 16/07/2026
+- **Điểm số tổng hợp (Composite Score)**: 28/100  
+  *Tách biệt 3 nguồn rủi ro*: [Macro Risk: 23/100 | Market Internal: 13/100 | Tail Risk: 35/100]
+- **Trạng thái vĩ mô (Regime)**: PRE-CRASH
+- **Mức rủi ro đuôi (Tail Risk)**: Elevated
+- **Cảnh báo cực đoan (Extreme Drivers Warning)**: Breadth MA20 chỉ 12.5%, VNIBOR ON 4.20%, LTMM transmission breakdown FIRE, ABM YELLOW 45/100, SSI 63%. EVT ξ trung tâm 0.345 nhưng threshold-sensitive nên chưa kích hoạt hard cap độc lập.
+
+Kết luận điều hành: trạng thái hiện tại vẫn là phòng thủ cao. Fed liquidity có xung hỗ trợ ngắn hạn, nhưng chất lượng không phải QE thật; trong nước, VNIBOR và LTMM cho thấy kênh truyền dẫn thanh khoản đang nghẽn. Độ rộng thị trường quá yếu, rủi ro cascade tăng, và valuation PVGO không còn đủ biên an toàn để hấp thụ shock. Không short phái sinh vì score không nằm vùng 8-14.
+
+### 0. Macro Analysis Layer
+Fed Liquidity là điểm sáng tương đối: Net Liquidity tuần 2026-07-08 đạt 5,958.2bn USD, tăng 114.9bn USD WoW. Nhưng đây nhiều khả năng là liquidity impulse từ TGA/RRP, không phải Fed phình WALCL theo kiểu QE. WALCL 6,735.6bn vẫn phản ánh hậu-QT; RRP chỉ 3.3bn gần cạn, nên nguồn hỗ trợ biên không còn dày như 2023-2024.
+
+Global FCI có conflict dữ liệu cần tách rõ. Adapter chính thức cho `global_financial_conditions` chấm 55, regime NEUTRAL / STOCK-PICKING, với `cqs_percentile` 3.0. Nhưng `score_band_reason` và humility packet lại ghi CQS >=80/99.5. Theo rule, adapter thắng trong relabel tool, nhưng conflict này phải được giữ trong risk note, không được kể một câu chuyện đơn tuyến.
+
+VNIBOR là headwind rõ hơn: ON 4.20%, adapter score 35, regime FEAR / DISTRIBUTION. Trend 20 phiên ghi “liquidity squeeze / stress building”, ON MA5 slope +0.099%/session, 5 phiên STRESS/WARNING. Đây không phải spike đơn phiên mà là căng thẳng tích tụ.
+
+LTMM xác nhận kênh truyền dẫn khó khăn: TE -0.472 ở trạng thái breakdown, transmission_breakdown FIRE = 1. Upstream Fed có hỗ trợ, nhưng downstream Việt Nam không hấp thụ tốt.
+
+Margin/M2 overlay: Margin/M2 5Y z-score 2.62σ, regime ELEVATED_LEVERAGE. Đây chỉ là monthly/lagged speculative leverage overlay, không phải hard PCA regime, nhưng nó làm stress funding và breadth yếu trở nên nguy hiểm hơn vì crowding có thể khuếch đại deleveraging.
+
+**💡 Diễn giải bình dân (Layman's terms)**: Bên ngoài có chút “nước” chảy vào hệ thống, nhưng đường ống về thị trường Việt Nam đang nghẹt. Khi tiền liên ngân hàng căng, độ rộng cổ phiếu yếu, và margin crowding cao, các nhịp hồi dễ là hồi kỹ thuật hơn là đảo chiều thật.
+
+### 0.5 Fundamental Corporate Health Layer
+VN100 Health Score 50.5, market-cap weighted 53.3, gap +2.8; regime Mixed / Divergent. Input không có valid company count, nên phần này ghi **DATA INSUFFICIENT** cho sample count, không tự giả định.
+
+Trend nền doanh nghiệp là “accounting recovery / low cash confirmation”: doanh thu và lợi nhuận phục hồi, nhưng CFO và healthy growth chưa xác nhận. Cash-confirmed recovery yếu, systemic stress trong báo cáo VN100 lại được mô tả là contained. Điều này tạo phân kỳ: fundamental backdrop không sụp, nhưng price-based internals đang xấu hơn nhiều.
+
+Không có dữ liệu đầy đủ về Revenue/Profit/CFO breadth, Working Capital Stress, Leverage Stress, Sector Diffusion, sector leadership/drag, watchlist, matrix diagnostics và PCA validation ngoài excerpt, nên các mục này là **DATA INSUFFICIENT**. Kết luận: VN100 **neutral-to-mild conflict** với market internals; không đủ để nâng allocation vì market breadth và funding đang veto.
+
+### 1. Trend Momentum
+History cho thấy score giảm từ 30 ngày 15/07 xuống 28 ngày 16/07, quay lại PRE-CRASH / PANIC. 5 ngày giảm -6 điểm, 10 ngày giảm -3 điểm. Đây là trạng thái deterioration sau một nhịp hồi yếu, không phải đảo chiều risk-on.
+
+Humility status = WATCH, 1/6 rule bị kích hoạt. Rule quan trọng nhất là Vingroup coupling FALSIFIED, nhưng đây là idiosyncratic/system-structure risk, không phủ định rủi ro hệ thống từ VNIBOR, breadth, SSI, ABM. Không hạ confidence xuống LOW chỉ vì coupling giảm nhiệt.
+
+### 2. Tool Consensus
+**Hard adapter consensus**: Bullish: không có. Bearish: VNIBOR 35 FEAR / DISTRIBUTION; LTMM 30 TRANSMISSION BREAKDOWN; Market Breadth 18 PRE-CRASH / PANIC; Var-CVaR 35 FEAR / DISTRIBUTION; ABM 35 YELLOW EARLY WARNING; PVGO 42 ELEVATED EXPECTATION RISK. Neutral: Global FCI 55 NEUTRAL / STOCK-PICKING; Credit Spread 49 NORMALIZING / CONTAINED; ESR 42 FEAR / DISTRIBUTION nhưng bias neutral_or_mixed theo adapter.
+
+**Soft interpretive consensus**: Bullish: Fed Liquidity, Bank Valuation. Bearish: Margin/M2, VN100, Humility, Manipulation, Dispersion, Upside Ratio, VaRES, Risk-Adjusted Growth. Neutral: Fear & Greed, News Sentiment. Đây là provider-dependent interpretation, không trộn vào hard counts.
+
+**Conflicts**: Fed liquidity/news risk-on vs VNIBOR/LTMM/breadth bearish là lệch pha thời gian: news 1-3 ngày và liquidity impulse ngắn hạn không phủ quyết hard macro 1-12 tuần. Global FCI CQS có conflict nội bộ giữa adapter 3.0 và score-band/humility >=80; giữ cảnh báo, nhưng không relabel adapter.
+
+### 3. Tail Risk Audit
+- ESR SSI 63%: WARNING, thanh khoản thị trường mỏng, VN30 dưới MA125.
+- EVT ξ 0.345 là fat-tail warning, nhưng xi_min 0.168 và xi_range 0.200 cho thấy threshold-sensitive; không kích hoạt hard EVT cap độc lập.
+- VaRES: VN30 Stress Index 10%, 3/30 mã breach VaR 95%; chưa phải contagion diện rộng.
+- ABM v4: Early-warning 45/100, YELLOW; drivers là liquidity stress, latent fragility, leverage crowding. Distance to cascade 7%, vulnerability 0.76 làm giảm risk budget.
+- Verdict: **Elevated**, chưa Extreme vì EVT không robust và VaRES chưa contagion active.
+
+### 4. Macro Regime
+Regime chọn: **PRE-CRASH**. Macro upstream có hỗ trợ kỹ thuật nhưng transmission downstream xấu; VNIBOR và LTMM đang là nút thắt. VN100 không xác nhận suy thoái doanh nghiệp diện rộng, nhưng cash confirmation yếu và không đủ chống lại breadth MA20 12.5%, upside participation thấp, ABM YELLOW và PVGO elevated.
+
+### 5. Risk/Reward Score & Sub-Score Details
+**Composite Score**: 28/100, Δ -2 vs T-1.
+
+**Macro Risk Score**: 23/100. Fed liquidity hỗ trợ nhưng không phải QE; VNIBOR ON 4.20% và trend 20 phiên squeeze kéo điểm xuống. LTMM transmission breakdown FIRE xác nhận dòng tiền thượng nguồn không truyền tốt xuống hạ nguồn. Margin/M2 2.62σ là crowding overlay, làm rủi ro deleveraging cao hơn.
+
+**Market Internal Score**: 13/100. Breadth MA20 12.5% là tín hiệu cực yếu. Upside Breadth 3.06% thấp hơn nền, Downside Breadth 25.18% cao hơn nền; đây là distribution. VN100 Health 50.5 chỉ cho thấy phục hồi kế toán chưa có CFO xác nhận, nên không đủ nâng market internal score.
+
+**Tail Risk Score**: 35/100. SSI 63%, EVT central ξ 0.345, ABM YELLOW 45/100 và cascade distance 7% đều cảnh báo rủi ro đuôi. Nhưng VaRES contagion 10% và EVT threshold-sensitive giữ Tail Risk ở Elevated, chưa Extreme.
+
+Top tail risk 5-20 phiên: liquidity dry-up, breadth failure, margin cascade cục bộ, và earnings/news risk-on bị hard macro veto.
+
+### 5.5 LLM Overlay
+**Metric-implied score/regime**: 28/100, PRE-CRASH / PANIC.  
+**Overlay adjustment**: zero, +0/-0 điểm.  
+**Final CIO score/regime after overlay**: 28/100, PRE-CRASH / PANIC.
+
+Lý do overlay bằng 0: các điểm hỗ trợ như Fed liquidity, credit spread narrowing, news risk-on và bank valuation chỉ là soft/short-horizon hoặc stock-picking. Chúng chưa đủ để bẻ gãy hard constraints: Breadth MA20 12.5%, VNIBOR ON 4.20%, LTMM FIRE, SSI 63%, ABM YELLOW. Đồng thời, EVT chưa robust nên không hạ score thêm bằng hard cap độc lập.
+
+### 6. Executive Order
+- **Cash**: 85-95%
+- **Equity**: 5-15%, ưu tiên mức thấp của range nếu không có cải thiện breadth/VNIBOR.
+- **Hedge instrument**: Short VN30F1M 0%. Matrix chỉ cho short ở EXTREME CRISIS 8-14; score hiện tại 28 nên không short.
+- **Core stocks list**: Không chọn core bank mới. Input không có mã nào thỏa đồng thời Bank Valuation fair/undervalued có confirmation mạnh và Risk-Adjusted Growth alpha dương ngoại trừ SHB alpha dương nhưng thiếu xác nhận valuation/market-confirmation đủ sạch trong rule.
+- **Avoid list**: FPT, BCM, MBB là VaRES breach watch. Tránh LPB do alpha âm lớn và premium burn. Tránh rổ bank overvalued/value trap/weak confirmation; không mua rổ rộng.
+
+### 7. Confidence Note
+Final confidence: **medium**. Không hạ LOW vì conflict phần lớn là lệch pha horizon: news/Fed liquidity ngắn hạn hỗ trợ, còn VNIBOR/breadth/tail-risk là hard constraints 1-12 tuần. VN100 sample count thiếu nên không dùng để nâng confidence, nhưng Health Score có dữ liệu đủ để đọc là mixed/divergent.
+
+### 8. Model Humility Box
+Luận điểm phòng thủ sẽ sai nếu funding stress hạ nhiệt thật, breadth phục hồi vượt 45%, SSI xuống dưới 55%, EVT grid hạ nhiệt với xi_max <0.25, và CQS stress không còn giữ vùng cảnh báo. Khi các ngưỡng này xảy ra đồng thời hoặc theo cụm, phải dừng lệnh cash-heavy và đánh giá tăng equity.
+
+final score & regime : 28 ; regime : PRE-CRASH / PANIC

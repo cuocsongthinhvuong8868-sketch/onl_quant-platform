@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-16",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Funding stress 20 phiên hạ nhiệt đủ để phủ định luận điểm liquidity squeeze"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 12.5,
+      "unit": "%",
+      "description": "Độ rộng MA20 phục hồi đủ mạnh để phủ định luận điểm market internals yếu"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63,
+      "unit": "%",
+      "description": "Systemic stress rơi khỏi vùng WARNING"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.367,
+      "unit": "",
+      "description": "Toàn bộ EVT threshold grid hạ nhiệt, phủ định fat-tail warning"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 13.3,
+      "unit": "th pct",
+      "description": "Coupling Vingroup tiếp tục hạ nhiệt, xác nhận rủi ro idiosyncratic không còn dẫn dắt"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 80,
+      "unit": "th pct",
+      "description": "CQS rơi khỏi vùng stress theo hard-constraint ledger"
+    }
+  ],
+  "provider_key": "chatgpt-local",
+  "saved_at": "2026-07-16",
+  "source": "ai_cio_executive_summary"
+}
