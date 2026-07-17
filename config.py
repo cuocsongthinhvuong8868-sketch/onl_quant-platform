@@ -39,14 +39,14 @@ AI_TEMPERATURE = float(os.getenv("AI_TEMPERATURE", "1.0"))
 # Key dùng trong UI  ->  {display_name, api_model_name, base_url, temperature}
 AI_PROVIDER_MAP = {
     "kimi-2.6": {
-        "display": "Kimi 2.6",
-        "api_model": "kimi-k2.6",
+        "display": "Kimi k3",
+        "api_model": "kimi-k3",
         "base_url": "https://api.moonshot.ai/v1",
         "temperature": 1.0,
     },
     "kimi-2.6-local": {
         "display": "Kimi 2.6 Local",
-        "api_model": os.getenv("KIMI_LOCAL_MODEL", "kimi-k2.6"),
+        "api_model": os.getenv("KIMI_LOCAL_MODEL", "kimi-k3"),
         "base_url": os.getenv("KIMI_LOCAL_BASE_URL", "http://127.0.0.1:5001/v1"),
         "temperature": float(os.getenv("KIMI_LOCAL_TEMPERATURE", "0.4")),
         "timeout": float(os.getenv("KIMI_LOCAL_TIMEOUT", "600")),
