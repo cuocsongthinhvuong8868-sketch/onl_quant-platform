@@ -1,0 +1,29 @@
+## 1. Scenario Assessment
+Bộ tham số hiện tại (K=1.0, CoE=14%, stress = 0) là baseline tiêu chuẩn cho ngành ngân hàng VN – không quá khắc nghiệt. Dù vậy, chỉ duy nhất SHB tạo ra Economic Alpha dương (+2.7%), phần còn lại đều đốt vốn cổ đông. Mặt bằng chung của ngành đang hủy hoại giá trị: hầu hết các bank có Alpha âm, cho thấy định giá thị trường hiện tại đã phản ánh kỳ vọng quá cao hoặc chất lượng ROE không bền vững. Trong kịch bản trung lập, cổ phiếu ngân hàng chỉ hấp dẫn nếu chọn lọc rất kỹ.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +2.7%)** – Hình mẫu **Fortress**. Động lực chính đến từ P/B rẻ (0.86) kết hợp ROE ổn định (17.5%) và độ biến động ROE cực thấp (σ=1.9%). Tỷ lệ chi trả cổ tức thấp (8.6%) giúp phần lớn lợi nhuận được tái đầu tư, củng cố compounding. Đây là cổ phiếu duy nhất có Disciplined Return (16.7%) vượt chi phí vốn.
+- **MBB (Alpha -1.2%)** – Chất lượng cao (ROE 21.8%, σ thấp 1.6%) nhưng định giá P/B 1.41 khiến lợi suất kỷ luật chỉ đạt 12.8%, không đủ bù đắp CoE. Có thể xếp vào **Premium Burn**: đắt đỏ so với nền tảng cơ bản.
+- **ACB (Alpha -1.7%)** – ROE vượt trội (23%) nhưng biến động vừa phải (σ=2.7%) và tỷ lệ chi trả cao hơn (15.9%) làm xói mòn lợi nhuận giữ lại. P/B 1.29 vẫn ở vùng “premium”, đẩy Alpha về âm. Cũng là **Premium Burn**.
+
+## 3. Value Traps Warning
+- **LPB** – Premium Burn cực đoan: P/B 3.35 phi lý so với ROE 21.1% khi rủi ro σ lên tới 3.8%. Risk-adjusted return chỉ còn 1.2% → Alpha -12.8%. Đốt vốn nghiêm trọng.
+- **EIB** – **Cheap Trap**: P/B 1.36 không quá cao nhưng ROE èo uột (10%) và rủi ro σ cao (3.8%) khiến lợi suất thực chỉ 3.2%. Không rẻ một cách nguy hiểm.
+- **VPB** – **Growth Trap**: ROE 14.1% khá, song độ biến động σ=4.7% (cao nhất nhóm) và Payout gần 25% làm Disciplined Return tụt xuống 4.0%, không gánh nổi CoE.
+
+## 4. Portfolio Construction
+- **Core Holding (70%)**: SHB – Fortress hiếm hoi có Alpha dương. Nên là vị thế chủ đạo trong phân bổ ngân hàng.
+- **Tactical (0%)**: MBB và ACB dù lọt Top 3 nhưng Alpha vẫn âm, không đủ luận điểm mua trong kịch bản hiện tại. Nếu K giảm hoặc CoE hạ, có thể xem xét lại.
+- **Cấm mua / Underweight**: LPB, EIB, VPB – đốt vốn rõ ràng. Tránh xa toàn bộ ba mã này.
+- MBB, ACB: giữ quan sát, chỉ xem xét khi P/B điều chỉnh mạnh hoặc ROE cải thiện bền vững.
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-17",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING giảm dưới 5, thanh khoản bớt căng."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 13.4,
+      "unit": "%",
+      "description": "Độ rộng phục hồi trên 45% xác nhận dòng tiền quay lại."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63,
+      "unit": "%",
+      "description": "SSI giảm dưới 55%, rủi ro hệ thống dịu bớt."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.367,
+      "unit": "",
+      "description": "Đuôi béo không còn là mối đe dọa khi xi max dưới 0.25."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 15.0,
+      "unit": "th pct",
+      "description": "Decoupling duy trì, giảm thiểu rủi ro cục bộ từ Vingroup."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 3.0,
+      "unit": "th pct",
+      "description": "CQS percentile duy trì ở mức thấp (3.0), tín hiệu tích cực nếu xác nhận thêm."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-17",
+  "source": "ai_cio_executive_summary"
+}

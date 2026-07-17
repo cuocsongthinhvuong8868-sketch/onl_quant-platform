@@ -1,0 +1,37 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái tín hiệu news sentiment (1d – 7d – 30d)**  
+- **1d:** Strongly Risk‑On – Khẳng định chắc chắn. Posterior trung bình +0.36, P_conf = 96% (>85%), xác suất sentiment trung bình >0 là 96%.  
+- **7d:** Strongly Risk‑On – Khẳng định chắc chắn. Posterior trung bình +0.51, P_conf = 100%.  
+- **30d:** Strongly Risk‑On – Khẳng định chắc chắn. Posterior trung bình +0.49, P_conf = 100%.  
+
+**2. Các kênh dẫn dắt mạnh nhất (Risk‑On / Risk‑Off)**  
+*Kéo Risk‑On (độ tin cậy cao):*  
+- **Earnings** (+1.31 ở 1d, P_conf 100%; +1.28 ở 7d, P_conf 100%; +1.11 ở 30d, P_conf 100%) – tín hiệu mạnh nhất, nhất quán qua các khung thời gian.  
+- **Credit Stress** (+1.22 ở 1d/99%; +0.79 ở 7d/100%; +1.00 ở 30d/100%) – căng thẳng tín dụng được đánh giá là giảm, hỗ trợ rủi ro.  
+- **Banking System** (+0.67 ở 1d, P_conf 89%; +0.63 ở 30d, P_conf 100%) – sức khỏe hệ thống ngân hàng tích cực.  
+
+*Kéo Risk‑Off (đáng chú ý nhưng chưa lấn át):*  
+- **Commodity** (–0.59 ở 1d/98%; –0.74 ở 30d/100%) – hàng hóa cơ bản giảm mạnh (thép, phân bón, PVC Trung Quốc) tạo điểm trừ.  
+- **Monetary Policy** (–0.72 ở 1d/95%) – xuất hiện tiêu cực trong ngày, nhưng ở 7d/30d lại dương mạnh (+0.67, +1.27), có thể chỉ là nhiễu ngắn hạn.  
+- **Liquidity** (–0.35 ở 7d/100%; –0.15 ở 30d/100%) – NHNN hút ròng OMO, nhưng biên độ nhỏ.
+
+**3. Các động lực quan trọng**  
+*Tích cực (3 drivers nổi bật):*  
+- Doanh nghiệp (earnings) duy trì tín hiệu rất mạnh, tin tức từ Walmart tìm nhà cung ứng tại Việt Nam, khơi thông nguồn lực tài chính.  
+- Tỷ giá trung tâm tăng nhẹ liên tục (25.254 ngày 17/7), lãi suất huy động nhóm NHTM khác tăng 1 bps – hỗ trợ kỳ vọng ổn định vĩ mô.  
+- Lợi suất TPCP đi ngang, giá hồ tiêu trong nước vượt đỉnh tháng – giảm áp lực tín dụng và tín hiệu từ nông sản nội địa.  
+
+*Tiêu cực (3 drivers nổi bật):*  
+- Giá hàng hóa Trung Quốc lao dốc: đường cát trắng đáy 1 năm còn 5.250 CNY/tấn, thép HRC, phân Ure, PVC đều chạm đáy.  
+- Giá vàng thế giới xuống đáy 6 tháng, vàng trong nước giảm ~2 triệu đồng/lượng.  
+- NHNN hút ròng qua OMO trong ngày (1.338 tỷ đồng) và lũy kế tuần (11.729 tỷ đồng).
+
+**4. Đánh giá với macro layer & công cụ market‑internal của AI CIO**  
+Nếu lớp vĩ mô và các công cụ nội tại của AI CIO đang ở chế độ Risk‑On: tín hiệu news sentiment **hỗ trợ mạnh mẽ**, nhất quán trên mọi khung thời gian.  
+Nếu lớp vĩ mô/công cụ đang nghiêng về Risk‑Off hoặc thận trọng: đây là một **mâu thuẫn** đáng chú ý; cần kiểm tra lại độ trễ hoặc yếu tố nào đang bị bỏ qua (ví dụ hàng hóa giảm sâu có thể báo hiệu suy yếu cầu bên ngoài). Hiện tại tín hiệu tin tức vẫn áp đảo về hướng tích cực.
+
+**5. Caveat (cảnh báo chất lượng dữ liệu)**  
+- Tỷ lệ nguồn social/opinion (`mozyfin_social`) cao: 1d 23%, 7d 39% – đặc biệt khung 7d có đến 517/1310 bài từ social, độ tin cậy thấp hơn so với tin chính thống. Ưu tiên trọng số cao hơn cho các kênh dữ liệu `widata` và các bài phân tích.  
+- Nguồn `widata` tương đối mỏng ở 7d (179 tin) và 30d (750 tin), phần lớn tín hiệu đến từ `mozyfin` (tài chính) – dễ bị thiên lệch chủ đề tài chính/ngân hàng.  
+- Feed sinh ngày 17/07/2026 (cùng ngày), không bị stale. Tuy nhiên bản chất headline‑driven có thể gây nhiễu ngắn hạn (ví dụ tín hiệu tiêu cực từ monetary policy trong 1d không kéo dài).  
+- Luôn kiểm tra lại với price action thực tế để tránh “bullish headline trap” khi sentiment quá đồng thuận.

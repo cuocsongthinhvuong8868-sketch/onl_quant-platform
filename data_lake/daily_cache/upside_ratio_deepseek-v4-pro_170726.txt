@@ -1,0 +1,38 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Độ lệch cầu: 7.29% so với Mu 11.84% → hụt ‑4.55 điểm %, cầu đang yếu hơn hẳn trạng thái cân bằng dài hạn.
+- Độ lệch cung: 16.94% so với Mu 11.85% → vượt +5.09 điểm %, cung đang áp đảo rõ rệt.
+- Cả hai phía duy trì momentum dương: Phi cầu = 0.134 (đà mua), Phi cung = 0.122 (đà bán) – không có dấu hiệu mean‑reversion.
+
+## 2. Supply-Demand Dynamics
+- Với cầu bị nén sâu dưới Mu và cung bị đẩy lên trên Mu, thị trường đang ở chế độ **distribution** (phân phối) – dòng tiền có xu hướng rút khỏi thị trường.
+- Mặc dù cả hai đều có quán tính, động lượng cầu (|Φ| = 0.134) nhỉnh hơn động lượng cung (0.122), cho thấy lực mua vẫn giữ một chút “trớn” dù tổng thể phe bán đang kiểm soát mặt bằng giá.
+
+## 3. Stress-Test Read
+- Kịch bản P95 downside 19.57%: nếu thị trường gãy, biên độ panic bán kỳ vọng lên tới gần 1/5 giá trị chỉ trong 19 phiên.
+- Bất đối xứng đuôi: P95 upside 19.81% chỉ cao hơn P95 downside 0.24 điểm %, hai bên đuôi gần như đối xứng – không có tail risk trội rõ bên nào.
+
+## 4. Verdict
+- Trong chế độ phân phối kèm momentum kép, rủi ro giảm tiếp vẫn chiếm ưu thế. Đề xuất tỷ trọng giải ngân **15%**, giữ phần lớn danh mục phòng thủ.
+- Chiến lược: **phòng thủ**, hạn chế mua đuổi. Chưa đủ tín hiệu mean‑reversion để “rình bắt đáy”. Theo dõi diễn biến Phi và độ lệch Mu để xác nhận chuyển pha.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 19.57,
+  "p95_upside_pct": 19.81,
+  "deployment_pct": 15,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

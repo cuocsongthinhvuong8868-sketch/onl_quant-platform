@@ -1,0 +1,33 @@
+## 1. Observations
+- Spread_Z ở mức –0.63σ, thấp hơn trung bình 60 phiên, không có dấu hiệu căng thẳng cấu trúc.
+- DPI = 45.0% – dưới ngưỡng 70%, dispersion không duy trì dai dẳng.
+- Avg Pairwise Correlation (Ledoit-Wolf) = 0.014, gần bằng 0, phản ánh môi trường phân hóa mạnh.
+- CS Skewness và Kurtosis không có dữ liệu, không thể đánh giá độ lệch đuôi.
+
+## 2. Structural State
+Tổ hợp DPI thấp và Spread_Z âm cho thấy thị trường đang vận hành trong trạng thái **bình thường, không chịu áp lực phân tán**. Không có tín hiệu về stress cục bộ (Spread_Z cao đơn lẻ) cũng như không có regime stress kéo dài (DPI cao). Cấu trúc hiện tại không phải là điểm bất thường.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu độ lệch (skew) và độ nhọn (kurtosis), không thể xác định có hiện tượng gãy đuôi hay không. Tuy nhiên, với Spread_Z âm và DPI chỉ ở mức trung bình thấp, khả năng xuất hiện fat‑tail outliers là rất hạn chế. Giả định tạm thời: phân phối lợi nhuận chéo đang ở trạng thái đối xứng, chưa có dấu hiệu tail‑driven.
+
+## 4. Regime Mapping
+Áp dụng bản đồ 2D DPI × Correlation:
+
+- DPI thấp (45%) & Correlation thấp (0.014) → **Healthy Stock‑Picking**.
+
+Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu: các mã ít biến động đồng loạt, alpha đến từ yếu tố đặc thù doanh nghiệp.  
+Rủi ro lớn nhất với Portfolio Manager trong regime này là **sự tự mãn trước mức độ phân hóa cao**, dẫn đến đánh giá thấp rủi ro đặc thù của từng cổ phiếu. Nếu xảy ra cú sốc vĩ mô bất ngờ khiến tương quan tăng vọt (từ 0.014 lên >0.5), toàn bộ danh mục đa dạng hóa có thể đồng thời sụt giảm, xóa sạch lợi thế phân tán rủi ro.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "17/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.63,
+  "dpi_pct": 45.0,
+  "avg_corr": 0.014,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```

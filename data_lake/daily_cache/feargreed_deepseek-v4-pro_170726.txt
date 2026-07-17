@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score: 56.7/100, nằm trong vùng NEUTRAL (40‑60).
+- EGARCH Vol (chuẩn hóa): 58.7%, giảm mạnh –9.9% so với phiên trước.
+- Rolling Skewness: 0.02, gần như trung tính (≈0).
+- Downside Correlation (norm): 3.6%; Upside Correlation (norm): 19.2% – chênh lệch rõ rệt, tương quan tăng vượt trội.
+
+## 2. Interpretation
+Dữ liệu hiện tại xác nhận pha NEUTRAL / STOCK PICKING. Mức vol tuy còn cao nhưng đang hạ nhiệt, skewness không thể hiện thiên kiến tiêu cực, còn upside correlation cao hơn hẳn downside cho thấy thị trường đang có sự phân hóa nhưng nghiêng về vận động tăng đồng thuận ở nhóm cổ phiếu nhất định. Không có tín hiệu của sợ hãi hay hưng phấn cực đoan.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol:** Score neutral (56.7) trong khi vol vẫn trên 50% và đang giảm → phù hợp, hàm ý rủi ro hệ thống đang giảm dần, không còn áp lực bán tháo.
+- **Skewness vs Correlation:** Skewness ≈0 nhưng upside correlation cao gấp nhiều lần downside → có sự phân kỳ nhẹ. Điều này cho thấy thị trường không “sợ” (downside cor thấp) nhưng cũng chưa có đủ lực kéo toàn thị trường tăng mạnh (skew chưa âm cũng chưa dương rõ rệt). Tín hiệu cho thấy tính chọn lọc cao (stock‑picking).
+
+## 4. Verdict
+- **Beta exposure đề xuất:** 0.7 (trung tính đến hơi nghiêng long) cho danh mục VN-Index.
+- Hành động: Duy trì chiến lược chọn cổ phiếu (stock picking), tập trung vào các mã có upside correlation cao và ít nhạy với pha giảm. Trên dữ liệu hiện tại, **không cần hành động phòng thủ quyết liệt** cũng như không gia tăng đòn bẩy mạnh. Tín hiệu chưa đủ đồng nhất để chuyển sang trạng thái long ròng hay phòng thủ toàn diện.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "17/07/2026",
+  "regime": "NEUTRAL",
+  "score": 56.7,
+  "confidence": "medium",
+  "beta_target": 0.7,
+  "key_signals": [
+    "Upside Correlation (19.2%) cao hơn hẳn Downside Correlation (3.6%)",
+    "EGARCH Vol giảm mạnh -9.9% từ mức 58.7%"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 56.7
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

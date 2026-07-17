@@ -1,0 +1,37 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- **SSI (Systemic Stress Index)**: 63.0% – nằm trong vùng **WARNING** (ngưỡng 50-80%).
+- **Market State (HMM)**: **ACTIVE STRESS**, phản ánh downtrend + stress cao, trùng khớp với thực tế VN30 đóng cửa dưới MA125.
+- **Top 3 trụ cột dẫn dắt rủi ro**: S_LIQ (35%), S_VAL (31%), S_COR (18%) – toàn bộ tính trên pha giảm (downside mode).
+- **PCA Concentration (EVR PC1)**: 38.1% – mức độ đồng pha systemic ở biên cao, củng cố chế độ stress.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (35%) – Volume Dry-Up**: Đây là driver chính hôm nay. Thanh khoản toàn thị trường đang khô cạn so với chuẩn 1 năm (MA20/MA252 giảm mạnh). Volume cạn kiệt trong downtrend cảnh báo thị trường mỏng, dễ xuất hiện cú sập mạnh do lực cầu không đủ hấp thụ lực bán.
+- **S_VAL (31%) – Valuation Tension**: Căng thẳng định giá gia tăng, khả năng cao do VN30 có hiệu suất 252 ngày kém xa lãi suất tiền gửi (âm sâu). Trong bối cảnh giảm, đây là tín hiệu thị trường đang “định giá lại” rủi ro, chưa tìm thấy điểm cân bằng.
+- **S_COR (18%) – Systemic Correlation**: Hệ số tương quan hệ thống cao trên khung 60 ngày cho thấy các cổ phiếu di chuyển đồng loạt. Sự đồng pha này triệt tiêu lợi ích đa dạng hóa, biến mọi vị thế long thành rủi ro chỉ số thuần túy.
+
+**Diễn giải tổng hợp**: Cấu trúc “volume khô cạn + tương quan cao” là signature cổ điển của giai đoạn bán tháo mất thanh khoản. S_LIQ dẫn đầu làm tăng xác suất các cú giảm đột ngột về biên độ.
+
+## 3. Cross-Check
+- **Giá VN30 vs SSI**: Không có divergence. Giá dưới MA125, SSI 63% WARNING – cả hai cùng xác nhận trạng thái bearish. Không có bẫy tăng giá (bull-trap).
+- **HMM regime vs SSI**: Hoàn toàn khớp – ACTIVE STRESS với SSI WARNING cho thấy thị trường đang trong nhịp bán bền vững, chưa có tín hiệu dừng.
+- **Flag (nếu có)**: Không. Không có yếu tố mâu thuẫn.
+
+## 4. Verdict
+**Cash weight đề xuất: 60%**. Thị trường đang trong ACTIVE STRESS, driver chính là khô cạn thanh khoản – rủi ro sập phiên mỏng rất rõ ràng. Tăng tỉ trọng tiền mặt lên mức cao để bảo toàn vốn.  
+**Hedge action**: **Giảm beta danh mục**. Cụ thể: bán các cổ phiếu beta cao (>1.2), chuyển sang cổ phiếu phòng thủ / tiền mặt. Có thể cân nhắc **mua put bảo vệ** (VN30F1M put) nếu muốn giữ một phần vị thế, nhưng không recomment short outright khi SSI chưa vào CRITICAL (>80%) vì có thể xuất hiện nhịp hồi kỹ thuật.  
+**Tự tin (confidence)**: **Medium**. Các tín hiệu nhất quán từ HMM, SSI và top driver, nhưng vẫn ở mức WARNING – cần giám sát liên tục nếu S_LIQ tiếp tục tăng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.0,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

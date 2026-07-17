@@ -1,0 +1,44 @@
+<!-- ai-cio-cache-version: primary_issuance_equal_weight_v1 -->
+## 1. Credit snapshot  
+Tại ngày 03/07/2026, lãi suất huy động sơ cấp bình quân của nhóm Ngân hàng đạt 8.39%, trong khi nhóm Bất động sản (BĐS) neo ở mức 11.80%. Mức chênh lệch tuyệt đối (signed spread Bank – BĐS) là -3.41 điểm phần trăm, phản ánh rủi ro tín dụng tương đối mà thị trường áp đặt lên doanh nghiệp địa ốc. Phần bù rủi ro (risk premium) BĐS so với Bank ghi nhận 340.8 bps, giảm mạnh 32.5 bps so với kỳ trước (373 bps). Đây là mức thu hẹp đáng kể trong một tuần, đưa premium rời khỏi vùng đỉnh cục bộ thiết lập cuối tháng 6.
+
+## 2. Direction và persistence  
+Kỳ gần nhất ghi nhận direction NARROWING với cú giảm 32.5 bps, nhưng bức tranh ngắn hạn không đơn điệu: ba tuần gần nhất đan xen hai narrowing (19/06: -8 bps, 03/07: -32 bps) và một widening (26/06: +13 bps), cho thấy nhịp giảm thiếu tính nhất quán. Xu hướng 3 kỳ (NARROWING_3P) phản ánh mức giảm lũy kế -27.2 bps từ 12/06 (368 bps) đến hiện tại, tức xu hướng trung hạn là thu hẹp, nhưng biến động tuần gần nhất có thể chỉ là điều chỉnh kỹ thuật sau đợt widening ngắn. Về mặt định vị, percentile 65 và z‑score +0.63 (trên 20 kỳ matched) xác nhận risk premium vẫn ở nửa trên của phân phối lịch sử, chưa lùi về vùng “trung bình bền vững”. Do đó, narrowing hiện tại mang hàm ý rằng áp lực rủi ro đang tạm thời hạ nhiệt, song persistance chưa cao và dễ đảo chiều nếu xuất hiện một kỳ widening mới.
+
+## 3. Cơ chế truyền dẫn tới tài sản rủi ro  
+Phần bù BĐS co lại thường đi kèm với tín hiệu rằng nhà đầu tư sơ cấp yêu cầu mức đền bù rủi ro thấp hơn khi tài trợ cho bất động sản so với ngân hàng. Điều này phản ánh khẩu vị rủi ro được cải thiện tương đối, giúp giảm chi phí vốn biên cho chủ đầu tư và có thể nâng đỡ tâm lý với nhóm cổ phiếu chu kỳ. Tuy nhiên, với premium vẫn ở phân vị 65, mặt bằng chi phí huy động BĐS còn cao (11.80%), cho thấy thị trường chưa hoàn toàn định lại giá rủi ro về trạng thái trung tính. Vì vậy, narrowing hiện tại nên được đọc như một sự giảm căng thẳng tương đối (từ vùng elevated), chưa đủ để xác lập chế độ risk-on rộng khắp. Không thể kết luận nhân quả trực tiếp cho chỉ số VN-Index khi thiếu biến kiểm soát về dòng tiền, margin và định giá thứ cấp.
+
+## 4. Data quality và falsification  
+Bộ dữ liệu được đánh giá chất lượng HIGH nhờ số kỳ matched 20, phương pháp bình quân đều minh bạch và số đợt phát hành đủ lớn (25 Bank, 15 BĐS). Tuy nhiên, một số hạn chế cần nêu:  
+- Coverage coupon Bank chỉ đạt 56%, tức gần một nửa trái phiếu ngân hàng (có thể thả nổi, zero coupon, hoặc phát hành riêng lẻ) bị loại khỏi tính toán, tiềm ẩn sai lệch nếu những trái phiếu đó có tính chất tín nhiệm khác biệt.  
+- Gộp tất cả bucket kỳ hạn làm phẳng rủi ro duration – spread có thể co/giãn thuần túy do thay đổi kỳ hạn phát hành chứ không chỉ do tín dụng.  
+Để đảo ngược nhận định hiện tại, cần ít nhất một trong các điều kiện: (i) risk premium widening trở lại >370 bps kèm 2–3 kỳ liên tục; (ii) số đợt BĐS giảm mạnh dưới 5 khiến mẫu mất ý nghĩa; (iii) Bank yield tăng sốc vượt 9% khiến spread tuyệt đối co nhưng hàm ý tháo chạy chất lượng tài sản, không phải cải thiện rủi ro BĐS.
+
+## 5. Kết luận  
+Risk premium 341 bps neo ở chế độ ELEVATED, nhưng xu hướng ngắn hạn NARROWING tạm thời giảm áp lực tài trợ cho bất động sản. Dấu hiệu cải thiện khẩu vị rủi ro chưa bền do phân vị lịch sử vẫn trên trung bình, số kỳ quan sát hạn chế và nhiễu từ coverage coupon ngân hàng. Overlay tín hiệu cho tài sản rủi ro là **neutral** – nghiêng tích cực nhẹ, nhưng cần kiểm chứng thêm dữ liệu tuần tới trước khi diễn giải chuyển pha risk-on thực sự.
+
+```json
+{
+  "tool": "credit_spread",
+  "risk_premium_bps": 340.8,
+  "direction": "NARROWING",
+  "trend_3p": "NARROWING_3P",
+  "credit_regime": "ELEVATED",
+  "risk_asset_overlay": "neutral",
+  "confidence": "medium"
+}
+```
+
+final score & regime : 62 ; regime : ELEVATED
+
+=== AI CIO STRUCTURED METRICS: credit_spread_canonical ===
+Credit Spread Data Date: 03/07/2026
+Credit Spread Risk Premium: 340.8 bps
+Credit Spread Risk Premium Change: -32.5 bps
+Credit Spread Risk Premium 3P Change: -27.2 bps
+Credit Spread Risk Premium Percentile: 65.0
+Credit Spread Matched Periods: 20
+Credit Spread Bank Issuance Count: 25
+Credit Spread Real Estate Issuance Count: 15
+Credit Spread Direction: NARROWING
+Credit Spread Data Quality: HIGH

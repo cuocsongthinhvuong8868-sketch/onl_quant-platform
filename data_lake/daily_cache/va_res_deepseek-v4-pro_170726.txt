@@ -1,0 +1,33 @@
+## 1. Observations
+- Stress Index: 0.00% – không có dấu hiệu lây lan real-time trên VN30.
+- Breach count: 0/30 mã thủng VaR 95% – toàn bộ VN30 nằm trong biên rủi ro kỳ vọng.
+- Complacency Index: 11.11% – thị trường **không** ở regime “ngủ quên”.
+- Mispriced count: 12 mã có spread bị nén chặt, dẫn đầu là HCM, MSB, ACB.
+
+## 2. Contagion Assessment (Module B)
+Stress Index 0.00% cho thấy **không có cú sốc hệ thống đang diễn** ra trên rổ VN30. Không có mã nào thủng VaR, do đó không có “top 3 crash” để đánh giá tính chất cá biệt hay đầu sóng. Rủi ro lây lan real-time = không tồn tại trong phiên 17/07/2026.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency 11.11% chỉ có ý nghĩa duy nhất: **thị trường KHÔNG ở regime ngủ quên (accumulation/sideways vol thấp kéo dài hay distribution top). Không suy ra “thị trường ổn định” hay “vận hành bình thường”.** Thị trường có thể đang trong uptrend mạnh, downtrend hoảng loạn hoặc biến động cao – những trạng thái này tự nhiên khiến spread không bị nén nên Complacency thấp.
+
+Tuy nhiên, cần lưu ý vẫn còn **12 mã bị định giá sai (spread nén cục bộ)**, nghĩa là có những cổ phiếu riêng lẻ đang hấp thụ rủi ro kém hiệu quả. Dù chưa thành hiện tượng lan rộng (Complacency toàn thị trường thấp), đây là **hạt giống cho điều chỉnh cục bộ** nếu xảy ra biến động bất ngờ. Không được phép đọc “Complacency thấp = an toàn”; bối cảnh hiện tại là không có stress hệ thống nhưng rủi ro định giá sai vẫn âm ỉ ở một số mã tài chính.
+
+## 4. Stock-Level Risk Calls
+- Module B: Không có breach → không có lệnh bán/giảm tỷ trọng bắt buộc từ stress.
+- Module C (cảnh báo tiềm ẩn): **HCM, MSB, ACB** – các mã này đang giao dịch với spread bị nén chặt nhất, bù rủi ro quá mỏng. Nhà đầu tư nắm giữ nên:
+  - Cân nhắc đặt trailing stop-loss 5–7% từ giá hiện tại, hoặc theo dõi MA20/MA50 trên D1; thủng các đường này là tín hiệu giảm tỷ trọng.
+  - Hạn chế mở mới vị thế mua khi spread vẫn duy trì quá hẹp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 11.11,
+  "mispriced_count": 12,
+  "regime": "spread_normal",
+  "watchlist_short": ["HCM", "MSB", "ACB"],
+  "confidence": "medium"
+}
+```

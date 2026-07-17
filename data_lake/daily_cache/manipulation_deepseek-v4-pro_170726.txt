@@ -1,0 +1,28 @@
+## 1. Observations
+- **OLS Slope: 0.18 (percentile 2.9)** – cực thấp, gần như không có beta giữa composite VIN và VN30F1M; VIN coi như “đứt dây cương”.
+- **Correlation: 0.54 (percentile 34.1)** – tương quan ở mức dưới trung bình lịch sử, vẫn còn một chút liên kết nhưng yếu và lỏng lẻo.
+- **Regime: DECOUPLING** – cả ΔCorr (-0.60) và ΔSlope (-0.78) cùng giảm sâu, xác nhận VIN mất hoàn toàn quyền dẫn dắt chỉ số.
+
+## 2. Microstructure Read
+Bộ ba VIC/VHM/VRE hiện không còn vai trò chi phối VN30F1M. Khi OLS slope rơi vào phân vị dưới 5, biến động của nhóm VIN gần như không giải thích được điểm số hợp đồng tương lai. Correlation dù chưa về 0 nhưng đã giảm mạnh trong event window, báo hiệu dòng tiền đã rời khỏi VIN để tìm đến các nhóm khác (bank, chứng, thép). Hành vi này phù hợp với giai đoạn thị trường phân hóa, VN30F1M chủ yếu vận động theo Bank/Chứng khoán, không theo VIN.
+
+## 3. Event Study Interpretation
+DECOUPLING kéo dài từ 22/04/2026 cho đến hôm nay chưa hồi phục có ý nghĩa: mọi tín hiệu từ VIC/VHM/VRE đều không đủ tin cậy để dự báo xu hướng intraday của F1. Overnight càng rủi ro hơn vì không có edge định hướng từ họ VIN. Trader cần dừng hẳn việc dùng composite này làm leading indicator, thay vào đó quan sát động thái giá và volume của các bluechip nhóm ngân hàng (CTG, VCB, BID) và chứng khoán (SSI, HCM).
+
+## 4. Verdict
+- **Trade plan: NO TRADE** với VN30F1M dựa trên mô hình VIN composite. Không đủ tín hiệu để long hay short chỉ số chỉ từ nhóm này. Nếu muốn giao dịch spread, có thể xem xét long Bank/Short VIN cổ phiếu riêng lẻ, nhưng với tư cách trader F1 – đứng ngoài.
+- **Leading indicator cần theo dõi:** CTG, VCB (banking), HPG (thép) – khi các mã này bứt phá mới mang lại tín hiệu đáng tin cậy cho F1.
+- **Stop-loss reference:** Không áp dụng (không có vị thế). Nếu tham gia spread, stop‑loss mẫu cho VIC: dưới 220.00 × (1 – 3%) ≈ 213.4 (tương đương 213,400 VND) hoặc dưới đường MA20 ngày.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "17/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 2.9,
+  "corr_percentile": 34.1,
+  "trade_signal": "no_trade",
+  "confidence": "medium"
+}
+```
