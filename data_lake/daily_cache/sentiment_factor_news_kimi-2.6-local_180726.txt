@@ -1,0 +1,35 @@
+**Regime hiện tại**
+
+- **1d:** `risk_on`, nhưng chỉ **nghiêng về risk-on**. P_conf 77%, P(mean > 0) 77%, CI còn cắt qua 0 `[-0.211; +0.548]`, nên chưa nên kết luận quá mạnh.
+- **7d:** `strong_risk_on`, **khẳng định chắc chắn**. P_conf 100%, CI dương `[+0.369; +0.652]`.
+- **30d:** `strong_risk_on`, **khẳng định chắc chắn**. P_conf 100%, CI dương `[+0.430; +0.536]`.
+
+Lưu ý: các xác suất trên là xác suất của **latent news-sentiment mean**, không phải xác suất VNINDEX tăng.
+
+**Kênh kéo chính**
+
+- Kéo risk-on mạnh: `earnings` rất mạnh ở cả 1d/7d/30d; `banking_system`, `growth`, `monetary_policy`, `credit_stress`, `fx_external` cũng xác nhận cao, nhất là 7d và 30d.
+- Kéo risk-off: `commodity` âm rõ ở 1d và 30d; `liquidity` âm ở 7d/30d với P_conf cao; `risk_appetite` hơi âm nhưng biên độ nhỏ. 1d có `fx_external` âm đáng chú ý, trái chiều với xu hướng 7d/30d.
+
+**Drivers đáng chú ý**
+
+Positive:
+- Doanh nghiệp có lãi 42,6%: hỗ trợ `growth`.
+- Tài chính khơi thông nguồn lực cho tăng trưởng: hỗ trợ `growth`.
+- Đầu tư công Hà Nội bứt tốc giải ngân: hỗ trợ `fiscal_public_investment`.
+- Foxconn tính làm trạm sạc EV ở Việt Nam: hỗ trợ `growth`.
+- Các tín hiệu lãi suất/tỷ giá trong feed WiData đóng góp mạnh cho `monetary_policy` và `fx_external` ở 7d/30d.
+
+Negative:
+- HRC Trung Quốc, PVC, Ure, đường giảm: gây áp lực `commodity`.
+- NHNN hút ròng 11.729,4 tỷ qua OMO ngày 13/07/2026: kéo âm `liquidity`.
+- Lợi suất TPCP Nhật Bản 20Y giảm mạnh: tín hiệu âm trong `credit_stress`.
+- 1d không có top negative driver cụ thể, dù channel `commodity` và `fx_external` đang âm.
+
+**Tác động cho AI CIO**
+
+News sentiment layer hiện **supports** risk-on macro layer trong khung 7d/30d, nhưng **1d chỉ là leaning**, không đủ mạnh để tăng conviction ngắn hạn một cách độc lập. Nếu macro layer và market-internal tools cũng đang risk-on, feed này củng cố bias thuận chiều; nếu market internals yếu, nên xem đây là hỗ trợ mềm chứ không phải tín hiệu override.
+
+**Caveat**
+
+Feed được tạo lúc **2026-07-18 12:08:52 +07**, tức còn mới trong ngày nhưng vẫn là snapshot nhanh. Nguồn có nhiều Mozyfin và một phần đáng kể `mozyfin_social`, đặc biệt 7d là 526/1339 dòng; đây là social/opinion evidence có độ tin cậy thấp hơn headline/data feed, nên cần discount signal strength. Rủi ro headline noise còn cao, nhất là với các kênh commodity, liquidity và risk_appetite.

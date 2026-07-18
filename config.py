@@ -46,7 +46,7 @@ AI_PROVIDER_MAP = {
     },
     "kimi-2.6-local": {
         "display": "Kimi 2.6 Local",
-        "api_model": os.getenv("KIMI_LOCAL_MODEL", "kimi-k3"),
+        "api_model": os.getenv("KIMI_LOCAL_MODEL", "kimi-k2.6"),
         "base_url": os.getenv("KIMI_LOCAL_BASE_URL", "http://127.0.0.1:5001/v1"),
         "temperature": float(os.getenv("KIMI_LOCAL_TEMPERATURE", "0.4")),
         "timeout": float(os.getenv("KIMI_LOCAL_TIMEOUT", "600")),
