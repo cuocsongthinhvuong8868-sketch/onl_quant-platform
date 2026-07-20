@@ -1,0 +1,28 @@
+## 1. Observations
+- **VN30 Stress Index** tại 60.00%, vượt xa ngưỡng cảnh báo 40% — trạng thái lây lan đang diễn ra trên diện rộng.
+- **Số mã thủng VaR 95%**: 18/30 mã, xác nhận rủi ro đuôi không còn là cá biệt mà đã trở thành hiện tượng hệ thống.
+- **Complacency Index** ở mức 8.33% (rất thấp), với 9 mã vẫn có spread bị nén bất thường (mispriced), nổi bật là HCM, MSB, STB.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress 60% cho thấy một cú sốc đang lan truyền theo thời gian thực. Việc 18/30 mã đồng loạt thủng VaR 95% là tín hiệu rõ ràng của *contagion active* — không phải những sự kiện riêng lẻ, mà là phản ứng dây chuyền giữa các cổ phiếu vốn hóa lớn. Ba mã breach sâu nhất (SHB, BCM, SSI) không phải là “sự cố cá biệt”; chúng là mũi nhọn của một đợt bán tháo lan tỏa, phản ánh mức độ tương quan nhảy vọt trong điều kiện thị trường căng thẳng. Khả năng cao các vị thế tập trung vào nhóm tài chính – bất động sản đang bị giải chấp đồng loạt.
+
+## 3. Complacency Assessment (Module C)
+Complacency thấp (8.33%) chỉ mang một ý nghĩa duy nhất: **thị trường không ở regime ngủ quên**. Không hề có chuyện “thị trường an toàn” hay “vận hành ổn định”. Trong bối cảnh Stress Index đang ở 60%, Complacency thấp là hệ quả tự nhiên của việc spread giãn rộng trên toàn thị trường do hoảng loạn. Tuy nhiên, sự tồn tại của 9 mã mispriced (đặc biệt HCM, MSB, STB với spread bị nén chặt nhất) là một nghịch lý nguy hiểm: một số cổ phiếu vẫn định giá rủi ro như thể chưa có gì xảy ra. Đây là những “túi complacency” tiềm ẩn, có thể hứng chịu cú điều chỉnh mạnh thứ cấp khi contagion lan tới.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B)** – SHB, BCM, SSI: Giảm tỷ trọng khẩn cấp hoặc thiết lập vị thế short. Vì đây là đợt lây lan hệ thống, các mức stop-loss nên đặt theo % từ giá hiện tại (không dùng mức tuyệt đối), ưu tiên thoát lệnh nếu thủng các đường MA20/MA50 trên khung D1.
+- **Top 3 Mispriced (Module C)** – HCM, MSB, STB: Cảnh báo rủi ro ẩn. Dù chưa giảm sâu, các mã này đang định giá sai rủi ro. Nhà đầu tư nên xem xét protective puts hoặc giảm tỷ trọng chủ động, vì nếu bị bán tháo theo dây chuyền, biên độ sụt giảm có thể rất lớn do spread hiện tại không phản ánh đúng mức biến động thực.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 60.00,
+  "breach_count": 18,
+  "complacency_pct": 8.33,
+  "mispriced_count": 9,
+  "regime": "contagion_active",
+  "watchlist_short": ["SHB", "BCM", "SSI", "HCM", "MSB", "STB"],
+  "confidence": "medium"
+}
+```

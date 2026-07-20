@@ -1,0 +1,29 @@
+## 1. Observations
+- **OLS Slope**: 0.17, percentile lịch sử 2.4 (🟢 cực thấp) — độ nhạy của cụm VIC/VHM/VRE lên VN30F1M gần mức đáy lịch sử.
+- **Correlation**: 0.52, percentile 28.1 (🟡 thấp) — mối liên kết lỏng lẻo, không đáng tin cậy.
+- **Regime**: `DECOUPLING` – xác nhận bởi ΔCorr = -0.73 và ΔSlope = -0.80 (cùng < -0.15), cho thấy cụm VIN mất quyền dẫn dắt chỉ số.
+
+## 2. Microstructure Read
+VIC/VHM/VRE hiện không còn chi phối VN30F1M. Slope ở 0.17 (percentile 2.4) chỉ ra rằng biến động của cụm này gây ảnh hưởng cực nhỏ đến F1; thị trường đã “rời bỏ” nhóm VIN. Dòng tiền và động lực chỉ số lúc này đến từ các nhóm khác (Ngân hàng, Chứng khoán, Thép). Do đó, dùng VIC/VHM/VRE để giao dịch F1 sẽ tạo ra nhiễu và rủi ro cao.
+
+## 3. Event Study Interpretation
+Sự kiện decoupling từ 23/04/2026 cho thấy quá trình phân rã mạnh mẽ (ΔSlope -0.80, ΔCorr -0.73). Đây không phải nhiễu tạm thời mà là xu hướng giảm dần sức ảnh hưởng của VIN. Trong phiên, F1 sẽ biến động chủ yếu theo nhóm Bank/Chứng, không theo VIN. **Không nên giữ vị thế qua đêm dựa vào mô hình này** vì tín hiệu rất yếu.
+
+## 4. Verdict
+**Trade plan: NO TRADE** – mô hình VIN composite không cung cấp lợi thế giao dịch đáng tin cậy trên VN30F1M. Mua/bán F1 dựa trên cụm này là noise trading.  
+Một chiến lược spread (Short basket VIC/VHM/VRE vs Long nhóm Ngân hàng) có thể khai thác decoupling, nhưng đòi hỏi tín hiệu xác nhận bổ sung và không phù hợp với khung thời gian ngắn trong phiên.  
+**Leading indicator cần theo dõi**: Nhóm Ngân hàng (VCB, BID, CTG) và Chứng khoán (SSI, VND) – nếu nhóm này tăng mạnh, F1 có thể kéo lên bất chấp VIN yếu.  
+**Stop-loss reference**: Không có vị thế, do đó không cần stop-loss.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "20/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 2.4,
+  "corr_percentile": 28.1,
+  "trade_signal": "no_trade",
+  "confidence": "high"
+}
+```

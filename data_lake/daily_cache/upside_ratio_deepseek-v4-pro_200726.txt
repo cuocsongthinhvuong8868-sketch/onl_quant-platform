@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- Chênh lệch vs. Mu: Lực cầu hiện tại (2.59%) thấp hơn cực lớn so với Mu (11.22%), trong khi lực cung (53.41%) cao đột biến so với Mu (12.42%); cả hai lệch khỏi cân bằng dài hạn – tín hiệu phân phối rõ rệt.
+- Chỉ báo Phi: Cả hai chiều đều trong chế độ momentum (Phi_up = 0.163, Phi_down = 0.170 > 0.10), xác nhận xu hướng tự củng cố: đà bán tiếp diễn, đà mua yếu vẫn duy trì quán tính.
+- Phân kỳ cực đoan: Cầu nén ở đáy thấp kỷ lục, cung bùng nổ ở đỉnh cao, phản ánh dòng tiền đang luân chuyển ra khỏi thị trường một cách bền vững.
+
+## 2. Supply-Demand Dynamics
+- Trạng thái dòng tiền hiện tại: **phân phối** (distribution) – lực cầu bị nén mạnh dưới Mu, lực cung vượt xa Mu, phù hợp định nghĩa “cùng chiều cả hai” (up << mu, down >> mu).
+- Momentum thực sự thuộc về **bên cung** (🩸 Đà Bán): |Phi_down| = 0.170 nhỉnh hơn |Phi_up| = 0.163, và cường độ hiện tại của cung (53.41%) cực kỳ áp đảo. Dòng tiền rút ra có quán tính cao, khó đảo chiều đột ngột.
+
+## 3. Stress-Test Read
+- P95 Downside = 21.16%: nếu kịch bản hoảng loạn (panic sell) xảy ra, biên độ giảm của chỉ số breadth có thể mở rộng tới 21% trong 19 phiên tới, phản ánh rủi ro đuôi dày.
+- Asymmetry: P95 Downside (21.16%) > P95 Upside (19.60%), tail rủi ro giảm dày hơn khoảng 1.56 điểm phần trăm. Xác suất xảy ra bán tháo cực đoan nhỉnh hơn bùng nổ mua, thị trường lệch về phía rủi ro giảm.
+
+## 4. Verdict
+- Tỷ trọng giải ngân đề xuất: **10%** (ưu tiên phòng thủ).
+- Strategy: **phòng thủ** – giữ tỷ lệ tiền mặt cao, hạn chế đuổi theo các nhịp hồi kỹ thuật; tránh giải ngân mạnh tay trong giai đoạn phân phối khi cung momentum còn mạnh. Không có tín hiệu mean-reversion hay tích lũy để “bắt đáy”.
+- Không thuộc chế độ random walk (|Phi| > 0.10), nên không khuyến nghị “NO ACTIONABLE”.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 21.16,
+  "p95_upside_pct": 19.60,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

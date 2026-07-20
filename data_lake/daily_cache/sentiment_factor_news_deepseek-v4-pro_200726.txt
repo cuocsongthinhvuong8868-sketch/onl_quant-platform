@@ -1,0 +1,48 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+# PHÂN TÍCH TÂM LÝ THỊ TRƯỜNG THEO TIN TỨC
+
+## 1. Chế độ tâm lý (Regime) và độ tin cậy
+- **Khung 1d: risk_on**  
+  P_conf = 90% (>85%) → *Khẳng định chắc chắn* tâm lý risk-on đang chiếm ưu thế, dù cường độ khiêm tốn (mean +0.21, BIÊN 90% -0.06 đến +0.48).
+- **Khung 7d: strong_risk_on**  
+  P_conf = 100% → *Khẳng định chắc chắn* rủi ro-on mạnh mẽ (mean +0.36, BIÊN hoàn toàn dương).  
+  **⚠️ Cảnh báo:** Tỷ lệ nguồn mozyfin_social chiếm ~35% (478/1359) → tín hiệu có thể bị pha loãng bởi ý kiến mạng xã hội, cần chiết khấu một phần độ tin cậy.
+- **Khung 30d: strong_risk_on**  
+  P_conf = 100% → *Khẳng định chắc chắn* xu hướng risk-on dai dẳng (mean +0.49, BIÊN hẹp và hoàn toàn dương).
+
+## 2. Kênh dẫn dắt chính
+**Kéo risk-on (dương, đáng tin cậy):**
+- `monetary_policy` (1d: +1.99, P_conf 100% | 30d: +1.27, 100%): chính sách tiền tệ hỗ trợ rõ nét.
+- `credit_stress` (1d: +1.21, P_conf 99% | 7d: +0.77, 100%): tín dụng ổn định.
+- `earnings` (7d: +1.31, P_conf 100% | 30d: +1.15, 100%): kỳ vọng lợi nhuận doanh nghiệp khả quan.
+- `growth` (1d: +0.78, P_conf 100%): tăng trưởng được nâng dự báo.
+
+**Kéo risk-off (âm, đáng tin cậy nhất):**
+- `fx_external` (1d: -2.00, P_conf 100%): tỷ giá ngày 20/07 giảm mạnh → là lực cản ngắn hạn. Lưu ý trên khung 7d/30d kênh này chuyển dương (+0.65/+0.60), tạo tín hiệu trái chiều.
+- `commodity` (7d: -0.71, P_conf 100% | 30d: -0.80, 100%): giá hàng hóa cơ bản (thép, ure…) lao dốc, phản ánh cầu yếu bên ngoài.
+- `inflation` (1d: -0.57, P_conf 85%): áp lực giá năng lượng sạch và chi phí.
+
+## 3. Động lực quan trọng
+**Tích cực:**
+1. PBoC giữ nguyên LPR 1Y ở 3.00% (tháng 7/2026) → chính sách tiền tệ nới lỏng duy trì.
+2. Standard Chartered nâng dự báo GDP Việt Nam 2026 lên 9.5% → xác nhận tăng trưởng mạnh.
+3. Xuất nhập khẩu đang trên đà đạt mốc 1,000 tỷ USD → động lực bên ngoài.
+4. Lợi suất trái phiếu chính phủ đi ngang → tín dụng không căng thẳng.
+5. Tỷ giá trung tâm tăng nhẹ các tuần trước (ngày 14/07: 25,225) → giai đoạn trước đó ổn định.
+
+**Tiêu cực:**
+1. Tỷ giá trung tâm 20/07 giảm 2 đồng (25.252) → áp lực tỷ giá quay lại trong phiên gần nhất.
+2. NHNN hút ròng 4,569.7 tỷ qua OMO phiên 20/07 → thanh khoản bị thu hẹp tạm thời.
+3. Giá thép HRC, phân ure Trung Quốc liên tục thủng đáy → tín hiệu suy yếu nhu cầu khu vực.
+4. Giá bạc Mỹ 6 tháng thấp, đường trắng Trung Quốc đáy 1 năm → giảm phát hàng hóa lan rộng.
+5. Năng lượng sạch Đông Nam Á đối mặt lực cản kép → rủi ro lạm phát chi phí đẩy.
+
+## 4. Kết luận tác động lên AI CIO
+- **Với macro layer:** Tâm lý tin tức phần lớn **hỗ trợ** kịch bản risk-on (tăng trưởng mạnh, chính sách thuận lợi, lợi nhuận doanh nghiệp tốt), đặc biệt ở khung 7d-30d. Tuy nhiên, khung 1d ghi nhận cảnh báo ngoại hối và hàng hóa, nên không hoàn toàn đồng nhất.
+- **Với market-internal tools:** Tín hiệu risk-on mạnh từ news có thể xung đột với các chỉ báo kỹ thuật/định lượng nếu chúng báo hiệu quá mua hoặc phân kỳ. Cần đối chiếu thêm, nhưng tổng thể xu hướng tin tức nghiêng về hỗ trợ vị thế chấp nhận rủi ro.
+- **Hành động:** Giữ thiên hướng tích cực, nhưng giảm bớt sự hưng phấn nếu tỷ giá tiếp tục giảm sâu; chú ý diễn biến hàng hóa Trung Quốc như chỉ báo sớm.
+
+## 5. Cảnh báo (Caveats)
+- **Chất lượng nguồn:** Khung 7d có ~35% tin từ mozyfin_social → đây là các luồng ý kiến mạng xã hội, độ tin cậy thấp hơn so với dữ liệu cứng (WiData) hoặc tin phân tích. Cần chiết khấu cường độ tín hiệu strong_risk_on ở khung này.
+- **Độ trễ dữ liệu:** Báo cáo sinh lúc 17:18 ngày 20/07/2026 → kịp thời cho phiên giao dịch cùng ngày.
+- **Nhiễu tiêu đề:** Các tín hiệu đơn lẻ (vd: tỷ giá giảm 2 đồng) có thể chỉ là biến động kỹ thuật; nên kết hợp khung dài hơn để tránh phản ứng quá mức.

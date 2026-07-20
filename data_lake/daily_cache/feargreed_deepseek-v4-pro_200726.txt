@@ -1,0 +1,41 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score: 57.2/100 – nằm trong vùng NEUTRAL (40–60).
+- EGARCH Vol (chuẩn hóa): 61.9% – trên ngưỡng 50%, tăng +3.2 điểm so với phiên trước.
+- Rolling Skewness: 0.04 – gần như bằng 0, phân phối lợi nhuận không lệch rõ.
+- Downside Correlation: 9.5% vs Upside Correlation: 19.4% – cả hai ở mức thấp, upside cao hơn nhưng vẫn dưới 20%.
+
+## 2. Interpretation
+Các chỉ báo cùng chỉ ra thị trường đang trong pha NEUTRAL / STOCK PICKING – biến động tăng nhẹ nhưng chưa đủ lan tỏa thành rủi ro hệ thống. Sự phân hóa cổ phiếu chiếm ưu thế, xác suất cao đây là môi trường không có xu hướng chung mạnh.
+
+## 3. Cross-Check
+- Score (cận trên neutral) <-> EGARCH Vol (trên trung bình): lệch pha nhẹ – vol cao hơn kỳ vọng của một pha hoàn toàn trung tính, nhưng mức +3.2% chưa đủ để đẩy điểm số xuống vùng FEAR.
+- Skewness ~0 <-> Downside Correlation thấp, Upside Correlation nhỉnh hơn: nhất quán, không có dấu hiệu đám đông bán tháo hay mua đuổi tập trung.
+- Kết luận: không có divergence đáng flag, tín hiệu khá đồng nhất cho trạng thái phân hóa.
+
+## 4. Verdict
+- Beta exposure đề xuất: 0.60 – tương ứng với mức rủi ro hệ thống trung tính, hơi thiên về thị trường.
+- Hành động: “NO ACTIONABLE SIGNAL: các chỉ báo dao động trong biên độ trung tính, chưa đạt ngưỡng xác nhận xu hướng rủi ro hệ thống; duy trì beta target, ưu tiên chọn cổ phiếu.”
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "20/07/2026",
+  "regime": "NEUTRAL",
+  "score": 57.2,
+  "confidence": "medium",
+  "beta_target": 0.60,
+  "key_signals": [
+    "Score 57.2 nằm trong vùng NEUTRAL",
+    "EGARCH vol 61.9% tăng nhẹ, trên ngưỡng trung bình",
+    "Skewness gần 0, downside correlation thấp hơn upside correlation"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 57.2
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

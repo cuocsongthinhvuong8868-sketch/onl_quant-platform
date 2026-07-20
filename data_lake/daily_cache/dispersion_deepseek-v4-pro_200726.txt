@@ -1,0 +1,36 @@
+## 1. Observations
+- **Spread Z-score**: –1.01σ — dispersion hẹp hơn đáng kể so với mức trung bình 60 phiên gần nhất.
+- **DPI**: 46.7% — thấp hơn ngưỡng 70%, không có chế độ phân tán kéo dài.
+- **Avg Pairwise Correlation**: 0.014 — gần như không có tương quan giữa các cổ phiếu.
+- **Cross-Sectional Skewness & Kurtosis**: không có dữ liệu (N/A), không thể đánh giá đuôi béo hay hướng lệch trực tiếp.
+
+## 2. Structural State
+Thị trường đang ở trạng thái **bình thường, không căng thẳng**.  
+- DPI chỉ 46.7%, xác nhận **không tồn tại chế độ phân tán dai dẳng** — đây là một giai đoạn tĩnh lặng, không phải biến cố kéo dài.
+- Spread Z âm sâu (–1.01σ) cho thấy **mức độ phân tán hiện tại đang co hẹp rõ rệt**, ngược với trạng thái stress khi spread thường giãn rộng.  
+Không có dấu hiệu stress cục bộ hay stress toàn hệ thống; cấu trúc phản ánh một thị trường đang “nghỉ ngơi” sau khi biến động giảm nhiệt.
+
+## 3. Cross-Check & Tail Direction
+Vì thiếu dữ liệu skewness/kurtosis, ta không thể xác định **đuôi nào đang gãy** hay có hiện tượng fat-tail. Tuy nhiên, các chỉ báo hiện tại (spread thấp, correlation gần zero) gián tiếp chỉ ra rằng **rủi ro đuôi không hiện hữu cấp tính**.  
+Nếu có dữ liệu, một thị trường với correlation cực thấp và dispersion hẹp thường có phân phối tương đối đối xứng, ít xuất hiện cú sập cá biệt hay cú đẩy điên rồ trong phiên này.
+
+## 4. Regime Mapping
+Theo bản đồ 2D (DPI × Correlation), tổ hợp **DPI thấp (46.7%) + Correlation thấp (0.014)** đặt thị trường vào ô **Healthy Stock-Picking**.  
+Đây là vùng phân hóa mạnh giữa các cổ phiếu, nơi yếu tố idiosyncratic lấn át hệ thống – lý tưởng cho chiến lược chọn cổ phiếu.  
+**Rủi ro lớn nhất cho Portfolio Manager**:  
+- Sự **chuyển chế độ đột ngột** từ phân hóa sang “bầy đàn” (correlation tăng vọt) có thể thổi bay alpha, đặc biệt nếu danh mục đang đặt cược vào độc lập giữa các vị thế.  
+- Bản thân môi trường phân hóa dễ khiến PM **quá tập trung vào những câu chuyện riêng lẻ**, bỏ quên khả năng thanh khoản cục bộ cạn kiệt khi có tin tức bất lợi ở một cổ phiếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "20/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.01,
+  "dpi_pct": 46.7,
+  "avg_corr": 0.014,
+  "tail_skew_direction": "N/A",
+  "confidence": "medium"
+}
+```

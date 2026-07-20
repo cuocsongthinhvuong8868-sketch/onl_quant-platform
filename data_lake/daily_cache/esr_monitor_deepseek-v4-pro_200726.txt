@@ -1,0 +1,33 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: 63.1% – vùng WARNING, stress hệ thống trên ngưỡng an toàn.
+- Market State (HMM): ACTIVE STRESS – xu hướng giảm + stress cao.
+- Top 3 Pillar drivers: S_LIQ (35%), S_VAL (31%), S_COR (18%).
+- VN30 đóng cửa dưới MA125, xác nhận xu hướng giảm trung hạn.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (35%) – Volume Dry-Up đang dẫn dắt rủi ro.** Chỉ số này phản ánh thanh khoản thị trường khô cạn nghiêm trọng so với chuẩn 1 năm. Dòng tiền rút mạnh, lực cầu yếu kể cả trong bối cảnh giảm giá. Đây là tín hiệu báo trước các đợt sụt giảm kéo dài (liquidity-driven sell-off).
+- **S_VAL (31%) – Căng thẳng định giá cao.** Chênh lệch giữa lợi nhuận 252 phiên VN30 và lãi suất tiền gửi gia tăng, phản ánh mặt bằng giá đã vượt xa nền tảng vĩ mô. Áp lực giảm định giá sẽ tiếp tục khi room rủi ro mở rộng.
+- **S_COR (18%) – Tương quan hệ thống tăng.** PCA EVR(PC1) = 38.1%, các cổ phiếu di chuyển đồng pha, hành vi bầy đàn (herding) rõ nét. Kết hợp với liquidity dry-up, cơ chế “đồng loạt bán – không người mua” có thể kích hoạt bất kỳ lúc nào.
+
+## 3. Cross-Check
+- Giá VN30 nằm dưới MA125, SSI vừa vào WARNING, HMM cho ACTIVE STRESS → không xuất hiện phân kỳ. Stress ngầm đã chuyển thành thực tế bán chủ động.
+- Volume khô cạn và correlation cao là cặp dấu hiệu điển hình của thị trường suy yếu sâu, ít phục hồi kỹ thuật bền vững.
+
+## 4. Verdict
+Tỷ trọng tiền mặt đề xuất: **80%**.  
+Hành động phòng vệ: **Giảm beta danh mục về mức thấp** (có thể bán hợp đồng tương lai VN30F1M để hedge chủ động).  
+Trạng thái ACTIVE STRESS do S_LIQ dẫn dắt – volume khô cạn với cường độ cao, khả năng hồi phục kỹ thuật sẽ ngắn và kém tin cậy. Do SSI chưa đạt CRITICAL, chưa cần phòng thủ cực đoan, nhưng tuyệt đối không gia tăng rủi ro, không sử dụng margin, ưu tiên bảo toàn vốn. Pillar không mâu thuẫn, tín hiệu nhất quán: giảm tỷ trọng và phòng vệ.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.1,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 80,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

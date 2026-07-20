@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-20",
+  "composite_score": 28,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa hạ nhiệt thực sự."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 8.5,
+      "unit": "%",
+      "description": "Độ rộng phục hồi trên 45% là dấu hiệu thị trường thoát suy yếu."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.1,
+      "unit": "%",
+      "description": "SSI xuống dưới 55% báo hiệu stress hệ thống hạ xuống mức an toàn."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.334,
+      "unit": "",
+      "description": "Đuôi béo robust biến mất khi toàn bộ lưới xi < 0.25."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 13.3,
+      "unit": "th pct",
+      "description": "Phân vị tương quan Vingroup giảm dưới 70 cho thấy rủi ro tập trung nhóm này chưa quay lại."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 80.0,
+      "unit": "th pct",
+      "description": "CQS Percentile xuống dưới 80 báo hiệu stress tín dụng rác hạ nhiệt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-20",
+  "source": "ai_cio_executive_summary"
+}
