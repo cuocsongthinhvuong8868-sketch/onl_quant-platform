@@ -1,0 +1,41 @@
+## 1. Mechanical Decomposition
+Net Liquidity tuần này đạt $5,986,659 triệu, tăng +$28,459 triệu so với tuần trước (Impulse dương).  
+Trong ba cấu phần, RRPONTSYD chỉ còn $151 triệu – gần như cạn kiệt, không đáng kể.  
+TGA ở mức $756,218 triệu, khá cao, cho thấy Kho bạc vẫn đang giữ tiền trong tài khoản, hiệu ứng hút thanh khoản (dù chưa thấy động thái tăng/giảm rõ rệt).  
+WALCL không được cập nhật delta, nhưng với Impulse dương và TGA có thể giảm nhẹ hoặc WALCL tăng (ví dụ do Fed giảm tốc QT), kết luận chính: thanh khoản cải thiện chủ yếu đến từ phía tài sản Fed (QE chậm lại hoặc không tiếp tục giảm) và có thể TGA xả một phần, trong bối cảnh RRP không còn ảnh hưởng.
+
+## 2. Cycle Positioning
+So với đỉnh thanh khoản tuyệt đối tháng 3/2022 (khoảng $6.5–6.6 nghìn tỷ) và đáy năm 2024 (~$5.5 nghìn tỷ), mức hiện tại $5,986 tỷ nằm ở nửa trên của hành lang phục hồi, tương đương vùng trung tính – trên.  
+RRP đã cạn từ lâu (< $100B từ giữa 2025), do đó cơ chế “bơm” từ RRP không còn; mọi động thái QT giờ đây sẽ trực tiếp ảnh hưởng đến thanh khoản ngân hàng. Tuy nhiên, Impulse dương cho thấy thời điểm này chưa thấy áp lực rút ròng mạnh, có thể QT đang tạm dừng hoặc được trung hòa bởi các nhân tố khác. Với RRP ở mức gần zero, thanh khoản đang trong pha “hậu RRP” – nhạy cảm hơn với QT, nhưng hiện tại chưa có tín hiệu rút mạnh.
+
+## 3. Signal Strength
+- Tín hiệu kỹ thuật: **HOLD** (Impulse_EMA > 0 nhưng Z-Score < +1σ).
+- Z-Score +0.51σ, cận biên rất thấp, chỉ hơi trên trung bình 52 tuần, không đủ mạnh để kích hoạt ADD (đòi hỏi Z ≥ 1.0σ).
+- Impulse_EMA(4) = +39 tỷ, thể hiện đà tăng tuần tự, nhưng độ biến động chưa bứt phá – phù hợp với trạng thái trung tính, không phải “bùng nổ” cũng không phải “rút mạnh”.
+
+Tóm lại, tín hiệu trên bề mặt là **HOLD** – hoàn toàn trùng khớp với logic định lượng.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **SPX/NDX**: Thanh khoản tăng nhẹ nhưng không bùng nổ, z-score thấp → xu hướng thị trường vẫn phụ thuộc vào yếu tố khác (EPS, AI, kỳ vọng lãi suất). Bias: trung tính đến tích cực nhẹ.
+- **DXY/Gold/Crypto**: DXY có thể chịu áp lực nhẹ từ thanh khoản nới lỏng, nhưng chưa đủ để phá vỡ xu hướng hiện tại. Gold và Crypto hưởng lợi trong bối cảnh thanh khoản cải thiện, tuy nhiên động lực yếu vì z-score không cao. Bias: hơi có lợi cho tài sản rủi ro (BTC, ETH) nhưng không phải cú hích lớn.
+- **VN-Index** (lag 4-8 tuần): Với độ trễ điển hình, mức tăng thanh khoản tuần này có thể hỗ trợ dòng vốn ngoại vào thị trường mới nổi nếu duy trì trong vài tuần tới. Tuy nhiên, ở z=0.51, tương quan chỉ là yếu; bias: tích cực nhẹ nhưng chưa đủ để “mua mạnh”.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)
+- RRP chỉ còn $151 triệu, gần như bằng không – nghĩa là mọi tín hiệu dựa trên thay đổi RRP nay không còn giá trị đệm; nếu Fed tiếp tục QT mà không có bù đắp, thanh khoản sẽ giảm mạnh, dễ đảo chiều tín hiệu HOLD.
+- TGA đang ở mức cao (~$756 tỷ). Nếu Treasury đột ngột xả mạnh (do chi tiêu hay kế hoạch tài khóa), thanh khoản có thể tăng vọt, chuyển tín hiệu sang ADD.
+- Không có bằng chứng về emergency facility hay buyback đặc biệt, nhưng sự kiện bất ngờ về Basel III endgame hay repo “technical adjustment” có thể làm lệch bức tranh.
+
+## 6. Kết luận
+Thanh khoản Fed đang trong trạng thái **trung tính, hơi nghiêng nới lỏng** nhưng chưa đạt ngưỡng bùng nổ (HOLD). Outlook 2-4 tuần cho risk assets: hỗ trợ nhẹ, nhưng chưa phải cú huých rõ nét; VN-Index có thể hưởng lợi một cách khiêm tốn với độ trễ 4-8 tuần.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5987,
+  "signal": "HOLD",
+  "z_score": 0.51,
+  "regime": "neutral",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

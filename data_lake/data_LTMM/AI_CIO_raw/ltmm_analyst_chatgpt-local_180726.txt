@@ -1,0 +1,39 @@
+## 1. Phân tích Thượng nguồn - Funding Liquidity
+
+FLI ở mức **-0,092, trạng thái neutral, chất lượng usable**. Đây không phải cấu hình “thắt chặt thượng nguồn”. Dữ liệu không cho thấy SBV/tài khóa/BoP đang rút thanh khoản hệ thống một cách rõ ràng. Đặc biệt, **FX offshore stress footprint = -0,962, trạng thái easy, chất lượng HIGH** cho thấy áp lực USD offshore, nếu xét theo dấu vết hiện có, không phải nguồn căng thẳng chính.
+
+Vì vậy, không nên suy luận rằng hệ thống đang thiếu tiền cơ sở hoặc dự trữ FX đang bị áp lực mạnh. Lát cắt hiện tại thiên về: **nguồn cung thanh khoản thượng nguồn ổn định, nhưng hiệu quả truyền dẫn xuống tài sản rủi ro suy yếu**.
+
+## 2. Chẩn đoán Friction Layer & Wedge Diagnostics
+
+Các nút thắt nổi bật nhất nằm ở lớp thị trường và chênh lệch định giá: **Foreign flow 5d pressure = 0,874**, **Equity-rate wedge = 0,723**, **Market breadth deterioration = 0,688**, **VN30F basis pressure = 0,522**. Trong vector FRI, hai điểm cần theo dõi là **FRI_collateral = 0,429** và **FRI_intermediary = 0,415**, đều neutral nhưng chất lượng warning.
+
+Điểm đáng chú ý là các chỉ báo ngân hàng lõi chưa xác nhận một funding squeeze: **FRI_banking = -0,421**, **FRI_counterparty = -0,441**, **FRI_risk = -0,450**. Deposit rate dispersion cũng neutral âm nhẹ. Interbank line tightness proxy = **-0,735** không xác nhận căng hạn mức liên ngân hàng. Do đó, wedge hiện tại không nên được đọc là “ngân hàng đang thiếu thanh khoản”, mà là **ma sát truyền dẫn ở vùng collateral/intermediary và risk appetite thị trường**.
+
+Cần lưu ý chất lượng: Foreign flow 5d pressure có cờ **LOW_SHORT_BASELINE** và observation date ghi **2026-10-06**, lệch sau phiên tín hiệu **2026-07-18**. Đây là điểm bất thường dữ liệu, nên chỉ dùng nó như cảnh báo cần kiểm tra lại, không dùng làm kết luận độc lập.
+
+## 3. Khảo sát Market Liquidity - MLI
+
+MLI = **0,499, neutral, usable**: thị trường hạ nguồn chưa rơi vào trạng thái dry-up hệ thống, nhưng đã có áp lực biên. Breadth xấu đi, basis VN30F có áp lực, và dòng ngoại 5 ngày là nút thắt lớn nhất theo bảng constraint.
+
+Cấu trúc truyền dẫn đang **lệch pha**: FLI không thắt, nhưng TE ở trạng thái **breakdown**. Điều này hàm ý thanh khoản thượng nguồn không chuyển hóa trơn tru thành độ sâu và độ rộng thị trường. Rủi ro nằm ở “hấp thụ dòng tiền” bởi các ma sát: foreign flow pressure, equity-rate wedge, collateral/intermediary capacity.
+
+## 4. Kiểm toán Narrative Triggers
+
+Trigger duy nhất **FIRE** là **transmission_breakdown**, với 1/1 điều kiện đạt. Đây là tín hiệu cốt lõi: vấn đề không nằm ở funding shock toàn hệ thống, mà ở **đứt gãy hiệu quả truyền dẫn**.
+
+Các trigger còn lại đều non-fire. Đáng chú ý nhất là **intermediary_balance_sheet_stress** đạt **2/4 điều kiện**, nhưng chưa đủ và chưa đạt duration. **developer_cashflow_to_bank_stress** đạt **1/3**, chưa xác nhận lan truyền sang ngân hàng. Các trigger nguy hiểm như **banking_funding_squeeze, fx_liquidity_drain_alert, forced_deleveraging, collateral_chain_breakdown** đều 0 điều kiện tươi đạt, nên chưa có cơ sở kết luận stress hệ thống đã bùng phát.
+
+## 5. Kết luận & Cảnh báo Rủi ro Hệ thống
+
+Macro State tổng hợp: **STRESS_TRANSMITTING**. Rủi ro hệ thống ở mức **trung bình**, không phải funding crisis, nhưng có cảnh báo rõ về chất lượng truyền dẫn. Cần giám sát sát: foreign flow pressure, breadth, VN30F basis, equity-rate wedge, FRI_collateral và FRI_intermediary. Data Ops Quality nhìn chung pass, nhưng một số quality warning và lỗi ngày quan sát của foreign flow làm confidence không thể để high.
+
+```json
+{
+  "tool": "ltmm_macro",
+  "macro_state": "STRESS_TRANSMITTING",
+  "primary_bottleneck": "Foreign flow 5d pressure",
+  "active_triggers_count": 1,
+  "confidence_level": "medium"
+}
+```

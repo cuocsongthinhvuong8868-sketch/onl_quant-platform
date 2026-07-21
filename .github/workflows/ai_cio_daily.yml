@@ -81,7 +81,7 @@ jobs:
         run: |
           git config user.name "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
-          git add data_lake/daily_cache/ data_lake/Ai_cio_report.csv data_lake/pvgo/ reports/
+          git add data_lake/daily_cache/ data_lake/ai_cio_metrics/ data_lake/Ai_cio_report.csv data_lake/pvgo/ reports/
           if git diff --cached --quiet; then
             echo "No changes to commit."
             exit 0

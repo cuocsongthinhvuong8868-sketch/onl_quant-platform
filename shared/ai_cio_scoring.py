@@ -4,8 +4,12 @@ from typing import Any
 
 
 def regime_from_score(score: float) -> str:
-    if score <= 7:
-        return "CAPITULATION"
+    """Map the monotonic health score to a stress regime.
+
+    Capitulation is a price-path phase, not a lower score band.  It must be
+    confirmed independently before the decision layer can use that label.
+    """
+
     if score <= 14:
         return "EXTREME CRISIS"
     if score <= 29:

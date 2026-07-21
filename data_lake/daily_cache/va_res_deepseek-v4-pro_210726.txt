@@ -1,0 +1,30 @@
+## 1. Observations
+- VN30 Stress Index chạm 60.00% (vượt xa ngưỡng cảnh báo 40%), số mã thủng VaR 95%: 18/30 – dấu hiệu lây lan diện rộng.
+- Top 3 mã breach sâu nhất: SHB, BCM, SSI.
+- Market Complacency Index chỉ 8.33%, với 9 mã bị định giá sai (spread nén), dẫn đầu bởi HCM, MSB, STB.
+
+## 2. Contagion Assessment (Module B)
+Stress Index 60% phản ánh cú sống đang lan truyền real-time trên VN30, không còn là sự kiện cá biệt. Tỷ lệ 18/30 mã phá vỡ VaR 95% cho thấy mức độ lây nhiễm cao, gần như toàn bộ rổ bị cuốn vào đợt bán tháo. Ba mã dẫn đầu (SHB, BCM, SSI) không đơn thuần là “sự cố riêng lẻ” mà là đầu sóng của đợt điều chỉnh hệ thống, với nhóm tài chính – chứng khoán (SHB, SSI) và bất động sản (BCM) chịu áp lực mạnh nhất. Xác suất căng thẳng tiếp tục lan sang các mã còn lại là đáng kể.
+
+## 3. Complacency Assessment (Module C)
+Complacency 8.33% rất thấp, khẳng định thị trường **không ở regime ngủ quên** (không có hiện tượng spread bị nén trên diện rộng, định giá sai rủi ro). **Nhưng mức thấp này không hề hàm ý thị trường ổn định hay an toàn.** Thực tế, Stress Index cao cho thấy thị trường đang trong trạng thái căng thẳng cực độ (hoảng loạn / điều chỉnh mạnh), spread giãn rộng tự nhiên khiến Complacency lao dốc. Hiện tượng mispriced ở 9 mã (HCM, MSB, STB) là những vùng spread chưa kịp giãn theo, tiềm ẩn rủi ro bị bán tháo bổ sung nếu contagion lan tới.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash (Module B):**  
+  - SHB, BCM, SSI: Giảm tỷ trọng mạnh tay. Đặt mức cắt lỗ 5–7% dưới giá đóng cửa hôm nay hoặc sử dụng điểm phá vỡ MA20 ngày làm tín hiệu thoát hàng (tránh giữ qua đêm nếu thủng hỗ trợ kỹ thuật). Xác suất tiếp tục giảm sâu là cao khi dòng tiền rút khỏi nhóm dẫn dắt.
+- **Top 3 Mispriced (Module C):**  
+  - HCM, MSB, STB: Cảnh báo tiềm ẩn – spread bị nén bất thường trong khi thị trường đang stress. Nếu xuất hiện tín hiệu breach VaR, giảm tỷ trọng ngay. Hiện tại, theo dõi chặt chẽ, không chủ quan.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 60.00,
+  "breach_count": 18,
+  "complacency_pct": 8.33,
+  "mispriced_count": 9,
+  "regime": "contagion_active",
+  "watchlist_short": ["SHB", "BCM", "SSI"],
+  "confidence": "high"
+}
+```

@@ -1,8 +1,78 @@
+import json
 from pathlib import Path
 from datetime import date
 
 from config import ROOT_DIR
-from shared.pdf_export import _build_model, _extract_tail_risk, create_ai_cio_pdf, load_ai_cio_history
+from shared.pdf_export import (
+    _build_model,
+    _extract_confidence,
+    _extract_executive_order,
+    _extract_tail_risk,
+    _load_metrics_snapshot,
+    create_ai_cio_pdf,
+    load_ai_cio_history,
+)
+
+
+def test_pdf_order_parser_prefers_last_authoritative_normalized_block():
+    report = """
+- **Cash**: **80%**
+- **Equity**: **20%**
+- **Short VN30F1M**: **10%**
+
+**Deterministic Normalized Executive Order**
+- **Cash**: **100%**
+- **Equity**: **0%**
+- **Short VN30F1M**: **0%**
+"""
+
+    orders = {item["sleeve"]: item["target"] for item in _extract_executive_order(report)}
+
+    assert orders == {
+        "Cash": "100%",
+        "Equity": "0%",
+        "Short VN30F1M": "0%",
+    }
+
+
+def test_pdf_order_parser_ignores_structured_sleeves_after_final_line():
+    report = """
+### 6. Executive Order
+- **Cash**: **85%**
+- **Equity**: **15%**
+- **Short VN30F1M**: **0%**
+
+final score & regime : 24 ; regime : PRE-CRASH / PANIC
+
+- **Cash**: **20%**
+- **Equity**: **80%**
+- **Short VN30F1M**: **10%**
+"""
+
+    orders = {item["sleeve"]: item["target"] for item in _extract_executive_order(report)}
+
+    assert orders["Cash"] == "85%"
+    assert orders["Equity"] == "15%"
+    assert orders["Short VN30F1M"] == "0%"
+
+
+def test_pdf_metrics_loader_does_not_cross_provider_boundaries(tmp_path):
+    metrics_dir = tmp_path / "ai_cio_metrics"
+    metrics_dir.mkdir()
+    (metrics_dir / "metrics_120726.json").write_text(
+        '{"provider":"deepseek-v4-pro","report_date":"12/07/2026"}',
+        encoding="utf-8",
+    )
+    (metrics_dir / "metrics_chatgpt-local_120726.json").write_text(
+        '{"provider":"chatgpt-local","report_date":"12/07/2026","marker":"right"}',
+        encoding="utf-8",
+    )
+
+    payload = _load_metrics_snapshot(tmp_path, date(2026, 7, 12), "chatgpt-local")
+    missing = _load_metrics_snapshot(tmp_path, date(2026, 7, 12), "kimi-2.6")
+
+    assert payload["marker"] == "right"
+    assert missing == {}
 
 
 def test_load_ai_cio_history_ignores_malformed_rows_and_appends_report_date(tmp_path):
@@ -23,6 +93,9 @@ def test_load_ai_cio_history_ignores_malformed_rows_and_appends_report_date(tmp_
         target_date=date(2026, 7, 12),
         final_score=28,
         final_regime="PRE-CRASH / PANIC",
+        final_stress_regime="PRE-CRASH / PANIC",
+        final_capitulation_phase="FRAGILE",
+        final_capitulation_action_eligible=False,
     )
 
     assert [point.date.isoformat() for point in history] == [
@@ -31,6 +104,54 @@ def test_load_ai_cio_history_ignores_malformed_rows_and_appends_report_date(tmp_
         "2026-07-12",
     ]
     assert history[-1].source == "report"
+    assert history[-1].stress_regime == "PRE-CRASH / PANIC"
+    assert history[-1].capitulation_phase == "FRAGILE"
+    assert history[-1].capitulation_action_eligible is False
+
+
+def test_load_ai_cio_history_preserves_persisted_capitulation_fields(tmp_path):
+    data_lake = tmp_path / "data_lake"
+    data_lake.mkdir()
+    (data_lake / "Ai_cio_report.csv").write_text(
+        "ddmmyyyy,score,regime,source,provider,stress_regime,capitulation_phase,capitulation_action_eligible\n"
+        "12072026,12,CAPITULATION,auto,deepseek-v4-pro,EXTREME CRISIS,EXHAUSTION_CONFIRMED,true\n",
+        encoding="utf-8",
+    )
+
+    history = load_ai_cio_history(
+        data_lake=data_lake,
+        provider_key="deepseek-v4-pro",
+    )
+
+    assert len(history) == 1
+    assert history[0].stress_regime == "EXTREME CRISIS"
+    assert history[0].capitulation_phase == "EXHAUSTION_CONFIRMED"
+    assert history[0].capitulation_action_eligible is True
+
+
+def test_load_ai_cio_history_enriches_legacy_selected_report_row(tmp_path):
+    data_lake = tmp_path / "data_lake"
+    data_lake.mkdir()
+    (data_lake / "Ai_cio_report.csv").write_text(
+        "ddmmyyyy,score,regime,source,provider\n"
+        "12072026,12,CAPITULATION,auto,deepseek-v4-pro\n",
+        encoding="utf-8",
+    )
+
+    history = load_ai_cio_history(
+        data_lake=data_lake,
+        provider_key="deepseek-v4-pro",
+        target_date=date(2026, 7, 12),
+        final_score=12,
+        final_regime="CAPITULATION",
+        final_stress_regime="EXTREME CRISIS",
+        final_capitulation_phase="EXHAUSTION_CONFIRMED",
+        final_capitulation_action_eligible=True,
+    )
+
+    assert history[0].stress_regime == "EXTREME CRISIS"
+    assert history[0].capitulation_phase == "EXHAUSTION_CONFIRMED"
+    assert history[0].capitulation_action_eligible is True
 
 
 def test_create_ai_cio_pdf_smoke(tmp_path):
@@ -169,3 +290,60 @@ final score & regime : 27 ; regime : PRE-CRASH / PANIC
     assert model["metrics_tools"]["esr_monitor"]["key_metrics"]["ssi_pct"] == 63.0
     assert model["metrics_tools"]["var_cvar_vnindex"]["key_metrics"]["evt_xi"] == 0.345
     assert model["metrics_tools"]["abm_simulator"]["key_metrics"]["abm_early_warning_score"] == 45.0
+
+
+def test_build_model_uses_bold_confidence_and_final_metrics_state(tmp_path):
+    data_lake = tmp_path / "data_lake"
+    (data_lake / "daily_cache").mkdir(parents=True)
+    metrics_dir = data_lake / "ai_cio_metrics"
+    metrics_dir.mkdir()
+    (data_lake / "Ai_cio_report.csv").write_text(
+        "ddmmyyyy,score,regime,source,provider\n",
+        encoding="utf-8",
+    )
+    (data_lake / "daily_cache" / "ai_cio_context_deepseek-v4-pro_130726.json").write_text(
+        json.dumps(
+            {
+                "decision_state": {
+                    "metric_implied_score": 24,
+                    "stress_regime": "PRE-CRASH / PANIC",
+                    "resolved_regime": "PRE-CRASH / PANIC",
+                }
+            }
+        ),
+        encoding="utf-8",
+    )
+    (metrics_dir / "metrics_deepseek-v4-pro_130726.json").write_text(
+        json.dumps(
+            {
+                "provider": "deepseek-v4-pro",
+                "report_date": "13/07/2026",
+                "final_output": {
+                    "score": 31,
+                    "stress_regime": "FEAR / DISTRIBUTION",
+                    "resolved_regime": "FEAR / DISTRIBUTION",
+                    "confidence": "low",
+                },
+            }
+        ),
+        encoding="utf-8",
+    )
+    report = (
+        "- **Final confidence**: **LOW**\n\n"
+        "final score & regime : 31 ; regime : FEAR / DISTRIBUTION"
+    )
+
+    model = _build_model(report, date(2026, 7, 13), "deepseek-v4-pro", data_lake)
+
+    assert model["confidence"] == "LOW"
+    assert model["history"][-1].stress_regime == "FEAR / DISTRIBUTION"
+    assert model["history"][-1].regime == "FEAR / DISTRIBUTION"
+    assert _extract_confidence("- **Final confidence**: **LOW**") == "LOW"
+
+    metrics_fallback = _build_model(
+        "final score & regime : 31 ; regime : FEAR / DISTRIBUTION",
+        date(2026, 7, 13),
+        "deepseek-v4-pro",
+        data_lake,
+    )
+    assert metrics_fallback["confidence"] == "LOW"

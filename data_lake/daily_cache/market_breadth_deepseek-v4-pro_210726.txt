@@ -1,0 +1,33 @@
+## 1. Observations
+- MA20: **8.5%** — cực thấp (oversold, dưới ngưỡng 20%)
+- MA60: **12.9%** — rất thấp, hầu hết mã phá vỡ xu hướng 1 quý
+- MA125: **15.5%** — thấp, chu kỳ nửa năm suy yếu rõ
+- MA252: **18.1%** — thấp, xu hướng dài hạn giảm sâu (dưới 40%)
+
+## 2. Structural Health
+Cả 4 đường MA đều co cụm ở mức rất thấp, thể hiện sự đồng thuận giảm giá tuyệt đối.  
+Khớp mẫu hình **Bear Confirmed**: MA20 < 30% và MA252 < 40%. Không có dấu hiệu Bear Trap vì MA252 không trụ được trên 50%. Thị trường đang trong secular downtrend, sức mạnh dài hạn gần như biến mất.
+
+## 3. Money Flow Leadership
+- **Top volume ngắn hạn (MA20)**: Phân hóa nhưng thiên về phòng thủ – BWE, ASP (năng lượng, hạ tầng), BMP (VLXD), ACB (ngân hàng), EVS (chứng khoán).  
+- **Top volume dài hạn (MA252)**: Overlap với ngắn hạn ở ABS, ASP, BMP, BWE. Dòng tiền dài hạn chủ yếu trú ẩn trong các nhóm **Defensive & Essential** (năng lượng, vật liệu, tiện ích), thay vì nhóm chu kỳ/tăng trưởng như thép hay chứng khoán. Điều này cho thấy smart money đang ưu tiên phòng thủ, chấp nhận rủi ro thấp.
+
+## 4. Verdict
+- **Strategy**: Defensive cash-up – đứng ngoài, không bắt đáy. Không thực hiện trend-following hay mean-reversion T+ trong môi trường bear đồng thuận.  
+- **Đòn bẩy**: **0% margin** (hoàn toàn bằng vốn tự có nếu nắm giữ phòng thủ). Quy định không cho phép margin >30% khi MA252 < 70%, và ở 18.1% thì rủi ro margin call cực lớn.  
+- Không xuất hiện phân kỳ nào cần chờ xác nhận – Bear đã xác nhận toàn diện.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 8.5,
+  "ma60_pct": 12.9,
+  "ma125_pct": 15.5,
+  "ma252_pct": 18.1,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

@@ -322,9 +322,15 @@ def test_history_csv_only_accepts_deepseek_provider(tmp_path, monkeypatch):
         "PRE-CRASH / PANIC",
         source="manual",
         provider="deepseek-v4-pro",
+        stress_regime="PRE-CRASH / PANIC",
+        capitulation_phase="FRAGILE",
+        capitulation_action_eligible=False,
     )
-    assert "deepseek-v4-pro" in history_path.read_text(encoding="utf-8")
-    assert "kimi-2.6-local" not in history_path.read_text(encoding="utf-8")
+    history_text = history_path.read_text(encoding="utf-8")
+    assert "deepseek-v4-pro" in history_text
+    assert "kimi-2.6-local" not in history_text
+    assert "capitulation_phase" in history_text
+    assert "PRE-CRASH / PANIC,FRAGILE,false" in history_text
 
 
 def test_evidence_packet_compacts_verbose_report_and_extracts_metrics():
@@ -396,7 +402,15 @@ def test_ai_cio_metrics_snapshot_contains_adapter_history_and_methodology(tmp_pa
     history = [
         {"date": "2026-06-16", "score": "11", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
         {"date": "2026-06-17", "score": "11", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
-        {"date": "2026-06-18", "score": "13", "regime": "CRISIS / PRE-CRASH", "provider": "deepseek-v4-pro"},
+        {
+            "date": "2026-06-18",
+            "score": "13",
+            "regime": "CRISIS / PRE-CRASH",
+            "provider": "deepseek-v4-pro",
+            "stress_regime": "EXTREME CRISIS",
+            "capitulation_phase": "FRAGILE",
+            "capitulation_action_eligible": "false",
+        },
     ]
     state = ai_cio._build_decision_state(packets, history, "20/06/2026", "19/06/2026")
 
@@ -409,21 +423,46 @@ def test_ai_cio_metrics_snapshot_contains_adapter_history_and_methodology(tmp_pa
         history_ledger=history,
     )
 
-    assert snapshot["metrics_version"] == "2.0"
+    assert snapshot["metrics_version"] == "3.0"
     assert snapshot["tools"]["market_breadth"]["tool_score"] == 35
     assert snapshot["tools"]["pvgo"]["tool_score"] == 42
     assert snapshot["tools"]["pvgo"]["tool_regime"] == "PVGO ELEVATED EXPECTATION RISK"
     assert snapshot["history"]["window_size"] == ai_cio.AI_CIO_HISTORY_WINDOW
     assert snapshot["history"]["rolling_summary"]["history_count"] == 3
     assert snapshot["history"]["rolling_summary"]["current_baseline_score"] == state["metric_implied_score"]
+    assert snapshot["history"]["history_window"][-1]["stress_regime"] == "EXTREME CRISIS"
+    assert snapshot["history"]["history_window"][-1]["capitulation_phase"] == "FRAGILE"
+    assert snapshot["history"]["history_window"][-1]["capitulation_action_eligible"] is False
     assert any(card["tool"] == "pvgo" and "Adapter" in card["authority"] for card in snapshot["methodology_cards"])
 
     monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
     path = ai_cio._write_ai_cio_metrics_snapshot(snapshot)
     latest = path.parent / "latest.json"
+    provider_latest = path.parent / "latest_deepseek-v4-pro.json"
+    assert "deepseek-v4-pro" in path.name
     assert path.name.startswith("metrics_")
     assert latest.exists()
+    assert provider_latest.exists()
     assert json.loads(latest.read_text(encoding="utf-8"))["tools"]["pvgo"]["tool_score"] == 42
+
+
+def test_provider_metrics_file_selection_does_not_leak_other_provider(tmp_path):
+    import shared.ai_cio as ai_cio
+
+    metrics_dir = tmp_path / ai_cio.AI_CIO_METRICS_DIRNAME
+    metrics_dir.mkdir()
+    selected = metrics_dir / "metrics_alpha_200726.json"
+    selected_alias = metrics_dir / "latest.json"
+    other = metrics_dir / "metrics_beta_200726.json"
+    malformed = metrics_dir / "broken.json"
+    selected.write_text(json.dumps({"provider": "alpha"}), encoding="utf-8")
+    selected_alias.write_text(json.dumps({"provider": "alpha"}), encoding="utf-8")
+    other.write_text(json.dumps({"provider": "beta"}), encoding="utf-8")
+    malformed.write_text("{", encoding="utf-8")
+
+    files = ai_cio._provider_metrics_files(tmp_path, "alpha")
+
+    assert files == sorted([selected, selected_alias])
 
 
 def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
@@ -432,7 +471,7 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
     master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
 
-    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v4_credit_spread"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v5_capitulation_gate"
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
     assert "mozyfin_social" in card["limits"]
     assert "source_counts" in card["authority"]
@@ -595,8 +634,580 @@ def test_final_score_drift_audit_allows_small_same_band_overlay():
     assert ai_cio.parse_score_regime(audited) == ("24", "PRE-CRASH / PANIC")
 
 
+def test_final_regime_enforcement_rejects_unconfirmed_capitulation():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "final score & regime : 90 ; regime : EXTREME GREED / TOP WARNING\n"
+        "**final score & regime : 7 ; regime : CAPITULATION**"
+    )
+    decision_state = {
+        "capitulation_state": {
+            "phase": "CAPITULATION_CLIMAX",
+            "action_eligible": True,
+            "data_quality": {"status": "GOOD"},
+        }
+    }
+
+    enforced = ai_cio._enforce_final_score_regime(report, decision_state)
+
+    assert "final score & regime : 90" not in enforced
+    assert enforced.endswith("**final score & regime : 7 ; regime : EXTREME CRISIS**")
+    assert ai_cio.parse_score_regime(enforced) == ("7", "EXTREME CRISIS")
+
+
+def test_final_regime_enforcement_allows_only_actionable_exhaustion():
+    import shared.ai_cio as ai_cio
+
+    report = "final score & regime : 12 ; regime : EXTREME CRISIS"
+    eligible_state = {
+        "capitulation_state": {
+            "phase": "EXHAUSTION_CONFIRMED",
+            "action_eligible": True,
+            "data_quality": {"status": "LIMITED"},
+            "freshness_status": "CURRENT",
+        }
+    }
+    insufficient_state = {
+        "capitulation_state": {
+            "phase": "EXHAUSTION_CONFIRMED",
+            "action_eligible": True,
+            "data_quality": {"status": "INSUFFICIENT"},
+            "freshness_status": "CURRENT",
+        }
+    }
+
+    eligible = ai_cio._enforce_final_score_regime(report, eligible_state)
+    insufficient = ai_cio._enforce_final_score_regime(
+        eligible,
+        insufficient_state,
+    )
+
+    assert ai_cio.parse_score_regime(eligible) == ("12", "CAPITULATION")
+    assert ai_cio.parse_score_regime(insufficient) == ("12", "EXTREME CRISIS")
+
+
+def test_capitulation_policy_fails_closed_on_bad_quality_or_stale_data():
+    import shared.ai_cio as ai_cio
+
+    base_state = {
+        "phase": "EXHAUSTION_CONFIRMED",
+        "action_eligible": True,
+        "data_quality": {"status": "GOOD"},
+        "freshness_status": "CURRENT",
+    }
+    insufficient = {**base_state, "data_quality": {"status": "INSUFFICIENT"}}
+    stale = {**base_state, "freshness_status": "STALE"}
+    missing_flag = {key: value for key, value in base_state.items() if key != "action_eligible"}
+    missing_freshness = {
+        key: value for key, value in base_state.items() if key != "freshness_status"
+    }
+
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": base_state}) is True
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": insufficient}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": stale}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": missing_flag}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": missing_freshness}) is False
+
+
+def test_allocation_guard_clamps_false_capitulation_body_and_keeps_final_line_last():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **80%**\n"
+        "- **Equity**: **20%**, buy the capitulation bottom.\n"
+        "- **Short VN30F1M**: **0%**.\n\n"
+        "final score & regime : 7 ; regime : CAPITULATION"
+    )
+    decision_state = {
+        "capitulation_state": {
+            "phase": "CAPITULATION_CLIMAX",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        }
+    }
+
+    enforced = ai_cio._enforce_final_score_regime(report, decision_state)
+    enforced = ai_cio._enforce_final_allocation_policy(enforced, decision_state)
+
+    assert "- **Cash**: **100%**" in enforced
+    assert "- **Equity**: **0%**" in enforced
+    assert "Deterministic Allocation Guardrail" in enforced
+    assert "Any conflicting allocation or bottom-fishing instruction above is void" in enforced
+    assert enforced.strip().endswith(
+        "final score & regime : 7 ; regime : EXTREME CRISIS"
+    )
+
+
+def test_allocation_guard_closes_short_only_for_confirmed_exhaustion_override():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **80%**\n"
+        "- **Equity**: **20%**\n"
+        "- **Short VN30F1M**: **10%**\n\n"
+        "final score & regime : 12 ; regime : EXTREME CRISIS"
+    )
+    decision_state = {
+        "capitulation_state": {
+            "phase": "EXHAUSTION_CONFIRMED",
+            "action_eligible": True,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        }
+    }
+
+    enforced = ai_cio._enforce_final_score_regime(report, decision_state)
+    enforced = ai_cio._enforce_final_allocation_policy(enforced, decision_state)
+
+    assert "- **Equity**: **20%**" in enforced
+    assert "- **Short VN30F1M**: **0%**" in enforced
+    assert enforced.strip().endswith("final score & regime : 12 ; regime : CAPITULATION")
+
+
+def test_llm_overlay_cannot_widen_deterministic_baseline_allocation_cap():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **70%**\n"
+        "- **Equity**: **30%**\n"
+        "- **Short VN30F1M**: **0%**\n\n"
+        "final score & regime : 31 ; regime : FEAR / DISTRIBUTION"
+    )
+    decision_state = {
+        "allocation_guardrail": {
+            "max_equity_pct": 15.0,
+            "max_short_vn30f1m_pct": 0.0,
+        },
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+
+    assert "- **Cash**: **85%**" in enforced
+    assert "- **Equity**: **15%**" in enforced
+    assert "deterministic baseline cap" in enforced
+
+
+def test_incomplete_or_range_allocation_gets_safe_normalized_order():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- Cash 85-95% | Equity 5-15%\n"
+        "- Short Hedge: KHÔNG\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "allocation_guardrail": {
+            "max_equity_pct": 15.0,
+            "max_short_vn30f1m_pct": 0.0,
+        },
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+
+    assert "**Deterministic Normalized Executive Order**" in enforced
+    assert "- **Cash**: **100%**" in enforced
+    assert "- **Equity**: **0%**" in enforced
+    assert "- **Short VN30F1M**: **0%**" in enforced
+    assert enforced.strip().endswith(
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+
+
+def test_missing_executive_order_fails_closed_with_normalized_zero_risk_block():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### Executive Bottom Line\n"
+        "The model proposes an unstructured allocation.\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "allocation_guardrail": {
+            "max_equity_pct": 15.0,
+            "max_short_vn30f1m_pct": 0.0,
+        },
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+            "action_eligible": False,
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+
+    assert "### 6. Deterministic Executive Order" in enforced
+    assert "- **Cash**: **100%**" in enforced
+    assert "- **Equity**: **0%**" in enforced
+    assert enforced.strip().endswith(
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+
+
+def test_allocation_guard_validates_last_repeated_order_used_by_pdf():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **100%**\n"
+        "- **Equity**: **0%**\n"
+        "- **Short VN30F1M**: **0%**\n\n"
+        "The following repeated block must not bypass policy:\n"
+        "- **Cash**: **70%**\n"
+        "- **Equity**: **30%**\n"
+        "- **Short VN30F1M**: **10%**\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "allocation_guardrail": {
+            "max_equity_pct": 15.0,
+            "max_short_vn30f1m_pct": 0.0,
+        },
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+            "action_eligible": False,
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+
+    assert enforced.count("- **Cash**: **85%**") == 1
+    assert enforced.count("- **Equity**: **15%**") == 1
+    assert enforced.count("- **Short VN30F1M**: **0%**") == 2
+
+
+def test_post_final_duplicate_order_cannot_bypass_enforcer_or_pdf_parser():
+    import shared.ai_cio as ai_cio
+    from shared.pdf_export import _extract_executive_order
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **85%**\n"
+        "- **Equity**: **15%**\n"
+        "- **Short VN30F1M**: **0%**\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC\n\n"
+        "- **Cash**: **20%**\n"
+        "- **Equity**: **80%**\n"
+        "- **Short VN30F1M**: **10%**"
+    )
+    decision_state = {
+        "metric_implied_score": 24,
+        "metric_implied_regime": "PRE-CRASH / PANIC",
+        "allocation_guardrail": {
+            "max_equity_pct": 15.0,
+            "max_short_vn30f1m_pct": 0.0,
+        },
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+    orders = {item["sleeve"]: item["target"] for item in _extract_executive_order(enforced)}
+
+    assert enforced.strip().endswith(
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    assert "- **Equity**: **80%**" not in enforced
+    assert orders["Equity"] == "15%"
+    assert orders["Short VN30F1M"] == "0%"
+
+
+def test_section_seven_sleeves_do_not_hide_unsafe_section_six_order():
+    import shared.ai_cio as ai_cio
+    from shared.pdf_export import _extract_executive_order
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **20%**\n"
+        "- **Equity**: **80%**\n"
+        "- **Short VN30F1M**: **10%**\n\n"
+        "### 7. Confidence Note\n"
+        "- **Cash**: **100%**\n"
+        "- **Equity**: **0%**\n"
+        "- **Short VN30F1M**: **0%**\n\n"
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+    decision_state = {
+        "metric_implied_score": 24,
+        "metric_implied_regime": "PRE-CRASH / PANIC",
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+    orders = {item["sleeve"]: item["target"] for item in _extract_executive_order(enforced)}
+
+    assert orders["Cash"] == "85%"
+    assert orders["Equity"] == "15%"
+    assert orders["Short VN30F1M"] == "0%"
+
+
+def test_initial_allocation_guardrail_applies_ssi_and_robust_evt_caps():
+    import shared.ai_cio as ai_cio
+
+    base = {
+        "metric_implied_score": 85,
+        "metric_implied_regime": "BULL CONFIRMED",
+        "score_band_reason": {},
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+    low_ssi = ai_cio._allocation_policy_for_score(
+        85,
+        {**base, "metric_values": {"esr_monitor.ssi_pct": 0.9}},
+    )
+    elevated_ssi = ai_cio._allocation_policy_for_score(
+        85,
+        {**base, "metric_values": {"esr_monitor.ssi_pct": 63}},
+    )
+    critical_ssi = ai_cio._attach_capitulation_policy(
+        {**base, "metric_values": {"esr_monitor.ssi_pct": 81}},
+        base["capitulation_state"],
+    )["allocation_guardrail"]
+    robust_evt = ai_cio._allocation_policy_for_score(
+        85,
+        {
+            **base,
+            "metric_values": {
+                "var_cvar_vnindex.evt_xi": 0.31,
+                "var_cvar_vnindex.evt_xi_min": 0.30,
+            },
+        },
+    )
+
+    assert low_ssi["max_equity_pct"] == 95
+    assert elevated_ssi["max_equity_pct"] == 90
+    assert critical_ssi["max_equity_pct"] == 30
+    assert critical_ssi["min_cash_pct"] == 70
+    assert robust_evt["max_equity_pct"] == 30
+    assert robust_evt["min_cash_pct"] == 70
+
+
+def test_allocation_guard_reads_bold_low_confidence_and_reduces_one_bracket():
+    import shared.ai_cio as ai_cio
+
+    for confidence_line in (
+        "- **Final confidence**: **LOW**",
+        "Final confidence: **LOW**",
+    ):
+        report = (
+            "### 6. Executive Order\n"
+            "- **Cash**: **25%**\n"
+            "- **Equity**: **75%**\n"
+            "- **Short VN30F1M**: **0%**\n\n"
+            f"### 7. Confidence Note\n{confidence_line}\n\n"
+            "final score & regime : 65 ; regime : UPTREND / EXPANSION"
+        )
+
+        enforced = ai_cio._enforce_final_allocation_policy(report, {})
+
+        assert "- **Cash**: **45%**" in enforced
+        assert "- **Equity**: **55%**" in enforced
+        assert "LOW-confidence one-bracket reduction" in enforced
+
+
+def test_allocation_guard_uses_deterministic_score_when_final_line_is_missing():
+    import shared.ai_cio as ai_cio
+
+    report = (
+        "### 6. Executive Order\n"
+        "- **Cash**: **5%**\n"
+        "- **Equity**: **95%**\n"
+        "- **Short VN30F1M**: **0%**"
+    )
+    decision_state = {
+        "metric_implied_score": 24,
+        "metric_implied_regime": "PRE-CRASH / PANIC",
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_allocation_policy(report, decision_state)
+
+    assert "- **Cash**: **85%**" in enforced
+    assert "- **Equity**: **15%**" in enforced
+    assert enforced.strip().endswith(
+        "final score & regime : 24 ; regime : PRE-CRASH / PANIC"
+    )
+
+
+def test_final_regime_enforcement_clamps_score_bounds_and_structured_label():
+    import shared.ai_cio as ai_cio
+
+    below = ai_cio._enforce_final_score_regime(
+        "- **Resolved Regime**: CAPITULATION\n\n"
+        "final score & regime : -10 ; regime : CAPITULATION",
+        {},
+    )
+    above = ai_cio._enforce_final_score_regime(
+        "final score & regime : 150 ; regime : CAPITULATION",
+        {},
+    )
+
+    assert ai_cio.parse_score_regime(below) == ("0", "EXTREME CRISIS")
+    assert "- **Resolved Regime**: EXTREME CRISIS" in below
+    assert ai_cio.parse_score_regime(above) == (
+        "100",
+        "EXTREME GREED / TOP WARNING",
+    )
+
+
+def test_postprocess_normalizes_humility_sidecar_to_enforced_regime(tmp_path, monkeypatch):
+    import shared.ai_cio as ai_cio
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    payload = {
+        "report_date": "2026-07-20",
+        "composite_score": 7,
+        "regime": "CAPITULATION",
+        "falsification_rules": [],
+    }
+    report = (
+        "<!-- HUMILITY_JSON_START -->\n"
+        "```json\n"
+        f"{json.dumps(payload)}\n"
+        "```\n"
+        "<!-- HUMILITY_JSON_END -->\n\n"
+        "final score & regime : 7 ; regime : CAPITULATION"
+    )
+    decision_state = {
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        }
+    }
+
+    clean, path = ai_cio.postprocess_executive_summary_report(
+        report,
+        "chatgpt-local",
+        decision_state=decision_state,
+    )
+    sidecar = json.loads(path.read_text(encoding="utf-8"))
+
+    assert ai_cio.parse_score_regime(clean) == ("7", "EXTREME CRISIS")
+    assert sidecar["regime"] == "EXTREME CRISIS"
+
+
+def test_postprocess_normalizes_payload_only_regime_before_writing_sidecar(
+    tmp_path,
+    monkeypatch,
+):
+    import shared.ai_cio as ai_cio
+
+    monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
+    payload = {
+        "report_date": "2026-07-20",
+        "composite_score": 7,
+        "regime": "CAPITULATION",
+        "falsification_rules": [],
+    }
+    report = (
+        "<!-- HUMILITY_JSON_START -->\n"
+        "```json\n"
+        f"{json.dumps(payload)}\n"
+        "```\n"
+        "<!-- HUMILITY_JSON_END -->"
+    )
+    decision_state = {
+        "capitulation_state": {
+            "phase": "FRAGILE",
+            "action_eligible": False,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        }
+    }
+
+    clean, path = ai_cio.postprocess_executive_summary_report(
+        report,
+        "chatgpt-local",
+        decision_state=decision_state,
+    )
+    sidecar = json.loads(path.read_text(encoding="utf-8"))
+
+    assert ai_cio.parse_score_regime(clean) == ("7", "EXTREME CRISIS")
+    assert sidecar["regime"] == "EXTREME CRISIS"
+
+
+def test_drift_audit_accepts_actionable_capitulation_override():
+    import shared.ai_cio as ai_cio
+
+    report = "final score & regime : 12 ; regime : EXTREME CRISIS"
+    decision_state = {
+        "metric_implied_score": 12,
+        "metric_implied_regime": "EXTREME CRISIS",
+        "capitulation_state": {
+            "phase": "EXHAUSTION_CONFIRMED",
+            "action_eligible": True,
+            "data_quality": {"status": "GOOD"},
+            "freshness_status": "CURRENT",
+        },
+    }
+
+    enforced = ai_cio._enforce_final_score_regime(report, decision_state)
+    audited = ai_cio._annotate_final_score_drift(enforced, decision_state)
+
+    assert ai_cio.parse_score_regime(audited) == ("12", "CAPITULATION")
+    assert "Final Score Drift Audit" not in audited
+
+
+def test_final_regime_enforcement_matches_non_capitulation_score_band():
+    import shared.ai_cio as ai_cio
+
+    report = "final score & regime : 14 ; regime : PRE-CRASH / PANIC"
+
+    enforced = ai_cio._enforce_final_score_regime(report, {})
+
+    assert enforced == "final score & regime : 14 ; regime : EXTREME CRISIS"
+    assert ai_cio._score_band_for_regime("CAPITULATION") is None
+    assert ai_cio._score_band_for_regime("EXTREME CRISIS") == (0, 14)
+
+
 def test_tool_score_adapters_are_deterministic():
-    from shared.ai_cio_scoring import derive_metric_implied_scores, score_tool_packet
+    from shared.ai_cio_scoring import derive_metric_implied_scores, regime_from_score, score_tool_packet
+
+    # The score is monotonic health/stress. Capitulation requires an independent
+    # price-phase confirmation and is never inferred from a low scalar score.
+    assert regime_from_score(0) == "EXTREME CRISIS"
+    assert regime_from_score(7) == "EXTREME CRISIS"
+    assert regime_from_score(14) == "EXTREME CRISIS"
 
     breadth = score_tool_packet("market_breadth", {"breadth_ma20_pct": 39.8})
     esr = score_tool_packet("esr_monitor", {"ssi_pct": 65.8})

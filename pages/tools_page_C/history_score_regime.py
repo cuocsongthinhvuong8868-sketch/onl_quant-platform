@@ -52,6 +52,17 @@ def _regime_tone(regime_str: str) -> str:
     return "neutral"
 
 
+def _phase_tone(phase: str) -> str:
+    normalized = str(phase or "").upper()
+    if normalized in {"LIQUIDATION", "CAPITULATION_CLIMAX"}:
+        return "danger"
+    if normalized == "FRAGILE":
+        return "warning"
+    if normalized in {"EXHAUSTION_CONFIRMED", "REPAIR"}:
+        return "positive"
+    return "neutral"
+
+
 def render():
     st.markdown("## 📊 History Score & Regime")
     st.markdown(
@@ -80,16 +91,21 @@ def render():
     df = df.dropna(subset=["date"]).sort_values("date").reset_index(drop=True)
     df["score"] = pd.to_numeric(df["score"], errors="coerce")
 
-    # Backwards-compat: rows cũ thiếu cột source/provider → fill empty string
-    for col in ("source", "provider"):
+    # Backwards compatibility for rows written before phase persistence.
+    for col in (
+        "source",
+        "provider",
+        "stress_regime",
+        "capitulation_phase",
+        "capitulation_action_eligible",
+    ):
         if col not in df.columns:
             df[col] = ""
-    df["source"] = df["source"].fillna("").astype(str)
-    df["provider"] = df["provider"].fillna("").astype(str)
+        df[col] = df[col].fillna("").astype(str)
 
     # ── Summary metrics ──
     latest = df.iloc[-1]
-    col1, col2, col3, col4 = st.columns([1, 1, 2, 1])
+    col1, col2, col3, col4, col5 = st.columns([1, 1, 1.8, 1.8, 1])
     with col1:
         st.metric("📅 Ngày gần nhất", latest["date"].strftime("%d/%m/%Y"))
     with col2:
@@ -103,6 +119,9 @@ def render():
     with col3:
         render_signal_card("🎯 Regime", latest["regime"], tone=_regime_tone(str(latest["regime"])))
     with col4:
+        phase = str(latest.get("capitulation_phase") or "LEGACY / N/A")
+        render_signal_card("Capitulation Phase", phase, tone=_phase_tone(phase))
+    with col5:
         st.metric("📊 Số ngày", f"{len(df)}")
 
     st.markdown("---")
@@ -129,11 +148,12 @@ def render():
                 line=dict(width=2, color="#ffffff"),
                 symbol="circle",
             ),
-            customdata=df["regime"],
+            customdata=df[["regime", "capitulation_phase"]].to_numpy(),
             hovertemplate=(
                 "<b>%{x|%d/%m/%Y}</b><br>"
                 "Score: <b>%{y}/100</b><br>"
-                "Regime: <b>%{customdata}</b><br>"
+                "Regime: <b>%{customdata[0]}</b><br>"
+                "Capitulation phase: <b>%{customdata[1]}</b><br>"
                 "<extra></extra>"
             ),
         )
@@ -141,8 +161,7 @@ def render():
 
     # Regime zones background
     zone_bands = [
-        (0, 7,    "rgba(192, 57, 43, 0.10)",   "Capitulation (0-7)"),
-        (8, 14,   "rgba(231, 76, 60, 0.08)",   "Extreme Crisis (8-14)"),
+        (0, 14,   "rgba(231, 76, 60, 0.10)",   "Extreme Crisis (0-14)"),
         (15, 29,  "rgba(230, 126, 34, 0.08)",  "Pre-Crash / Panic (15-29)"),
         (30, 44,  "rgba(241, 196, 15, 0.08)",  "Fear / Distribution (30-44)"),
         (45, 59,  "rgba(52, 152, 219, 0.08)",  "Neutral / Stock-Picking (45-59)"),
@@ -163,7 +182,6 @@ def render():
 
     # Threshold lines
     thresholds = [
-        (7, "dot", "#c0392b"),
         (14, "dash", "#e74c3c"),
         (29, "dash", "#e67e22"),
         (44, "dash", "#f1c40f"),
@@ -210,11 +228,36 @@ def render():
                 return "👤 Manual (user)"
             return "—"  # rows cũ trước upgrade
 
-        display_df = df[["date", "score", "regime", "source", "provider"]].copy()
+        display_df = df[
+            [
+                "date",
+                "score",
+                "regime",
+                "capitulation_phase",
+                "capitulation_action_eligible",
+                "source",
+                "provider",
+            ]
+        ].copy()
         display_df["date"] = display_df["date"].dt.strftime("%d/%m/%Y")
         display_df["source"] = display_df["source"].map(_source_badge)
         display_df["provider"] = display_df["provider"].replace("", "—")
-        display_df.columns = ["Ngày", "Score", "Regime", "Nguồn", "Model"]
+        display_df["capitulation_phase"] = display_df["capitulation_phase"].replace("", "—")
+        display_df["capitulation_action_eligible"] = (
+            display_df["capitulation_action_eligible"]
+            .str.lower()
+            .map({"true": "Yes", "false": "No"})
+            .fillna("—")
+        )
+        display_df.columns = [
+            "Ngày",
+            "Score",
+            "Regime",
+            "Capitulation Phase",
+            "Action Eligible",
+            "Nguồn",
+            "Model",
+        ]
         # Reverse to show newest first
         display_df = display_df.iloc[::-1].reset_index(drop=True)
 
@@ -226,6 +269,8 @@ def render():
                 "Ngày": st.column_config.TextColumn("📅 Ngày", width="small"),
                 "Score": st.column_config.NumberColumn("📈 Score", format="%d", width="small"),
                 "Regime": st.column_config.TextColumn("🎯 Regime", width="large"),
+                "Capitulation Phase": st.column_config.TextColumn("Capitulation Phase", width="medium"),
+                "Action Eligible": st.column_config.TextColumn("Action Eligible", width="small"),
                 "Nguồn": st.column_config.TextColumn("🔧 Nguồn", width="small",
                                                       help="Auto = cron GitHub Actions; Manual = user chạy từ app"),
                 "Model": st.column_config.TextColumn("🤖 Model", width="small"),

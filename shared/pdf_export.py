@@ -42,6 +42,9 @@ class HistoryPoint:
     regime: str
     source: str = ""
     provider: str = ""
+    stress_regime: str = ""
+    capitulation_phase: str = ""
+    capitulation_action_eligible: bool | None = None
 
 
 def _set_color(pdf: FPDF, color: tuple[int, int, int], target: str = "text") -> None:
@@ -137,11 +140,11 @@ def _regime_color(regime: str) -> tuple[int, int, int]:
 
 def _status_color(status: str, score: float | None = None) -> tuple[int, int, int]:
     lower = str(status or "").lower()
-    if any(key in lower for key in ("negative", "bearish", "prohibited", "critical", "panic", "crisis", "pre-crash")):
+    if any(key in lower for key in ("negative", "bearish", "prohibited", "critical", "panic", "crisis", "pre-crash", "liquidation", "climax")):
         return RED
-    if any(key in lower for key in ("watch", "warning", "caution", "elevated", "tactical", "distribution", "fear")):
+    if any(key in lower for key in ("watch", "warning", "caution", "elevated", "tactical", "distribution", "fear", "fragile")):
         return AMBER
-    if any(key in lower for key in ("positive", "supportive", "implement", "bull", "improving")):
+    if any(key in lower for key in ("positive", "supportive", "implement", "bull", "improving", "exhaustion_confirmed", "repair")):
         return GREEN
     if score is not None:
         return _score_color(score)
@@ -173,6 +176,17 @@ def _safe_float(value: Any) -> float | None:
         return None
 
 
+def _safe_optional_bool(value: Any) -> bool | None:
+    if isinstance(value, bool):
+        return value
+    normalized = str(value or "").strip().lower()
+    if normalized in {"true", "1", "yes"}:
+        return True
+    if normalized in {"false", "0", "no"}:
+        return False
+    return None
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -188,16 +202,34 @@ def _load_context_state(data_lake: Path, provider_key: str, report_date: date) -
     return payload.get("decision_state", {}) if isinstance(payload, dict) else {}
 
 
-def _load_metrics_snapshot(data_lake: Path, report_date: date) -> dict[str, Any]:
-    dated = data_lake / "ai_cio_metrics" / f"metrics_{_ddmmyy(report_date)}.json"
-    payload = _load_json(dated)
+def _load_metrics_snapshot(
+    data_lake: Path,
+    report_date: date,
+    provider_key: str = "",
+) -> dict[str, Any]:
+    metrics_dir = data_lake / "ai_cio_metrics"
+    safe_provider = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(provider_key or "").strip())
+    provider_dated = metrics_dir / f"metrics_{safe_provider}_{_ddmmyy(report_date)}.json"
+    payload = _load_json(provider_dated) if safe_provider else {}
     if payload:
         return payload
 
-    latest = data_lake / "ai_cio_metrics" / "latest.json"
-    payload = _load_json(latest)
-    if str(payload.get("report_date", "")) == report_date.strftime("%d/%m/%Y"):
+    dated = metrics_dir / f"metrics_{_ddmmyy(report_date)}.json"
+    payload = _load_json(dated)
+    if payload and (not provider_key or str(payload.get("provider") or "") == provider_key):
         return payload
+
+    latest_candidates = []
+    if safe_provider:
+        latest_candidates.append(metrics_dir / f"latest_{safe_provider}.json")
+    latest_candidates.append(metrics_dir / "latest.json")
+    for latest in latest_candidates:
+        payload = _load_json(latest)
+        if (
+            str(payload.get("report_date", "")) == report_date.strftime("%d/%m/%Y")
+            and (not provider_key or str(payload.get("provider") or "") == provider_key)
+        ):
+            return payload
     return {}
 
 
@@ -207,6 +239,9 @@ def load_ai_cio_history(
     target_date: date | None = None,
     final_score: float | None = None,
     final_regime: str = "",
+    final_stress_regime: str = "",
+    final_capitulation_phase: str = "",
+    final_capitulation_action_eligible: bool | None = None,
 ) -> list[HistoryPoint]:
     """Load AI CIO score history and tolerate malformed conflict-marker rows."""
     path = data_lake / "Ai_cio_report.csv"
@@ -234,6 +269,11 @@ def load_ai_cio_history(
                         regime=str(row.get("regime", "") or ""),
                         source=str(row.get("source", "") or ""),
                         provider=str(row.get("provider", "") or ""),
+                        stress_regime=str(row.get("stress_regime", "") or ""),
+                        capitulation_phase=str(row.get("capitulation_phase", "") or ""),
+                        capitulation_action_eligible=_safe_optional_bool(
+                            row.get("capitulation_action_eligible")
+                        ),
                     )
                 )
 
@@ -248,7 +288,14 @@ def load_ai_cio_history(
 
     if target_date and final_score is not None:
         existing = next((item for item in rows if item.date == target_date), None)
-        if existing is None:
+        if existing is not None:
+            if not existing.stress_regime:
+                existing.stress_regime = final_stress_regime
+            if not existing.capitulation_phase:
+                existing.capitulation_phase = final_capitulation_phase
+            if existing.capitulation_action_eligible is None:
+                existing.capitulation_action_eligible = final_capitulation_action_eligible
+        else:
             rows.append(
                 HistoryPoint(
                     date=target_date,
@@ -256,6 +303,9 @@ def load_ai_cio_history(
                     regime=final_regime,
                     source="report",
                     provider=provider_key,
+                    stress_regime=final_stress_regime,
+                    capitulation_phase=final_capitulation_phase,
+                    capitulation_action_eligible=final_capitulation_action_eligible,
                 )
             )
             rows.sort(key=lambda point: point.date)
@@ -278,13 +328,17 @@ def _extract_tail_risk(report_text: str) -> str:
 
 
 def _extract_confidence(report_text: str) -> str:
-    match = re.search(r"Final confidence\s*:\s*\*\*?([^*.\n]+)", report_text, flags=re.IGNORECASE)
+    match = re.search(
+        r"Final\s+confidence\s*\*{0,2}\s*:\s*\*{0,2}\s*(low|medium|high)\b",
+        report_text,
+        flags=re.IGNORECASE,
+    )
     if match:
         return _sanitize_text(match.group(1)).upper()
     match = re.search(r"Confidence\)\*\*:\s*\*\*?([^*\n]+)", report_text, flags=re.IGNORECASE)
     if match:
         return _sanitize_text(match.group(1)).upper()
-    return "MEDIUM"
+    return ""
 
 
 def _extract_horizon(report_text: str) -> str:
@@ -318,6 +372,20 @@ def _extract_data_gaps(report_text: str, limit: int = 5) -> list[str]:
 
 def _extract_executive_order(report_text: str) -> list[dict[str, str]]:
     orders: list[dict[str, str]] = []
+    scoped_text = report_text
+    heading = re.search(
+        r"(?im)^#{1,4}\s*6(?:\.\d+)?\.?\s*(?:Deterministic\s+)?Executive\s+Order[^\n]*$",
+        report_text,
+    )
+    if heading:
+        tail = report_text[heading.end():]
+        boundary = re.search(
+            r"(?im)^(?:#{1,4}\s*(?:[7-9](?:\.\d+)?\.?\s+|FINAL)|"
+            r"\s*\**\s*final\s+score\s*&\s*regime\s*[:=])",
+            tail,
+        )
+        section_end = heading.end() + boundary.start() if boundary else len(report_text)
+        scoped_text = report_text[heading.start():section_end]
     sleeve_patterns = [
         ("Cash", r"^[ \t]*-[ \t]*\*\*Cash\*\*:[ \t]*\*\*?([0-9.]+%)\*\*?[ \t]*\.?[ \t]*(.*)$"),
         ("Equity", r"^[ \t]*-[ \t]*\*\*Equity\*\*:[ \t]*\*\*?([0-9.]+%)\*\*?,?[ \t]*(.*)$"),
@@ -326,9 +394,10 @@ def _extract_executive_order(report_text: str) -> list[dict[str, str]]:
         ("Avoid list", r"^[ \t]*-[ \t]*\*\*Avoid list\*\*:[ \t]*(.*)$"),
     ]
     for sleeve, pattern in sleeve_patterns:
-        match = re.search(pattern, report_text, flags=re.IGNORECASE | re.MULTILINE)
-        if not match:
+        matches = list(re.finditer(pattern, scoped_text, flags=re.IGNORECASE | re.MULTILINE))
+        if not matches:
             continue
+        match = matches[-1]
         if len(match.groups()) == 2:
             target = _sanitize_text(match.group(1))
             instruction = _sanitize_text(match.group(2)) or "See source report"
@@ -490,12 +559,42 @@ def _build_model(
 ) -> dict[str, Any]:
     score, regime = _parse_final_score_regime(report_text)
     context_state = _load_context_state(data_lake, provider_key, report_date)
-    metrics = _load_metrics_snapshot(data_lake, report_date)
+    metrics = _load_metrics_snapshot(data_lake, report_date, provider_key)
+    final_output = metrics.get("final_output") if isinstance(metrics, dict) else None
+    final_output = final_output if isinstance(final_output, dict) else {}
 
+    if score is None:
+        score = _safe_float(final_output.get("score"))
     if score is None:
         score = _safe_float(context_state.get("metric_implied_score"))
     if not regime:
-        regime = _sanitize_text(context_state.get("metric_implied_regime", "DATA GAP"))
+        regime = _sanitize_text(
+            final_output.get("resolved_regime")
+            or context_state.get("resolved_regime")
+            or context_state.get("metric_implied_regime", "DATA GAP")
+        )
+
+    score_anchor = metrics.get("score_anchor", {}) if isinstance(metrics, dict) else {}
+    capitulation_state = context_state.get("capitulation_state") or score_anchor.get(
+        "capitulation_state"
+    )
+    if not isinstance(capitulation_state, dict):
+        capitulation_state = {}
+
+    final_stress_regime = ""
+    if score is not None:
+        try:
+            from shared.ai_cio_scoring import regime_from_score
+
+            final_stress_regime = regime_from_score(score)
+        except Exception:
+            final_stress_regime = ""
+    if not final_stress_regime:
+        final_stress_regime = _sanitize_text(final_output.get("stress_regime"))
+    if not final_stress_regime:
+        final_stress_regime = str(
+            context_state.get("stress_regime") or score_anchor.get("stress_regime") or ""
+        )
 
     history = load_ai_cio_history(
         data_lake=data_lake,
@@ -503,6 +602,11 @@ def _build_model(
         target_date=report_date,
         final_score=score,
         final_regime=regime,
+        final_stress_regime=final_stress_regime,
+        final_capitulation_phase=str(capitulation_state.get("phase") or ""),
+        final_capitulation_action_eligible=_safe_optional_bool(
+            capitulation_state.get("action_eligible")
+        ),
     )
 
     score_for_display = score if score is not None else 0
@@ -513,7 +617,10 @@ def _build_model(
         "score": score_for_display,
         "regime": regime or "DATA GAP",
         "tail_risk": _extract_tail_risk(report_text),
-        "confidence": _extract_confidence(report_text),
+        "capitulation_state": capitulation_state,
+        "confidence": _extract_confidence(report_text)
+        or _sanitize_text(final_output.get("confidence")).upper()
+        or "MEDIUM",
         "horizon": _extract_horizon(report_text),
         "summary": _extract_summary_paragraph(report_text),
         "orders": _extract_executive_order(report_text),
@@ -1162,11 +1269,19 @@ def _page_tail_consensus(pdf: _AiCioPDF, model: dict[str, Any]) -> None:
             AMBER_100,
         ),
         (
-            "VaRES",
-            "Soft evidence",
-            "No hard adapter score available in the metrics snapshot; use as secondary context.",
-            BLUE,
-            BLUE_100,
+            "Capitulation gate",
+            str(model.get("capitulation_state", {}).get("phase") or "DATA GAP"),
+            (
+                "Action eligible; exhaustion confirmation can override the stress regime."
+                if model.get("capitulation_state", {}).get("action_eligible") is True
+                else "No bottom override; evidence scores are uncalibrated diagnostics."
+            ),
+            _status_color(str(model.get("capitulation_state", {}).get("phase") or "DATA GAP")),
+            (
+                GREEN_100
+                if model.get("capitulation_state", {}).get("action_eligible") is True
+                else AMBER_100
+            ),
         ),
     ]
     for idx, (label, value, body, color, fill) in enumerate(tail_cards):

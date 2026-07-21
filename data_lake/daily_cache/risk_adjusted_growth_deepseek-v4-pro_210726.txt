@@ -1,0 +1,34 @@
+## 1. Scenario Assessment
+
+Bộ tham số K = 1.0 (trung lập) và CoE = 14.0% là mức nền hợp lý cho ngành ngân hàng Việt Nam, không quá khắc nghiệt. Tuy nhiên, trong 6 mã tiêu biểu, chỉ có **SHB** đạt Alpha dương nhẹ (+4.0%), 5 mã còn lại đều âm, trong đó 3 mã đội sổ âm sâu từ -9.7% đến -12.8%. Mặt bằng chung đang nghiêng về trạng thái **đốt vốn (Alpha âm)**, cho thấy ngành khó tạo giá trị thặng dư bền vững cho cổ đông ở định giá hiện tại.
+
+## 2. Top Alpha Decomposition
+
+- **SHB (Alpha +4.0%)**: Động lực chính đến từ **P/B rất rẻ (0.80)** kết hợp ROE ổn định cao (17.5%) và biến động cực thấp (σROE 1.9%). Tỷ lệ chi trả thấp (8.6%) giúp giữ lại phần lớn lợi nhuận để tái đầu tư. Đây là mẫu **Fortress** kinh điển – chất lượng cao, phòng thủ tốt, margin of safety lớn.
+- **MBB (Alpha -0.6%)**: ROE cao (21.8%), σROE thấp (1.6%) và payout thấp cho thấy chất lượng hàng đầu, nhưng P/B 1.35 đã phản ánh phần lớn sức mạnh đó. Disciplined Return chỉ còn 13.5%, thấp hơn CoE một chút. Không phải bẫy, chỉ là **chất lượng cao nhưng định giá đầy đủ** (Fairly Valued Quality).
+- **ACB (Alpha -1.2%)**: ROE rất cao (23.0%) nhưng biến động σROE 2.7% cao hơn và P/B 1.25 không còn rẻ. Risk penalty cộng với payout 15.9% làm bào mòn lợi nhuận, đẩy Disciplined Return xuống dưới CoE. Thiên về **Growth Trap nhẹ** – tăng trưởng hấp dẫn nhưng rủi ro ẩn khiến Alpha khó dương.
+
+## 3. Value Traps Warning
+
+- **LPB (Alpha -12.8%)**: **Premium Burn** nghiêm trọng. P/B 3.39 quá đắt so với ROE 21.1%, lại thêm σROE 3.8% và payout lớn. Định giá ảo tưởng khiến Disciplined Return chỉ 1.1%.
+- **EIB (Alpha -10.3%)**: **Cheap Trap** điển hình – P/B 1.28 không đắt, nhưng ROE quá thấp (10.0%), σROE cao (3.8%) khiến lợi nhuận điều chỉnh rủi ro gần như bằng không. “Rẻ” nhưng không đáng.
+- **VPB (Alpha -9.7%)**: **Growth Trap** do biến động lợi nhuận lớn nhất (σROE 4.7%) kết hợp ROE trung bình (14.1%) và payout cao (24.6%). Risk penalty quá lớn triệt tiêu toàn bộ tiềm năng.
+
+## 4. Portfolio Construction
+
+- **Core Holding (Fortress)**: **SHB** là lựa chọn duy nhất xứng đáng, nên chiếm **60-70%** phân bổ cho ngành ngân hàng (nếu có).
+- **Tactical**: Hiện không mã nào trong Top 3 còn lại thỏa mãn Cheap-but-not-trap. MBB chất lượng cao nhưng Alpha âm nhẹ, có thể xem xét tỷ trọng rất nhỏ (<15%) nếu cần đa dạng hóa, nhưng không khuyến khích dựa trên nguyên tắc Alpha.
+- **Cấm mua / Underweight**: **LPB, EIB, VPB** – tuyệt đối tránh do Alpha âm sâu, rủi ro đốt vốn rõ rệt.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

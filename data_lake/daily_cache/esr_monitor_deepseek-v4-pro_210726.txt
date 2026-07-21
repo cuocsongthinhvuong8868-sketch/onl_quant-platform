@@ -1,0 +1,35 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: **63.1%** → đang trong vùng **WARNING** (ngưỡng 0.50 – 0.80).
+- Market State: **ACTIVE STRESS** (high stress + downtrend).
+- VN30 đóng cửa dưới MA125 (downtrend xác nhận).
+- Top 3 pillar drivers: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (volume khô cạn vs 1Y norm)** là driver số một: dollar volume giao dịch co hẹp đáng kể so với trung bình 1 năm, tín hiệu thanh khoản cạn kiệt. Trong downtrend, hiện tượng này thường đi kèm suy giảm niềm tin của dòng tiền lớn, không đủ lực hấp thụ lệnh bán.
+- **S_VAL (định giá)** ở mức cao, phản ánh chênh lệch giữa lợi suất VN30 1 năm so với lãi suất tiền gửi vẫn lớn. Khi thanh khoản khô, valuation tension dễ bị “xì hơi” nhanh vì thiếu lực mua đỡ.
+- **S_COR (tương quan hệ thống)** 18% nhưng đứng thứ ba, cho thấy các mã đang di chuyển đồng pha cao (herding) – đặc biệt trong các phiên giảm, rủi ro bán tháo đồng loạt hiện hữu.
+- Kết hợp: **volume dry-up + valuation tension + herding** là tổ hợp rủi ro ngầm điển hình cho một pha sustained selling, không phải bull-trap vì xu hướng đã rõ ràng đi xuống.
+
+## 3. Cross-Check
+- Giá VN30 hiện dưới MA125, không có divergence với SSI – stress tăng, giá giảm là nhất quán.
+- HMM regime ACTIVE STRESS khớp hoàn toàn với SSI WARNING và xu hướng giảm. Không có flag.
+
+## 4. Verdict
+- **Tăng tỉ trọng tiền mặt lên 65%**. Trong WARNING zone kèm ACTIVE STRESS, bảo toàn vốn là ưu tiên hàng đầu. Phần còn lại nắm giữ các cổ phiếu phòng thủ beta thấp.
+- **Hedge action**: giảm beta danh mục (bán cổ phiếu có beta cao, mua thêm phòng thủ). Nếu mandate cho phép, có thể short nhẹ VN30F1M để bảo vệ khi stress leo thang lên CRITICAL.
+- Với SSI 63.1% chưa đến CRITICAL, không chủ động mua put out-of-the-money vì chi phí cao, ưu tiên đơn giản hoá bằng nắm giữ tiền mặt và giảm beta.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.1,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 65,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

@@ -138,6 +138,8 @@ def build_ai_cio_prompt_payload(provider_key: str) -> dict[str, Any]:
         current_packets["risk_adjusted_growth"],
         ai_cio._build_evidence_packet("pvgo", pvgo_context, "valuation", data_date, max_excerpt_chars=700),
     ]
+    capitulation_state = ai_cio._build_capitulation_state(df_stocks, evidence_packets)
+    evidence_packets.append(ai_cio._build_capitulation_evidence_packet(capitulation_state))
 
     decision_state = ai_cio._build_decision_state(
         evidence_packets=evidence_packets,
@@ -145,6 +147,7 @@ def build_ai_cio_prompt_payload(provider_key: str) -> dict[str, Any]:
         report_date=report_date,
         data_date=data_date,
     )
+    decision_state = ai_cio._attach_capitulation_policy(decision_state, capitulation_state)
     metrics_snapshot = ai_cio._build_ai_cio_metrics_snapshot(
         provider_key=provider_key,
         report_date=report_date,
@@ -218,6 +221,10 @@ def write_prompt_markdown(payload: dict[str, Any], output_path: Path) -> Path:
 {json.dumps({
     "metric_implied_score": decision_state.get("metric_implied_score"),
     "metric_implied_regime": decision_state.get("metric_implied_regime"),
+    "stress_regime": decision_state.get("stress_regime"),
+    "resolved_regime": decision_state.get("resolved_regime"),
+    "capitulation_state": decision_state.get("capitulation_state"),
+    "allocation_guardrail": decision_state.get("allocation_guardrail"),
     "metric_implied_subscores": decision_state.get("metric_implied_subscores"),
     "hard_constraints": decision_state.get("hard_constraints"),
     "tool_score_count": decision_state.get("tool_score_count"),

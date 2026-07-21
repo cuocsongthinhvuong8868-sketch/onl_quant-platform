@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-21",
+  "composite_score": 25.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING trong 20 phiên gần nhất xuống dưới 5 cho thấy thanh khoản liên ngân hàng ổn định trở lại, làm suy yếu luận điểm stress."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 8.5,
+      "unit": "%",
+      "description": "Tỷ lệ mã trên MA20 vượt 45% chứng tỏ dòng tiền quay trở lại diện rộng, falsify chế độ PRE-CRASH."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.1,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% cho thấy stress hệ thống hạ nhiệt, loại bỏ rủi ro bán tháo lan tỏa."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.334,
+      "unit": "",
+      "description": "Tham số đuôi xi max trên toàn grid giảm dưới 0.25 xác nhận phân phối lợi suất không còn fat‑tail."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 13.3,
+      "unit": "th pct",
+      "description": "Slope percentile giữ ở mức thấp (decouple) không còn gây méo mó chỉ số; rule này đã FALSIFIED – không phải yếu tố then chốt."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.5,
+      "unit": "th pct",
+      "description": "CQS Percentile rớt khỏi vùng cực đoan, báo hiệu stress tín dụng toàn cầu giảm."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-21",
+  "source": "ai_cio_executive_summary"
+}

@@ -1,0 +1,41 @@
+<!-- ai-cio-cache-version: pca_point_in_time_v1 -->
+## 1. Observations
+- Risk Score ở mức 57.2/100, nằm sát biên trên vùng NEUTRAL (40–60), thay đổi +0.5 so với phiên trước.
+- EGARCH Vol (chuẩn hóa) đạt 61.9%, tăng +3.2% – đang ở phân vị cao so với lịch sử quan sát.
+- Rolling Skewness = 0.04, gần như đối xứng, chưa xuất hiện lệch âm đáng kể.
+- Downside Correlation (9.5%) thấp hơn rõ rệt Upside Correlation (19.4%), cho thấy phân hóa mạnh khi thị trường giảm.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường vận hành trong pha phân hóa (stock-picking) với dòng tiền luân chuyển giữa các nhóm cổ phiếu. Biến động đang gia tăng nhưng chưa đi kèm tâm lý sợ hãi đồng loạt, cũng chưa hình thành trạng thái đám đông mua quá mức.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: Điểm số trung tính nhưng biến động ở mức cao, tạo divergence nhẹ. Thông thường vol cao sẽ kéo score về vùng FEAR; sự lệch pha này cảnh báo rủi ro biến động đang tăng nhưng chưa phản ánh vào hành vi bán tháo.
+- **Skewness vs Correlation**: Skewness gần zero trong khi Upside Correlation cao hơn Downside — không nhất quán với cấu trúc FEAR (vốn cần skew âm và down-corr cao). Tương quan tăng điểm vượt trội cho thấy lực kéo chỉ số vẫn đến từ một số cổ phiếu trụ, không phải toàn thị trường.
+→ Hệ quả: tín hiệu mâu thuẫn, cần đánh giá với độ tin cậy trung bình, chưa đủ cơ sở để chuyển sang pha phòng thủ sâu.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.5 – 0.6 cho danh mục VN-Index (từ mức trung lập 1.0).
+- **Hành động**: Giảm tỷ trọng các vị thế chỉ số thuần, ưu tiên chọn cổ phiếu riêng lẻ có nền tảng phòng thủ. Hạn chế sử dụng đòn bẩy cao trong bối cảnh vol tăng; tăng tỷ lệ tiền mặt chờ xác nhận thêm. Không đặt cược định hướng mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "20/07/2026",
+  "regime": "NEUTRAL",
+  "score": 57.2,
+  "confidence": "medium",
+  "beta_target": 0.55,
+  "key_signals": [
+    "Điểm sợ hãi-tham lam ở biên trên vùng trung tính (57.2), chỉ tăng nhẹ +0.5",
+    "EGARCH Vol chuẩn hóa 61.9% tăng +3.2%, divergence với score",
+    "Skewness ~0 và tương quan tăng điểm cao hơn tương quan giảm điểm, thị trường phân hóa"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 57.2
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

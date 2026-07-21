@@ -12,15 +12,25 @@ from scipy.stats import percentileofscore
 from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 
 # ── History CSV (Ai_cio_report.csv) ──
-# Schema mới: ddmmyyyy, score, regime, source, provider
-# Cũ chỉ có 3 cột — auto-migrate khi đọc.
+# Score/stress regime plus the independent capitulation phase gate.
+# Older schemas are auto-migrated on the next write.
 CSV_HISTORY_PATH = DATA_LAKE / "Ai_cio_report.csv"
-CSV_HISTORY_HEADER = ['ddmmyyyy', 'score', 'regime', 'source', 'provider']
+CSV_HISTORY_HEADER = [
+    "ddmmyyyy",
+    "score",
+    "regime",
+    "source",
+    "provider",
+    "stress_regime",
+    "capitulation_phase",
+    "capitulation_action_eligible",
+]
 AI_CIO_HISTORY_PROVIDER = "deepseek-v4-pro"
-AI_CIO_METRICS_VERSION = "2.0"
+AI_CIO_METRICS_VERSION = "3.0"
 AI_CIO_HISTORY_WINDOW = 30
 AI_CIO_METRICS_DIRNAME = "ai_cio_metrics"
 HUMILITY_RULES_PREFIX = "ai_cio_humility_rules"
+NON_SCORING_EVIDENCE_TOOLS = frozenset({"humility_falsification", "capitulation_regime"})
 TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
 AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
@@ -34,7 +44,7 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "upside_ratio": "deterministic_mc_seed_v1",
     "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
-    "executive_summary": "ai_cio_methodology_v4_credit_spread",
+    "executive_summary": "ai_cio_methodology_v5_capitulation_gate",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -205,6 +215,14 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "limits": "Pre-shock stress diagnostic, not an exact crash-timing model and not a standalone buy/sell signal.",
         "authority": "ABM v4 early_warning_score/level and adapter score/regime/bias are authoritative when ABM CSV metrics are available.",
     },
+    "capitulation_regime": {
+        "domain": "price_path_capitulation_phase_gate",
+        "horizon": "sessions_to_weeks",
+        "primary_metric": "three_gate_climax_then_exhaustion_confirmation",
+        "score_direction": "Gate-only state; its uncalibrated evidence scores are not probabilities or composite-score inputs.",
+        "limits": "FRAGILE, LIQUIDATION and CAPITULATION_CLIMAX are not bottom signals. Only action-eligible EXHAUSTION_CONFIRMED can activate the CAPITULATION decision override.",
+        "authority": "Deterministic phase/action_eligible are authoritative for capitulation policy; the LLM cannot relabel them.",
+    },
 }
 HUMILITY_DEFAULT_RULES = [
     {
@@ -350,8 +368,11 @@ def upsert_history_csv(
     source: str = "manual",
     provider: str = "",
     target_date: date = None,
+    stress_regime: str = "",
+    capitulation_phase: str = "",
+    capitulation_action_eligible: bool | None = None,
 ) -> bool:
-    """Upsert (date, score, regime, source, provider) vào Ai_cio_report.csv.
+    """Upsert score, resolved regime, and independent capitulation phase history.
 
     Logic same-day:
     - Nếu file đã có row cùng ngày → **ghi đè** (drop row cũ, thêm row mới)
@@ -402,6 +423,13 @@ def upsert_history_csv(
         'regime': regime_val,
         'source': source,
         'provider': provider,
+        'stress_regime': stress_regime,
+        'capitulation_phase': capitulation_phase,
+        'capitulation_action_eligible': (
+            ""
+            if capitulation_action_eligible is None
+            else str(capitulation_action_eligible).lower()
+        ),
     })
 
     CSV_HISTORY_PATH.parent.mkdir(parents=True, exist_ok=True)
@@ -473,6 +501,8 @@ from tools.va_res.report import snapshot as vares_snapshot
 from tools.var_cvar_vnindex.report import snapshot as var_cvar_snapshot
 # Import Humility/Falsification audit context
 from tools.humility_falsification.page import get_humility_falsification_context
+from tools.capitulation_regime import METHODOLOGY_VERSION as CAPITULATION_METHODOLOGY_VERSION
+from tools.capitulation_regime import analyze_capitulation
 from shared.ai_cio_scoring import derive_metric_implied_scores, regime_from_score, score_tool_packet
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
@@ -594,7 +624,9 @@ def _read_ai_cio_context_for_summary(provider_key: str, target_date: date) -> st
     metrics_snapshot = payload.get("metrics_snapshot") or {}
     metrics_snapshot_path = payload.get("metrics_snapshot_path")
     if not metrics_snapshot:
-        candidate_path = _get_ai_cio_metrics_snapshot_path(target_date)
+        candidate_path = _get_ai_cio_metrics_snapshot_path(target_date, provider_key)
+        if not candidate_path.exists():
+            candidate_path = _get_ai_cio_metrics_snapshot_path(target_date)
         if candidate_path.exists():
             try:
                 metrics_snapshot = json.loads(candidate_path.read_text(encoding="utf-8"))
@@ -606,6 +638,12 @@ def _read_ai_cio_context_for_summary(provider_key: str, target_date: date) -> st
     compact = {
         "metric_implied_score": decision_state.get("metric_implied_score"),
         "metric_implied_regime": decision_state.get("metric_implied_regime"),
+        "baseline_stress_regime": decision_state.get("baseline_stress_regime"),
+        "baseline_resolved_regime": decision_state.get("baseline_resolved_regime"),
+        "stress_regime": decision_state.get("stress_regime"),
+        "resolved_regime": decision_state.get("resolved_regime"),
+        "capitulation_state": decision_state.get("capitulation_state"),
+        "allocation_guardrail": decision_state.get("allocation_guardrail"),
         "metric_implied_subscores": decision_state.get("metric_implied_subscores"),
         "tool_score_count": decision_state.get("tool_score_count"),
         "tool_scores": tool_scores[:8],
@@ -731,10 +769,16 @@ def _strip_telegram_source_echo(text: str) -> str:
     return text[: min(cut_points)].rstrip()
 
 
-def postprocess_executive_summary_report(report_text: str, provider_key: str) -> tuple[str, Path | None]:
+def postprocess_executive_summary_report(
+    report_text: str,
+    provider_key: str,
+    decision_state: dict[str, Any] | None = None,
+) -> tuple[str, Path | None]:
     """Strip the machine JSON block from the human report and save it as a sidecar file."""
 
     source_text = strip_wrapping_markdown_fence(report_text)
+    if decision_state is not None:
+        source_text = _enforce_final_score_regime(source_text, decision_state)
     payload, span = _extract_falsification_payload(source_text)
     clean_text = source_text
     if span is not None:
@@ -744,8 +788,6 @@ def postprocess_executive_summary_report(report_text: str, provider_key: str) ->
 
     if payload is None and '"falsification_rules"' in source_text:
         payload = _fallback_humility_payload_from_markdown(clean_text)
-
-    sidecar_path = _write_humility_rules_payload(payload, provider_key) if payload else None
 
     score_val, regime_val = parse_score_regime(clean_text)
     if score_val == "N/A" and payload:
@@ -762,15 +804,31 @@ def postprocess_executive_summary_report(report_text: str, provider_key: str) ->
     if score_val != "N/A" and regime_val != "N/A" and not _has_final_score_line(clean_text):
         clean_text = clean_text.rstrip() + f"\n\nfinal score & regime : {score_val} ; regime : {regime_val}\n"
 
+    if decision_state is not None:
+        clean_text = _enforce_final_score_regime(clean_text, decision_state)
+        enforced_score, enforced_regime = parse_score_regime(clean_text)
+        if enforced_score != "N/A":
+            score_val = enforced_score
+        if enforced_regime != "N/A":
+            regime_val = enforced_regime
+
+    if payload:
+        if score_val != "N/A":
+            payload["composite_score"] = float(score_val)
+        if regime_val != "N/A":
+            payload["regime"] = regime_val
+    sidecar_path = _write_humility_rules_payload(payload, provider_key) if payload else None
+
     return clean_text, sidecar_path
 
 
 def _score_band_for_regime(regime: str) -> tuple[int, int] | None:
     normalized = _clean_regime_value(regime).upper()
     if normalized == "CAPITULATION":
-        return 0, 7
+        # Capitulation is a path-dependent phase override, not a score band.
+        return None
     if normalized == "EXTREME CRISIS":
-        return 8, 14
+        return 0, 14
     if normalized == "PRE-CRASH / PANIC":
         return 15, 29
     if normalized == "FEAR / DISTRIBUTION":
@@ -784,6 +842,442 @@ def _score_band_for_regime(regime: str) -> tuple[int, int] | None:
     if normalized == "EXTREME GREED / TOP WARNING":
         return 90, 100
     return None
+
+
+def _capitulation_action_eligible(decision_state: dict[str, Any] | None) -> bool:
+    """Fail closed unless exhaustion is confirmed with usable detector data."""
+    if not isinstance(decision_state, dict):
+        return False
+
+    state: Any = decision_state.get("capitulation_state")
+    if hasattr(state, "to_dict"):
+        state = state.to_dict()
+    if not isinstance(state, dict):
+        return False
+
+    phase = state.get("phase")
+    if hasattr(phase, "value"):
+        phase = phase.value
+    if str(phase or "").strip().upper() != "EXHAUSTION_CONFIRMED":
+        return False
+
+    explicit_eligibility = state.get("action_eligible")
+    if explicit_eligibility is not True:
+        return False
+
+    data_quality: Any = state.get("data_quality")
+    if hasattr(data_quality, "to_dict"):
+        data_quality = data_quality.to_dict()
+    if isinstance(data_quality, dict):
+        quality_status = data_quality.get("status")
+    else:
+        quality_status = getattr(data_quality, "status", None)
+    if str(quality_status or "").strip().upper() not in {"GOOD", "LIMITED"}:
+        return False
+
+    freshness_status = state.get("freshness_status")
+    if str(freshness_status or "").strip().upper() != "CURRENT":
+        return False
+    return True
+
+
+def _enforce_final_score_regime(
+    report_text: str,
+    decision_state: dict[str, Any] | None,
+) -> str:
+    """Resolve the final regime deterministically while preserving its canonical line."""
+    if not report_text:
+        return report_text
+
+    score_value, _ = parse_score_regime(report_text)
+    final_score = _safe_float(score_value)
+    if final_score is None and isinstance(decision_state, dict):
+        final_score = _safe_float(
+            decision_state.get("final_score", decision_state.get("metric_implied_score"))
+        )
+    if final_score is None:
+        return report_text
+    final_score = max(0.0, min(100.0, final_score))
+
+    expected_regime = (
+        "CAPITULATION"
+        if _capitulation_action_eligible(decision_state)
+        else regime_from_score(final_score)
+    )
+    score_display = (
+        f"{final_score:.0f}" if final_score.is_integer() else f"{final_score:.1f}"
+    )
+    score_pattern = re.compile(
+        r"(?P<prefix>final\s+score\s*&\s*regime\s*[:=]\s*)"
+        r"(?P<score>[-+]?\d+(?:\.\d+)?)",
+        re.IGNORECASE,
+    )
+    score_matches = list(score_pattern.finditer(report_text))
+    if score_matches:
+        score_match = score_matches[-1]
+        report_text = (
+            f"{report_text[:score_match.start('score')]}{score_display}"
+            f"{report_text[score_match.end('score'):]}"
+        )
+    final_pattern = re.compile(
+        r"(?P<prefix>final\s+score\s*&\s*regime\s*[:=]\s*[-+]?\d+(?:\.\d+)?"
+        r"\s*;\s*regime\s*[:=]\s*)(?P<regime>[^\n`]+)",
+        re.IGNORECASE,
+    )
+    matches = list(final_pattern.finditer(report_text))
+    if matches:
+        match = matches[-1]
+        raw_regime = match.group("regime")
+        clean_regime = _clean_regime_value(raw_regime)
+        if clean_regime.upper() != expected_regime:
+            # Retain surrounding Markdown emphasis and punctuation on the final line.
+            token_start = raw_regime.lower().find(clean_regime.lower()) if clean_regime else -1
+            if token_start >= 0:
+                token_end = token_start + len(clean_regime)
+                replacement = (
+                    f"{raw_regime[:token_start]}{expected_regime}{raw_regime[token_end:]}"
+                )
+            else:
+                replacement = expected_regime
+            report_text = (
+                f"{report_text[:match.start('regime')]}{replacement}"
+                f"{report_text[match.end('regime'):]}"
+            )
+    else:
+        report_text = (
+            report_text.rstrip()
+            + f"\n\nfinal score & regime : {score_display} ; regime : {expected_regime}\n"
+        )
+
+    canonical_regimes = sorted(
+        {
+            "CAPITULATION",
+            "EXTREME CRISIS",
+            "PRE-CRASH / PANIC",
+            "FEAR / DISTRIBUTION",
+            "NEUTRAL / STOCK-PICKING",
+            "UPTREND / EXPANSION",
+            "BULL CONFIRMED",
+            "EXTREME GREED / TOP WARNING",
+        },
+        key=len,
+        reverse=True,
+    )
+    regime_token = re.compile(
+        "|".join(re.escape(value) for value in canonical_regimes),
+        re.IGNORECASE,
+    )
+    structured_line = re.compile(
+        r"(?im)^(?P<line>[^\n]*(?:Resolved\s+Regime|Final\s+CIO\s+score/regime\s+after\s+overlay)[^\n]*)$"
+    )
+
+    def normalize_structured_line(match: re.Match[str]) -> str:
+        line = match.group("line")
+        tokens = list(regime_token.finditer(line))
+        if not tokens:
+            return line
+        token = tokens[-1]
+        return f"{line[:token.start()]}{expected_regime}{line[token.end():]}"
+
+    report_text = structured_line.sub(normalize_structured_line, report_text)
+    canonical_line_pattern = re.compile(
+        r"(?im)^\s*\**\s*final\s+score\s*&\s*regime\s*[:=]\s*"
+        r"[-+]?\d+(?:\.\d+)?\s*;\s*regime\s*[:=][^\n`]+$"
+    )
+    canonical_lines = list(canonical_line_pattern.finditer(report_text))
+    if canonical_lines:
+        authoritative_line = canonical_lines[-1].group(0).strip()
+        report_text = canonical_line_pattern.sub("", report_text)
+        report_text = re.sub(r"\n{3,}", "\n\n", report_text).rstrip()
+        report_text = f"{report_text}\n\n{authoritative_line}" if report_text else authoritative_line
+    if isinstance(decision_state, dict):
+        final_stress_regime = regime_from_score(final_score)
+        decision_state["final_score"] = final_score
+        decision_state["final_stress_regime"] = final_stress_regime
+        decision_state["final_resolved_regime"] = expected_regime
+        decision_state["stress_regime"] = final_stress_regime
+        decision_state["resolved_regime"] = expected_regime
+        decision_state["capitulation_override_active"] = expected_regime == "CAPITULATION"
+    return report_text
+
+
+def _normalized_ssi_fraction(value: Any) -> float | None:
+    ssi = _safe_float(value)
+    if ssi is None or ssi < 0:
+        return None
+    # The structured key is ``ssi_pct`` and is contractually in percentage points.
+    return ssi / 100.0
+
+
+def _extract_final_confidence(report_text: str) -> str | None:
+    matches = list(
+        re.finditer(
+            r"(?im)^.*final\s+confidence\s*\*{0,2}\s*[:=]\s*\*{0,2}\s*"
+            r"(low|medium|high)\b",
+            report_text or "",
+        )
+    )
+    return matches[-1].group(1).lower() if matches else None
+
+
+def _allocation_policy_for_score(
+    score: float,
+    decision_state: dict[str, Any] | None,
+) -> dict[str, Any]:
+    capitulation_override = _capitulation_action_eligible(decision_state)
+    if capitulation_override:
+        max_equity, max_short = 20.0, 0.0
+        label = "CAPITULATION phase override"
+    elif score <= 14:
+        max_equity, max_short = 0.0, 20.0
+        label = "EXTREME CRISIS"
+    elif score <= 29:
+        max_equity, max_short = 15.0, 0.0
+        label = "PRE-CRASH / PANIC"
+    elif score <= 44:
+        max_equity, max_short = 35.0, 0.0
+        label = "FEAR / DISTRIBUTION"
+    elif score <= 59:
+        max_equity, max_short = 55.0, 0.0
+        label = "NEUTRAL / STOCK-PICKING"
+    elif score <= 74:
+        max_equity, max_short = 75.0, 0.0
+        label = "UPTREND / EXPANSION"
+    elif score <= 89:
+        max_equity, max_short = 95.0, 0.0
+        label = "BULL CONFIRMED"
+    else:
+        max_equity, max_short = 85.0, 0.0
+        label = "EXTREME GREED / TOP WARNING"
+    base_max_equity = max_equity
+    policy = {
+        "label": label,
+        "max_equity_pct": max_equity,
+        "base_max_equity_pct": base_max_equity,
+        "min_cash_pct": 100.0 - max_equity,
+        "max_short_vn30f1m_pct": max_short,
+        "capitulation_override": capitulation_override,
+        "bottom_fishing_allowed": capitulation_override,
+    }
+    metrics = decision_state.get("metric_values") if isinstance(decision_state, dict) else None
+    metrics = metrics if isinstance(metrics, dict) else {}
+    ssi = _normalized_ssi_fraction(metrics.get("esr_monitor.ssi_pct"))
+    evt_xi = _safe_float(metrics.get("var_cvar_vnindex.evt_xi"))
+    evt_xi_min = _safe_float(metrics.get("var_cvar_vnindex.evt_xi_min"))
+    score_band_reason = decision_state.get("score_band_reason") if isinstance(decision_state, dict) else None
+    caps = score_band_reason.get("caps", []) if isinstance(score_band_reason, dict) else []
+    robust_evt = (
+        evt_xi is not None
+        and evt_xi_min is not None
+        and evt_xi > 0.30
+        and evt_xi_min >= 0.30
+    ) or any("robust" in str(cap).lower() and "evt" in str(cap).lower() for cap in (caps or []))
+
+    tail_cap: float | None = None
+    tail_reasons: list[str] = []
+    if ssi is not None and ssi > 0.80:
+        tail_cap = 30.0
+        tail_reasons.append(f"SSI critical ({ssi:.2f})")
+    if robust_evt:
+        tail_cap = 30.0 if tail_cap is None else min(tail_cap, 30.0)
+        tail_reasons.append("EVT xi robust above 0.30")
+    if 60 <= score <= 74 and ssi is not None and ssi > 0.60:
+        tail_cap = 60.0 if tail_cap is None else min(tail_cap, 60.0)
+        tail_reasons.append(f"SSI elevated for expansion band ({ssi:.2f})")
+    if 75 <= score <= 89 and ssi is not None and ssi > 0.60:
+        tail_cap = 90.0 if tail_cap is None else min(tail_cap, 90.0)
+        tail_reasons.append(f"tail risk elevated for bull band ({ssi:.2f})")
+    if tail_cap is not None:
+        policy["max_equity_pct"] = min(policy["max_equity_pct"], tail_cap)
+        policy["tail_risk_cap_pct"] = tail_cap
+        policy["tail_risk_reasons"] = tail_reasons
+        policy["label"] += " + tail-risk cap"
+
+    confidence = str(
+        (decision_state or {}).get("final_confidence")
+        or (decision_state or {}).get("confidence")
+        or ""
+    ).strip().lower() if isinstance(decision_state, dict) else ""
+    if confidence == "low" and not capitulation_override:
+        if score <= 14:
+            confidence_cap = 0.0
+        elif score <= 29:
+            confidence_cap = 0.0
+        elif score <= 44:
+            confidence_cap = 15.0
+        elif score <= 59:
+            confidence_cap = 35.0
+        elif score <= 74:
+            confidence_cap = 55.0
+        else:
+            confidence_cap = 75.0
+        policy["max_equity_pct"] = min(policy["max_equity_pct"], confidence_cap)
+        policy["confidence_cap_pct"] = confidence_cap
+        policy["label"] += " + LOW-confidence one-bracket reduction"
+    baseline = decision_state.get("allocation_guardrail") if isinstance(decision_state, dict) else None
+    if isinstance(baseline, dict):
+        baseline_equity = _safe_float(baseline.get("max_equity_pct"))
+        baseline_short = _safe_float(baseline.get("max_short_vn30f1m_pct"))
+        if baseline_equity is not None:
+            policy["max_equity_pct"] = min(policy["max_equity_pct"], baseline_equity)
+        if baseline_short is not None:
+            policy["max_short_vn30f1m_pct"] = min(
+                policy["max_short_vn30f1m_pct"],
+                baseline_short,
+            )
+        policy["label"] += " + deterministic baseline cap"
+    policy["min_cash_pct"] = 100.0 - policy["max_equity_pct"]
+    return policy
+
+
+def _enforce_final_allocation_policy(
+    report_text: str,
+    decision_state: dict[str, Any] | None,
+) -> str:
+    """Clamp structured Executive Order sleeves to deterministic policy maxima."""
+
+    if not report_text:
+        return report_text
+    report_text = _enforce_final_score_regime(report_text, decision_state)
+    score_value, _ = parse_score_regime(report_text)
+    score = _safe_float(score_value)
+    if score is None and isinstance(decision_state, dict):
+        score = _safe_float(
+            decision_state.get("final_score", decision_state.get("metric_implied_score"))
+        )
+    if score is None:
+        score = 0.0
+    policy_state = dict(decision_state or {})
+    final_confidence = _extract_final_confidence(report_text)
+    if final_confidence:
+        policy_state["final_confidence"] = final_confidence
+        if isinstance(decision_state, dict):
+            decision_state["final_confidence"] = final_confidence
+    policy = _allocation_policy_for_score(score, policy_state)
+
+    heading = re.search(
+        r"(?im)^#{1,4}\s*6(?:\.\d+)?\.?\s*(?:Deterministic\s+)?Executive\s+Order[^\n]*$",
+        report_text,
+    )
+    if not heading:
+        final_lines = list(
+            re.finditer(
+                r"(?im)^.*final\s+score\s*&\s*regime\s*[:=].*$",
+                report_text,
+            )
+        )
+        normalized = (
+            "### 6. Deterministic Executive Order\n"
+            "- **Cash**: **100%**\n"
+            "- **Equity**: **0%**\n"
+            "- **Short VN30F1M**: **0%**\n\n"
+            "**Deterministic Allocation Guardrail (authoritative)**: "
+            f"The Executive Order section was missing or non-canonical. {policy['label']} "
+            f"permits Equity <= {policy['max_equity_pct']:.0f}% and Short VN30F1M <= "
+            f"{policy['max_short_vn30f1m_pct']:.0f}%; the safe normalized order above "
+            "overrides conflicting prose.\n\n"
+        )
+        if final_lines:
+            final_line = final_lines[-1]
+            return f"{report_text[:final_line.start()].rstrip()}\n\n{normalized}{report_text[final_line.start():]}"
+        return f"{report_text.rstrip()}\n\n{normalized.rstrip()}\n"
+    next_heading = re.search(
+        r"(?im)^(?:#{1,4}\s*(?:[7-9](?:\.\d+)?\.?\s+|FINAL)|"
+        r"\s*\**\s*final\s+score\s*&\s*regime\s*[:=])",
+        report_text[heading.end():],
+    )
+    section_end = heading.end() + next_heading.start() if next_heading else len(report_text)
+    section = report_text[heading.start():section_end]
+
+    patterns = {
+        "cash": re.compile(
+            r"(?im)^(?P<prefix>\s*-\s*\*\*(?:Cash|Tiền\s*mặt)\*\*\s*:\s*\**\s*)"
+            r"(?P<value>\d+(?:\.\d+)?)(?P<suffix>\s*%[^\n]*)$"
+        ),
+        "equity": re.compile(
+            r"(?im)^(?P<prefix>\s*-\s*\*\*(?:Equity|Cổ\s*phiếu)\*\*\s*:\s*\**\s*)"
+            r"(?P<value>\d+(?:\.\d+)?)(?P<suffix>\s*%[^\n]*)$"
+        ),
+        "short": re.compile(
+            r"(?im)^(?P<prefix>\s*-\s*\*\*(?:Short\s+VN30F1M|Phái\s*sinh|Hedge(?:\s+instrument)?)\*\*"
+            r"\s*:\s*\**\s*)(?P<value>\d+(?:\.\d+)?)(?P<suffix>\s*%[^\n]*)$"
+        ),
+    }
+
+    def last_match(key: str) -> re.Match[str] | None:
+        matches = list(patterns[key].finditer(section))
+        return matches[-1] if matches else None
+
+    def current_value(key: str) -> float | None:
+        match = last_match(key)
+        return float(match.group("value")) if match else None
+
+    values = {key: current_value(key) for key in patterns}
+    adjusted_equity = (
+        min(values["equity"], policy["max_equity_pct"])
+        if values["equity"] is not None
+        else None
+    )
+    adjusted_short = (
+        min(values["short"], policy["max_short_vn30f1m_pct"])
+        if values["short"] is not None
+        else None
+    )
+    adjusted_cash = 100.0 - adjusted_equity if adjusted_equity is not None else None
+    targets = {
+        "cash": adjusted_cash,
+        "equity": adjusted_equity,
+        "short": adjusted_short,
+    }
+    corrections: list[str] = []
+    for key, target in targets.items():
+        original = values[key]
+        if original is None or target is None or abs(original - target) < 1e-9:
+            continue
+        match = last_match(key)
+        if not match:
+            continue
+        display = f"{target:.0f}" if float(target).is_integer() else f"{target:.1f}"
+        section = (
+            f"{section[:match.start('value')]}{display}{section[match.end('value'):]}"
+        )
+        corrections.append(f"{key} {original:g}% -> {display}%")
+
+    structured_complete = all(value is not None for value in values.values())
+    prohibited_instruction = (
+        not policy["bottom_fishing_allowed"]
+        and re.search(
+            r"(?i)(?:bottom[- ]?fish(?:ing)?|buy\s+(?:the\s+)?(?:capitulation\s+)?bottom|bắt\s+đáy|mua\s+đáy)",
+            section,
+        )
+        is not None
+    )
+    if not corrections and structured_complete and not prohibited_instruction:
+        return report_text
+
+    guard_note = (
+        "\n\n**Deterministic Allocation Guardrail (authoritative)**: "
+        f"{policy['label']} permits Equity <= {policy['max_equity_pct']:.0f}%, "
+        f"Short VN30F1M <= {policy['max_short_vn30f1m_pct']:.0f}%, and "
+        f"Cash = 100% - Equity. "
+    )
+    if corrections:
+        guard_note += "Applied corrections: " + "; ".join(corrections) + ". "
+    if not structured_complete:
+        normalized_equity = adjusted_equity if adjusted_equity is not None else 0.0
+        normalized_short = adjusted_short if adjusted_short is not None else 0.0
+        normalized_cash = 100.0 - normalized_equity
+        normalized_block = (
+            "\n\n**Deterministic Normalized Executive Order**\n"
+            f"- **Cash**: **{normalized_cash:.0f}%**\n"
+            f"- **Equity**: **{normalized_equity:.0f}%**\n"
+            f"- **Short VN30F1M**: **{normalized_short:.0f}%**"
+        )
+        section = section.rstrip() + normalized_block
+        guard_note += "Structured Cash/Equity/Short lines were incomplete; the normalized three-line order above is authoritative. "
+    guard_note += "Any conflicting allocation or bottom-fishing instruction above is void."
+    section = section.rstrip() + guard_note + "\n\n"
+    return f"{report_text[:heading.start()]}{section}{report_text[section_end:].lstrip()}"
 
 
 def _annotate_final_score_drift(report_text: str, decision_state: dict[str, Any] | None) -> str:
@@ -807,6 +1301,11 @@ def _annotate_final_score_drift(report_text: str, decision_state: dict[str, Any]
         return report_text
     final_regime = _clean_regime_value(str(regime_val or ""))
     score_regime = regime_from_score(final_score)
+    expected_final_regime = (
+        "CAPITULATION"
+        if _capitulation_action_eligible(decision_state)
+        else score_regime
+    )
     drift = final_score - baseline
     drift_alert_points = int(decision_state.get("drift_alert_points") or 8)
     baseline_band = _score_band_for_regime(baseline_regime)
@@ -817,8 +1316,11 @@ def _annotate_final_score_drift(report_text: str, decision_state: dict[str, Any]
         flags.append(f"large overlay drift {drift:+d} points versus metric_implied_score={baseline}")
     if not final_in_baseline_band:
         flags.append(f"final score moved outside metric-implied band {baseline_regime}")
-    if final_regime not in ("", "N/A") and final_regime != score_regime:
-        flags.append(f"reported regime {final_regime} differs from score-matrix regime {score_regime}")
+    if final_regime not in ("", "N/A") and final_regime != expected_final_regime:
+        flags.append(
+            f"reported regime {final_regime} differs from deterministic decision regime "
+            f"{expected_final_regime}"
+        )
     if not flags:
         return report_text
 
@@ -1115,6 +1617,19 @@ def _extract_first_number(patterns: list[str], text: str) -> float | None:
     return None
 
 
+def _is_scoring_evidence_packet(packet: dict[str, Any]) -> bool:
+    """Keep audit/diagnostic evidence out of deterministic live scoring."""
+    if (
+        packet.get("layer") in {"history", "audit"}
+        or str(packet.get("tool") or "") in NON_SCORING_EVIDENCE_TOOLS
+    ):
+        return False
+    explicit = packet.get("scoring_eligible")
+    if isinstance(explicit, bool):
+        return explicit
+    return True
+
+
 def _format_evt_xi_summary(snap: dict[str, Any], xi_label: str) -> str:
     xi_text = f"{snap['evt_xi']:+.3f} MLE ({xi_label})"
     if snap.get("evt_interval_available"):
@@ -1139,12 +1654,22 @@ def _build_evidence_packet(
         "tool": tool_id,
         "layer": layer,
         "date": date_label or "N/A",
+        "scoring_eligible": (
+            layer not in {"history", "audit"}
+            and tool_id not in NON_SCORING_EVIDENCE_TOOLS
+        ),
         "bias": _infer_evidence_bias(text),
         "score": None if score_val == "N/A" else score_val,
         "regime": None if regime_val == "N/A" else regime_val,
         "key_metrics": {},
         "evidence_excerpt": _compact_text(text, max_chars=max_excerpt_chars),
     }
+
+    # Audit packets quote prior thresholds alongside current observations. Generic
+    # metric regexes cannot distinguish those roles, so retain the bounded evidence
+    # but never promote its numbers into the live metric contract.
+    if not _is_scoring_evidence_packet(packet):
+        return packet
 
     metric_patterns = {
         "ssi_pct": [r"\bSSI\b[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
@@ -1164,9 +1689,9 @@ def _build_evidence_packet(
         "evt_threshold_stable": [r"EVT\s+Threshold\s+Stable[^0-9]*(0|1)"],
         "breadth_ma20_pct": [r"MA20[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "cqs_percentile": [
-            r"\bCQS\s+Percentile\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
-            r"\bCQS\b[^\n]*?percentile[^0-9-]*([-+]?\d+(?:\.\d+)?)",
-            r"\bCQS\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
+            r"\bCQS\s+Percentile(?:\s+\d+\s*[Yy])?\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
+            r"\bCQS\b[^\n]*?percentile(?:\s+\d+\s*[Yy])?\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
+            r"\bCQS\b\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
         ],
         "vnibor_on": [r"Overnight[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
         "pvgo_pct": [r"\bPVGO\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
@@ -1243,6 +1768,452 @@ def _safe_float(value: Any) -> float | None:
         return None
 
 
+def _packet_metrics(evidence_packets: list[dict[str, Any]], tool_id: str) -> dict[str, Any]:
+    for packet in evidence_packets:
+        if str(packet.get("tool") or "") == tool_id:
+            metrics = packet.get("key_metrics")
+            return dict(metrics) if isinstance(metrics, dict) else {}
+    return {}
+
+
+def _packet_metrics_as_of(
+    evidence_packets: list[dict[str, Any]],
+    tool_id: str,
+    market_index: pd.Index,
+    expected_as_of: pd.Timestamp,
+    max_session_lag: int = 1,
+) -> tuple[dict[str, Any], dict[str, Any]]:
+    packet = next(
+        (
+            item
+            for item in evidence_packets
+            if str(item.get("tool") or "") == tool_id
+        ),
+        None,
+    )
+    raw_date = str((packet or {}).get("date") or "")
+    parsed_date = _parse_ledger_date({"date": raw_date})
+    metadata: dict[str, Any] = {
+        "packet_date": raw_date or None,
+        "session_lag": None,
+        "status": "MISSING",
+        "used": False,
+    }
+    if packet is None or parsed_date is None:
+        metadata["status"] = "MISSING" if packet is None else "INVALID_DATE"
+        return {}, metadata
+
+    packet_stamp = pd.Timestamp(parsed_date)
+    expected = pd.Timestamp(expected_as_of).normalize()
+    if packet_stamp.normalize() > expected:
+        metadata["status"] = "FUTURE_MISMATCH"
+        return {}, metadata
+
+    sessions = pd.DatetimeIndex(pd.to_datetime(market_index)).normalize().unique().sort_values()
+    sessions = sessions[sessions <= expected]
+    packet_sessions = sessions[sessions <= packet_stamp.normalize()]
+    if packet_sessions.empty:
+        metadata["status"] = "OUT_OF_SAMPLE"
+        return {}, metadata
+    packet_session = packet_sessions[-1]
+    session_lag = int(((sessions > packet_session) & (sessions <= expected)).sum())
+    metadata["session_lag"] = session_lag
+    if session_lag > max_session_lag:
+        metadata["status"] = "STALE"
+        return {}, metadata
+
+    metadata["status"] = "CURRENT" if session_lag == 0 else "PREVIOUS_SESSION"
+    metadata["used"] = True
+    return _packet_metrics(evidence_packets, tool_id), metadata
+
+
+def _load_abm_metric_history_as_of(
+    as_of: Any,
+    data_lake: Path | None = None,
+) -> pd.DataFrame:
+    """Load explicitly dated ABM state available on or before ``as_of``."""
+
+    cutoff = pd.Timestamp(as_of)
+    if cutoff.tzinfo is not None:
+        cutoff = cutoff.tz_localize(None)
+    cutoff = cutoff.normalize()
+    base_dir = Path(data_lake) if data_lake is not None else DATA_LAKE
+    frames: list[pd.DataFrame] = []
+    metric_names = {
+        "vulnerability",
+        "vulnerability_score",
+        "system_vulnerability",
+        "cascade_vulnerability",
+        "margin_distance",
+        "margin_distance_pct",
+        "distance_to_margin_call",
+        "distance_to_margin_call_pct",
+        "distance_to_cascade",
+        "distance_to_cascade_pct",
+        "forced_selling_share",
+        "forced_liquidation_share",
+        "liquidation_share",
+        "panic_share",
+        "panic_rate",
+        "panic_probability",
+        "panic_pct",
+        "panic_ratio_pct",
+        "orange_share",
+        "orange_pct",
+        "orange",
+        "red_share",
+        "red_pct",
+        "red",
+    }
+
+    for filename in ("abm_behavioral_state.csv", "abm_alert.csv"):
+        path = base_dir / filename
+        if not path.exists():
+            continue
+        try:
+            raw = pd.read_csv(path)
+        except (OSError, UnicodeError, pd.errors.ParserError):
+            continue
+        if raw.empty:
+            continue
+
+        normalized_columns = {
+            str(column).strip().lower(): column for column in raw.columns
+        }
+        date_column = next(
+            (
+                normalized_columns[name]
+                for name in ("as_of_date", "as_of", "date", "timestamp")
+                if name in normalized_columns
+            ),
+            None,
+        )
+        if date_column is None:
+            continue
+        metric_columns = [
+            column
+            for normalized, column in normalized_columns.items()
+            if normalized in metric_names
+        ]
+        if not metric_columns:
+            continue
+
+        parsed_dates = pd.to_datetime(
+            raw[date_column],
+            errors="coerce",
+            format="mixed",
+            dayfirst=True,
+        )
+        if getattr(parsed_dates.dt, "tz", None) is not None:
+            parsed_dates = parsed_dates.dt.tz_localize(None)
+        parsed_dates = parsed_dates.dt.normalize()
+        frame = raw.loc[:, metric_columns].apply(pd.to_numeric, errors="coerce")
+        frame.index = pd.DatetimeIndex(parsed_dates, name="as_of_date")
+        frame = frame.loc[frame.index.notna() & (frame.index <= cutoff)]
+        frame = frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+        if not frame.empty:
+            frames.append(frame)
+
+    if not frames:
+        return pd.DataFrame(index=pd.DatetimeIndex([], name="as_of_date"))
+
+    history = pd.concat(frames, axis=1).sort_index()
+    history = history.loc[:, ~history.columns.duplicated(keep="last")]
+    return history.loc[history.index <= cutoff]
+
+
+def _merge_abm_history_with_current_metrics(
+    history: pd.DataFrame,
+    current_metrics: dict[str, Any],
+    market_index: pd.Index,
+    as_of: Any,
+) -> pd.DataFrame:
+    """Expose dated history while keeping the live ABM view freshness-bounded."""
+
+    stamp = pd.Timestamp(as_of)
+    if stamp.tzinfo is not None:
+        stamp = stamp.tz_localize(None)
+    stamp = stamp.normalize()
+    frame = history.copy()
+    if not frame.empty:
+        frame.index = pd.DatetimeIndex(pd.to_datetime(frame.index)).tz_localize(None).normalize()
+        frame = frame.loc[frame.index <= stamp]
+
+    sessions = pd.DatetimeIndex(pd.to_datetime(market_index)).tz_localize(None).normalize()
+    sessions = sessions[(sessions <= stamp)].unique().sort_values()
+    if not frame.empty:
+        union = frame.index.union(sessions).union(pd.DatetimeIndex([stamp])).sort_values()
+        current_row = frame.reindex(union).ffill(limit=1).reindex([stamp]).iloc[0]
+    else:
+        current_row = pd.Series(dtype=object)
+
+    for key, value in (current_metrics or {}).items():
+        current_row[str(key)] = value
+
+    if frame.empty and current_row.empty:
+        return frame
+
+    live_row = current_row.to_frame().T
+    live_row.index = pd.DatetimeIndex([stamp], name="as_of_date")
+    frame = pd.concat([frame.loc[frame.index != stamp], live_row], axis=0, sort=False)
+    return frame.loc[~frame.index.duplicated(keep="last")].sort_index()
+
+
+def _insufficient_capitulation_state(reason: str, expected_as_of: Any = None) -> dict[str, Any]:
+    expected = pd.Timestamp(expected_as_of).isoformat() if expected_as_of is not None else None
+    return {
+        "as_of": None,
+        "expected_as_of": expected,
+        "freshness_status": "UNAVAILABLE",
+        "phase": "DATA_INSUFFICIENT",
+        "stress_risk_score_uncalibrated": None,
+        "liquidation_risk_score_uncalibrated": None,
+        "exhaustion_evidence_score_uncalibrated": None,
+        "features": {},
+        "percentiles": {},
+        "required_gates_met": {
+            "price_shock": False,
+            "breadth_shock": False,
+            "forced_selling": False,
+            "three_gate_climax": False,
+            "post_climax_exhaustion": False,
+        },
+        "trigger_reasons": ("Capitulation detector unavailable",),
+        "confirmation_reasons": (),
+        "data_quality": {
+            "status": "INSUFFICIENT",
+            "warnings": (str(reason)[:400],),
+        },
+        "action_eligible": False,
+        "methodology_version": CAPITULATION_METHODOLOGY_VERSION,
+        "score_interpretation": (
+            "Deterministic 0-100 evidence scores; uncalibrated and not probabilities."
+        ),
+    }
+
+
+def _build_capitulation_state(
+    df_stocks: pd.DataFrame,
+    evidence_packets: list[dict[str, Any]],
+    report_as_of: Any = None,
+) -> dict[str, Any]:
+    """Run the point-in-time phase detector without feeding it back into the score."""
+
+    expected_as_of = pd.Timestamp(df_stocks.index[-1]) if not df_stocks.empty else None
+    report_timestamp = pd.Timestamp(
+        report_as_of if report_as_of is not None else date.today()
+    ).normalize()
+    try:
+        if expected_as_of is None:
+            raise ValueError("constituent market data are empty")
+        esr_metrics, esr_freshness = _packet_metrics_as_of(
+            evidence_packets,
+            "esr_monitor",
+            df_stocks.index,
+            expected_as_of,
+        )
+        abm_metrics, abm_freshness = _packet_metrics_as_of(
+            evidence_packets,
+            "abm_simulator",
+            df_stocks.index,
+            expected_as_of,
+        )
+        abm_history = _load_abm_metric_history_as_of(expected_as_of)
+        dated_abm_metrics = _merge_abm_history_with_current_metrics(
+            abm_history,
+            abm_metrics,
+            df_stocks.index,
+            expected_as_of,
+        )
+        index_frame = load_custom("vnindex_cache.csv")
+        normalized_columns = {str(column).strip().lower(): column for column in index_frame.columns}
+        close_column = normalized_columns.get("vnindex")
+        if close_column is None:
+            raise ValueError("vnindex_cache.csv has no VNINDEX close column")
+        volume_column = normalized_columns.get("vnindex_volume")
+        constituent_volume = load_volumes()
+        snapshot = analyze_capitulation(
+            index_close=index_frame[close_column],
+            constituent_close=df_stocks,
+            index_volume=index_frame[volume_column] if volume_column is not None else None,
+            constituent_volume=constituent_volume,
+            esr_metrics=esr_metrics,
+            abm_metrics=dated_abm_metrics,
+            as_of=expected_as_of,
+        )
+    except Exception as exc:
+        return _insufficient_capitulation_state(
+            f"{type(exc).__name__}: {exc}",
+            expected_as_of=expected_as_of,
+        )
+
+    state = snapshot.to_dict()
+    state["external_metric_freshness"] = {
+        "esr_monitor": esr_freshness,
+        "abm_simulator": abm_freshness,
+    }
+    state["expected_as_of"] = expected_as_of.isoformat() if expected_as_of is not None else None
+    state["report_as_of"] = report_timestamp.isoformat()
+    actual_as_of = pd.Timestamp(snapshot.as_of)
+    market_timestamp = expected_as_of.normalize()
+    if report_timestamp >= market_timestamp:
+        market_data_lag = len(
+            pd.bdate_range(market_timestamp + pd.offsets.BDay(1), report_timestamp)
+        )
+    else:
+        market_data_lag = -len(
+            pd.bdate_range(report_timestamp + pd.offsets.BDay(1), market_timestamp)
+        )
+    state["market_data_lag_business_days"] = market_data_lag
+    state["market_data_freshness_policy"] = "current or previous business session"
+    detector_matches_market = actual_as_of.normalize() == market_timestamp
+    is_current = detector_matches_market and 0 <= market_data_lag <= 1
+    state["freshness_status"] = "CURRENT" if is_current else "STALE"
+    if not is_current:
+        state["action_eligible"] = False
+        quality = state.get("data_quality") if isinstance(state.get("data_quality"), dict) else {}
+        warnings = list(quality.get("warnings") or [])
+        if not detector_matches_market:
+            warnings.append(
+                f"detector as_of {actual_as_of.date()} differs from market data {expected_as_of.date()}"
+            )
+        if market_data_lag < 0:
+            warnings.append(
+                f"market data {expected_as_of.date()} are future-dated versus report {report_timestamp.date()}"
+            )
+        elif market_data_lag > 1:
+            warnings.append(
+                f"market data lag is {market_data_lag} business days versus report date; action gate disabled"
+            )
+        quality["warnings"] = warnings
+        if quality.get("status") == "GOOD":
+            quality["status"] = "LIMITED"
+        state["data_quality"] = quality
+    stale_external = [
+        tool
+        for tool, metadata in state["external_metric_freshness"].items()
+        if metadata.get("used") is not True
+    ]
+    if stale_external:
+        quality = state.get("data_quality") if isinstance(state.get("data_quality"), dict) else {}
+        warnings = list(quality.get("warnings") or [])
+        warnings.append(
+            "external detector metrics excluded by as-of policy: " + ", ".join(stale_external)
+        )
+        quality["warnings"] = warnings
+        if quality.get("status") == "GOOD":
+            quality["status"] = "LIMITED"
+        state["data_quality"] = quality
+    return state
+
+
+def _build_capitulation_evidence_packet(state: dict[str, Any]) -> dict[str, Any]:
+    phase = str(state.get("phase") or "DATA_INSUFFICIENT")
+    features = state.get("features") if isinstance(state.get("features"), dict) else {}
+    diagnostic = {
+        "phase": phase,
+        "stress_risk_score_uncalibrated": state.get("stress_risk_score_uncalibrated"),
+        "liquidation_risk_score_uncalibrated": state.get("liquidation_risk_score_uncalibrated"),
+        "exhaustion_evidence_score_uncalibrated": state.get(
+            "exhaustion_evidence_score_uncalibrated"
+        ),
+        "required_gates_met": state.get("required_gates_met"),
+        "action_eligible": state.get("action_eligible") is True,
+        "freshness_status": state.get("freshness_status"),
+        "market_data_lag_business_days": state.get("market_data_lag_business_days"),
+        "external_metric_freshness": state.get("external_metric_freshness"),
+        "data_quality": state.get("data_quality"),
+        "price_structure": {
+            key: features.get(key)
+            for key in (
+                "return_1d",
+                "return_5d",
+                "drawdown",
+                "ma200_gap",
+                "downside_participation",
+                "new_low_252",
+                "breadth_ma20",
+                "turnover_ratio_20",
+            )
+        },
+        "trigger_reasons": state.get("trigger_reasons"),
+        "confirmation_reasons": state.get("confirmation_reasons"),
+    }
+    return {
+        "tool": "capitulation_regime",
+        "layer": "regime_gate",
+        "date": state.get("as_of") or "N/A",
+        "scoring_eligible": False,
+        "consensus_eligible": False,
+        "diagnostic_metrics_visible": True,
+        "bias": "neutral_or_mixed",
+        "score": None,
+        "regime": phase,
+        "key_metrics": diagnostic,
+        "evidence_excerpt": _compact_text(
+            json.dumps(diagnostic, ensure_ascii=False, default=str),
+            max_chars=2200,
+        ),
+    }
+
+
+def _attach_capitulation_policy(
+    decision_state: dict[str, Any],
+    capitulation_state: dict[str, Any],
+) -> dict[str, Any]:
+    """Attach the gate and resolve the baseline decision regime fail-closed."""
+
+    phase = str(capitulation_state.get("phase") or "DATA_INSUFFICIENT").upper()
+    action_eligible = _capitulation_action_eligible(
+        {"capitulation_state": capitulation_state}
+    )
+    stress_regime = str(decision_state.get("metric_implied_regime") or "")
+    resolved_regime = "CAPITULATION" if action_eligible else stress_regime
+    decision_state["score_semantics"] = (
+        "Monotonic health/stress score; lower is worse and does not identify a bottom."
+    )
+    decision_state["baseline_stress_regime"] = stress_regime
+    decision_state["baseline_resolved_regime"] = resolved_regime
+    # Legacy aliases remain the pre-LLM values until final post-processing.
+    decision_state["stress_regime"] = stress_regime
+    decision_state["capitulation_state"] = capitulation_state
+    decision_state["capitulation_override_active"] = action_eligible
+    decision_state["resolved_regime"] = resolved_regime
+    score = _safe_float(decision_state.get("metric_implied_score"))
+    decision_state["allocation_guardrail"] = (
+        _allocation_policy_for_score(score, decision_state) if score is not None else None
+    )
+
+    constraints = list(decision_state.get("hard_constraints") or [])
+    if phase in {"LIQUIDATION", "CAPITULATION_CLIMAX"}:
+        constraints.append(
+            f"Bottom-fishing prohibited: capitulation phase is {phase}; exhaustion is not confirmed"
+        )
+    elif phase == "FRAGILE":
+        constraints.append("Capitulation gate is FRAGILE; no bottom or short-closing override")
+    elif phase == "EXHAUSTION_CONFIRMED" and action_eligible:
+        constraints.append(
+            "CAPITULATION override active: exhaustion confirmed with usable data; close shorts and use tranche-only equity"
+        )
+    elif phase in {"EXHAUSTION_CONFIRMED", "DATA_INSUFFICIENT"}:
+        constraints.append(
+            "Capitulation override prohibited: confirmation data are insufficient, stale, or not action-eligible"
+        )
+    decision_state["hard_constraints"] = sorted(set(constraints))
+
+    writer_rules = list(decision_state.get("writer_rules") or [])
+    writer_rules.extend(
+        [
+            "Do not interpret capitulation evidence scores as probabilities.",
+            "Do not add the capitulation gate to the composite score or consensus; it reuses price, breadth, ESR, and ABM evidence.",
+            "Use CAPITULATION only when capitulation_state.phase is EXHAUSTION_CONFIRMED and action_eligible is true.",
+            "LIQUIDATION and CAPITULATION_CLIMAX prohibit bottom-fishing; they are not reversal confirmations.",
+        ]
+    )
+    decision_state["writer_rules"] = list(dict.fromkeys(writer_rules))
+    return decision_state
+
+
 def _round_or_none(value: float | None, digits: int = 1) -> float | None:
     if value is None:
         return None
@@ -1278,19 +2249,35 @@ def _build_history_rollup(
 ) -> dict[str, Any]:
     """Build compact deterministic history stats for AI CIO; no LLM trend summarizer needed."""
 
+    def optional_bool(value: Any) -> bool | None:
+        if isinstance(value, bool):
+            return value
+        normalized = str(value or "").strip().lower()
+        if normalized in {"true", "1", "yes"}:
+            return True
+        if normalized in {"false", "0", "no"}:
+            return False
+        return None
+
     rows = sorted(history_ledger or [], key=_history_row_sort_key)
     compact_history: list[dict[str, Any]] = []
     for row in rows[-AI_CIO_HISTORY_WINDOW:]:
         score = _safe_float(row.get("score"))
-        compact_history.append(
-            {
-                "date": row.get("date"),
-                "score": None if score is None else int(round(score)),
-                "regime": row.get("regime", "N/A"),
-                "source": row.get("source", ""),
-                "provider": row.get("provider", ""),
-            }
-        )
+        compact_row = {
+            "date": row.get("date"),
+            "score": None if score is None else int(round(score)),
+            "regime": row.get("regime", "N/A"),
+            "source": row.get("source", ""),
+            "provider": row.get("provider", ""),
+        }
+        for key in ("stress_regime", "capitulation_phase"):
+            value = row.get(key)
+            if value not in (None, ""):
+                compact_row[key] = value
+        action_eligible = optional_bool(row.get("capitulation_action_eligible"))
+        if action_eligible is not None:
+            compact_row["capitulation_action_eligible"] = action_eligible
+        compact_history.append(compact_row)
 
     series = list(compact_history)
     current_numeric = _safe_float(current_score)
@@ -1397,9 +2384,11 @@ def _build_tool_metrics_snapshot(evidence_packets: list[dict[str, Any]]) -> dict
         tool = str(packet.get("tool") or "")
         if not tool:
             continue
-        metrics = packet.get("key_metrics") or {}
-        adapter_score = packet.get("adapter_score")
-        if not isinstance(adapter_score, dict):
+        scoring_eligible = _is_scoring_evidence_packet(packet)
+        diagnostic_visible = packet.get("diagnostic_metrics_visible") is True
+        metrics = (packet.get("key_metrics") or {}) if scoring_eligible or diagnostic_visible else {}
+        adapter_score = packet.get("adapter_score") if scoring_eligible else None
+        if scoring_eligible and not isinstance(adapter_score, dict):
             adapter_score = score_tool_packet(tool, metrics)
         tools[tool] = {
             "tool": tool,
@@ -1409,12 +2398,22 @@ def _build_tool_metrics_snapshot(evidence_packets: list[dict[str, Any]]) -> dict
             "report_score": packet.get("score"),
             "report_regime": packet.get("regime"),
             "key_metrics": metrics,
+            "scoring_eligible": scoring_eligible,
+            "diagnostic_gate_only": diagnostic_visible and not scoring_eligible,
             "adapter_available": isinstance(adapter_score, dict),
             "tool_score": adapter_score.get("tool_score") if isinstance(adapter_score, dict) else None,
             "tool_regime": adapter_score.get("tool_regime") if isinstance(adapter_score, dict) else None,
             "tool_bias": adapter_score.get("tool_bias") if isinstance(adapter_score, dict) else None,
             "score_reason": adapter_score.get("score_reason") if isinstance(adapter_score, dict) else None,
-            "data_quality": "structured_adapter" if isinstance(adapter_score, dict) else "soft_excerpt_only",
+            "data_quality": (
+                "deterministic_gate_only"
+                if diagnostic_visible and not scoring_eligible
+                else "audit_evidence_only"
+                if not scoring_eligible
+                else "structured_adapter"
+                if isinstance(adapter_score, dict)
+                else "soft_excerpt_only"
+            ),
         }
     return tools
 
@@ -1432,7 +2431,10 @@ def _build_ai_cio_metrics_snapshot(
     history = _build_history_rollup(
         history_ledger=history_ledger,
         current_score=decision_state.get("metric_implied_score"),
-        current_regime=decision_state.get("metric_implied_regime"),
+        current_regime=(
+            decision_state.get("resolved_regime")
+            or decision_state.get("metric_implied_regime")
+        ),
         current_date_label=date.today().isoformat(),
     )
     methodology_cards = _build_methodology_cards(evidence_packets)
@@ -1445,6 +2447,8 @@ def _build_ai_cio_metrics_snapshot(
         "authority_rules": [
             "This JSON is deterministic and generated by code before final LLM synthesis.",
             "Adapter tool_score/tool_regime/tool_bias are authoritative when present.",
+            "Packets with scoring_eligible=false cannot affect composite metric inputs, bias counts, or tool-score consensus; a deterministic gate may add explicit phase-policy constraints.",
+            "The capitulation_regime packet is a deterministic gate: it can resolve the decision regime but cannot enter the composite score or consensus.",
             "LLM may explain or lightly overlay, but must not relabel adapter outputs from prose.",
             "History is for persistence/delta only; it must not anchor today's final score.",
             "Human report excerpts are supporting evidence, not the scoring source of truth.",
@@ -1452,6 +2456,13 @@ def _build_ai_cio_metrics_snapshot(
         "score_anchor": {
             "metric_implied_score": decision_state.get("metric_implied_score"),
             "metric_implied_regime": decision_state.get("metric_implied_regime"),
+            "baseline_stress_regime": decision_state.get("baseline_stress_regime"),
+            "baseline_resolved_regime": decision_state.get("baseline_resolved_regime"),
+            "stress_regime": decision_state.get("stress_regime"),
+            "resolved_regime": decision_state.get("resolved_regime"),
+            "capitulation_override_active": decision_state.get("capitulation_override_active"),
+            "capitulation_state": decision_state.get("capitulation_state"),
+            "allocation_guardrail": decision_state.get("allocation_guardrail"),
             "metric_implied_subscores": decision_state.get("metric_implied_subscores"),
             "score_band_reason": decision_state.get("score_band_reason"),
             "hard_constraints": decision_state.get("hard_constraints"),
@@ -1463,18 +2474,47 @@ def _build_ai_cio_metrics_snapshot(
     }
 
 
-def _get_ai_cio_metrics_snapshot_path(target_date: date | None = None) -> Path:
+def _get_ai_cio_metrics_snapshot_path(
+    target_date: date | None = None,
+    provider_key: str | None = None,
+) -> Path:
     date_key = (target_date or date.today()).strftime("%d%m%y")
-    return DATA_LAKE / AI_CIO_METRICS_DIRNAME / f"metrics_{date_key}.json"
+    provider = re.sub(r"[^a-zA-Z0-9_.-]+", "-", str(provider_key or "").strip())
+    filename = f"metrics_{provider}_{date_key}.json" if provider else f"metrics_{date_key}.json"
+    return DATA_LAKE / AI_CIO_METRICS_DIRNAME / filename
+
+
+def _provider_metrics_files(data_lake: Path, provider_key: str) -> list[Path]:
+    """Return only persisted metric snapshots owned by the selected provider."""
+
+    metrics_dir = Path(data_lake) / AI_CIO_METRICS_DIRNAME
+    selected: list[Path] = []
+    for path in metrics_dir.glob("*.json"):
+        try:
+            payload = json.loads(path.read_text(encoding="utf-8"))
+        except (OSError, ValueError):
+            continue
+        if str(payload.get("provider") or "") == str(provider_key):
+            selected.append(path)
+    return sorted(selected)
 
 
 def _write_ai_cio_metrics_snapshot(snapshot: dict[str, Any], target_date: date | None = None) -> Path:
-    path = _get_ai_cio_metrics_snapshot_path(target_date)
+    provider_key = str(snapshot.get("provider") or "").strip()
+    path = _get_ai_cio_metrics_snapshot_path(target_date, provider_key or None)
     path.parent.mkdir(parents=True, exist_ok=True)
     payload = json.dumps(snapshot, ensure_ascii=False, indent=2, default=str)
     path.write_text(payload, encoding="utf-8")
+    # Keep legacy aliases for existing readers while provider-aware readers use
+    # the collision-free files above.
+    legacy_dated_path = _get_ai_cio_metrics_snapshot_path(target_date)
+    if legacy_dated_path != path:
+        legacy_dated_path.write_text(payload, encoding="utf-8")
     latest_path = path.parent / "latest.json"
     latest_path.write_text(payload, encoding="utf-8")
+    if provider_key:
+        safe_provider = re.sub(r"[^a-zA-Z0-9_.-]+", "-", provider_key)
+        (path.parent / f"latest_{safe_provider}.json").write_text(payload, encoding="utf-8")
     return path
 
 
@@ -1505,15 +2545,24 @@ def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = AI
                         continue
                     if row_date >= date.today():
                         continue
-                    rows.append(
-                        {
-                            "date": row_date.isoformat(),
-                            "score": row.get("score", "N/A"),
-                            "regime": row.get("regime", "N/A"),
-                            "source": row.get("source", ""),
-                            "provider": row.get("provider", ""),
-                        }
+                    item = {
+                        "date": row_date.isoformat(),
+                        "score": row.get("score", "N/A"),
+                        "regime": row.get("regime", "N/A"),
+                        "source": row.get("source", ""),
+                        "provider": row.get("provider", ""),
+                    }
+                    optional_fields = {
+                        "stress_regime": row.get("stress_regime", ""),
+                        "capitulation_phase": row.get("capitulation_phase", ""),
+                        "capitulation_action_eligible": row.get(
+                            "capitulation_action_eligible", ""
+                        ),
+                    }
+                    item.update(
+                        {key: value for key, value in optional_fields.items() if value not in (None, "")}
                     )
+                    rows.append(item)
         except Exception:
             rows = []
 
@@ -3530,7 +4579,7 @@ def _build_consensus_map(current_packets: list[dict[str, Any]], tool_scores: lis
 
     for packet in current_packets:
         tool = str(packet.get("tool") or "")
-        if tool in scored_tools:
+        if tool in scored_tools or packet.get("consensus_eligible") is False:
             continue
         bias = packet.get("bias") if packet.get("bias") in soft else "neutral_or_mixed"
         soft[bias].append(
@@ -3562,15 +4611,16 @@ def _build_decision_state(
 ) -> dict[str, Any]:
     """Build a compact deterministic state so the final LLM explains decisions instead of re-reading prose."""
     current_packets = [packet for packet in evidence_packets if packet.get("layer") != "history"]
+    scoring_packets = [packet for packet in current_packets if _is_scoring_evidence_packet(packet)]
     bias_counts = {
-        "bullish": sum(1 for packet in current_packets if packet.get("bias") == "bullish"),
-        "bearish": sum(1 for packet in current_packets if packet.get("bias") == "bearish"),
-        "neutral_or_mixed": sum(1 for packet in current_packets if packet.get("bias") == "neutral_or_mixed"),
+        "bullish": sum(1 for packet in scoring_packets if packet.get("bias") == "bullish"),
+        "bearish": sum(1 for packet in scoring_packets if packet.get("bias") == "bearish"),
+        "neutral_or_mixed": sum(1 for packet in scoring_packets if packet.get("bias") == "neutral_or_mixed"),
     }
     hard_constraints: list[str] = []
     metric_values: dict[str, Any] = {}
     tool_scores: list[dict[str, Any]] = []
-    for packet in current_packets:
+    for packet in scoring_packets:
         adapter_score = packet.get("adapter_score")
         if not isinstance(adapter_score, dict):
             adapter_score = score_tool_packet(str(packet.get("tool") or ""), packet.get("key_metrics") or {})
@@ -3646,7 +4696,7 @@ def _build_decision_state(
             "Use evidence packets as the source of truth; omit raw child-report narration.",
             "In Tool Consensus, separate hard_adapter_consensus from soft_interpretive_consensus.",
             "Use metric_implied_score/regime as the baseline score before any LLM overlay.",
-            "Do not place final score in 8-14 solely because recent history was 11-13.",
+            "Do not place final score in 0-14 solely because recent history was 11-13.",
             "Hard constraints dominate LLM overlay and allocation.",
             "If evidence is missing, mark it DATA INSUFFICIENT instead of filling gaps.",
         ],
@@ -3785,12 +4835,15 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
         _build_evidence_packet("risk_adjusted_growth", r11, "current_tool", data_date, max_excerpt_chars=900),
         _build_evidence_packet("pvgo", pvgo_context, "valuation", data_date, max_excerpt_chars=700),
     ]
+    capitulation_state = _build_capitulation_state(df_stocks, evidence_packets)
+    evidence_packets.append(_build_capitulation_evidence_packet(capitulation_state))
     decision_state = _build_decision_state(
         evidence_packets=evidence_packets,
         history_ledger=history_ledger,
         report_date=report_date,
         data_date=data_date,
     )
+    decision_state = _attach_capitulation_policy(decision_state, capitulation_state)
     metrics_snapshot = _build_ai_cio_metrics_snapshot(
         provider_key=provider_key,
         report_date=report_date,
@@ -3828,8 +4881,23 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else master_full
     
     raw_final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
-    final_res, humility_rules_path = postprocess_executive_summary_report(raw_final_res, provider_key)
+    final_res, humility_rules_path = postprocess_executive_summary_report(
+        raw_final_res,
+        provider_key,
+        decision_state=decision_state,
+    )
+    final_res = _enforce_final_score_regime(final_res, decision_state)
+    final_res = _enforce_final_allocation_policy(final_res, decision_state)
     final_res = _annotate_final_score_drift(final_res, decision_state)
+    final_score_value, final_regime_value = parse_score_regime(final_res)
+    metrics_snapshot["final_output"] = {
+        "score": _safe_float(final_score_value),
+        "stress_regime": decision_state.get("final_stress_regime"),
+        "resolved_regime": final_regime_value,
+        "capitulation_override_active": decision_state.get("capitulation_override_active"),
+        "confidence": decision_state.get("final_confidence"),
+    }
+    metrics_snapshot_path = _write_ai_cio_metrics_snapshot(metrics_snapshot)
     if humility_rules_path:
         print(f"[Humility] Saved rules JSON: {humility_rules_path}")
     _write_cache("executive_summary", final_res, provider_key)
@@ -3841,8 +4909,20 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     try:
         score_val, regime_val = parse_score_regime(final_res)
         if score_val != "N/A":
-            ok = upsert_history_csv(score_val, regime_val,
-                                    source=source, provider=provider_key)
+            cap_state = decision_state.get("capitulation_state") or {}
+            try:
+                final_stress_regime = regime_from_score(float(score_val))
+            except (TypeError, ValueError):
+                final_stress_regime = str(decision_state.get("stress_regime") or "")
+            ok = upsert_history_csv(
+                score_val,
+                regime_val,
+                source=source,
+                provider=provider_key,
+                stress_regime=final_stress_regime,
+                capitulation_phase=str(cap_state.get("phase") or ""),
+                capitulation_action_eligible=cap_state.get("action_eligible"),
+            )
             if ok:
                 print(f"[CSV] Upserted history: {score_val} | {regime_val} | source={source} | provider={provider_key}")
         else:

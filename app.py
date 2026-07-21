@@ -186,6 +186,9 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
                         _cache_dir = DATA_LAKE / "daily_cache"
                         _sync_files = list(_cache_dir.glob(f"*{_sync_provider}*.txt"))
                         _sync_files += list(_cache_dir.glob(f"executive_summary_{_sync_provider}_*.txt"))
+                        _sync_files += list(_cache_dir.glob(f"*{_sync_provider}*.json"))
+                        from shared.ai_cio import _provider_metrics_files
+                        _sync_files += _provider_metrics_files(DATA_LAKE, _sync_provider)
                         # Deduplicate
                         _sync_files = list(set(_sync_files))
                         
