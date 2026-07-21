@@ -1,6 +1,6 @@
 {
   "report_date": "2026-07-21",
-  "composite_score": 25.0,
+  "composite_score": 21.0,
   "regime": "PRE-CRASH / PANIC",
   "falsification_rules": [
     {
@@ -8,27 +8,27 @@
       "metric": "STRESS/WARNING sessions (20D)",
       "threshold_operator": "<",
       "threshold_value": 5,
-      "current_value": 5,
+      "current_value": 4,
       "unit": "sessions",
-      "description": "Số phiên STRESS/WARNING trong 20 phiên gần nhất xuống dưới 5 cho thấy thanh khoản liên ngân hàng ổn định trở lại, làm suy yếu luận điểm stress."
+      "description": "Số phiên STRESS/WARNING dưới 5 cho thấy thanh khoản liên ngân hàng hạ nhiệt, làm yếu luận điểm siết thanh khoản."
     },
     {
       "model": "Market Breadth",
       "metric": "Breadth MA20",
       "threshold_operator": ">",
       "threshold_value": 45,
-      "current_value": 8.5,
+      "current_value": 9.6,
       "unit": "%",
-      "description": "Tỷ lệ mã trên MA20 vượt 45% chứng tỏ dòng tiền quay trở lại diện rộng, falsify chế độ PRE-CRASH."
+      "description": "Breadth MA20 vượt 45% sẽ phủ định chế độ thị trường suy yếu, báo hiệu dòng tiền quay lại rộng rãi."
     },
     {
       "model": "ESR Monitor",
       "metric": "Systemic Stress Index (SSI)",
       "threshold_operator": "<",
       "threshold_value": 55,
-      "current_value": 63.1,
+      "current_value": 63.3,
       "unit": "%",
-      "description": "SSI giảm dưới 55% cho thấy stress hệ thống hạ nhiệt, loại bỏ rủi ro bán tháo lan tỏa."
+      "description": "SSI xuống dưới 55% sẽ giảm mức cảnh báo stress hệ thống, cho phép nới lỏng hơn."
     },
     {
       "model": "Tail Risk (EVT)",
@@ -37,16 +37,16 @@
       "threshold_value": 0.25,
       "current_value": 0.334,
       "unit": "",
-      "description": "Tham số đuôi xi max trên toàn grid giảm dưới 0.25 xác nhận phân phối lợi suất không còn fat‑tail."
+      "description": "Cận trên xi qua các ngưỡng dưới 0.25 xác nhận đuôi phân phối không còn dày, giảm rủi ro cực đoan."
     },
     {
       "model": "Manipulation / Coupling",
       "metric": "Vingroup Slope Percentile",
       "threshold_operator": "<",
       "threshold_value": 70,
-      "current_value": 13.3,
+      "current_value": 15.0,
       "unit": "th pct",
-      "description": "Slope percentile giữ ở mức thấp (decouple) không còn gây méo mó chỉ số; rule này đã FALSIFIED – không phải yếu tố then chốt."
+      "description": "Hệ số dốc Vingroup duy trì dưới phân vị 70th sẽ giảm rủi ro can thiệp và tập trung, ủng hộ thị trường phân hoá."
     },
     {
       "model": "Global Financial Conditions",
@@ -55,7 +55,7 @@
       "threshold_value": 80,
       "current_value": 99.5,
       "unit": "th pct",
-      "description": "CQS Percentile rớt khỏi vùng cực đoan, báo hiệu stress tín dụng toàn cầu giảm."
+      "description": "CQS giảm dưới phân vị 80 sẽ báo hiệu rủi ro tín dụng toàn cầu hạ nhiệt, loại bỏ một chân kiềng của headwind."
     }
   ],
   "provider_key": "deepseek-v4-pro",

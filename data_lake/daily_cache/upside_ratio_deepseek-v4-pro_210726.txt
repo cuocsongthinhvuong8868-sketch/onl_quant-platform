@@ -1,20 +1,21 @@
 <!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
 ## 1. Observations
-- Lực cầu hiện tại (2.59%) đang rất thấp so với trung bình dài hạn (11.22%) – khoảng cách -8.63 điểm phần trăm, phản ánh sức mua suy yếu rõ rệt.
-- Lực cung hiện tại (53.41%) cao gấp hơn 4 lần trung bình (12.42%) – delta +40.99 điểm phần trăm, áp lực bán đang áp đảo bất thường.
-- Cả hai chiều đều có Phi > 0.10 (cầu 0.163, cung 0.170) → xác nhận chế độ Momentum: xu hướng hiện tại (mua yếu, bán mạnh) có quán tính tiếp diễn.
+- Lực cầu hiện tại 6.12%, thấp hơn đáng kể so với trung bình dài hạn 11.13% (Δ = -5.01pp), Phi = 0.167 cho thấy đà yếu đang duy trì (momentum).
+- Lực cung 21.41% cao vượt trội so với Mu 12.44% (Δ = +8.97pp), Phi = 0.178 xác nhận đà bán mạnh và kéo dài.
+- Cả hai chiều cùng ở chế độ momentum, phản ánh bức tranh thị trường phân phối tiêu cực.
 
 ## 2. Supply-Demand Dynamics
-- Trạng thái dòng tiền: **distribution (phân phối)**. Cầu nén sâu dưới Mu, cung bùng nổ trên Mu – tín hiệu cổ phiếu đang được phân phối từ tay mạnh sang tay yếu, dòng tiền rút ra.
-- So sánh |Phi|: |Phi_cung| = 0.170 > |Phi_cầu| = 0.163. Cung giữ momentum thực sự mạnh hơn, tức đà bán có độ tự tương quan cao hơn, khó đảo chiều hơn đà mua.
+- Trạng thái dòng tiền hiện tại là **phân phối** (distribution): cầu yếu dưới trung bình trong khi cung mạnh trên trung bình – dấu hiệu của dòng tiền thoát ra.
+- So sánh cường độ momentum: cung (|Phi|=0.178) nhỉnh hơn cầu (0.167). Bên bán thực sự nắm ưu thế, cho thấy áp lực điều chỉnh/cắt lỗ vẫn chủ đạo.
 
 ## 3. Stress-Test Read
-- P95 Downside Breadth = 21.16%: trong kịch bản cực đoan (xác suất 5%), tỷ lệ mã giảm mạnh sẽ leo lên ngưỡng này, báo hiệu biên độ panic đáng kể nếu thị trường gãy.
-- Asymmetry: P95 Downside (21.16%) > P95 Upside (19.60%) → tail risk nghiêng về phía giảm sâu (dày hơn). Rủi ro bán tháo lan rộng lớn hơn cơ hội bùng nổ mua.
+- P95 Downside ở 21.07%: kịch bản panic sell không còn nhiều dư địa mở rộng thêm (gần sát ngưỡng hiện tại 21.41%), tail-risk giảm giá tương đối mỏng.
+- Asymmetry rõ nét: P95 Upside 19.57% gấp ~3 lần mức cầu hiện tại (6.12%), đuôi phía mua dày hơn hẳn, tiềm ẩn một đợt bùng nổ mua nếu yếu tố xúc tác xuất hiện.
 
 ## 4. Verdict
-- Tỷ trọng giải ngân đề xuất: **20%**. Ưu tiên bảo toàn vốn, chỉ giữ các vị thế phòng thủ có yếu tố chất lượng cao.
-- Strategy: **phòng thủ (defensive)**. Không phù hợp cho đánh bắt đáy (vì momentum bán chưa suy giảm) hay mua đuổi (cầu quá yếu). Chờ tín hiệu mean-reversion (Phi xuống dưới -0.10) hoặc chỉ báo phân phối kết thúc.
+- **Tỷ trọng giải ngân đề xuất: 20%** – vẫn duy trì phòng thủ là chính, chỉ dành một phần nhỏ để “rình bắt đáy”.
+- Chiến lược: **rình bắt đáy** với quy mô nhỏ, canh tín hiệu đảo chiều của breadth; không mua đuổi. Phe bán còn chiếm ưu thế momentum, nên chưa đủ cơ sở để nâng tỷ trọng mạnh.
+- Không NO ACTIONABLE vì có chế độ phân phối xác lập, nhưng bất cân xứng đuôi nghiêng về phía đảo chiều nên có thể đặt lệnh thăm dò với kỷ luật rủi ro.
 
 ## 5. Structured Tail
 ```json
@@ -22,11 +23,11 @@
   "tool": "upside_ratio",
   "regime": "distribution",
   "momentum_winner": "supply",
-  "p95_downside_pct": 21.16,
-  "p95_upside_pct": 19.60,
+  "p95_downside_pct": 21.07,
+  "p95_upside_pct": 19.57,
   "deployment_pct": 20,
-  "strategy": "defensive",
-  "confidence": "medium"
+  "strategy": "bottom_fishing",
+  "confidence": "low"
 }
 ```
 

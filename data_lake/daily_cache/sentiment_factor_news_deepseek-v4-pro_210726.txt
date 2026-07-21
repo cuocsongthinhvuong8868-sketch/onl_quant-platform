@@ -1,80 +1,45 @@
 <!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
-# PHÂN TÍCH TIN TỨC – CẬP NHẬT NGÀY 20/07/2026
+### 1. Chế độ cảm xúc tin tức (News Sentiment Regime)
 
-## 1. CHẾ ĐỘ TÂM LÝ TIN TỨC (NEWS SENTIMENT REGIME)
+- **1 ngày:** strong_risk_on (P_conf 100%, P(mean>0) 100%, posterior mean +0.5853). **Khẳng định chắc chắn** xu hướng tích cực ngắn hạn.
+- **7 ngày:** strong_risk_on (P_conf 100%, P(mean>0) 100%, posterior mean +0.3990). **Khẳng định chắc chắn** xu hướng tích cực tuần qua.
+- **30 ngày:** strong_risk_on (P_conf 100%, P(mean>0) 100%, posterior mean +0.5114). **Khẳng định chắc chắn** xu hướng tích cực trung hạn.
 
-**Khẳng định chắc chắn (Strongly Confirmed) — RỦI RO GIẢM (RISK-ON)**
+Tất cả các khung thời gian đều đạt ngưỡng tin cậy tối đa, loại bỏ nghi ngờ về nhiễu loạn.
 
-| Cửa sổ | Chế độ | Mean hậu nghiệm | P_conf | Kết luận |
-|---|---|---|---|---|
-| 1d | risk_on | +0.2098 | **90%** | Tâm lý tích cực rõ ràng trong ngày hôm nay; xác suất vượt trội cho thấy momentum tin tức thuận lợi đang chiếm ưu thế. |
-| 7d | strong_risk_on | +0.3596 | **100%** | Tín hiệu tích cực mạnh mẽ và đồng thuận tuyệt đối trong tuần; mức trung bình vững trên ngưỡng 0 với biên độ rất hẹp (CI: +0.22 đến +0.50). |
-| 30d | strong_risk_on | +0.4885 | **100%** | Xu hướng tích cực kéo dài và củng cố qua tháng; độ phân tán thấp nhất, hàm ý một nền tảng tin tức bền vững ủng hộ tài sản rủi ro. |
+### 2. Kênh dẫn dắt Risk-on/Risk-off chính
 
-**Diễn biến:** Tín hiệu Risk-On leo thang từ 1d lên 30d, thể hiện động lượng tin tức vĩ mô ngày càng được xác nhận. Không có bất kỳ suy yếu nào về độ tin cậy ở khung dài.
+**Kênh kéo Risk-on mạnh nhất:**
+- `fx_external` (P_conf 100%): Tỷ giá trung tâm tăng liên tục, tín hiệu ngoại hối hỗ trợ.
+- `earnings` (P_conf 100%): Kỳ vọng lợi nhuận doanh nghiệp vững.
+- `credit_stress` (P_conf 99-100%): Lợi suất TPCP ổn định, áp lực tín dụng thấp.
+- `monetary_policy` (P_conf 100% ở 7d, 30d): Chính sách tiền tệ (PBoC giữ LPR, lãi suất huy động nhích nhẹ) hỗ trợ thanh khoản.
+- `banking_system` (P_conf 99-100%): Dòng vốn vào ngành chứng khoán/ngân hàng tích cực.
 
----
+**Kênh kéo Risk-off (yếu, không đủ lấn át):**
+- `commodity` (P_conf 100% trong 30d): Giá hàng hóa cơ bản (ure, thép, đường, bạc) giảm sâu dài hạn, nhưng có tín hiệu phục hồi ngắn hạn (PVC, lưu huỳnh).
+- `liquidity` (P_conf 94-100%): Hơi tiêu cực ở biên, nhưng CI bao gồm giá trị dương, chưa đáng lo.
+- `inflation` (P_conf 90% ở 30d): Nghiêng về giảm áp lực giá, nhưng không rõ ràng.
 
-## 2. KÊNH DẪN DẮT CHÍNH (DOMINANT CHANNELS)
+### 3. Các động lực chính
 
-### Kênh kéo Risk-On (Cross-Window)
+**Tích cực:**
+- Tỷ giá trung tâm USD/VND tăng 8 đồng (21/07), duy trì xu hướng tăng trong tháng → hỗ trợ dòng vốn ngoại, giảm áp lực tỷ giá.
+- PBoC giữ nguyên Lãi suất cho vay cơ bản 1Y ở 3,00%, tín hiệu nới lỏng bền vững → tích cực cho xuất khẩu và tâm lý khu vực.
+- Lợi suất TPCP Việt Nam đi ngang → rủi ro tín dụng thấp, ổn định vĩ mô.
+- Giá nhựa PVC Trung Quốc + lưu huỳnh bật tăng lên đỉnh tháng → dấu hiệu nhu cầu công nghiệp cải thiện.
 
-| Kênh | 1d Score (P_conf) | 7d Score (P_conf) | 30d Score (P_conf) | Nhận định |
-|---|---|---|---|---|
-| **monetary_policy** | **+1.989 (100%)** | +0.686 (100%) | **+1.268 (100%)** | Lực kéo mạnh nhất 1d và là trụ cột 30d; tín hiệu xác nhận tuyệt đối. PBOC giữ nguyên LPR 3.00% đang hỗ trợ kỳ vọng chính sách nới lỏng khu vực. |
-| **earnings** | +1.182 (100%) | **+1.309 (100%)** | **+1.153 (100%)** | Động lực bền bỉ nhất xuyên suốt 3 khung; phản ánh kỳ vọng lợi nhuận doanh nghiệp vững chắc. |
-| **credit_stress** | +1.212 (99%) | +0.773 (100%) | +0.983 (100%) | Tín hiệu giảm căng thẳng tín dụng nhất quán, củng cố Risk-On. |
-| **growth** | +0.778 (100%) | +0.603 (100%) | Không trong top | Standard Chartered nâng GDP 2026 lên 9.5% tạo xúc tác ngắn hạn mạnh. |
+**Tiêu cực (yếu):**
+- Việt Nam chi 19,5 tỷ USD nhập than/dầu/xăng (tính đến 15/07) → gây chú ý về chi phí nhập khẩu, nhưng điểm số rất thấp (-0.166).
+- Doanh nghiệp dệt may gặp khó về đơn hàng/lợi nhuận → điểm số thấp (-0.165), tác động cục bộ.
+- Giá ure Trung Quốc giảm xuống đáy tháng, giá thép HRC, bạc, đường giảm sâu (30d) → áp lực giảm phát hàng hóa, nhưng đang bị phản ứng bởi tín hiệu hồi phục của một số mặt hàng.
 
-### Kênh kéo Risk-Off (Cần theo dõi)
+### 4. Kết luận tác động lên AI CIO
 
-| Kênh | 1d Score (P_conf) | 7d Score (P_conf) | 30d Score (P_conf) | Nhận định |
-|---|---|---|---|---|
-| **fx_external** | **-2.000 (100%)** | +0.653 (100%) | +0.600 (100%) | ĐẢO CHIỀU GẮT 1d: Tỷ giá trung tâm giảm 2 đồng hôm nay tạo áp lực tiêu cực cực mạnh trong ngày, dù xu hướng 7d-30d vẫn tích cực (tỷ giá tăng = VND yếu có lợi cho xuất khẩu và định giá lại). Đây là tín hiệu cần theo dõi sát. |
-| **commodity** | 0.000 (50%) | **-0.707 (100%)** | **-0.798 (100%)** | Kênh tiêu cực nhất dài hạn: giá thép, ure, PVC Trung Quốc liên tục thủng đáy, báo hiệu nhu cầu nguyên liệu yếu từ đối tác thương mại lớn nhất. |
-| **inflation** | -0.572 (85%) | -0.016 (52%) | -0.411 (90%) | Lo ngại lạm phát do chi phí năng lượng sạch, nhưng tín hiệu chưa đồng đều. |
+**Hỗ trợ (supports) mạnh mẽ** cho macro layer và các công cụ nội bộ (internal tools) đang ở trạng thái risk-on. Mức độ đồng thuận cao (100% P_conf) ở mọi khung thời gian củng cố quan điểm tích cực về tài sản rủi ro. Tuy nhiên, do tỉ trọng nguồn tin xã hội (mozyfin_social) cao (đặc biệt 33% ở 7d), đây chỉ nên được xem là **lớp phủ tâm lý mềm (soft sentiment overlay)**, không dùng làm căn cứ phân bổ cứng.
 
----
+### 5. Cảnh báo (Caveats)
 
-## 3. ĐỘNG LỰC TIN TỨC CHÍNH (KEY DRIVERS)
-
-### Tích cực (kéo Risk-On)
-
-- **PBOC giữ nguyên LPR 1Y ở 3.00%** (monetary_policy, +0.770, 1d/7d): Tín hiệu chính sách tiền tệ ổn định từ Trung Quốc, giảm rủi ro thắt chặt đột ngột. Nguồn widata, độ tin cậy cao.
-- **Lợi suất TPCP đi ngang** (credit_stress, +0.347, 1d): Thị trường trái phiếu ổn định, không dấu hiệu căng thẳng thanh khoản hay rủi ro vỡ nợ lan rộng.
-- **Standard Chartered nâng dự báo GDP 2026 lên 9.5%** (growth, +0.165, 1d): Hai nguồn mozyfin xác nhận, củng cố kỳ vọng tăng trưởng mạnh mẽ vượt Consensus.
-- **Xuất nhập khẩu trên đà cán đích 1.000 tỷ USD** (growth, +0.163, 1d): Hỗ trợ thêm cho câu chuyện thương mại và dòng vốn ngoại tệ.
-
-### Tiêu cực (kéo Risk-Off) — Cần lưu ý
-
-- **Tỷ giá trung tâm 20/07 giảm 2 đồng** (fx_external, -0.727, 1d): Đảo chiều trong ngày so với xu hướng tăng tuần trước (lưu ý: tăng tỷ giá trung tâm = VND yếu, thường được đọc là tích cực cho xuất khẩu; việc giảm hôm nay là tiêu cực cục bộ).
-- **NHNN hút ròng 4,569.7 tỷ qua OMO** (liquidity, -0.215, 1d): Thắt chặt nhẹ thanh khoản, tín hiệu kiểm soát đầu cơ ngắn hạn.
-- **Rổ hàng hóa Trung Quốc giảm sâu (thép, ure, PVC)** (commodity, cross-window): Phản ánh nhu cầu yếu từ nền kinh tế lớn thứ hai, tiềm ẩn rủi ro lan tỏa sang xuất khẩu Việt Nam. Đây là tín hiệu bearish cấu trúc cần theo dõi chặt.
-
----
-
-## 4. KẾT LUẬN CHO AI CIO
-
-**Hành động:** Tín hiệu tin tức **HỖ TRỢ MẠNH (Strongly Supports)** lớp phân bổ vĩ mô hiện tại cho tài sản rủi ro Việt Nam.
-
-- **Khớp với lớp vĩ mô:** Các kênh tăng trưởng, chính sách tiền tệ, và lợi nhuận đều đồng thuận ở mức xác nhận tuyệt đối (P_conf 100%), tạo nền tảng vững chắc cho vị thế Risk-On dài hạn.
-- **Khớp với market-internal tools:** Đà tăng của tín hiệu tin tức (từ +0.21 lên +0.49 qua các khung) thường dẫn trước hoặc xác nhận động lượng giá, ủng hộ tiếp tục giữ overweight.
-- **Xung đột tiềm ẩn:** Tín hiệu FX 1d đảo chiều mạnh (-2.000) nhưng bị cô lập trong ngày, trong khi xu hướng 7d-30d vẫn tích cực. Không đủ để đảo ngược chế độ, nhưng nếu lặp lại 2-3 phiên liên tiếp sẽ kích hoạt rà soát phân bổ ngoại hối và phòng hộ.
-- **Cảnh báo hàng hóa:** Kênh commodity tiêu cực kéo dài 30d có thể sớm ảnh hưởng đến kênh growth nếu giá nguyên liệu Trung Quốc tiếp tục suy yếu → chỉ báo leading cần tích hợp vào monitoring dashboard.
-
-**Khuyến nghị hành động tạm thời:** Giữ nguyên phân bổ Risk-On, không thay đổi allocation; tăng cường tần suất theo dõi kênh fx_external và commodity lên daily check từ weekly.
-
----
-
-## 5. CẢNH BÁO VÀ GIỚI HẠN (CAVEATS)
-
-| Yếu tố | Đánh giá |
-|---|---|
-| **Nguồn tin** | Dữ liệu 1d có **48/228 (~21%) từ mozyfin_social** — đây là bằng chứng ý kiến xã hội, độ tin cậy thấp hơn hẳn so với widata. Toàn bộ kết luận về earnings, growth, và fiscal_public_investment có thể bị nhiễu bởi quan điểm cộng đồng. **Đã giảm trọng số tín hiệu từ các kênh có tỷ trọng mozyfin_social cao.** Ở khung 7d-30d, tỷ lệ này lên tới ~35-66%, làm suy yếu tín hiệu dài hạn — cần bổ sung nguồn dữ liệu cứng (widata, chính thống) để xác nhận. |
-| **Thời gian cập nhật** | Sinh ngày 20/07/2026 (hôm nay) — dữ liệu tươi, không có độ trễ đáng kể. |
-| **Rủi ro headline noise** | Tin Standard Chartered (+0.165) hay xuất nhập khẩu (+0.163) có trọng số nhẹ, dễ bị nhiễu bởi các bài đăng lặp lại từ mozyfin. Không dùng chúng làm cơ sở quyết định đơn lẻ. |
-| **Rủi ro mô hình** | Chế độ "risk_on" được gán tự động; luôn đối chiếu với market price action và volatility surface thực tế trước khi ra quyết định cuối cùng. |
-
----
-
-**Tóm tắt:** Tâm lý tin tức Việt Nam đang ở chế độ **Risk-On mạnh, xác nhận cao**, dẫn dắt bởi chính sách tiền tệ ổn định và tăng trưởng vượt kỳ vọng. Cảnh báo duy nhất trong ngày là tín hiệu FX đảo chiều và rổ hàng hóa Trung Quốc tiếp tục suy yếu — chưa đủ để đảo chiều phân bổ, nhưng yêu cầu giám sát chặt chẽ.
+- **Nguồn tin xã hội chiếm ưu thế:** Trong 1d (55/269 ~20%), 7d (448/1352 ~33%), 30d (944/4882 ~19%). Mozyfin social là bằng chứng có độ tin cậy thấp hơn, cần chiết khấu cường độ tín hiệu.
+- **Nhiễu tiêu đề (headline noise):** Tin tức có thể đảo chiều nhanh; chỉ nên kết hợp cùng phân tích cơ bản và định lượng.
+- **Thời gian tạo nguồn cấp (generated_at)**: Mới (21/07, 16:32), dữ liệu tươi, không rủi ro trễ.

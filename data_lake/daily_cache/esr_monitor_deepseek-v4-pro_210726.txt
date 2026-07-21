@@ -1,34 +1,32 @@
 <!-- ai-cio-cache-version: production_downside_ema20_v1 -->
 ## 1. Observations
-- SSI: **63.1%** → đang trong vùng **WARNING** (ngưỡng 0.50 – 0.80).
-- Market State: **ACTIVE STRESS** (high stress + downtrend).
-- VN30 đóng cửa dưới MA125 (downtrend xác nhận).
-- Top 3 pillar drivers: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**.
+- SSI: 63.3% – vùng WARNING (tích lũy rủi ro ngầm)
+- Market State: ACTIVE STRESS (high stress + downtrend)
+- Top 3 driver: S_LIQ (35%), S_VAL (31%), S_COR (18%)
+- VN30 đóng cửa dưới MA125, PCA PC1 EVR 38.1%
 
 ## 2. Risk Decomposition (Bóc tách)
-- **S_LIQ (volume khô cạn vs 1Y norm)** là driver số một: dollar volume giao dịch co hẹp đáng kể so với trung bình 1 năm, tín hiệu thanh khoản cạn kiệt. Trong downtrend, hiện tượng này thường đi kèm suy giảm niềm tin của dòng tiền lớn, không đủ lực hấp thụ lệnh bán.
-- **S_VAL (định giá)** ở mức cao, phản ánh chênh lệch giữa lợi suất VN30 1 năm so với lãi suất tiền gửi vẫn lớn. Khi thanh khoản khô, valuation tension dễ bị “xì hơi” nhanh vì thiếu lực mua đỡ.
-- **S_COR (tương quan hệ thống)** 18% nhưng đứng thứ ba, cho thấy các mã đang di chuyển đồng pha cao (herding) – đặc biệt trong các phiên giảm, rủi ro bán tháo đồng loạt hiện hữu.
-- Kết hợp: **volume dry-up + valuation tension + herding** là tổ hợp rủi ro ngầm điển hình cho một pha sustained selling, không phải bull-trap vì xu hướng đã rõ ràng đi xuống.
+Driver chính hiện tại là **S_LIQ (Volume Dry‑Up)** – thanh khoản dollar volume trung bình 20 phiên co hẹp nghiêm trọng so với trung bình 1 năm. Trong chế độ ACTIVE STRESS, hiện tượng volume khô cạn cho thấy dòng tiền rút khỏi thị trường, người mua biên không sẵn sàng hấp thụ lực bán.  
+S_VAL ở mức cao phản ánh căng thẳng định giá: lợi nhuận 252 ngày của VN30 âm sâu so với lãi suất tiền gửi – chỉ báo này đang gia tăng khi thị trường giảm kéo dài, làm trầm trọng thêm tâm lý bi quan.  
+S_COR (hệ số tương quan hệ thống 18%) ghi nhận sự đồng pha giảm của các cổ phiếu, nhưng chưa lên mức herding cực đoan. Cấu trúc rủi ro hiện tại là thanh khoản cạn + định hình downtrend giá trị, không phải tín hiệu bull‑trap.
 
 ## 3. Cross-Check
-- Giá VN30 hiện dưới MA125, không có divergence với SSI – stress tăng, giá giảm là nhất quán.
-- HMM regime ACTIVE STRESS khớp hoàn toàn với SSI WARNING và xu hướng giảm. Không có flag.
+- VN30 nằm dưới MA125, không có đỉnh mới → không có phân kỳ bull‑trap với SSI WARNING.  
+- HMM regime ACTIVE STRESS hoàn toàn khớp với mức SSI 63.3% và trạng thái downtrend, không có cờ lệch (flag).  
+- Rủi ro hiện hữu đến từ sự suy yếu thanh khoản trong xu hướng giảm bền vững.
 
 ## 4. Verdict
-- **Tăng tỉ trọng tiền mặt lên 65%**. Trong WARNING zone kèm ACTIVE STRESS, bảo toàn vốn là ưu tiên hàng đầu. Phần còn lại nắm giữ các cổ phiếu phòng thủ beta thấp.
-- **Hedge action**: giảm beta danh mục (bán cổ phiếu có beta cao, mua thêm phòng thủ). Nếu mandate cho phép, có thể short nhẹ VN30F1M để bảo vệ khi stress leo thang lên CRITICAL.
-- Với SSI 63.1% chưa đến CRITICAL, không chủ động mua put out-of-the-money vì chi phí cao, ưu tiên đơn giản hoá bằng nắm giữ tiền mặt và giảm beta.
+Đề xuất **nâng tỉ trọng tiền mặt lên 75%** danh mục. Hành động phòng hộ phù hợp là **giảm beta** – bán bớt cổ phiếu có hệ số beta cao, tránh giữ vị thế margin. Chưa đủ ngưỡng để kích hoạt short thẳng VN30F1M hay mua put do SSI mới ở WARNING, nhưng cần chuẩn bị sẵn kịch bản nếu chỉ số vượt 0.80 (CRITICAL).
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "esr_monitor",
-  "ssi_pct": 63.1,
+  "ssi_pct": 63.3,
   "regime": "WARNING",
   "market_state": "ACTIVE_STRESS",
   "top_driver": "S_LIQ",
-  "cash_target_pct": 65,
+  "cash_target_pct": 75,
   "hedge_action": "reduce_beta",
   "confidence": "medium"
 }

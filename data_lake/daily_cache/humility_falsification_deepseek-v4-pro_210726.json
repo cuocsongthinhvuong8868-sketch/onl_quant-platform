@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-21T13:14:49",
+  "t_data_date": "2026-07-21",
+  "target_report_date": "2026-07-20",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_200726.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_200726.txt",
+  "report_mtime": "report:2026-07-21T13:05:32|sidecar:2026-07-21T13:05:32",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_200726.txt:8f5c7e66caf466280e568912a97ac4ebecf78c17|sidecar:ai_cio_humility_rules_deepseek-v4-pro_200726.json:e369aedd36ecbd68ce9a66a69229b3236ec1519e",
+  "parsed": {
+    "report_date": "2026-07-20",
+    "composite_score": 28.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa hạ nhiệt thực sự."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 8.5,
+        "unit": "%",
+        "description": "Độ rộng phục hồi trên 45% là dấu hiệu thị trường thoát suy yếu."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.1,
+        "unit": "%",
+        "description": "SSI xuống dưới 55% báo hiệu stress hệ thống hạ xuống mức an toàn."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.334,
+        "unit": "",
+        "description": "Đuôi béo robust biến mất khi toàn bộ lưới xi < 0.25."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 13.3,
+        "unit": "th pct",
+        "description": "Phân vị tương quan Vingroup giảm dưới 70 cho thấy rủi ro tập trung nhóm này chưa quay lại."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 80.0,
+        "unit": "th pct",
+        "description": "CQS Percentile xuống dưới 80 báo hiệu stress tín dụng rác hạ nhiệt."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-20",
+      "composite_score": 28,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa hạ nhiệt thực sự."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 8.5,
+          "unit": "%",
+          "description": "Độ rộng phục hồi trên 45% là dấu hiệu thị trường thoát suy yếu."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.1,
+          "unit": "%",
+          "description": "SSI xuống dưới 55% báo hiệu stress hệ thống hạ xuống mức an toàn."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.334,
+          "unit": "",
+          "description": "Đuôi béo robust biến mất khi toàn bộ lưới xi < 0.25."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 13.3,
+          "unit": "th pct",
+          "description": "Phân vị tương quan Vingroup giảm dưới 70 cho thấy rủi ro tập trung nhóm này chưa quay lại."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 80.0,
+          "unit": "th pct",
+          "description": "CQS Percentile xuống dưới 80 báo hiệu stress tín dụng rác hạ nhiệt."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-20",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 4.0,
+      "T actual display": "4 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-19",
+      "Description": "Số phiên STRESS/WARNING giảm dưới 5 cho thấy thanh khoản nội địa hạ nhiệt thực sự.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "8.5%",
+      "T actual": 9.647058823529411,
+      "T actual display": "9.647%",
+      "Delta": 1.1470588235294112,
+      "Delta display": "+1.147%",
+      "Status": "Intact",
+      "Data date": "2026-07-21",
+      "Description": "Độ rộng phục hồi trên 45% là dấu hiệu thị trường thoát suy yếu.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.1%",
+      "T actual": 63.2576561110289,
+      "T actual display": "63.3%",
+      "Delta": 0.1576561110288992,
+      "Delta display": "+0.158%",
+      "Status": "Intact",
+      "Data date": "2026-07-21",
+      "Description": "SSI xuống dưới 55% báo hiệu stress hệ thống hạ xuống mức an toàn.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.334",
+      "T actual": 0.33418169361402134,
+      "T actual display": "0.334",
+      "Delta": 0.00018169361402131656,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-07-21",
+      "Description": "Đuôi béo robust biến mất khi toàn bộ lưới xi < 0.25.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "13.3 th pct",
+      "T actual": 15.0,
+      "T actual display": "15.0 th pct",
+      "Delta": 1.6999999999999993,
+      "Delta display": "+1.7 th pct",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-21",
+      "Description": "Phân vị tương quan Vingroup giảm dưới 70 cho thấy rủi ro tập trung nhóm này chưa quay lại.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "80.0 th pct",
+      "T actual": 99.53703703703704,
+      "T actual display": "99.5 th pct",
+      "Delta": 19.537037037037038,
+      "Delta display": "+19.5 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-20",
+      "Description": "CQS Percentile xuống dưới 80 báo hiệu stress tín dụng rác hạ nhiệt.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 4,
+      "date": "2026-07-19",
+      "error": ""
+    },
+    "breadth": {
+      "value": 9.647058823529411,
+      "date": "2026-07-21",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.2576561110289,
+      "date": "2026-07-21",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-21",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.33418169361402134,
+      "date": "2026-07-21",
+      "error": ""
+    },
+    "coupling": {
+      "value": 15.0,
+      "date": "2026-07-21",
+      "error": ""
+    },
+    "gfc": {
+      "value": 99.53703703703704,
+      "date": "2026-07-20",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 6,
+  "total": 6
+}

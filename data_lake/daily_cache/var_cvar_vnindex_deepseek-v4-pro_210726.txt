@@ -1,25 +1,32 @@
 <!-- ai-cio-cache-version: evt_threshold_sensitivity_mcmc_interval_v2 -->
 ## 1. Observations
-- Historical VaR 95% (3Y rolling) ghi nhận mức tổn thất -1.67%, gần với parametric VaR (-1.57%), cho thấy phân phối quanh trung tâm chưa biến dạng nhiều.
-- EVT VaR 99% (POT/GPD) suy ra -3.69%, sâu hơn đáng kể so với ước lượng Gaussian thông thường, cảnh báo đuôi dày hơn giả định chuẩn.
-- Tham số hình dạng đuôi ξ (MLE) đạt +0.345, xếp vào vùng “fat tail” (vượt ngưỡng 0.30), với MCMC posterior trung vị còn cao hơn (+0.417).
-- Chỉ số Hill kiểm tra chéo ở mức +0.447, cùng dấu và tương đồng độ lớn với ξ, củng cố tín hiệu đuôi cực đoan không phải nhiễu.
+- **VaR cổ điển 95%** (Historical VaR –1.67%) mô tả kịch bản xấu ở phía đuôi trung bình; hoàn toàn không phản ánh được độ dày của đuôi phân phối thực.
+- **EVT VaR 99%** đạt –3.69% – khoảng lỗ gấp hơn 2 lần so với VaR 95%, cho thấy tổn thất cực đoan có thể sâu hơn nhiều so với mô hình Gaussian.
+- **Tham số hình dạng đuôi ξ (MLE)** = +0.345, nằm trong vùng **fat tail**; ước lượng MCMC trung vị +0.417 với khoảng tin cậy 90% [+0.200, +0.668] bao phủ cả vùng heavy-tail và fat-tail, hàm ý tham số chưa thực sự ổn định.
+- **Hill index** = +0.447 cùng dấu và tương đương với ξ – cross‑check xác nhận tín hiệu đuôi dày, mặc dù mô hình EVT nhạy với ngưỡng POT.
 
-## 2. Chẩn đoán độ dày đuôi
-Với ξ > 0.30, phân phối lợi suất rơi vào chế độ **FAT TAIL**, nơi rủi ro cực đoan tăng mạnh và ES kém ổn định. Hill (+0.447) xác nhận tín hiệu, không có phân kỳ. Chênh lệch ES–VaR (tính với Historical VaR) đạt 1.37 điểm phần trăm, vượt hẳn σ₃₀ = 0.90%, phù hợp với thực nghiệm đuôi dày.  
-Tuy nhiên, **phân loại đuôi lại nhạy với ngưỡng**: ξ dao động từ +0.147 (mildly heavy) đến +0.334 (fat) khi thay đổi ngưỡng POT, dù VaR 99% khá ổn định (biên độ chỉ 0.12 điểm phần trăm). MCMC posterior cho thấy khoảng tin cậy 90% của ξ là [0.200, 0.668], vắt qua ranh giới heavy–fat. Do đó, tín hiệu fat tail là đáng tin cậy về mức độ tổn thất nhưng kém chắc chắn trong phân loại tuyệt đối. Kết luận: **cảnh báo fat tail nhạy ngưỡng, confidence trung bình.**
+## 2. Chẩn đoán độ dày đuôi (Tail Thickness)
+- ξ = +0.345 > 0.30 → chính thức thuộc phổ **fat tail (đuôi cực dày)**. Tuy nhiên, ξ dao động từ +0.147 (heavy) đến +0.334 (fat) khi thay đổi ngưỡng POT, báo hiệu phân loại **nhạy với ngưỡng** → không phải tín hiệu fat‑tail vững chắc mà là “**cảnh báo fat‑tail phụ thuộc ngưỡng**” (threshold‑sensitive fat‑tail warning).
+- Hill index đồng thuận về dấu và độ lớn, củng cố nhận định đuôi dày nhưng không loại bỏ hoàn toàn yếu tố bất định từ ngưỡng EVT.
+- Chênh lệch ES – VaR = –1.37%, vượt σ₃₀ = 0.91% → bằng chứng thực nghiệm khẳng định rủi ro đuôi béo hơn đáng kể so với phân phối thông thường.
 
-## 3. Khoảng cách Gaussian
-Phân phối Gaussian ngầm định VaR 99% ≈ μ − 2.33σ = -2.18%. So với EVT VaR 99% (-3.69%), **khoảng cách lên tới 1.51 điểm phần trăm**, vượt xa ngưỡng 1 điểm. Mô hình Gaussian ước tính thấp rủi ro đuôi một cách hệ thống, không phù hợp cho phân bổ vốn rủi ro trong bối cảnh hiện tại.
+## 3. Khoảng cách Gaussian (Gaussian Gap)
+- Gaussian VaR 99% (dùng μ + z₀.₀₁·σ) ≈ –2.23%  
+  (μ = –0.11% từ parametric VaR 95%, z = –2.33, σ = 0.91%).
+- EVT VaR 99% = –3.69%.  
+  **Gap = 1.46 điểm phần trăm** (Gaussian đánh giá thấp tổn thất cực đoan hơn 1pp).
+- Gap > 1pp → mô hình Gaussian bị **phá vỡ** trong phân bổ vốn rủi ro (risk capital allocation). Định cỡ vị thế dựa trên σ thôi là không đủ.
 
-## 4. Kết luận – Hàm ý phòng hộ
-Với ξ point estimate > 0.30, ngưỡng hành động cao nhất được kích hoạt: tránh chiến lược momentum, mua quyền chọn bán ITM và phòng hộ bằng hợp đồng tương lai bán (short futures). Do tính nhạy ngưỡng, các biện pháp này nên được triển khai như một lớp bảo vệ đuôi bắt buộc, song song với việc giảm đòn bẩy để dự phòng cho trường hợp phân loại đuôi có thể chỉ ở mức “heavy” trong một số kịch bản ngưỡng.
+## 4. Phán quyết – Hàm ý phòng hộ (Hedging)
+- ξ > 0.30 (fat‑tail) → **tránh chiến lược momentum**, cần mua **put ITM** (in‑the‑money) và phòng hộ bằng **short futures**.  
+  Tuy nhiên, bối cảnh “threshold‑sensitive fat‑tail” (ξ dao động giữa heavy và fat) đi kèm khoảng bất định hậu nghiệm rộng → **giảm đòn bẩy 30‑50%** là bước phòng ngừa bắt buộc trước khi triển khai phòng hộ đuôi.
+- **Confidence ở mức trung bình** do: tín hiệu hội tụ giữa ξ và Hill, nhưng ξ nhạy ngưỡng và CI 90% vượt ranh giới heavy‑fat.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "var_cvar_vnindex",
-  "date": "20/07/2026",
+  "date": "21/07/2026",
   "evt_var_99_pct": -3.69,
   "evt_es_99_pct": -6.15,
   "xi": 0.345,
@@ -29,8 +36,8 @@ Với ξ point estimate > 0.30, ngưỡng hành động cao nhất được kíc
   "xi_range": 0.187,
   "threshold_stable": 0,
   "tail_regime": "fat",
-  "gaussian_gap_pp": 1.51,
-  "hedge_action": "buy_puts_itm, short_futures",
+  "gaussian_gap_pp": 1.46,
+  "hedge_action": "short_futures",
   "confidence": "medium"
 }
 ```

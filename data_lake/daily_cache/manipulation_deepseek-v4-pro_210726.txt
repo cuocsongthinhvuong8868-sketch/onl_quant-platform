@@ -1,27 +1,34 @@
 ## 1. Observations
-- OLS Slope đang ở phân vị 2.4th – cực thấp, xác nhận lực đẩy từ VIC/VHM/VRE lên chỉ số gần như biến mất.
-- Tương quan (Corr) ở phân vị 28.1th – mức lỏng, không đủ để tin rằng biến động nhóm VIN còn lan truyền sang VN30F1M.
-- Chế độ hiện tại là **DECOUPLING** (ΔCorr = –0.73, ΔSlope = –0.80), bộ ba VIC group đã mất vai trò dẫn dắt.
+- OLS Slope ở mức 0.17 – percentile **2.5th** (cực thấp), gần như VIN composite không còn ảnh hưởng lên biến động của VN30F1M.
+- Correlation hiện tại 0.53 – percentile **30.8th** (trung bình thấp), cho thấy liên kết suy yếu rõ rệt nhưng chưa biến mất hoàn toàn.
+- Regime xác lập **DECOUPLING** từ 24/04/2026, với các xung lượng ΔCorr = -0.70 và ΔSlope = -0.75 – cú decouple mạnh và kéo dài.
 
 ## 2. Microstructure Read
-VIC/VHM/VRE composite hiện không còn chi phối hướng đi của VN30F1M. Với slope ở phân vị nhỏ hơn 20th, độ decoupling đang tiến sát cực dưới lịch sử – thị trường đang hoàn toàn rời bỏ nhóm VIN. Dòng tiền lớn có thể đang xoay trục sang Bank (BID, CTG), Thép (HPG) hoặc Chứng khoán (SSI). Futures lúc này phản ứng chính với nhóm ngành còn lại; VIC/VHM/VRE chỉ là “noise” không còn edge.
+Vai trò chi phối của VIC, VHM, VRE lên VN30F1M đã suy giảm sâu. Slope dưới ngưỡng 20th percentile cho thấy thị trường **đã rời hẳn họ Vingroup**, chuyển sự quan tâm sang các ngành khác. Corr ở mức 30.8th vẫn có chút liên hệ lỏng lẻo nhưng không đủ tin cậy để dùng VIN làm chỉ báo dẫn đường trong phiên. Khi cả hai percentile đều không ở mức cực đoan trên 80th (coupling intervention), rủi ro can thiệp từ Market Maker vào nhóm VIN là thấp.
 
 ## 3. Event Study Interpretation
-Trạng thái DECOUPLING kéo dài từ 23/04/2026 với cả ΔCorr và ΔSlope đều âm sâu. **Intraday**: không nên dùng dao động của VIC/VHM/VRE để đón đầu F1; các tín hiệu từ nhóm này dễ đảo chiều nhanh, khả năng thua lỗ cao nếu đặt kỳ vọng dẫn dắt. **Overnight**: chưa đủ signal rõ ràng, nhưng bias ngắn hạn nghiêng về yếu đi của chỉ số khi đầu tàu truyền thống mất sức kéo.
+Trạng thái DECOUPLING bắt đầu từ tháng 4/2026 và chưa có dấu hiệu đảo chiều. Trong phiên (intraday), không nên mua/bán VN30F1M dựa trên phản ứng giá của VIC/VHM/VRE, vì tương quan yếu sẽ tạo tín hiệu nhiễu. Giữ vị thế qua đêm (overnight) cũng thiếu cơ sở từ nhóm VIN – chỉ nên duy trì nếu có catalyst từ các ngành dẫn dắt mới (Ngân hàng, Thép, Chứng khoán).
 
 ## 4. Verdict
-- **Trade plan**: Short VN30F1M (mở vị thế bán) vì decoupling mạnh thường xuất hiện trước nhịp suy yếu của chỉ số mà không có lực đỡ từ Vingroup. Cần xác nhận thêm từ nhóm Bank: nếu BID hoặc CTG phá đáy phiên sáng, gia tăng tỷ trọng short.
-- **Leading indicator**: theo dõi BID (đại diện bank vốn hóa lớn) và HPG (thép); khi chúng đồng pha giảm, tăng độ tin cậy cho lệnh short.
-- **Stop-loss reference**: entry short VN30F1M tại **1,893.00**, stop-loss đặt tại **1,902.50** (≈ +0.5% so với entry, tương ứng với đỉnh dao động 15 phút gần nhất). Mục tiêu chốt lời bước đầu **1,875.00**.
+**Trade plan:** Spread – **short rổ VIC/VHM/VRE, long VN30F1M** (kỳ vọng họ Vingroup kém hiệu quả hơn mặt bằng chung của chỉ số).  
+**Leading indicator cần theo dõi:** Nhóm cổ phiếu Ngân hàng (MBB, CTG, ACB) và Chứng khoán (SSI, VND), vì đây là các trụ hiện tại của VN30F1M khi VIN mất vai trò.  
+**Stop-loss reference:**  
+- VIC: cắt short nếu giá vượt **217.30 × 1.05 ≈ 228.17**  
+- VHM: cắt short nếu vượt **136.40 × 1.05 ≈ 143.22**  
+- VRE: cắt short nếu vượt **23.05 × 1.05 ≈ 24.20**  
+- VN30F1M: cắt long nếu index giảm về **1,884.50 × 0.97 ≈ 1,827.97**  
 
+Khi bất kỳ ngưỡng nào ở trên chạm, đóng toàn bộ spread. Độ tin cậy ở mức medium do chế độ decoupling rõ nhưng chưa có xác nhận từ các chỉ báo ngành khác.
+
+## 5. Structured Tail
 ```json
 {
   "tool": "manipulation",
-  "date": "20/07/2026",
+  "date": "21/07/2026",
   "regime": "DECOUPLING",
-  "slope_percentile": 2.4,
-  "corr_percentile": 28.1,
-  "trade_signal": "short_f1",
+  "slope_percentile": 2.5,
+  "corr_percentile": 30.8,
+  "trade_signal": "spread",
   "confidence": "medium"
 }
 ```

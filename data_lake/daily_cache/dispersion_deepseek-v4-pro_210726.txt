@@ -1,30 +1,29 @@
 ## 1. Observations
-- Spread_Z = -1.01σ – mức phân tán chéo đang thấp hơn đáng kể so với trung bình 60 phiên.
-- DPI = 46.7% – chưa đạt ngưỡng 70%, dispersion không có tính chất regime bền vững.
-- Avg Pairwise Correlation = 0.014 – tương quan gần như bằng 0, các cổ phiếu di chuyển độc lập.
-- Cross-Sectional Skewness & Kurtosis không có dữ liệu, không đánh giá được đuôi phân phối.
+- Spread_Z = -0.19σ – độ phân tán tổng thể sát trung bình 60 phiên, không có dấu hiệu căng cứng.
+- DPI = 46.7% – dưới ngưỡng 70%, dispersion không duy trì thành chế độ dai dẳng.
+- Avg Pairwise Correlation = 0.014 – tương quan cực thấp, gần như bằng 0.
+- Cross-Sectional Skewness & Kurtosis không có dữ liệu – không thể đánh giá đuôi phân phối.
 
 ## 2. Structural State
-Thị trường đang ở trạng thái bình thường, không có dấu hiệu stress. DPI thấp và Spread_Z âm cho thấy dispersion hiện tại vừa thấp vừa không duy trì lâu, tức là không tồn tại một regime kéo căng dai dẳng. Stress nếu có sẽ chỉ là cục bộ (vài cổ phiếu riêng lẻ), không lan rộng thành hiệu ứng hệ thống.
+Thị trường đang trong trạng thái **bình thường, không chịu stress hệ thống**. Spread_Z gần zero và DPI trung bình – thấp cho thấy không có sự kiện bất thường nào kéo giãn cấu trúc lợi nhuận. Sự thiếu vắng cả spread cao lẫn DPI cao khẳng định không tồn tại stress cục bộ hay regime kéo dài.
 
 ## 3. Cross-Check & Tail Direction
-Do thiếu dữ liệu Cross-Sectional Skewness và Kurtosis, không thể xác định tail nào đang gãy hay mức độ fat‑tail. Giả định tạm thời là phân phối cân xứng, nhưng cần lưu ý đây là điểm mù trong đánh giá rủi ro đuôi.
+Do dữ liệu Skewness và Kurtosis không có sẵn, không thể xác định đuôi phân phối gãy về phía nào (cú sập cá biệt hay cú đẩy điên rồ). Với tương quan thấp và DPI không cao, khả năng xảy ra sự kiện đuôi béo lan toả là thấp, nhưng không có bằng chứng để loại trừ. Kịch bản fat‑tail chưa được kiểm chứng, các mô hình chuẩn vẫn có thể áp dụng tạm thời.
 
 ## 4. Regime Mapping
-Với DPI thấp (~47%) và Avg Correlation rất thấp (0.014), trạng thái hiện tại ánh xạ rõ vào ô **“Healthy Stock‑Picking”** trên bản đồ 2D (DPI × Corr). Đây là môi trường phân hóa mạnh, cổ phiếu ít di chuyển cùng hướng, thuận lợi cho chiến lược chọn cổ phiếu dựa trên yếu tố cơ bản/định lượng.
-
-Rủi ro lớn nhất cho Portfolio Manager lúc này là **rủi ro phân tán quay đầu** – nếu dispersion đột ngột tăng trở lại (mean‑reversion từ vùng Z‑score âm sâu) kết hợp với correlation nhảy vọt (sự kiện bất ngờ), thị trường có thể chuyển sang chế độ Trending hoặc Capitulation, gây thua lỗ cho các vị thế đa dạng hóa quá mức hoặc các chiến lược short dispersion/convexity.
+Trên bản đồ 2D (DPI × Correlation): DPI thấp (46.7%) kết hợp Correlation rất thấp (0.014) đặt thị trường vào ô **Healthy Stock‑Picking**. Đây là môi trường cổ phiếu phân hoá rõ rệt, lợi nhuận được thúc đẩy bởi yếu tố riêng lẻ, không còn hiệu ứng bầy đàn.  
+Rủi ro lớn nhất cho Portfolio Manager không phải là sập hệ thống (herding crash) hay cạn thanh khoản diện rộng, mà là **concentration risk** – những cược riêng lẻ sai hướng có thể gây thiệt hại cục bộ do thiếu sự bù trừ từ tương quan. Quản lý rủi ro nên tập trung vào phân bổ vị thế đơn lẻ, không cần phòng hộ tương quan cao.
 
 ## 5. Structured Tail
 ```json
 {
   "tool": "dispersion",
-  "date": "20/07/2026",
+  "date": "21/07/2026",
   "regime": "STOCK_PICKING",
-  "spread_z": -1.01,
+  "spread_z": -0.19,
   "dpi_pct": 46.7,
   "avg_corr": 0.014,
-  "tail_skew_direction": "symmetric (assumed, lacking data)",
-  "confidence": "medium"
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
 }
 ```
