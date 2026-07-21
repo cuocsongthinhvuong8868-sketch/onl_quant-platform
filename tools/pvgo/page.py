@@ -7,6 +7,7 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from config import DATA_LAKE
+from tools.pvgo.freshness import evaluate_pvgo_freshness
 
 
 DATA_PATH = DATA_LAKE / "pvgo" / "vnindex_valuation_history.csv"
@@ -103,6 +104,35 @@ def _metric_card(label: str, value: str, caption: str | None = None) -> None:
         """,
         unsafe_allow_html=True,
     )
+
+
+def _render_freshness_status(freshness: dict[str, str | int | None]) -> None:
+    status = freshness["status"]
+    source_date = freshness["source_date"] or "unknown"
+    market_date = freshness["market_date"] or "unknown"
+    session_lag = freshness["session_lag"]
+    max_lag = freshness["max_session_lag"]
+
+    if status == "STALE":
+        st.warning(
+            "PVGO data freshness: STALE. "
+            f"Source {source_date} is {session_lag} market sessions behind {market_date}; "
+            f"the operational limit is {max_lag}."
+        )
+    elif status == "CURRENT":
+        message = (
+            f"PVGO data freshness: CURRENT. Source {source_date}; latest market session {market_date}; "
+            f"lag {session_lag}/{max_lag}."
+        )
+        if session_lag:
+            st.info(message)
+        else:
+            st.success(message)
+    else:
+        st.warning(
+            "PVGO data freshness: UNKNOWN. "
+            f"Source date {source_date}; latest market session {market_date}."
+        )
 
 
 def _matrix_html(selected_pe: float, selected_coe: float) -> str:
@@ -211,6 +241,8 @@ def render() -> None:
     latest = df.iloc[-1]
     latest_date = latest["date"].strftime("%d/%m/%Y")
     data_updated_at = latest.get("scraped_at", "")
+    freshness = evaluate_pvgo_freshness(latest["date"])
+    _render_freshness_status(freshness)
 
     coe = st.sidebar.slider(
         "Cost of Equity (COE %)",

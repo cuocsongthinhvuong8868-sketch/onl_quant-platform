@@ -11,6 +11,11 @@ import numpy as np
 import pandas as pd
 
 from config import DATA_LAKE
+from tools.pvgo.freshness import (
+    DEFAULT_MARKET_DATA_PATH,
+    DEFAULT_MAX_SESSION_LAG,
+    evaluate_pvgo_freshness,
+)
 
 DEFAULT_COE_PCT = 14.0
 PVGO_DATA_PATH = DATA_LAKE / "pvgo" / "vnindex_valuation_history.csv"
@@ -58,12 +63,22 @@ def load_pvgo_history(path: str | Path = PVGO_DATA_PATH) -> pd.DataFrame:
     return df
 
 
-def snapshot(coe_pct: float = DEFAULT_COE_PCT, path: str | Path = PVGO_DATA_PATH) -> dict[str, Any]:
+def snapshot(
+    coe_pct: float = DEFAULT_COE_PCT,
+    path: str | Path = PVGO_DATA_PATH,
+    market_data_path: str | Path = DEFAULT_MARKET_DATA_PATH,
+    max_session_lag: int = DEFAULT_MAX_SESSION_LAG,
+) -> dict[str, Any]:
     df = load_pvgo_history(path)
     if df.empty:
         return {
             "status": "DATA INSUFFICIENT",
             "reason": f"PVGO valuation history not found or empty at {path}",
+            "freshness": evaluate_pvgo_freshness(
+                None,
+                market_data_path=market_data_path,
+                max_session_lag=max_session_lag,
+            ),
         }
 
     latest = df.iloc[-1]
@@ -74,6 +89,11 @@ def snapshot(coe_pct: float = DEFAULT_COE_PCT, path: str | Path = PVGO_DATA_PATH
     steady_state_pe = 1.0 / (coe_pct / 100.0)
     status = classify_pvgo(pvgo_pct)
     hist_pvgo = df["pe"].apply(lambda value: calculate_pvgo(float(value), coe_pct))
+    freshness = evaluate_pvgo_freshness(
+        latest["date"],
+        market_data_path=market_data_path,
+        max_session_lag=max_session_lag,
+    )
 
     return {
         "status": "OK",
@@ -90,13 +110,32 @@ def snapshot(coe_pct: float = DEFAULT_COE_PCT, path: str | Path = PVGO_DATA_PATH
         "rows": int(len(df)),
         "source": latest.get("source", "24hmoney:key-statistic-history"),
         "scraped_at": latest.get("scraped_at", ""),
+        "freshness": freshness,
     }
 
 
-def build_ai_cio_context(coe_pct: float = DEFAULT_COE_PCT) -> str:
-    snap = snapshot(coe_pct=coe_pct)
+def build_ai_cio_context(
+    coe_pct: float = DEFAULT_COE_PCT,
+    path: str | Path = PVGO_DATA_PATH,
+    market_data_path: str | Path = DEFAULT_MARKET_DATA_PATH,
+    max_session_lag: int = DEFAULT_MAX_SESSION_LAG,
+) -> str:
+    snap = snapshot(
+        coe_pct=coe_pct,
+        path=path,
+        market_data_path=market_data_path,
+        max_session_lag=max_session_lag,
+    )
     if snap.get("status") != "OK":
         return f"DATA INSUFFICIENT - PVGO valuation feed unavailable: {snap.get('reason', 'unknown')}"
+
+    freshness = snap["freshness"]
+    if freshness["status"] == "STALE":
+        return (
+            "DATA INSUFFICIENT - PVGO valuation feed STALE: "
+            f"source {freshness['source_date']} is {freshness['session_lag']} market sessions behind "
+            f"{freshness['market_date']} (limit {freshness['max_session_lag']})."
+        )
 
     return f"""
 === PVGO VALUATION STRUCTURED SNAPSHOT ===
@@ -111,9 +150,13 @@ def build_ai_cio_context(coe_pct: float = DEFAULT_COE_PCT) -> str:
 - PVGO historical average: {snap['pvgo_avg']:.2f}%
 - PVGO z-score: {snap['pvgo_zscore']:+.2f}
 - Source: {snap['source']}
+- Freshness: {freshness['status']}
+- Freshness source date: {freshness['source_date'] or 'unknown'}
+- Latest market session: {freshness['market_date'] or 'unknown'}
+- Market-session lag: {freshness['session_lag'] if freshness['session_lag'] is not None else 'unknown'} (limit {freshness['max_session_lag']})
 
 Interpretation rule:
 - Negative/low PVGO means the market embeds low growth expectations, potentially supportive if earnings quality holds.
 - Elevated/very high/extreme PVGO means valuation depends heavily on growth expectations; treat as expectation-risk overlay for AI CIO allocation and confidence.
+- If freshness is UNKNOWN, keep that uncertainty explicit and reduce confidence in the valuation overlay.
 """.strip()
-

@@ -1,0 +1,58 @@
+name: PVGO T+1 Morning Refresh
+
+on:
+  schedule:
+    # 11:00 Vietnam time (04:00 UTC), Monday through Friday.
+    - cron: '0 4 * * 1-5'
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: pvgo-valuation-data
+  cancel-in-progress: false
+
+jobs:
+  refresh-pvgo:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+        with:
+          fetch-depth: 0
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Install PVGO dependencies
+        run: python -m pip install pandas requests python-dotenv
+
+      - name: Refresh PVGO valuation feed
+        run: python command/update_pvgo_valuation.py
+
+      - name: Commit PVGO data when changed
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "41898282+github-actions[bot]@users.noreply.github.com"
+          git add data_lake/pvgo/
+
+          if git diff --cached --quiet; then
+            echo "No PVGO data changes detected."
+            exit 0
+          fi
+
+          git commit -m "Auto-update PVGO T+1 valuation data"
+          for attempt in 1 2 3 4 5; do
+            if git push; then
+              exit 0
+            fi
+            git pull --rebase --autostash origin main || {
+              git rebase --abort || true
+            }
+            sleep $((attempt * 3))
+          done
+          exit 1

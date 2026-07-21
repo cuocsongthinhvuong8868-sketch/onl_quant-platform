@@ -18,6 +18,11 @@ import pandas as pd
 import requests
 
 from config import DATA_LAKE
+from tools.pvgo.freshness import (
+    DEFAULT_MARKET_DATA_PATH,
+    evaluate_pvgo_freshness,
+    load_market_dates,
+)
 
 TABLE_NAME = "vnindex_valuation_history"
 DEFAULT_FLOOR_CODE = "10"
@@ -40,6 +45,10 @@ CORE_COLUMNS = [
     "source_url",
     "source",
 ]
+KEY_COLUMNS = ["date", "index_code"]
+METADATA_COLUMNS = ["scrape_run_id", "scraped_at"]
+NUMERIC_COLUMNS = ["close", "pe", "pb"]
+TEXT_COLUMNS = ["index_code", "floor_code", "range_type", "source_url", "source"]
 
 
 def _parse_trading_date(value: Any) -> dt.date | None:
@@ -113,6 +122,54 @@ def normalize_key_statistic_history(
     return df
 
 
+def _canonical_core(frame: pd.DataFrame) -> pd.DataFrame:
+    """Normalize persisted values so unchanged API rows compare idempotently."""
+    normalized = frame.copy()
+    for column in CORE_COLUMNS:
+        if column not in normalized:
+            normalized[column] = None
+
+    normalized["date"] = pd.to_datetime(normalized["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    for column in TEXT_COLUMNS:
+        normalized[column] = normalized[column].fillna("").astype(str)
+    for column in ("floor_code", "range_type"):
+        normalized[column] = normalized[column].str.replace(r"\.0$", "", regex=True)
+    for column in NUMERIC_COLUMNS:
+        normalized[column] = pd.to_numeric(normalized[column], errors="coerce").round(10)
+
+    return normalized[CORE_COLUMNS]
+
+
+def _changed_incoming_rows(
+    existing: pd.DataFrame,
+    incoming: pd.DataFrame,
+) -> tuple[pd.DataFrame, int, int]:
+    """Return only new or source-revised rows plus added/updated counts."""
+    incoming_core = _canonical_core(incoming).dropna(subset=KEY_COLUMNS)
+    incoming_core = incoming_core.drop_duplicates(KEY_COLUMNS, keep="last")
+    if existing.empty:
+        return incoming_core.reset_index(drop=True), int(len(incoming_core)), 0
+
+    existing_core = _canonical_core(existing).dropna(subset=KEY_COLUMNS)
+    existing_core = existing_core.drop_duplicates(KEY_COLUMNS, keep="last")
+    incoming_indexed = incoming_core.set_index(KEY_COLUMNS)
+    existing_indexed = existing_core.set_index(KEY_COLUMNS)
+
+    is_new = ~incoming_indexed.index.isin(existing_indexed.index)
+    changed = pd.Series(is_new, index=incoming_indexed.index, dtype=bool)
+    common = incoming_indexed.index[~is_new]
+    if len(common):
+        left = incoming_indexed.loc[common]
+        right = existing_indexed.reindex(common)
+        equal_cells = left.eq(right) | (left.isna() & right.isna())
+        changed.loc[common] = ~equal_cells.all(axis=1)
+
+    changed_rows = incoming_indexed.loc[changed].reset_index()
+    rows_added = int(is_new.sum())
+    rows_updated = int(changed.sum()) - rows_added
+    return changed_rows[CORE_COLUMNS], rows_added, rows_updated
+
+
 class Money24hVNIndexValuationScraper:
     name = "vnindex_valuation_24hmoney"
     source_url = PAGE_URL
@@ -164,7 +221,14 @@ class Money24hVNIndexValuationScraper:
             range_type=self.range_type,
         )
 
-    def run(self, *, output_dir: Path = DEFAULT_OUTPUT_DIR, dry_run: bool = False) -> dict[str, Any]:
+    def run(
+        self,
+        *,
+        output_dir: Path = DEFAULT_OUTPUT_DIR,
+        dry_run: bool = False,
+        market_data_path: Path = DEFAULT_MARKET_DATA_PATH,
+        max_session_lag: int = 1,
+    ) -> dict[str, Any]:
         started = time.time()
         frame = self.scrape()
         stats: dict[str, Any] = {
@@ -180,41 +244,65 @@ class Money24hVNIndexValuationScraper:
 
         stats["earliest_date"] = str(frame["date"].min())
         stats["latest_date"] = str(frame["date"].max())
-        tagged = frame.copy()
-        tagged["scraped_at"] = pd.Timestamp.now(tz=VN_TZ).isoformat()
-        tagged["scrape_run_id"] = self.run_id
-        tagged["date"] = pd.to_datetime(tagged["date"]).dt.strftime("%Y-%m-%d")
+        freshness = evaluate_pvgo_freshness(
+            frame["date"].max(),
+            load_market_dates(market_data_path),
+            max_session_lag=max_session_lag,
+        )
+        stats.update(
+            {
+                "freshness_status": freshness["status"],
+                "market_latest_date": freshness["market_date"],
+                "session_lag": freshness["session_lag"],
+                "max_session_lag": freshness["max_session_lag"],
+            }
+        )
 
-        column_order = CORE_COLUMNS + ["scrape_run_id", "scraped_at"]
+        incoming = _canonical_core(frame)
+        column_order = CORE_COLUMNS + METADATA_COLUMNS
         csv_path = output_dir / f"{TABLE_NAME}.csv"
+        existing_df = pd.DataFrame(columns=column_order)
+        if csv_path.exists():
+            try:
+                existing_df = pd.read_csv(csv_path)
+            except Exception as exc:
+                print(f"Warning: could not read existing CSV at {csv_path}: {exc}")
+
+        changed_rows, rows_added, rows_updated = _changed_incoming_rows(existing_df, incoming)
+        stats.update(
+            {
+                "rows_added": rows_added,
+                "rows_updated": rows_updated,
+                "rows_unchanged": int(len(incoming) - len(changed_rows)),
+                "data_changed": bool(len(changed_rows)),
+            }
+        )
 
         if dry_run:
-            print(tagged[column_order].to_string(index=False))
+            print(incoming[CORE_COLUMNS].to_string(index=False))
         else:
             output_dir.mkdir(parents=True, exist_ok=True)
-            if csv_path.exists():
-                try:
-                    existing_df = pd.read_csv(csv_path)
-                    existing_df["date"] = pd.to_datetime(existing_df["date"]).dt.strftime("%Y-%m-%d")
-                    combined = pd.concat([existing_df, tagged], ignore_index=True)
-                except Exception as exc:
-                    print(f"Warning: could not read existing CSV at {csv_path}: {exc}")
-                    combined = tagged
+            if len(changed_rows):
+                tagged = changed_rows.copy()
+                tagged["scrape_run_id"] = self.run_id
+                tagged["scraped_at"] = pd.Timestamp.now(tz=VN_TZ).isoformat()
+                combined = pd.concat([existing_df, tagged], ignore_index=True)
+                for column in column_order:
+                    if column not in combined:
+                        combined[column] = None
+                combined["date"] = pd.to_datetime(combined["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+                combined = (
+                    combined[column_order]
+                    .dropna(subset=KEY_COLUMNS)
+                    .drop_duplicates(subset=KEY_COLUMNS, keep="last")
+                    .sort_values(KEY_COLUMNS)
+                    .reset_index(drop=True)
+                )
+                combined.to_csv(csv_path, index=False, encoding="utf-8")
+                stats["tables_written"] = 1
+                stats["rows_written"] = int(len(combined))
             else:
-                combined = tagged
-
-            for col in column_order:
-                if col not in combined:
-                    combined[col] = None
-            combined = (
-                combined[column_order]
-                .drop_duplicates(subset=["date", "index_code"], keep="last")
-                .sort_values(["date", "index_code"])
-                .reset_index(drop=True)
-            )
-            combined.to_csv(csv_path, index=False, encoding="utf-8")
-            stats["tables_written"] = 1
-            stats["rows_written"] = int(len(combined))
+                stats["rows_written"] = int(len(existing_df))
             stats["csv_path"] = str(csv_path)
 
         stats["elapsed_s"] = round(time.time() - started, 2)
@@ -227,6 +315,13 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--index-code", default=DEFAULT_INDEX_CODE)
     parser.add_argument("--range-type", default=DEFAULT_RANGE_TYPE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
+    parser.add_argument("--market-data-path", type=Path, default=DEFAULT_MARKET_DATA_PATH)
+    parser.add_argument("--max-session-lag", type=int, default=1)
+    parser.add_argument(
+        "--allow-stale",
+        action="store_true",
+        help="Exit successfully even when PVGO is more than max-session-lag market sessions behind.",
+    )
     parser.add_argument("--dry-run", action="store_true")
     args = parser.parse_args(argv)
 
@@ -235,11 +330,19 @@ def main(argv: list[str] | None = None) -> int:
         index_code=args.index_code,
         range_type=args.range_type,
     )
-    stats = scraper.run(output_dir=args.output_dir, dry_run=args.dry_run)
+    stats = scraper.run(
+        output_dir=args.output_dir,
+        dry_run=args.dry_run,
+        market_data_path=args.market_data_path,
+        max_session_lag=args.max_session_lag,
+    )
     print("DONE:", json.dumps(stats, default=str, indent=2))
-    return 0 if stats["rows_ready"] > 0 else 1
+    if stats["rows_ready"] <= 0:
+        return 1
+    if stats.get("freshness_status") == "STALE" and not args.allow_stale:
+        return 2
+    return 0
 
 
 if __name__ == "__main__":
     raise SystemExit(main())
-
