@@ -1,0 +1,58 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Tổng quan chế độ cảm xúc tin tức (News Sentiment Regime)**
+
+- **1 ngày (22/07/2026):**  
+  Chế độ: `strong_risk_on`. Mức độ tin cậy cùng chiều (P_conf) **97%** (>85%) → **Khẳng định chắc chắn** thị trường nghiêng mạnh về rủi ro (risk-on).  
+- **7 ngày (16–22/07/2026):**  
+  Chế độ: `strong_risk_on`. P_conf **100%** → **Khẳng định chắc chắn** risk-on kéo dài.  
+- **30 ngày (23/06–22/07/2026):**  
+  Chế độ: `strong_risk_on`. P_conf **100%** → **Khẳng định chắc chắn** cả chu kỳ tháng giữ vững tâm lý tích cực.
+
+*Lưu ý: P_conf là xác suất của latent news‑sentiment mean, không phải xác suất VN-Index tăng.*
+
+---
+
+**Kênh dẫn dắt Risk‑On / Risk‑Off chính**
+
+- **Kênh ủng hộ Risk‑On (mạnh, P_conf rất cao)**  
+  - `earnings` (1d: +1.222, P_conf 100%; 7d: +1.411, P_conf 100%): tín hiệu lợi nhuận doanh nghiệp rất khả quan.  
+  - `credit_stress` (1d: +1.217, P_conf 99%; 7d: +1.624, P_conf 100%): căng thẳng tín dụng thấp, lợi suất TPCP ổn định.  
+  - `monetary_policy` (7d: +1.072, P_conf 100%; 30d: +1.087, P_conf 100%): chính sách tiền tệ hỗ trợ (PBoC giữ LPR, lãi suất huy động NHTM tăng nhẹ).  
+  - `fiscal_public_investment` (1d: +0.564, P_conf 89%): đầu tư công và tài khóa là động lực tăng trưởng.  
+- **Kênh gây Risk‑Off (yếu hơn, nhưng đáng chú ý)**  
+  - `liquidity` (1d: -0.441, P_conf 97%; 7d: -0.112, P_conf 86%): NHNN hút ròng mạnh qua OMO, thanh khoản hệ thống âm nhẹ.  
+  - `commodity` (30d: -0.700, P_conf 100%): giá hàng hóa Trung Quốc (thép, ure, PVC, bạc, đường) đồng loạt giảm sâu, phủ bóng lên kỳ vọng cầu bên ngoài.
+
+---
+
+**Tóm lược các động lực chính (drivers quan trọng)**
+
+**Tích cực (kéo tâm lý risk‑on)**  
+1. **Lợi suất TPCP đi ngang** – Thanh khoản trái phiếu ổn, không có dấu hiệu căng thẳng tín dụng (1d, credit_stress).  
+2. **Đầu tư công / hạ tầng lan tỏa** – Hưng Yên đẩy nhanh khu CNC, Quảng Ninh cải thiện cạnh tranh, dự án 500kV LNG Bạc Liêu – Thốt Nốt (1d, growth & banking_system).  
+3. **Chính sách tiền tệ hỗ trợ** – PBoC giữ nguyên LPR 1Y 3.00%; lãi suất huy động nhóm NHTM khác tăng nhẹ, cho thấy nhu cầu vốn lành mạnh (7d, 30d, monetary_policy).  
+4. **Tỷ giá ổn định có chiều hướng tăng nhẹ** – Tỷ giá trung tâm 21/07 tăng 8 đồng, phản ánh dòng vốn ngoại ổn (7d, fx_external).  
+
+**Tiêu cực (đối trọng rủi ro)**  
+1. **NHNN hút ròng 13.102 tỷ qua OMO** – Thanh khoản bị thắt chặt ngắn hạn, lãi suất liên ngân hàng có thể nhích lên (1d, 7d, liquidity).  
+2. **Rủi ro môi trường đầu tư từ lừa đảo online** – Bài viết cảnh báo “cuộc di cư” của tội phạm công nghệ, ảnh hưởng lòng tin nhà đầu tư nhỏ lẻ (1d, growth).  
+3. **Giá hàng hóa Trung Quốc lao dốc kéo dài** – Thép, ure, PVC, bạc, đường chạm đáy tháng/năm, phát tín hiệu cầu yếu từ đối tác lớn (30d, commodity).  
+4. **Điều chỉnh nhẹ tỷ giá một số phiên** – Tỷ giá 20/07 giảm 2 đồng, dù không bền vững nhưng gây nhiễu ngắn hạn (7d, fx_external).  
+
+---
+
+**Đánh giá tác động lên AI CIO**
+
+- **Hỗ trợ (Supports):** Tâm lý vĩ mô đang ở mức risk‑on mạnh nhất trên cả ba khung thời gian, phù hợp với một lớp phân bổ nghiêng về tài sản rủi ro (cổ phiếu, tín nhiệm). Các kênh như lợi nhuận doanh nghiệp, ổn định tín dụng, đầu tư công đều xác nhận tín hiệu tăng trưởng trong nước.  
+- **Xung đột nhẹ (Minor conflicts):** Động thái hút ròng OMO và giá hàng hóa thế giới yếu có thể tạo áp lực ngắn hạn lên thanh khoản và định giá các ngành nguyên vật liệu. Tuy nhiên, các kênh này chưa đủ mạnh để phá vỡ bức tranh chung.  
+- **Trung lập:** Không có tín hiệu trái chiều lớn từ nguồn widata (dữ liệu cứng).  
+
+→ Tổng thể: AI CIO nên duy trì thiên hướng risk‑on nhưng cần theo dõi chặt chẽ diễn biến OMO để điều chỉnh linh hoạt, đặc biệt với các vị thế nhạy cảm lãi suất.
+
+---
+
+**Cảnh báo (Caveats)**
+
+- **Nguồn tin xã hội (Mozyfin Social):** Bộ dữ liệu có tỉ trọng đáng kể từ Mozyfin (1d: 100/253, 7d: 674/1341, 30d: 3110/4910) và Mozyfin Social (1d: 51, 7d: 403, 30d: 1007). Các bài đăng mạng xã hội có độ tin cậy thấp hơn, dễ khuếch đại tâm lý đám đông. Tín hiệu risk‑on mạnh cần được chiết khấu một phần ảnh hưởng từ “lớp phủ cảm xúc xã hội” này.  
+- **Thời điểm cập nhật:** Dữ liệu được sinh lúc 16:31 ngày 22/07/2026, không có độ trễ đáng kể.  
+- **Nhiễu tiêu đề (Headline noise):** Một số tiêu đề có thể phản ánh sự kiện riêng lẻ (như bài viết về lừa đảo) và không nên ngoại suy toàn thị trường. Việc giám sát liên tục giúp AI CIO phân biệt tín hiệu thật và nhiễu.

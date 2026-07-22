@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-22",
+  "composite_score": 21.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 4,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 6.1,
+      "unit": "%",
+      "description": "Tỷ lệ cổ phiếu trên MA20 vượt 45%"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.3,
+      "unit": "%",
+      "description": "Chỉ số SSI giảm xuống dưới 55%"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.325,
+      "unit": "",
+      "description": "Hệ số đuôi EVT qua tất cả ngưỡng đều dưới 0.25"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 21.7,
+      "unit": "th pct",
+      "description": "Phân vị tương quan Vingroup xuống dưới 70"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.9,
+      "unit": "th pct",
+      "description": "CQS rời khỏi vùng cực kỳ căng thẳng (dưới 80th percentile)"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-22",
+  "source": "ai_cio_executive_summary"
+}

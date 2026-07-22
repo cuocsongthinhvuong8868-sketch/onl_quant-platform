@@ -1,0 +1,37 @@
+<!-- ai-cio-cache-version: deterministic_mc_seed_v1 -->
+## 1. Observations
+- **Delta cung – cầu vs mu**: Lực cầu hiện tại 5.18% (thấp hơn trung bình dài hạn –5.85 điểm phần trăm), lực cung 27.06% (cao hơn trung bình +14.49 điểm phần trăm). Cả hai cùng lệch xa mu theo chiều bearish → tín hiệu phân phối rõ nét.
+- **Chế độ tự tương quan**: Cả hai phía đều có Phi > +0.10 (cầu 0.170, cung 0.193) ⇒ momentum duy trì đà hiện tại, không có dấu hiệu đảo chiều.
+- **Bất đối xứng đuôi**: P95 T+19 downside 21.69% > upside 19.76% ⇒ rủi ro đuôi bán tháo dày hơn đuôi bùng nổ mua, phản ánh áp lực cung vượt trội.
+
+## 2. Supply-Demand Dynamics
+Trạng thái hiện tại là **distribution** (phân phối) do demand << mu và supply >> mu – dòng tiền thông minh đang xả hàng trong khi lực mua yếu ớt.  
+So sánh |Phi|: 0.193 (cung) > 0.170 (cầu) → **momentum của bên cung chiếm ưu thế**. Đà bán có quán tính mạnh hơn, xác suất tiếp tục mở rộng breadth giảm giá cao hơn.
+
+## 3. Stress-Test Read
+Kịch bản cực đoan P95 Downside = 21.69% sau 19 phiên mô phỏng một đợt panic sell diện rộng (cổ phiếu giảm >2% lan nhanh). Trong khi đó, P95 Upside chỉ 19.76% – không bù đắp được rủi ro. Chênh lệch ~1.93 điểm phần trăm cho thấy tail risk nghiêng hẳn về phía giảm điểm, củng cố quan điểm phòng thủ.
+
+## 4. Verdict
+Đề xuất tỷ trọng giải ngân **10%** (ưu tiên giữ tiền mặt). Chiến lược: **phòng thủ** (defensive).  
+Lý do: Phân phối kết hợp momentum bán mạnh chưa có dấu hiệu cạn cung; Phi cầu vẫn dương nhưng yếu hơn nên không đủ lực để đảo chiều. Chưa phải thời điểm bắt đáy hay mua đuổi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 21.69,
+  "p95_upside_pct": 19.76,
+  "deployment_pct": 10,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

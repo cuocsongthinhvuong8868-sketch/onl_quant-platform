@@ -1,0 +1,34 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI = 63.3% → mức WARNING (tích lũy rủi ro ngầm)
+- Market State: ACTIVE STRESS – giá dưới MA125, xu hướng giảm + stress cao
+- Top 3 pillar drivers: S_LIQ (35%), S_VAL (31%), S_COR (18%)
+- Chỉ số PCA EVR PC1 = 38.1%, phản ánh độ tập trung hệ thống trung bình cao
+
+## 2. Risk Decomposition
+Trụ cột dẫn dắt là **S_LIQ – Volume Dry-Up**. Chỉ số này cao đồng nghĩa thanh khoản toàn thị trường đang khô cạn mạnh so với định mức 1 năm. Khi khối lượng giao dịch suy yếu trong xu hướng giảm, rủi ro thanh khoản phi mã (liquidity spiral) hiện hữu: lệnh bán dễ đẩy giá trượt sâu mà không có lực cầu hấp thụ.
+
+S_VAL (31%) đứng thứ hai – căng thẳng định giá biểu thị bằng chênh lệch giữa lợi nhuận 252 ngày của VN30 so với lãi suất tiền gửi. Mức đóng góp cao cho thấy thị trường định vị trên nền tảng lợi nhuận kỳ vọng chưa tương xứng với chi phí cơ hội, gia tăng áp lực điều chỉnh.
+
+S_COR (18%) xác nhận tương quan hệ thống đang gia tăng – 30 cổ phiếu di chuyển đồng pha. Cộng hưởng với khối lượng cạn kiệt và định giá căng, hiện tượng này tạo ra môi trường “rút thanh khoản đồng loạt”: thị trường thiếu chiều sâu, dễ xảy ra sụt giảm lan truyền ngay cả khi không có cú sốc lớn.
+
+## 3. Cross-Check
+- Giá VN30 nằm dưới MA125, không tồn tại phân kỳ giá tăng – SSI tăng (bull‑trap risk) → tín hiệu nhất quán với bức tranh ACTIVE STRESS.
+- HMM regime ACTIVE STRESS khớp hoàn toàn với mức SSI WARNING và xu hướng giảm giá thực tế. Không có mâu thuẫn cần flag.
+
+## 4. Verdict
+Tỉ trọng tiền mặt khuyến nghị: **80%** danh mục. Với cấu trúc rủi ro hiện tại, việc phòng vệ thông qua **bán khống hợp đồng tương lai VN30F1M** (short futures) là phù hợp, nhằm giảm thiểu tổn thất từ kịch bản thanh khoản cạn kiệt lan rộng. Không sử dụng đòn bẩy; toàn bộ phần nắm giữ cổ phiếu thuần (20%) cần là các vị thế phòng thủ có beta thấp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.3,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 80,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```

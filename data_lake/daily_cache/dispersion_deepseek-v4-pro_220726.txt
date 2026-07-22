@@ -1,0 +1,30 @@
+## 1. Observations
+- Spread_Z = -1.10σ: mức phân tán chéo thấp hơn đáng kể so với trung vị 60 phiên.
+- DPI = 46.7%: dưới ngưỡng 70%, không tồn tại chế độ phân tán kéo dài.
+- Avg Pairwise Correlation (Ledoit-Wolf) = 0.031: tương quan gần như bằng 0, các cổ phiếu di chuyển độc lập.
+- Cross-Sectional Skewness và Kurtosis không có sẵn trong dữ liệu.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không có dấu hiệu căng thẳng. Chỉ báo tổng hợp DPI thấp + Spread_Z âm sâu cho thấy mức độ phân tán hiện tại vừa yếu vừa không bền vững. Không có bằng chứng của stress cục bộ (vì Spread_Z không cao) cũng như stress duy trì (DPI không cao). Đây là điều kiện nền chuẩn, ít nhiễu loạn.
+
+## 3. Cross-Check & Tail Direction
+Do thiếu dữ liệu Skewness và Kurtosis, không thể kết luận về hướng gãy đuôi hay sự hiện diện của fat-tail. Tuy nhiên, với Spread dương nhưng ở mức thấp và Z-score âm, mức độ đóng góp của các điểm dị biệt vào phân tán là không đáng kể. Tạm thời coi phân phối lợi suất chéo là cân xứng và không có yếu tố đột biến bất thường.
+
+## 4. Regime Mapping
+Đối chiếu lên bản đồ 2D (DPI × Corr), với DPI = 46.7% và Corr = 0.031, trạng thái rơi chính xác vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu vì tương quan thấp giúp đa dạng hóa phát huy tác dụng, cổ phiếu di chuyển theo yếu tố riêng (idiosyncratic) thay vì bị cuốn theo xu hướng chung của thị trường.
+
+Rủi ro lớn nhất đối với Portfolio Manager trong bối cảnh này là **concentration risk tiềm ẩn**: sự yên ắng quá mức (corr ~0, spread thấp) có thể khiến nhà quản lý quá tự tin vào các vị thế tập trung lớn. Nếu thị trường bất ngờ chuyển sang chế độ tương quan cao (trending/hoảng loạn) do một cú sốc ngoại sinh, các vị thế vốn không tương quan có thể đồng loạt sụt giảm, gây tổn thất vượt kiểm soát.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "22/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.10,
+  "dpi_pct": 46.7,
+  "avg_corr": 0.031,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```

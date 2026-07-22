@@ -1,0 +1,28 @@
+## 1. Observations
+- OLS Slope ở mức 0.19 – percentile 5.1th (🟢 rất thấp), cho thấy VN30F1M gần như không phản ứng với biến động composite VIC/VHM/VRE.
+- Correlation 0.58 ở percentile 47.5th (🟡 trung bình), mối liên kết tuyến tính ở mức lỏng lẻo, không đủ để dự báo.
+- Regime hiện tại là **DECOUPLING** với ΔCorr = -0.37, ΔSlope = -0.62 → VIN mất hoàn toàn vai trò dẫn dắt chỉ số.
+
+## 2. Microstructure Read
+Với slope cực thấp (5.1th) và correlation chỉ ở mức trung bình, bộ ba VIC/VHM/VRE hiện **không còn chi phối** biến động VN30F1M. Dòng tiền đã rời khỏi nhóm VIN và chuyển sang các ngành khác. Không có dấu hiệu “can thiệp” (không có percentile nào >80th), thị trường đang tự vận hành theo các driver mới.
+
+## 3. Event Study Interpretation
+Sự kiện DECOUPLING từ 28/04/2026 kéo dài với ΔCorr và ΔSlope cùng âm sâu cho thấy mối quan hệ VIN–Futures đã đứt gãy có hệ thống. Trong ngắn hạn (intraday/overnight), sử dụng biến động VIC/VHM để dự đoán VN30F1M sẽ cho tín hiệu nhiễu. Không nên giữ vị thế qua đêm dựa trên model này.
+
+## 4. Verdict
+- **Trade plan:** `NO TRADE` trên cặp VIN–VN30F1M vì không có edge từ mô hình. Nếu muốn hành động trong ngày, cần dịch chuyển theo dõi sang nhóm ngân hàng (VCB, BID, CTG) hoặc chứng khoán (SSI) – những nhóm có thể đang dẫn dắt chỉ số thay VIN.
+- **Leading indicator:** Theo dõi momentum giá và khối lượng của bộ chỉ cổ phiếu ngân hàng lớn; tín hiệu từ nhóm này sẽ có giá trị dự báo cao hơn.
+- **Stop-loss reference:** Không áp dụng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "22/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 5.1,
+  "corr_percentile": 47.5,
+  "trade_signal": "no_trade",
+  "confidence": "medium"
+}
+```

@@ -1,0 +1,30 @@
+## 1. Observations  
+- VN30 Stress Index chạm 40.00%, đúng ngưỡng cảnh báo.  
+- 12/30 mã VN30 thủng VaR 95% (tỷ lệ 40%), phản ánh áp lực bán lan rộng.  
+- Complacency Index cực thấp (5.56%), với 6 mã mispriced, đứng đầu là MSB, STB, LPB.
+
+## 2. Contagion Assessment (Module B)  
+Stress Index 40% xác nhận rủi ro lây lan đang diễn ra real-time trong rổ VN30, không còn là dấu hiệu tiền cảnh báo. 12 mã breach VaR – chiếm 40% rổ – cho thấy mức độ xâm thực của stress hệ thống lên diện rộng.  
+Top 3 breach sâu nhất (MWG, VIC, VHM) đều là bluechip vốn hoá lớn, có tương quan chặt với chỉ số và liên thông nhóm ngành. Đây **không phải** sự cố cá biệt; nhiều khả năng là đầu sóng systemic, cần đánh giá lan truyền sang các nhóm còn lại (tài chính, bất động sản).
+
+## 3. Complacency Assessment (Module C)  
+Complacency 5.56% cực thấp khẳng định **thị trường KHÔNG ở regime ngủ quên** – spread không bị nén diện rộng, rủi ro đang được phản ánh tương đối rõ ràng.  
+Tuy nhiên, **điều này không đồng nghĩa thị trường ổn định hay không có áp lực bán**. Kết hợp với Stress Index cao, bức tranh hiện tại là: căng thẳng lan truyền công khai, không bị che giấu bởi định giá sai hàng loạt. Sáu mã mispriced (MSB, STB, LPB dẫn đầu) chỉ còn là những “điểm mù” nhỏ – một vài cổ phiếu ngân hàng vẫn nén spread, tiềm ẩn rủi ro điều chỉnh bất ngờ nếu stress lan sang nhóm tài chính.
+
+## 4. Stock-Level Risk Calls  
+- **MWG, VIC, VHM (top crash)**: Cân nhắc giảm mạnh tỷ trọng, đặc biệt nếu thủng hỗ trợ kỹ thuật D1 (MA20/MA50) với volume đột biến. Stop-loss nên tính theo % biến động từ vùng giá hiện tại, tránh neo vào mốc tuyệt đối.  
+- **MSB, STB, LPB (top mispriced)**: Cảnh báo tiềm ẩn. Dù chưa giảm theo stress, spread bị nén khiến các mã này dễ hứng cú sập mạnh nếu contagion lan vào ngân hàng. Nên chốt lời một phần hoặc đặt trailing stop chặt, không giữ vị thế lớn trong giai đoạn này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 40.00,
+  "breach_count": 12,
+  "complacency_pct": 5.56,
+  "mispriced_count": 6,
+  "regime": "contagion_active",
+  "watchlist_short": ["MWG", "VIC", "VHM", "MSB", "STB", "LPB"],
+  "confidence": "medium"
+}
+```
