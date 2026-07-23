@@ -25,6 +25,11 @@ from shared.page_layout import setup_page
 setup_page("Quant Platform - AI CIO Chat")
 
 CHAT_MESSAGES_KEY = "ai_cio_chat_messages"
+HIDDEN_DIAGNOSTIC_TITLES = {
+    "AI-CIO Tool Metrics",
+    "Data Health",
+    "Kết quả tìm dữ liệu",
+}
 
 
 @st.cache_resource(show_spinner=False)
@@ -80,10 +85,18 @@ def _serialize_sources(sources: tuple[Any, ...]) -> list[dict[str, Any]]:
     ]
 
 
+def _is_volume_series(column: str) -> bool:
+    normalized = str(column).strip().lower().replace("_", " ")
+    return any(
+        term in normalized
+        for term in ("volume", "khối lượng", "khoi luong", "turnover", "giá trị giao dịch")
+    ) or normalized in {"vol", "gtgd"}
+
+
 def _render_tool_traces(tool_traces: list[dict[str, Any]] | tuple[dict[str, Any], ...]) -> None:
     if not tool_traces:
         return
-    with st.expander(f"Agent audit trail ({len(tool_traces)} tool calls)", expanded=False):
+    with st.expander(f"Agent audit trail ({len(tool_traces)} bước)", expanded=False):
         for index, trace in enumerate(tool_traces, start=1):
             status = "OK" if trace.get("ok", True) else "ERROR"
             st.markdown(f"**{index}. `{trace.get('tool', 'unknown')}` — {status}**")
@@ -91,6 +104,8 @@ def _render_tool_traces(tool_traces: list[dict[str, Any]] | tuple[dict[str, Any]
                 st.json(trace["arguments"], expanded=False)
             if trace.get("sources"):
                 st.caption("Nguồn: " + ", ".join(str(source) for source in trace["sources"]))
+            if trace.get("reason"):
+                st.caption("Lý do: " + str(trace["reason"]))
             if trace.get("error"):
                 st.error(str(trace["error"]))
 
@@ -102,8 +117,10 @@ def _render_displays(displays: list[dict[str, Any]] | tuple[dict[str, Any], ...]
             continue
         frame = pd.DataFrame(rows)
         title = str(display.get("title") or "Dữ liệu từ agent")
+        if title in HIDDEN_DIAGNOSTIC_TITLES or display.get("visibility") == "diagnostic":
+            continue
         display_type = str(display.get("type") or "table")
-        if display_type == "line_chart":
+        if display_type in {"line_chart", "bar_chart"}:
             x_column = str(display.get("x") or "")
             y_columns = [str(column) for column in display.get("y") or [] if str(column) in frame.columns]
             if x_column not in frame.columns or not y_columns:
@@ -112,10 +129,34 @@ def _render_displays(displays: list[dict[str, Any]] | tuple[dict[str, Any], ...]
             frame = frame.dropna(subset=[x_column]).sort_values(x_column)
             if frame.empty:
                 continue
-            st.markdown(f"#### {title}")
-            figure = px.line(frame, x=x_column, y=y_columns, markers=True)
-            figure.update_layout(legend_title_text="", margin={"l": 10, "r": 10, "t": 20, "b": 10})
-            st.plotly_chart(figure, use_container_width=True)
+            chart_specs = [(display_type, title, y_columns)]
+            if display_type == "line_chart":
+                volume_columns = [column for column in y_columns if _is_volume_series(column)]
+                primary_columns = [column for column in y_columns if column not in volume_columns]
+                if volume_columns and primary_columns:
+                    subject = title.removeprefix("Diễn biến ").replace("_cache", "").strip()
+                    if subject.lower() in {"vnindex", "vn30", "hnxindex"}:
+                        subject = subject.upper()
+                    chart_specs = [
+                        ("line_chart", title, primary_columns),
+                        ("bar_chart", f"Khối lượng {subject}", volume_columns),
+                    ]
+            for chart_type, chart_title, chart_columns in chart_specs:
+                st.markdown(f"#### {chart_title}")
+                if chart_type == "bar_chart":
+                    figure = px.bar(frame, x=x_column, y=chart_columns, barmode="group")
+                else:
+                    figure = px.line(frame, x=x_column, y=chart_columns, markers=True)
+                figure.update_layout(
+                    legend_title_text=str(display.get("legend_title") or ""),
+                    yaxis_title=(
+                        "Khối lượng"
+                        if chart_type == "bar_chart"
+                        else str(display.get("y_axis_title") or "")
+                    ),
+                    margin={"l": 10, "r": 10, "t": 20, "b": 10},
+                )
+                st.plotly_chart(figure, use_container_width=True)
         else:
             st.markdown(f"#### {title}")
             st.dataframe(frame, hide_index=True, use_container_width=True)
@@ -138,7 +179,7 @@ if CHAT_MESSAGES_KEY not in st.session_state:
 
 st.title("Chat với AI CIO")
 st.caption(
-    "AI-CIO Data Agent v2 chủ động gọi công cụ read-only, giữ hội thoại nhiều lượt và dựng bảng/biểu đồ từ dữ liệu nguồn."
+    "AI-CIO Data Agent v2.1 dùng AI Query Planner trước khi đọc dữ liệu, sau đó gọi công cụ read-only và dựng bảng/biểu đồ từ nguồn."
 )
 st.info(
     "Quyền đọc gồm `data_lake/`, `reports/`, `docs/`, `config/`, `tickers.csv` và `tickers_400.csv`. "

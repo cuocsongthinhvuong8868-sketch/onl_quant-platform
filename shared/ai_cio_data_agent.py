@@ -26,15 +26,34 @@ from shared.tool_registry import BRANCHES, iter_tools
 from src.data_manager import DataManager
 
 
-DATA_AGENT_VERSION = "ai_cio_data_agent_v2.0.0"
+DATA_AGENT_VERSION = "ai_cio_data_agent_v2.1.0"
 MAX_AGENT_ITERATIONS = 4
 MAX_TOOL_RESULT_CHARS = 14_000
+PLANNER_MAX_TOKENS = 800
+PLANNER_CONFIDENCE_THRESHOLD = 0.55
 LOCAL_PROVIDER_HOSTS = {"127.0.0.1", "localhost", "0.0.0.0", "::1"}
 VIETNAM_TIMEZONE = ZoneInfo("Asia/Ho_Chi_Minh")
 _ISO_DATE_RE = re.compile(r"^\d{4}[-/]\d{1,2}[-/]\d{1,2}(?:\D|$)")
 _LOCAL_DATE_RE = re.compile(r"^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}(?:\D|$)")
 _DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _LATEST_COUNT_RE = re.compile(r"\b(\d{1,3})\s*(?:phien|ngay|quan\s*sat|periods?)\b")
+ALLOWED_QUERY_INTENTS = {
+    "systemic_risk",
+    "market_timeseries",
+    "tool_metrics",
+    "data_health",
+    "tool_registry",
+    "project_file",
+    "general_research",
+}
+ALLOWED_AGENT_TOOLS = {
+    "search_project_data",
+    "read_timeseries",
+    "read_project_file",
+    "get_tool_metrics",
+    "get_data_health",
+    "list_quant_tools",
+}
 
 
 AGENT_TOOL_SCHEMAS: list[dict[str, Any]] = [
@@ -178,6 +197,40 @@ class DataAgentAnswer:
     methodology_version: str = DATA_AGENT_VERSION
 
 
+@dataclass(frozen=True)
+class QueryPlan:
+    intents: tuple[str, ...]
+    entities: tuple[str, ...]
+    required_tools: tuple[str, ...]
+    search_queries: tuple[str, ...] = ()
+    source_hints: tuple[str, ...] = ()
+    tool_ids: tuple[str, ...] = ()
+    latest_sessions: int | None = None
+    start_date: str | None = None
+    end_date: str | None = None
+    confidence: float = 0.0
+    reason: str = ""
+    planner_mode: str = "ai"
+    warnings: tuple[str, ...] = ()
+
+    def as_dict(self) -> dict[str, Any]:
+        return {
+            "intents": list(self.intents),
+            "entities": list(self.entities),
+            "required_tools": list(self.required_tools),
+            "search_queries": list(self.search_queries),
+            "source_hints": list(self.source_hints),
+            "tool_ids": list(self.tool_ids),
+            "latest_sessions": self.latest_sessions,
+            "start_date": self.start_date,
+            "end_date": self.end_date,
+            "confidence": self.confidence,
+            "reason": self.reason,
+            "planner_mode": self.planner_mode,
+            "warnings": list(self.warnings),
+        }
+
+
 def is_local_provider(provider_key: str) -> bool:
     cfg = AI_PROVIDER_MAP.get(provider_key) or {}
     hostname = (urlparse(str(cfg.get("base_url") or "")).hostname or "").lower()
@@ -218,6 +271,17 @@ def _local_native_tools_enabled() -> bool:
         "yes",
         "on",
     }
+
+
+def _native_tool_agent_enabled(provider_key: str) -> bool:
+    override = os.getenv("QUANT_PLATFORM_NATIVE_TOOL_AGENT", "").strip().lower()
+    if override in {"1", "true", "yes", "on"}:
+        return True
+    if override in {"0", "false", "no", "off"}:
+        return False
+    if is_local_provider(provider_key):
+        return _local_native_tools_enabled()
+    return False
 
 
 def _clean_records(frame: pd.DataFrame) -> list[dict[str, Any]]:
@@ -336,6 +400,27 @@ def _parse_datetime_series(values: pd.Series) -> pd.Series:
     return parsed
 
 
+def _is_volume_column(column: str) -> bool:
+    normalized = _normalize_query(str(column).replace("_", " "))
+    return any(
+        term in normalized
+        for term in (
+            "volume",
+            "khoi luong",
+            "turnover",
+            "gia tri giao dich",
+        )
+    ) or normalized in {"vol", "gtgd"}
+
+
+def _chart_subject(source: str) -> str:
+    stem = Path(source).stem
+    if stem.lower().endswith("_cache"):
+        stem = stem[:-6]
+    label = stem.replace("_", " ").strip()
+    return label.upper() if label.lower() in {"vnindex", "vn30", "hnxindex"} else label
+
+
 def _read_tabular(path: Path) -> pd.DataFrame:
     if path.suffix.lower() == ".parquet":
         return pd.read_parquet(path)
@@ -387,7 +472,6 @@ class DataAgentToolbox:
             "search_project_data",
             {"query": query, "max_results": max_results},
             {"ok": True, "query": query, "results": rows},
-            displays=({"type": "table", "title": "Kết quả tìm dữ liệu", "rows": rows},),
         )
 
     def read_timeseries(
@@ -447,7 +531,10 @@ class DataAgentToolbox:
             str(column)
             for column in latest.columns
             if str(column) != resolved_date_column and pd.api.types.is_numeric_dtype(latest[column])
-        ][:4]
+        ]
+        volume_columns = [column for column in numeric_columns if _is_volume_column(column)][:2]
+        primary_columns = [column for column in numeric_columns if column not in volume_columns][:4]
+        chart_subject = _chart_subject(source)
         displays = [
             {
                 "type": "table",
@@ -456,14 +543,29 @@ class DataAgentToolbox:
                 "rows": table_rows,
             }
         ]
-        if include_chart and numeric_columns:
+        if include_chart and primary_columns:
             displays.append(
                 {
                     "type": "line_chart",
-                    "title": f"Diễn biến {Path(source).stem}",
+                    "title": f"Diễn biến {chart_subject}",
                     "source": source,
                     "x": resolved_date_column,
-                    "y": numeric_columns,
+                    "y": primary_columns,
+                    "y_axis_title": "Chỉ số / Giá trị",
+                    "legend_title": "",
+                    "rows": chart_rows,
+                }
+            )
+        if include_chart and volume_columns:
+            displays.append(
+                {
+                    "type": "bar_chart",
+                    "title": f"Khối lượng {chart_subject}",
+                    "source": source,
+                    "x": resolved_date_column,
+                    "y": volume_columns,
+                    "y_axis_title": "Khối lượng",
+                    "legend_title": "",
                     "rows": chart_rows,
                 }
             )
@@ -577,7 +679,6 @@ class DataAgentToolbox:
             result,
             sources=(relative_path,),
             source_excerpts=((relative_path, json.dumps(result, ensure_ascii=False, default=str)[:8_000]),),
-            displays=({"type": "table", "title": "AI-CIO Tool Metrics", "source": relative_path, "rows": rows},),
         )
 
     def get_data_health(self, source_name: str = "", max_rows: int = 30) -> ToolExecution:
@@ -623,7 +724,6 @@ class DataAgentToolbox:
             result,
             sources=(source,),
             source_excerpts=((source, json.dumps(result, ensure_ascii=False, default=str)[:8_000]),),
-            displays=({"type": "table", "title": "Data Health", "source": source, "rows": compact_rows},),
         )
 
     def list_quant_tools(self, branch: str | None = None) -> ToolExecution:
@@ -785,6 +885,390 @@ def _matched_tool_ids(question: str) -> list[str]:
     return matches[:12]
 
 
+def _has_systemic_risk_language(normalized_question: str) -> bool:
+    return any(
+        term in normalized_question
+        for term in (
+            "rui ro he thong",
+            "systemic risk",
+            "rui ro thi truong",
+            "regime hien tai",
+            "trang thai thi truong",
+            "tin hieu chi phoi",
+            "dong luc chi phoi",
+            "thi truong hien tai ra sao",
+        )
+    )
+
+
+def _extract_json_object(content: str) -> dict[str, Any]:
+    text = str(content or "").strip()
+    if text.startswith("```"):
+        text = re.sub(r"^```(?:json)?\s*", "", text, flags=re.IGNORECASE)
+        text = re.sub(r"\s*```$", "", text)
+    try:
+        payload = json.loads(text)
+        if isinstance(payload, dict):
+            return payload
+    except json.JSONDecodeError:
+        pass
+    decoder = json.JSONDecoder()
+    for index, character in enumerate(text):
+        if character != "{":
+            continue
+        try:
+            payload, _ = decoder.raw_decode(text[index:])
+        except json.JSONDecodeError:
+            continue
+        if isinstance(payload, dict):
+            return payload
+    raise ValueError("AI planner không trả JSON object hợp lệ.")
+
+
+def _string_list(value: Any, *, max_items: int, max_chars: int = 200) -> list[str]:
+    if not isinstance(value, (list, tuple)):
+        return []
+    result = []
+    for item in value:
+        text = str(item or "").strip()
+        if text and text not in result:
+            result.append(text[:max_chars])
+        if len(result) >= max_items:
+            break
+    return result
+
+
+def _validated_iso_date(value: Any) -> str | None:
+    text = str(value or "").strip()
+    if not text:
+        return None
+    if not _DATE_ONLY_RE.fullmatch(text):
+        return None
+    try:
+        pd.Timestamp(text)
+    except (TypeError, ValueError):
+        return None
+    return text
+
+
+def _validate_query_plan(
+    payload: dict[str, Any],
+    question: str,
+    catalog: ProjectDataCatalog,
+) -> QueryPlan:
+    warnings: list[str] = []
+    intents = [
+        intent
+        for intent in _string_list(payload.get("intents"), max_items=6, max_chars=40)
+        if intent in ALLOWED_QUERY_INTENTS
+    ]
+    proposed_tools = [
+        name
+        for name in _string_list(payload.get("required_tools"), max_items=6, max_chars=40)
+        if name in ALLOWED_AGENT_TOOLS
+    ]
+    entities = _string_list(payload.get("entities"), max_items=8, max_chars=80)
+    search_queries = _string_list(payload.get("search_queries"), max_items=4, max_chars=240)
+    valid_tool_ids = {tool.id for tool in iter_tools(include_hidden=True)}
+    tool_ids = [
+        tool_id
+        for tool_id in _string_list(payload.get("tool_ids"), max_items=12, max_chars=80)
+        if tool_id in valid_tool_ids
+    ]
+    for matched_tool_id in _matched_tool_ids(question):
+        if matched_tool_id not in tool_ids:
+            tool_ids.append(matched_tool_id)
+
+    source_hints = []
+    for source in _string_list(payload.get("source_hints"), max_items=8, max_chars=300):
+        try:
+            path = catalog.resolve_source(source)
+        except (FileNotFoundError, ValueError):
+            warnings.append(f"source_hint rejected: {source}")
+            continue
+        relative_path = path.relative_to(catalog.root_dir).as_posix()
+        if relative_path not in source_hints:
+            source_hints.append(relative_path)
+
+    try:
+        confidence = float(payload.get("confidence", 0.0))
+    except (TypeError, ValueError):
+        confidence = 0.0
+    confidence = max(0.0, min(confidence, 1.0))
+    try:
+        latest_sessions = int(payload["latest_sessions"]) if payload.get("latest_sessions") else None
+    except (TypeError, ValueError):
+        latest_sessions = None
+    if latest_sessions is not None:
+        latest_sessions = max(1, min(latest_sessions, 100))
+
+    normalized = _normalize_query(question)
+    explicit_latest_match = _LATEST_COUNT_RE.search(normalized)
+    explicit_latest = int(explicit_latest_match.group(1)) if explicit_latest_match else None
+    systemic_risk = _has_systemic_risk_language(normalized) or "systemic_risk" in intents
+    if _has_systemic_risk_language(normalized) and "systemic_risk" not in intents:
+        intents.insert(0, "systemic_risk")
+        warnings.append("policy override added systemic_risk intent")
+    if systemic_risk:
+        if "get_tool_metrics" not in proposed_tools:
+            proposed_tools.insert(0, "get_tool_metrics")
+            warnings.append("policy override added get_tool_metrics")
+        if "read_timeseries" not in proposed_tools:
+            proposed_tools.append("read_timeseries")
+            warnings.append("policy override added market confirmation")
+        latest_sessions = explicit_latest or max(latest_sessions or 0, 5)
+
+    if explicit_latest is not None:
+        latest_sessions = max(1, min(explicit_latest, 100))
+        if "market_timeseries" not in intents:
+            intents.append("market_timeseries")
+        if "read_timeseries" not in proposed_tools:
+            proposed_tools.append("read_timeseries")
+            warnings.append("policy override added read_timeseries")
+
+    intent_tool_map = {
+        "market_timeseries": ("read_timeseries",),
+        "tool_metrics": ("get_tool_metrics",),
+        "data_health": ("get_data_health",),
+        "tool_registry": ("list_quant_tools",),
+        "project_file": ("search_project_data", "read_project_file"),
+        "general_research": ("search_project_data", "read_project_file"),
+    }
+    for intent in intents:
+        for required_tool in intent_tool_map.get(intent, ()):
+            if required_tool not in proposed_tools:
+                proposed_tools.append(required_tool)
+
+    evidence_tools = {
+        "read_timeseries",
+        "read_project_file",
+        "get_tool_metrics",
+        "get_data_health",
+        "list_quant_tools",
+    }
+    if "search_project_data" in proposed_tools and not evidence_tools.intersection(proposed_tools):
+        proposed_tools.append("read_project_file")
+        warnings.append("policy override added evidence reader after search")
+    if not proposed_tools:
+        intents = intents or ["general_research"]
+        proposed_tools = ["search_project_data", "read_project_file"]
+        warnings.append("empty AI plan expanded to safe general research")
+
+    canonical_order = (
+        "get_tool_metrics",
+        "get_data_health",
+        "list_quant_tools",
+        "search_project_data",
+        "read_timeseries",
+        "read_project_file",
+    )
+    required_tools = [name for name in canonical_order if name in proposed_tools][:5]
+    if "search_project_data" in required_tools and not search_queries:
+        search_queries = [question[:240]]
+    if confidence < PLANNER_CONFIDENCE_THRESHOLD:
+        warnings.append(
+            f"planner confidence {confidence:.2f} below threshold {PLANNER_CONFIDENCE_THRESHOLD:.2f}"
+        )
+
+    return QueryPlan(
+        intents=tuple(intents),
+        entities=tuple(entities),
+        required_tools=tuple(required_tools),
+        search_queries=tuple(search_queries),
+        source_hints=tuple(source_hints),
+        tool_ids=tuple(tool_ids[:12]),
+        latest_sessions=latest_sessions,
+        start_date=_validated_iso_date(payload.get("start_date")),
+        end_date=_validated_iso_date(payload.get("end_date")),
+        confidence=confidence,
+        reason=str(payload.get("reason") or "")[:500],
+        planner_mode="ai" if confidence >= PLANNER_CONFIDENCE_THRESHOLD else "ai_low_confidence",
+        warnings=tuple(warnings),
+    )
+
+
+def _plan_question_with_ai(
+    client: Any,
+    provider_key: str,
+    question: str,
+    history: Sequence[dict[str, Any]] | None,
+    catalog: ProjectDataCatalog,
+) -> QueryPlan:
+    cfg = AI_PROVIDER_MAP[provider_key]
+    tool_catalog = [
+        {
+            "name": schema["function"]["name"],
+            "description": schema["function"]["description"],
+        }
+        for schema in AGENT_TOOL_SCHEMAS
+    ]
+    registry = [
+        {"tool_id": tool.id, "name": tool.name, "branch": tool.branch}
+        for tool in iter_tools(include_hidden=True)
+    ]
+    try:
+        candidates = catalog.search(
+            question,
+            provider_key=provider_key,
+            max_sources=8,
+        )
+    except (FileNotFoundError, ValueError):
+        candidates = ()
+    candidate_metadata = [
+        {
+            "source": entry.relative_path,
+            "format": entry.suffix,
+            "size_bytes": entry.size_bytes,
+            "readable": entry.readable,
+        }
+        for entry in candidates
+    ]
+    previous_user_questions = [
+        str(item.get("content") or "")[:1_000]
+        for item in list(history or [])[-8:]
+        if item.get("role") == "user" and item.get("content")
+    ][-3:]
+    planner_input = {
+        "current_question": question,
+        "previous_user_questions": previous_user_questions,
+        "allowed_intents": sorted(ALLOWED_QUERY_INTENTS),
+        "available_read_only_tools": tool_catalog,
+        "quant_tool_registry": registry,
+        "catalog_candidates_metadata_only": candidate_metadata,
+    }
+    response = client.chat.completions.create(
+        model=cfg["api_model"],
+        messages=[
+            {
+                "role": "system",
+                "content": (
+                    "Bạn là AI-CIO Query Planner. Chỉ phân loại và lập kế hoạch truy xuất; tuyệt đối không "
+                    "trả lời câu hỏi đầu tư. Bạn chưa được xem dữ liệu hàng, metrics hoặc report content. "
+                    "Hãy chọn đa nhãn khi câu hỏi có nhiều mục tiêu. Chỉ dùng intent/tool/source có trong "
+                    "input. Trả duy nhất một JSON object, không Markdown, theo schema: "
+                    '{"intents":[],"entities":[],"required_tools":[],"search_queries":[],"source_hints":[], '
+                    '"tool_ids":[],"latest_sessions":null,"start_date":null,"end_date":null, '
+                    '"confidence":0.0,"reason":""}. '
+                    "Rủi ro hệ thống/regime/tín hiệu chi phối cần get_tool_metrics; N phiên cần "
+                    "read_timeseries. search_project_data chỉ tìm nguồn nên phải có reader đi sau."
+                ),
+            },
+            {
+                "role": "user",
+                "content": json.dumps(planner_input, ensure_ascii=False, default=str),
+            },
+        ],
+        temperature=0.0,
+        max_tokens=PLANNER_MAX_TOKENS,
+    )
+    payload = _extract_json_object(_message_content(response.choices[0].message))
+    return _validate_query_plan(payload, question, catalog)
+
+
+def _execute_query_plan(
+    plan: QueryPlan,
+    question: str,
+    toolbox: DataAgentToolbox,
+    catalog: ProjectDataCatalog,
+    *,
+    max_sources: int,
+    max_context_chars: int,
+) -> list[ToolExecution]:
+    executions: list[ToolExecution] = []
+    search_result_paths: list[str] = []
+    bundle_sources: list[RetrievedSource] | None = None
+
+    def retrieve_sources() -> list[RetrievedSource]:
+        nonlocal bundle_sources
+        if bundle_sources is None:
+            bundle = catalog.retrieve(
+                question,
+                provider_key=toolbox.provider_key,
+                max_sources=max_sources,
+                max_context_chars=max_context_chars,
+            )
+            bundle_sources = list(bundle.sources)
+        return bundle_sources
+
+    for tool_name in plan.required_tools:
+        if tool_name == "get_tool_metrics":
+            executions.append(
+                toolbox.execute("get_tool_metrics", {"tool_ids": list(plan.tool_ids)})
+            )
+            continue
+        if tool_name == "get_data_health":
+            source_name = plan.entities[0] if len(plan.entities) == 1 else ""
+            executions.append(
+                toolbox.execute(
+                    "get_data_health",
+                    {"source_name": source_name, "max_rows": max(10, min(max_sources * 5, 50))},
+                )
+            )
+            continue
+        if tool_name == "list_quant_tools":
+            normalized_entities = {_normalize_query(entity) for entity in plan.entities}
+            branch = next((candidate for candidate in BRANCHES if candidate in normalized_entities), None)
+            executions.append(toolbox.execute("list_quant_tools", {"branch": branch}))
+            continue
+        if tool_name == "search_project_data":
+            query = plan.search_queries[0] if plan.search_queries else question
+            execution = toolbox.execute(
+                "search_project_data",
+                {"query": query, "max_results": max_sources},
+            )
+            executions.append(execution)
+            search_result_paths.extend(
+                str(row.get("source") or "")
+                for row in list(execution.payload.get("results") or [])
+                if row.get("source")
+            )
+            continue
+        if tool_name == "read_timeseries":
+            candidates = list(plan.source_hints)
+            if "systemic_risk" in plan.intents:
+                candidates.insert(0, "data_lake/vnindex_cache.csv")
+            candidates.extend(search_result_paths)
+            candidates.extend(source.relative_path for source in retrieve_sources())
+            seen_sources: set[str] = set()
+            for source in candidates:
+                if source in seen_sources or Path(source).suffix.lower() not in {".csv", ".parquet"}:
+                    continue
+                seen_sources.add(source)
+                execution = toolbox.execute(
+                    "read_timeseries",
+                    {
+                        "source": source,
+                        "latest_n": plan.latest_sessions or 10,
+                        "start_date": plan.start_date,
+                        "end_date": plan.end_date,
+                        "include_chart": (plan.latest_sessions or 10) > 1,
+                    },
+                )
+                executions.append(execution)
+                if execution.payload.get("ok"):
+                    break
+            continue
+        if tool_name == "read_project_file":
+            candidates = list(plan.source_hints) + search_result_paths
+            candidates.extend(source.relative_path for source in retrieve_sources())
+            seen_sources: set[str] = set()
+            successful_reads = 0
+            for source in candidates:
+                if source in seen_sources:
+                    continue
+                seen_sources.add(source)
+                execution = toolbox.execute(
+                    "read_project_file",
+                    {"source": source, "query": question, "max_chars": 6_000},
+                )
+                executions.append(execution)
+                if execution.payload.get("ok"):
+                    successful_reads += 1
+                if successful_reads >= min(3, max_sources):
+                    break
+    return executions
+
+
 def _compatibility_executions(
     question: str,
     toolbox: DataAgentToolbox,
@@ -809,19 +1293,7 @@ def _compatibility_executions(
         branch = next((candidate for candidate in BRANCHES if candidate in normalized), None)
         return [toolbox.execute("list_quant_tools", {"branch": branch})]
 
-    systemic_risk_intent = any(
-        term in normalized
-        for term in (
-            "rui ro he thong",
-            "systemic risk",
-            "rui ro thi truong",
-            "regime hien tai",
-            "trang thai thi truong",
-            "tin hieu chi phoi",
-            "dong luc chi phoi",
-            "thi truong hien tai ra sao",
-        )
-    )
+    systemic_risk_intent = _has_systemic_risk_language(normalized)
     if systemic_risk_intent:
         executions = [toolbox.execute("get_tool_metrics", {"tool_ids": []})]
         market_confirmation = toolbox.execute(
@@ -973,7 +1445,7 @@ def _retrieval_fallback_answer(
     )
 
 
-def _compatibility_answer(
+def _planned_answer(
     api_key: str,
     provider_key: str,
     question: str,
@@ -985,14 +1457,36 @@ def _compatibility_answer(
     reason: str,
 ) -> DataAgentAnswer:
     toolbox = DataAgentToolbox(catalog, provider_key)
+    plan: QueryPlan | None = None
+    planner_error: str | None = None
+    execution_mode = "planned_agent"
+    compatibility_reason = reason
     try:
-        executions = _compatibility_executions(
-            question,
-            toolbox,
-            catalog,
-            max_sources=max_sources,
-            max_context_chars=max_context_chars,
-        )
+        plan = _plan_question_with_ai(client, provider_key, question, history, catalog)
+    except Exception as error:
+        planner_error = str(error)
+
+    try:
+        if plan is not None and plan.confidence >= PLANNER_CONFIDENCE_THRESHOLD:
+            executions = _execute_query_plan(
+                plan,
+                question,
+                toolbox,
+                catalog,
+                max_sources=max_sources,
+                max_context_chars=max_context_chars,
+            )
+        else:
+            execution_mode = "compatibility_agent"
+            if plan is not None:
+                compatibility_reason = f"planner confidence {plan.confidence:.2f} below threshold"
+            executions = _compatibility_executions(
+                question,
+                toolbox,
+                catalog,
+                max_sources=max_sources,
+                max_context_chars=max_context_chars,
+            )
     except Exception as error:
         return _retrieval_fallback_answer(
             api_key,
@@ -1003,11 +1497,25 @@ def _compatibility_answer(
             max_sources,
             max_context_chars,
             client,
-            f"{reason}; compatibility router failed: {error}",
+            f"{reason}; planned execution failed: {error}",
         )
 
     usable = [execution for execution in executions if execution.payload.get("ok")]
     evidence_tools = {"read_timeseries", "read_project_file", "get_tool_metrics", "get_data_health", "list_quant_tools"}
+    if (
+        execution_mode == "planned_agent"
+        and not any(execution.name in evidence_tools for execution in usable)
+    ):
+        execution_mode = "compatibility_agent"
+        compatibility_reason = "validated plan returned no readable evidence"
+        executions = _compatibility_executions(
+            question,
+            toolbox,
+            catalog,
+            max_sources=max_sources,
+            max_context_chars=max_context_chars,
+        )
+        usable = [execution for execution in executions if execution.payload.get("ok")]
     if not any(execution.name in evidence_tools for execution in usable):
         return _retrieval_fallback_answer(
             api_key,
@@ -1021,14 +1529,47 @@ def _compatibility_answer(
             f"{reason}; compatibility router found no readable evidence",
         )
 
-    traces: list[dict[str, Any]] = [
-        {
-            "tool": "compatibility_router",
-            "status": "used",
-            "ok": True,
-            "reason": reason,
-        }
-    ]
+    traces: list[dict[str, Any]] = []
+    if plan is not None:
+        traces.append(
+            {
+                "tool": "ai_query_planner",
+                "status": "used",
+                "ok": True,
+                "arguments": plan.as_dict(),
+                "reason": f"{reason}; {plan.reason}" if plan.reason else reason,
+            }
+        )
+        traces.append(
+            {
+                "tool": "policy_validator",
+                "status": "validated",
+                "ok": True,
+                "arguments": {
+                    "required_tools": list(plan.required_tools),
+                    "confidence": plan.confidence,
+                    "warnings": list(plan.warnings),
+                },
+            }
+        )
+    else:
+        traces.append(
+            {
+                "tool": "ai_query_planner",
+                "status": "fallback",
+                "ok": False,
+                "error": planner_error or "planner unavailable",
+            }
+        )
+    if execution_mode == "compatibility_agent":
+        traces.append(
+            {
+                "tool": "compatibility_router",
+                "status": "used",
+                "ok": True,
+                "reason": compatibility_reason,
+            }
+        )
     displays: list[dict[str, Any]] = []
     source_map: dict[str, RetrievedSource] = {}
     evidence_sections: list[str] = []
@@ -1055,14 +1596,19 @@ def _compatibility_answer(
             remaining_chars -= len(section)
 
     cfg = AI_PROVIDER_MAP[provider_key]
+    plan_context = plan.as_dict() if plan else {"planner_mode": "deterministic_fallback"}
+    plan_context.pop("reason", None)
     messages: list[dict[str, Any]] = [
         {
             "role": "system",
             "content": load_chat_system_prompt()
             + (
-                "\n\nCOMPATIBILITY DATA AGENT RULES:\n"
-                "- Server đã chọn và chạy read-only tools vì provider không phát native tool-call.\n"
+                "\n\nPLANNED DATA AGENT RULES:\n"
+                "- AI Query Planner đã phân loại trước khi được xem dữ liệu; policy validator mới cho phép "
+                "server chạy read-only tools.\n"
                 "- Chỉ tổng hợp từ READ-ONLY TOOL OUTPUTS bên dưới; không dùng trí nhớ để bổ sung số liệu.\n"
+                "- VALIDATED QUERY PLAN chỉ là kế hoạch truy xuất, không phải bằng chứng thị trường và "
+                "không được dùng làm nguồn.\n"
                 "- Với rủi ro hệ thống, score_anchor và hard_adapter_consensus là bằng chứng chính; "
                 "time-series chỉ xác nhận diễn biến giá.\n"
                 "- Phân biệt structured_adapter consensus với soft_excerpt_only; không nâng soft signal "
@@ -1082,7 +1628,9 @@ def _compatibility_answer(
         {
             "role": "user",
             "content": (
-                f"CÂU HỎI: {question}\n\nREAD-ONLY TOOL OUTPUTS:\n"
+                f"CÂU HỎI: {question}\n"
+                f"VALIDATED QUERY PLAN: {json.dumps(plan_context, ensure_ascii=False, default=str)}\n\n"
+                "READ-ONLY TOOL OUTPUTS:\n"
                 + "\n\n".join(evidence_sections)
                 + "\n\nHãy trả lời trực tiếp bằng tiếng Việt và giữ nguyên đường dẫn nguồn."
             ),
@@ -1117,7 +1665,7 @@ def _compatibility_answer(
         provider_key=provider_key,
         tool_traces=tuple(traces),
         displays=tuple(displays),
-        mode="compatibility_agent",
+        mode=execution_mode,
     )
 
 
@@ -1155,8 +1703,8 @@ def ask_ai_cio_data_agent(
         )
 
     toolbox = DataAgentToolbox(active_catalog, provider_key)
-    if is_local_provider(provider_key) and not _local_native_tools_enabled():
-        return _compatibility_answer(
+    if not _native_tool_agent_enabled(provider_key):
+        return _planned_answer(
             api_key,
             provider_key,
             question,
@@ -1165,7 +1713,7 @@ def ask_ai_cio_data_agent(
             max_sources,
             max_context_chars,
             client,
-            "localhost provider defaults to compatibility mode",
+            "AI Query Planner is the primary execution mode",
         )
     system_prompt = load_chat_system_prompt() + (
         "\n\nDATA AGENT V2 RULES:\n"
@@ -1212,7 +1760,7 @@ def ask_ai_cio_data_agent(
                 max_tokens=int(cfg.get("chat_max_tokens", 2_200)),
             )
         except Exception as error:
-            return _compatibility_answer(
+            return _planned_answer(
                 api_key,
                 provider_key,
                 question,
@@ -1237,7 +1785,7 @@ def ask_ai_cio_data_agent(
                     tool_traces=tuple(traces),
                     displays=tuple(displays),
                 )
-            return _compatibility_answer(
+            return _planned_answer(
                 api_key,
                 provider_key,
                 question,

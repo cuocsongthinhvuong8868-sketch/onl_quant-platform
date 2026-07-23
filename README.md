@@ -284,10 +284,11 @@ LLM chi nen duoc doc nhu mot analyst tong hop bang chung. Cac score/regime va ri
 Trang `pages/E_AI_CIO_Chat.py` cung cap AI-CIO Data Agent v2 tren du lieu cua du an.
 
 - `shared/ai_cio_data_agent.py` chi expose sau native read-only tools: `search_project_data`, `read_timeseries`, `read_project_file`, `get_tool_metrics`, `get_data_health` va `list_quant_tools`.
+- Mac dinh moi provider deu di qua AI Query Planner: planner phan loai da nhan va tra JSON plan truoc khi nhin thay row values. Policy validator chan tool/path ngoai allowlist va bo sung mandatory tools; router rule-based chi con la fallback khi confidence thap hoac plan loi. Native tool-agent cu chi duoc opt-in bang `QUANT_PLATFORM_NATIVE_TOOL_AGENT=true`.
 - Agent khong phai coding agent: khong co shell, Python executor, write tool, updater hay quyen truy cap duong dan ngoai allowlist.
 - Cau hoi theo thoi gian nhu "3 phien gan nhat" bat buoc parse va sap xep cot ngay qua `read_timeseries`, khong lay `tail()` theo thu tu file.
 - UI hien audit trail, file nguon, bang va bieu do ma agent da dung. Co the yeu cau file cu the bang cu phap `@data_lake/vnindex_cache.csv`.
-- Neu provider khong phat native tool-call, compatibility router phia server van chay cung read-only tools va dua output da gioi han cho model tong hop. Provider localhost mac dinh vao mode nay de tranh gateway treo do protocol; co the opt-in native bang `QUANT_PLATFORM_LOCAL_NATIVE_TOOLS=true`. `shared/ai_cio_chat.py` chi la retrieval du phong cuoi cung khi tool evidence khong doc duoc.
+- Neu AI planner loi hoac confidence thap, compatibility router phia server van chay cung read-only tools va dua output da gioi han cho model tong hop. `shared/ai_cio_chat.py` chi la retrieval du phong cuoi cung khi tool evidence khong doc duoc.
 - `command/build_ai_cio_data_catalog.py` tao `data_lake/ai_cio_data_catalog.json` deterministic, chi chua path/format/size/schema va khong chua row values.
 - Cac GitHub Actions data pipeline tai tao catalog sau khi update data. Streamlit Cloud doc catalog da commit thay vi scan toan bo data lake luc khoi dong.
 - Tren cloud, provider localhost tu dong bi an; co the force bang `QUANT_PLATFORM_CLOUD_RUNTIME=true`. API key cua provider remote can duoc luu trong Streamlit Secrets/GitHub Secrets.
