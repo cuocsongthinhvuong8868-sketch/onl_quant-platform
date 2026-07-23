@@ -37,6 +37,14 @@ _ISO_DATE_RE = re.compile(r"^\d{4}[-/]\d{1,2}[-/]\d{1,2}(?:\D|$)")
 _LOCAL_DATE_RE = re.compile(r"^\d{1,2}[-/.]\d{1,2}[-/.]\d{4}(?:\D|$)")
 _DATE_ONLY_RE = re.compile(r"^\d{4}-\d{2}-\d{2}$")
 _LATEST_COUNT_RE = re.compile(r"\b(\d{1,3})\s*(?:phien|ngay|quan\s*sat|periods?)\b")
+_UNEXPECTED_SCRIPT_PATTERNS = {
+    "cyrillic": re.compile(r"[\u0400-\u052f]"),
+    "arabic": re.compile(r"[\u0600-\u06ff]"),
+    "devanagari": re.compile(r"[\u0900-\u097f]"),
+    "thai": re.compile(r"[\u0e00-\u0e7f]"),
+    "cjk": re.compile(r"[\u3040-\u30ff\u3400-\u9fff\uac00-\ud7af]"),
+}
+_MOJIBAKE_MARKERS = ("\ufffd", "Ã¡", "Ã ", "Ã¢", "Ã£", "á»", "áº", "Ä‘", "Æ°", "Æ¡", "â€")
 ALLOWED_QUERY_INTENTS = {
     "systemic_risk",
     "market_timeseries",
@@ -854,6 +862,72 @@ def _bounded_tool_content(payload: dict[str, Any]) -> str:
         preview = preview[: max(0, len(preview) - (len(content) - MAX_TOOL_RESULT_CHARS) - 8)]
 
 
+def _language_issues(answer: str) -> list[str]:
+    text = str(answer or "")
+    issues = [
+        name for name, pattern in _UNEXPECTED_SCRIPT_PATTERNS.items() if pattern.search(text)
+    ]
+    if any(marker in text for marker in _MOJIBAKE_MARKERS):
+        issues.append("mojibake")
+    return issues
+
+
+def _ensure_vietnamese_answer(
+    client: Any,
+    provider_config: dict[str, Any],
+    answer: str,
+) -> tuple[str, dict[str, Any] | None]:
+    issues = _language_issues(answer)
+    if not issues:
+        return answer, None
+    try:
+        response = client.chat.completions.create(
+            model=provider_config["api_model"],
+            messages=[
+                {
+                    "role": "system",
+                    "content": (
+                        "Bạn là biên tập viên tiếng Việt. Hãy sửa duy nhất lỗi code-switching, ký tự lạ "
+                        "hoặc mojibake trong ANSWER. Chỉ dùng tiếng Việt và thuật ngữ tài chính tiếng Anh "
+                        "phổ biến; tuyệt đối không dùng chữ Cyrillic, Arabic, Devanagari, Thai, CJK hoặc "
+                        "Hangul. Giữ nguyên mọi số liệu, ticker, Markdown, cấu trúc lập luận và citation "
+                        "[Nguồn: ...]. Không thêm, bớt hoặc suy diễn dữ kiện. Chỉ trả lại câu trả lời đã sửa."
+                    ),
+                },
+                {
+                    "role": "user",
+                    "content": f"ANSWER TO REPAIR:\n{answer[:24_000]}",
+                },
+            ],
+            temperature=0.0,
+            max_tokens=int(provider_config.get("chat_max_tokens", 2_200)),
+        )
+        repaired = _message_content(response.choices[0].message)
+        remaining_issues = _language_issues(repaired)
+        if repaired and not remaining_issues:
+            return repaired, {
+                "tool": "language_quality_gate",
+                "status": "repaired",
+                "ok": True,
+                "arguments": {"issues": issues},
+            }
+        return answer, {
+            "tool": "language_quality_gate",
+            "status": "failed",
+            "ok": False,
+            "arguments": {"issues": issues},
+            "error": f"Bản sửa vẫn còn lỗi ngôn ngữ: {remaining_issues or ['empty_response']}",
+        }
+    except Exception as error:
+        return answer, {
+            "tool": "language_quality_gate",
+            "status": "failed",
+            "ok": False,
+            "arguments": {"issues": issues},
+            "error": str(error),
+        }
+
+
 def _normalize_query(value: str) -> str:
     normalized = unicodedata.normalize("NFKD", str(value or ""))
     return " ".join(
@@ -1435,12 +1509,22 @@ def _retrieval_fallback_answer(
         max_context_chars=max_context_chars,
         client=client,
     )
+    answer, language_trace = _ensure_vietnamese_answer(
+        client,
+        AI_PROVIDER_MAP[provider_key],
+        fallback.answer,
+    )
+    traces: list[dict[str, Any]] = [
+        {"tool": "retrieval_fallback", "status": "used", "reason": reason}
+    ]
+    if language_trace is not None:
+        traces.append(language_trace)
     return DataAgentAnswer(
-        answer=fallback.answer,
+        answer=answer,
         sources=fallback.sources,
         catalog_stats=fallback.catalog_stats,
         provider_key=provider_key,
-        tool_traces=({"tool": "retrieval_fallback", "status": "used", "reason": reason},),
+        tool_traces=tuple(traces),
         mode="retrieval_fallback",
     )
 
@@ -1658,6 +1742,9 @@ def _planned_answer(
             client,
             f"{reason}; compatibility synthesis failed: {error}",
         )
+    answer, language_trace = _ensure_vietnamese_answer(client, cfg, answer)
+    if language_trace is not None:
+        traces.append(language_trace)
     return DataAgentAnswer(
         answer=answer,
         sources=tuple(source_map.values()),
@@ -1777,6 +1864,9 @@ def ask_ai_cio_data_agent(
         if not tool_calls:
             answer = _message_content(message)
             if traces and answer:
+                answer, language_trace = _ensure_vietnamese_answer(client, cfg, answer)
+                if language_trace is not None:
+                    traces.append(language_trace)
                 return DataAgentAnswer(
                     answer=answer,
                     sources=tuple(source_map.values()),
@@ -1847,6 +1937,9 @@ def ask_ai_cio_data_agent(
     answer = _message_content(response.choices[0].message)
     if not answer:
         raise RuntimeError("Data Agent không tạo được câu trả lời cuối cùng.")
+    answer, language_trace = _ensure_vietnamese_answer(client, cfg, answer)
+    if language_trace is not None:
+        traces.append(language_trace)
     return DataAgentAnswer(
         answer=answer,
         sources=tuple(source_map.values()),

@@ -12,6 +12,7 @@ from shared.ai_cio_data_agent import (
     MAX_TOOL_RESULT_CHARS,
     DataAgentToolbox,
     _bounded_tool_content,
+    _language_issues,
     ask_ai_cio_data_agent,
     available_provider_keys,
     is_local_provider,
@@ -480,6 +481,52 @@ def test_low_confidence_ai_plan_falls_back_to_deterministic_router(tmp_path: Pat
     ]
     assert result.tool_traces[0]["arguments"]["planner_mode"] == "ai_low_confidence"
     assert "below threshold" in result.tool_traces[2]["reason"]
+
+
+def test_language_quality_gate_repairs_cyrillic_without_changing_evidence(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    (tmp_path / "data_lake/vnindex_cache.csv").write_text(
+        "time,VNINDEX\n2026-07-22,1668.53\n",
+        encoding="utf-8",
+    )
+    catalog.refresh()
+    broken_answer = (
+        "Kết luận CIO: 20% NAV lúc này là quá агрессив so với dữ liệu rủi ro hiện tại "
+        "[Nguồn: data_lake/vnindex_cache.csv]."
+    )
+    repaired_answer = (
+        "Kết luận CIO: 20% NAV lúc này là quá mạnh tay so với dữ liệu rủi ro hiện tại "
+        "[Nguồn: data_lake/vnindex_cache.csv]."
+    )
+    client = _FakeClient(
+        [
+            _planner_message(latest_sessions=1),
+            SimpleNamespace(content=broken_answer, tool_calls=None),
+            SimpleNamespace(content=repaired_answer, tool_calls=None),
+        ]
+    )
+
+    result = ask_ai_cio_data_agent(
+        "test-key",
+        "deepseek-v4-pro",
+        "Đánh giá mức phân bổ hiện tại?",
+        catalog=catalog,
+        client=client,
+    )
+
+    assert result.answer == repaired_answer
+    assert _language_issues(result.answer) == []
+    assert _language_issues(broken_answer) == ["cyrillic"]
+    assert _language_issues("Tail risk ξ cao nhưng threshold-sensitive và aggressive.") == []
+    assert result.tool_traces[-1] == {
+        "tool": "language_quality_gate",
+        "status": "repaired",
+        "ok": True,
+        "arguments": {"issues": ["cyrillic"]},
+    }
+    repair_prompt = json.dumps(client.completions.requests[2]["messages"], ensure_ascii=False)
+    assert "Không thêm, bớt hoặc suy diễn dữ kiện" in repair_prompt
+    assert "data_lake/vnindex_cache.csv" in result.answer
 
 
 def test_toolbox_blocks_timeseries_path_traversal(tmp_path: Path) -> None:
