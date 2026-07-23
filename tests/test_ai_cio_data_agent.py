@@ -559,16 +559,27 @@ def test_policy_adds_system_metrics_when_cloud_planner_misclassifies_nav_questio
         "Rủi ro vĩ mô hiện tại có ủng hộ mua SHB không?",
         catalog,
     )
+    security_plan = _validate_query_plan(
+        cloud_like_payload,
+        "Phân tích SHB và ngành ngân hàng hiện tại.",
+        catalog,
+    )
 
     assert "portfolio_decision" in nav_plan.intents
     assert nav_plan.required_tools[0] == "get_tool_metrics"
-    assert "policy override added system metrics for decision context" in nav_plan.warnings
+    assert "policy override added system metrics for investment context" in nav_plan.warnings
     assert "macro_context" in macro_plan.intents
     assert "systemic_risk" in macro_plan.intents
     assert macro_plan.required_tools[:2] == ("get_tool_metrics", "search_project_data")
+    assert "security_analysis" in security_plan.intents
+    assert security_plan.required_tools[0] == "get_tool_metrics"
 
 
-def test_cloud_planned_nav_answer_receives_metrics_before_company_evidence(tmp_path: Path) -> None:
+def test_cloud_planned_stock_answer_receives_metrics_before_company_evidence(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("QUANT_PLATFORM_NATIVE_TOOL_AGENT", "true")
     catalog = _catalog(tmp_path)
     _write_systemic_risk_snapshot(tmp_path)
     (tmp_path / "reports/shb.md").write_text(
@@ -600,7 +611,7 @@ def test_cloud_planned_nav_answer_receives_metrics_before_company_evidence(tmp_p
     result = ask_ai_cio_data_agent(
         "test-key",
         "deepseek-v4-pro",
-        "SHB có phù hợp để phân bổ 20% NAV lúc này không?",
+        "Phân tích SHB và ngành ngân hàng hiện tại.",
         catalog=catalog,
         client=client,
     )
@@ -620,6 +631,52 @@ def test_cloud_planned_nav_answer_receives_metrics_before_company_evidence(tmp_p
     synthesis_prompt = client.completions.requests[1]["messages"][-1]["content"]
     assert "PRE-CRASH / PANIC" in synthesis_prompt
     assert "risk adapter" in client.completions.requests[1]["messages"][0]["content"]
+
+
+def test_evidence_gate_repairs_false_missing_metrics_claim(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    _write_systemic_risk_snapshot(tmp_path)
+    (tmp_path / "reports/shb.md").write_text(
+        "# SHB\nCompany-specific evidence for SHB.\n",
+        encoding="utf-8",
+    )
+    catalog.refresh()
+    client = _FakeClient(
+        [
+            _planner_message(
+                intents=["general_research"],
+                required_tools=["search_project_data", "read_project_file"],
+                entities=["SHB", "ngành ngân hàng"],
+                search_queries=["SHB ngành ngân hàng"],
+                source_hints=["reports/shb.md"],
+                confidence=0.96,
+                reason="Company-only cloud plan",
+            ),
+            SimpleNamespace(
+                content=(
+                    "Rủi ro hệ thống: Chưa có output từ get_tool_metrics, nên không có "
+                    "risk adapter hay hard_adapter_consensus cho SHB."
+                ),
+                tool_calls=None,
+            ),
+        ]
+    )
+
+    result = ask_ai_cio_data_agent(
+        "test-key",
+        "deepseek-v4-pro",
+        "Phân tích SHB và ngành ngân hàng hiện tại.",
+        catalog=catalog,
+        client=client,
+    )
+
+    assert "Chưa có output" not in result.answer
+    assert "PRE-CRASH / PANIC" in result.answer
+    assert "2 bearish" in result.answer
+    assert "context toàn thị trường" in result.answer
+    assert "data_lake/ai_cio_metrics/latest_chatgpt-local.json" in result.answer
+    assert result.tool_traces[-1]["tool"] == "evidence_consistency_gate"
+    assert result.tool_traces[-1]["status"] == "repaired"
 
 
 def test_metrics_tool_uses_generic_snapshot_for_unmatched_cloud_provider(tmp_path: Path) -> None:

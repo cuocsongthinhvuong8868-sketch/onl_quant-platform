@@ -45,6 +45,29 @@ def test_catalog_indexes_safe_project_data_and_skips_sensitive_files(tmp_path: P
     assert catalog.stats()["metadata_only_files"] == 1
 
 
+def test_catalog_skips_local_sentiment_archives_but_keeps_deployable_feed(
+    tmp_path: Path,
+) -> None:
+    catalog = _build_catalog(tmp_path)
+    archive_paths = (
+        "data_lake/sentiment_factor_news/raw/raw_sample.json",
+        "data_lake/sentiment_factor_news/normalized/norm_sample.json",
+        "data_lake/sentiment_factor_news/classified/class_sample.json",
+    )
+    for relative_path in archive_paths:
+        path = tmp_path / relative_path
+        path.parent.mkdir(parents=True, exist_ok=True)
+        path.write_text('{"headline":"local archive"}', encoding="utf-8")
+    feed_path = tmp_path / "data_lake/sentiment_factor_news/feed/latest.json"
+    feed_path.parent.mkdir(parents=True, exist_ok=True)
+    feed_path.write_text('{"items":[]}', encoding="utf-8")
+
+    indexed_paths = {entry.relative_path for entry in catalog.refresh()}
+
+    assert "data_lake/sentiment_factor_news/feed/latest.json" in indexed_paths
+    assert indexed_paths.isdisjoint(archive_paths)
+
+
 def test_catalog_rejects_path_traversal_and_files_outside_scope(tmp_path: Path) -> None:
     catalog = _build_catalog(tmp_path)
     (tmp_path / "data_lake/allowed.csv").write_text("date,value\n2026-07-22,1\n", encoding="utf-8")

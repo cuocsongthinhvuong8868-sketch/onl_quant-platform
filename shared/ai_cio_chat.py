@@ -10,7 +10,7 @@ import unicodedata
 from collections import Counter, deque
 from dataclasses import dataclass
 from datetime import datetime, timezone
-from pathlib import Path
+from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Sequence
 
 from config import AI_PROVIDER_MAP, ROOT_DIR
@@ -38,6 +38,11 @@ INDEXED_SUFFIXES = READABLE_SUFFIXES | METADATA_ONLY_SUFFIXES
 DEFAULT_DATA_ROOTS = ("data_lake", "reports", "docs", "config")
 DEFAULT_ROOT_FILES = ("tickers.csv", "tickers_400.csv")
 DEFAULT_CATALOG_MANIFEST = "data_lake/ai_cio_data_catalog.json"
+DEFAULT_INDEX_EXCLUDED_GLOBS = (
+    "data_lake/sentiment_factor_news/raw/*.json",
+    "data_lake/sentiment_factor_news/normalized/*.json",
+    "data_lake/sentiment_factor_news/classified/*.json",
+)
 
 _SENSITIVE_FILE_RE = re.compile(
     r"(^|[._-])(secret|secrets|credential|credentials|password|passwd|token|cookies?|api[_-]?key)([._-]|$)",
@@ -285,6 +290,7 @@ class ProjectDataCatalog:
         max_index_chars: int = 16_000,
         manifest_path: Path | str | None = None,
         use_manifest: bool = True,
+        excluded_globs: Sequence[str] | None = None,
     ) -> None:
         self.root_dir = Path(root_dir).resolve()
         configured_roots = data_roots if data_roots is not None else DEFAULT_DATA_ROOTS
@@ -294,6 +300,14 @@ class ProjectDataCatalog:
         self.max_index_chars = max(2_000, int(max_index_chars))
         self.manifest_path = self._resolve_configured_path(manifest_path or DEFAULT_CATALOG_MANIFEST)
         self.use_manifest = bool(use_manifest)
+        configured_exclusions = (
+            excluded_globs if excluded_globs is not None else DEFAULT_INDEX_EXCLUDED_GLOBS
+        )
+        self.excluded_globs = tuple(
+            str(pattern).strip().replace("\\", "/")
+            for pattern in configured_exclusions
+            if str(pattern).strip()
+        )
         self._entries: tuple[CatalogEntry, ...] | None = None
         self._refreshed_at: str | None = None
 
@@ -315,9 +329,20 @@ class ProjectDataCatalog:
             return True
         return bool(_SENSITIVE_FILE_RE.search(path.name))
 
+    def _is_index_excluded(self, path: Path) -> bool:
+        relative_path = path.resolve().relative_to(self.root_dir).as_posix()
+        return any(
+            PurePosixPath(relative_path).match(pattern)
+            for pattern in self.excluded_globs
+        )
+
     def _make_entry(self, path: Path) -> CatalogEntry | None:
         suffix = path.suffix.lower()
-        if suffix not in INDEXED_SUFFIXES or self._is_sensitive(path):
+        if (
+            suffix not in INDEXED_SUFFIXES
+            or self._is_sensitive(path)
+            or self._is_index_excluded(path)
+        ):
             return None
         try:
             stat = path.stat()
@@ -377,7 +402,13 @@ class ProjectDataCatalog:
             if not relative_path:
                 continue
             path = (self.root_dir / relative_path).resolve()
-            if not path.exists() or not path.is_file() or not self._is_allowed(path) or self._is_sensitive(path):
+            if (
+                not path.exists()
+                or not path.is_file()
+                or not self._is_allowed(path)
+                or self._is_sensitive(path)
+                or self._is_index_excluded(path)
+            ):
                 continue
             suffix = path.suffix.lower()
             if suffix not in INDEXED_SUFFIXES or path == self.manifest_path:

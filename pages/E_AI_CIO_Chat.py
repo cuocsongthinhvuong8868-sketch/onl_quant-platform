@@ -14,6 +14,7 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 from config import AI_PROVIDER_MAP
 from shared.ai_cio_chat import ProjectDataCatalog
 from shared.ai_cio_data_agent import (
+    DATA_AGENT_VERSION,
     ask_ai_cio_data_agent,
     available_provider_keys,
     is_cloud_runtime,
@@ -179,7 +180,8 @@ if CHAT_MESSAGES_KEY not in st.session_state:
 
 st.title("Chat với AI CIO")
 st.caption(
-    "AI-CIO Data Agent v2.1 dùng AI Query Planner trước khi đọc dữ liệu, sau đó gọi công cụ read-only và dựng bảng/biểu đồ từ nguồn."
+    f"AI-CIO Data Agent `{DATA_AGENT_VERSION}` dùng AI Query Planner trước khi đọc dữ liệu, "
+    "sau đó gọi công cụ read-only và dựng bảng/biểu đồ từ nguồn."
 )
 st.info(
     "Quyền đọc gồm `data_lake/`, `reports/`, `docs/`, `config/`, `tickers.csv` và `tickers_400.csv`. "
