@@ -60,6 +60,92 @@ def _tool_call_message(name: str, arguments: dict) -> SimpleNamespace:
     )
 
 
+def _write_systemic_risk_snapshot(tmp_path: Path) -> None:
+    metrics_dir = tmp_path / "data_lake/ai_cio_metrics"
+    metrics_dir.mkdir(parents=True, exist_ok=True)
+    payload = {
+        "generated_at": "2026-07-23T07:15:48Z",
+        "report_date": "23/07/2026",
+        "data_date": "22/07/2026",
+        "score_anchor": {
+            "metric_implied_score": 25,
+            "metric_implied_regime": "PRE-CRASH / PANIC",
+            "stress_regime": "PRE-CRASH / PANIC",
+            "resolved_regime": "PRE-CRASH / PANIC",
+            "capitulation_override_active": False,
+            "metric_implied_subscores": {
+                "macro_risk_score": 15,
+                "market_internal_score": 13,
+                "tail_risk_score": 35,
+            },
+            "hard_constraints": ["Breadth MA20 weak at 6.1%", "Global FCI CQS high at 99.9"],
+            "capitulation_state": {
+                "as_of": "2026-07-22T00:00:00",
+                "phase": "FRAGILE",
+                "stress_risk_score_uncalibrated": 61.4,
+                "liquidation_risk_score_uncalibrated": 68.5,
+                "features": {
+                    "return_1d": -0.0358,
+                    "return_3d": -0.0665,
+                    "breadth_ma20": 0.061,
+                    "esr_ssi": 0.633,
+                },
+                "freshness_status": "CURRENT",
+            },
+        },
+        "consensus": {
+            "hard_adapter_consensus": {
+                "bullish": [],
+                "bearish": [
+                    {
+                        "tool": "market_breadth",
+                        "tool_score": 18,
+                        "tool_regime": "PRE-CRASH / PANIC",
+                        "reason": "Breadth MA20 <25% (6.1%)",
+                    },
+                    {
+                        "tool": "global_financial_conditions",
+                        "tool_score": 20,
+                        "tool_regime": "PRE-CRASH / PANIC",
+                        "reason": "CQS >=85 (99.9)",
+                    },
+                ],
+                "neutral_or_mixed": [],
+            }
+        },
+        "final_output": {
+            "score": 25.0,
+            "stress_regime": "PRE-CRASH / PANIC",
+            "resolved_regime": "PRE-CRASH / PANIC",
+            "confidence": "medium",
+        },
+        "tools": {
+            "market_breadth": {
+                "as_of": "22/07/2026",
+                "tool_score": 18,
+                "tool_regime": "PRE-CRASH / PANIC",
+                "tool_bias": "bearish",
+                "data_quality": "structured_adapter",
+                "score_reason": "Breadth MA20 <25% (6.1%)",
+                "key_metrics": {"breadth_ma20_pct": 6.1},
+            },
+            "esr_monitor": {
+                "as_of": "22/07/2026",
+                "tool_score": 42,
+                "tool_regime": "FEAR / DISTRIBUTION",
+                "tool_bias": "neutral_or_mixed",
+                "data_quality": "structured_adapter",
+                "score_reason": "SSI >=55% (63.3%)",
+                "key_metrics": {"ssi_pct": 63.3},
+            },
+        },
+    }
+    (metrics_dir / "latest_chatgpt-local.json").write_text(
+        json.dumps(payload, ensure_ascii=False),
+        encoding="utf-8",
+    )
+
+
 def test_data_agent_executes_timeseries_tool_and_returns_displays(tmp_path: Path) -> None:
     catalog = _catalog(tmp_path)
     (tmp_path / "data_lake/vnindex_cache.csv").write_text(
@@ -196,6 +282,58 @@ def test_local_provider_defaults_directly_to_compatibility_tools(tmp_path: Path)
     assert result.tool_traces[0]["reason"] == "localhost provider defaults to compatibility mode"
     assert len(client.completions.requests) == 1
     assert "tools" not in client.completions.requests[0]
+
+
+def test_systemic_risk_question_uses_metrics_anchor_and_five_session_confirmation(
+    tmp_path: Path,
+) -> None:
+    catalog = _catalog(tmp_path)
+    _write_systemic_risk_snapshot(tmp_path)
+    (tmp_path / "data_lake/vnindex_cache.csv").write_text(
+        "time,VNINDEX,VNINDEX_volume\n"
+        "2026-07-17,1780.00,700000000\n"
+        "2026-07-20,1743.51,862568937\n"
+        "2026-07-21,1730.56,789069211\n"
+        "2026-07-22,1668.53,915046404\n",
+        encoding="utf-8",
+    )
+    catalog.refresh()
+    client = _FakeClient(
+        [
+            SimpleNamespace(
+                content=(
+                    "Rủi ro hệ thống ở mức PRE-CRASH / PANIC, do breadth và điều kiện tài chính "
+                    "chi phối [Nguồn: data_lake/ai_cio_metrics/latest_chatgpt-local.json]."
+                ),
+                tool_calls=None,
+            )
+        ]
+    )
+
+    result = ask_ai_cio_data_agent(
+        "test-key",
+        "chatgpt-local",
+        "Rủi ro hệ thống hiện tại là gì và tín hiệu nào đang chi phối?",
+        catalog=catalog,
+        client=client,
+    )
+
+    assert result.mode == "compatibility_agent"
+    assert [trace["tool"] for trace in result.tool_traces] == [
+        "compatibility_router",
+        "get_tool_metrics",
+        "read_timeseries",
+    ]
+    assert result.tool_traces[2]["arguments"]["latest_n"] == 5
+    assert [display["type"] for display in result.displays] == ["table", "table", "line_chart"]
+    assert {source.relative_path for source in result.sources} == {
+        "data_lake/ai_cio_metrics/latest_chatgpt-local.json",
+        "data_lake/vnindex_cache.csv",
+    }
+    prompt = client.completions.requests[0]["messages"][-1]["content"]
+    assert "PRE-CRASH / PANIC" in prompt
+    assert "Breadth MA20 <25% (6.1%)" in prompt
+    assert "2026-07-22" in prompt
 
 
 def test_toolbox_blocks_timeseries_path_traversal(tmp_path: Path) -> None:
