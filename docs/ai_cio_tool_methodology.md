@@ -85,8 +85,8 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: sentiment and positioning.
 - Horizon: days to weeks.
-- Primary signal: risk score and sentiment regime.
-- Methodology control: correlation factors use expanding point-in-time PCA/refits, so historical signals are not backfilled with future loadings.
+- Primary signal: risk score, sentiment regime, panic/FOMO attribution, CSV dispersion stress, acute selloff shock, and signal confidence.
+- Methodology control: correlation factors use expanding point-in-time PCA/refits, and scoring uses rolling percentile ranks without backfilling future information.
 - Interpretation: supportive when risk appetite is healthy, cautionary when extremes are unstable.
 - Limit: secondary to liquidity, breadth, and tail-risk constraints.
 

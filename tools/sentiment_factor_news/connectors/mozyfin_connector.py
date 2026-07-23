@@ -21,6 +21,7 @@ logger = logging.getLogger(__name__)
 
 RESEARCH_NEWS_URL = "https://research.mozyfin.com/news"
 TOKEN_CACHE_FILE = DATA_DIR / "mozyfin_token.txt"
+ANON_TOKEN_CACHE_FILE = DATA_DIR / "mozyfin_anon_token.txt"
 DEFAULT_NEXT_ACTION_IDS = (
     "00f0e3d2d4b37aab0e6c8e80c94677d393318a47b7",
     "00de0fef2648a54493cdc0d04f0043907069fbf84d",
@@ -52,6 +53,15 @@ def _runtime_api_key() -> str:
 
 def _runtime_auth_header() -> str:
     return (os.getenv("MOZYFIN_AUTH_HEADER") or MOZYFIN_AUTH_HEADER or "Authorization").strip()
+
+
+def _anonymous_token_enabled() -> bool:
+    return os.getenv("MOZYFIN_ENABLE_ANONYMOUS_TOKEN", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
 
 
 def _get_token_expiry(token_str: str) -> float:
@@ -297,6 +307,9 @@ def _refresh_mozyfin_token_via_cookie(cookie_file_path: str) -> str:
 
 def _get_anonymous_token() -> str:
     """Fetch an anonymous access token from Mozyfin API."""
+    if not _anonymous_token_enabled():
+        return ""
+
     try:
         url = "https://api.mozyfin.com/api/v1/auth/anonymous"
         headers = {
@@ -309,10 +322,9 @@ def _get_anonymous_token() -> str:
         if r.status_code in (200, 201):
             token = r.json().get("data", {}).get("token") or ""
             if token:
-                anon_file = DATA_DIR / "mozyfin_anon_token.txt"
                 try:
-                    anon_file.parent.mkdir(parents=True, exist_ok=True)
-                    anon_file.write_text(token, encoding="utf-8")
+                    ANON_TOKEN_CACHE_FILE.parent.mkdir(parents=True, exist_ok=True)
+                    ANON_TOKEN_CACHE_FILE.write_text(token, encoding="utf-8")
                 except Exception:
                     pass
                 return token
@@ -352,32 +364,31 @@ def _resolve_access_token() -> str:
         except Exception:
             pass
 
-    anon_file = DATA_DIR / "mozyfin_anon_token.txt"
-    if anon_file.exists():
-        try:
-            cached_anon = anon_file.read_text(encoding="utf-8").strip()
-            if _token_is_fresh(cached_anon, now):
-                return cached_anon
-        except Exception:
-            pass
-
-    # Tự động lấy anonymous token mới trước tiên
-    logger.info("Attempting to get anonymous Mozyfin token...")
-    anon_token = _get_anonymous_token()
-    if anon_token:
-        logger.info("Successfully fetched anonymous Mozyfin token.")
-        try:
-            TOKEN_CACHE_FILE.write_text(anon_token, encoding="utf-8")
-        except Exception:
-            pass
-        return anon_token
+    if _runtime_api_key():
+        return ""
 
     refreshed = _refresh_from_available_cookies()
     if refreshed:
         return refreshed
 
-    if _runtime_api_key():
-        return ""
+    if ANON_TOKEN_CACHE_FILE.exists() and _anonymous_token_enabled():
+        try:
+            cached_anon = ANON_TOKEN_CACHE_FILE.read_text(encoding="utf-8").strip()
+            if _token_is_fresh(cached_anon, now):
+                return cached_anon
+        except Exception:
+            pass
+
+    if _anonymous_token_enabled():
+        logger.info("Attempting to get anonymous Mozyfin token...")
+        anon_token = _get_anonymous_token()
+        if anon_token:
+            logger.info("Successfully fetched anonymous Mozyfin token.")
+            try:
+                TOKEN_CACHE_FILE.write_text(anon_token, encoding="utf-8")
+            except Exception:
+                pass
+            return anon_token
 
     if stale_candidates:
         logger.warning("Using stale Mozyfin token after cookie refresh failed.")
@@ -447,18 +458,18 @@ def _request_mozyfin_endpoint(url: str, params: dict, label: str):
     response = requests.get(url, headers=headers, params=params, timeout=20)
     if response.status_code == 401:
         logger.warning(f"Mozyfin {label} API unauthorized; attempting to refresh token.")
-        
-        # 1. Thử lấy anonymous token mới trước tiên
-        refreshed = _get_anonymous_token()
+
+        refreshed = _refresh_from_available_cookies()
         if refreshed:
-            logger.info("Successfully refreshed Mozyfin token via anonymous flow.")
-            try:
-                TOKEN_CACHE_FILE.write_text(refreshed, encoding="utf-8")
-            except Exception:
-                pass
-        else:
-            # 2. Thử cookie refresh
-            refreshed = _refresh_from_available_cookies()
+            logger.info("Successfully refreshed Mozyfin token via cookie flow.")
+        elif _anonymous_token_enabled():
+            refreshed = _get_anonymous_token()
+            if refreshed:
+                logger.info("Successfully refreshed Mozyfin token via anonymous flow.")
+                try:
+                    TOKEN_CACHE_FILE.write_text(refreshed, encoding="utf-8")
+                except Exception:
+                    pass
             
         if refreshed:
             retry_headers = dict(API_HEADERS)

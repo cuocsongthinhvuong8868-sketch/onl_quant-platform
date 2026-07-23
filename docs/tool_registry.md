@@ -24,14 +24,14 @@ Mỗi tool nên có các metadata sau:
 | --- | --- | --- | --- | --- |
 | Macro | `fed_liquidity` | `tools.fed_liquidity` | yes | `macro_child_report` |
 | Macro | `global_financial_conditions` | `tools.global_financial_conditions` | yes | `macro_child_report` |
-| Macro | `humility_falsification` | `tools.humility_falsification` | no | `audit_evidence` |
+| Macro | `humility_falsification` | `tools.humility_falsification` | yes | `audit_evidence` |
 | Macro | `vnibor` | `tools.vnibor` | yes | `macro_child_report` |
 | Macro | `bank_valuation` | `tools.bank_valuation` | yes | `executive_scoring` |
-| Macro | `ltmm` | `tools.ltmm` | no | `macro_context` |
-| Macro | `vn100_earnings_health` | `tools.vn100_earnings_health` | no | `macro_context` |
-| Macro | `credit_spread` | `tools.credit_spread` | no | `macro_child_report` |
-| Micro | `pairs_trading` | `tools.pairs_trading` | no | `research_tool` |
-| Micro | `factor_examination` | `tools.factor_examination` | no | `standalone_ai` |
+| Macro | `ltmm` | `tools.ltmm` | yes | `macro_context` |
+| Macro | `vn100_earnings_health` | `tools.vn100_earnings_health` | yes | `macro_context` |
+| Macro | `credit_spread` | `tools.credit_spread` | yes | `macro_child_report` |
+| Micro | `pairs_trading` | `tools.pairs_trading` | yes | `research_tool` |
+| Micro | `factor_examination` | `tools.factor_examination` | yes | `standalone_ai` |
 | Micro | `risk_adjusted_growth` | `tools.risk_adjusted_growth` | yes | `executive_scoring` |
 | Behavioral | `fear_greed` | `tools.fear_greed` | yes | `executive_scoring` |
 | Behavioral | `sentiment_factor_news` | `tools.sentiment_factor_news` | yes | `executive_scoring` |
@@ -43,10 +43,10 @@ Mỗi tool nên có các metadata sau:
 | Behavioral | `va_res` | `tools.va_res` | yes | `executive_scoring` |
 | Behavioral | `manipulation` | `tools.manipulation` | yes | `executive_scoring` |
 | Behavioral | `var_cvar_vnindex` | `tools.var_cvar_vnindex` | yes | `executive_scoring` |
-| Behavioral | `abm_simulator` | `tools.abm_simulator` | no | `structured_context` |
+| Behavioral | `abm_simulator` | `tools.abm_simulator` | yes | `structured_context` |
 | Behavioral | `backtest` | `tools.backtest` | no | `research_tool` |
-| Data | `data_health` | `pages` | no | `operations` |
-| Engine | `capitulation_regime` | `tools.capitulation_regime` | no | `diagnostic_gate` |
+| Data | `data_health` | `tools.data_health` | yes | `operations` |
+| Engine | `capitulation_regime` | `tools.capitulation_regime` | yes | `diagnostic_gate` |
 
 ## Chuẩn Nâng Cấp Từng Tool
 

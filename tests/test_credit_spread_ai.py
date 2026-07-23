@@ -11,6 +11,7 @@ from tools.credit_spread.ai_analysis import (
     decode_cache,
     encode_cache,
 )
+from tools.credit_spread.report import snapshot as report_snapshot
 
 
 def _snapshot_issuance() -> pd.DataFrame:
@@ -61,6 +62,23 @@ def test_canonical_snapshot_contains_trend_quality_and_recent_table():
     assert snapshot["trend_3p"] == "WIDENING_3P"
     assert snapshot["data_quality"] == "MEDIUM"
     assert "risk_premium_bps" in snapshot["recent_table"]
+
+
+def test_report_snapshot_reuses_canonical_credit_spread_snapshot(monkeypatch):
+    canonical = build_credit_spread_snapshot(_snapshot_issuance())
+    monkeypatch.setattr(
+        "tools.credit_spread.report.load_canonical_snapshot",
+        lambda: canonical,
+    )
+
+    row = report_snapshot()
+
+    assert row["snapshot_date"] == canonical["data_date_iso"]
+    assert row["risk_premium_bps"] == 390.0
+    assert row["risk_premium_change_3p_bps"] == 30.0
+    assert row["trend_3p"] == "WIDENING_3P"
+    assert row["matched_periods"] == 10
+    assert row["status"] == "ok"
 
 
 def test_prompt_replaces_canonical_inputs_and_preserves_guardrails():

@@ -18,7 +18,7 @@ from config                              import RANK_WINDOW, DEFAULT_WINDOW, AI_
 from shared.data_loader                  import load_close_prices
 from shared.daily_cache                  import load_daily_cache, save_daily_cache
 from tools.fear_greed.quant.metrics      import calculate_quant_metrics
-from tools.fear_greed.quant.scoring      import calculate_risk_score
+from tools.fear_greed.quant.scoring      import METHOD_VERSION, calculate_risk_score
 from tools.fear_greed.ui.sidebar         import render_sidebar
 from tools.fear_greed.ui.gauge           import render_gauge
 from tools.fear_greed.ui.charts          import render_analysis_chart
@@ -33,7 +33,7 @@ def render():
     st.title("🎯 Market Sentiment Monitor — PCA & EGARCH")
     st.caption(
         "Market Factor via PCA · EGARCH(1,1,1) Skewed-T · "
-        "Rolling Percentile Rank · Kelly Skewness"
+        "Rolling Percentile Rank · Kelly Skewness · CSV-aware v2 scoring"
     )
 
     params      = render_sidebar()
@@ -51,7 +51,12 @@ def render():
     st.caption(f"📅 Dữ liệu cuối cùng: {df_stocks.index.max().strftime('%d/%m/%Y')}")
 
     data_date = df_stocks.index.max().strftime("%Y-%m-%d")
-    key = {"cache_version": 3, "window_size": window_size, "pca_method": "point_in_time"}
+    key = {
+        "cache_version": 4,
+        "window_size": window_size,
+        "pca_method": "point_in_time",
+        "scoring_method": METHOD_VERSION,
+    }
     cached = load_daily_cache("fear_greed", key, data_date=data_date)
     if cached is not None:
         scored_df = cached["scored_df"]
@@ -80,7 +85,7 @@ def render():
 
     with col_m:
         st.markdown("#### 🔍 Core Metrics")
-        c1, c2, c3, c4 = st.columns(4)
+        c1, c2, c3, c4, c5, c6 = st.columns(6)
         c1.metric("Vol Rank (1Y)",      f"{latest['Vol_Norm']:.0%}",
                   f"{latest['Vol_Norm']-prev['Vol_Norm']:+.1%}",       delta_color="inverse")
         c2.metric("Kelly Skewness",     f"{latest['Skewness']:.2f}",
@@ -89,13 +94,26 @@ def render():
                   f"{latest['Down_Corr_Norm']-prev['Down_Corr_Norm']:+.1%}", delta_color="inverse")
         c4.metric("Upside Corr Rank",   f"{latest['Up_Corr_Norm']:.0%}",
                   f"{latest['Up_Corr_Norm']-prev['Up_Corr_Norm']:+.1%}")
+        c5.metric("CSV Rank",           f"{latest['CSV_Norm']:.0%}",
+                  f"{latest['CSV_Norm']-prev['CSV_Norm']:+.1%}",       delta_color="inverse")
+        c6.metric("Acute Shock",        f"{latest['Acute_Shock']:.0%}",
+                  f"{latest['Acute_Shock']-prev['Acute_Shock']:+.1%}", delta_color="inverse")
+
+        shock_flag = latest.get("Shock_Regime_Flag", "NONE")
+        st.caption(
+            f"Regime: **{latest['Sentiment_Regime']}** · "
+            f"Shock: **{shock_flag}** · "
+            f"Confidence: **{latest['Signal_Confidence']:.0%}** · "
+            f"Method: `{latest.get('Methodology_Version', METHOD_VERSION)}`"
+        )
 
         st.info(
             "**Ghi chú kỹ thuật** \n"
             "- **Market Factor**: PCA — loại bỏ bias vốn hóa. \n"
             "- **Volatility**: EGARCH(1,1,1) Skewed-T — leverage effect & fat tails. \n"
-            "- **Scaling**: Rolling percentile rank 252 ngày — robust với outlier. \n"
-            "- **Skewness**: Kelly non-parametric, bounded [−1, 1]."
+            "- **Scaling**: Rolling percentile rank 252 ngày, không backfill tín hiệu sớm. \n"
+            "- **Skewness**: Kelly non-parametric, bounded [−1, 1]. \n"
+            "- **Score v2**: Net FOMO minus Panic pressure, có CSV dispersion stress."
         )
 
     st.divider()
@@ -138,7 +156,9 @@ def render():
                             with open(str(ROOT_DIR / "promt" / "fear greed promt.md"), "r", encoding="utf-8") as f:
                                 prompt_template = f.read()
 
-                            status_text = "EXTREME FEAR" if score <= 20 else "FEAR" if score <= 40 else "NEUTRAL / STOCK PICKING" if score < 60 else "GREED" if score < 80 else "EXTREME GREED"
+                            status_text = latest.get("Sentiment_Regime") or ("EXTREME FEAR" if score <= 20 else "FEAR" if score <= 40 else "NEUTRAL / STOCK PICKING" if score < 60 else "GREED" if score < 80 else "EXTREME GREED")
+                            if shock_flag != "NONE":
+                                status_text = f"{shock_flag} / {status_text}"
 
                             full_prompt = prompt_template.replace("{date_str}", date_str)\
                                                          .replace("{score}", f"{score:.1f}")\

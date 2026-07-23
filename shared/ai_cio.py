@@ -471,7 +471,7 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 
 # Import logic Fear Greed
 from tools.fear_greed.quant.metrics import calculate_quant_metrics
-from tools.fear_greed.quant.scoring import calculate_risk_score
+from tools.fear_greed.quant.scoring import METHOD_VERSION as FEAR_GREED_METHOD_VERSION, calculate_risk_score
 from tools.upside_ratio.quant.metrics import build_breadth_series
 from tools.upside_ratio.quant.engine import DEFAULT_MC_SEED, run_hybrid_ensemble_mc
 # Import logic Manipulation
@@ -2855,7 +2855,10 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
     score = latest["Risk_Score"]
     date_str = scored_df.index.max().strftime('%d/%m/%Y')
     
-    status_text = "EXTREME FEAR" if score <= 20 else "FEAR" if score <= 40 else "NEUTRAL / STOCK PICKING" if score < 60 else "GREED" if score < 80 else "EXTREME GREED"
+    status_text = latest.get("Sentiment_Regime") or ("EXTREME FEAR" if score <= 20 else "FEAR" if score <= 40 else "NEUTRAL / STOCK PICKING" if score < 60 else "GREED" if score < 80 else "EXTREME GREED")
+    shock_flag = latest.get("Shock_Regime_Flag", "NONE")
+    if shock_flag != "NONE":
+        status_text = f"{shock_flag} / {status_text}"
 
     with open(str(ROOT_DIR / "promt" / "fear greed promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
@@ -2880,6 +2883,12 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
         "fear_greed_methodology",
         [
             f"FearGreed Risk Score: {score:.1f}",
+            f"Methodology Version: {latest.get('Methodology_Version', FEAR_GREED_METHOD_VERSION)}",
+            f"Sentiment Regime: {status_text}",
+            f"Signal Confidence: {latest.get('Signal_Confidence', float('nan')):.2f}",
+            f"CSV Rank: {latest.get('CSV_Norm', float('nan')):.2f}",
+            f"Acute Shock: {latest.get('Acute_Shock', float('nan')):.2f}",
+            f"Shock Regime Flag: {shock_flag}",
             "PCA Method: expanding_point_in_time",
             "PCA Full-History Fit: 0",
             "PCA Refit Every Sessions: 21",
