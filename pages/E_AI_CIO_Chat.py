@@ -12,7 +12,7 @@ import streamlit as st
 sys.path.insert(0, str(Path(__file__).parent.parent))
 
 from config import AI_PROVIDER_MAP
-from shared.ai_cio_chat import ProjectDataCatalog
+from shared.ai_cio_chat import DEFAULT_MAX_SOURCES, ProjectDataCatalog
 from shared.ai_cio_data_agent import (
     DATA_AGENT_VERSION,
     ask_ai_cio_data_agent,
@@ -130,6 +130,8 @@ def _render_displays(displays: list[dict[str, Any]] | tuple[dict[str, Any], ...]
             frame = frame.dropna(subset=[x_column]).sort_values(x_column)
             if frame.empty:
                 continue
+            x_tick_format = str(display.get("x_tick_format") or "%d/%m/%Y")
+            x_hover_format = str(display.get("x_hover_format") or "%d/%m/%Y")
             chart_specs = [(display_type, title, y_columns)]
             if display_type == "line_chart":
                 volume_columns = [column for column in y_columns if _is_volume_series(column)]
@@ -150,12 +152,24 @@ def _render_displays(displays: list[dict[str, Any]] | tuple[dict[str, Any], ...]
                     figure = px.line(frame, x=x_column, y=chart_columns, markers=True)
                 figure.update_layout(
                     legend_title_text=str(display.get("legend_title") or ""),
+                    hovermode="x unified",
                     yaxis_title=(
                         "Khối lượng"
                         if chart_type == "bar_chart"
                         else str(display.get("y_axis_title") or "")
                     ),
-                    margin={"l": 10, "r": 10, "t": 20, "b": 10},
+                    margin={"l": 10, "r": 10, "t": 20, "b": 55},
+                )
+                figure.update_xaxes(
+                    title_text=str(display.get("x_axis_title") or "Thời gian"),
+                    type="date",
+                    tickformat=x_tick_format,
+                    hoverformat=x_hover_format,
+                    showticklabels=True,
+                    tickangle=-35 if len(frame) > 6 else 0,
+                    nticks=min(max(len(frame), 2), 12),
+                    automargin=True,
+                    showgrid=True,
                 )
                 st.plotly_chart(figure, use_container_width=True)
         else:
@@ -216,7 +230,13 @@ with st.sidebar:
         st.success(key_message)
     st.caption("Excerpt từ nguồn được chọn sẽ được gửi tới AI provider này. Dùng provider local nếu dữ liệu nhạy cảm.")
 
-    max_sources = st.slider("Số nguồn agent tối đa", min_value=4, max_value=12, value=8, step=1)
+    max_sources = st.slider(
+        "Số nguồn agent tối đa",
+        min_value=4,
+        max_value=12,
+        value=DEFAULT_MAX_SOURCES,
+        step=1,
+    )
     st.caption("Giới hạn nguồn cho compatibility router và retrieval dự phòng cuối cùng.")
 
     if st.button("Làm mới danh mục dữ liệu", use_container_width=True):

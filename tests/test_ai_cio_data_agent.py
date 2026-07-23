@@ -728,6 +728,29 @@ def test_timeseries_parser_handles_vietnamese_day_month_dates(tmp_path: Path) ->
     assert [row["date"] for row in execution.payload["rows"]] == ["2026-07-22", "2026-07-15"]
 
 
+def test_timeseries_charts_preserve_timestamp_but_display_date_only(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    (tmp_path / "data_lake/vnindex_intraday.csv").write_text(
+        "time,VNINDEX,VNINDEX_volume\n"
+        "2026-07-22 09:15:00,1665.10,120000000\n"
+        "2026-07-22 10:30:00,1668.53,180000000\n",
+        encoding="utf-8",
+    )
+    catalog.refresh()
+
+    execution = DataAgentToolbox(catalog, "chatgpt-local").execute(
+        "read_timeseries",
+        {"source": "data_lake/vnindex_intraday.csv", "latest_n": 2},
+    )
+
+    line_chart, volume_chart = execution.displays[1:]
+    assert execution.payload["rows"][0]["time"] == "2026-07-22"
+    assert line_chart["rows"][1]["time"] == "2026-07-22T10:30:00"
+    assert line_chart["x_axis_title"] == "Thời gian"
+    assert line_chart["x_tick_format"] == "%d/%m/%Y"
+    assert volume_chart["x_hover_format"] == "%d/%m/%Y"
+
+
 def test_cloud_provider_filter_removes_localhost_endpoints() -> None:
     providers = available_provider_keys(cloud_runtime=True)
 

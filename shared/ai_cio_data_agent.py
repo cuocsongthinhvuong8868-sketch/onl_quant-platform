@@ -554,7 +554,9 @@ class DataAgentToolbox:
         table_frame = latest.sort_values(resolved_date_column, ascending=False).copy()
         table_frame[resolved_date_column] = table_frame[resolved_date_column].dt.strftime("%Y-%m-%d")
         chart_frame = latest.copy()
-        chart_frame[resolved_date_column] = chart_frame[resolved_date_column].dt.strftime("%Y-%m-%d")
+        chart_frame[resolved_date_column] = chart_frame[resolved_date_column].dt.strftime(
+            "%Y-%m-%dT%H:%M:%S"
+        )
         table_rows = _clean_records(table_frame)
         chart_rows = _clean_records(chart_frame)
         numeric_columns = [
@@ -580,6 +582,9 @@ class DataAgentToolbox:
                     "title": f"Diễn biến {chart_subject}",
                     "source": source,
                     "x": resolved_date_column,
+                    "x_axis_title": "Thời gian",
+                    "x_tick_format": "%d/%m/%Y",
+                    "x_hover_format": "%d/%m/%Y",
                     "y": primary_columns,
                     "y_axis_title": "Chỉ số / Giá trị",
                     "legend_title": "",
@@ -593,6 +598,9 @@ class DataAgentToolbox:
                     "title": f"Khối lượng {chart_subject}",
                     "source": source,
                     "x": resolved_date_column,
+                    "x_axis_title": "Thời gian",
+                    "x_tick_format": "%d/%m/%Y",
+                    "x_hover_format": "%d/%m/%Y",
                     "y": volume_columns,
                     "y_axis_title": "Khối lượng",
                     "legend_title": "",
