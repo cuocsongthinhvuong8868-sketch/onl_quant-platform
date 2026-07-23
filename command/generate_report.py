@@ -11,6 +11,7 @@ from pathlib import Path
 import pandas as pd
 
 from shared.data_loader import load_close_prices, load_custom
+from shared.tool_registry import report_tool_ids
 
 
 def _fail(tool: str, err: Exception) -> dict:
@@ -27,9 +28,17 @@ def _ok(tool: str, payload: dict) -> dict:
 
 def discover_report_tools(root_dir: Path) -> list[str]:
     tools_dir = root_dir / "tools"
-    names = []
     if not tools_dir.exists():
-        return names
+        return []
+    registered = [
+        tool_id
+        for tool_id in report_tool_ids()
+        if (tools_dir / tool_id / "report.py").exists()
+    ]
+    if registered:
+        return registered
+
+    names = []
     for d in sorted(tools_dir.iterdir()):
         if not d.is_dir() or d.name.startswith("__"):
             continue

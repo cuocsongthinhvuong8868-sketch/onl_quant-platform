@@ -8,68 +8,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 from shared.page_layout import setup_page
+from shared.tool_registry import tools_for_branch
 
 setup_page("Quant Platform — Macro Analysis")
 
 # ── Định nghĩa danh sách tools ─────────────────────────────────────
-TOOLS = [
-    {
-        "id": "fed_liquidity",
-        "name": "🏦 Fed Liquidity Monitor",
-        "desc": "Net Liquidity (WALCL − TGA − RRP) + Impulse EMA + Z-Score 52W → Tín hiệu ADD/CUT/HOLD",
-        "page_module": "tools.fed_liquidity.page",
-        "render_func": "render",
-    },
-    {
-        "id": "global_financial_conditions",
-        "name": "🌐 Global Financial Conditions",
-        "desc": "VIX + MOVE + HY OAS + CCC OAS · Static PCA composite · Regime via PC1 percentile rank 3Y (STRESS/ELEVATED/CALM)",
-        "page_module": "tools.global_financial_conditions.page",
-        "render_func": "render",
-    },
-    {
-        "id": "humility_falsification",
-        "name": "🧭 Humility & Falsification Monitor",
-        "desc": "Đối chiếu điều kiện falsification trong AI CIO T-1 với dữ liệu T từ VNIBOR, Breadth, ESR, EVT, Coupling và Global Conditions",
-        "page_module": "tools.humility_falsification.page",
-        "render_func": "render",
-    },
-    {
-        "id": "vnibor",
-        "name": "🏦 VNIBOR Monitor",
-        "desc": "Lãi suất qua đêm và các kỳ hạn ngắn liên ngân hàng · Phân loại trạng thái thanh khoản (Regime Percentile 1Y) · Tác động tới VN-Index",
-        "page_module": "tools.vnibor.page",
-        "render_func": "render",
-    },
-    {
-        "id": "bank_valuation",
-        "name": "🏦 Bank Valuation",
-        "desc": "Định giá bottom-up nhóm ngân hàng: Adjusted Book Value, Sustainable ROE, Residual Income, stress fair P/B và regime từ valuation breadth.",
-        "page_module": "tools.bank_valuation.page",
-        "render_func": "render",
-    },
-    {
-        "id": "ltmm",
-        "name": "📊 Liquidity Transmission (LTMM)",
-        "desc": "Theo dõi kênh truyền dẫn thanh khoản hệ thống: Thượng nguồn (upstream), Lớp ma sát (friction), và Hạ nguồn (market liquidity)",
-        "page_module": "tools.ltmm.page",
-        "render_func": "render",
-    },
-    {
-        "id": "vn100_earnings_health",
-        "name": "🇻🇳 VN100 Corporate Health",
-        "desc": "Bottom-up VN100 financial statement monitor: growth quality, cash conversion, working-capital stress, leverage stress, sector diffusion và matrix diagnostics",
-        "page_module": "tools.vn100_earnings_health.page",
-        "render_func": "render",
-    },
-    {
-        "id": "credit_spread",
-        "name": "💳 Credit Spread Bank vs BĐS",
-        "desc": "So sánh lãi suất phát hành trái phiếu Bank và BĐS, spread theo kỳ, kỳ hạn và phần bù so với TPCP Việt Nam",
-        "page_module": "tools.credit_spread.page",
-        "render_func": "render",
-    },
-]
+TOOLS = tools_for_branch("macro")
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
 if "macro_selected_tool" not in st.session_state:

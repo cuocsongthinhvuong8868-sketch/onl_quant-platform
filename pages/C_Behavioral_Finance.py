@@ -8,89 +8,13 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 from shared.page_layout import setup_page
+from shared.tool_registry import get_tool, tools_for_branch
 
 setup_page("Quant Platform — Behavioral Finance")
 
 # ── Định nghĩa danh sách tools ─────────────────────────────────────
-TOOLS = [
-    {
-        "id": "fear_greed",
-        "name": "🎯 Market Sentiment (Fear & Greed)",
-        "desc": "PCA & EGARCH — Đo lường tâm lý thị trường qua PCA, EGARCH(1,1,1) Skewed-T, Kelly Skewness",
-        "page_module": "tools.fear_greed.page",
-        "render_func": "render",
-    },
-    {
-        "id": "sentiment_factor_news",
-        "name": "📰 News Sentiment Factor",
-        "desc": "Rule-based macro/news sentiment feed từ Mozyfin và WiData: composite, regime, channel scores và headline drivers.",
-        "page_module": "tools.sentiment_factor_news.page",
-        "render_func": "render",
-    },
-    {
-        "id": "pvgo",
-        "name": "PVGO Valuation Model",
-        "desc": "Present Value of Growth Opportunities cho VN-Index: P/E, COE, steady-state value và growth expectations.",
-        "page_module": "tools.pvgo.page",
-        "render_func": "render",
-    },
-    {
-        "id": "upside_ratio",
-        "name": "🧬 Upside/Downside Ratio",
-        "desc": "Hybrid MC Bidirectional Breadth Model — Phân tích Cung-Cầu với Monte Carlo ensemble",
-        "page_module": "tools.upside_ratio.page",
-        "render_func": "render",
-    },
-    {
-        "id": "market_breadth",
-        "name": "📈 Market Breadth",
-        "desc": "Độ rộng thị trường — Số mã >MA20/60/125/252, Top 10 Volume Leaders",
-        "page_module": "tools.market_breadth.page",
-        "render_func": "render",
-    },
-    {
-        "id": "esr_monitor",
-        "name": "⚡ ESR Monitor",
-        "desc": "Hệ thống Cảnh báo Rủi ro Hệ thống — PCA trên VN30, phát hiện SAFE/WARNING/CRITICAL",
-        "page_module": "tools.esr_monitor.page",
-        "render_func": "render",
-    },
-    {
-        "id": "dispersion",
-        "name": "🔄 Dispersion",
-        "desc": "Phân tích phân tán thị trường — Volatility skew, term structure",
-        "page_module": "tools.dispersion.page",
-        "render_func": "render",
-    },
-    {
-        "id": "va_res",
-        "name": "🛡️ VaRES Engine",
-        "desc": "3 Module: A-Single Ticker, B-VN30 Stress, C-Market Complacency với Self-Baseline",
-        "page_module": "tools.va_res.page",
-        "render_func": "show",
-    },
-    {
-        "id": "manipulation",
-        "name": "🔍 Manipulation Detection",
-        "desc": "Phát hiện dấu hiệu thao túng giá — Các metrics đặc biệt về hành vi giao dịch",
-        "page_module": "tools.manipulation.page",
-        "render_func": "render",
-    },
-    {
-        "id": "var_cvar_vnindex",
-        "name": "📉 Var-CVaR VNINDEX",
-        "desc": "Value-at-Risk & Expected Shortfall cho VNINDEX — Rolling σ, Parametric & Historical VaR, ES",
-        "page_module": "tools.var_cvar_vnindex.page",
-        "render_func": "show",
-    },
-    {
-        "id": "abm_simulator",
-        "name": "ABM Market Simulator",
-        "desc": "Agent-based monitor for leverage stress, panic ratio, forced-selling amplification and margin cascade distance.",
-        "page_module": "tools.abm_simulator.page",
-        "render_func": "render",
-    },
-]
+TOOLS = tools_for_branch("behavioral")
+BACKTEST_TOOL = get_tool("backtest").to_page_dict()
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
 if "bf_selected_tool" not in st.session_state:
@@ -111,8 +35,8 @@ if st.session_state.bf_selected_tool is None:
     with col_title:
         st.subheader("📋 Danh mục Công cụ")
     with col_history:
-        if st.button("⚖️ Backtest Strategy", use_container_width=True, key="btn_backtest"):
-            st.session_state.bf_selected_tool = "backtest"
+        if st.button(BACKTEST_TOOL["name"], use_container_width=True, key="btn_backtest"):
+            st.session_state.bf_selected_tool = BACKTEST_TOOL["id"]
             st.rerun()
     st.markdown("Chọn một công cụ bên dưới để bắt đầu phân tích:")
 
@@ -144,10 +68,11 @@ else:
                 st.session_state.bf_selected_tool = None
                 st.rerun()
         with col_title:
-            st.markdown("## ⚖️ Backtest Strategy")
+            st.markdown(f"## {BACKTEST_TOOL['name']}")
         try:
-            from tools.backtest.page import show as render_backtest
-            render_backtest()
+            module = __import__(BACKTEST_TOOL["page_module"], fromlist=[BACKTEST_TOOL["render_func"]])
+            render_fn = getattr(module, BACKTEST_TOOL["render_func"])
+            render_fn()
         except Exception as e:
             st.error(f"❌ Lỗi khi tải trang Backtest: {e}")
             st.exception(e)

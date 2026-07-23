@@ -8,40 +8,12 @@ sys.path.insert(0, str(Path(__file__).parent.parent))
 
 import streamlit as st
 from shared.page_layout import setup_page
+from shared.tool_registry import tools_for_branch
 
 setup_page("Quant Platform — Micro Analysis")
 
 # ── Định nghĩa danh sách tools ─────────────────────────────────────
-TOOLS = [
-    {
-        "id": "pairs_trading",
-        "name": "🔁 Pairs Trading Research Lab",
-        "desc": (
-            "Cointegration (Engle-Granger + Johansen) + OU half-life + Z-score 60d trên 7 cluster VN "
-            "(Vingroup, Big4 Bank, Steel, Securities, Private Bank, Oil&Gas, Utility) + custom pair UI."
-        ),
-        "page_module": "tools.pairs_trading.page",
-        "render_func": "render",
-    },
-    {
-        "id": "factor_examination",
-        "name": "📐 Portfolio Factor Examination",
-        "desc": (
-            "Multi-factor cross-sectional scorer (10 factor price-based, sector-neutral ICB): "
-            "Mom/LowVol/Beta/IdioVol/Liquidity/Size/Anti-Lottery/Reversal. Portfolio examination — "
-            "xếp hạng tickers ổn hơn phần còn lại. KHÔNG phải regime classifier."
-        ),
-        "page_module": "tools.factor_examination.page",
-        "render_func": "render",
-    },
-    {
-        "id": "risk_adjusted_growth",
-        "name": "📊 Risk-Adjusted Growth",
-        "desc": "Phân tích tăng trưởng điều chỉnh rủi ro — Economic Alpha, P/B, ROE và Cash Payout cho nhóm ngân hàng.",
-        "page_module": "tools.risk_adjusted_growth.page",
-        "render_func": "render",
-    },
-]
+TOOLS = tools_for_branch("micro")
 
 # ── Khởi tạo session_state ─────────────────────────────────────────
 if "micro_selected_tool" not in st.session_state:

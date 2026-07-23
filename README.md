@@ -88,7 +88,8 @@ CodeGraph cung cho thay cac hot paths can can trong khi sua:
 
 - `shared/ai_cio.py:run_executive_summary()` duoc goi tu `app.py` va `command/run_ai_cio_auto.py`.
 - `shared/daily_cache.py:load_daily_cache()` duoc nhieu page dung, nen thay doi cache key co blast radius rong.
-- `pages/*` import dong `tools.<name>.page.render()`; tool moi nen theo pattern `quant/`, `ui/`, `page.py`, optional `report.py`.
+- `shared/tool_registry.py` la registry metadata chung cho branch/page/report/cache/AI-CIO role.
+- `pages/*` import dong `tools.<name>.page.render()` qua registry; tool moi nen theo pattern `quant/`, `ui/`, `page.py`, optional `report.py`.
 
 ## Tool Map
 
@@ -248,7 +249,7 @@ pytest -q
 |-- app.py                         # Streamlit home, AI-CIO controls, methodology summary block
 |-- pages/                         # Multipage Streamlit branch wrappers
 |-- tools/                         # Research modules: quant/, ui/, page.py, optional report.py
-|-- shared/                        # Data loading, cache, AI-CIO, DCC-GARCH, GitHub sync, layout
+|-- shared/                        # Data loading, cache, registry, AI-CIO, DCC-GARCH, GitHub sync, layout
 |-- command/                       # Data update, report generation, automation entry points
 |-- src/                           # Data health / data management utilities
 |-- docs/                          # Methodology docs and handbooks
