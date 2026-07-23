@@ -13,6 +13,7 @@ from shared.ai_cio_data_agent import (
     DataAgentToolbox,
     _bounded_tool_content,
     _language_issues,
+    _validate_query_plan,
     ask_ai_cio_data_agent,
     available_provider_keys,
     is_local_provider,
@@ -65,6 +66,8 @@ def _planner_message(
     *,
     intents: list[str] | None = None,
     required_tools: list[str] | None = None,
+    entities: list[str] | None = None,
+    search_queries: list[str] | None = None,
     source_hints: list[str] | None = None,
     latest_sessions: int | None = None,
     confidence: float = 0.9,
@@ -74,9 +77,9 @@ def _planner_message(
         content=json.dumps(
             {
                 "intents": intents or ["market_timeseries"],
-                "entities": ["VNINDEX"],
+                "entities": entities or ["VNINDEX"],
                 "required_tools": required_tools or ["read_timeseries"],
-                "search_queries": [],
+                "search_queries": search_queries or [],
                 "source_hints": source_hints or ["data_lake/vnindex_cache.csv"],
                 "tool_ids": [],
                 "latest_sessions": latest_sessions,
@@ -95,6 +98,7 @@ def _write_systemic_risk_snapshot(tmp_path: Path) -> None:
     metrics_dir = tmp_path / "data_lake/ai_cio_metrics"
     metrics_dir.mkdir(parents=True, exist_ok=True)
     payload = {
+        "provider": "chatgpt-local",
         "generated_at": "2026-07-23T07:15:48Z",
         "report_date": "23/07/2026",
         "data_date": "22/07/2026",
@@ -527,6 +531,111 @@ def test_language_quality_gate_repairs_cyrillic_without_changing_evidence(tmp_pa
     repair_prompt = json.dumps(client.completions.requests[2]["messages"], ensure_ascii=False)
     assert "Không thêm, bớt hoặc suy diễn dữ kiện" in repair_prompt
     assert "data_lake/vnindex_cache.csv" in result.answer
+
+
+def test_policy_adds_system_metrics_when_cloud_planner_misclassifies_nav_question(
+    tmp_path: Path,
+) -> None:
+    catalog = _catalog(tmp_path)
+    cloud_like_payload = {
+        "intents": ["general_research"],
+        "entities": ["SHB"],
+        "required_tools": ["search_project_data", "read_project_file"],
+        "search_queries": ["SHB"],
+        "source_hints": [],
+        "tool_ids": [],
+        "latest_sessions": None,
+        "confidence": 0.95,
+        "reason": "Company-specific research only",
+    }
+
+    nav_plan = _validate_query_plan(
+        cloud_like_payload,
+        "SHB có phù hợp để phân bổ 20% NAV lúc này không?",
+        catalog,
+    )
+    macro_plan = _validate_query_plan(
+        cloud_like_payload,
+        "Rủi ro vĩ mô hiện tại có ủng hộ mua SHB không?",
+        catalog,
+    )
+
+    assert "portfolio_decision" in nav_plan.intents
+    assert nav_plan.required_tools[0] == "get_tool_metrics"
+    assert "policy override added system metrics for decision context" in nav_plan.warnings
+    assert "macro_context" in macro_plan.intents
+    assert "systemic_risk" in macro_plan.intents
+    assert macro_plan.required_tools[:2] == ("get_tool_metrics", "search_project_data")
+
+
+def test_cloud_planned_nav_answer_receives_metrics_before_company_evidence(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    _write_systemic_risk_snapshot(tmp_path)
+    (tmp_path / "reports/shb.md").write_text(
+        "# SHB\nCompany-specific evidence for SHB.\n",
+        encoding="utf-8",
+    )
+    catalog.refresh()
+    client = _FakeClient(
+        [
+            _planner_message(
+                intents=["general_research"],
+                required_tools=["search_project_data", "read_project_file"],
+                entities=["SHB"],
+                search_queries=["SHB"],
+                source_hints=["reports/shb.md"],
+                confidence=0.96,
+                reason="Company-only cloud plan",
+            ),
+            SimpleNamespace(
+                content=(
+                    "20% NAV là quá cao trong regime PRE-CRASH / PANIC "
+                    "[Nguồn: data_lake/ai_cio_metrics/latest_chatgpt-local.json]."
+                ),
+                tool_calls=None,
+            ),
+        ]
+    )
+
+    result = ask_ai_cio_data_agent(
+        "test-key",
+        "deepseek-v4-pro",
+        "SHB có phù hợp để phân bổ 20% NAV lúc này không?",
+        catalog=catalog,
+        client=client,
+    )
+
+    assert result.mode == "planned_agent"
+    assert [trace["tool"] for trace in result.tool_traces[:5]] == [
+        "ai_query_planner",
+        "policy_validator",
+        "get_tool_metrics",
+        "search_project_data",
+        "read_project_file",
+    ]
+    assert result.tool_traces[2]["sources"] == [
+        "data_lake/ai_cio_metrics/latest_chatgpt-local.json"
+    ]
+    assert result.tool_traces[2]["ok"] is True
+    synthesis_prompt = client.completions.requests[1]["messages"][-1]["content"]
+    assert "PRE-CRASH / PANIC" in synthesis_prompt
+    assert "risk adapter" in client.completions.requests[1]["messages"][0]["content"]
+
+
+def test_metrics_tool_uses_generic_snapshot_for_unmatched_cloud_provider(tmp_path: Path) -> None:
+    catalog = _catalog(tmp_path)
+    _write_systemic_risk_snapshot(tmp_path)
+    metrics_dir = tmp_path / "data_lake/ai_cio_metrics"
+    (metrics_dir / "latest_chatgpt-local.json").replace(metrics_dir / "latest.json")
+    catalog.refresh()
+
+    execution = DataAgentToolbox(catalog, "kimi-2.6").execute("get_tool_metrics", {})
+
+    assert execution.payload["ok"] is True
+    assert execution.payload["source"] == "data_lake/ai_cio_metrics/latest.json"
+    assert execution.payload["requested_provider"] == "kimi-2.6"
+    assert execution.payload["snapshot_provider"] == "chatgpt-local"
+    assert execution.payload["provider_snapshot_fallback"] is True
 
 
 def test_toolbox_blocks_timeseries_path_traversal(tmp_path: Path) -> None:
