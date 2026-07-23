@@ -185,3 +185,17 @@ def test_ai_context_fails_closed_when_pvgo_exceeds_session_lag(tmp_path: Path) -
 
     assert context.startswith("DATA INSUFFICIENT - PVGO valuation feed STALE")
     assert "2 market sessions behind" in context
+
+
+def test_ai_context_fails_closed_when_pvgo_is_one_session_behind_by_default(tmp_path: Path) -> None:
+    pvgo_path = tmp_path / "vnindex_valuation_history.csv"
+    market_data_path = tmp_path / "vnindex_cache.csv"
+    friday = _valuation_row("2026-07-17", close=1_787.45, pe=13.14, pb=2.04)
+    _write_existing_history(pvgo_path, [friday])
+    _write_market_dates(market_data_path, ["2026-07-17", "2026-07-20"])
+
+    context = build_ai_cio_context(path=pvgo_path, market_data_path=market_data_path)
+
+    assert context.startswith("DATA INSUFFICIENT - PVGO valuation feed STALE")
+    assert "1 market sessions behind" in context
+    assert "(limit 0)" in context

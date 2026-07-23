@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+
+ON ở mức **3.54%**, giảm **-0.14 điểm %** so với phiên trước. Đây là mức thuộc vùng vốn ngắn hạn tương đối dễ chịu theo dữ liệu VNIBOR, không còn biểu hiện căng thẳng tức thời.
+
+Cấu trúc kỳ hạn **không đảo ngược**: 1W cao hơn ON **+0.79%**, 2W cao hơn ON **+1.83%**. Việc kỳ hạn dài hơn vẫn trả lãi suất cao hơn overnight cho thấy không có squeeze cực ngắn hạn ở ON. Tuy nhiên spread 2W-ON khá rộng, phản ánh thị trường vẫn định giá phần bù kỳ hạn đáng kể thay vì trạng thái thanh khoản hoàn toàn phẳng/rẻ ở mọi tenor.
+
+## 2. Trend 20 phiên
+
+Kết luận 20 phiên là **stress unwinding nghiêng easing**. ON MA5 giảm **-0.86 điểm %**, slope MA5 ở mức **-0.050 điểm %/phiên**, và số phiên ON giảm áp đảo: **16 phiên giảm so với 4 phiên tăng**. Đây là tín hiệu hạ nhiệt có tính chuỗi, không chỉ là một phiên ON giảm đơn lẻ.
+
+Điểm cần lưu ý là 20 phiên vẫn có “di sản stress”: **4 phiên STRESS/WARNING**, **4 phiên TIGHT**, và một cú spike ON lên **12.49%** ngày 2026-06-29. Tuy vậy, hiện tại Signal đã về **NEUTRAL**, Regime về **EASY**, và số phiên curve đảo ngược chỉ **1/20**, nên dữ liệu phù hợp hơn với pha tháo căng sau squeeze thay vì stress đang tích tụ.
+
+## 3. Regime & Z-Score
+
+Z-score ON MA5 hiện ở **-1.09**, percentile **0.077**, tức ON MA5 đang nằm quanh nhóm thấp trong phân phối 252 ngày gần nhất. Điều này cho thấy điều kiện vốn ngắn hạn hiện tại dễ hơn đáng kể so với mặt bằng một năm.
+
+Regime **EASY** vì bộ chỉ báo làm mượt đang phản ánh áp lực thanh khoản thấp. Cần nhấn mạnh: input hiện tại chỉ gồm VNIBOR, spread, Z-score, percentile, regime/signal và trend 20 phiên; **không đủ dữ liệu để kết luận nguyên nhân** như OMO, tín phiếu, tỷ giá, dòng tiền Kho bạc, mùa vụ thuế hay hành vi từng nhóm ngân hàng.
+
+## 4. Spillover tới VN-Index
+
+Tác động 2-4 tuần tới nghiêng **tích cực có điều kiện** cho VN-Index. Snapshot hiện tại cho thấy ON giảm, regime EASY, signal NEUTRAL và đường cong không đảo ngược. Kết hợp với trend 20 phiên đang hạ nhiệt, đây là nền thanh khoản thuận lợi hơn cho tài sản rủi ro so với giai đoạn ON vượt 5-6% và xuất hiện STRESS/WARNING.
+
+Cơ chế truyền dẫn chủ yếu nằm ở chi phí cơ hội của tiền và chi phí sử dụng vốn. Khi ON và ON MA5 giảm, áp lực lên mặt bằng vốn ngắn hạn giảm, từ đó hỗ trợ tâm lý dòng tiền nội, đặc biệt là nhóm sử dụng margin hoặc giao dịch theo thanh khoản. Tuy nhiên, do 20 phiên gần nhất từng có spike mạnh và 4 phiên cảnh báo, thị trường có thể chưa định giá đây là một môi trường thanh khoản ổn định hoàn toàn. Tác động hỗ trợ sẽ mạnh hơn nếu ON MA5 tiếp tục giảm và signal duy trì NEUTRAL.
+
+## 5. Rủi ro & Điều kiện theo dõi
+
+Các ngưỡng cần theo dõi tiếp là: ON có quay lại vùng **trên 5-6%** hay không; ON MA5 có tiếp tục giảm hay đảo chiều tăng; spread 1W-ON có chuyển âm hay không; số phiên STRESS/WARNING có tiếp tục giảm hay tái xuất hiện dày hơn.
+
+Các yếu tố như SBV, tỷ giá, tín phiếu, OMO hoặc mùa vụ là dữ liệu ngoài phạm vi input và cần kiểm chứng riêng, không nên xem là kết luận từ VNIBOR hiện tại.
+
+## 6. KẾT LUẬN & KHUYẾN NGHỊ
+
+Thanh khoản liên ngân hàng đang trong pha **hạ nhiệt sau stress**, hỗ trợ tương đối cho VN-Index trong 2-4 tuần nếu ON MA5 tiếp tục giảm. Phân bổ tài sản nên giữ thiên hướng chọn lọc rủi ro, tránh suy rộng khi chưa có thêm xác nhận từ các phiên kế tiếp.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 3.54,
+  "trend_20d": "stress_unwinding",
+  "regime": "EASY",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "positive",
+  "confidence": "high"
+}
+```

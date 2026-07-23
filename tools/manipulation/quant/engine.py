@@ -3,8 +3,10 @@ import pandas as pd
 from sklearn.decomposition import PCA
 from scipy.stats import percentileofscore
 
+METHOD_VERSION = "manipulation_v2.0.0"
 TICKERS = ["VIC", "VHM", "VRE"]
-TARGET = "VN30F1M"
+TARGET = "VNINDEX"
+TARGET_RETURN_COL = f"{TARGET}_Return"
 
 
 def _safe_rank_tail(x):
@@ -14,17 +16,24 @@ def _safe_rank_tail(x):
     return percentileofscore(x[~np.isnan(x)], x[-1], kind="rank") / 100.0
 
 
-def prepare_data(df: pd.DataFrame) -> pd.DataFrame:
-    req = [*TICKERS, TARGET]
-    miss = [c for c in req if c not in df.columns]
-    if miss:
-        raise ValueError(
-            f"Thiếu cột bắt buộc trong data_lake/market_data.csv: {miss}. "
-            "Vui lòng kiểm tra tickers.csv và chạy lại update_data."
-        )
-
+def prepare_data(df: pd.DataFrame, target_series: pd.Series | None = None) -> pd.DataFrame:
     out = df.copy().sort_index()
     out.index = pd.to_datetime(out.index)
+
+    if target_series is not None:
+        target = pd.to_numeric(target_series.sort_index(), errors="coerce")
+        target.index = pd.to_datetime(target.index)
+        target = target[~target.index.duplicated(keep="last")]
+        out = out.join(target.rename(TARGET), how="left")
+
+    req = [*TICKERS, TARGET]
+    miss = [c for c in req if c not in out.columns]
+    if miss:
+        raise ValueError(
+            f"Thiếu cột bắt buộc cho Manipulation Detection: {miss}. "
+            "Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+        )
+
     out = out[[*TICKERS, TARGET]].apply(pd.to_numeric, errors="coerce")
     out = out.dropna(how="all")
     return out
@@ -34,7 +43,9 @@ def compute_metrics(df_prices: pd.DataFrame, window: int):
     if len(df_prices) < 2 * window + 10:
         raise ValueError(f"Không đủ dữ liệu cho window={window}. Cần tối thiểu {2 * window + 10} phiên.")
 
-    log_ret = np.log(df_prices / df_prices.shift(1)).dropna()
+    simple_ret = df_prices.pct_change(fill_method=None)
+    simple_ret = simple_ret.mask(simple_ret <= -1.0)
+    log_ret = np.log1p(simple_ret).dropna(subset=[*TICKERS, TARGET])
 
     composite = pd.Series(index=log_ret.index, dtype=float)
     weights = pd.DataFrame(index=log_ret.index, columns=TICKERS, dtype=float)
@@ -51,7 +62,7 @@ def compute_metrics(df_prices: pd.DataFrame, window: int):
         composite.iloc[i] = np.dot(w, log_ret[TICKERS].iloc[i])
 
     comp = composite.dropna()
-    f1 = log_ret[TARGET].reindex(comp.index)
+    target_return = log_ret[TARGET].reindex(comp.index)
     wdf = weights.dropna()
 
     var_95 = comp.rolling(window).quantile(0.05)
@@ -62,16 +73,17 @@ def compute_metrics(df_prices: pd.DataFrame, window: int):
         return tail.mean() if len(tail) else np.nan
 
     cvar_95 = comp.rolling(window).apply(cvar_fn, raw=False)
-    corr = comp.rolling(window).corr(f1)
-    slope = comp.rolling(window).cov(f1) / comp.rolling(window).var()
-    intercept = f1.rolling(window).mean() - slope * comp.rolling(window).mean()
+    corr = comp.rolling(window).corr(target_return)
+    slope = comp.rolling(window).cov(target_return) / comp.rolling(window).var()
+    intercept = target_return.rolling(window).mean() - slope * comp.rolling(window).mean()
 
     pr_corr = corr.rolling(window).apply(_safe_rank_tail, raw=True)
     pr_slope = slope.rolling(window).apply(_safe_rank_tail, raw=True)
 
     result = pd.DataFrame({
         "Composite_Return": comp,
-        "VN30F1M_Return": f1,
+        TARGET_RETURN_COL: target_return,
+        "Target_Return": target_return,
         "VaR_95": var_95,
         "CVaR_95": cvar_95,
         "Correlation": corr,

@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-23",
+  "composite_score": 25.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 4,
+      "unit": "sessions",
+      "description": "Stress liên ngân hàng hạ đủ để phủ định phần thesis liquidity squeeze"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 6.1,
+      "unit": "%",
+      "description": "Độ rộng phục hồi đủ mạnh để phủ định thesis market internal breakdown"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.3,
+      "unit": "%",
+      "description": "Rủi ro hệ thống hạ khỏi vùng warning"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.334,
+      "unit": "",
+      "description": "Toàn bộ EVT threshold grid hạ nhiệt, phủ định thesis fat-tail"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": null,
+      "unit": "th pct",
+      "description": "Rủi ro coupling/concentration hạ dưới ngưỡng cảnh báo"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.9,
+      "unit": "th pct",
+      "description": "Global financial stress hạ khỏi vùng hard macro headwind"
+    }
+  ],
+  "provider_key": "chatgpt-local",
+  "saved_at": "2026-07-23",
+  "source": "ai_cio_executive_summary"
+}

@@ -17,6 +17,7 @@ Bạn là Quant Risk Officer. Đã chạy Monte Carlo deterministic 5,000 simula
 ## Methodology note
 - Monte Carlo engine runs 5,000 simulations per side with fixed seeds for reproducibility.
 - Treat P95 projections as deterministic stress scenarios, not standalone allocation authority.
+- V2 breadth stress uses downside rank, net sell pressure and MA5 sell pressure. If downside stress is HIGH/EXTREME, supply pressure dominates even when Monte Carlo paths look balanced.
 
 # REFERENCE
 - **Phi > +0.10** : Momentum regime (đà tiếp tục)

@@ -1,0 +1,271 @@
+{
+  "provider_key": "chatgpt-local",
+  "generated_at": "2026-07-23T13:52:09",
+  "t_data_date": "2026-07-22",
+  "target_report_date": "2026-07-21",
+  "report_match": "fallback:2026-07-16",
+  "report_path": "C:\\Users\\ADMIN\\Documents\\GitHub\\onl_quant-platform\\data_lake\\daily_cache\\executive_summary_chatgpt-local_160726.txt",
+  "report_name": "executive_summary_chatgpt-local_160726.txt",
+  "report_mtime": "report:2026-07-16T14:29:50|sidecar:2026-07-16T14:29:50",
+  "report_signature": "report:executive_summary_chatgpt-local_160726.txt:e6cd143f3d9e66bd1459e9de6accbedbc46f0c9c|sidecar:ai_cio_humility_rules_chatgpt-local_160726.json:1da5b1ac8552f357bc9726bec559a39b41985a0b",
+  "parsed": {
+    "report_date": "2026-07-16",
+    "composite_score": 28.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Funding stress 20 phiên hạ nhiệt đủ để phủ định luận điểm liquidity squeeze"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 12.5,
+        "unit": "%",
+        "description": "Độ rộng MA20 phục hồi đủ mạnh để phủ định luận điểm market internals yếu"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.0,
+        "unit": "%",
+        "description": "Systemic stress rơi khỏi vùng WARNING"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.367,
+        "unit": "",
+        "description": "Toàn bộ EVT threshold grid hạ nhiệt, phủ định fat-tail warning"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 13.3,
+        "unit": "th pct",
+        "description": "Coupling Vingroup tiếp tục hạ nhiệt, xác nhận rủi ro idiosyncratic không còn dẫn dắt"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 80.0,
+        "unit": "th pct",
+        "description": "CQS rơi khỏi vùng stress theo hard-constraint ledger"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-16",
+      "composite_score": 28,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Funding stress 20 phiên hạ nhiệt đủ để phủ định luận điểm liquidity squeeze"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 12.5,
+          "unit": "%",
+          "description": "Độ rộng MA20 phục hồi đủ mạnh để phủ định luận điểm market internals yếu"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63,
+          "unit": "%",
+          "description": "Systemic stress rơi khỏi vùng WARNING"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.367,
+          "unit": "",
+          "description": "Toàn bộ EVT threshold grid hạ nhiệt, phủ định fat-tail warning"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 13.3,
+          "unit": "th pct",
+          "description": "Coupling Vingroup tiếp tục hạ nhiệt, xác nhận rủi ro idiosyncratic không còn dẫn dắt"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 80,
+          "unit": "th pct",
+          "description": "CQS rơi khỏi vùng stress theo hard-constraint ledger"
+        }
+      ],
+      "provider_key": "chatgpt-local",
+      "saved_at": "2026-07-16",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 4.0,
+      "T actual display": "4 sessions",
+      "Delta": -1.0,
+      "Delta display": "-1 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-20",
+      "Description": "Funding stress 20 phiên hạ nhiệt đủ để phủ định luận điểm liquidity squeeze",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "12.5%",
+      "T actual": 6.11764705882353,
+      "T actual display": "6.118%",
+      "Delta": -6.38235294117647,
+      "Delta display": "-6.382%",
+      "Status": "Intact",
+      "Data date": "2026-07-22",
+      "Description": "Độ rộng MA20 phục hồi đủ mạnh để phủ định luận điểm market internals yếu",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.0%",
+      "T actual": 63.3231257718509,
+      "T actual display": "63.3%",
+      "Delta": 0.3231257718508971,
+      "Delta display": "+0.323%",
+      "Status": "Intact",
+      "Data date": "2026-07-22",
+      "Description": "Systemic stress rơi khỏi vùng WARNING",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.367",
+      "T actual": 0.32520846567672185,
+      "T actual display": "0.325",
+      "Delta": -0.041791534323278146,
+      "Delta display": "-0.042",
+      "Status": "Intact",
+      "Data date": "2026-07-22",
+      "Description": "Toàn bộ EVT threshold grid hạ nhiệt, phủ định fat-tail warning",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "13.3 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Coupling Vingroup tiếp tục hạ nhiệt, xác nhận rủi ro idiosyncratic không còn dẫn dắt",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "80.0 th pct",
+      "T actual": 99.93386243386243,
+      "T actual display": "99.9 th pct",
+      "Delta": 19.93386243386243,
+      "Delta display": "+19.9 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-22",
+      "Description": "CQS rơi khỏi vùng stress theo hard-constraint ledger",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 4,
+      "date": "2026-07-20",
+      "error": ""
+    },
+    "breadth": {
+      "value": 6.11764705882353,
+      "date": "2026-07-22",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.3231257718509,
+      "date": "2026-07-22",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-22",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.32520846567672185,
+      "date": "2026-07-22",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.93386243386243,
+      "date": "2026-07-22",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

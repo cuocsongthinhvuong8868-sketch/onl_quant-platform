@@ -10,7 +10,7 @@ import pandas as pd
 from config import DATA_LAKE
 
 DEFAULT_MARKET_DATA_PATH = DATA_LAKE / "vnindex_cache.csv"
-DEFAULT_MAX_SESSION_LAG = 1
+DEFAULT_MAX_SESSION_LAG = 0
 
 FreshnessResult = dict[str, str | int | None]
 

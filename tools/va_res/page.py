@@ -5,7 +5,7 @@ import numpy as np
 import os
 import datetime
 from shared.data_loader import load_close_prices
-from tools.va_res.quant.metrics import SystemicRiskEngine, RiskConfig
+from tools.va_res.quant.metrics import METHOD_VERSION, SystemicRiskEngine, summarize_vares_state
 from tools.va_res.ui.sidebar import render_sidebar
 from tools.va_res.ui.charts import plot_individual_risk, plot_systemic_risk, plot_complacency_index
 
@@ -57,6 +57,9 @@ def show():
 
     engine = SystemicRiskEngine()
     date_col = df_price_pandas.columns[0]
+    data_date_raw = df_price_pandas[date_col].max()
+    data_date_token = data_date_raw.strftime("%d%m%y") if hasattr(data_date_raw, "strftime") else datetime.date.today().strftime("%d%m%y")
+    st.caption(f"Method: {METHOD_VERSION} · Data date: {data_date_raw}")
 
     # ============================================================
     # MODULE A — Phân tích Cổ phiếu Riêng lẻ
@@ -132,18 +135,19 @@ def show():
             df_latest = df_metrics[df_metrics[date_col] == latest_date].copy()
             df_latest['breach_margin'] = df_latest['VaR'] - df_latest['return']
             breached = df_latest[df_latest['return'] < df_latest['VaR']]
-            total_vn30 = len(available_vn30)
-            breached_count = len(breached)
-            breach_pct = (breached_count / total_vn30 * 100.0) if total_vn30 > 0 else 0.0
+            latest_contagion = df_contagion.iloc[-1] if not df_contagion.empty else {}
+            total_vn30 = int(latest_contagion.get('Valid_Names', len(available_vn30)))
+            breached_count = int(latest_contagion.get('Breached_Count', len(breached)))
+            breach_pct = float(latest_contagion.get('Contagion_Index', 0.0)) if total_vn30 > 0 else 0.0
             
             col_m1, col_m2, col_m3 = st.columns(3)
             with col_m1:
-                st.metric("Tổng số mã VN30", total_vn30)
+                st.metric("Số mã VN30 hợp lệ", total_vn30)
             with col_m2:
                 st.metric("Số mã thủng VaR", breached_count, delta=f"{breach_pct:.1f}%")
             with col_m3:
-                latest_stress = stress_index.iloc[-1] if not stress_index.empty else 0.0
-                st.metric("Stress Index", f"{latest_stress:.2f}%", delta="🔴 Vượt ngưỡng" if latest_stress > STRESS_THRESHOLD_VN30 * 100 else "🟢 An toàn")
+                latest_stress = breach_pct
+                st.metric("Stress Index", f"{latest_stress:.2f}%", delta="🔴 Vượt ngưỡng" if latest_stress >= STRESS_THRESHOLD_VN30 * 100 else "🟢 An toàn")
             
             if not breached.empty:
                 top3_breach = breached.sort_values(by='breach_margin', ascending=False).head(3)
@@ -202,10 +206,8 @@ def show():
             
             with st.spinner("Đang tính toán hệ số trượt động & rủi ro nền (Polars)..."):
                 df_metrics = engine.calculate_risk_metrics(df_mkt_pl, method='cornish_fisher')
-                df_complacency = engine.calculate_complacency_index(df_metrics)
-                df_comp_agg = df_complacency.group_by(date_col).agg(
-                    (pl.col("is_mispriced").sum() / len(available_tickers) * 100).alias("Complacency_Index")
-                ).sort(date_col)
+                df_complacency = engine.calculate_complacency_index(df_metrics, benchmark_ticker='VNINDEX')
+                df_comp_agg = engine.calculate_complacency_aggregate(df_complacency)
                 df_status = engine.get_latest_risk_status(df_complacency)
                 df_status_pd = df_status.to_pandas()
                 
@@ -233,7 +235,8 @@ def show():
             # Status Table
             df_status_pd['Spread (%)'] = (df_status_pd['Spread'] * 100).round(2)
             df_status_pd['Ngưỡng động (%)'] = (df_status_pd['dynamic_threshold'] * 100).round(2)
-            df_display = df_status_pd[['ticker', 'Spread (%)', 'Ngưỡng động (%)', 'Status']].set_index('ticker')
+            df_status_pd['Severity (%)'] = (df_status_pd['Severity'] * 100).round(2)
+            df_display = df_status_pd[['ticker', 'Spread (%)', 'Ngưỡng động (%)', 'Severity (%)', 'Status']].set_index('ticker')
             df_display.rename(columns={'Status': 'Tình trạng'}, inplace=True)
             
             def highlight_mispriced(row):
@@ -242,17 +245,18 @@ def show():
             st.dataframe(df_display.style.apply(highlight_mispriced, axis=1), use_container_width=True)
 
             # Lưu vào session_state để AI block sử dụng
-            st.session_state.vares_c_complacency = float(df_comp_agg.iloc[-1]['Complacency_Index'])
+            latest_comp_row = df_comp_agg.iloc[-1]
+            st.session_state.vares_c_complacency = float(latest_comp_row['Complacency_Index'])
+            st.session_state.vares_c_valid_market_count = int(latest_comp_row.get('Valid_Names', len(available_tickers)))
+            st.session_state.vares_c_mispriced_count = int(latest_comp_row.get('Mispriced_Count', 0))
             st.session_state.vares_c_status_pd = df_status_pd
             st.session_state.vares_c_datecol = date_col
 
         # ── AI Analysis: chỉ ở Module C, kèm dữ liệu Module B (VN30 Stress) ──
         from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
-        from datetime import date
         from openai import OpenAI
         
-        today_str = date.today().strftime('%d%m%y')
-        ai_cache_file = DATA_LAKE / "daily_cache" / f"va_res_{ai_provider}_{today_str}.txt"
+        ai_cache_file = DATA_LAKE / "daily_cache" / f"va_res_{ai_provider}_{data_date_token}.txt"
         
         has_c_data = "vares_c_complacency" in st.session_state
         
@@ -297,23 +301,26 @@ def show():
                                     df_latest_30 = df_metrics30.filter(pl.col(date_col) == latest_date_b).to_pandas()
                                     df_latest_30['breach_margin'] = df_latest_30['VaR'] - df_latest_30['return']
                                     breached_30 = df_latest_30[df_latest_30['return'] < df_latest_30['VaR']]
-                                    stress_index = df_contagion.to_pandas().iloc[-1]['Contagion_Index']
+                                    latest_contagion = df_contagion.to_pandas().iloc[-1]
+                                    stress_index = latest_contagion['Contagion_Index']
+                                    valid_vn30_count = int(latest_contagion.get('Valid_Names', len(available_vn30)))
 
                                     if not breached_30.empty:
                                         top_3_crash = breached_30.sort_values(by='breach_margin', ascending=False).head(3)
                                         top_3_crash_str = ", ".join([f"{row['ticker']} (margin {row['breach_margin']*100:.2f}%)" for _, row in top_3_crash.iterrows()])
-                                        breached_count = len(breached_30)
+                                        breached_count = int(latest_contagion.get('Breached_Count', len(breached_30)))
                                     else:
                                         top_3_crash_str = "Không có"
-                                        breached_count = 0
+                                        breached_count = int(latest_contagion.get('Breached_Count', 0))
 
                                     # ── Module C data từ session_state ──
                                     latest_complacency = st.session_state.vares_c_complacency
+                                    valid_market_count = st.session_state.get("vares_c_valid_market_count", len(df_status_pd))
+                                    mispriced_count = st.session_state.get("vares_c_mispriced_count", 0)
                                     mispriced_df = df_status_pd[df_status_pd['Status'] == 'Risk Mispriced']
                                     if not mispriced_df.empty:
-                                        top_3_mis = mispriced_df.sort_values(by='Spread (%)', ascending=True).head(3)
-                                        top_3_mis_str = ", ".join([f"{row['ticker']} (Spread {row['Spread (%)']:.2f}%)" for _, row in top_3_mis.iterrows()])
-                                        mispriced_count = len(mispriced_df)
+                                        top_3_mis = mispriced_df.sort_values(by='Severity (%)', ascending=False).head(3)
+                                        top_3_mis_str = ", ".join([f"{row['ticker']} (Severity {row['Severity (%)']:.2f}%)" for _, row in top_3_mis.iterrows()])
                                     else:
                                         top_3_mis_str = "Không có"
                                         mispriced_count = 0
@@ -334,6 +341,23 @@ def show():
                                     full_prompt = full_prompt.replace("[Complacency Index %]", f"{latest_complacency:.2f}%")
                                     full_prompt = full_prompt.replace("[Mispriced Count]", str(mispriced_count))
                                     full_prompt = full_prompt.replace("[Top 3 Mispriced]", top_3_mis_str)
+                                    vares_summary = summarize_vares_state(
+                                        stress_index,
+                                        latest_complacency,
+                                        breached_count,
+                                        valid_vn30_count,
+                                        mispriced_count,
+                                        valid_market_count,
+                                    )
+                                    full_prompt += (
+                                        "\n\n# V2 DIAGNOSTICS\n"
+                                        f"- Methodology: {METHOD_VERSION}\n"
+                                        f"- VaRES regime: {vares_summary['vares_regime']}\n"
+                                        f"- Stress level: {vares_summary['stress_level']} ({breached_count}/{valid_vn30_count} valid VN30 breached)\n"
+                                        f"- Complacency level: {vares_summary['complacency_level']} ({mispriced_count}/{valid_market_count} valid market names mispriced)\n"
+                                        f"- Return handling: prior-window VaR/ES, no look-ahead, no forward-fill, abs daily return > {engine.config.max_abs_return:.0%} treated as bad tick.\n"
+                                        "- Market proxy: VNINDEX if available; otherwise equal-weight normalized proxy.\n"
+                                    )
 
                                     parts = full_prompt.split("# INPUT DATA")
                                     system_prompt = parts[0].strip()
@@ -379,4 +403,3 @@ def show():
                             st.markdown(f.read())
                     except Exception as e:
                         st.error(f"Lỗi đọc file: {e}")
-

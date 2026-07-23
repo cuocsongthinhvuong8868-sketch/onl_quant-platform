@@ -1,0 +1,32 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Regime**
+- **1d:** `strong_risk_on`, **Strongly Confirmed**. P_conf 97%, P(mean > 0) 97%, mean +0.388.
+- **7d:** `strong_risk_on`, **Strongly Confirmed**. P_conf 100%, P(mean > 0) 100%, mean +0.600.
+- **30d:** `strong_risk_on`, **Strongly Confirmed**. P_conf 100%, P(mean > 0) 100%, mean +0.498.
+
+Lưu ý: P_conf là xác suất về **latent news-sentiment mean**, không phải xác suất VNINDEX tăng.
+
+**Kênh Kéo Chính**
+- Risk-on mạnh: `earnings` rất mạnh và ổn định; `credit_stress` tích cực mạnh; `monetary_policy`, `fx_external`, `banking_system`, `growth` đều hỗ trợ trên 7d/30d với P_conf cao.
+- Risk-off chính: `liquidity` âm nhất quán, đặc biệt do NHNN hút ròng OMO; `commodity` âm mạnh ở 30d; `inflation` âm nhưng độ chắc thấp hơn ở 7d, khá rõ hơn ở 30d; `risk_appetite` âm nhẹ.
+
+**Drivers Nổi Bật**
+Positive:
+- Lợi suất TPCP đi ngang phiên 22/07, kênh `credit_stress`, score +0.348.
+- Các headline tài khóa/tăng trưởng: quyết sách tăng trưởng, KCN/KKT Hưng Yên, Quảng Ninh mở dư địa tăng trưởng.
+- Dự án đường dây 500kV LNG Bạc Liêu - Thốt Nốt hơn 8.275 tỷ, kênh `banking_system`.
+- PBoC giữ LPR 1Y ở 3.00%, kênh `monetary_policy`.
+- Một số tín hiệu hàng hóa/FX tích cực trong 7d: PVC, đồng Trung Quốc, tỷ giá trung tâm.
+
+Negative:
+- NHNN hút ròng 13.102,1 tỷ qua OMO phiên 22/07, kênh `liquidity`, score -0.741.
+- Tỷ giá 20/07: trung tâm giảm 2, kênh `fx_external`, score -0.727.
+- Bạc Mỹ giảm xuống đáy 6 tháng.
+- Đường cát trắng Trung Quốc giảm xuống đáy một năm.
+- 30d có áp lực hàng hóa rõ: HRC, Ure, PVC, heo hơi giảm mạnh.
+
+**Tác Động Cho AI CIO**
+News sentiment layer hiện **supports macro layer** nếu macro layer đang risk-on hoặc trung lập. Nếu market-internal tools đang yếu/phan kỳ, feed này chỉ nên xem là **hỗ trợ mềm**, không đủ để override tín hiệu thị trường. Nếu market internals cũng risk-on, đây là xác nhận bổ sung khá mạnh.
+
+**Caveat**
+Feed generated lúc **2026-07-22 16:31 +07**, hiện đã có rủi ro stale nếu dùng cho quyết định sau thời điểm đó. Source có nhiều `mozyfin_social` rows: 1d 51, 7d 403, 30d 1007; đây là bằng chứng social/opinion confidence thấp hơn. Tuy không chi phối tuyệt đối nguồn tin, cần discount một phần tín hiệu và cảnh giác headline noise.

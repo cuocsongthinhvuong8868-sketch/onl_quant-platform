@@ -1,0 +1,78 @@
+<!-- ai-cio-cache-version: indicator_pr3y_pca_point_in_time_v1 -->
+## 1. Cross-Asset Snapshot
+
+**Academic:** Dữ liệu ngày **2026-07-22** cho thấy stress không đồng đều. Xếp theo percentile giảm dần: **Vol:** OVX 65.31, 92% **HIGH**; SKEW 150.2, 69% **ELEVATED**; VIX 17.05, 57% **ELEVATED**; VVIX 95.6, 50% **ELEVATED**; MOVE 76.3 bps, 23% **LOW**. **Credit:** CCC OAS 9.78%, 91% **HIGH**; IG OAS 0.78%, 16% **LOW**; HY OAS 2.69%, 8% **LOW**; EM OAS 1.44%, 4% **LOW**. **Macro:** 2s10s +0.36%, 55% **ELEVATED**; DXY 101.14, 46% **LOW**.
+
+Về mức tuyệt đối: OVX >50 xác nhận oil-vol shock; SKEW >145 hàm ý nhu cầu hedge tail-risk cao. Nhưng VIX 17 chưa phải equity panic, MOVE 76 thấp hơn ngưỡng rates stress 120, HY 2.69 thấp hơn ngưỡng cảnh báo 5%, IG 0.78 thấp hơn 1.5%, DXY 101 chưa phải USD extreme, và 2s10s dương nên không còn inverted.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Thị trường chưa “cháy nhà” trên diện rộng, nhưng có hai điểm nóng: **dầu biến động rất mạnh** và **nhóm doanh nghiệp vay nợ yếu nhất bị soi rủi ro vỡ nợ**. Cổ phiếu Mỹ và trái phiếu chính phủ chưa hoảng loạn, nhưng nhà đầu tư vẫn âm thầm mua bảo hiểm rủi ro đuôi qua SKEW.
+
+## 2. PCA Composite Interpretation
+
+**Academic:** PC1 stress factor EMA(5) ở **+0.25σ**, percentile 1Y **54%**, phù hợp regime **ELEVATED**, không phải STRESS vì chưa vượt vùng 80%. PC1 6-core đo breadth của stress qua VIX, MOVE, SKEW, HY, CCC, IG; hiện breadth hẹp vì chỉ CCC và SKEW nổi bật, trong khi HY, IG, MOVE thấp. Driver được gắn là **CCC_CREDIT_DRIVEN**, tức stress xuất phát từ deep junk thay vì equity vol hay rates vol. PC2 +0.33σ cho thấy divergence có ý nghĩa; không có loading nên không nên gán máy móc dấu PC2, nhưng cấu trúc dữ liệu cho thấy phân kỳ giữa **CCC rất căng** và **HY/IG/EM còn lành**.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Áp lực tài chính tổng thể đang ở mức “vàng”, chưa sang “đỏ”. Kẻ gây rối chính không phải chứng khoán Mỹ hay Fed, mà là nhóm công ty nợ xấu nhất. Nói đơn giản: phần yếu nhất của hệ thống tín dụng đang kêu trước, còn phần còn lại chưa kêu theo.
+
+## 3. Credit Cycle Read
+
+**Academic:** Credit Quality Spread **CCC − HY = 7.09%**, percentile 3Y max **100%**, là tín hiệu dispersion cực đoan. CCC OAS 91% và gần ngưỡng deep distress 10%, trong khi HY OAS chỉ 8% và IG OAS 16%. Điều này không phải broad credit repricing, mà là **credit deterioration confined to junk tier**. EM OAS 4% cho thấy thị trường nợ doanh nghiệp EM bằng USD chưa bị repricing trực tiếp; dòng vốn EM chưa bị stress credit diện rộng.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Các công ty khỏe vẫn vay được khá ổn, nhưng nhóm yếu nhất đang bị thị trường đòi lãi rất cao. Giống như ngân hàng chưa siết toàn bộ nền kinh tế, nhưng đã bắt đầu “khó tính” cực mạnh với người vay rủi ro nhất. Đây là tín hiệu muộn của chu kỳ tín dụng, đáng theo dõi vì nếu lan sang HY và IG thì stress sẽ chuyển từ cục bộ sang hệ thống.
+
+## 4. Volatility Breadth
+
+**Academic:** VIX 57% và SKEW 69% cho thấy equity risk không bùng nổ nhưng tail-risk premium đã cao. MOVE 23% phản ánh rates uncertainty thấp, tức Fed path/Treasury volatility chưa phải nguồn stress. VVIX 50% trung tính-cao, chưa báo derivatives stress rõ. Điểm lệch lớn là **OVX 92%**, không nằm trong PC1 6-core, nên PCA có thể đánh giá thấp một kênh rủi ro quan trọng: energy/geopolitical shock.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Nỗi sợ chưa lan đều khắp thị trường. Người ta chưa bán tháo cổ phiếu, cũng chưa hoảng về trái phiếu, nhưng đang rất lo giá dầu nhảy mạnh và vẫn mua bảo hiểm cho cú rơi bất ngờ. Đây giống kiểu bề mặt còn yên, nhưng bên dưới đã có vài dòng nước xoáy.
+
+## 5. Macro Overlay
+
+**Academic:** 2s10s ở **+0.36%**, percentile 55%, cho thấy đường cong lợi suất đã normal/re-steepened dương, không còn inverted. Điều này làm giảm tín hiệu recession trực tiếp từ inversion, nhưng sau một chu kỳ inverted dài, re-steepening vẫn cần được đọc thận trọng vì có thể đi cùng kỳ vọng giảm lãi suất khi tăng trưởng yếu đi. DXY 101.14, percentile 46%, dưới xa ngưỡng USD extreme 110; áp lực FX lên EM hiện **benign to moderate**, chưa phải headwind cứng từ USD.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Đèn suy thoái Mỹ không còn nhấp nháy mạnh như khi đường cong âm, nhưng cũng chưa thể kết luận mọi thứ đã an toàn. Đồng USD chưa quá mạnh, nên áp lực lên VND và dòng vốn ngoại chưa phải cú đấm lớn. Vấn đề hiện tại nằm ở dầu và nợ yếu hơn là USD.
+
+## 6. Momentum
+
+**Academic:** PC1 raw hôm nay +0.21σ, thấp hơn PC1 smoothed +0.25σ nhưng PC1 5-day change **+0.16σ** cho thấy stress đang **accelerate nhẹ**. Mức tăng chưa đủ để gọi là shock impulse, song các chỉ báo sớm lệch pha: OVX và CCC đã ở HIGH, SKEW elevated, trong khi HY/IG/MOVE chưa xác nhận. Đây là dạng early-warning có chọn lọc, không phải broad confirmation.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+Căng thẳng đang tăng lên, nhưng chưa tăng kiểu mất kiểm soát. Có vài “chuông báo cháy” kêu ở khu vực dầu và nợ xấu, còn các khu vực lớn khác chưa kêu. Vì vậy cần theo dõi xem lửa có lan sang HY, IG, VIX hay không.
+
+## 7. Spillover to VN-Index (4-8 tuần)
+
+**Academic:** Với regime **ELEVATED + CCC_CREDIT_DRIVEN**, tác động sang VN-Index trong 4-8 tuần nghiêng **negative nhưng chưa systemic**. Kênh chính là risk-premium toàn cầu: CCC stress làm nhà đầu tư giảm khẩu vị với tài sản rủi ro, nhất là EM equities. OVX 92% bổ sung headwind riêng cho Việt Nam vì sốc dầu có thể làm CPI nhập khẩu tăng, gây áp lực lên chính sách tiền tệ và biên lợi nhuận doanh nghiệp. DXY chưa cực đoan và EM OAS thấp giúp giảm rủi ro tháo chạy vốn diện rộng.
+
+**💡 Diễn giải bình dân (Layman's terms):**  
+VN-Index có thể gặp lực cản trung hạn từ ba gọng kìm: **nợ xấu Mỹ căng**, **giá dầu biến động mạnh**, và **nhà đầu tư toàn cầu bớt thích rủi ro**. Tuy nhiên, vì USD và EM credit chưa xấu, đây chưa phải kịch bản bán tháo kiểu khủng hoảng. Rủi ro chính là tâm lý phòng thủ tăng dần, dòng tiền ngoại chọn lọc hơn, và các nhóm nhạy với chi phí vốn/năng lượng chịu áp lực.
+
+## 8. KẾT LUẬN
+
+Regime hiện tại là **ELEVATED**, stress tăng nhẹ và bị dẫn dắt bởi **CCC credit**, với rủi ro dầu là overlay quan trọng. Trong 2-4 tuần tới, dòng tiền nhiều khả năng thiên về phòng thủ, chưa phải panic nhưng bất lợi cho risk assets nếu CCC, OVX hoặc VIX tiếp tục tăng.
+
+```json
+{
+  "tool": "global_financial_conditions",
+  "pc1_pct": 54,
+  "regime": "ELEVATED",
+  "driver": "CCC_CREDIT_DRIVEN",
+  "credit_cycle_signal": "deteriorating",
+  "vol_breadth": "divergent",
+  "macro_overlay": "benign",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: global_financial_conditions_methodology ===
+- CQS Percentile 3Y: 99.9
+- PC1 Regime Percentile 1Y: 53.6
+- Indicator Percentile Window: 756 sessions max, 252 sessions min
+- Z-Score Window: 252 sessions
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

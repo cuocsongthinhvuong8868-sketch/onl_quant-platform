@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- Ngày 22/07/2026: VN30 Stress Index = **40.00%**, đúng ngưỡng alert 40%.
+- Có **12/30** mã VN30 thủng VaR 95%, cho thấy stress đã lan rộng hơn mức nhiễu đơn lẻ.
+- Complacency Index = **3.74%**, với **4/107** mã bị mispriced; mức này là LOW, không phải cảnh báo nén rủi ro diện rộng.
+
+## 2. Contagion Assessment (Module B)
+Stress VN30 đang ở trạng thái **ACTIVE**: 12 mã thủng VaR 95% đồng thời là dấu hiệu rủi ro lây lan đang diễn ra real-time, không còn là biến động riêng của một cổ phiếu.
+
+Top 3 breach sâu nhất là **MWG, VIC, VHM**. Xác suất đây chỉ là sự cố cá biệt giảm xuống vì số lượng breach đã đạt 40% rổ VN30. Tôi nghiêng về kịch bản **đầu sóng systemic / contagion đang mở**, dù chưa đủ dữ kiện để kết luận crash toàn thị trường.
+
+## 3. Complacency Assessment (Module C)
+Complacency thấp **chỉ cho phép kết luận thị trường KHÔNG ở regime ngủ quên**. Điều này **KHÔNG đồng nghĩa thị trường ổn định**.
+
+Trong bối cảnh Stress Index đã kích hoạt ACTIVE, Complacency thấp phù hợp với trạng thái spread đã giãn ra do biến động hoặc bán tháo cục bộ/lan rộng. Vì vậy rủi ro chính lúc này không phải “rủi ro bị che giấu”, mà là **contagion đang hiện hình**.
+
+## 4. Stock-Level Risk Calls
+- **MWG**: giảm tỷ trọng, không bắt đáy khi chưa tái chiếm lại vùng kỹ thuật ngắn hạn; stop-risk nếu tiếp tục thủng MA20/MA50 trên D1.
+- **VIC**: ưu tiên cắt giảm overweight vì vừa nằm trong nhóm crash sâu vừa nằm trong nhóm mispriced.
+- **VHM**: hạ đòn bẩy, chỉ giữ phần core nếu khẩu vị rủi ro cho phép.
+
+Mispriced watch: **VIC, BMP, LPB** cần theo dõi vì spread bị nén tương đối, có thể phản ứng mạnh nếu stress lan sang nhóm này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 40.0,
+  "breach_count": 12,
+  "complacency_pct": 3.74,
+  "mispriced_count": 4,
+  "regime": "contagion_active",
+  "watchlist_short": ["MWG", "VIC", "VHM", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=CONTAGION_ACTIVE; stress=40.00% (12/30); complacency=3.74% (4/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null

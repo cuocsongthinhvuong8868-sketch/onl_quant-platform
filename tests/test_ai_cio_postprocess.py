@@ -471,12 +471,15 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
     master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
 
-    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v5_capitulation_gate"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v6_updated_tool_prompt_discipline"
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
     assert "mozyfin_social" in card["limits"]
     assert "source_counts" in card["authority"]
     assert "mozyfin_social" in master_prompt
     assert "lower-confidence social/opinion" in master_prompt
+    assert "UPDATED TOOL METHOD DISCIPLINE" in master_prompt
+    assert "Manipulation v2" in master_prompt
+    assert "PVGO Valuation" in master_prompt
 
 
 def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch):

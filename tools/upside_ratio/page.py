@@ -5,7 +5,12 @@ import streamlit as st
 from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.page_layout import render_signal_card, tone_for_signal
-from tools.upside_ratio.quant.metrics import build_breadth_series, compute_actual_breadth
+from tools.upside_ratio.quant.metrics import (
+    METHOD_VERSION,
+    build_breadth_series,
+    compute_actual_breadth,
+    summarize_breadth_state,
+)
 from tools.upside_ratio.quant.engine import DEFAULT_MC_SEED, run_hybrid_ensemble_mc
 from tools.upside_ratio.ui.sidebar import render_sidebar
 from tools.upside_ratio.ui.charts import render_history_chart, render_projection_tabs, render_diagnostics
@@ -68,6 +73,7 @@ def render():
         "lookback_days": params["lookback_days"],
         "sim_days": params["sim_days"],
         "mc_seed": DEFAULT_MC_SEED,
+        "methodology_version": METHOD_VERSION,
         "backtest_date": str(params["backtest_date"]) if params["backtest_date"] else None,
     }
 
@@ -131,6 +137,7 @@ def render():
 
     p5_up, p25_up, p50_up, p75_up, p95_up, phi_up, mu_up, _, _ = up_tuple
     p5_dn, p25_dn, p50_dn, p75_dn, p95_dn, phi_dn, mu_dn, _, _ = dn_tuple
+    breadth_summary = summarize_breadth_state(data)
 
     regime_up = (
         "📈 Momentum (Đà Mua)" if phi_up > 0.1
@@ -160,6 +167,32 @@ def render():
             caption=regime_dn,
         )
     d.metric("Long-run Mean Cung (μ)", f"{mu_dn*100:.1f}%")
+
+    stress_tone = (
+        "danger" if breadth_summary["breadth_stress_level"] in {"HIGH", "EXTREME"}
+        else "warning" if breadth_summary["breadth_stress_level"] == "ELEVATED"
+        else "positive"
+    )
+    e, f, g = st.columns(3)
+    with e:
+        render_signal_card(
+            "Breadth Regime",
+            breadth_summary["breadth_regime"],
+            tone=stress_tone,
+            caption=f"Stress level: {breadth_summary['breadth_stress_level']}",
+        )
+    f.metric(
+        "Breadth Stress Score",
+        f"{breadth_summary['breadth_stress_score']:.1f}/100",
+        f"Downside rank {breadth_summary['downside_rank']:.0%}",
+        delta_color="inverse",
+    )
+    g.metric(
+        "Net Sell Pressure",
+        f"{breadth_summary['net_pressure']:+.1f} pp",
+        f"MA5 {breadth_summary['ma5_net_pressure']:+.1f} pp",
+        delta_color="inverse",
+    )
 
     # Header lịch sử
     header_text = "1. Lịch sử Cung - Cầu & VN-Index"
@@ -266,6 +299,18 @@ def render():
                                                          .replace("{sim_days}", str(params['sim_days']-1))\
                                                          .replace("{p95_up}", f"{p95_up[-1]:.2f}")\
                                                          .replace("{p95_dn}", f"{p95_dn[-1]:.2f}")
+                            full_prompt += (
+                                "\n\n# V2 DIAGNOSTICS\n"
+                                f"- Methodology: {breadth_summary['methodology_version']}\n"
+                                f"- Breadth regime: {breadth_summary['breadth_regime']}\n"
+                                f"- Breadth stress score: {breadth_summary['breadth_stress_score']:.1f}/100 "
+                                f"({breadth_summary['breadth_stress_level']})\n"
+                                f"- Downside rank: {breadth_summary['downside_rank']:.2f}; "
+                                f"upside rank: {breadth_summary['upside_rank']:.2f}\n"
+                                f"- Net sell pressure: {breadth_summary['net_pressure']:+.1f}pp; "
+                                f"MA5: {breadth_summary['ma5_net_pressure']:+.1f}pp\n"
+                                "- Interpretation control: downside stress dominates; MC paths are stress scenarios, not allocation authority.\n"
+                            )
 
                             parts = full_prompt.split("# INPUT DATA")
                             system_prompt = parts[0].strip()

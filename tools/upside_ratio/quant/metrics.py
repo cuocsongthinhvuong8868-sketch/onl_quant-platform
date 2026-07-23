@@ -1,5 +1,7 @@
 import pandas as pd
 
+METHOD_VERSION = "upside_ratio_v2.0.0"
+
 
 def build_breadth_series(
     df_close: pd.DataFrame,
@@ -16,7 +18,7 @@ def build_breadth_series(
         Nếu có, dữ liệu train sẽ cắt đến ngày này; trả về thêm future_returns
         để vẽ overlay thực tế trong chế độ backtest.
     """
-    returns = df_close.pct_change() * 100.0
+    returns = df_close.pct_change(fill_method=None) * 100.0
     returns = returns.dropna(how="all")
     returns = returns.loc[returns.abs().sum(axis=1) > 0.001]
 
@@ -56,6 +58,77 @@ def build_breadth_series(
         result["target_date_pd"] = target_date_pd
 
     return result
+
+
+def summarize_breadth_state(data: dict[str, pd.Series]) -> dict[str, float | str]:
+    """Summarize latest upside/downside participation into auditable stress fields.
+
+    High score means downside participation dominates upside participation.
+    The function only uses the already cut training window, so it is safe for
+    as-of/backtest views.
+    """
+    raw_upside = data["raw_upside"].dropna()
+    raw_downside = data["raw_downside"].dropna()
+    ma5_upside = data["ma5_upside"].dropna()
+    ma5_downside = data["ma5_downside"].dropna()
+    if raw_upside.empty or raw_downside.empty or ma5_upside.empty or ma5_downside.empty:
+        raise ValueError("Không đủ dữ liệu breadth để tạo summary.")
+
+    upside_current = float(raw_upside.iloc[-1])
+    downside_current = float(raw_downside.iloc[-1])
+    upside_ma5 = float(ma5_upside.iloc[-1])
+    downside_ma5 = float(ma5_downside.iloc[-1])
+    upside_rank = float(raw_upside.rank(pct=True).iloc[-1])
+    downside_rank = float(raw_downside.rank(pct=True).iloc[-1])
+    net_pressure = downside_current - upside_current
+    ma5_net_pressure = downside_ma5 - upside_ma5
+
+    ma5_pressure_norm = max(0.0, min(ma5_net_pressure / 50.0, 1.0))
+    low_upside_norm = 1.0 - upside_rank
+    breadth_stress_score = max(
+        0.0,
+        min(
+            100.0,
+            55.0 * downside_rank + 30.0 * ma5_pressure_norm + 15.0 * low_upside_norm,
+        ),
+    )
+
+    if downside_current >= 50.0 or downside_ma5 >= 35.0:
+        regime = "CAPITULATION_BREADTH"
+    elif downside_rank >= 0.90 and net_pressure >= 15.0:
+        regime = "DOWNSIDE_STRESS"
+    elif ma5_net_pressure >= 15.0 and downside_ma5 >= 20.0:
+        regime = "PERSISTENT_SELL_PRESSURE"
+    elif upside_rank >= 0.90 and -net_pressure >= 15.0:
+        regime = "UPSIDE_EXPANSION"
+    elif downside_current > upside_current:
+        regime = "SELL_PRESSURE"
+    elif upside_current > downside_current:
+        regime = "BUY_PRESSURE"
+    else:
+        regime = "BALANCED"
+
+    if breadth_stress_score >= 80.0:
+        stress_level = "EXTREME"
+    elif breadth_stress_score >= 65.0:
+        stress_level = "HIGH"
+    elif breadth_stress_score >= 45.0:
+        stress_level = "ELEVATED"
+    else:
+        stress_level = "NORMAL"
+
+    return {
+        "methodology_version": METHOD_VERSION,
+        "upside_rank": upside_rank,
+        "downside_rank": downside_rank,
+        "upside_ma5": upside_ma5,
+        "downside_ma5": downside_ma5,
+        "net_pressure": net_pressure,
+        "ma5_net_pressure": ma5_net_pressure,
+        "breadth_stress_score": breadth_stress_score,
+        "breadth_stress_level": stress_level,
+        "breadth_regime": regime,
+    }
 
 
 def compute_actual_breadth(future_returns, target_date_pd, sim_days, user_X, user_Y):

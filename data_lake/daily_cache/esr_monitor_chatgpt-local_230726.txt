@@ -1,0 +1,37 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: **63.3%**, thuộc vùng **WARNING**.
+- Market State: **CALM CORRECTION**; VN30 nằm dưới **MA125**.
+- Top driver #1: **S_LIQ 35%**.
+- Top driver #2: **S_VAL 31%**; #3: **S_COR 18%**.
+
+## 2. Risk Decomposition (Bóc tách)
+Rủi ro đang dẫn bởi **S_LIQ**, tức **volume khô cạn vs 1Y norm**. Đây không phải tín hiệu bán tháo mạnh, mà là trạng thái thanh khoản suy giảm trong pha giảm: lực đỡ mỏng, khả năng hấp thụ cung yếu hơn, và nhịp hồi dễ thiếu độ tin cậy.
+
+**S_VAL** đứng thứ hai cho thấy căng định giá vẫn còn đáng kể so với nền lãi suất tiền gửi. Khi định giá còn căng trong khi chỉ số đã dưới MA125, thị trường không có nhiều “biên an toàn” nếu dòng tiền tiếp tục rút.
+
+**S_COR** ở vị trí thứ ba, với EVR PC1 **38.1%**, cho thấy mức đồng pha hệ thống chưa bùng nổ nhưng đã đủ để theo dõi. Tổ hợp **S_LIQ + S_COR** nghiêng về rủi ro hồi kỹ thuật dễ thất bại: không phải panic, nhưng nền thanh khoản yếu làm xác suất bull-trap tăng nếu giá bật lên mà breadth/volume không cải thiện.
+
+## 3. Cross-Check
+VN30 dưới MA125, nên price action đang khớp với trạng thái **CALM CORRECTION** hơn là phân kỳ tăng giá. Không có dữ liệu “đỉnh mới” trong input, nên chưa gắn nhãn bull-trap theo điều kiện giá đỉnh mới + SSI WARNING/CRITICAL.
+
+HMM **CALM CORRECTION** khớp tương đối với SSI **WARNING**: stress chưa vượt CRITICAL, nhưng không còn SAFE. Dữ liệu thị trường lịch sử có thể đối soát qua SSI DailyIndex API. [Nguồn](https://guide.ssi.com.vn/ssi-products/fastconnect-data/api-specs)
+
+## 4. Verdict
+Cash target: **45% danh mục**.
+
+Hedge action: **reduce_beta**. Chưa ưu tiên short VN30F1M toàn phần vì regime chưa vào ACTIVE_STRESS và driver chính là dry-up, không phải selling pressure/panic. Có thể dùng hedge nhẹ nếu danh mục beta cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.3,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

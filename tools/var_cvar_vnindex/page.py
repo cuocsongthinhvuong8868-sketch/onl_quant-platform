@@ -1,9 +1,8 @@
 import streamlit as st
 import pandas as pd
 import os
-from datetime import date
 from shared.data_loader import load_custom
-from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
+from tools.var_cvar_vnindex.quant.metrics import METHOD_VERSION, calculate_var_cvar_metrics, summarize_var_cvar_state
 from tools.var_cvar_vnindex.quant.evt import evt_posterior_intervals, evt_threshold_sensitivity
 from tools.var_cvar_vnindex.ui.sidebar import render_sidebar
 from tools.var_cvar_vnindex.ui.charts import plot_var_cvar, plot_evt_tail_risk
@@ -63,6 +62,9 @@ def show():
         df_vni = load_custom("vnindex_cache.csv")
         idx_col = "VNINDEX" if "VNINDEX" in df_vni.columns else df_vni.columns[0]
         vni_series = df_vni[idx_col]
+        data_date_raw = vni_series.dropna().index.max()
+        data_date_token = data_date_raw.strftime("%d%m%y") if hasattr(data_date_raw, "strftime") else pd.Timestamp.today().strftime("%d%m%y")
+        st.caption(f"Method: {METHOD_VERSION} · Data date: {data_date_raw} · VaR/ES dùng prior-window returns")
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
@@ -73,10 +75,10 @@ def show():
             df_metrics = calculate_var_cvar_metrics(vni_series)
             st.session_state.var_cvar_metrics = df_metrics
             st.session_state.var_cvar_evt_sensitivity = evt_threshold_sensitivity(
-                df_metrics["return"]
+                df_metrics["return_for_risk_model"]
             )
             st.session_state.var_cvar_evt_intervals = evt_posterior_intervals(
-                df_metrics["return"]
+                df_metrics["return_for_risk_model"]
             )
 
     # ── Hiển thị ──
@@ -105,7 +107,7 @@ def show():
                     )
                     sensitivity = st.session_state.get("var_cvar_evt_sensitivity")
                     if sensitivity is None:
-                        sensitivity = evt_threshold_sensitivity(df_metrics["return"])
+                        sensitivity = evt_threshold_sensitivity(df_metrics["return_for_risk_model"])
                         st.session_state.var_cvar_evt_sensitivity = sensitivity
 
                     with st.expander("🧪 EVT threshold sensitivity", expanded=True):
@@ -160,7 +162,7 @@ def show():
                             )
                     intervals = st.session_state.get("var_cvar_evt_intervals")
                     if intervals is None:
-                        intervals = evt_posterior_intervals(df_metrics["return"])
+                        intervals = evt_posterior_intervals(df_metrics["return_for_risk_model"])
                         st.session_state.var_cvar_evt_intervals = intervals
                     with st.expander("EVT MCMC posterior interval", expanded=False):
                         if intervals.get("status") != "ok":
@@ -203,6 +205,13 @@ def show():
         # Metrics T0
         latest = df_metrics.dropna(subset=["historical_var"]).iloc[-1]
         latest_date = df_metrics.dropna(subset=["historical_var"]).index[-1]
+        sensitivity_for_summary = st.session_state.get("var_cvar_evt_sensitivity")
+        intervals_for_summary = st.session_state.get("var_cvar_evt_intervals")
+        tail_summary = summarize_var_cvar_state(
+            latest,
+            sensitivity=sensitivity_for_summary,
+            intervals=intervals_for_summary,
+        )
 
         st.markdown("### 📈 Snapshot T0")
         col1, col2, col3, col4 = st.columns(4)
@@ -221,9 +230,24 @@ def show():
         with col5:
             st.metric("Expected Shortfall 95%", f"{latest['expected_shortfall']*100:.2f}%")
         with col6:
-            es_exceed = latest['expected_shortfall'] - latest['historical_var']
+            es_exceed = latest['es_var_spread']
             st.metric("ES - VaR Spread", f"{es_exceed*100:.2f}%",
                       delta="Tail risk" if es_exceed < 0 else "")
+
+        col7, col8, col9, col10 = st.columns(4)
+        with col7:
+            st.metric("Return T0", f"{latest['return']*100:.2f}%")
+        with col8:
+            st.metric(
+                "VaR Breach 95%",
+                "YES" if bool(latest["var_breach_95"]) else "NO",
+                delta=f"{latest['breach_margin_95']*100:.2f}pp" if bool(latest["var_breach_95"]) else None,
+            )
+        with col9:
+            st.metric("Tail Regime", tail_summary["tail_regime"])
+        with col10:
+            gap = latest.get("evt_gaussian_var99_gap", pd.NA)
+            st.metric("EVT - Gaussian VaR99", f"{gap*100:.2f}pp" if pd.notna(gap) else "N/A")
 
         # ── EVT metrics (nếu có) ──
         has_evt = 'evt_var_99' in df_metrics.columns and pd.notna(latest.get('evt_var_99'))
@@ -290,8 +314,7 @@ def show():
         from config import DATA_LAKE, AI_TEMPERATURE, ROOT_DIR
         from openai import OpenAI
 
-        today_str = date.today().strftime('%d%m%y')
-        ai_cache_file = DATA_LAKE / "daily_cache" / f"var_cvar_vnindex_{ai_provider}_{today_str}.txt"
+        ai_cache_file = DATA_LAKE / "daily_cache" / f"var_cvar_vnindex_{ai_provider}_{data_date_token}.txt"
 
         tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
         with tab_current:
@@ -386,6 +409,16 @@ def show():
                                     "[EVT ES99 P05]", "[EVT ES99 P50]", "[EVT ES99 P95]",
                                 ]:
                                     full_prompt = full_prompt.replace(placeholder, "N/A")
+                                full_prompt += (
+                                    "\n\n# V3 DIAGNOSTICS\n"
+                                    f"- Methodology: {METHOD_VERSION}\n"
+                                    f"- Tail regime: {tail_summary['tail_regime']} ({tail_summary['tail_risk_level']})\n"
+                                    f"- Current log return: {latest['return']*100:.2f}%\n"
+                                    f"- VaR breach 95%: {int(bool(latest['var_breach_95']))}; breach margin: {latest['breach_margin_95']*100:.2f}pp\n"
+                                    f"- Gaussian VaR99: {latest['gaussian_var_99']*100:.2f}%; EVT VaR99 gap: {latest.get('evt_gaussian_var99_gap', 0.0)*100:.2f}pp\n"
+                                    f"- EVT threshold stable: {int(tail_summary['evt_threshold_stable'])}; xi range: {tail_summary['evt_sensitivity_xi_range']:.3f}\n"
+                                    "- Method control: same-date VaR/ES uses prior-window returns only; no forward-fill; bad ticks abs(simple return)>50% removed.\n"
+                                )
 
                                 parts = full_prompt.split("# INPUT DATA")
                                 system_prompt = parts[0].strip()
@@ -432,4 +465,3 @@ def show():
                             st.markdown(f.read())
                     except Exception as e:
                         st.error(f"Lỗi đọc file: {e}")
-

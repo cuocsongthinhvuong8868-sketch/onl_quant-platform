@@ -1,0 +1,41 @@
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần 2026-07-15 là **$5,986.7B**, tăng **+$28.5B** tuần qua. Vì input không có delta riêng của WALCL/TGA/RRP, không thể gán tuyệt đối nguồn tăng cho từng cấu phần. Tuy nhiên cơ chế biên khá rõ: **RRP chỉ còn $0.151B**, tức gần zero, nên không còn là nguồn bơm/hút đáng kể. Do đó impulse dương nhiều khả năng đến từ **TGA giảm/xả ròng** hoặc **WALCL tăng nhẹ**, hoặc kết hợp cả hai. TGA ở **$756.2B** vẫn là một “stock drain” lớn.
+
+## 2. Cycle Positioning
+
+Regime rộng vẫn là **QT/neutral**, không phải QE thuần túy. WALCL ở **$6.743T** thấp hơn rõ so với vùng đỉnh 2022 của Fed balance sheet, nên chưa thể gọi là QE mới. Nhưng Net Liquidity đang được đỡ bởi việc RRP đã cạn. RRP **đã dưới $100B rất xa**, nghĩa là tailwind từ RRP drawdown gần như đã hết. TGA ở $756B cho thấy Treasury vẫn giữ lượng tiền mặt cao; ở biên, nếu TGA xả thì bơm lại liquidity, nếu tái tích lũy thì hút.
+
+So với đỉnh thanh khoản 2022, mức **$5.99T** vẫn thấp hơn. So với đáy 2024, mức hiện tại đã hồi phục, nhưng chưa phải pha liquidity boom.
+
+## 3. Signal Strength
+
+Signal hiện tại là **HOLD**. Điều này hợp lý: **Impulse EMA(4) = +$39.1B** là dương, cho thấy dòng thanh khoản ngắn hạn đang cải thiện, nhưng **Z-score = +0.51** chưa đạt ngưỡng **+1σ** để kích hoạt ADD. Đây là vùng trung tính, không phải cận biên mạnh 1.0-1.5σ và càng không phải extreme >2σ. EMA khớp với bias “constructive but insufficient”: có bơm ròng, nhưng chưa đủ mạnh để xác nhận risk-on regime.
+
+## 4. Cross-Asset Spillover
+
+**SPX/NDX:** bias 1-4 tuần là **trung tính đến hơi tích cực**, nhất là với duration/growth beta, nhưng thiếu xác nhận mạnh từ Z-score.
+
+**DXY/Gold/Crypto:** liquidity impulse dương thường làm dịu áp lực USD; vì vậy DXY có bias bớt căng. Gold hưởng lợi nếu USD/real yields mềm, còn crypto có bias tích cực hơn equities do beta liquidity cao, nhưng tín hiệu chỉ ở mức vừa.
+
+**VN-Index:** với lag 4-8 tuần, spillover là **neutral-positive**. Kênh truyền dẫn đi qua DXY, EM FX, foreign flows và khẩu vị rủi ro EM. Độ tin cậy vừa phải vì correlation lịch sử chỉ khoảng 0.25-0.35.
+
+## 5. Risk Factors
+
+RRP đã gần zero nên các tín hiệu CUT/ADD sau này sẽ nhạy hơn với WALCL và TGA; RRP không còn bộ đệm lớn. TGA có thể nhiễu quanh mùa thuế **April/June/Sep/Dec**, đặc biệt sau June. Fed buyback, facility đặc biệt hoặc stress funding cũng có thể làm tín hiệu headline sai lệch.
+
+## 6. KẾT LUẬN
+
+Regime hiện tại là **QT-neutral với impulse cải thiện**, chưa phải liquidity boom. Outlook 2-4 tuần cho risk assets: **hơi thuận lợi nhưng chưa đủ mạnh để gọi risk-on quyết liệt**.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5986.659,
+  "signal": "HOLD",
+  "z_score": 0.51,
+  "regime": "neutral",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

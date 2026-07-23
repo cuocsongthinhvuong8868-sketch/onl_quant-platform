@@ -20,6 +20,7 @@ import requests
 from config import DATA_LAKE
 from tools.pvgo.freshness import (
     DEFAULT_MARKET_DATA_PATH,
+    DEFAULT_MAX_SESSION_LAG,
     evaluate_pvgo_freshness,
     load_market_dates,
 )
@@ -227,7 +228,7 @@ class Money24hVNIndexValuationScraper:
         output_dir: Path = DEFAULT_OUTPUT_DIR,
         dry_run: bool = False,
         market_data_path: Path = DEFAULT_MARKET_DATA_PATH,
-        max_session_lag: int = 1,
+        max_session_lag: int = DEFAULT_MAX_SESSION_LAG,
     ) -> dict[str, Any]:
         started = time.time()
         frame = self.scrape()
@@ -316,7 +317,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--range-type", default=DEFAULT_RANGE_TYPE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--market-data-path", type=Path, default=DEFAULT_MARKET_DATA_PATH)
-    parser.add_argument("--max-session-lag", type=int, default=1)
+    parser.add_argument("--max-session-lag", type=int, default=DEFAULT_MAX_SESSION_LAG)
     parser.add_argument(
         "--allow-stale",
         action="store_true",

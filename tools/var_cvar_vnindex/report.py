@@ -1,5 +1,9 @@
 import pandas as pd
-from tools.var_cvar_vnindex.quant.metrics import calculate_var_cvar_metrics
+from tools.var_cvar_vnindex.quant.metrics import (
+    METHOD_VERSION,
+    calculate_var_cvar_metrics,
+    summarize_var_cvar_state,
+)
 from tools.var_cvar_vnindex.quant.evt import evt_posterior_intervals, evt_threshold_sensitivity
 
 
@@ -7,12 +11,23 @@ def _empty_snapshot(err: str = "") -> dict:
     """Khung dữ liệu fallback — đảm bảo prompt template không vỡ vì key thiếu."""
     return {
         "date": "",
+        "snapshot_date": "",
+        "methodology_version": METHOD_VERSION,
         "vnindex_price": 0.0,
+        "current_return": 0.0,
+        "simple_return": 0.0,
+        "bad_return_flag": False,
         "stdev_30": 0.0,
         "parametric_var": 0.0,
+        "gaussian_var_99": 0.0,
         "historical_var": 0.0,
         "expected_shortfall": 0.0,
         "es_var_spread": 0.0,
+        "var_breach_95": False,
+        "breach_margin_95": 0.0,
+        "tail_regime": "UNAVAILABLE",
+        "tail_risk_level": "UNAVAILABLE",
+        "evt_gaussian_var99_gap": 0.0,
         # EVT fields
         "evt_var_95": 0.0, "evt_var_99": 0.0, "evt_var_995": 0.0,
         "evt_es_95": 0.0, "evt_es_99": 0.0, "evt_es_995": 0.0,
@@ -78,12 +93,20 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
     snap = _empty_snapshot()
     snap.update({
         "date": latest_date.strftime('%d/%m/%Y'),
+        "snapshot_date": latest_date.strftime('%Y-%m-%d'),
+        "methodology_version": METHOD_VERSION,
         "vnindex_price": float(latest['price']),
+        "current_return": float(latest['return']),
+        "simple_return": float(latest['simple_return']),
+        "bad_return_flag": bool(latest.get('bad_return_flag', False)),
         "stdev_30": float(latest['stdev_30']),
         "parametric_var": float(latest['parametric_var']),
+        "gaussian_var_99": float(latest['gaussian_var_99']),
         "historical_var": float(latest['historical_var']),
         "expected_shortfall": float(latest['expected_shortfall']),
-        "es_var_spread": float(latest['expected_shortfall'] - latest['historical_var']),
+        "es_var_spread": float(latest['es_var_spread']),
+        "var_breach_95": bool(latest['var_breach_95']),
+        "breach_margin_95": float(latest['breach_margin_95']),
         "status": "ok",
         "error": "",
     })
@@ -102,9 +125,10 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
             "evt_threshold": float(latest['evt_threshold']),
             "evt_n_exceed": int(latest['evt_n_exceed']),
             "hill_index": float(latest['hill_index']),
+            "evt_gaussian_var99_gap": float(latest.get('evt_gaussian_var99_gap', 0.0)),
             "evt_available": True,
         })
-        sensitivity = evt_threshold_sensitivity(df_metrics["return"])
+        sensitivity = evt_threshold_sensitivity(df_metrics["return_for_risk_model"])
         valid = sensitivity[sensitivity["status"] == "ok"]
         if not valid.empty:
             xi_min = float(valid["xi"].min())
@@ -132,7 +156,7 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
                 "evt_sensitivity_status": "stable" if stable else "threshold_sensitive",
             })
 
-        intervals = evt_posterior_intervals(df_metrics["return"])
+        intervals = evt_posterior_intervals(df_metrics["return_for_risk_model"])
         if intervals.get("status") == "ok":
             xi_interval = intervals.get("xi", {})
             beta_interval = intervals.get("beta", {})
@@ -156,5 +180,11 @@ def snapshot(df_close: pd.DataFrame, load_custom=None) -> dict:
                 "evt_es99_p50": float(es99_interval.get("p50", 0.0)),
                 "evt_es99_p95": float(es99_interval.get("p95", 0.0)),
             })
+
+        summary = summarize_var_cvar_state(latest, sensitivity=sensitivity, intervals=intervals)
+        snap.update({
+            "tail_regime": summary["tail_regime"],
+            "tail_risk_level": summary["tail_risk_level"],
+        })
 
     return snap

@@ -35,16 +35,19 @@ TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
 AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
 AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
-    "feargreed": "pca_point_in_time_v1",
+    "feargreed": "fear_greed_v2_prompt_shock_overlay",
     "global_financial_conditions": "indicator_pr3y_pca_point_in_time_v1",
     "credit_spread": "primary_issuance_equal_weight_v1",
     "vnibor": "structured_20d_trend_v1",
     "vn100_earnings_health": "structured_yoy_v1",
     "esr_monitor": "production_downside_ema20_v1",
-    "upside_ratio": "deterministic_mc_seed_v1",
-    "var_cvar_vnindex": "evt_threshold_sensitivity_mcmc_interval_v2",
+    "manipulation": "manipulation_v2_vnindex_prompt_guardrail",
+    "dispersion": "dispersion_v2_broad_stress_prompt",
+    "va_res": "vares_v2_prior_window_prompt",
+    "upside_ratio": "upside_ratio_v2_stress_prompt",
+    "var_cvar_vnindex": "var_cvar_vnindex_v3_prior_window_prompt",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
-    "executive_summary": "ai_cio_methodology_v5_capitulation_gate",
+    "executive_summary": "ai_cio_methodology_v6_updated_tool_prompt_discipline",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -122,18 +125,18 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "manipulation": {
         "domain": "index_coupling_and_concentration",
         "horizon": "days_to_weeks",
-        "primary_metric": "vingroup_slope_percentile",
+        "primary_metric": "vingroup_to_vnindex_slope_percentile",
         "score_direction": "Higher coupling/concentration stress is worse.",
-        "limits": "Mostly idiosyncratic/system-structure risk; do not overrule broad systemic tools alone.",
+        "limits": "Measures cash-index coupling, not a direct VN30F1M/futures trade signal; do not overrule broad systemic tools alone.",
         "authority": "Use as concentration risk overlay unless adapter provides a hard score.",
     },
     "dispersion": {
         "domain": "market_structure_and_participation_quality",
         "horizon": "days_to_weeks",
-        "primary_metric": "dispersion_pressure_index",
-        "score_direction": "Health depends on whether dispersion confirms or undermines index moves.",
-        "limits": "Low dispersion can mean idle/compressed risk, not automatically bullish.",
-        "authority": "Use as soft market-internal evidence unless adapter provides a hard score.",
+        "primary_metric": "dispersion_pressure_index_with_broad_stress_overlay",
+        "score_direction": "Health depends on whether dispersion is idiosyncratic or broad selloff stress.",
+        "limits": "Low spread can still be dangerous when CSAD/CSSD and downside participation are extreme.",
+        "authority": "Use as diagnostic market-internal evidence; confirm broad stress with breadth, ESR, VaRES, and Fear & Greed.",
     },
     "upside_ratio": {
         "domain": "upside_participation",
@@ -170,18 +173,18 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "va_res": {
         "domain": "contagion_and_complacency",
         "horizon": "days_to_weeks",
-        "primary_metric": "contagion_complacency_modules",
+        "primary_metric": "prior_window_var_es_contagion_and_complacency",
         "score_direction": "Higher contagion/complacency stress is worse.",
-        "limits": "Use for tail-risk color and avoid list; not a standalone composite score.",
-        "authority": "Use as tail-risk evidence; adapter wins if present.",
+        "limits": "Complacency low does not mean market safe; use stress index for active selloff and valid-name denominators for breadth.",
+        "authority": "Use as tail-risk evidence; v2 regime and valid denominators are authoritative when present.",
     },
     "var_cvar_vnindex": {
         "domain": "left_tail_risk",
         "horizon": "days_to_weeks",
-        "primary_metric": "evt_xi_mle_with_threshold_sensitivity_and_mcmc_interval",
+        "primary_metric": "prior_window_var_es_evt_xi_threshold_sensitivity",
         "score_direction": "Higher EVT xi is worse.",
-        "limits": "EVT threshold sensitivity and MCMC posterior intervals are robustness/confidence diagnostics, not second bearish votes. A single high xi only becomes a hard cap when elevated/fat-tail classification is robust across thresholds.",
-        "authority": "Adapter score/regime/bias are authoritative.",
+        "limits": "VaR/ES uses prior-window returns; EVT threshold sensitivity and MCMC intervals are robustness/confidence diagnostics, not second bearish votes.",
+        "authority": "Use tail_regime and robust-threshold fields when present; hard cap only when xi is robust across thresholds.",
     },
     "sentiment_factor_news": {
         "domain": "news_sentiment",
@@ -204,7 +207,7 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
         "horizon": "medium_term",
         "primary_metric": "pvgo_pct",
         "score_direction": "Higher PVGO means more embedded growth expectation risk.",
-        "limits": "Not a crash timing signal; amplifies risk when breadth/liquidity/tail risk are weak.",
+        "limits": "Not a crash timing signal; stale valuation feed is DATA INSUFFICIENT and cannot raise confidence.",
         "authority": "Adapter score/regime/bias are authoritative; do not relabel from raw PVGO pct.",
     },
     "abm_simulator": {
@@ -472,12 +475,23 @@ from shared.data_loader import load_close_prices, load_custom, load_volumes
 # Import logic Fear Greed
 from tools.fear_greed.quant.metrics import calculate_quant_metrics
 from tools.fear_greed.quant.scoring import METHOD_VERSION as FEAR_GREED_METHOD_VERSION, calculate_risk_score
-from tools.upside_ratio.quant.metrics import build_breadth_series
+from tools.upside_ratio.quant.metrics import build_breadth_series, summarize_breadth_state
 from tools.upside_ratio.quant.engine import DEFAULT_MC_SEED, run_hybrid_ensemble_mc
 # Import logic Manipulation
-from tools.manipulation.quant.engine import prepare_data as prep_mani, compute_metrics as comp_mani, classify_regime
+from tools.manipulation.quant.engine import (
+    METHOD_VERSION as MANIPULATION_METHOD_VERSION,
+    TARGET as MANIPULATION_TARGET,
+    prepare_data as prep_mani,
+    compute_metrics as comp_mani,
+    classify_regime,
+)
 # Import logic Dispersion
-from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
+from tools.dispersion.quant.metrics import (
+    calculate_dispersion_metrics,
+    determine_macro_regime,
+    fit_rolling_correlation,
+    summarize_dispersion_state,
+)
 # Import logic Upside Ratio
 
 # Import logic Bank Valuation
@@ -2872,7 +2886,16 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
                                  .replace("{skewness}", f"{latest['Skewness']:.2f}")\
                                  .replace("{down_corr}", f"{latest['Down_Corr_Norm']*100:.1f}")\
                                  .replace("{up_corr}", f"{latest['Up_Corr_Norm']*100:.1f}")
-                                 
+    full_prompt += (
+        "\n\n# V2 DIAGNOSTICS\n"
+        f"- Methodology: {latest.get('Methodology_Version', FEAR_GREED_METHOD_VERSION)}\n"
+        f"- CSV Rank: {latest.get('CSV_Norm', float('nan')):.2f}\n"
+        f"- Acute Shock: {latest.get('Acute_Shock', float('nan')):.2f}\n"
+        f"- Shock Regime Flag: {shock_flag}\n"
+        f"- Signal Confidence: {latest.get('Signal_Confidence', float('nan')):.2f}\n"
+        "- Interpretation control: if shock flag is not NONE, do not treat neutral band as ordinary neutral; cap risk-on interpretation.\n"
+    )
+                                  
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
@@ -2901,7 +2924,9 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     cached = _read_cache("manipulation", provider_key)
     if cached: return cached
 
-    df_prices = prep_mani(df_stocks)
+    df_idx = load_custom("vnindex_cache.csv")
+    idx_col = MANIPULATION_TARGET if MANIPULATION_TARGET in df_idx.columns else df_idx.columns[0]
+    df_prices = prep_mani(df_stocks, target_series=df_idx[idx_col])
     weights_df, result_df = comp_mani(df_prices, window=60)
     # Rolling 60-session event-study anchor — mirror UI default in tools/manipulation/page.py:71
     t0_dt = pd.Timestamp(result_df.index[-60] if len(result_df) >= 60 else result_df.index[0])
@@ -2927,26 +2952,26 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
 
     momentum_str = f"ΔCorr = {d_corr:.2f}, ΔSlope = {d_slope:.2f}"
 
-    # ── Inject giá real-time VIC/VHM/VRE + VN30F1M để chống AI hallucinate
+    # ── Inject giá real-time VIC/VHM/VRE + VNINDEX để chống AI hallucinate
     # mức giá cũ (vd. "VIC mất 45,000" trong khi VIC hiện ~200k). df_prices từ
-    # prep_mani() có sẵn 4 cột [VIC, VHM, VRE, VN30F1M].
+    # prep_mani() có sẵn 4 cột [VIC, VHM, VRE, VNINDEX].
     # Cổ phiếu: market_data.csv lưu theo nghìn VND → *1000 ra VND đầy đủ.
-    # F1M: là futures index, đơn vị "điểm" (~VN30 index level) — KHÔNG nhân 1000.
+    # VNINDEX: đơn vị "điểm" — KHÔNG nhân 1000.
     def _fmt_stock_price(value: float) -> str:
         if pd.isna(value) or value <= 0:
             return "N/A"
         return f"{value:.2f} (≈ {int(value * 1000):,} VND)"
 
-    def _fmt_futures_index(value: float) -> str:
+    def _fmt_index_value(value: float) -> str:
         if pd.isna(value) or value <= 0:
             return "N/A"
-        return f"{value:,.2f} điểm (VN30 index level)"
+        return f"{value:,.2f} điểm"
 
     last_prices = df_prices.iloc[-1]
     vic_close = _fmt_stock_price(last_prices.get("VIC", float("nan")))
     vhm_close = _fmt_stock_price(last_prices.get("VHM", float("nan")))
     vre_close = _fmt_stock_price(last_prices.get("VRE", float("nan")))
-    f1m_close = _fmt_futures_index(last_prices.get("VN30F1M", float("nan")))
+    vnindex_close = _fmt_index_value(last_prices.get(MANIPULATION_TARGET, float("nan")))
 
     with open(str(ROOT_DIR / "promt" / "manipulation promt.md"), "r", encoding="utf-8") as f:
         prompt_template = f.read()
@@ -2964,13 +2989,26 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
                                  .replace("{vic_close}", vic_close)\
                                  .replace("{vhm_close}", vhm_close)\
                                  .replace("{vre_close}", vre_close)\
-                                 .replace("{f1m_close}", f1m_close)
+                                 .replace("{vnindex_close}", vnindex_close)
+    full_prompt += (
+        "\n\n# V2 DIAGNOSTICS\n"
+        f"- Methodology: {MANIPULATION_METHOD_VERSION}\n"
+        f"- Target: {MANIPULATION_TARGET}, not VN30F1M.\n"
+        "- Interpretation: slope/correlation measure VIN composite coupling with cash VNINDEX, not futures trading signal.\n"
+        "- Return handling: pct_change(fill_method=None), log1p returns, rows require VIC/VHM/VRE/VNINDEX all valid.\n"
+    )
 
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res += (
+        "\n\n---\n"
+        f"manipulation_methodology: {MANIPULATION_METHOD_VERSION}; "
+        f"target={MANIPULATION_TARGET}; not_futures=true; "
+        f"slope={float(slope_val):.3f}; corr={float(corr_val):.3f}; regime={regime}"
+    )
     _write_cache("manipulation", res, provider_key)
     return res
 
@@ -2985,7 +3023,9 @@ def run_dispersion(client, df_stocks, provider_key: str = "kimi-2.6", model: str
     stock_returns, metrics = calculate_dispersion_metrics(df_stocks, index_series, zscore_type="Rolling", zscore_window=60, dpi_window=60)
     corr = fit_rolling_correlation(stock_returns, window=30, refit_every=5)
     metrics["Ledoit_Correlation"] = corr
+    metrics["Macro_Regime"] = determine_macro_regime(metrics)
     metrics = metrics.dropna(subset=["DPI", "Ledoit_Correlation"])
+    dispersion_summary = summarize_dispersion_state(metrics)
     
     latest = metrics.iloc[-1]
     date_str = metrics.index.max().strftime('%d/%m/%Y')
@@ -3010,12 +3050,36 @@ def run_dispersion(client, df_stocks, provider_key: str = "kimi-2.6", model: str
                                  .replace("{corr_val}", f"{corr_val:.3f}")\
                                  .replace("{cs_skew}", cs_skew)\
                                  .replace("{cs_kurt}", cs_kurt)
+    full_prompt += (
+        "\n\n# V2 DIAGNOSTICS\n"
+        f"- Macro regime: {dispersion_summary['macro_regime']}\n"
+        f"- Broad stress score: {dispersion_summary['broad_stress_score']:.1f}/100 "
+        f"({dispersion_summary['broad_stress_level']})\n"
+        f"- CSAD_Z / CSSD_Z: {dispersion_summary['csad_z']:+.2f} / {dispersion_summary['cssd_z']:+.2f}\n"
+        f"- Downside participation: {dispersion_summary['downside_participation']:.1f}%\n"
+        "- Return method: no forward-fill; bad ticks >50% daily absolute return treated as missing.\n"
+    )
 
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res = _append_structured_footer(
+        res,
+        "dispersion_methodology",
+        [
+            f"Methodology Version: {dispersion_summary['methodology_version']}",
+            f"Macro Regime: {dispersion_summary['macro_regime']}",
+            f"Broad Stress Score: {dispersion_summary['broad_stress_score']:.1f}",
+            f"Broad Stress Level: {dispersion_summary['broad_stress_level']}",
+            f"CSAD Z: {dispersion_summary['csad_z']:+.2f}",
+            f"CSSD Z: {dispersion_summary['cssd_z']:+.2f}",
+            f"Downside Participation: {dispersion_summary['downside_participation']:.1f}%",
+            "Returns Fill Method: none",
+            "Bad Tick Filter: abs daily return >50% set to missing",
+        ],
+    )
     _write_cache("dispersion", res, provider_key)
     return res
 
@@ -3024,6 +3088,7 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
     if cached: return cached
     
     data = build_breadth_series(df_stocks, upside_x=2.0, downside_y=-2.0, lookback_days=90)
+    breadth_summary = summarize_breadth_state(data)
     up_tuple = run_hybrid_ensemble_mc(
         data["raw_upside"], days_to_sim=20, num_sims=5000, seed=DEFAULT_MC_SEED
     )
@@ -3059,6 +3124,18 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
                                  .replace("{sim_days}", "19")\
                                  .replace("{p95_up}", f"{p95_up[-1]:.2f}")\
                                  .replace("{p95_dn}", f"{p95_dn[-1]:.2f}")
+    full_prompt += (
+        "\n\n# V2 DIAGNOSTICS\n"
+        f"- Methodology: {breadth_summary['methodology_version']}\n"
+        f"- Breadth regime: {breadth_summary['breadth_regime']}\n"
+        f"- Breadth stress score: {breadth_summary['breadth_stress_score']:.1f}/100 "
+        f"({breadth_summary['breadth_stress_level']})\n"
+        f"- Downside rank: {breadth_summary['downside_rank']:.2f}; "
+        f"upside rank: {breadth_summary['upside_rank']:.2f}\n"
+        f"- Net sell pressure: {breadth_summary['net_pressure']:+.1f}pp; "
+        f"MA5: {breadth_summary['ma5_net_pressure']:+.1f}pp\n"
+        "- Interpretation control: downside stress dominates; MC paths are stress scenarios, not allocation authority.\n"
+    )
 
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
@@ -3073,6 +3150,10 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
             f"MC Seed Downside: {DEFAULT_MC_SEED + 1}",
             "MC Simulations Per Side: 5000",
             "MC Deterministic: 1",
+            f"Breadth Regime: {breadth_summary['breadth_regime']}",
+            f"Breadth Stress Score: {breadth_summary['breadth_stress_score']:.1f}",
+            f"Downside Rank: {breadth_summary['downside_rank']:.2f}",
+            f"Net Sell Pressure: {breadth_summary['net_pressure']:+.1f} pp",
             "MC Interpretation: scenario_diagnostic_not_allocation_authority",
         ],
     )
@@ -3360,12 +3441,33 @@ def run_va_res(client, df_stocks, provider_key: str = "kimi-2.6", model: str = N
                                  .replace("[Complacency Index %]", f"{snap['complacency_index']:.2f}%")\
                                  .replace("[Mispriced Count]", str(snap.get('mispriced_count', 0)))\
                                  .replace("[Top 3 Mispriced]", ", ".join(snap['top_3_mispriced']))
+    full_prompt += (
+        "\n\n# V2 DIAGNOSTICS\n"
+        f"- Methodology: {snap.get('methodology_version', 'N/A')}\n"
+        f"- VaRES regime: {snap.get('vares_regime', 'N/A')}\n"
+        f"- Stress level: {snap.get('stress_level', 'N/A')} "
+        f"({snap.get('breached_count', 0)}/{snap.get('valid_vn30_count', 'N/A')} valid VN30 breached)\n"
+        f"- Complacency level: {snap.get('complacency_level', 'N/A')} "
+        f"({snap.get('mispriced_count', 0)}/{snap.get('valid_market_count', 'N/A')} valid market names mispriced)\n"
+        "- Return handling: prior-window VaR/ES, no look-ahead, no forward-fill, abs daily return > 50% treated as bad tick.\n"
+        "- Market proxy: VNINDEX if available; otherwise equal-weight normalized proxy.\n"
+    )
     
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res += (
+        "\n\n---\n"
+        f"vares_methodology: {snap.get('methodology_version', 'N/A')}; "
+        f"regime={snap.get('vares_regime', 'N/A')}; "
+        f"stress={snap.get('stress_index', float('nan')):.2f}% "
+        f"({snap.get('breached_count', 0)}/{snap.get('valid_vn30_count', 'N/A')}); "
+        f"complacency={snap.get('complacency_index', float('nan')):.2f}% "
+        f"({snap.get('mispriced_count', 0)}/{snap.get('valid_market_count', 'N/A')}); "
+        "prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null"
+    )
     _write_cache("va_res", res, provider_key)
     return res
 
@@ -3454,12 +3556,34 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
         ]:
             full_prompt = full_prompt.replace(placeholder, "N/A (cần ≥ 756 phiên)")
 
+    full_prompt += (
+        "\n\n# V3 DIAGNOSTICS\n"
+        f"- Methodology: {snap.get('methodology_version', 'N/A')}\n"
+        f"- Tail regime: {snap.get('tail_regime', 'N/A')} ({snap.get('tail_risk_level', 'N/A')})\n"
+        f"- Current log return: {snap.get('current_return', 0.0)*100:.2f}%\n"
+        f"- VaR breach 95%: {int(bool(snap.get('var_breach_95', False)))}; "
+        f"breach margin: {snap.get('breach_margin_95', 0.0)*100:.2f}pp\n"
+        f"- Gaussian VaR99: {snap.get('gaussian_var_99', 0.0)*100:.2f}%; "
+        f"EVT VaR99 gap: {snap.get('evt_gaussian_var99_gap', 0.0)*100:.2f}pp\n"
+        f"- EVT threshold stable: {1 if snap.get('evt_sensitivity_stable') else 0}; "
+        f"xi range: {snap.get('evt_sensitivity_xi_range', 0.0):.3f}\n"
+        "- Method control: same-date VaR/ES uses prior-window returns only; no forward-fill; bad ticks abs(simple return)>50% removed.\n"
+    )
+
     parts = full_prompt.split("# INPUT DATA")
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
     res = call_ai(client, sys_p, usr_p, model=model)
-    footer_lines = ["EVT Method: POT_GPD_threshold_sensitivity_5_15pct"]
+    footer_lines = [
+        f"Methodology: {snap.get('methodology_version', 'N/A')}",
+        f"Tail Regime: {snap.get('tail_regime', 'N/A')}",
+        f"Tail Risk Level: {snap.get('tail_risk_level', 'N/A')}",
+        f"Current Return: {snap.get('current_return', 0.0)*100:.2f}%",
+        f"VaR Breach 95: {1 if snap.get('var_breach_95') else 0}",
+        f"Breach Margin 95: {snap.get('breach_margin_95', 0.0)*100:.2f}pp",
+        "EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window",
+    ]
     if snap.get("evt_available"):
         footer_lines.extend(
             [

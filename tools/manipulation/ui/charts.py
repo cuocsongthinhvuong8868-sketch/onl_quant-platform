@@ -8,12 +8,12 @@ from scipy.stats import percentileofscore
 
 def _slope_label(s):
     if s >= 0.8:
-        return "Rất cao — F1 cực nhạy với VIN"
+        return "Rất cao — VNINDEX cực nhạy với VIN"
     if s >= 0.55:
-        return "Cao — F1 bị VIN dẫn dắt rõ"
+        return "Cao — VNINDEX bị VIN dẫn dắt rõ"
     if s >= 0.35:
         return "Trung bình — ảnh hưởng vừa phải"
-    return "Thấp — VIN ít tác động lên F1"
+    return "Thấp — VIN ít tác động lên VNINDEX"
 
 
 def _corr_label(c):
@@ -89,9 +89,9 @@ def render_core(plot_df, plot_weights, full_result_df):
         st.info(
             f"**💡 Ý nghĩa OLS Slope (Beta):**\n\n"
             f"- Slope = `{latest_slope:.2f}` nghĩa là khi composite VIC/VHM/VRE biến động **1%**, "
-            f"VN30F1M có xu hướng biến động khoảng **{latest_slope:.2f}%** cùng phiên.\n"
-            f"- Slope càng cao: F1 càng nhạy với nhóm VIN.\n"
-            f"- Slope càng thấp: F1 đang phản ứng nhiều hơn với nhân tố khác ngoài VIN."
+            f"VNINDEX có xu hướng biến động khoảng **{latest_slope:.2f}%** cùng phiên.\n"
+            f"- Slope càng cao: VNINDEX càng nhạy với nhóm VIN.\n"
+            f"- Slope càng thấp: VNINDEX đang phản ứng nhiều hơn với nhân tố khác ngoài VIN."
         )
 
 
@@ -123,10 +123,10 @@ def render_event(re_df, threshold):
     col_m6.metric("➖ STATUS QUO — Quán tính", f"{counts.get('STATUS QUO', 0)} ngày")
 
     regime_conclusion = {
-        "COUPLING": "**COUPLING — Siết chặt:** VIN là hoa tiêu dẫn đường tuyệt đối. Bám sát VIC/VHM/VRE để giao dịch F1.",
-        "TÍN HIỆU GIẢ": "**TÍN HIỆU GIẢ — Bẫy nhiễu:** VIN 'mất kết nối' nhưng số liệu báo ảo. Dễ dính trap nếu nhìn VIN đánh F1.",
-        "DECOUPLING": "**DECOUPLING — Rời bỏ:** VIN bị thị trường lãng quên. F1 đang chạy theo nhóm ngành khác.",
-        "ANCHORING": "**ANCHORING — Neo giữ:** VIN đóng vai trò giữ nhịp, hãm phanh cho F1 nhưng không kéo giá.",
+        "COUPLING": "**COUPLING — Siết chặt:** VIN đang dẫn nhịp VNINDEX rõ hơn bình thường.",
+        "TÍN HIỆU GIẢ": "**TÍN HIỆU GIẢ — Bẫy nhiễu:** VIN 'mất kết nối' nhưng slope báo ảo. Không dùng VIN làm chỉ báo index.",
+        "DECOUPLING": "**DECOUPLING — Rời bỏ:** VIN bị thị trường lãng quên. VNINDEX đang chạy theo nhóm ngành khác.",
+        "ANCHORING": "**ANCHORING — Neo giữ:** VIN đóng vai trò giữ nhịp cho VNINDEX nhưng lực kéo yếu.",
         "STATUS QUO": "**STATUS QUO — Quán tính:** Giữ nguyên chiến thuật cũ từ ngày t₀. Cấu trúc tương quan không thay đổi đáng kể.",
     }
     st.info(f"**Kết luận Kịch bản:** {regime_conclusion.get(dominant_regime, dominant_regime)}")
@@ -209,18 +209,18 @@ def render_event(re_df, threshold):
             "Corr ↑  |  Slope ↓",
             "Nằm trong hộp Threshold",
         ],
-        "Bản chất cơ khí (VIN vs. F1)": [
-            "VIN và F1 dính chặt nhau + 1 lệnh VIN đẩy điểm F1 rất mạnh.",
-            "F1 nhảy múa nhưng không theo hướng VIN + Slope báo ảo do VIN cạn Vol.",
-            "Mỗi bên đi một nẻo + Lệnh VIN không làm F1 xê dịch đáng kể.",
-            "VIN và F1 vẫn cùng hướng (đồng pha) + Nhưng tác động rất 'êm', không giật sốc.",
-            "Tỷ lệ tác động của VIN lên F1 không thay đổi so với ngày gốc t₀.",
+        "Bản chất cơ khí (VIN vs. VNINDEX)": [
+            "VIN và VNINDEX dính chặt nhau + biến động VIN kéo index rất mạnh.",
+            "VNINDEX nhảy múa nhưng không theo hướng VIN + Slope báo ảo do VIN cạn Vol.",
+            "Mỗi bên đi một nẻo + Lệnh VIN không làm VNINDEX xê dịch đáng kể.",
+            "VIN và VNINDEX vẫn cùng hướng (đồng pha) + Nhưng tác động rất 'êm', không giật sốc.",
+            "Tỷ lệ tác động của VIN lên VNINDEX không thay đổi so với ngày gốc t₀.",
         ],
         "Trạng thái thực chiến": [
             "Siết chặt: VIN là hoa tiêu dẫn đường tuyệt đối.",
-            "Bẫy nhiễu: VIN 'mất kết nối' nhưng số liệu báo ảo. Dễ dính trap nếu nhìn VIN đánh F1.",
-            "Rời bỏ: VIN bị thị trường lãng quên. F1 đang chạy theo nhóm khác.",
-            "Neo giữ: VIN đóng vai trò giữ nhịp, hãm phanh cho F1 nhưng không kéo giá.",
+            "Bẫy nhiễu: VIN 'mất kết nối' nhưng số liệu báo ảo. Không dùng VIN làm chỉ báo index.",
+            "Rời bỏ: VIN bị thị trường lãng quên. VNINDEX đang chạy theo nhóm khác.",
+            "Neo giữ: VIN đóng vai trò giữ nhịp cho VNINDEX nhưng không kéo giá.",
             "Quán tính: Giữ nguyên chiến thuật cũ từ ngày t₀.",
         ],
     }
@@ -232,7 +232,7 @@ def render_event(re_df, threshold):
         column_config={
             "Kịch bản": st.column_config.TextColumn(width="medium"),
             "Logic Toán học (ΔPR)": st.column_config.TextColumn(width="medium"),
-            "Bản chất cơ khí (VIN vs. F1)": st.column_config.TextColumn(width="large"),
+            "Bản chất cơ khí (VIN vs. VNINDEX)": st.column_config.TextColumn(width="large"),
             "Trạng thái thực chiến": st.column_config.TextColumn(width="large"),
         },
     )
@@ -240,8 +240,8 @@ def render_event(re_df, threshold):
     st.markdown(
         """
         **🗺️ Cách đọc Ma trận 2D (Scatter Plot):**
-        - **Trục X (ΔCorr):** Thay đổi Tương quan so với t₀. Dương = tương quan tăng (VIN–F1 gắn chặt hơn). Âm = tương quan giảm (đang phân kỳ).
-        - **Trục Y (ΔSlope):** Thay đổi Độ nhạy so với t₀. Dương = F1 phản ứng mạnh hơn per 1% VIN move. Âm = F1 phản ứng yếu hơn (đòn bẩy hạ xuống).
+        - **Trục X (ΔCorr):** Thay đổi Tương quan so với t₀. Dương = tương quan tăng (VIN–VNINDEX gắn chặt hơn). Âm = tương quan giảm (đang phân kỳ).
+        - **Trục Y (ΔSlope):** Thay đổi Độ nhạy so với t₀. Dương = VNINDEX phản ứng mạnh hơn per 1% VIN move. Âm = VNINDEX phản ứng yếu hơn (đòn bẩy hạ xuống).
         - **4 góc phần tư** tương ứng với 4 kịch bản chủ động. Các điểm nằm trong hộp vuông trung tâm (trong ngưỡng Threshold) được phân loại là **STATUS QUO**.
         - **Đường đứt nét** trên biểu đồ là ranh giới Threshold — thay đổi thông số này trên thanh điều khiển trái để mở rộng/thu hẹp vùng STATUS QUO.
         """

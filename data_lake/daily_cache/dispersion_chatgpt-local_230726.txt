@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+
+- Spread annualized: 8.37%; Spread_Z: -1.07σ.
+- DPI: 48.3%, dưới ngưỡng persistence 70%.
+- Avg Pairwise Correlation Ledoit-Wolf: 0.017, rất gần 0.
+- Cross-sectional skewness: +0.03; kurtosis: 2.84.
+
+## 2. Structural State
+
+Theo cặp DPI + Spread_Z, cấu trúc dispersion chưa ở trạng thái stressed theo định nghĩa lõi: Spread_Z âm và DPI trung bình thấp cho thấy tail-driven dispersion không bị kéo căng so với nền 60 ngày, cũng chưa có bằng chứng regime dispersion kéo dài.
+
+Stress vì vậy không phải **regime persistent**. Cũng không phải mẫu **cục bộ cổ điển** kiểu Spread_Z cao nhưng DPI thấp. Tuy nhiên V2 overlay ghi nhận **BROAD_SELLOFF_STRESS HIGH** với stress score 77.3/100, CSAD_Z +3.85 và CSSD_Z +2.54. Nghĩa là rủi ro nằm ở broad-stress layer, không nằm ở Spread = CSSD - CSAD thuần túy.
+
+## 3. Cross-Check & Tail Direction
+
+CS Skew +0.03 gần như đối xứng, không chỉ ra tail âm gãy cá biệt hoặc tail dương bị đẩy cực đoan. Kurtosis 2.84 thấp hơn ngưỡng fat-tail 5, nên chưa có tín hiệu outlier cực đoan làm vô hiệu hóa giả định gần-normal ở lát cắt này.
+
+Downside participation 28.7% cho thấy áp lực giảm có hiện diện nhưng chưa mang hình thái herding toàn thị trường.
+
+## 4. Regime Mapping
+
+DPI thấp + Corr thấp khớp ô **Healthy Stock-Picking / STOCK_PICKING** trong 2D map. Nhưng nhãn này cần đọc kèm overlay: đây là stock-picking environment trong bối cảnh broad selloff stress đang cao, không phải trạng thái “an toàn”.
+
+Risk lớn nhất cho Portfolio Manager là **concentration risk**: tương quan thấp khiến phân hóa còn mạnh, nên sai lệch sector/name exposure có thể chi phối P&L. Herding crash chưa phải cấu trúc chính vì corr gần 0; liquidity dry-up là rủi ro phụ nếu stress breadth tiếp tục lan rộng.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "dispersion",
+  "date": "22/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.07,
+  "dpi_pct": 48.3,
+  "avg_corr": 0.017,
+  "tail_skew_direction": "symmetric",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: BROAD_SELLOFF_STRESS
+- Broad Stress Score: 77.3
+- Broad Stress Level: HIGH
+- CSAD Z: +3.85
+- CSSD Z: +2.54
+- Downside Participation: 28.7%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing

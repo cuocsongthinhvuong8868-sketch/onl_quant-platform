@@ -1,7 +1,6 @@
 import pandas as pd
 import polars as pl
-import numpy as np
-from tools.va_res.quant.metrics import SystemicRiskEngine
+from tools.va_res.quant.metrics import METHOD_VERSION, SystemicRiskEngine, summarize_vares_state
 
 VN30_TICKERS = ['ACB', 'BCM', 'BID', 'BVH', 'CTG', 'FPT', 'GAS', 'GVR', 'HDB', 'HPG', 'MBB', 'MSN', 'MWG', 'PLX', 'POW', 'SAB', 'SHB', 'SSB', 'SSI', 'STB', 'TCB', 'TPB', 'VCB', 'VHM', 'VIB', 'VIC', 'VJC', 'VNM', 'VPB', 'VRE']
 
@@ -43,7 +42,10 @@ def snapshot(df_price_full: pd.DataFrame, load_custom=None) -> dict:
     df_metrics30 = engine.calculate_risk_metrics(df_vn30_pl, method='cornish_fisher')
     df_contagion = engine.calculate_contagion_index(df_metrics30)
     
-    latest_stress = df_contagion.to_pandas().iloc[-1]['Contagion_Index']
+    latest_contagion = df_contagion.to_pandas().iloc[-1]
+    latest_stress = latest_contagion['Contagion_Index']
+    valid_vn30_count = int(latest_contagion.get('Valid_Names', len(available_vn30)))
+    breached_count = int(latest_contagion.get('Breached_Count', 0))
     
     # Top 3 tickers breaching VaR by most margin
     latest_date_30 = df_metrics30[date_col].max()
@@ -53,10 +55,8 @@ def snapshot(df_price_full: pd.DataFrame, load_custom=None) -> dict:
     
     if not breached_30.empty:
         top_3_crash = breached_30.sort_values(by='breach_margin', ascending=False).head(3)['ticker'].tolist()
-        breached_count = len(breached_30)
     else:
         top_3_crash = ["Không có"]
-        breached_count = 0
         
     # 2. Complacency Index (Market Mispricing)
     available_tickers = [t for t in ALL_MARKET_TICKERS if t in df_price_reset.columns]
@@ -84,31 +84,46 @@ def snapshot(df_price_full: pd.DataFrame, load_custom=None) -> dict:
     df_mkt_pl = pl.from_pandas(df_mkt_pandas)
     
     df_metricsM = engine.calculate_risk_metrics(df_mkt_pl, method='cornish_fisher')
-    df_complacency = engine.calculate_complacency_index(df_metricsM)
+    df_complacency = engine.calculate_complacency_index(df_metricsM, benchmark_ticker='VNINDEX')
     
-    df_comp_agg = df_complacency.group_by(date_col).agg(
-        (pl.col("is_mispriced").sum() / len(available_tickers) * 100).alias("Complacency_Index")
-    ).sort(date_col)
+    df_comp_agg = engine.calculate_complacency_aggregate(df_complacency)
     
-    latest_complacency = df_comp_agg.to_pandas().iloc[-1]['Complacency_Index']
+    latest_complacency_row = df_comp_agg.to_pandas().iloc[-1]
+    latest_complacency = latest_complacency_row['Complacency_Index']
+    valid_market_count = int(latest_complacency_row.get('Valid_Names', len(available_tickers)))
+    mispriced_count = int(latest_complacency_row.get('Mispriced_Count', 0))
     
     # Top 3 mispriced tickers by tightest spread
     df_status = engine.get_latest_risk_status(df_complacency).to_pandas()
     mispriced_df = df_status[df_status['Status'] == 'Risk Mispriced']
     
     if not mispriced_df.empty:
-        top_3_mispriced = mispriced_df.sort_values(by='Spread', ascending=True).head(3)['ticker'].tolist()
-        mispriced_count = len(mispriced_df)
+        top_3_mispriced = mispriced_df.sort_values(by='Severity', ascending=False).head(3)['ticker'].tolist()
     else:
         top_3_mispriced = ["Không có"]
-        mispriced_count = 0
+
+    summary = summarize_vares_state(
+        latest_stress,
+        latest_complacency,
+        breached_count,
+        valid_vn30_count,
+        mispriced_count,
+        valid_market_count,
+    )
         
     return {
         "date": date_str,
+        "snapshot_date": df_price_full.index[-1].strftime('%Y-%m-%d'),
+        "methodology_version": METHOD_VERSION,
         "stress_index": float(latest_stress),
         "complacency_index": float(latest_complacency),
         "top_3_crash": top_3_crash,
         "top_3_mispriced": top_3_mispriced,
         "breached_count": breached_count,
-        "mispriced_count": mispriced_count
+        "valid_vn30_count": valid_vn30_count,
+        "mispriced_count": mispriced_count,
+        "valid_market_count": valid_market_count,
+        "vares_regime": summary["vares_regime"],
+        "stress_level": summary["stress_level"],
+        "complacency_level": summary["complacency_level"],
     }

@@ -169,6 +169,15 @@ def render():
                                                          .replace("{skewness}", f"{latest['Skewness']:.2f}")\
                                                          .replace("{down_corr}", f"{latest['Down_Corr_Norm']*100:.1f}")\
                                                          .replace("{up_corr}", f"{latest['Up_Corr_Norm']*100:.1f}")
+                            full_prompt += (
+                                "\n\n# V2 DIAGNOSTICS\n"
+                                f"- Methodology: {latest.get('Methodology_Version', METHOD_VERSION)}\n"
+                                f"- CSV Rank: {latest.get('CSV_Norm', float('nan')):.2f}\n"
+                                f"- Acute Shock: {latest.get('Acute_Shock', float('nan')):.2f}\n"
+                                f"- Shock Regime Flag: {shock_flag}\n"
+                                f"- Signal Confidence: {latest.get('Signal_Confidence', float('nan')):.2f}\n"
+                                "- Interpretation control: if shock flag is not NONE, do not treat neutral band as ordinary neutral; cap risk-on interpretation.\n"
+                            )
 
                             parts = full_prompt.split("# INPUT DATA")
                             system_prompt = parts[0].strip()

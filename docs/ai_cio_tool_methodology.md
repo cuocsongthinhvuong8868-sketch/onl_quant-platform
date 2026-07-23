@@ -94,25 +94,27 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: index concentration and coupling risk.
 - Horizon: days to weeks.
-- Primary signal: Vingroup slope percentile and concentration diagnostics.
-- Interpretation: high concentration risk can make index-level signals fragile.
-- Limit: mostly idiosyncratic/system-structure risk; do not overrule broad systemic tools alone.
+- Primary signal: Vingroup PCA composite slope/correlation percentile versus VNINDEX.
+- Interpretation: high VIN-to-VNINDEX coupling means index-level signals can be fragile or concentration-driven.
+- Method control: target is cash VNINDEX, not VN30F1M; returns use no forward-fill and require VIC/VHM/VRE/VNINDEX all valid.
+- Limit: not a direct futures trade signal; do not overrule broad systemic tools alone.
 
 ## Dispersion
 
 - Domain: market structure and participation quality.
 - Horizon: days to weeks.
-- Primary signal: dispersion pressure and correlation behavior.
-- Interpretation: helps distinguish broad participation from narrow index movement.
-- Limit: low dispersion can mean compressed/idle risk, not automatically bullish.
+- Primary signal: spread z-score, DPI, Ledoit-Wolf correlation, CSAD/CSSD z-scores, downside participation, and macro regime.
+- Methodology control: returns use no forward-fill and bad ticks above 50% daily absolute return are treated as missing.
+- Interpretation: separates idiosyncratic dispersion from broad selloff stress; low spread can still be dangerous when CSAD/CSSD are extreme.
+- Limit: broad selloff stress is diagnostic; confirm with breadth, ESR, VaRES, and Fear & Greed before allocation.
 
 ## Upside Ratio
 
 - Domain: upside participation.
 - Horizon: days to weeks.
-- Primary signal: upside participation ratio and breadth confirmation.
-- Methodology control: Monte Carlo uses fixed seeds for reproducibility; P95 paths are scenario diagnostics rather than independent allocation signals.
-- Interpretation: sustained upside participation supports risk-on.
+- Primary signal: upside/downside participation, downside rank, net sell pressure, and breadth stress regime.
+- Methodology control: returns use no forward-fill across missing prices; Monte Carlo uses fixed seeds for reproducibility; P95 paths are scenario diagnostics rather than independent allocation signals.
+- Interpretation: sustained upside participation supports risk-on; high downside rank/net sell pressure flags sell-pressure stress even if MC median mean-reverts.
 - Limit: zombie rallies without breadth confirmation should not lift regime materially.
 
 ## Bank Valuation
@@ -143,17 +145,19 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 
 - Domain: contagion and complacency.
 - Horizon: days to weeks.
-- Primary signal: contagion, crash-risk, and complacency modules.
-- Interpretation: useful for tail-risk color and avoid lists.
-- Limit: not a standalone composite score unless an adapter provides one.
+- Primary signal: prior-window VaR/ES breach breadth, valid-name denominator, complacency spread compression, and VaRES regime.
+- Interpretation: stress index captures active selloff contagion; complacency captures compressed risk compensation before/inside quiet regimes.
+- Method control: VaR/ES uses prior-window estimates only, no forward-fill returns, and daily absolute returns above 50% are treated as bad ticks.
+- Limit: low complacency never means market is safe; during active selloff, stress index dominates interpretation.
 
 ## Var-CVaR VNINDEX
 
 - Domain: left-tail risk.
 - Horizon: days to weeks.
-- Primary signal: EVT tail index xi, VaR, CVaR, expected shortfall, and threshold sensitivity over 5%-15% POT thresholds.
+- Primary signal: prior-window VaR/ES breach state, EVT tail index xi, expected shortfall, Gaussian-vs-EVT VaR99 gap, and tail regime.
 - Interpretation: threshold sensitivity measures robustness/confidence and is not a second bearish vote.
 - Hard-cap rule: a fat-tail hard cap requires robust evidence across thresholds (normally central xi >= 0.30 and xi_min >= 0.30). A central high xi with low xi_min or wide xi range is a warning, not a standalone hard cap.
+- Method control: same-date VaR/ES estimates use only prior-window returns, no forward-fill, and bad ticks above 50% absolute simple return are removed before model fitting.
 - Limit: do not offset robust high tail risk with sentiment alone.
 
 ## Pairs Trading

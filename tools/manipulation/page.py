@@ -1,7 +1,7 @@
 """
 tools/manipulation/page.py
 Hàm render() được gọi bởi pages/tools_page_C/_8_Manipulation.py hoặc từ C_Behavioral_Finance.py
-Phát hiện dấu hiệu thao túng giá qua PCA trên VIC/VHM/VRE vs VN30F1M
+Phát hiện dấu hiệu thao túng/chỉ số qua PCA trên VIC/VHM/VRE vs VNINDEX
 """
 import logging
 import warnings
@@ -17,18 +17,18 @@ logging.basicConfig(
 )
 
 from config import AI_PROVIDER_MAP
-from shared.data_loader import load_close_prices
+from shared.data_loader import load_close_prices, load_custom
 from shared.daily_cache import clear_daily_cache, load_daily_cache, save_daily_cache
-from tools.manipulation.quant.engine import prepare_data, compute_metrics, classify_regime
+from tools.manipulation.quant.engine import METHOD_VERSION, TARGET, prepare_data, compute_metrics, classify_regime
 from tools.manipulation.ui.sidebar import render_sidebar
 from tools.manipulation.ui.charts import render_core, render_event
 
 
 def render():
-    st.title("🔍 Manipulation Detection — VIC/VHM/VRE vs VN30F1M")
+    st.title("🔍 Manipulation Detection — VIC/VHM/VRE vs VNINDEX")
     st.caption(
         "PCA Composite · Rolling VaR/CVaR · Percentile Rank Correlation · "
-        "Event Study Regime Classification"
+        f"Event Study Regime Classification · {METHOD_VERSION}"
     )
 
     params = render_sidebar(default_threshold=0.15)
@@ -39,11 +39,13 @@ def render():
 
     try:
         df_prices = load_close_prices()
+        df_idx = load_custom("vnindex_cache.csv")
+        idx_col = TARGET if TARGET in df_idx.columns else df_idx.columns[0]
     except FileNotFoundError as e:
         st.error(str(e))
         st.stop()
     try:
-        df_prepared = prepare_data(df_prices)
+        df_prepared = prepare_data(df_prices, target_series=df_idx[idx_col])
     except ValueError as e:
         st.error(f"❌ Lỗi dữ liệu: {e}")
         st.stop()
@@ -55,7 +57,7 @@ def render():
         f"Manipulation input valid tới: {pd.Timestamp(effective_data_date).strftime('%d/%m/%Y')}"
     )
 
-    key = {"window": window}
+    key = {"method": METHOD_VERSION, "target": TARGET, "window": window}
     cached = load_daily_cache("manipulation", key, data_date=effective_data_date)
     if cached is not None:
         cached_result_date = cached["result"].index.max().strftime("%Y-%m-%d")
@@ -99,11 +101,10 @@ def render():
     st.subheader("✨ Trợ lý AI Phân tích Dấu hiệu Thao túng")
 
     from config import DATA_LAKE, ROOT_DIR
-    from datetime import date
     from openai import OpenAI
     
-    today_str = date.today().strftime('%d%m%y')
-    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{today_str}.txt"
+    ai_cache_token = pd.Timestamp(effective_data_date).strftime('%d%m%y')
+    ai_cache_file = DATA_LAKE / "daily_cache" / f"manipulation_{ai_provider}_{ai_cache_token}.txt"
     
     tab_current, tab_history = st.tabs(["🚀 Phân tích hiện tại", "📅 Xem lại phân tích cũ"])
     with tab_current:
@@ -147,16 +148,16 @@ def render():
                             slope_status = "Cao" if slope_pr >= 80 else "Thap" if slope_pr <= 20 else "Trung binh"
                             corr_status  = "Rat chat" if corr_pr >= 80 else "Phan ky" if corr_pr <= 20 else "Long"
 
-                            # Gia thuc te VIC/VHM/VRE + VN30F1M (chong AI hallucinate)
+                            # Gia thuc te VIC/VHM/VRE + VNINDEX (chong AI hallucinate)
                             last_px = df_prepared.iloc[-1]
                             def _fmt_stk(v):
                                 return f"{v:.2f} (≈ {int(v*1000):,} VND)" if (not __import__('math').isnan(v) and v > 0) else "N/A"
-                            def _fmt_f1(v):
-                                return f"{v:,.2f} diem" if (not __import__('math').isnan(v) and v > 0) else "N/A"
+                            def _fmt_index(v):
+                                return f"{v:,.2f} điểm" if (not __import__('math').isnan(v) and v > 0) else "N/A"
                             vic_close = _fmt_stk(float(last_px.get("VIC", float("nan"))))
                             vhm_close = _fmt_stk(float(last_px.get("VHM", float("nan"))))
                             vre_close = _fmt_stk(float(last_px.get("VRE", float("nan"))))
-                            f1m_close = _fmt_f1(float(last_px.get("VN30F1M", float("nan"))))
+                            vnindex_close = _fmt_index(float(last_px.get(TARGET, float("nan"))))
 
                             # Event study: regime + momentum
                             t0_str = t0_dt.strftime('%d/%m/%Y')
@@ -174,7 +175,7 @@ def render():
                                 .replace("{vic_close}",   vic_close)\
                                 .replace("{vhm_close}",   vhm_close)\
                                 .replace("{vre_close}",   vre_close)\
-                                .replace("{f1m_close}",   f1m_close)\
+                                .replace("{vnindex_close}", vnindex_close)\
                                 .replace("{slope_val}",   f"{slope_val:.3f}")\
                                 .replace("{slope_pr}",    f"{slope_pr:.1f}")\
                                 .replace("{slope_status}", slope_status)\
@@ -184,6 +185,13 @@ def render():
                                 .replace("{t0_str}",      t0_str)\
                                 .replace("{regime}",      regime)\
                                 .replace("{momentum_str}", momentum_str)
+                            full_prompt += (
+                                "\n\n# V2 DIAGNOSTICS\n"
+                                f"- Methodology: {METHOD_VERSION}\n"
+                                f"- Target: {TARGET}, not VN30F1M.\n"
+                                "- Interpretation: slope/correlation measure VIN composite coupling with cash VNINDEX, not futures trading signal.\n"
+                                "- Return handling: pct_change(fill_method=None), log1p returns, rows require VIC/VHM/VRE/VNINDEX all valid.\n"
+                            )
 
                             parts = full_prompt.split("# INPUT DATA")
                             system_prompt = parts[0].strip()

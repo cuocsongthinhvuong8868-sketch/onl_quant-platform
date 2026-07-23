@@ -20,6 +20,9 @@ Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilisti
 - Hill index (cross-check): [Hill Index]
 - # exceedances (top 10% losses, 3Y window): [EVT N Exceed]
 
+## Methodology note
+- V3 same-date VaR/ES uses prior-window returns only; no forward-fill; bad ticks with abs(simple return)>50% are removed before risk estimation.
+
 ## EVT threshold sensitivity — robustness test, not a second signal
 - Xi min across 5%-15% POT thresholds: [EVT Xi Min]
 - Xi max across 5%-15% POT thresholds: [EVT Xi Max]

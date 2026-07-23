@@ -1,0 +1,45 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 32.7/100, nằm trong band FEAR 20-40; Δ -3.9.
+- EGARCH Vol chuẩn hóa 92.5%, cao hơn ngưỡng 80%; Δ -1.6%.
+- Rolling Skewness -0.10, dưới 0 nhưng chưa âm sâu.
+- Downside Corr 9.5% thấp hơn Upside Corr 19.8%; CSV Rank 0.24, Acute Shock 0.99.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, VN-Index đang ở pha FEAR có overlay MARGIN_CALL_RISK, với xác suất cao là môi trường rủi ro hệ thống chưa hạ nhiệt. Không suy luận hướng giá; trạng thái chính là kiểm soát beta và thanh khoản.
+
+## 3. Cross-Check
+Score 32.7 đồng pha với EGARCH Vol 92.5%: consistent với FEAR/risk-off. Skewness âm nhẹ nhưng Downside Corr thấp hơn Upside Corr: divergence nhẹ, cho thấy áp lực tail chưa lan tỏa đồng bộ toàn thị trường dù shock overlay rất cao.
+
+## 4. Verdict
+Beta exposure đề xuất: **0.30-0.40** cho danh mục VN-Index.
+
+Hành động: giữ beta thấp, ưu tiên giảm margin, giảm vị thế kém thanh khoản/high beta, chưa tăng risk-on cho đến khi Acute Shock hạ và score phục hồi khỏi vùng FEAR. Có thể giữ phần core ở nhóm thanh khoản cao, biến động thấp; không mở rộng tấn công theo beta thị trường.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "22/07/2026",
+  "regime": "FEAR",
+  "score": 32.7,
+  "confidence": "medium",
+  "beta_target": 0.35,
+  "key_signals": [
+    "Risk Score 32.7 in FEAR band with MARGIN_CALL_RISK overlay",
+    "EGARCH Vol 92.5% remains high despite small negative delta"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 32.7
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: MARGIN_CALL_RISK / FEAR
+- Signal Confidence: 0.55
+- CSV Rank: 0.24
+- Acute Shock: 0.99
+- Shock Regime Flag: MARGIN_CALL_RISK
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

@@ -23,13 +23,20 @@ except ImportError:
         },
     }
 from shared.data_loader import load_close_prices, load_custom
-from tools.dispersion.quant.metrics import calculate_dispersion_metrics, fit_rolling_correlation
+from tools.dispersion.quant.metrics import (
+    METHOD_VERSION,
+    calculate_dispersion_metrics,
+    determine_macro_regime,
+    fit_rolling_correlation,
+    summarize_dispersion_state,
+)
 from tools.dispersion.ui.sidebar import render_sidebar
 from tools.dispersion.ui.charts import render_main_chart
 
 
 def _cache_path(params: dict) -> str:
     key = (
+        f"{METHOD_VERSION}_"
         f"mc{params['mc_window']}_rf{params['cov_refit_freq']}_"
         f"zt{params['zscore_type']}_z{params['zscore_window']}_"
         f"dpi{params['dpi_window']}"
@@ -37,27 +44,30 @@ def _cache_path(params: dict) -> str:
     return str(DATA_LAKE / "daily_cache" / f"dispersion_cache_{key}.csv")
 
 
-def _load_daily_cache(path: str):
+def _load_daily_cache(path: str, data_date: str):
     try:
         df = pd.read_csv(path, parse_dates=["time"])
     except Exception:
         return None
-    if df.empty or "cache_date" not in df.columns:
+    if df.empty or "cache_date" not in df.columns or "data_date" not in df.columns:
         return None
     cache_day = str(df["cache_date"].iloc[0])
     if cache_day != str(date.today()):
+        return None
+    if str(df["data_date"].iloc[0]) != str(data_date):
         return None
     df["time"] = pd.to_datetime(df["time"])
     df = df.set_index("time")
     return df
 
 
-def _save_daily_cache(path: str, df_metrics: pd.DataFrame):
+def _save_daily_cache(path: str, df_metrics: pd.DataFrame, data_date: str):
     cache_dir = (DATA_LAKE / "daily_cache")
     cache_dir.mkdir(parents=True, exist_ok=True)
     out = df_metrics.copy()
     out = out.reset_index().rename(columns={"index": "time"})
     out["cache_date"] = str(date.today())
+    out["data_date"] = str(data_date)
     out.to_csv(path, index=False)
 
 
@@ -72,6 +82,7 @@ def _compute_metrics_cached(df_prices, index_series, p: dict):
         refit_every=p["cov_refit_freq"],
     )
     metrics["Ledoit_Correlation"] = corr
+    metrics["Macro_Regime"] = determine_macro_regime(metrics)
     return metrics.dropna(subset=["DPI", "Ledoit_Correlation"])
 
 
@@ -95,16 +106,17 @@ def render():
 
     idx_col = "VNINDEX" if "VNINDEX" in df_idx.columns else df_idx.columns[0]
     index_series = df_idx[idx_col]
+    data_date = df_prices.index.max().strftime("%Y-%m-%d")
     cache_file = _cache_path(p)
 
-    metrics = _load_daily_cache(cache_file)
+    metrics = _load_daily_cache(cache_file, data_date=data_date)
     if metrics is not None:
         st.caption(f"⚡ Dùng cache cùng ngày: {cache_file}")
     else:
         with st.spinner("Đang tính Dispersion metrics..."):
             metrics = _compute_metrics_cached(df_prices, index_series, p)
             try:
-                _save_daily_cache(cache_file, metrics)
+                _save_daily_cache(cache_file, metrics, data_date=data_date)
                 st.caption(f"💾 Đã tạo cache ngày mới: {cache_file}")
             except Exception as e:
                 st.warning(f"Tính xong nhưng không ghi được cache file: {e}")
@@ -114,11 +126,18 @@ def render():
         return
 
     latest = metrics.iloc[-1]
+    summary = summarize_dispersion_state(metrics)
     
-    c1, c2, c3 = st.columns(3)
+    c1, c2, c3, c4 = st.columns(4)
     c1.metric(f"Spread_Z ({p['zscore_type']})", f"{latest['Spread_Z']:+.2f}σ")
     c2.metric(f"DPI ({p['dpi_window']}d)", f"{latest['DPI']:.1f}%")
     c3.metric("Ledoit Corr", f"{latest['Ledoit_Correlation']:.3f}")
+    c4.metric("Macro Regime", str(latest["Macro_Regime"]))
+
+    s1, s2, s3 = st.columns(3)
+    s1.metric("Broad Stress", f"{summary['broad_stress_score']:.1f}/100", summary["broad_stress_level"], delta_color="inverse")
+    s2.metric("CSAD / CSSD Z", f"{latest['CSAD_Z']:+.2f} / {latest['CSSD_Z']:+.2f}")
+    s3.metric("Downside Participation", f"{latest['Downside_Participation']:.1f}%")
 
     render_main_chart(
         metrics,
@@ -184,6 +203,15 @@ def render():
                                                          .replace("{corr_val}", f"{corr_val:.3f}")\
                                                          .replace("{cs_skew}", cs_skew)\
                                                          .replace("{cs_kurt}", cs_kurt)
+                            full_prompt += (
+                                "\n\n# V2 DIAGNOSTICS\n"
+                                f"- Macro regime: {summary['macro_regime']}\n"
+                                f"- Broad stress score: {summary['broad_stress_score']:.1f}/100 "
+                                f"({summary['broad_stress_level']})\n"
+                                f"- CSAD_Z / CSSD_Z: {summary['csad_z']:+.2f} / {summary['cssd_z']:+.2f}\n"
+                                f"- Downside participation: {summary['downside_participation']:.1f}%\n"
+                                "- Return method: no forward-fill; bad ticks >50% daily absolute return treated as missing.\n"
+                            )
 
                             parts = full_prompt.split("# INPUT DATA")
                             system_prompt = parts[0].strip()
@@ -233,5 +261,3 @@ def render():
                         st.markdown(f.read())
                 except Exception as e:
                     st.error(f"Lỗi đọc file: {e}")
-
-
