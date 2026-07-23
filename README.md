@@ -22,6 +22,7 @@ Day khong phai retail trading bot va khong phai he thong dat lenh. Nen tang bien
 - [Tests](#tests)
 - [Cau truc repository](#cau-truc-repository)
 - [AI-CIO layer](#ai-cio-layer)
+- [AI-CIO Chat](#ai-cio-chat)
 - [Gioi han hien tai](#gioi-han-hien-tai)
 - [Disclaimer](#disclaimer)
 
@@ -32,6 +33,7 @@ Day khong phai retail trading bot va khong phai he thong dat lenh. Nen tang bien
 - **Systematic equity research**: factor examination, IC validation, pairs trading, risk-adjusted growth, VN100 corporate health.
 - **Valuation context**: bank residual income/justified P/B, PVGO/P-E context, bottom-up financial statement processing.
 - **AI-CIO synthesis**: child reports, evidence packets, history ledger, humility/falsification context, PDF/Telegram/GitHub automation.
+- **AI-CIO Data Agent**: hoi dap nhieu luot bang native read-only tools, co audit trail, bang/bieu do va retrieval fallback.
 - **Research engineering**: multipage Streamlit app, local data lake, daily cache, CLI update scripts, GitHub Actions and targeted pytest coverage.
 
 ## Methodology Tóm tắt
@@ -276,6 +278,26 @@ Core behavior:
 - Optional Telegram delivery va GitHub Actions automation.
 
 LLM chi nen duoc doc nhu mot analyst tong hop bang chung. Cac score/regime va risk constraints can duoc review lai bang metrics goc.
+
+## AI-CIO Chat
+
+Trang `pages/E_AI_CIO_Chat.py` cung cap AI-CIO Data Agent v2 tren du lieu cua du an.
+
+- `shared/ai_cio_data_agent.py` chi expose sau native read-only tools: `search_project_data`, `read_timeseries`, `read_project_file`, `get_tool_metrics`, `get_data_health` va `list_quant_tools`.
+- Agent khong phai coding agent: khong co shell, Python executor, write tool, updater hay quyen truy cap duong dan ngoai allowlist.
+- Cau hoi theo thoi gian nhu "3 phien gan nhat" bat buoc parse va sap xep cot ngay qua `read_timeseries`, khong lay `tail()` theo thu tu file.
+- UI hien audit trail, file nguon, bang va bieu do ma agent da dung. Co the yeu cau file cu the bang cu phap `@data_lake/vnindex_cache.csv`.
+- Neu provider khong phat native tool-call, compatibility router phia server van chay cung read-only tools va dua output da gioi han cho model tong hop. Provider localhost mac dinh vao mode nay de tranh gateway treo do protocol; co the opt-in native bang `QUANT_PLATFORM_LOCAL_NATIVE_TOOLS=true`. `shared/ai_cio_chat.py` chi la retrieval du phong cuoi cung khi tool evidence khong doc duoc.
+- `command/build_ai_cio_data_catalog.py` tao `data_lake/ai_cio_data_catalog.json` deterministic, chi chua path/format/size/schema va khong chua row values.
+- Cac GitHub Actions data pipeline tai tao catalog sau khi update data. Streamlit Cloud doc catalog da commit thay vi scan toan bo data lake luc khoi dong.
+- Tren cloud, provider localhost tu dong bi an; co the force bang `QUANT_PLATFORM_CLOUD_RUNTIME=true`. API key cua provider remote can duoc luu trong Streamlit Secrets/GitHub Secrets.
+- Path traversal, ten file secrets va instruction nam trong data source bi chan/vo hieu hoa boi system contract. Pickle/PDF chi duoc index metadata, khong deserialize trong chat.
+
+Tao lai catalog thu cong:
+
+```bash
+python -m command.build_ai_cio_data_catalog
+```
 
 ## Screenshots
 

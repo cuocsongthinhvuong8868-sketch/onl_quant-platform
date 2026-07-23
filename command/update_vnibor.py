@@ -7,6 +7,7 @@ import datetime
 import logging
 import sys
 from pathlib import Path
+from zoneinfo import ZoneInfo
 
 # Setup logging
 logging.basicConfig(
@@ -20,7 +21,18 @@ ROOT_DIR = Path(__file__).resolve().parent.parent
 if str(ROOT_DIR) not in sys.path:
     sys.path.insert(0, str(ROOT_DIR))
 
-from config import DATA_LAKE
+from config import DATA_LAKE  # noqa: E402
+
+
+VIETNAM_TIMEZONE = ZoneInfo("Asia/Ho_Chi_Minh")
+
+
+def _timestamp_ms_to_vietnam_date(timestamp_ms: int | float) -> str:
+    timestamp_utc = datetime.datetime.fromtimestamp(
+        float(timestamp_ms) / 1000.0,
+        datetime.timezone.utc,
+    )
+    return timestamp_utc.astimezone(VIETNAM_TIMEZONE).strftime("%Y-%m-%d")
 
 def update_vnibor():
     url = "https://api.wichart.vn/vietnambiz/vi-mo"
@@ -67,8 +79,7 @@ def update_vnibor():
             if val is None:
                 continue
                 
-            dt = datetime.datetime.fromtimestamp(ts_ms / 1000.0, datetime.timezone.utc)
-            date_str = dt.strftime("%Y-%m-%d")
+            date_str = _timestamp_ms_to_vietnam_date(ts_ms)
             
             if date_str not in data_by_date:
                 data_by_date[date_str] = {}

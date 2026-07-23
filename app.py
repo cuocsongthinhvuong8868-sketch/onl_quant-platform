@@ -89,6 +89,20 @@ with col4:
 
 st.markdown("---")
 
+with st.container(border=True):
+    chat_col, chat_action_col = st.columns([4, 1])
+    with chat_col:
+        st.markdown("### 💬 Chat với AI CIO")
+        st.markdown(
+            "Đặt câu hỏi nhiều lượt trên toàn bộ data lake, báo cáo và tài liệu phương pháp; "
+            "AI-CIO sẽ hiển thị các nguồn dữ liệu đã dùng."
+        )
+    with chat_action_col:
+        if st.button("Mở AI CIO Chat", key="btn_ai_cio_chat", use_container_width=True, type="primary"):
+            st.switch_page("pages/E_AI_CIO_Chat.py")
+
+st.markdown("---")
+
 # ── Data lake status ──
 from config import MARKET_DATA, DATA_LAKE, ROOT_DIR
 from datetime import datetime, date

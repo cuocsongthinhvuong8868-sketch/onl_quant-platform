@@ -113,6 +113,10 @@ jobs:
           echo "▶️  python ${{ steps.cfg.outputs.script }} ${{ steps.cfg.outputs.args }}"
           python ${{ steps.cfg.outputs.script }} ${{ steps.cfg.outputs.args }}
 
+      - name: 🗂️ Build AI-CIO data catalog
+        if: steps.cfg.outputs.commit == 'true'
+        run: python command/build_ai_cio_data_catalog.py
+
       - name: 📤 Commit outputs nếu thay đổi
         if: steps.cfg.outputs.commit == 'true'
         run: |

@@ -82,6 +82,9 @@ jobs:
       - name: Run update_vnibor.py
         run: python command/update_vnibor.py
 
+      - name: Build AI-CIO data catalog
+        run: python command/build_ai_cio_data_catalog.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"

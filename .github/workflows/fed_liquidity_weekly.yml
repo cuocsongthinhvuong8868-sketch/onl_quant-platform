@@ -35,12 +35,15 @@ jobs:
           FRED_API_KEY: ${{ secrets.FRED_API_KEY }}
         run: python command/update_fed_liquidity.py
 
+      - name: Build AI-CIO data catalog
+        run: python command/build_ai_cio_data_catalog.py
+
       - name: Commit and Push changes
         run: |
           git config --global user.name "github-actions[bot]"
           git config --global user.email "41898282+github-actions[bot]@users.noreply.github.com"
 
-          git add data_lake/fed_liquidity_cache.csv
+          git add data_lake/fed_liquidity_cache.csv data_lake/ai_cio_data_catalog.json
 
           if ! git diff-index --quiet HEAD; then
             git commit -m "Auto-update fed_liquidity_cache.csv [skip ci]"
