@@ -103,11 +103,11 @@ def test_updater_skips_write_and_preserves_metadata_when_core_rows_are_unchanged
     stats = scraper.run(
         output_dir=output_dir,
         market_data_path=market_data_path,
-        max_session_lag=1,
     )
 
     assert stats["freshness_status"] == "CURRENT"
     assert stats["session_lag"] == 1
+    assert stats["max_session_lag"] == 1
     assert stats["tables_written"] == 0
     assert stats["data_changed"] is False
     assert stats["rows_added"] == 0
@@ -164,6 +164,37 @@ def test_updater_stamps_only_a_genuinely_new_row(
     assert pd.notna(new_row["scraped_at"])
 
 
+def test_updater_repairs_merge_markers_without_source_changes(
+    tmp_path: Path,
+    monkeypatch,
+) -> None:
+    output_dir = tmp_path / "pvgo"
+    output_dir.mkdir()
+    csv_path = output_dir / f"{TABLE_NAME}.csv"
+    market_data_path = tmp_path / "vnindex_cache.csv"
+    friday = _valuation_row("2026-07-17", close=1_787.45, pe=13.14, pb=2.04)
+    _write_existing_history(csv_path, [friday])
+    header, row = csv_path.read_text(encoding="utf-8").splitlines()
+    csv_path.write_text(
+        f"{header}\n<<<<<<< HEAD\n{row}\n=======\n{row}\n>>>>>>> other-branch\n",
+        encoding="utf-8",
+    )
+    _write_market_dates(market_data_path, ["2026-07-17"])
+
+    scraper = Money24hVNIndexValuationScraper()
+    monkeypatch.setattr(scraper, "scrape", lambda: pd.DataFrame([friday], columns=CORE_COLUMNS))
+
+    stats = scraper.run(output_dir=output_dir, market_data_path=market_data_path)
+
+    assert stats["data_changed"] is False
+    assert stats["history_rows_repaired"] == 4
+    assert stats["tables_written"] == 1
+    persisted = pd.read_csv(csv_path, dtype={"floor_code": str, "range_type": str})
+    assert len(persisted) == 1
+    assert persisted.loc[0, "floor_code"] == "10"
+    assert persisted.loc[0, "range_type"] == "5"
+
+
 def test_cli_fails_on_stale_payload_unless_explicitly_allowed(monkeypatch) -> None:
     def stale_run(self, **kwargs):
         return {"rows_ready": 10, "freshness_status": "STALE"}
@@ -172,6 +203,19 @@ def test_cli_fails_on_stale_payload_unless_explicitly_allowed(monkeypatch) -> No
 
     assert main([]) == 2
     assert main(["--allow-stale"]) == 0
+
+
+def test_cli_forwards_t_plus_one_freshness_default(monkeypatch) -> None:
+    captured: dict[str, object] = {}
+
+    def current_run(self, **kwargs):
+        captured.update(kwargs)
+        return {"rows_ready": 10, "freshness_status": "CURRENT"}
+
+    monkeypatch.setattr(Money24hVNIndexValuationScraper, "run", current_run)
+
+    assert main([]) == 0
+    assert captured["max_session_lag"] == 1
 
 
 def test_ai_context_fails_closed_when_pvgo_exceeds_session_lag(tmp_path: Path) -> None:

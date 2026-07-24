@@ -20,7 +20,6 @@ import requests
 from config import DATA_LAKE
 from tools.pvgo.freshness import (
     DEFAULT_MARKET_DATA_PATH,
-    DEFAULT_MAX_SESSION_LAG,
     evaluate_pvgo_freshness,
     load_market_dates,
 )
@@ -29,6 +28,10 @@ TABLE_NAME = "vnindex_valuation_history"
 DEFAULT_FLOOR_CODE = "10"
 DEFAULT_INDEX_CODE = "VNINDEX"
 DEFAULT_RANGE_TYPE = "5"
+# 24hmoney publishes the completed valuation snapshot on a T+1 schedule.  The
+# updater therefore accepts the previous observed market session by default,
+# while PVGO report consumers keep their stricter zero-lag freshness policy.
+DEFAULT_UPDATE_MAX_SESSION_LAG = 1
 PAGE_URL = "https://24hmoney.vn/indices/vn-index"
 API_URL = "https://api-finance-t19.24hmoney.vn/v1/ios/indices/key-statistic-history"
 SOURCE_NAME = "24hmoney:key-statistic-history"
@@ -130,7 +133,11 @@ def _canonical_core(frame: pd.DataFrame) -> pd.DataFrame:
         if column not in normalized:
             normalized[column] = None
 
-    normalized["date"] = pd.to_datetime(normalized["date"], errors="coerce").dt.strftime("%Y-%m-%d")
+    normalized["date"] = pd.to_datetime(
+        normalized["date"],
+        format="mixed",
+        errors="coerce",
+    ).dt.strftime("%Y-%m-%d")
     for column in TEXT_COLUMNS:
         normalized[column] = normalized[column].fillna("").astype(str)
     for column in ("floor_code", "range_type"):
@@ -139,6 +146,25 @@ def _canonical_core(frame: pd.DataFrame) -> pd.DataFrame:
         normalized[column] = pd.to_numeric(normalized[column], errors="coerce").round(10)
 
     return normalized[CORE_COLUMNS]
+
+
+def _sanitize_existing_history(frame: pd.DataFrame) -> tuple[pd.DataFrame, int]:
+    """Drop malformed/duplicate persisted rows and restore canonical field types."""
+    column_order = CORE_COLUMNS + METADATA_COLUMNS
+    normalized = frame.copy()
+    for column in column_order:
+        if column not in normalized:
+            normalized[column] = None
+
+    normalized[CORE_COLUMNS] = _canonical_core(normalized)
+    valid_keys = normalized["date"].notna() & normalized["index_code"].ne("")
+    invalid_rows = int((~valid_keys).sum())
+    normalized = normalized.loc[valid_keys, column_order].copy()
+
+    duplicates = normalized.duplicated(KEY_COLUMNS, keep="last")
+    duplicate_rows = int(duplicates.sum())
+    normalized = normalized.loc[~duplicates].reset_index(drop=True)
+    return normalized, invalid_rows + duplicate_rows
 
 
 def _changed_incoming_rows(
@@ -228,7 +254,7 @@ class Money24hVNIndexValuationScraper:
         output_dir: Path = DEFAULT_OUTPUT_DIR,
         dry_run: bool = False,
         market_data_path: Path = DEFAULT_MARKET_DATA_PATH,
-        max_session_lag: int = DEFAULT_MAX_SESSION_LAG,
+        max_session_lag: int = DEFAULT_UPDATE_MAX_SESSION_LAG,
     ) -> dict[str, Any]:
         started = time.time()
         frame = self.scrape()
@@ -263,9 +289,11 @@ class Money24hVNIndexValuationScraper:
         column_order = CORE_COLUMNS + METADATA_COLUMNS
         csv_path = output_dir / f"{TABLE_NAME}.csv"
         existing_df = pd.DataFrame(columns=column_order)
+        history_rows_repaired = 0
         if csv_path.exists():
             try:
                 existing_df = pd.read_csv(csv_path)
+                existing_df, history_rows_repaired = _sanitize_existing_history(existing_df)
             except Exception as exc:
                 print(f"Warning: could not read existing CSV at {csv_path}: {exc}")
 
@@ -276,6 +304,7 @@ class Money24hVNIndexValuationScraper:
                 "rows_updated": rows_updated,
                 "rows_unchanged": int(len(incoming) - len(changed_rows)),
                 "data_changed": bool(len(changed_rows)),
+                "history_rows_repaired": history_rows_repaired,
             }
         )
 
@@ -283,7 +312,7 @@ class Money24hVNIndexValuationScraper:
             print(incoming[CORE_COLUMNS].to_string(index=False))
         else:
             output_dir.mkdir(parents=True, exist_ok=True)
-            if len(changed_rows):
+            if len(changed_rows) or history_rows_repaired:
                 tagged = changed_rows.copy()
                 tagged["scrape_run_id"] = self.run_id
                 tagged["scraped_at"] = pd.Timestamp.now(tz=VN_TZ).isoformat()
@@ -317,7 +346,12 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--range-type", default=DEFAULT_RANGE_TYPE)
     parser.add_argument("--output-dir", type=Path, default=DEFAULT_OUTPUT_DIR)
     parser.add_argument("--market-data-path", type=Path, default=DEFAULT_MARKET_DATA_PATH)
-    parser.add_argument("--max-session-lag", type=int, default=DEFAULT_MAX_SESSION_LAG)
+    parser.add_argument(
+        "--max-session-lag",
+        type=int,
+        default=DEFAULT_UPDATE_MAX_SESSION_LAG,
+        help="Maximum accepted lag in observed market sessions (default: 1 for the T+1 feed).",
+    )
     parser.add_argument(
         "--allow-stale",
         action="store_true",
