@@ -1,0 +1,32 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index đạt 3,33% – thấp rõ rệt so với ngưỡng cảnh báo 40%.
+- Số mã vi phạm VaR 95% trong VN30: 1/30 (MWG là mã breach sâu nhất).
+- Complacency toàn thị trường ở mức 5,61% (dưới xa ngưỡng nguy hiểm 80%), với 6 mã bị mispriced, nổi bật là VIC, BMP, LPB.
+
+## 2. Contagion Assessment (Module B)
+Stress Index 3,33% báo hiệu **không có sự lây lan rủi ro hệ thống real‑time** trên VN30. Mức breach chỉ 1/30 phản ánh sự kiện cá biệt ở MWG – không phải đầu sóng giảm sâu đồng loạt. Do đó, nguy cơ lan truyền đột biến từ MWG sang phần còn lại của chỉ số gần như bằng không ở thời điểm này.
+
+## 3. Complacency Assessment (Module C)
+Complacency thấp (5,61%) xác nhận thị trường **không ở regime “ngủ quên”** – định giá rủi ro chưa bị bóp méo do spread nén diện rộng. Điều này **không đồng nghĩa với thị trường “ổn định” hay “vận hành bình thường”**, mà chỉ đơn thuần phản ánh cấu trúc bù rủi ro hiện tại không bị méo mó nghiêm trọng. Kết hợp với Stress Index thấp, bức tranh cho thấy môi trường rủi ro không có dấu hiệu bất thường về lây lan hay định giá sai; dù vậy, không loại trừ các cú sốc bất ngờ từ bên ngoài.
+
+## 4. Stock‑Level Risk Calls
+- **MWG** (breach duy nhất): nên giảm tỷ trọng nếu nắm giữ, đặt điểm cắt lỗ động dạng % so với giá hiện tại (ví dụ −10% từ đóng cửa 24/07) hoặc thủng MA20 trên khung ngày. Đây là rủi ro cá biệt, cần theo dõi khối lượng và tin tức riêng.
+- **VIC, BMP, LPB** (top mispriced): spread nén hơn so với lịch sử nhưng trong bối cảnh Complacency thấp, mức độ cảnh báo không cao. Vẫn giữ trong watchlist để quan sát nếu Complacency tăng đột biến kèm phá vỡ kỹ thuật.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 5.61,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["MWG", "VIC", "BMP", "LPB"],
+  "confidence": "high"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=3.33% (1/30); complacency=5.61% (6/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null

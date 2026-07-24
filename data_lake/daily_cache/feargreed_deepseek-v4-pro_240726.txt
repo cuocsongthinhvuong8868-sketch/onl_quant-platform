@@ -1,0 +1,47 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Điểm số rủi ro 34.0/100, nằm trong vùng FEAR (20–40), tăng nhẹ +0.5 điểm so với phiên trước.
+- EGARCH Vol chuẩn hóa 88.9% (giảm -4.4 điểm % so với phiên trước) – vẫn ở ngưỡng biến động cực đoan (>80%).
+- Rolling Skewness -0.09, âm nhẹ, chưa thấp hơn -0.5 – không phản ánh đuôi trái dày sâu.
+- Downside Correlation (chuẩn hóa) 7.5%, Upside Correlation 18.5% – cả hai ở mức thấp; Downside thấp hơn hẳn Upside, nhưng không mang dấu hiệu tương quan bán tháo hệ thống cao.
+
+## 2. Interpretation
+Dữ liệu đang mô tả pha FEAR có sốc cấp tính (ACUTE_SELLOFF), với biến động rất cao nhưng độ lệch âm không sâu và tương quan giảm điểm thấp. Điều này cho thấy cú bán tháo có tính chất cục bộ, ít lan truyền hệ thống; tâm lý sợ hãi chủ yếu đến từ biến động chứ không từ hoảng loạn đồng pha.
+
+## 3. Cross-Check
+Ghi nhận **phân kỳ**: Điểm số FEAR + cờ sốc ACUTE_SELLOFF nhưng Downside Correlation chỉ 7.5% – trái với kỳ vọng “down-corr cao” của pha sợ hãi cực đoan. Skewness -0.09 cũng không đi cùng mức giảm điểm tương quan cao. Phân kỳ này báo hiệu rủi ro hệ thống hiện tại thấp hơn so với mức điểm sợ hãi đơn thuần; cú sốc có thể đang tập trung vào một nhóm cổ phiếu riêng lẻ.
+
+## 4. Verdict
+Với trạng thái ACUTE_SELLOFF, chiến lược giảm hệ số beta là phù hợp. Tuy nhiên, do phân kỳ nói trên, không cần thiết phải hạ beta xuống cực thấp. Đề xuất **beta mục tiêu 0.55** (trên thang 0-1). Hành động cụ thể:
+- Tăng tỉ trọng tiền mặt hoặc phòng hộ bằng quyền chọn bán chỉ số.
+- Giới hạn mở mới vị thế mua cho đến khi cờ sốc hạ nhiệt và biến động giảm bền vững.
+- Duy trì sàng lọc cổ phiếu có tương quan thấp để tận dụng phân hóa nếu muốn tham gia chọn lọc (stock-picking) với tỉ trọng nhỏ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "24/07/2026",
+  "regime": "FEAR",
+  "score": 34.0,
+  "confidence": "medium",
+  "beta_target": 0.55,
+  "key_signals": [
+    "Điểm số 34 nằm trong vùng FEAR, nhưng Downside Correlation thấp (7.5%) – phân kỳ hệ thống",
+    "EGARCH Vol 88.9% cực đoan dù đang hạ nhiệt, Skewness -0.09 chưa cho thấy hoảng loạn sâu",
+    "Cờ sốc ACUTE_SELLOFF kích hoạt – giới hạn diễn giải risk-on ngay cả khi có phân kỳ"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 34.0
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: ACUTE_SELLOFF / FEAR
+- Signal Confidence: 0.54
+- CSV Rank: 0.25
+- Acute Shock: 0.97
+- Shock Regime Flag: ACUTE_SELLOFF
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## 1. Trạng thái news sentiment hiện tại  
+
+- **Cửa sổ 1 ngày (23/07/2026):** Nghiêng về **risk-on** với dấu hiệu ban đầu. Posterior mean +0.3481, P_conf = 85% (xác suất cùng chiều), khoảng tin cậy 90%: -0.207 đến +0.904. Tín hiệu tích cực nhưng chưa đủ mạnh để khẳng định chắc chắn (ngưỡng Leaning).  
+- **Cửa sổ 7 ngày:** Khẳng định chắc chắn **strong_risk_on**. Posterior mean +0.6320, P_conf = 100%, khoảng CI hẹp và dương hoàn toàn (+0.493 đến +0.771).  
+- **Cửa sổ 30 ngày:** Khẳng định chắc chắn **strong_risk_on**. Posterior mean +0.4786, P_conf = 100%, CI: +0.424 đến +0.533.  
+
+→ Bức tranh trung – dài hạn rất vững vàng ở trạng thái chấp nhận rủi ro cao; ngắn hạn hạ nhiệt nhẹ nhưng vẫn nghiêng về risk-on.
+
+## 2. Các kênh dẫn dắt chính  
+
+**Kéo risk-on:**  
+- **1d:** Hàng hóa (+2.00, P_conf 100%), Tỷ giá ngoại hối (+1.324, P_conf 100%), Căng thẳng tín dụng (+1.217, P_conf 99%), Lợi nhuận (+1.176, P_conf 100%).  
+- **7d:** Căng thẳng tín dụng (+1.624, P_conf 100%), Lợi nhuận (+1.407), Tỷ giá ngoại hối (+1.099), Chính sách tiền tệ (+1.071).  
+- **30d:** Lợi nhuận (+1.255), Căng thẳng tín dụng (+0.990), Chính sách tiền tệ (+0.922), Tỷ giá (+0.879) – đều độ tin cậy tuyệt đối.  
+
+**Kéo risk-off (yếu, nhưng cần lưu ý):**  
+- **7d:** Lạm phát (-0.572, P_conf 85% – nghiêng về tiêu cực), Thanh khoản (-0.122, P_conf 87%), Khẩu vị rủi ro (-0.123, P_conf 96%) – tín hiệu nhỏ nhưng độ tin cậy cao.  
+- **30d:** Hàng hóa (-0.630, P_conf 100%) – mâu thuẫn với tín hiệu ngày: giá hàng công nghiệp Trung Quốc yếu kéo dài, dầu phục hồi chỉ là nhất thời.
+
+## 3. Các động lực quan trọng  
+
+**Tích cực** (từ dữ liệu widata, độ tin cậy cao):  
+- Giá dầu WTI vượt đỉnh tháng lên 87.57 USD/thùng (23/07, +1.303 điểm) – kênh Hàng hóa.  
+- Tỷ giá trung tâm liên tục tăng: 25,260 đồng ngày 21/07 (+8 đồng) – giảm áp lực tỷ giá.  
+- Lợi suất TPCP đi ngang 23/07 – ổn định thị trường nợ (kênh Tín dụng).  
+- PBoC giữ LPR 1Y ở 3.00% tháng 7/2026 – chính sách tiền tệ hỗ trợ.  
+- Giá đồng, PVC Trung Quốc hồi phục kỹ thuật nhưng vẫn dưới trung bình dài hạn.  
+
+**Tiêu cực** (từ dữ liệu widata):  
+- NHNN hút ròng 13,102.1 tỷ đồng qua OMO phiên 22/07 (-0.741) – siết nhẹ thanh khoản.  
+- Hàng loạt nguyên liệu Trung Quốc (thép HRC, phân Ure, PVC, đường) chạm đáy 1 năm / 10 năm trong tháng 6–7 (điểm từ -0.57 đến -1.36) – sức cầu công nghiệp yếu.  
+- Giá bạc Mỹ giảm đáy 6 tháng (-0.655) – tín hiệu rủi ro với tài sản trú ẩn.
+
+## 4. Kết luận đối với AI CIO  
+
+News sentiment **ủng hộ mạnh mẽ** lớp vĩ mô risk-on ở khung trung – dài hạn, với các trụ cột: lợi nhuận, tín dụng, chính sách tiền tệ, tỷ giá – tất cả xác suất hậu nghiệm cao. Ngắn hạn hơi nghiêng về risk-on nhưng chưa đủ tự tin, đồng thời xuất hiện lực cản từ thanh khoản (OMO hút ròng) và giá hàng hóa yếu.  
+
+- Với vị thế macro layer: **củng cố** rủi ro chấp nhận thêm.  
+- Với market‑internal tools: nếu các chỉ báo kỹ thuật/độ rộng/khối lượng xác nhận → có thể tăng tỷ trọng; nếu mâu thuẫn → giữ risk-on nhưng giảm quy mô, chờ tín hiệu rõ hơn từ cửa sổ 1 ngày.
+
+## 5. Cảnh báo  
+
+- **Tỷ trọng nguồn tin xã hội cao:** 1d có 35% từ mozyfin_social, 7d là 32%, 30d là 23%. Đây là bằng chứng ý kiến/lan truyền, độ tin cậy thấp → giảm trọng số cho các biến động ngắn hạn được dẫn dắt bởi các kênh đó.  
+- Dữ liệu được sinh lúc 16:30 ngày 23/07/2026 – còn mới, không có độ trễ đáng kể.  
+- Rủi ro nhiễu tiêu đề: phần lớn driver dương là biến động tỷ giá/giá dầu hàng ngày, dễ đảo chiều. Cần kết hợp với kịch bản cơ bản và dữ liệu chậm hơn để ra quyết định cuối cùng.

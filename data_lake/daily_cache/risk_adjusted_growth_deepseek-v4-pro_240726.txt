@@ -1,0 +1,30 @@
+## 1. Scenario Assessment  
+K = 1.0, CoE = 14% là mức baseline cho ngành ngân hàng VN – không khắc nghiệt. Stress test không có hình phạt bổ sung. Tuy nhiên, chỉ 2/6 mã được cung cấp có Alpha ≥ 0 (SHB +4.1%, MBB +0.1%), còn lại đều âm, thậm chí âm sâu. Mặt bằng chung của ngành đang **đốt vốn** (value destruction), phản ánh định giá quá cao hoặc rủi ro chưa được chiết khấu hết. Đây là tín hiệu thận trọng cho nhà đầu tư cơ bản.
+
+## 2. Top Alpha Decomposition  
+- **SHB (Alpha +4.1%)** – **Fortress**. Driver chính: P/B rẻ (0.80) kết hợp σ(ROE) cực thấp (1.9%) và payout thấp (8.6%) → Disciplined Return lên tới ~18.1%, vượt trội so với CoE. Đây là cổ phiếu tạo giá trị bền vững nhờ định giá hấp dẫn và chất lượng ổn định.  
+- **MBB (Alpha +0.1%)** – **Fortress (nhẹ)**. ROE cao (21.8%), σ thấp (1.6%), nhưng P/B 1.30 làm pha loãng lợi nhuận giữ lại. Alpha sát 0, vẫn tạo giá trị nhưng biên an toàn mỏng.  
+- **ACB (Alpha -1.0%)** – **Growth Trap**. ROE rất cao (23.0%) nhưng σ 2.7% và payout 15.9% khiến Disciplined Return bị kéo về sát CoE, dẫn đến Alpha âm. Định giá P/B 1.23 không còn rẻ để bù đắp rủi ro.
+
+## 3. Value Traps Warning  
+- **LPB (Alpha -12.7%)** – **Premium Burn**. P/B 3.32 quá đắt so với ROE 21.1%, lại chịu risk penalty lớn từ σ 3.8%. Định giá ảo tưởng là thủ phạm chính.  
+- **EIB (Alpha -10.2%)** – **Cheap Trap**. ROE thấp (10.0%) không đủ bù đắp CoE, ngay cả với payout thấp; σ cao 3.8% càng đào sâu Alpha âm. P/B 1.26 chỉ rẻ nếu so với chính nó, không phải rẻ thực chất.  
+- **VPB (Alpha -9.6%)** – **Growth Trap + Risk Penalty**. ROE vừa phải (14.1%), nhưng σ cao nhất nhóm (4.7%) và payout lớn (24.6%) phá hủy phần lớn lợi nhuận giữ lại. Rủi ro quá nặng so với mặt bằng sinh lời.
+
+## 4. Portfolio Construction  
+- **Core (70%)**: **SHB** (chính), **MBB** (bổ trợ) – cả hai đều thuộc Fortress với rủi ro thấp và tạo alpha dương.  
+- **Tactical (0%)**: Không có mã Cheap-but-not-trap nào trong danh sách. ACB tạm thời không đưa vào do Alpha âm.  
+- **Cấm mua / giảm tỷ trọng**: LPB, EIB, VPB.  
+- **Sector view**: Bearish – nếu không thể chọn đúng Fortress, toàn ngành đang hủy hoại giá trị ở mức K=1.0. Chỉ nên giữ các mã có Alpha dương rõ ràng.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB", "MBB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```

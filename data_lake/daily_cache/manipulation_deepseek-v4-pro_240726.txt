@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+## 1. Observations
+- OLS Slope ở mức 0.31, phân vị 20.9th – độ nhạy của tổ hợp VIC/VHM/VRE với VNINDEX đang ở vùng thấp, gần cực phân tách.
+- Hệ số tương quan 0.78, phân vị 61.7th – tương quan vẫn duy trì mức trung bình, chưa rơi về cực rời rạc.
+- Trạng thái sự kiện: **DECOUPLING**, với ΔCorr = -0.38 và ΔSlope = -0.57, cả hai đều vượt ngưỡng -0.15, xác nhận VIN đang mất dần khả năng dẫn dắt chỉ số.
+
+## 2. Microstructure Read
+Tổ hợp VIC/VHM/VRE không còn chi phối đà tăng của VNINDEX. Correlation ở mức “lỏng” (61.7th) cho thấy chúng vẫn cùng pha với thị trường, nhưng Slope ở phân vị thấp (20.9th) chỉ ra rằng mỗi biến động của nhóm này tác động lên chỉ số rất yếu. Nếu cả hai phân vị đều < 20th, thị trường đã rời bỏ hoàn toàn VIN. Hiện tại, VNINDEX đang vận động theo nhóm khác (Bank, Chứng khoán, Thép) trong bối cảnh DECOUPLING rõ nét.
+
+## 3. Event Study Interpretation
+Sự kiện DECOUPLING từ 04/05/2026 đến nay cho thấy xác suất VIC/VHM/VRE “kéo” only VNINDEX trong phiên/day trading đã suy yếu nghiêm trọng. Intraday, nếu nhóm này tăng mạnh nhưng VNINDEX không phản ứng cùng nhịp, đó chính là biểu hiện của DECOUPLING. Overnight, coupling yếu càng làm giảm độ tin cậy khi dùng biến động VIN để dự báo gap của VNINDEX. Đây không phải tín hiệu giả – cả ΔCorr và ΔSlope đều cùng chiều giảm mạnh.
+
+## 4. Verdict
+- **Market read**: index-led-by-other-sectors. VIN group không còn là leading indicator đáng tin cậy.
+- Các nhóm cần theo dõi dẫn dắt thay thế: Ngân hàng (VCB, BID, CTG), Chứng khoán (SSI, VND), Thép (HPG).
+- Stop‑loss tham khảo: Nếu sử dụng VIC cho một vị thế phòng hộ, có thể đặt stop‑loss dưới mức hiện tại 3%, tức tại 213.20 – 3% ≈ 206.80 (≈206.800 VND), hoặc dưới MA20 (nếu có dữ liệu kỹ thuật). Mọi ngưỡng đều được tính từ giá đóng cửa ngày 24/07/2026 trong INPUT.
+
+```json
+{
+  "tool": "manipulation",
+  "date": "24/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 20.9,
+  "corr_percentile": 61.7,
+  "market_read": "other_sector_led",
+  "confidence": "high"
+}
+```
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.308; corr=0.781; regime=DECOUPLING

@@ -1,0 +1,39 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Lực cầu hiện tại 6.73%, thấp hơn nhiều so với trung bình dài hạn 11.23% (delta –4.5pp) – mặt mua bị nén mạnh.
+- Lực cung 12.47%, xấp xỉ trung bình 12.89% (delta –0.42pp) – áp lực bán duy trì cao dù chưa giãn rộng đột biến.
+- Cả hai chiều đều trong chế độ momentum: Phi cầu +0.144 (đà mua), Phi cung +0.187 (đà bán). Cung có quán tính mạnh hơn, củng cố xu thế giảm.
+
+## 2. Supply-Demand Dynamics
+Trạng thái hiện tại: **phân phối** (distribution) với bên bán chiếm ưu thế. Mặc dù con số tuyệt đối của lực cung chưa vượt xa trung bình, nhưng chẩn đoán V2 chỉ ra điểm stress tăng cao (59.5/100, mức ELEVATED), downside rank 0.67 và net sell pressure +5.7pp (MA5 +18pp). Áp lực cung đang chi phối thị trường, bất chấp các đường Monte Carlo cho thấy cân bằng cục bộ. So sánh độ lớn momentum: |Phi cung| = 0.187 > |Phi cầu| = 0.144 → bên cung giữ động lượng thực sự.
+
+## 3. Stress-Test Read
+P95 Downside = 22.19%: trong kịch bản cực đoan, tỷ lệ mã giảm mạnh có thể lên tới 22.19% – biên độ panic đáng kể. So với P95 Upside 19.37%, đuôi rủi ro lệch hẳn về phía giảm (downside tail dày hơn). Bất đối xứng này nhất quán với môi trường phân phối và cảnh báo rủi ro sụt giảm diện rộng.
+
+## 4. Verdict
+Tỷ trọng giải ngân đề xuất: **0%**. Trong bối cảnh stress bán ở mức cao, momentum cung mạnh hơn cầu, bất kỳ nỗ lực giải ngân nào đều đối mặt rủi ro đuôi. Chiến lược: **phòng thủ** (defensive), giữ tiền mặt, kiên nhẫn chờ tín hiệu hạ nhiệt từ breadth và chỉ số stress.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 22.19,
+  "p95_upside_pct": 19.37,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: PERSISTENT_SELL_PRESSURE
+- Breadth Stress Score: 59.5
+- Downside Rank: 0.67
+- Net Sell Pressure: +5.7 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

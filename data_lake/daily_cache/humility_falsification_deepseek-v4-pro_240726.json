@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-24T05:14:52",
+  "t_data_date": "2026-07-24",
+  "target_report_date": "2026-07-23",
+  "report_match": "fallback:2026-07-22",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_220726.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_220726.txt",
+  "report_mtime": "report:2026-07-24T05:05:34|sidecar:2026-07-24T05:05:34",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_220726.txt:474b880c9223bfc6dd581d1bc3f231b4698f0e1b|sidecar:ai_cio_humility_rules_deepseek-v4-pro_220726.json:29bad3ff9789fdf0bf016664244c2dd4a9ac3a1b",
+  "parsed": {
+    "report_date": "2026-07-22",
+    "composite_score": 21.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 4.0,
+        "unit": "sessions",
+        "description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 6.1,
+        "unit": "%",
+        "description": "Tỷ lệ cổ phiếu trên MA20 vượt 45%"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.3,
+        "unit": "%",
+        "description": "Chỉ số SSI giảm xuống dưới 55%"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.325,
+        "unit": "",
+        "description": "Hệ số đuôi EVT qua tất cả ngưỡng đều dưới 0.25"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 21.7,
+        "unit": "th pct",
+        "description": "Phân vị tương quan Vingroup xuống dưới 70"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.9,
+        "unit": "th pct",
+        "description": "CQS rời khỏi vùng cực kỳ căng thẳng (dưới 80th percentile)"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-22",
+      "composite_score": 21.0,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 4,
+          "unit": "sessions",
+          "description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 6.1,
+          "unit": "%",
+          "description": "Tỷ lệ cổ phiếu trên MA20 vượt 45%"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.3,
+          "unit": "%",
+          "description": "Chỉ số SSI giảm xuống dưới 55%"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.325,
+          "unit": "",
+          "description": "Hệ số đuôi EVT qua tất cả ngưỡng đều dưới 0.25"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 21.7,
+          "unit": "th pct",
+          "description": "Phân vị tương quan Vingroup xuống dưới 70"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.9,
+          "unit": "th pct",
+          "description": "CQS rời khỏi vùng cực kỳ căng thẳng (dưới 80th percentile)"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-22",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "4 sessions",
+      "T actual": 4.0,
+      "T actual display": "4 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-23",
+      "Description": "Số phiên STRESS/WARNING trong 20 phiên giảm dưới 5",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "6.1%",
+      "T actual": 7.294117647058823,
+      "T actual display": "7.294%",
+      "Delta": 1.1941176470588237,
+      "Delta display": "+1.194%",
+      "Status": "Intact",
+      "Data date": "2026-07-24",
+      "Description": "Tỷ lệ cổ phiếu trên MA20 vượt 45%",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.3%",
+      "T actual": 63.508760483772875,
+      "T actual display": "63.5%",
+      "Delta": 0.2087604837728776,
+      "Delta display": "+0.209%",
+      "Status": "Intact",
+      "Data date": "2026-07-24",
+      "Description": "Chỉ số SSI giảm xuống dưới 55%",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.325",
+      "T actual": 0.32520846567672185,
+      "T actual display": "0.325",
+      "Delta": 0.00020846567672183625,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-07-24",
+      "Description": "Hệ số đuôi EVT qua tất cả ngưỡng đều dưới 0.25",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "21.7 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Phân vị tương quan Vingroup xuống dưới 70",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.9 th pct",
+      "T actual": 99.86772486772487,
+      "T actual display": "99.9 th pct",
+      "Delta": -0.03227513227513157,
+      "Delta display": "-0.032 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-24",
+      "Description": "CQS rời khỏi vùng cực kỳ căng thẳng (dưới 80th percentile)",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 4,
+      "date": "2026-07-23",
+      "error": ""
+    },
+    "breadth": {
+      "value": 7.294117647058823,
+      "date": "2026-07-24",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.508760483772875,
+      "date": "2026-07-24",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-24",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.32520846567672185,
+      "date": "2026-07-24",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.86772486772487,
+      "date": "2026-07-24",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

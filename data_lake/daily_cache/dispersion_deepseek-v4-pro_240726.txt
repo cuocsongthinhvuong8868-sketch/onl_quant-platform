@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread_Z = –0.44σ: mức phân tán đang thấp hơn trung bình 60 ngày, thị trường không căng thẳng.
+- DPI = 48.3%: chưa vượt ngưỡng 70%, chưa hình thành chế độ phân tán dai dẳng.
+- Tương quan trung bình cặp cổ phiếu = 0.032, tiệm cận 0 – môi trường phân hoá cực mạnh.
+- CS Skew = +0.38 (lệch dương nhẹ), Kurtosis = 8.14 > 5 – có đuôi béo, xuất hiện dị biệt nhưng chưa hình thành xu hướng đuôi cực đoan.
+
+## 2. Trạng thái cấu trúc
+Cả Spread_Z và DPI đều ở mức thấp, khẳng định trạng thái **bình thường, không stress**. Không xảy ra stress cục bộ (Spread_Z thấp) hay kéo dài. Thị trường đang vận hành trong chế độ phân hoá lành mạnh, không có dấu hiệu hoảng loạn hay phân phối đỉnh. Điểm căng thẳng tổng thể (broad stress score) chỉ 7.5/100, xác nhận không có áp lực bán tháo diện rộng.
+
+## 3. Kiểm tra chéo & hướng đuôi
+Độ lệch dương (+0.38) ở vùng an toàn, không phản ánh cú đẩy điên rồ (trên +1) hay cú sập cá biệt (dưới –1). Tuy nhiên, Kurtosis 8.14 cho thấy các outlier đuôi béo vẫn tồn tại – tức là những cú dịch chuyển bất thường ở một vài cổ phiếu riêng lẻ có thể xảy ra, dù bức tranh toàn thị trường không có dấu hiệu cực đoan. Điều này làm giảm độ tin cậy của các mô hình giả định phân phối chuẩn.
+
+## 4. Ánh xạ chế độ & rủi ro
+Với DPI thấp và tương quan thấp, thị trường nằm trong ô **Healthy Stock-Picking** trên bản đồ 2D. Đây là môi trường lý tưởng cho chiến lược chọn cổ phiếu, vì các diễn biến giá ít bị chi phối bởi xu hướng vĩ mô hay hiệu ứng bầy đàn. Rủi ro chính đối với PM không phải là sập hệ thống hay cạn thanh khoản diện rộng, mà là **rủi ro tập trung**: sự cố đuôi béo tại một vài cổ phiếu riêng lẻ có thể gây tổn thất lớn nếu danh mục quá tập trung vào các tên có đột biến bất lợi. Cần quản trị rủi ro ở cấp độ cổ phiếu đơn lẻ chứ không phải hedging chỉ số.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "24/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.44,
+  "dpi_pct": 48.3,
+  "avg_corr": 0.032,
+  "tail_skew_direction": "positive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 7.5
+- Broad Stress Level: NORMAL
+- CSAD Z: -1.03
+- CSSD Z: -1.25
+- Downside Participation: 12.5%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing

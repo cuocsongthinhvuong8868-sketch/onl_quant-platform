@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI 63.5% — WARNING, cận dưới vùng tích lũy rủi ro ngầm.
+- Market State: ACTIVE STRESS (stress cao + downtrend).
+- Top drivers: S_LIQ (35%), S_VAL (31%), S_COR (18%).
+- EVR PC1 38.1% — tương quan hệ thống vừa phải, chưa cực đoan.
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ dẫn dắt với tỉ trọng 35%. Chỉ báo này đo lường **volume khô cạn so với quy chuẩn 1 năm** (volume giảm mạnh → −log(MA20/MA252) tăng). Ở chế độ downside, hiện tượng khô cạn thanh khoản trong xu hướng giảm cho thấy lực cầu gần như tê liệt, rủi ro trượt giá sâu hơn khi áp lực bán trở lại. S_VAL 31% phản ánh căng thẳng định giá — chênh lệch giữa lợi nhuận 252 ngày của VN30 và lãi suất tiền gửi ở mức âm sâu, đồng nghĩa thị trường đã chiết khấu đáng kể (oversold cục bộ), nhưng chưa đủ để kích hoạt dòng tiền mua vào. S_COR 18% cho thấy mức tương quan hệ thống chưa cao, các mã vẫn phân hóa nhẹ. Sự kết hợp S_LIQ + S_VAL vẽ lên bức tranh “thị trường giảm trong cạn kiệt thanh khoản” hơn là một cú sập tập thể do herding.
+
+## 3. Cross-Check
+VN30 đang nằm dưới MA125, nên không xuất hiện phân kỳ tăng giá — SSI leo thang trong xu hướng giảm là nhất quán. HMM regime ACTIVE STRESS khớp hoàn toàn với mức SSI WARNING (0.535 threshold đã vượt), xác nhận đà bán bền vững. Không có dấu hiệu bẫy tăng (bull-trap) vì giá không tạo đỉnh mới. Không cần flag.
+
+## 4. Verdict
+Với SSI WARNING + ACTIVE STRESS + top driver là khô cạn thanh khoản, cần phòng thủ cao. Khuyến nghị tăng tiền mặt lên **70%** danh mục.  
+Hành động phòng hộ: **giảm beta** danh mục (cắt toàn bộ margin, bán bớt cổ phiếu có beta >1.2). Chưa kích hoạt short futures hay mua put vì SSI chưa vào CRITICAL (>80%), nhưng sẵn sàng nếu S_LIQ tiếp tục dẫn dắt và SSI vượt 0.80.  
+Pillar không mâu thuẫn; tín hiệu đủ rõ để hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.5,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
