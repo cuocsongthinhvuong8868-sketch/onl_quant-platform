@@ -1,0 +1,51 @@
+## 1. Mechanical Decomposition  
+Tuần 2026-07-15, Net Liquidity đạt 5,986,659 triệu USD. Biến động tuần (Impulse Δ) ghi nhận mức +28,459 triệu USD, cho thấy thanh khoản ròng được bơm thêm gần 28.5 tỷ USD so với tuần trước.  
+
+Phân tích các cấu phần:  
+- **WALCL (Bảng cân đối Fed):** 6,743,028 triệu USD – không có số liệu so sánh tuần trước, nhưng với mức RRP gần như bằng 0 (151 triệu USD), thay đổi của WALCL và TGA quyết định hoàn toàn Net Liquidity.  
+- **WTREGEN (TGA):** 756,218 triệu USD – khả năng cao **TGA giảm** (Kho bạc chi tiêu ròng) là nguồn bơm chính trong tuần, vì một đợt tăng WALCL đơn thuần khó tạo ra +28.5B nếu không có hoạt động QE mới rất lớn.  
+- **RRPONTSYD (Reverse Repo):** 151 triệu USD, gần như cạn kiệt, không còn ảnh hưởng đáng kể đến biến động biên.  
+
+Kết luận: Động lực chính của Impulse dương là Treasury xả TGA, bơm thanh khoản trở lại hệ thống ngân hàng. RRP đã đóng vai trò “van xả” trước đây nay không còn tác dụng.
+
+## 2. Cycle Positioning  
+So sánh với lịch sử gần đây:  
+- **Đỉnh Net Liquidity** hậu COVID (~6.5T - 6.8T USD) hình thành khi Fed vừa mở rộng bảng cân đối, RRP chưa hấp thụ nhiều.  
+- **Đáy 2024** (~5.5T - 5.7T USD) trong giai đoạn QT căng thẳng nhất, lúc RRP còn cao và TGA thường xuyên tăng.  
+Hiện tại 5.99T USD nằm ở vùng trung tính, thoát khỏi đáy nhưng chưa trở lại đỉnh.  
+
+Pha thanh khoản: RRP đã cạn (<100B từ lâu), đồng nghĩa **QT không còn đệm an toàn**. Fed gần như chắc chắn đã dừng hoặc kết thúc QT để tránh rút thẳng dự trữ ngân hàng. Chính sách tiền tệ thiên về duy trì ổn định, chưa có dấu hiệu QE chủ động. Treasury đang ở chế độ chi tiêu ròng (TGA giảm), đây là yếu tố bơm thanh khoản thụ động nhưng bền vững trong ngắn hạn.  
+
+Tóm lại, hệ thống đang ở **pha trung tính – hậu QT, chưa vào QE mở rộng**.
+
+## 3. Signal Strength  
+- Tín hiệu từ mô hình: **HOLD** (Impulse_EMA > 0 nhưng Z-Score chỉ +0.51σ).  
+- Z-Score +0.51 nằm dưới ngưỡng +1σ, xác nhận không có bùng nổ thanh khoản.  
+- Impulse EMA(4) = +39,112 triệu USD – dương nhẹ, nhất quán với tín hiệu HOLD (không đủ mạnh để ADD, không âm để CUT).  
+
+Tín hiệu phản ánh môi trường thanh khoản ôn hòa, thiếu động lực bùng nổ rủi ro nhưng cũng không có lực hút rút mạnh.
+
+## 4. Cross-Asset Spillover (1‑4 tuần)  
+**SPX/NDX:** Thanh khoản ổn định, Impulse dương nhẹ → bias tích cực yếu, nhưng không đủ để tạo sóng tăng mạnh.  
+**DXY/Gold/Crypto:** DXY có thể chịu áp lực giảm nhẹ khi TGA xả (tăng cung USD thực), hỗ trợ nhẹ cho Vàng và Crypto. Tuy nhiên, mức độ không lớn vì dòng tiền chưa thực sự dồi dào.  
+**VN-Index:** Theo cơ chế lan tỏa: Fed liquidity ↑ → DXY ↓ → EM FX ổn định → dòng vốn ngoại vào ròng tích cực hơn. Với lag 4-8 tuần, tín hiệu hiện tại đem lại **bias hơi tích cực cho VN-Index**, nhưng độ mạnh ở mức trung bình (hệ số tương quan lịch sử ~0.25-0.35). Cơ hội tăng điểm có nhưng không rõ nét.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)  
+- **RRP quá thấp:** Khi RRP gần 0, các tín hiệu CUT trước đây dựa vào RRP tăng giờ không còn giá trị; mô hình giảm độ nhạy với rút thanh khoản thực sự.  
+- **TGA mùa thuế:** Ngày 15/07 là hạn nộp thuế quý II, TGA có thể tăng đột biến trong tuần kế tiếp, gây nhiễu loạn Impulse tuần tới (đảo chiều hút thanh khoản).  
+- **Fed buyback đặc biệt:** Nếu có hoạt động hỗ trợ khẩn cấp hoặc điều chỉnh kỹ thuật bảng cân đối, tín hiệu có thể biến dạng.
+
+## 6. KẾT LUẬN  
+Thanh khoản Fed đang ở chế độ **trung tính – hậu QT, Treasury bơm nhẹ thụ động**. Outlook 2-4 tuần cho tài sản rủi ro: xu hướng tăng điểm yếu, không bùng nổ; VN-Index hưởng lợi nhẹ với độ trễ 4-8 tuần nhưng thiếu xúc tác mạnh.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5986.7,
+  "signal": "HOLD",
+  "z_score": 0.51,
+  "regime": "neutral",
+  "spillover_vnindex": "positive",
+  "confidence": "medium"
+}
+```

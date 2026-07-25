@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 34/100, thuộc vùng FEAR, chỉ tăng không đáng kể (+0.5đ) so với phiên trước.
+- EGARCH Vol (chuẩn hóa) ở 88.9%, giảm 4.4% nhưng vẫn duy trì mức cực kỳ cao.
+- Rolling Skewness -0.09, âm nhẹ, thể hiện phân phối lợi nhuận hơi lệch về phía rủi ro đuôi trái.
+- Downside Correlation 9.9%, Upside Correlation 18.5% – cả hai thấp, nhưng tương quan tăng điểm cao hơn đôi chút so với tương quan giảm.
+- Shock Regime Flag duy trì ACUTE_SELLOFF (Acute Shock 0.98), báo hiệu trạng thái bán tháo cấp tính do giải chấp/call margin.
+
+## 2. Interpretation
+Dữ liệu phản ánh pha FEAR trong bối cảnh sốc bán tháo cấp tính (acute sell-off). Mức điểm 34 kết hợp với volatility chuẩn hóa gần 89% và flag ACUTE_SELLOFF cho thấy rủi ro hệ thống vẫn rất cao. Dù Upside Correlation nhỉnh hơn Downside Correlation, giá trị tuyệt đối cả hai đều thấp, chưa đủ để hình thành tín hiệu phân phối dòng tiền mua đáng kể. Theo cơ chế v2, khi shock flag đang kích hoạt, không thể coi đây là vùng trung tính hay có xu hướng đảo chiều sớm.
+
+## 3. Cross-Check
+- **Score 34 & EGARCH Vol 88.9%**: cùng hướng – điểm số thấp đi kèm biến động cực đoan → tín hiệu nhất quán.
+- **Skewness (-0.09) vs Upside Correlation (18.5%)**: phân kỳ nhẹ, khi skew âm (thị trường nghiêng về bán) nhưng tương quan tăng lại cao hơn tương quan giảm, gợi ý một số cổ phiếu vẫn thu hút lực cầu tương đối. Tuy nhiên, giá trị tuyệt đối thấp nên mức độ tin cậy của phân kỳ này hạn chế.
+
+## 4. Verdict
+Trên dữ liệu hiện tại, xác suất cao thị trường tiếp tục trong trạng thái rủi ro cao, chưa có tín hiệu đủ mạnh để quay lại môi trường chấp nhận rủi ro. Đề xuất beta mục tiêu **0.25** cho danh mục VN-Index.  
+Hành động cụ thể: ưu tiên phòng thủ – duy trì tỷ trọng tiền mặt cao, giảm đòn bẩy, chỉ giữ các vị thế có khả năng chống chịu tốt; tránh gia tăng rủi ro hướng thị trường cho đến khi ACUTE_SELLOFF kết thúc và volatility hạ nhiệt bền vững.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "24/07/2026",
+  "regime": "FEAR",
+  "score": 34.0,
+  "confidence": "medium",
+  "beta_target": 0.25,
+  "key_signals": [
+    "Shock Regime Flag: ACUTE_SELLOFF (Acute Shock 0.98)",
+    "EGARCH Vol 88.9%, Skewness -0.09"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 34.0
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: ACUTE_SELLOFF / FEAR
+- Signal Confidence: 0.54
+- CSV Rank: 0.24
+- Acute Shock: 0.98
+- Shock Regime Flag: ACUTE_SELLOFF
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

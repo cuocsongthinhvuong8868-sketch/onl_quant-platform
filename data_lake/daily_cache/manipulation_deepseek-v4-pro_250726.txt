@@ -1,0 +1,32 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+## 1. Observations
+- OLS Slope hiện ở mức 0.31, phân vị 20.9th – giáp ranh vùng rất thấp, cho thấy độ nhạy của VIN‑composite đối với VNINDEX đang yếu.
+- Correlation 0.78, phân vị 61.3th – vẫn duy trì tương quan nhưng không có đột biến, VIN không thống trị biến động chỉ số.
+- Regime xác định là **DECOUPLING** (ΔCorr -0.38 < -0.15, ΔSlope -0.57 < -0.15), xác nhận mất vai trò dẫn dắt của họ Vingroup từ đầu tháng 5.
+
+## 2. Microstructure Read
+VIC/VHM/VRE hiện không còn là "tay lái" chính của VNINDEX. Slope phân vị thấp cho thấy mỗi biến động của composite VIN chỉ kéo index một cách hạn chế; thị trường đang chuyển dịch dòng tiền sang các nhóm khác. Với cả hai chỉ báo nằm xa ngưỡng >80th, không có dấu hiệu can thiệp hay tập trung bất thường.
+
+## 3. Event Study Interpretation
+DECOUPLING kéo dài từ tháng 5 báo hiệu VNINDEX chạy độc lập với cổ phiếu họ Vingroup. Trong phiên, các biến động của VIC/VHM/VRE ít gây phản ứng dây chuyền lên chỉ số; thay vào đó, nhóm Ngân hàng, Chứng khoán hoặc Thép mới là động lực. Kịch bản qua đêm: rủi ro từ VIN không tác động mạnh đến gap sáng hôm sau, nhưng cần theo dõi nếu corr bất ngờ tăng trở lại (quay về COUPLING) – điều này sẽ là tín hiệu đảo chiều micro‑structure.
+
+## 4. Verdict
+- **Market read**: VNINDEX đang được dẫn dắt bởi các ngành khác (index‑led‑by‑other‑sectors). Vingroup không còn giữ vai trò chi phối.
+- **Leading indicator**: Theo dõi nhóm Ngân hàng (VCB, BID, CTG) và Chứng khoán (SSI, VND) – sự luân chuyển thanh khoản sẽ xác nhận xu hướng chỉ số.
+- **Stop‑loss tham chiếu**: Nếu tham gia vị thế dựa trên luận điểm “VNINDEX hưởng lợi từ nhóm khác”, có thể đặt điểm dừng kỹ thuật cho VNINDEX tại 1,686.11 × (1 − 2.1%) ≈ **1,650 điểm** (mức giảm ~2.1% so với giá hiện tại), tương ứng vùng hỗ trợ ngắn hạn khi loại trừ dao động của họ Vin.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "24/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 20.9,
+  "corr_percentile": 61.3,
+  "market_read": "other_sector_led",
+  "confidence": "medium"
+}
+```
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.308; corr=0.780; regime=DECOUPLING

@@ -1,0 +1,32 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index: 6.67% (thấp, ngưỡng cảnh báo 40%)
+- Số mã VN30 thủng VaR 95%: 2/30  
+- Complacency Index toàn thị trường: 5.61% (thấp, ngưỡng nguy hiểm 80%), số mã mispriced: 6
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress chỉ 6.67%, phản ánh rủi ro lây lan thực (real‑time) không đáng kể. Với 2/30 mã vi phạm VaR 95%, thị trường chưa xuất hiện hiệu ứng domino. Hai mã vi phạm sâu nhất **MWG** và **FPT** là các bluechip lớn, nhưng số lượng tuyệt đối thấp và stress index không tăng đột biến cho thấy đây là sự cố cá biệt, chưa phải đầu sóng lan truyền hệ thống. Khả năng lây lan từ những cú sập này sang phần còn lại của VN30 được đánh giá thấp.
+
+## 3. Complacency Assessment (Module C)
+Complacency Index ở mức 5.61%, xác nhận **thị trường KHÔNG rơi vào regime ngủ quên**. Điều này không đồng nghĩa với “thị trường ổn định” hay “vận hành bình thường” – nó chỉ đơn thuần nói rằng cấu trúc bù rủi ro không bị nén trên diện rộng, các tín hiệu định giá sai rủi ro (như ở Distribution Top hay Sideways kéo dài) không hiện hữu. Kết hợp với Stress Index thấp, bức tranh hiện tại là: không có bằng chứng về một cơn bán tháo lan rộng (contagion) và cũng không có sự tự mãn che giấu rủi ro đuôi (complacency), nhưng biến động đột ngột vẫn có thể đến từ các cú sốc idiosyncratic.
+
+## 4. Stock‑Level Risk Calls
+- **Top crash (Module B):** **MWG**, **FPT** – đề xuất giảm tỷ trọng nếu giá thủng các hỗ trợ động như MA20/MA50 trên khung ngày (D1), nhằm hạn chế rủi ro downtrend tiếp diễn.  
+- **Top mispriced (Module C):** **VIC**, **BMP**, **LPB** – spread bị nén chặt dù thị trường chung không complacent; cần cảnh giác nguy cơ điều chỉnh cục bộ khi spread bất ngờ giãn rộng. Không có tín hiệu bán ngay, nhưng đây là các vị thế tiềm ẩn tổn thương nếu tâm lý đột ngột thay đổi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 6.67,
+  "breach_count": 2,
+  "complacency_pct": 5.61,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["MWG", "FPT", "VIC", "BMP", "LPB"],
+  "confidence": "low"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=6.67% (2/30); complacency=5.61% (6/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null

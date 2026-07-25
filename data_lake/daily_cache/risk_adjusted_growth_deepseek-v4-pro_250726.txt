@@ -1,0 +1,29 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14%) là baseline cho ngành ngân hàng VN, không khắc nghiệt nhưng đủ để lộ rõ chất lượng từng cổ phiếu. Mặt bằng chung đang đốt vốn là chính: hầu hết các mã có Alpha ≤ 0, chỉ SHB và MBB tạo được giá trị thặng dư (Alpha > 0). Như vậy, cơ hội chọn lọc rất khan hiếm – nhà đầu tư cần kỷ luật cao, tránh mua theo đám đông.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +4.0%)**: Là “Fortress” điển hình – P/B rẻ (0.80) kết hợp σROE cực thấp (1.9%), risk penalty nhỏ. ROE 17.5% không quá cao nhưng nhờ payout thấp (8.6%), phần lớn lợi nhuận được tái đầu tư, tạo compound bền vững. Đây là driver chính đưa Disciplined Return vượt CoE.
+- **MBB (Alpha +0.1%)**: Cũng là “Fortress” nhưng biên an toàn hẹp. ROE 21.8% và σROE 1.6% thuộc loại xuất sắc, nhưng P/B 1.30 khiến Disciplined Return chỉ vừa bằng CoE. Giá trị thặng dư mong manh, phụ thuộc vào việc duy trì chất lượng tài sản và định giá không giãn thêm.
+- **ACB (Alpha -1.0%)**: ROE đỉnh nhất nhóm (23.0%) nhưng σROE cao hơn (2.7%) và P/B 1.23 không thực sự rẻ. Đây là dấu hiệu của “Growth Trap”: tăng trưởng ăn mòn bởi rủi ro, không đủ vượt qua chi phí vốn. Dù chỉ âm nhẹ, mã này không tạo giá trị thực.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.7%)**: “Premium Burn” kinh điển. ROE 21.1% khá tốt nhưng P/B 3.32 quá đắt, đẩy tỷ suất lợi nhuận trên vốn đầu tư xuống thảm. Đây không phải cổ phiếu tăng trưởng, mà là cái bẫy định giá.
+- **EIB (Alpha -10.2%)**: “Cheap Trap” – dù P/B 1.25 không quá cao nhưng ROE èo uột (10%) và σROE lớn (3.8%). Risk penalty nuốt trọn phần lợi nhuận ít ỏi, Alpha âm sâu.
+- **VPB (Alpha -9.7%)**: “Growth Trap” điển hình. σROE 4.7% rất cao, ROE 14.1% trung bình và payout tới 24.6% làm giảm khả năng tái đầu tư. Risk penalty lớn nhất nhóm khiến giá trị bị hủy hoại.
+
+## 4. Portfolio Construction
+- **Core Holding (60–70% bank allocation)**: SHB – Fortress thực thụ, P/B rẻ + ổn định vượt trội, Alpha dương rõ ràng. Có thể bổ sung MBB với tỷ trọng nhỏ, nhưng cần theo dõi sát vì biên an toàn hẹp.
+- **Tactical (0–20%)**: Không có mã nào thực sự rẻ mà không phải bẫy. Thận trọng đứng ngoài nhóm này.
+- **Cấm mua**: LPB, EIB, VPB, ACB – tất cả đều Alpha < 0, bất kể câu chuyện tăng trưởng hay thị phần.
+- **Nhận định ngành**: Chỉ 2 mã dương, còn lại đốt vốn → toàn ngành ở trạng thái **neutral** với độ tin cậy trung bình. Chỉ nên giải ngân vào SHB; nếu muốn an toàn tuyệt đối, chờ scenario mềm hơn (K thấp hơn hoặc CoE giảm).
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB", "MBB"],
+  "avoid_list": ["LPB", "EIB", "VPB", "ACB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```

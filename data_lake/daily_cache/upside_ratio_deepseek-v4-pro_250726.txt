@@ -1,0 +1,43 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- **Lệch pha trung bình:** Lực cầu (5.49%) đang bị nén sâu dưới μ (11.22%), trong khi lực cung (27.43%) bùng nổ vượt xa μ (13.05%) → phân phối rõ nét.
+- **Động lượng kép:** Cả hai chiều đều trong vùng momentum (Φ_cầu = 0.142, Φ_cung = 0.181) – cầu yếu vẫn có quán tính, cung mạnh càng có đà.
+- **V2 cảnh báo cấu trúc:** Breadth stress score 76/100 (HIGH), áp lực bán ròng +21.9pp, rank bán áp đảo 0.91 vs rank mua chỉ 0.12.
+
+## 2. Supply-Demand Dynamics
+- Trạng thái hiện tại là **phân phối (distribution)**: dòng tiền lớn đang thoát hàng, cầu bị triệt tiêu, cung áp đảo.
+- Bên cung giữ momentum thực sự: |Φ_cung| = 0.181 > |Φ_cầu| = 0.142, kết hợp với net sell pressure cao → đà bán là lực chi phối thị trường, không phải nhiễu.
+
+## 3. Stress-Test Read
+- P95 Downside = 22.24%: xác suất 5% phiên tới có hơn 1/5 mã giảm mạnh – kịch bản panic vẫn hiện hữu.
+- Bất đối xứng rủi ro: P95 Downside (22.24%) cao hơn P95 Upside (19.58%), tail risk nghiêng về phía giảm sâu. Đuôi trái dày hơn, cho thấy áp lực bán tiềm tàng lớn hơn cơ hội bùng nổ mua.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất: 0–10%** (phòng thủ tuyệt đối, ưu tiên bảo toàn vốn).
+- **Chiến lược: phòng thủ** – không bắt đáy khi đà bán đang mạnh và cấu trúc thị trường là phân phối. Chỉ xem xét giải ngân khi V2 stress hạ nhiệt và ít nhất một chiều phi giảm dưới ngưỡng momentum.
+- Kịch bản “NO ACTIONABLE” không xảy ra vì cả hai Φ đều vượt ±0.10.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 22.24,
+  "p95_upside_pct": 19.58,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: DOWNSIDE_STRESS
+- Breadth Stress Score: 76.0
+- Downside Rank: 0.91
+- Net Sell Pressure: +21.9 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority

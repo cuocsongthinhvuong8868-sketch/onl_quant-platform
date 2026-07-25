@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-25",
+  "composite_score": 24.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 4,
+      "unit": "sessions",
+      "description": "Số phiên VNIBOR STRESS/WARNING giảm dưới 5, xác nhận căng thẳng thanh khoản liên ngân hàng đã hạ nhiệt hẳn."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 7.5,
+      "unit": "%",
+      "description": "Tỷ lệ mã trên MA20 vượt 45%, báo hiệu thị trường thoát khỏi trạng thái suy yếu lan rộng."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.5,
+      "unit": "%",
+      "description": "SSI giảm dưới ngưỡng 55%, rủi ro hệ thống giảm từ WARNING về trạng thái bình thường."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.325,
+      "unit": "",
+      "description": "EVT Xi Max trên toàn bộ lưới ngưỡng giảm dưới 0.25, đuôi phân phối trở nên mỏng, rủi ro cực đoan giảm."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 21.7,
+      "unit": "th pct",
+      "description": "Hệ số coupling của họ Vingroup duy trì dưới phân vị 70, rủi ro tập trung dẫn dắt từ nhóm Vingroup không tăng cao."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.9,
+      "unit": "th pct",
+      "description": "CQS percentile rơi khỏi vùng nguy hiểm >80th, áp lực tài chính toàn cầu hạ nhiệt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-25",
+  "source": "ai_cio_executive_summary"
+}

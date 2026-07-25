@@ -74,7 +74,7 @@ jobs:
       - name: Refresh PVGO valuation feed
         run: python command/update_pvgo_valuation.py
 
-      - name: 🤖 Chạy AI CIO (force — không dùng cache cũ của tool con)
+      - name: 🤖 Chạy AI CIO (preflight + force refresh an toàn)
         run: python command/run_ai_cio_auto.py --force
 
       - name: 🗂️ Build AI-CIO data catalog

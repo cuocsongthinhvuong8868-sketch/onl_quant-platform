@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread Z‑score ở –0.33σ, không có dấu hiệu căng thẳng cấu trúc.
+- DPI 48.3%, thấp xa ngưỡng regime persistent (>70%), dispersion chỉ ở mức thông thường.
+- Tương quan trung bình 0.032, cực thấp, hàm ý phân hóa mạnh giữa các cổ phiếu.
+- Cross‑sectional Skewness +0.61 (lệch phải nhẹ), Kurtosis 6.59 > 5 – đuôi béo, tồn tại outliners.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không stress. Cả Spread Z lẫn DPI đều ở vùng thấp, không thỏa điều kiện stress cục bộ (Spread Z cao, DPI thấp) hay stress regime kéo dài (cả hai cùng cao). Chỉ báo V2 cũng xác nhận Broad stress score 18.7/100 (NORMAL).
+
+## 3. Cross‑Check & Tail Direction
+Skew dương nhẹ (+0.61) chưa chạm ngưỡng “cú đẩy điên rồ” (>+1), thị trường không bị chi phối bởi một nhóm cổ phiếu tăng vọt bất thường. Tuy nhiên, Kurtosis cao (6.59) cho thấy đuôi phân phối dày hơn phân phối chuẩn, mô hình normal không còn đáng tin cậy. Biến động cực đoan ở một vài mã riêng lẻ có thể xuất hiện bất ngờ.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D: DPI (48.3%) < 70%, tương quan trung bình ≈ 0.032 (rất thấp), tương ứng ô **Healthy Stock‑Picking**. Điều này đồng nhất với Macro regime từ V2 diagnostics là STOCK_PICKING. Rủi ro lớn nhất cho Portfolio Manager không phải là sụp đổ theo đàn hay khô thanh khoản hệ thống, mà là **fat‑tail outliers**: một vài cổ phiếu có thể di chuyển cực mạnh ngoài dự đoán của mô hình phân phối chuẩn, gây tổn thất đột ngột ở cấp độ vị thế đơn lẻ nếu không quản trị rủi ro đuôi cẩn thận.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "24/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.33,
+  "dpi_pct": 48.3,
+  "avg_corr": 0.032,
+  "tail_skew_direction": "positive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 18.7
+- Broad Stress Level: NORMAL
+- CSAD Z: +0.23
+- CSSD Z: -0.07
+- Downside Participation: 27.4%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing

@@ -1,0 +1,63 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái sentiment tin tức hiện tại (News Sentiment Regime)**
+
+- **1 ngày:** `strong_risk_on`  
+  Posterior mean = +0.4327, P_conf = 90% (CI: -0.128 đến +0.993).  
+  → **Khẳng định chắc chắn** xu hướng tích cực (risk‑on) trong ngắn hạn.
+
+- **7 ngày:** `strong_risk_on`  
+  Posterior mean = +0.7887, P_conf = 100% (CI: +0.645 đến +0.932).  
+  → **Khẳng định chắc chắn** – tín hiệu mạnh hơn, độ tin cậy tuyệt đối.
+
+- **30 ngày:** `strong_risk_on`  
+  Posterior mean = +0.5410, P_conf = 100% (CI: +0.484 đến +0.598).  
+  → **Khẳng định chắc chắn** – xu hướng risk‑on bền vững trong trung hạn.
+
+**2. Kênh dẫn dắt risk‑on / risk‑off mạnh nhất**
+
+- **Dẫn dắt tăng (risk‑on):**  
+  - `fx_external`: +2.000 (P_conf 100%) – tỷ giá trung tâm tăng liên tục, tác động mạnh nhất.  
+  - `earnings`: +1.3…+1.4 (P_conf 100%) – kỳ vọng lợi nhuận doanh nghiệp tích cực.  
+  - `credit_stress`: +1.2…+1.6 (P_conf 99–100%) – lợi suất TPCP ổn định, rủi ro tín dụng thấp.  
+  - `monetary_policy`: +0.9…+1.7 (P_conf 100%) – chính sách tiền tệ hỗ trợ (VD: lãi suất huy động tăng nhẹ, PBoC giữ LPR).  
+  - `growth`: +0.7 (7d, P_conf 100%) và `banking_system` +0.6 (30d, P_conf 100%) góp phần củng cố.
+
+- **Kéo giảm (risk‑off) nhưng yếu hơn:**  
+  - `commodity`: −0.49 (30d, P_conf 100%) – giá hàng hóa cơ bản giảm sâu (thép, ure, PVC…).  
+  - `inflation`: −0.41 (30d, P_conf 90%) và −0.57 (7d) – áp lực giảm phát / lạm phát thấp.  
+  - `liquidity`: −0.19…−0.22 (P_conf 97–100%) – NHNN hút ròng qua OMO.  
+  - `risk_appetite`: −0.1…−0.24 (P_conf 88–99%) – tâm lý thận trọng nhẹ.
+
+→ Các kênh risk‑on có độ tin cậy rất cao và trọng số lớn, lấn át hoàn toàn nhóm risk‑off.
+
+**3. Các yếu tố tác động nổi bật (drivers chính)**
+
+*Tích cực (lựa chọn từ top drivers 3 khung thời gian)*
+
+- Tỷ giá trung tâm tăng mạnh: 24/07 tăng 11đ lên 25.283, 21/07 tăng 8đ, 14/07 tăng 5đ, 08/07 tăng 4đ, 30/06 tăng 5đ. (kênh `fx_external`, score ≈+1.47).  
+- Lãi suất huy động kỳ hạn 1–3 tháng nhóm NHTM khác tăng 1 bps (13/07, `monetary_policy`, +1.557).  
+- Lợi suất TPCP đi ngang phiên 24/07 (`credit_stress`, +0.348).  
+- PBoC giữ LPR 1Y ở 3.00% (20/07, `monetary_policy`, +0.770).  
+- Giá dầu WTI vượt đỉnh tháng 87.57 USD/thùng (23/07, `commodity`, +1.303) và PVC Trung Quốc vượt đỉnh tháng (21/07, `commodity`, +0.651).
+
+*Tiêu cực*
+
+- Giá phân Ure Trung Quốc thủng đáy (23/07 và 15/07, `commodity`, score −1.0 đến −1.3).  
+- NHNN hút ròng 13,102.1 tỷ đồng qua OMO (22/07, `liquidity`, −0.741).  
+- Giá thép HRC Trung Quốc liên tục giảm về đáy (nhiều phiên trong 30 ngày, `commodity`, score ≈−1.0 đến −1.4).  
+- Giá bạc Mỹ giảm về đáy 6 tháng (18/07, `commodity`, −0.655).  
+- Giá đường cát trắng Trung Quốc giảm đáy 1 năm (18/07, `commodity`, −0.574).
+
+Các yếu tố tiêu cực chủ yếu tập trung ở hàng hóa toàn cầu (kênh `commodity`) và thanh khoản nội địa.
+
+**4. Kết luận tác động đến AI CIO**
+
+- **Hỗ trợ mạnh** cho quan điểm risk‑on trong phân bổ vĩ mô. Tín hiệu đồng thuận cao ở cả ba khung thời gian, dẫn dắt bởi tỷ giá, chính sách tiền tệ và tín dụng ổn định.  
+- **Xung đột nhẹ** từ nhóm hàng hóa cơ bản và thanh khoản bị hút ròng – có thể là chỉ báo sớm về sức cầu yếu từ Trung Quốc, nhưng chưa đủ để đảo chiều xu hướng chính.  
+- **Khuyến nghị hành động:** Tiếp tục duy trì hoặc gia tăng vị thế rủi ro đối với tài sản Việt Nam, nhưng theo dõi sát diễn biến giá hàng hóa (thép, ure) và động thái OMO – nếu các tín hiệu tiêu cực lan sang `growth` hoặc `monetary_policy` thì cần đánh giá lại.
+
+**5. Cảnh báo (caveats)**
+
+- **Nguồn tin mạng xã hội:** Khung 1d có 33% (`mozyfin_social`=45/135), 7d có ~34% (`mozyfin_social`=375/1114), 30d có 25% (`mozyfin_social`=1147/4594). Các bài đăng xã hội được gắn nhãn *lower‑confidence social/opinion evidence*, làm giảm độ tin cậy của tín hiệu tổng hợp. Tuy nhiên, toàn bộ top drivers nêu trên đều đến từ `Data Wi` (widata) – nguồn dữ liệu cứng đáng tin cậy hơn, nên phần lõi của tín hiệu vẫn có cơ sở vững.  
+- **Thời điểm cập nhật:** Generated at 24/07/2026, dữ liệu mới, không bị trễ.  
+- **Rủi ro nhiễu tiêu đề:** Tin tức từ mạng xã hội và các kênh `mozyfin` có thể chứa headline noise, cần thận trọng khi giải thích các dao động ngắn hạn.

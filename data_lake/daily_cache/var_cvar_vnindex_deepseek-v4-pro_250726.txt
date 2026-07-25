@@ -1,0 +1,67 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+## 1. Observations
+- **Historical VaR 95%** – chỉ –1.69%, phản ánh kịch bản xấu mức vừa phải trong 3 năm qua, chưa lộ diện rủi ro đuôi.
+- **EVT VaR 99%** – sụt sâu xuống –3.69%, chênh lệch lớn so với VaR lịch sử; mức mất khoảng 1/100 ngày theo mô hình cực đoan.
+- **ξ (shape)** – ước lượng MLE +0.345, trung vị MCMC +0.390, cả hai nằm trong vùng đuôi dày (fat tail, ξ > 0.30).
+- **Hill index** – +0.447, cùng dấu và tương đồng độ lớn với ξ, xác nhận tín hiệu đuôi dày bền vững.
+
+## 2. Tail Thickness Diagnosis
+ξ được phân loại **fat tail** (ξ > 0.30) theo cả MLE và MCMC. Chỉ số Hill cross‑check không phân kỳ, củng cố niềm tin. Chênh lệch ES–VaR (tuyệt đối 1.40%) vượt σ₃₀ (1.17%), thực nghiệm cũng ủng hộ đuôi dày: khi đuôi dày, kỳ vọng thiệt hại (ES) giãn xa so với VaR.
+
+Tuy nhiên, **độ nhạy ngưỡng EVT cao**: ξ dao động từ 0.067 (gần‑Gaussian) đến 0.325 (fat) khi thay đổi ngưỡng POT. VaR₉₉ ổn định (biên độ chỉ 0.16pp) nhưng phân loại đuôi không chắc chắn. MCMC 90% CI của ξ [+0.183, +0.651] kéo qua ranh giới heavy‑fat, tín hiệu đuôi dày mang tính cảnh báo có điều kiện ngưỡng (threshold‑sensitive fat‑tail warning), không phải kết luận cứng.
+
+## 3. Gaussian Gap
+Gaussian VaR₉₉ ước tính –2.90%, EVT VaR₉₉ –3.69%, khoảng cách **+0.79 điểm phần trăm** (<1pp). Dù chưa chạm ngưỡng báo động (gap>1pp), Gaussian vẫn đánh giá thấp rủi ro đuôi. Tại các phân vị sâu hơn (99.5%), chênh lệch sẽ giãn rộng do phân phối thực nghiệm có đuôi dày, khiến mô hình chuẩn không đủ cho phân bổ vốn rủi ro.
+
+## 4. Verdict – Hedging Implications
+Với ξ > 0.30 nhưng nhạy cảm ngưỡng, **nhà đầu tư nên hành động như kịch bản fat tail**: tránh chiến lược momentum, mua quyền chọn bán trong‑the‑money (ITM) và bán khống hợp đồng tương lai. Rủi ro ẩn vẫn cao dù khoảng cách Gaussian chưa kịch tính, do đuôi thực sự nặng hơn đáng kể so với phân phối chuẩn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "24/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.067,
+  "xi_max": 0.325,
+  "xi_range": 0.258,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.79,
+  "hedge_action": "short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: THRESHOLD_SENSITIVE_FAT_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: -0.78%
+- VaR Breach 95: 0
+- Breach Margin 95: -0.91pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.067
+- EVT Xi Max: +0.325
+- EVT Xi Range: 0.258
+- EVT VaR99 Range: 0.16pp
+- EVT ES99 Range: 0.66pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.0%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.183
+- EVT Xi P50: +0.390
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.90%
+- EVT VaR99 P50: -3.83%
+- EVT VaR99 P95: -3.22%
+- EVT ES99 P05: -12.54%
+- EVT ES99 P50: -6.70%
+- EVT ES99 P95: -4.91%
