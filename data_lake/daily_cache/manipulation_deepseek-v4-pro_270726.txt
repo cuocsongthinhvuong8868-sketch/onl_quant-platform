@@ -1,0 +1,34 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+## 1. Observations
+- OLS Slope hiện tại 0.31 nằm ở phân vị 21.0 – thấp hơn trung bình lịch sử nhưng chưa cực đoan giải ghép (chưa < 20th).
+- Correlation 0.78 ở phân vị 59.5 – tương đối lỏng, không đặc biệt cao hay thấp, cho thấy liên kết VIN–VNINDEX vẫn tồn tại.
+- Event Study từ 05/05/2026 xác nhận chế độ **DECOUPLING** với ΔCorr = –0.53 và ΔSlope = –0.52 (đều < –0.15), cho thấy vai trò dẫn dắt của cụm VIC/VHM/VRE với VNINDEX suy giảm rõ rệt trong giai đoạn gần đây.
+
+## 2. Microstructure Read
+- Với Slope và Corr đều không quá cao, cụm VIN không còn chi phối VNINDEX mạnh như trước. Thị trường hiện tại chịu tác động từ các nhóm khác (Ngân hàng, Chứng khoán, Thép) nhiều hơn.
+- Phân vị Slope chỉ 21.0, gần ngưỡng “rời VIN”, nếu giảm xuống dưới 20th sẽ là tín hiệu thị trường hoàn toàn thoát khỏi ảnh hưởng của VIN. Ở mức hiện tại, vẫn còn liên kết yếu, nhưng biến động VIN khó kéo chỉ số một cách đồng pha.
+
+## 3. Event Study Interpretation
+- Trạng thái DECOUPLING kéo dài từ đầu tháng 5/2026 cho thấy VNINDEX đang vận hành độc lập hơn với cụm VIN. Intraday, nếu VIC/VHM tăng/giảm mạnh, phản ứng của VNINDEX có thể bị tắt tiếng; thay vào đó, dòng tiền tập trung ở các cổ phiếu vốn hóa lớn khác.
+- Overnight, rủi ro gap từ các sự kiện liên quan đến VIN ít có khả năng lan rộng ra toàn chỉ số, giảm thiểu hiệu ứng domino. Tuy nhiên, cần lưu ý đây không phải tín hiệu giả, regime hoàn toàn hợp lệ.
+
+## 4. Verdict
+- **Market read**: index-led-by-other-sectors. VNINDEX hiện chủ yếu bị chi phối bởi các nhóm ngành ngoài VIN.  
+- **Leading indicator**: theo dõi nhóm Ngân hàng (VCB, BID, CTG) và VN30-ex-VIN để xác nhận xu hướng chỉ số. Nếu các mã này tiếp tục tăng, VNINDEX có thể đi lên ngay cả khi VIC giảm.  
+- **Stop-loss reference**: Giả định một vị thế bán VIC dựa trên tín hiệu decoupling, mức stop-loss có thể đặt tại 213.50 × (1 + 3%) ≈ 219.91 (≈ 219,900 đồng), hoặc sử dụng kháng cự kỹ thuật (MA50 ~ 215K). Lưu ý đây chỉ là tham khảo, không phải khuyến nghị giao dịch; việc dùng công cụ phái sinh phải có guardrail của AI CIO.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "27/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 21.0,
+  "corr_percentile": 59.5,
+  "market_read": "other_sector_led",
+  "confidence": "medium"
+}
+```
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.309; corr=0.777; regime=DECOUPLING

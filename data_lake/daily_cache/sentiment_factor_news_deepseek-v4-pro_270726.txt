@@ -1,0 +1,54 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Chế độ sentiment tin tức hiện tại (News Sentiment Regime)**
+
+- **Cửa sổ 1 ngày (1d):** Chế độ `strong_risk_on` được **khẳng định chắc chắn**  
+  *Posterior mean = +0.427, P_conf = 97% (>85%), 90% CI [+0.043, +0.811]*  
+  Điểm số dương rất đáng tin cậy, sentiment vĩ mô nghiêng hẳn về rủi ro chấp nhận (risk-on).
+
+- **Cửa sổ 7 ngày (7d):** Chế độ `strong_risk_on` được **khẳng định chắc chắn**  
+  *Posterior mean = +0.792, P_conf = 100% (>85%), 90% CI [+0.615, +0.970]*  
+  Tín hiệu đồng thuận cực cao, không có dấu hiệu tranh chấp.
+
+- **Cửa sổ 30 ngày (30d):** Chế độ `strong_risk_on` được **khẳng định chắc chắn**  
+  *Posterior mean = +0.622, P_conf = 100% (>85%), 90% CI [+0.553, +0.692]*  
+  Xu hướng risk-on bền vững trong tháng.
+
+**2. Các kênh dẫn dắt risk-on / risk-off mạnh nhất**
+
+- **Kênh hỗ trợ risk-on mạnh (P_conf ≥ 85%):**
+  - `fx_external`: +2.000 (P_conf 100%) – *Cực kỳ tin cậy, tỷ giá trung tâm tăng ổn định được mô hình đọc là tích cực.*
+  - `earnings`: +1.396 đến +1.433 (P_conf 100%) – *Triển vọng lợi nhuận doanh nghiệp khả quan.*
+  - `monetary_policy`: +1.577 (7d, P_conf 100%) và `banking_system`: +0.666 đến +0.911 (P_conf 88%–100%) – *Chính sách tiền tệ và hệ thống ngân hàng lành mạnh.*
+  - `credit_stress`: +0.391 đến +1.306 (P_conf 82%–100%, riêng 1d ở mức 82% vẫn nghiêng về tích cực).
+
+- **Kênh gây áp lực risk-off (P_conf cao):**
+  - `commodity`: -2.000 (1d, P_conf 100%) và -0.234 (30d, P_conf 100%) – *Hàng hóa giảm giá mạnh, đặc biệt heo hơi nội địa và nguyên liệu Trung Quốc, tạo tín hiệu tiêu cực rõ nét.*
+  - `liquidity`: -0.444 (7d, P_conf 100%) và -0.161 (30d, P_conf 100%) – *Thanh khoản bị hút ròng qua OMO, dấu hiệu thắt chặt.*
+  - `risk_appetite`: -0.407 (1d, P_conf 99%) và -0.119 (30d, P_conf 100%) – *Khẩu vị rủi ro suy giảm nhẹ, nhưng kém thuyết phục hơn so với hàng hóa.*
+
+**3. Tóm tắt các yếu tố dẫn dắt chính**
+
+**Tích cực (kéo risk-on):**
+- Tỷ giá trung tâm liên tục điều chỉnh tăng qua các phiên (25,206 → 25,293), được mô hình gán điểm +2.000 – củng cố niềm tin ổn định vĩ mô.
+- Lợi suất trái phiếu chính phủ đi ngang, phản ánh thị trường nợ bình ổn.
+- Việt Nam sản xuất nhôm thỏi lần đầu, kỳ vọng giảm nhập khẩu 1,5 tỷ USD; DHL đầu tư 1.900 tỷ đồng xây khu logistics lớn nhất Đông Nam Á – tín hiệu tăng trưởng và FDI.
+- Vượt Trung Quốc tại thị trường Campuchia, tạo xúc tác tăng trưởng xuất khẩu.
+- Kênh `earnings` và `monetary_policy` đồng loạt báo hiệu tích cực.
+
+**Tiêu cực (kéo risk-off):**
+- Giá heo hơi Việt Nam xuống đáy 6 tháng (62,833 đồng/kg) – sức ép lên ngành chăn nuôi và lạm phát kỳ vọng thấp.
+- Hàng loạt hàng hóa Trung Quốc giảm sâu: quặng sắt đáy 1 năm (710.67 CNY/tấn), phân Ure, PVC chạm đáy 10 năm, thép HRC giảm – tín hiệu cầu toàn cầu yếu.
+- NHNN hút ròng 13,102 tỷ đồng qua OMO (phiên 22/07) – thanh khoản hệ thống thu hẹp.
+- Rủi ro bị Hoa Kỳ đánh giá về lao động cưỡng bức (tác động tiêu cực nhỏ lên kênh tăng trưởng).
+
+**4. Kết luận tác động lên AI CIO**
+
+- **Hỗ trợ (supports):** Sentiment vĩ mô `strong_risk_on` với độ tin cậy rất cao ở mọi khung thời gian (1d, 7d, 30d) khớp với kỳ vọng tích cực của macro-layer và các tín hiệu internal tools khác. Xu hướng chung ủng hộ phân bổ rủi ro.
+- **Xung đột nhẹ (conflicts):** Kênh `commodity` âm sâu và `liquidity` thắt chặt cục bộ có thể tạo ra một vài phiên điều chỉnh hoặc hạn chế đà tăng. Tuy nhiên, các kênh này không đủ sức đảo chiều sentiment vĩ mô tổng thể khi các driver chính (tỷ giá, lợi nhuận, chính sách) vẫn áp đảo.
+- **Khuyến nghị:** Giữ thái độ tích cực, nhưng cần theo dõi sát diễn biến giá hàng hóa và động thái OMO tiếp theo. Nếu `liquidity` tiếp tục âm sâu, có thể giảm nhẹ độ nhạy risk-on.
+
+**5. Lưu ý (Caveats)**
+
+- **Nguồn tin mạng xã hội (mozyfin_social) chiếm tỷ trọng đáng kể:** Cửa sổ 7d có tới 389/965 (~40%) là tín hiệu từ mạng xã hội, 30d cũng có 1284/4337 (~30%). Đây là bằng chứng có độ tin cậy thấp hơn, dễ nhiễu và mang tính cảm tính. Tín hiệu 7d (P_conf = 100%) có thể bị thổi phồng bởi ý kiến xã hội; cần giảm trọng số khi đối chiếu với quyết định phân bổ dài hạn.
+- **Độ trễ dữ liệu:** Báo cáo được sinh ra vào 27/07/2026 lúc 17:49, các giá và tin tức có thể đã cũ nếu thị trường biến động sau đó.
+- **Rủi ro nhiễu tiêu đề (headline noise):** Các tin như “giá dầu WTI vượt đỉnh tháng” chỉ phản ánh một phiên, không nên ngoại suy thành xu hướng bền vững nếu thiếu xác nhận từ các cửa sổ dài hơn.

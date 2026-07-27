@@ -1,0 +1,32 @@
+## 1. Observations  
+- **MA20 (1M): 7.8%** – cực kỳ thấp, đang ở vùng oversold (<20%).  
+- **MA60 (1Q): 10.4%** – chỉ vỏn vẹn 44 mã giữ đường trung bình quý, rất yếu.  
+- **MA125 (½Y): 11.8%** – hầu hết mã đều dưới đường nửa năm, không có tín hiệu hồi phục chu kỳ.  
+- **MA252 (1Y): 14.1%** – dưới mức báo hiệu Bear Regime sâu sắc, thậm chí thấp hơn cả ngưỡng “>40%” thường thấy trong downtrend.
+
+## 2. Structural Health  
+Cả bốn đường MA đồng thuận ở mức cực thấp, không có sự phân kỳ. Mẫu mô hình rơi vào **Bear Confirmed**: MA20 < 30% (thực tế 7.8%) và MA252 < 40% (14.1%). Đây là suy yếu mang tính thế tục (secular), hoàn toàn không phải bẫy gấu hay rũ bỏ trong uptrend. Không có dấu hiệu hình thành đáy từ góc nhìn breadth.
+
+## 3. Money Flow Leadership  
+- **Dòng tiền ngắn hạn (MA20 volume leaders):** xuất hiện ở nhiều nhóm: ngân hàng (ABB), năng lượng (ASP), bất động sản (CLI), công nghiệp cao su (CSM), ô tô (CTF), dược (DBT, GPC), đường (DHB), thực phẩm (GCF). Không có ngành nào chiếm ưu thế rõ rệt – **dấu hiệu của dòng tiền “luẩn quẩn” tìm nơi trú ẩn riêng lẻ, không dám đặt cược vào một ngành dẫn dắt**.  
+- **Dài hạn (MA252 leaders):** có sự trùng lặp với ngắn hạn ở một số mã như ABB, ASP, CSM, DBT; nhưng phần còn lại nghiêng về xây dựng/dầu khí (C32, C69, BCA, BSR).  
+- **Smart money** dường như đang ưu tiên phòng thủ hơn tấn công: dược, ngân hàng, lương thực – các cổ phiếu ít tương quan với chu kỳ. Không thấy Steel hay Brokers nổi bật.
+
+## 4. Verdict  
+Trạng thái Bear Confirmed đòi hỏi **chiến lược phòng thủ, giữ tiền mặt**. Không nên chạy theo trend-following vì phần lớn cổ phiếu đang dưới MA252. Mean-reversion T+ cực kỳ rủi ro, chỉ dành cho nhà đầu tư kiên nhẫn với quy mô siêu nhỏ. **Đòn bẩy: 0%**, không margin vì MA252 thấp hơn 70% và không có xác nhận hồi phục từ breadth. Không có phân kỳ trái chiều nên không cần “WAIT FOR CONFIRMATION”, thị trường đã rõ ràng là suy yếu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 7.8,
+  "ma60_pct": 10.4,
+  "ma125_pct": 11.8,
+  "ma252_pct": 14.1,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```

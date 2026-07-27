@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-27",
+  "composite_score": 32.0,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 4,
+      "unit": "sessions",
+      "description": "VNIBOR stress sessions below 5 falsifies the domestic funding stress pillar of the bearish thesis."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 30,
+      "unit": "%",
+      "description": "Breadth MA20 rising above 45% would reverse the bearish breadth signal."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.4,
+      "unit": "%",
+      "description": "SSI dropping below 55% indicates systemic stress has abated."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.325,
+      "unit": "",
+      "description": "Fat-tail risk is falsified if xi_max falls below 0.25 across sensitivity thresholds."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": null,
+      "unit": "th pct",
+      "description": "If Vingroup coupling stays low, concentration risk is contained – current data MISSING."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.9,
+      "unit": "th pct",
+      "description": "CQS percentile moving below 80% would signal global credit stress easing."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-27",
+  "source": "ai_cio_executive_summary"
+}

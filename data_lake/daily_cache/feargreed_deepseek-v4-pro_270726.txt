@@ -1,0 +1,43 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Score 34.3, nằm trong dải FEAR (20–40), Δ +0.3 – gần như đi ngang.
+- EGARCH Vol (chuẩn hóa) 89.3%, sát ngưỡng cực đoan, Δ +0.4%.
+- Skewness -0.08, lệch âm nhẹ, không sâu (so với ngưỡng báo động <-0.5).
+- Downside Correlation 4.0%, thấp hơn hẳn Upside Correlation 18.7% – trái với mẫu hình “đám đông bán” trong pha FEAR.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang ở pha FEAR kết hợp sốc bán cấp tính (ACUTE_SELLOFF). Biến động cực cao phản ánh áp lực thanh khoản/margin call, nhưng các chỉ báo tương quan và độ lệch chưa lan tỏa thành hoảng loạn phân phối; thị trường vận động theo cơ chế kỹ thuật hơn là suy giảm tâm lý có tổ chức.
+
+## 3. Cross-Check
+- **Divergence:** Score 34.3 (FEAR) trong khi EGARCH Vol ~90% (EXTREME FEAR). Đây là tín hiệu sốc thanh khoản đơn lẻ, chưa được xác nhận bởi skew sâu hay tương quan cao.
+- **Nghịch lý:** Downside Correlation chỉ 4.0% trong bán tháo – khả năng cao cấu trúc PCA tạm thời bị bóp méo do diễn biến phi tuyến, làm suy yếu độ tin cậy của tín hiệu này.
+
+## 4. Verdict
+- Beta mục tiêu: **0.2** cho danh mục VN-Index.
+- Hành động: Duy trì phòng thủ, giảm đòn bẩy/xuống beta bằng cách bán các vị thế có beta cao, tăng nắm giữ tiền mặt hoặc phòng hộ (hedge). Không gia tăng rủi ro cho đến khi Shock Regime Flag trở về NONE và Downside Correlation hồi phục trên 30%.
+- Nếu danh mục đã ở trạng thái phòng thủ, không có tín hiệu đủ mạnh để hành động thêm (các xác nhận chưa đồng thuận, môi trường bất định cao).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "27/07/2026",
+  "regime": "FEAR",
+  "score": 34.3,
+  "confidence": "medium",
+  "beta_target": 0.2,
+  "key_signals": ["EGARCH vol extreme", "Downside correlation anomaly low", "Acute sell-off shock flag active"]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 34.3
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: ACUTE_SELLOFF / FEAR
+- Signal Confidence: 0.52
+- CSV Rank: 0.22
+- Acute Shock: 0.95
+- Shock Regime Flag: ACUTE_SELLOFF
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21

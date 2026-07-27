@@ -1,0 +1,33 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI đạt 63.4% — vùng **WARNING**, hàm ý rủi ro hệ thống đang tích lũy ngầm.
+- Trạng thái thị trường được nhận diện là **CALM CORRECTION**, nhưng có điểm bất thường (xem mục 3).
+- Chỉ số VN30 đóng cửa dưới MA125, xu hướng trung hạn vẫn là điều chỉnh.
+- Top 3 trụ cột dẫn dắt: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)** — không có áp lực bán hoặc biến động dẫn đầu.
+
+## 2. Risk Decomposition
+Trụ cột #1 **S_LIQ** với tỉ trọng 35% cho thấy **thanh khoản khô cạn** so với chuẩn 1 năm (volume dry‑up). Khi dòng tiền co lại đáng kể trong khi biến động chưa tăng mạnh, đây là dấu hiệu thị trường mất động lực hấp thụ, dễ dẫn đến các cú giảm đột ngột nếu có cú sốc nhỏ.
+
+S_VAL (31%) phản ánh sức căng định giá — mức sinh lời 1 năm của VN30 vẫn cao hơn đáng kể so với lãi suất tiền gửi, cho thấy rủi ro định giá chưa được xả hết dù giá đã điều chỉnh.
+
+S_COR (18%) ở mức vừa phải cho biết các cổ phiếu vẫn di chuyển khá đồng pha, nhưng chưa đạt ngưỡng herding cực đoan (thường gắn với sell‑off đồng loạt). Tổ hợp S_LIQ dẫn đầu + S_VAL cao + S_COR trung bình không phải mẫu hình bull‑trap, mà là **dạng stress ngầm âm ỉ trong xu hướng giảm**: tiền rút, định giá chưa rẻ, tương quan chưa quá cao — thị trường dễ rơi vào trạng thái “bốc hơi lặng lẽ”.
+
+## 3. Cross-Check
+- **Phân kỳ SSI – Market State**: HMM gán nhãn CALM CORRECTION, nghĩa là mức stress thấp + xu hướng giảm. Tuy nhiên SSI 63.4% đã nằm trong vùng WARNING, không phải “low stress”. Điều này tạo ra **cảnh báo lệch pha**: mô hình đang đánh giá thấp mức stress thực tế, có thể do dữ liệu lịch sử của các phiên tăng chưa được tính (Pillar Mode = downside). Cần theo dõi sát, vì xác suất chuyển sang ACTIVE_STRESS cao hơn nếu thanh khoản tiếp tục cạn.
+- Giá VN30 đang dưới MA125, không có đỉnh mới — bác bỏ kịch bản bull‑trap. Không có phân kỳ giá‑stress nào thuộc loại bẫy tăng giá.
+
+## 4. Verdict
+Với SSI WARNING, dẫn dắt bởi khô cạn thanh khoản và định giá chưa hạ nhiệt trong xu hướng giảm, rủi ro một nhịp giảm sâu tuy không hiện hữu ngay nhưng đang âm ỉ. Đề xuất trọng số tiền mặt ở mức **60%** danh mục. Hành động phòng hộ: **giảm beta** (bán bớt cổ phiếu có hệ số nhạy cao, giảm tỉ trọng cổ phiếu) thay vì short trực tiếp, do các pillar chưa đồng thuận cho một cú sập cấp tính. Không có tín hiệu hành động mạnh từ các trụ mâu thuẫn, nhưng cần sẵn sàng nâng phòng hộ nếu SSI vượt 0.80.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.4,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```

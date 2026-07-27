@@ -1,0 +1,33 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index: **16.67%** (ngưỡng cảnh báo 40%), với **5/30** mã thủng VaR 95%.
+- Top 3 vi phạm sâu nhất: **MWG, BCM, BID**.
+- Complacency Index: **4.67%** (ngưỡng nguy hiểm 80%), với **5** mã bị định giá sai trên toàn thị trường.
+- Top 3 mispriced (spread bị nén): **VIC, BMP, LPB**.
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress ở mức thấp (16.67%), cách xa ngưỡng cảnh báo 40% – **chưa có dấu hiệu lây lan hệ thống real‑time**. Chỉ 5/30 mã breach và Top 3 (MWG, BCM, BID) chủ yếu phản ánh biến động cá biệt hơn là một cú sốc đồng loạt trên rổ bluechip. Dù vậy, nhóm này vẫn đáng chú ý vì mức thủng tương đối sâu; không loại trừ khả năng chúng nhạy cảm với thanh khoản hoặc tin riêng lẻ, nhưng **chưa đủ bằng chứng cho một đợt domino**.
+
+## 3. Complacency Assessment (Module C)
+Complacency cực thấp (4.67%) – **thị trường KHÔNG ở regime “ngủ quên”** (giá đi ngang vùng cao, biến động thấp, spread nén). Điều này **không đồng nghĩa** thị trường ổn định hay không có áp lực bán; nó chỉ báo hiệu rằng cấu trúc bù rủi ro hiện chưa bị bóp méo trên diện rộng. Kết hợp với Stress Index thấp, bức tranh hiện tại là **môi trường rủi ro không có điểm cực đoan rõ ràng**: không hoảng loạn (stress thấp) và không phiêu lưu định giá sai lan tỏa (complacency thấp).
+
+## 4. Stock‑Level Risk Calls
+- **Crash candidates (Module B):** MWG, BCM, BID. Với mức breach đáng kể, nhà đầu tư nên đặt điểm dừng lỗ nếu cổ phiếu giảm thêm **4–5% so với giá đóng cửa 27/07** hoặc thủng đường MA20 trên đồ thị D1. Cân nhắc giảm tỷ trọng nếu breach tiếp diễn.
+- **Mispriced candidates (Module C):** VIC, BMP, LPB – spread bị nén chặt, dễ bị điều chỉnh mạnh nếu xuất hiện biến động bất ngờ. Khuyến nghị rà soát vị thế, thận trọng khi mở mới quy mô lớn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 16.67,
+  "breach_count": 5,
+  "complacency_pct": 4.67,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["MWG", "BCM", "BID", "VIC", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=16.67% (5/30); complacency=4.67% (5/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null

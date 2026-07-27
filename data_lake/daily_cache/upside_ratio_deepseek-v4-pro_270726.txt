@@ -1,0 +1,44 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Lệch trạng thái lớn: upside breadth hiện tại 4.74% thấp hơn nhiều so với trung bình dài hạn 11.11%; downside breadth 37.66% lại gấp gần 3 lần trung bình 13.37% → phân phối mạnh.
+- Cả hai chiều đều duy trì momentum: Phi cầu 0.149, Phi cung 0.219, đều > 0.10 → đà tiếp diễn (không mean-reversion).
+- Cung giữ động lượng trội hơn rõ rệt: |Phi_dn| = 0.219 vượt |Phi_up| = 0.149, cho thấy đà bán đang dẫn dắt thị trường.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại là **phân phối (distribution)**: cầu bị nén sâu dưới trung bình, cung trồi cao hẳn lên – tiền rút ra khỏi cổ phiếu trên diện rộng.  
+Momentum thực sự thuộc về **cung (supply)**: Phi_downside cao hơn và V2 diagnostics ghi nhận Breadth stress score 77.9/100 (HIGH), net sell pressure +32.9 điểm phần trăm, MA5 sell pressure +17.1 điểm phần trăm. Áp lực bán chiếm ưu thế tuyệt đối, các đường Monte Carlo chỉ phản ánh kịch bản căng thẳng chứ không phải tín hiệu cân bằng.
+
+## 3. Stress-Test Read
+P95 Downside = 23.13%: nếu thị trường gãy, biên độ panic có thể lên tới gần 1/4 giá trị trong 19 phiên.  
+P95 Upside chỉ 19.15% – vùng đuôi mua mỏng hơn đuôi bán.  
+Bất cân xứng rõ: tail risk dày hơn nghiêng hẳn về downside, upside tiềm năng không bù đắp nổi rủi ro giảm sâu.
+
+## 4. Verdict
+- Tỷ trọng giải ngân đề xuất: **0%** (đứng ngoài hoàn toàn).
+- Chiến lược: **phòng thủ (defensive)** – không bắt đáy, không mua đuổi. Áp lực cung momentum + phân phối khiến mọi nhịp hồi đều mong manh. Chỉ xem xét hành động khi downside breadth hạ nhiệt và ít nhất một chiều quay về mean-reversion.
+- Không phải “NO ACTIONABLE” vì thị trường vẫn có tín hiệu momentum mạnh, nhưng tín hiệu đó là bearish – do đó hành động hợp lý là phòng thủ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 23.13,
+  "p95_upside_pct": 19.15,
+  "deployment_pct": 0,
+  "strategy": "defensive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: DOWNSIDE_STRESS
+- Breadth Stress Score: 77.9
+- Downside Rank: 0.98
+- Net Sell Pressure: +32.9 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
