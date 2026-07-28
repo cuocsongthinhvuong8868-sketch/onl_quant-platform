@@ -14,12 +14,12 @@
     "Human report excerpts are supporting evidence, not the scoring source of truth."
   ],
   "score_anchor": {
-    "metric_implied_score": 30,
-    "metric_implied_regime": "FEAR / DISTRIBUTION",
-    "baseline_stress_regime": "FEAR / DISTRIBUTION",
-    "baseline_resolved_regime": "FEAR / DISTRIBUTION",
-    "stress_regime": "FEAR / DISTRIBUTION",
-    "resolved_regime": "FEAR / DISTRIBUTION",
+    "metric_implied_score": 25,
+    "metric_implied_regime": "PRE-CRASH / PANIC",
+    "baseline_stress_regime": "PRE-CRASH / PANIC",
+    "baseline_resolved_regime": "PRE-CRASH / PANIC",
+    "stress_regime": "PRE-CRASH / PANIC",
+    "resolved_regime": "PRE-CRASH / PANIC",
     "capitulation_override_active": false,
     "capitulation_state": {
       "as_of": "2026-07-27T00:00:00",
@@ -140,17 +140,17 @@
       "freshness_status": "CURRENT"
     },
     "allocation_guardrail": {
-      "label": "FEAR / DISTRIBUTION",
-      "max_equity_pct": 35.0,
-      "base_max_equity_pct": 35.0,
-      "min_cash_pct": 65.0,
+      "label": "PRE-CRASH / PANIC",
+      "max_equity_pct": 15.0,
+      "base_max_equity_pct": 15.0,
+      "min_cash_pct": 85.0,
       "max_short_vn30f1m_pct": 0.0,
       "capitulation_override": false,
       "bottom_fishing_allowed": false
     },
     "metric_implied_subscores": {
       "macro_risk_score": 15,
-      "market_internal_score": 30,
+      "market_internal_score": 13,
       "tail_risk_score": 35
     },
     "score_band_reason": {
@@ -163,7 +163,7 @@
         "broad bearish evidence balance"
       ],
       "market_internal": [
-        "Breadth MA20 <45% (30.0%)",
+        "Breadth MA20 <25% (7.8%)",
         "current-tool consensus skewed bearish"
       ],
       "tail": [
@@ -183,7 +183,7 @@
       ]
     },
     "hard_constraints": [
-      "Breadth MA20 weak at 30.0%",
+      "Breadth MA20 weak at 7.8%",
       "Capitulation gate is FRAGILE; no bottom or short-closing override",
       "EVT xi threshold-sensitive: base xi=0.345, xi_min=0.067, xi_range=0.258; no standalone hard cap",
       "Global FCI CQS high at 99.9"
@@ -207,9 +207,9 @@
         },
         {
           "tool": "market_breadth",
-          "tool_score": 35,
-          "tool_regime": "FEAR / DISTRIBUTION",
-          "reason": "Breadth MA20 <45% (30.0%)"
+          "tool_score": 18,
+          "tool_regime": "PRE-CRASH / PANIC",
+          "reason": "Breadth MA20 <25% (7.8%)"
         },
         {
           "tool": "var_cvar_vnindex",
@@ -595,15 +595,15 @@
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "breadth_ma20_pct": 30.0
+        "breadth_ma20_pct": 7.8
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
       "adapter_available": true,
-      "tool_score": 35,
-      "tool_regime": "FEAR / DISTRIBUTION",
+      "tool_score": 18,
+      "tool_regime": "PRE-CRASH / PANIC",
       "tool_bias": "bearish",
-      "score_reason": "Breadth MA20 <45% (30.0%)",
+      "score_reason": "Breadth MA20 <25% (7.8%)",
       "data_quality": "structured_adapter"
     },
     "esr_monitor": {
@@ -1066,18 +1066,18 @@
     ],
     "rolling_summary": {
       "history_count": 30,
-      "current_baseline_score": 30,
-      "current_baseline_regime": "FEAR / DISTRIBUTION",
+      "current_baseline_score": 25,
+      "current_baseline_regime": "PRE-CRASH / PANIC",
       "latest_prior_score": 24,
-      "score_avg_5d": 24.0,
-      "score_avg_10d": 26.1,
-      "score_avg_20d": 28.1,
-      "score_change_1d": 6.0,
-      "score_change_5d": 2.0,
-      "score_change_10d": 3.0,
-      "days_below_30": 0,
+      "score_avg_5d": 23.0,
+      "score_avg_10d": 25.6,
+      "score_avg_20d": 27.9,
+      "score_change_1d": 1.0,
+      "score_change_5d": -3.0,
+      "score_change_10d": -2.0,
+      "days_below_30": 8,
       "days_below_15": 0,
-      "current_regime_streak": 1,
+      "current_regime_streak": 8,
       "min_20d": 21,
       "max_20d": 34,
       "usage_rule": "Use for persistence/delta only. Do not anchor the final score to history."
@@ -1284,9 +1284,11 @@
     }
   ],
   "final_output": {
-    "score": 32.0,
-    "stress_regime": "FEAR / DISTRIBUTION",
-    "resolved_regime": "FEAR / DISTRIBUTION",
+    "score": 25.0,
+    "metric_implied_score": 25.0,
+    "llm_overlay": 0.0,
+    "stress_regime": "PRE-CRASH / PANIC",
+    "resolved_regime": "PRE-CRASH / PANIC",
     "capitulation_override_active": false,
     "confidence": null
   }

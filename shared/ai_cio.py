@@ -10,6 +10,8 @@ import streamlit as st
 from openai import OpenAI
 from scipy.stats import percentileofscore
 from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
+from shared.ai_cio_metric_contract import append_direct_metrics as _append_direct_metrics
+from shared.ai_cio_metric_contract import resolve_tool_metrics
 
 # ── History CSV (Ai_cio_report.csv) ──
 # Score/stress regime plus the independent capitulation phase gate.
@@ -496,11 +498,14 @@ from tools.dispersion.quant.metrics import (
 
 # Import logic Bank Valuation
 from tools.bank_valuation.quant.engine.ai_analysis import build_bank_valuation_ai_prompt
+from tools.bank_valuation.quant.engine.market_regime import calculate_bank_valuation_regime
 from tools.bank_valuation.quant.pipeline import run_bank_valuation_pipeline
 # Import logic Sentiment Factor From News
 from tools.sentiment_factor_news.report import build_sentiment_factor_news_ai_prompt
+from tools.sentiment_factor_news.report import snapshot as sentiment_factor_news_snapshot
 # Import logic PVGO Valuation
 from tools.pvgo.report import build_ai_cio_context as build_pvgo_ai_cio_context
+from tools.pvgo.report import snapshot as pvgo_snapshot
 # Import logic Market Breadth
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
 # Import logic ESR Monitor
@@ -1619,18 +1624,6 @@ def _infer_evidence_bias(text: str) -> str:
     return "neutral_or_mixed"
 
 
-def _extract_first_number(patterns: list[str], text: str) -> float | None:
-    for pattern in patterns:
-        match = re.search(pattern, text, flags=re.IGNORECASE)
-        if not match:
-            continue
-        try:
-            return float(match.group(1).replace(",", ""))
-        except Exception:
-            continue
-    return None
-
-
 def _is_scoring_evidence_packet(packet: dict[str, Any]) -> bool:
     """Keep audit/diagnostic evidence out of deterministic live scoring."""
     if (
@@ -1660,6 +1653,7 @@ def _build_evidence_packet(
     layer: str,
     date_label: str | None = None,
     max_excerpt_chars: int = 1400,
+    direct_metrics: dict[str, Any] | None = None,
 ) -> dict[str, Any]:
     """Convert a verbose child report into a bounded evidence packet for AI CIO."""
     text = str(report_text or "").strip()
@@ -1676,6 +1670,12 @@ def _build_evidence_packet(
         "score": None if score_val == "N/A" else score_val,
         "regime": None if regime_val == "N/A" else regime_val,
         "key_metrics": {},
+        "metric_provenance": {},
+        "metric_consistency": {
+            "status": "NOT_SCORING",
+            "warnings": [],
+            "blocked_candidates": [],
+        },
         "evidence_excerpt": _compact_text(text, max_chars=max_excerpt_chars),
     }
 
@@ -1685,70 +1685,14 @@ def _build_evidence_packet(
     if not _is_scoring_evidence_packet(packet):
         return packet
 
-    metric_patterns = {
-        "ssi_pct": [r"\bSSI\b[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "evt_xi": [
-            r"EVT\s+Xi(?:\s+MLE)?\s*:[^0-9-]*([-+]?\d+(?:\.\d+)?)",
-            r"\bxi_mle\b[^0-9-]*([-+]?\d+(?:\.\d+)?)",
-            r"Tail Index.*?([-+]?\d+(?:\.\d+)?)",
-        ],
-        "evt_xi_p05": [r"EVT\s+Xi\s+P05[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_xi_p50": [r"EVT\s+Xi\s+P50[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_xi_p95": [r"EVT\s+Xi\s+P95[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_xi_min": [r"EVT\s+Xi\s+Min[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_min\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_xi_max": [r"EVT\s+Xi\s+Max[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_max\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_xi_range": [r"EVT\s+Xi\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)", r"\bxi_range\b[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "evt_var99_range_pp": [r"EVT\s+VaR99\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*pp"],
-        "evt_es99_range_pp": [r"EVT\s+ES99\s+Range[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*pp"],
-        "evt_threshold_stable": [r"EVT\s+Threshold\s+Stable[^0-9]*(0|1)"],
-        "breadth_ma20_pct": [r"MA20[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "cqs_percentile": [
-            r"\bCQS\s+Percentile(?:\s+\d+\s*[Yy])?\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
-            r"\bCQS\b[^\n]*?percentile(?:\s+\d+\s*[Yy])?\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
-            r"\bCQS\b\s*[:=]\s*([-+]?\d+(?:\.\d+)?)",
-        ],
-        "vnibor_on": [r"Overnight[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "pvgo_pct": [r"\bPVGO\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "pe": [r"\bP/E\b\s*:\s*([-+]?\d+(?:\.\d+)?)x"],
-        "coe_pct": [r"\bCOE assumption\b\s*:\s*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "distance_to_cascade_pct": [r"Distance to Cascade[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "panic_ratio_pct": [r"(?:Simulated\s+)?Panic Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "abm_early_warning_score": [r"Early-warning Score[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*(?:/100)?"],
-        "abm_avg_leverage_ratio": [r"Avg Leverage Ratio[^0-9-]*([-+]?\d+(?:\.\d+)?)x?"],
-        "cascade_vulnerability": [r"Cascade Vulnerability[^0-9-]*([-+]?\d+(?:\.\d+)?)"],
-        "abm_stress_confidence_pct": [r"Stress Confidence[^0-9-]*([-+]?\d+(?:\.\d+)?)\s*%"],
-        "ltmm_fli": [r"LTMM\s+FLI\s*:\s*([-+]?\d+(?:\.\d+)?)"],
-        "ltmm_mli": [r"LTMM\s+MLI\s*:\s*([-+]?\d+(?:\.\d+)?)"],
-        "ltmm_te": [r"LTMM\s+TE\s*:\s*([-+]?\d+(?:\.\d+)?)"],
-        "ltmm_fri_collateral": [r"LTMM\s+FRI_collateral\s*:\s*([-+]?\d+(?:\.\d+)?)"],
-        "ltmm_fire_trigger_count": [r"LTMM\s+Fire\s+Trigger\s+Count\s*:\s*(\d+)"],
-        "ltmm_transmission_breakdown_fire": [r"(?:LTMM\s+)?transmission_breakdown\s+FIRE\s*:\s*(\d+)"],
-        "credit_spread_risk_premium_bps": [
-            r"Credit\s+Spread\s+Risk\s+Premium\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
-        ],
-        "credit_spread_change_bps": [
-            r"Credit\s+Spread\s+Risk\s+Premium\s+Change\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
-        ],
-        "credit_spread_3p_change_bps": [
-            r"Credit\s+Spread\s+Risk\s+Premium\s+3P\s+Change\s*:\s*([-+]?\d+(?:\.\d+)?)\s*bps",
-        ],
-        "credit_spread_percentile": [
-            r"Credit\s+Spread\s+Risk\s+Premium\s+Percentile\s*:\s*([-+]?\d+(?:\.\d+)?)",
-        ],
-        "credit_spread_matched_periods": [
-            r"Credit\s+Spread\s+Matched\s+Periods\s*:\s*(\d+)",
-        ],
-        "credit_spread_bank_count": [
-            r"Credit\s+Spread\s+Bank\s+Issuance\s+Count\s*:\s*(\d+)",
-        ],
-        "credit_spread_real_estate_count": [
-            r"Credit\s+Spread\s+Real\s+Estate\s+Issuance\s+Count\s*:\s*(\d+)",
-        ],
-    }
-    for metric, patterns in metric_patterns.items():
-        value = _extract_first_number(patterns, text)
-        if value is not None:
-            packet["key_metrics"][metric] = value
+    resolution = resolve_tool_metrics(
+        tool_id,
+        text,
+        direct_metrics=direct_metrics,
+    )
+    packet["key_metrics"] = resolution.metrics
+    packet["metric_provenance"] = resolution.provenance
+    packet["metric_consistency"] = resolution.consistency
     adapter_score = score_tool_packet(tool_id, packet["key_metrics"])
     if adapter_score:
         packet["adapter_score"] = adapter_score
@@ -1770,6 +1714,35 @@ def _append_structured_footer(report_text: str, title: str, lines: list[str]) ->
         + f"\n\n=== AI CIO STRUCTURED METRICS: {title} ===\n"
         + "\n".join(f"- {line}" for line in clean_lines)
         + "\n"
+    )
+
+
+def build_pvgo_ai_cio_metric_context(coe_pct: float = 14.0) -> str:
+    """Return PVGO prose plus the authoritative code-generated metric contract."""
+
+    context = build_pvgo_ai_cio_context(coe_pct=coe_pct)
+    try:
+        snap = pvgo_snapshot(coe_pct=coe_pct)
+    except Exception:
+        return context
+    if snap.get("status") != "OK":
+        return context
+    freshness = snap.get("freshness") if isinstance(snap.get("freshness"), dict) else {}
+    if freshness.get("status") == "STALE":
+        return context
+    return _append_direct_metrics(
+        context,
+        "pvgo",
+        {
+            "pvgo_pct": snap.get("pvgo_pct"),
+            "pe": snap.get("pe"),
+            "pb": snap.get("pb"),
+            "coe_pct": snap.get("coe_pct"),
+            "pvgo_zscore": snap.get("pvgo_zscore"),
+            "pvgo_status": snap.get("pvgo_status"),
+            "freshness_status": freshness.get("status"),
+            "freshness_session_lag": freshness.get("session_lag"),
+        },
     )
 
 
@@ -2401,6 +2374,16 @@ def _build_tool_metrics_snapshot(evidence_packets: list[dict[str, Any]]) -> dict
         scoring_eligible = _is_scoring_evidence_packet(packet)
         diagnostic_visible = packet.get("diagnostic_metrics_visible") is True
         metrics = (packet.get("key_metrics") or {}) if scoring_eligible or diagnostic_visible else {}
+        metric_provenance = (
+            packet.get("metric_provenance") or {}
+            if scoring_eligible or diagnostic_visible
+            else {}
+        )
+        metric_consistency = (
+            packet.get("metric_consistency") or {}
+            if scoring_eligible or diagnostic_visible
+            else {}
+        )
         adapter_score = packet.get("adapter_score") if scoring_eligible else None
         if scoring_eligible and not isinstance(adapter_score, dict):
             adapter_score = score_tool_packet(tool, metrics)
@@ -2419,11 +2402,28 @@ def _build_tool_metrics_snapshot(evidence_packets: list[dict[str, Any]]) -> dict
             "tool_regime": adapter_score.get("tool_regime") if isinstance(adapter_score, dict) else None,
             "tool_bias": adapter_score.get("tool_bias") if isinstance(adapter_score, dict) else None,
             "score_reason": adapter_score.get("score_reason") if isinstance(adapter_score, dict) else None,
+            "metric_provenance": metric_provenance,
+            "metric_consistency": metric_consistency,
+            "metric_authority": (
+                "direct_quantitative"
+                if "direct_quantitative" in set(metric_provenance.values())
+                else "structured_tail_json"
+                if "structured_tail_json" in set(metric_provenance.values())
+                else "prose_regex_fallback"
+                if "prose_regex_fallback" in set(metric_provenance.values())
+                else None
+            ),
             "data_quality": (
                 "deterministic_gate_only"
                 if diagnostic_visible and not scoring_eligible
                 else "audit_evidence_only"
                 if not scoring_eligible
+                else "direct_quantitative"
+                if "direct_quantitative" in set(metric_provenance.values())
+                else "structured_tail_json"
+                if "structured_tail_json" in set(metric_provenance.values())
+                else "prose_regex_fallback"
+                if "prose_regex_fallback" in set(metric_provenance.values())
                 else "structured_adapter"
                 if isinstance(adapter_score, dict)
                 else "soft_excerpt_only"
@@ -2460,6 +2460,7 @@ def _build_ai_cio_metrics_snapshot(
         "data_date": data_date,
         "authority_rules": [
             "This JSON is deterministic and generated by code before final LLM synthesis.",
+            "Metric authority is direct_quantitative > structured_tail_json > prose_regex_fallback; lower-priority mismatches are blocked and audited.",
             "Adapter tool_score/tool_regime/tool_bias are authoritative when present.",
             "Packets with scoring_eligible=false cannot affect composite metric inputs, bias counts, or tool-score consensus; a deterministic gate may add explicit phase-policy constraints.",
             "The capitulation_regime packet is a deterministic gate: it can resolve the decision regime but cannot enter the composite score or consensus.",
@@ -2917,6 +2918,18 @@ def run_fear_greed(client, df_stocks, provider_key: str = "kimi-2.6", model: str
             "PCA Refit Every Sessions: 21",
         ],
     )
+    res = _append_direct_metrics(
+        res,
+        "fear_greed",
+        {
+            "fear_greed_score": score,
+            "sentiment_regime": status_text,
+            "signal_confidence": latest.get("Signal_Confidence"),
+            "acute_shock": latest.get("Acute_Shock"),
+            "csv_rank": latest.get("CSV_Norm"),
+            "shock_regime_flag": shock_flag,
+        },
+    )
     _write_cache("feargreed", res, provider_key)
     return res
 
@@ -3009,6 +3022,19 @@ def run_manipulation(client, df_stocks, provider_key: str = "kimi-2.6", model: s
         f"target={MANIPULATION_TARGET}; not_futures=true; "
         f"slope={float(slope_val):.3f}; corr={float(corr_val):.3f}; regime={regime}"
     )
+    res = _append_direct_metrics(
+        res,
+        "manipulation",
+        {
+            "manip_slope": slope_val,
+            "manip_corr": corr_val,
+            "manip_slope_percentile": slope_pr,
+            "manip_corr_percentile": corr_pr,
+            "regime": regime,
+            "delta_corr_percentile": d_corr,
+            "delta_slope_percentile": d_slope,
+        },
+    )
     _write_cache("manipulation", res, provider_key)
     return res
 
@@ -3079,6 +3105,19 @@ def run_dispersion(client, df_stocks, provider_key: str = "kimi-2.6", model: str
             "Returns Fill Method: none",
             "Bad Tick Filter: abs daily return >50% set to missing",
         ],
+    )
+    res = _append_direct_metrics(
+        res,
+        "dispersion",
+        {
+            "dispersion_spread_z": spread_z,
+            "dispersion_dpi_pct": dpi_val,
+            "dispersion_avg_corr": corr_val,
+            "dispersion_broad_stress_score": dispersion_summary["broad_stress_score"],
+            "downside_participation_pct": dispersion_summary["downside_participation"],
+            "macro_regime": dispersion_summary["macro_regime"],
+            "broad_stress_level": dispersion_summary["broad_stress_level"],
+        },
     )
     _write_cache("dispersion", res, provider_key)
     return res
@@ -3157,6 +3196,21 @@ def run_upside_ratio(client, df_stocks, provider_key: str = "kimi-2.6", model: s
             "MC Interpretation: scenario_diagnostic_not_allocation_authority",
         ],
     )
+    res = _append_direct_metrics(
+        res,
+        "upside_ratio",
+        {
+            "upside_current_pct": data["raw_upside"].values[-1],
+            "downside_current_pct": data["raw_downside"].values[-1],
+            "p95_upside_pct": p95_up[-1],
+            "p95_downside_pct": p95_dn[-1],
+            "phi_up": phi_up,
+            "phi_down": phi_dn,
+            "breadth_stress_score": breadth_summary["breadth_stress_score"],
+            "net_sell_pressure_pct": breadth_summary["net_pressure"],
+            "breadth_regime": breadth_summary["breadth_regime"],
+        },
+    )
     _write_cache("upside_ratio", res, provider_key)
     return res
 
@@ -3182,6 +3236,34 @@ def run_bank_valuation(client, df_stocks, provider_key: str = "kimi-2.6", model:
     )
 
     res = call_ai(client, sys_p, usr_p, model=model)
+    valuation_regime = calculate_bank_valuation_regime(valuation_df)
+    best = (
+        valuation_df.sort_values("valuation_gap_pct", ascending=False).iloc[0]
+        if not valuation_df.empty and "valuation_gap_pct" in valuation_df
+        else pd.Series(dtype=object)
+    )
+    worst = (
+        valuation_df.sort_values("valuation_gap_pct", ascending=True).iloc[0]
+        if not valuation_df.empty and "valuation_gap_pct" in valuation_df
+        else pd.Series(dtype=object)
+    )
+    res = _append_direct_metrics(
+        res,
+        "bank_valuation",
+        {
+            "eligible_banks": valuation_regime.eligible_banks,
+            "bank_valuation_breadth_score": valuation_regime.bank_valuation_breadth_score,
+            "median_valuation_gap_pct": valuation_regime.median_valuation_gap,
+            "valuation_regime": valuation_regime.regime_label,
+            "overvalued_count": valuation_regime.overvalued_count,
+            "fair_count": valuation_regime.fair_count,
+            "undervalued_count": valuation_regime.undervalued_count,
+            "best_ticker": best.get("ticker"),
+            "best_valuation_gap_pct": best.get("valuation_gap_pct"),
+            "worst_ticker": worst.get("ticker"),
+            "worst_valuation_gap_pct": worst.get("valuation_gap_pct"),
+        },
+    )
     _write_cache("bank_valuation_ai", res, provider_key)
     return res
 
@@ -3198,6 +3280,22 @@ def run_sentiment_factor_news(client, provider_key: str = "kimi-2.6", model: str
         return res
 
     res = call_ai(client, sys_p, usr_p, model=model)
+    direct_metrics: dict[str, Any] = {}
+    for window in ("1d", "7d", "30d"):
+        snap = sentiment_factor_news_snapshot(window=window)
+        if snap.get("status") != "ok":
+            continue
+        suffix = window
+        direct_metrics[f"news_macro_composite_{suffix}"] = snap.get("macro_composite")
+        direct_metrics[f"news_confidence_{suffix}"] = snap.get("macro_composite_prob_pos")
+        direct_metrics[f"news_count_{suffix}"] = snap.get("news_count")
+        direct_metrics[f"news_regime_{suffix}"] = snap.get("regime")
+        direct_metrics[f"news_source_counts_{suffix}"] = snap.get("source_counts")
+    if direct_metrics:
+        direct_metrics["news_macro_composite"] = direct_metrics.get("news_macro_composite_1d")
+        direct_metrics["news_confidence"] = direct_metrics.get("news_confidence_1d")
+        direct_metrics["news_count"] = direct_metrics.get("news_count_1d")
+        res = _append_direct_metrics(res, "sentiment_factor_news", direct_metrics)
     _write_cache("sentiment_factor_news", res, provider_key)
     return res
 
@@ -3285,6 +3383,23 @@ def run_risk_adjusted_growth(client, df_stocks, provider_key: str = "kimi-2.6", 
         return res
 
     res = call_ai(client, system_prompt, user_prompt, model=model)
+    top_row = top_alpha.iloc[0]
+    res = _append_direct_metrics(
+        res,
+        "risk_adjusted_growth",
+        {
+            "top_ticker": top_row[ticker_col],
+            "top_economic_alpha_pct": float(top_row["Economic Alpha"]) * 100.0,
+            "median_economic_alpha_pct": float(df_result["Economic Alpha"].median()) * 100.0,
+            "positive_alpha_count": int((df_result["Economic Alpha"] > 0).sum()),
+            "bank_count": int(len(df_result)),
+            "top_tickers": top_alpha[ticker_col].astype(str).tolist(),
+            "bottom_tickers": bottom_alpha[ticker_col].astype(str).tolist(),
+            "scenario_k": 1.0,
+            "coe_pct": 14.0,
+            "source_signature": source_signature,
+        },
+    )
     _write_cache("risk_adjusted_growth", res, provider_key)
     return res
 
@@ -3338,6 +3453,22 @@ def run_market_breadth(client, df_stocks, provider_key: str = "kimi-2.6", model:
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res = _append_direct_metrics(
+        res,
+        "market_breadth",
+        {
+            "breadth_ma20_pct": ma20_pct,
+            "breadth_ma60_pct": ma60_pct,
+            "breadth_ma125_pct": ma125_pct,
+            "breadth_ma252_pct": ma252_pct,
+            "above_ma20_count": ma20_count,
+            "above_ma60_count": ma60_count,
+            "above_ma125_count": ma125_count,
+            "above_ma252_count": ma252_count,
+            "breadth_universe_size": total_count,
+            "snapshot_date": date_str,
+        },
+    )
     _write_cache("market_breadth", res, provider_key)
     return res
 
@@ -3422,6 +3553,20 @@ def run_esr_monitor(client, df_stocks, provider_key: str = "kimi-2.6", model: st
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     
     res = call_ai(client, sys_p, usr_p, model=model)
+    res = _append_direct_metrics(
+        res,
+        "esr_monitor",
+        {
+            "ssi_pct": ssi_pct,
+            "pca_concentration_pct": evr_pct,
+            "market_state": status,
+            "hmm_available": hmm_ok,
+            "production_regime_method": PRODUCTION_REGIME_METHOD,
+            "production_pillar_mode": PRODUCTION_PILLAR_MODE,
+            "top_pillar": w1_name,
+            "top_pillar_weight_pct": w1_val,
+        },
+    )
     _write_cache("esr_monitor", res, provider_key)
     return res
 
@@ -3467,6 +3612,21 @@ def run_va_res(client, df_stocks, provider_key: str = "kimi-2.6", model: str = N
         f"complacency={snap.get('complacency_index', float('nan')):.2f}% "
         f"({snap.get('mispriced_count', 0)}/{snap.get('valid_market_count', 'N/A')}); "
         "prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null"
+    )
+    res = _append_direct_metrics(
+        res,
+        "va_res",
+        {
+            "vares_stress_index_pct": snap.get("stress_index"),
+            "vares_complacency_pct": snap.get("complacency_index"),
+            "vares_breach_count": snap.get("breached_count"),
+            "vares_mispriced_count": snap.get("mispriced_count"),
+            "valid_vn30_count": snap.get("valid_vn30_count"),
+            "valid_market_count": snap.get("valid_market_count"),
+            "vares_regime": snap.get("vares_regime"),
+            "stress_level": snap.get("stress_level"),
+            "complacency_level": snap.get("complacency_level"),
+        },
     )
     _write_cache("va_res", res, provider_key)
     return res
@@ -3621,6 +3781,43 @@ def run_var_cvar_vnindex(client, df_stocks, provider_key: str = "kimi-2.6", mode
             ]
         )
     res = _append_structured_footer(res, "var_cvar_vnindex_methodology", footer_lines)
+    direct_metrics = {
+        "historical_var_pct": snap.get("historical_var", 0.0) * 100.0,
+        "expected_shortfall_pct": snap.get("expected_shortfall", 0.0) * 100.0,
+        "tail_regime": snap.get("tail_regime"),
+        "tail_risk_level": snap.get("tail_risk_level"),
+        "var_breach_95": snap.get("var_breach_95"),
+        "breach_margin_95_pp": snap.get("breach_margin_95", 0.0) * 100.0,
+    }
+    if snap.get("evt_available"):
+        direct_metrics.update(
+            {
+                "evt_xi": snap.get("evt_xi"),
+                "evt_var_99_pct": snap.get("evt_var_99", 0.0) * 100.0,
+                "evt_es_99_pct": snap.get("evt_es_99", 0.0) * 100.0,
+                "hill_index": snap.get("hill_index"),
+            }
+        )
+    if snap.get("evt_sensitivity_available"):
+        direct_metrics.update(
+            {
+                "evt_xi_min": snap.get("evt_sensitivity_xi_min"),
+                "evt_xi_max": snap.get("evt_sensitivity_xi_max"),
+                "evt_xi_range": snap.get("evt_sensitivity_xi_range"),
+                "evt_var99_range_pp": abs(snap.get("evt_sensitivity_var99_range", 0.0)) * 100.0,
+                "evt_es99_range_pp": abs(snap.get("evt_sensitivity_es99_range", 0.0)) * 100.0,
+                "evt_threshold_stable": int(bool(snap.get("evt_sensitivity_stable"))),
+            }
+        )
+    if snap.get("evt_interval_available"):
+        direct_metrics.update(
+            {
+                "evt_xi_p05": snap.get("evt_xi_p05"),
+                "evt_xi_p50": snap.get("evt_xi_p50"),
+                "evt_xi_p95": snap.get("evt_xi_p95"),
+            }
+        )
+    res = _append_direct_metrics(res, "var_cvar_vnindex", direct_metrics)
     _write_cache("var_cvar_vnindex", res, provider_key)
     return res
 
@@ -3935,6 +4132,22 @@ Interpretation rule:
             "\n\n=== LTMM ANALYST REPORT - SUPPORTING PROSE ===\n"
             + _compact_text(raw_report, max_chars=2200)
         )
+    snapshot = _append_direct_metrics(
+        snapshot,
+        "ltmm",
+        {
+            "ltmm_fli": fli_value,
+            "ltmm_mli": mli_value,
+            "ltmm_te": te_value,
+            "ltmm_fri_collateral": fri_collateral_value,
+            "ltmm_fire_trigger_count": len(fire_triggers),
+            "ltmm_transmission_breakdown_fire": transmission_breakdown_fire,
+            "fli_state": fli_state,
+            "mli_state": mli_state,
+            "te_state": te_state,
+            "fri_collateral_state": fri_state,
+        },
+    )
     return date_label, snapshot
 
 
@@ -3999,6 +4212,20 @@ def run_fed_liquidity_child_report(
         user_prompt,
         model=model or cfg["api_model"],
         temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    result = _append_direct_metrics(
+        result,
+        "fed_liquidity",
+        {
+            "fed_net_liquidity": summary.get("net_liquidity"),
+            "fed_liquidity_impulse": summary.get("impulse"),
+            "fed_liquidity_impulse_ema": summary.get("impulse_ema"),
+            "fed_liquidity_zscore": summary.get("z_score"),
+            "signal": summary.get("signal"),
+            "walcl": summary.get("walcl"),
+            "wtregen": summary.get("wtregen"),
+            "rrpontsyd": summary.get("rrpontsyd"),
+        },
     )
     _write_cache("fed_liquidity", result, provider_key)
     return result
@@ -4101,6 +4328,21 @@ def run_global_financial_conditions_child_report(
             "PCA Refit Every Sessions: 21",
         ],
     )
+    result = _append_direct_metrics(
+        result,
+        "global_financial_conditions",
+        {
+            "cqs_percentile": summary.get("cqs_pct", 0.0) * 100.0,
+            "gfcm_pc1_percentile": summary.get("pc1_pct", 0.0) * 100.0,
+            "gfcm_pc1": summary.get("pc1"),
+            "gfcm_ccc_oas": summary.get("ccc_oas"),
+            "vix": summary.get("vix"),
+            "move": summary.get("move"),
+            "hy_oas": summary.get("hy_oas"),
+            "regime": summary.get("regime"),
+            "driver": summary.get("driver"),
+        },
+    )
     _write_cache("global_financial_conditions", result, provider_key)
     return result
 
@@ -4129,6 +4371,22 @@ def run_credit_spread_child_report(
             provider_key=provider_key,
             client=client,
             model=model,
+        )
+        result = _append_direct_metrics(
+            result,
+            "credit_spread",
+            {
+                "credit_spread_risk_premium_bps": snapshot.get("risk_premium_bps"),
+                "credit_spread_change_bps": snapshot.get("risk_premium_change_bps"),
+                "credit_spread_3p_change_bps": snapshot.get("risk_premium_change_3p_bps"),
+                "credit_spread_percentile": snapshot.get("risk_premium_percentile"),
+                "credit_spread_matched_periods": snapshot.get("matched_periods"),
+                "credit_spread_bank_count": snapshot.get("bank_issuance_count"),
+                "credit_spread_real_estate_count": snapshot.get("real_estate_issuance_count"),
+                "direction": snapshot.get("direction"),
+                "trend_3p": snapshot.get("trend_3p"),
+                "data_quality": snapshot.get("data_quality"),
+            },
         )
     except Exception as e:
         result = f"DATA INSUFFICIENT: Không generate được Credit Spread child report ({e})"
@@ -4204,6 +4462,18 @@ Usage discipline:
 - Not included in Global FCI PCA, PC1, PC1 percentile, or GFCM hard regime.
 - Use it to interpret whether Global FCI stress is amplified by crowded leverage.
 """.strip()
+    snapshot = _append_direct_metrics(
+        snapshot,
+        "margin_m2_overlay",
+        {
+            "margin_debt_pct_m2": summary.get("margin_debt_pct_m2"),
+            "margin_debt_yoy_pct": summary.get("margin_debt_yoy_pct"),
+            "m2_yoy_pct": summary.get("m2_yoy_pct"),
+            "margin_debt_pct_m2_zscore_5y": summary.get("margin_debt_pct_m2_zscore_5y"),
+            "margin_debt_pct_m2_percentile_10y": summary.get("margin_debt_pct_m2_percentile_10y"),
+            "signal_regime": summary.get("signal_regime"),
+        },
+    )
     return label, snapshot
 
 
@@ -4253,6 +4523,22 @@ Current snapshot:
 - 20D table:
 {trend.get('trend_table', 'N/A')}
 """.strip()
+    snapshot = _append_direct_metrics(
+        snapshot,
+        "vnibor",
+        {
+            "vnibor_on": summary.get("overnight"),
+            "vnibor_zscore": summary.get("z_score"),
+            "vnibor_percentile": summary.get("percentile"),
+            "vnibor_impulse": summary.get("impulse"),
+            "vnibor_spread_1w": summary.get("spread_1w"),
+            "vnibor_spread_2w": summary.get("spread_2w"),
+            "vnibor_regime": summary.get("regime"),
+            "vnibor_signal": summary.get("signal"),
+            "vnibor_stress_warning_days_20d": trend.get("stress_warning_days"),
+            "vnibor_trend_label": trend.get("trend_label"),
+        },
+    )
     return label, snapshot
 
 
@@ -4332,6 +4618,21 @@ def run_vnibor_child_report(
         user_prompt,
         model=model or cfg["api_model"],
         temperature=cfg.get("temperature", AI_TEMPERATURE),
+    )
+    result = _append_direct_metrics(
+        result,
+        "vnibor",
+        {
+            "vnibor_on": summary.get("overnight"),
+            "vnibor_zscore": summary.get("z_score"),
+            "vnibor_percentile": summary.get("percentile"),
+            "vnibor_impulse": summary.get("impulse"),
+            "vnibor_spread_1w": summary.get("spread_1w"),
+            "vnibor_spread_2w": summary.get("spread_2w"),
+            "vnibor_regime": summary.get("regime"),
+            "vnibor_signal": summary.get("signal"),
+            "vnibor_stress_warning_days_20d": trend.get("stress_warning_days"),
+        },
     )
     _write_cache("vnibor", result, provider_key)
     return result
@@ -4520,6 +4821,25 @@ PCA validation:
 Watch next:
 {payload.get('watch_next', 'N/A')}
 """.strip()
+    snapshot = _append_direct_metrics(
+        snapshot,
+        "vn100_corporate_health",
+        {
+            "vn100_health_score": payload.get("vn100_health_score"),
+            "vn100_health_score_market_cap_weighted": payload.get("vn100_health_score_market_cap_weighted"),
+            "valid_company_count": payload.get("valid_company_count"),
+            "regime": payload.get("regime"),
+            "revenue_breadth": payload.get("revenue_breadth"),
+            "profit_breadth": payload.get("profit_breadth"),
+            "cfo_breadth": payload.get("cfo_breadth"),
+            "healthy_growth_breadth": payload.get("healthy_growth_breadth"),
+            "working_capital_stress_index": payload.get("working_capital_stress_index"),
+            "leverage_stress_index": payload.get("leverage_stress_index"),
+            "sector_diffusion_score": payload.get("sector_diffusion_score"),
+            "positive_sector_count": payload.get("positive_sector_count"),
+            "valid_sector_count": payload.get("valid_sector_count"),
+        },
+    )
     return label, snapshot
 
 
@@ -4686,6 +5006,29 @@ Usage discipline:
 - YELLOW means risk-budget caution, ORANGE means de-risking pressure, RED means severe cascade-risk warning.
 - Do not interpret ABM as exact crash timing or as a standalone directional price forecast.
 """.strip()
+    try:
+        from tools.abm_simulator.report import snapshot as abm_snapshot
+
+        direct = abm_snapshot()
+    except Exception:
+        direct = {}
+    if direct:
+        snapshot = _append_direct_metrics(
+            snapshot,
+            "abm_simulator",
+            {
+                "abm_early_warning_score": direct.get("early_warning_score"),
+                "early_warning_level": direct.get("early_warning_level"),
+                "distance_to_cascade_pct": direct.get("distance_to_cascade_pct"),
+                "panic_ratio_pct": direct.get("panic_ratio_pct"),
+                "abm_avg_leverage_ratio": direct.get("avg_leverage_ratio"),
+                "cascade_vulnerability": direct.get("cascade_vulnerability"),
+                "abm_stress_confidence_pct": direct.get("stress_confidence_pct"),
+                "input_quality_score_pct": direct.get("input_quality_score_pct"),
+                "regime_flag": direct.get("regime_flag"),
+                "methodology_version": direct.get("methodology_version"),
+            },
+        )
     return as_of_date, snapshot
 
 
@@ -4915,7 +5258,7 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
     r10 = run_sentiment_factor_news(client, provider_key, model)
     r11 = run_risk_adjusted_growth(client, df_stocks, provider_key, model)
-    pvgo_context = build_pvgo_ai_cio_context(coe_pct=14.0)
+    pvgo_context = build_pvgo_ai_cio_metric_context(coe_pct=14.0)
     humility_context = get_humility_falsification_context(provider_key, force=force)
     run_fed_liquidity_child_report(client, provider_key, model, force=force)
     run_global_financial_conditions_child_report(client, provider_key, model, force=force)

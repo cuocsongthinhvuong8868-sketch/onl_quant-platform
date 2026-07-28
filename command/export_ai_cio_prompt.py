@@ -107,7 +107,7 @@ def build_ai_cio_prompt_payload(provider_key: str) -> dict[str, Any]:
     ltmm_date, ltmm_rep = ai_cio._build_ltmm_structured_context(provider_key)
     vn100_label, vn100_rep = ai_cio._get_vn100_corporate_health_context(provider_key)
     abm_date, abm_rep = ai_cio._build_abm_structured_snapshot()
-    pvgo_context = ai_cio.build_pvgo_ai_cio_context(coe_pct=14.0)
+    pvgo_context = ai_cio.build_pvgo_ai_cio_metric_context(coe_pct=14.0)
     humility_context = ai_cio.get_humility_falsification_context(provider_key, force=False)
     current_packets = {
         packet["tool"]: packet
