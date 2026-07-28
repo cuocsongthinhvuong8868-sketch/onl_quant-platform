@@ -7,10 +7,11 @@ import plotly.graph_objects as go
 import streamlit as st
 
 from config import DATA_LAKE
-from tools.pvgo.freshness import evaluate_pvgo_freshness
+from tools.pvgo.freshness import DEFAULT_MARKET_DATA_PATH, evaluate_pvgo_freshness
 
 
 DATA_PATH = DATA_LAKE / "pvgo" / "vnindex_valuation_history.csv"
+MARKET_DATA_PATH = DEFAULT_MARKET_DATA_PATH
 
 
 def calculate_pvgo(pe: float, coe_pct: float) -> float:
@@ -93,6 +94,53 @@ def load_pvgo_history(path: str | Path = DATA_PATH, file_mtime: float | None = N
     return df
 
 
+@st.cache_data(show_spinner=False)
+def load_vnindex_history(
+    path: str | Path = MARKET_DATA_PATH,
+    file_mtime: float | None = None,
+) -> pd.DataFrame:
+    """Load the canonical VN-Index market feed independently of valuation data."""
+    path = Path(path)
+    if not path.exists():
+        return pd.DataFrame(columns=["date", "close", "volume"])
+
+    df = pd.read_csv(path)
+    if df.empty:
+        return pd.DataFrame(columns=["date", "close", "volume"])
+
+    columns = {str(column).strip().lower(): column for column in df.columns}
+    date_column = next(
+        (columns[name] for name in ("time", "date", "trading_date") if name in columns),
+        None,
+    )
+    close_column = next(
+        (columns[name] for name in ("vnindex", "close") if name in columns),
+        None,
+    )
+    if date_column is None or close_column is None:
+        return pd.DataFrame(columns=["date", "close", "volume"])
+
+    market = pd.DataFrame(
+        {
+            "date": pd.to_datetime(df[date_column], errors="coerce"),
+            "close": pd.to_numeric(df[close_column], errors="coerce"),
+        }
+    )
+    volume_column = next(
+        (columns[name] for name in ("vnindex_volume", "volume") if name in columns),
+        None,
+    )
+    market["volume"] = (
+        pd.to_numeric(df[volume_column], errors="coerce") if volume_column is not None else np.nan
+    )
+    return (
+        market.dropna(subset=["date", "close"])
+        .drop_duplicates(subset=["date"], keep="last")
+        .sort_values("date")
+        .reset_index(drop=True)
+    )
+
+
 def _metric_card(label: str, value: str, caption: str | None = None) -> None:
     st.markdown(
         f"""
@@ -115,14 +163,15 @@ def _render_freshness_status(freshness: dict[str, str | int | None]) -> None:
 
     if status == "STALE":
         st.warning(
-            "PVGO data freshness: STALE. "
-            f"Source {source_date} is {session_lag} market sessions behind {market_date}; "
-            f"the operational limit is {max_lag}."
+            "P/E and P/B valuation freshness: STALE. "
+            f"Valuation source {source_date} is {session_lag} market sessions behind the latest "
+            f"VN-Index market session {market_date}; the valuation limit is {max_lag}. "
+            "This warning does not mean that the separate VN-Index price feed is stale."
         )
     elif status == "CURRENT":
         message = (
-            f"PVGO data freshness: CURRENT. Source {source_date}; latest market session {market_date}; "
-            f"lag {session_lag}/{max_lag}."
+            f"P/E and P/B valuation freshness: CURRENT. Valuation source {source_date}; latest "
+            f"VN-Index market session {market_date}; valuation lag {session_lag}/{max_lag}."
         )
         if session_lag:
             st.info(message)
@@ -130,8 +179,8 @@ def _render_freshness_status(freshness: dict[str, str | int | None]) -> None:
             st.success(message)
     else:
         st.warning(
-            "PVGO data freshness: UNKNOWN. "
-            f"Source date {source_date}; latest market session {market_date}."
+            "P/E and P/B valuation freshness: UNKNOWN. "
+            f"Valuation source date {source_date}; latest VN-Index market session {market_date}."
         )
 
 
@@ -165,7 +214,7 @@ def _matrix_html(selected_pe: float, selected_coe: float) -> str:
     return html
 
 
-def _plot_price_pe(df: pd.DataFrame) -> go.Figure:
+def _plot_vnindex(df: pd.DataFrame) -> go.Figure:
     fig = go.Figure()
     fig.add_trace(
         go.Scatter(
@@ -176,6 +225,17 @@ def _plot_price_pe(df: pd.DataFrame) -> go.Figure:
             line=dict(color="#2563eb", width=2),
         )
     )
+    fig.update_layout(
+        height=380,
+        margin=dict(l=35, r=25, t=25, b=35),
+        yaxis=dict(title="VN-Index points", gridcolor="rgba(0,0,0,0.06)"),
+        showlegend=False,
+    )
+    return fig
+
+
+def _plot_pe(df: pd.DataFrame) -> go.Figure:
+    fig = go.Figure()
     fig.add_trace(
         go.Scatter(
             x=df["date"],
@@ -183,15 +243,13 @@ def _plot_price_pe(df: pd.DataFrame) -> go.Figure:
             name="P/E",
             mode="lines",
             line=dict(color="#f59e0b", width=1.6, dash="dash"),
-            yaxis="y2",
         )
     )
     fig.update_layout(
         height=380,
-        margin=dict(l=35, r=35, t=25, b=35),
-        legend=dict(orientation="h", y=1.1),
-        yaxis=dict(title="VN-Index", gridcolor="rgba(0,0,0,0.06)"),
-        yaxis2=dict(title="P/E", overlaying="y", side="right", showgrid=False),
+        margin=dict(l=35, r=25, t=25, b=35),
+        yaxis=dict(title="P/E (x)", ticksuffix="x", gridcolor="rgba(0,0,0,0.06)"),
+        showlegend=False,
     )
     return fig
 
@@ -229,12 +287,28 @@ def render() -> None:
     st.title("PVGO Valuation Model")
     st.caption("Present Value of Growth Opportunities for VN-Index. Data-only tool, no AI analysis.")
 
+    market_data_mtime = MARKET_DATA_PATH.stat().st_mtime if MARKET_DATA_PATH.exists() else None
+    market_df = load_vnindex_history(MARKET_DATA_PATH, market_data_mtime)
+    st.markdown("### VN-Index Market Data")
+    if market_df.empty:
+        st.warning("VN-Index market data is unavailable. This is independent of the valuation feed.")
+    else:
+        latest_market = market_df.iloc[-1]
+        latest_market_date = latest_market["date"].strftime("%d/%m/%Y")
+        market_left, market_right = st.columns(2)
+        with market_left:
+            _metric_card("Latest VN-Index", f"{float(latest_market['close']):,.2f}", latest_market_date)
+        with market_right:
+            _metric_card("Latest market session", latest_market_date, "Canonical VN-Index price feed")
+        st.caption("VN-Index prices are loaded from the canonical market feed, separately from P/E and P/B.")
+
+    st.markdown("### P/E and P/B Valuation Data")
     data_mtime = DATA_PATH.stat().st_mtime if DATA_PATH.exists() else None
     df = load_pvgo_history(DATA_PATH, data_mtime)
     if df.empty:
         st.warning(
-            "Chua co du lieu PVGO. Hay chay `python command/update_pvgo_valuation.py` "
-            "hoac doi workflow 14:30 cap nhat."
+            "No P/E/P/B valuation data is available. Run `python command/update_pvgo_valuation.py` "
+            "or wait for the scheduled refresh."
         )
         return
 
@@ -254,22 +328,26 @@ def render() -> None:
     )
 
     date_labels = df["date"].dt.strftime("%d/%m/%Y").tolist()[::-1]
-    selected_label = st.sidebar.selectbox("Analysis date", date_labels, index=0, key="pvgo_date")
+    selected_label = st.sidebar.selectbox(
+        "Valuation analysis date (P/E and P/B)",
+        date_labels,
+        index=0,
+        key="pvgo_date",
+    )
     selected_date = pd.to_datetime(selected_label, format="%d/%m/%Y")
     row = df.loc[df["date"] == selected_date].iloc[0]
 
     pe = float(row["pe"])
     pb = float(row["pb"])
-    close = float(row["close"])
     pvgo = calculate_pvgo(pe, coe)
     steady_state_pe = 1.0 / (coe / 100.0)
     status = get_pvgo_status(pvgo)
 
     c1, c2, c3, c4 = st.columns(4)
     with c1:
-        _metric_card("VN-Index", f"{close:,.2f}", selected_label)
+        _metric_card("P/E", f"{pe:.2f}x", f"Valuation date {selected_label}")
     with c2:
-        _metric_card("P/E", f"{pe:.2f}x", f"P/B {pb:.2f}x")
+        _metric_card("P/B", f"{pb:.2f}x", f"Valuation date {selected_label}")
     with c3:
         _metric_card("Steady-State P/E", f"{steady_state_pe:.2f}x", f"COE {coe:.1f}%")
     with c4:
@@ -296,9 +374,23 @@ def render() -> None:
         st.markdown(_matrix_html(pe, coe), unsafe_allow_html=True)
 
     with tab_history:
-        st.caption(f"Latest source date: {latest_date}. Last scraper timestamp: {data_updated_at}")
         left, right = st.columns(2)
         with left:
-            st.plotly_chart(_plot_price_pe(df), use_container_width=True)
+            st.markdown("#### VN-Index Price History")
+            if market_df.empty:
+                st.info("VN-Index market history is unavailable.")
+            else:
+                st.caption(
+                    f"Canonical market feed through {latest_market_date}; independent of the valuation feed."
+                )
+                st.plotly_chart(_plot_vnindex(market_df), use_container_width=True)
         with right:
-            st.plotly_chart(_plot_pvgo(df, coe), use_container_width=True)
+            st.markdown("#### P/E Valuation History")
+            st.caption(
+                f"24hmoney valuation feed through {latest_date}. Last scraper timestamp: {data_updated_at}"
+            )
+            st.plotly_chart(_plot_pe(df), use_container_width=True)
+
+        st.markdown("#### PVGO History Derived from P/E")
+        st.caption(f"Calculated from the P/E valuation feed through {latest_date} using COE {coe:.1f}%.")
+        st.plotly_chart(_plot_pvgo(df, coe), use_container_width=True)
