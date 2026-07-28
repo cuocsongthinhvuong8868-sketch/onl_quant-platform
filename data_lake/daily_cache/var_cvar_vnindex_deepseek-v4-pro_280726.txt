@@ -1,0 +1,99 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+## 1. Observations
+- **Historical VaR 95%** ở mức -1.69%, thấp hơn đáng kể so với ngưỡng Gaussian -2.18%, cho thấy phân phối thực tế có phần nhẹ hơn ở đuôi trung bình.
+- **EVT VaR 99%** đạt -3.69%, xấp xỉ 1.7 lần σ₃₀, báo hiệu sự kiện cực đoan có mức sụt giảm sâu hơn mọi dự báo chuẩn.
+- **GPD shape (ξ) MLE** ở +0.345, rơi vào vùng FAT TAIL; MCMC p50 là +0.390, củng cố độ dày đuôi cực đoan.
+- **Hill index** +0.447 cùng dấu và cùng cỡ magnitude, xác nhận tín hiệu đuôi dày khá nhất quán, dù độ nhạy ngưỡng cao.
+
+## 2. Tail Thickness Diagnosis
+- ξ = 0.345 > 0.30 → phân loại **FAT TAIL**, tiềm ẩn rủi ro cực đoan hội tụ ES kém.
+- Hill (+0.447) xác nhận cùng chiều và gần giá trị ξ, tăng độ tin cậy của tín hiệu đuôi dày.
+- Chênh lệch ES−VaR = -1.40% vượt σ₃₀ (1.17%) → minh chứng thực nghiệm cho đuôi dày.
+- Tuy nhiên, bài kiểm tra ngưỡng POT cho thấy ξ thay đổi mạnh (0.067 → 0.326), VaR99 ổn định (dải 0.16pp) nhưng phân loại đuôi không ổn định → **cảnh báo đuôi béo nhạy ngưỡng**. Khoảng hậu nghiệm MCMC của ξ (p05 = 0.183, p95 = 0.651) vượt cả ranh giới heavy vs fat, làm giảm độ chắc chắn.
+
+## 3. Gaussian Gap
+- Gaussian VaR 99% = μ − 2.33σ = -2.98% (theo V3 diagnostics).
+- EVT VaR 99% = -3.69%, chênh lệch **-0.70pp**, thấp hơn ngưỡng 1pp. Gaussian chưa “vỡ” hoàn toàn nhưng vẫn đánh giá thấp rủi ro đuôi; phân bổ vốn dựa thuần Gaussian sẽ thiếu an toàn nếu chỉ nhìn VaR99.
+
+## 4. Verdict — Hedging Implications
+- Với ξ > 0.30, khuyến nghị **tránh chiến lược momentum**, **mua puts ITM** và **short futures** để phòng vệ đuôi.
+- Tuy nhiên, do xi cực kỳ nhạy với ngưỡng POT và khoảng hậu nghiệm vắt qua vùng heavy–fat, mức độ tin cậy chỉ ở **medium**. Nhà đầu tư nên áp dụng phòng vệ nhưng điều chỉnh quy mô vừa phải, tránh over-hedge nếu thị trường chưa có dấu hiệu căng thẳng cực đoan.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "28/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.067,
+  "xi_max": 0.326,
+  "xi_range": 0.259,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.70,
+  "hedge_action": "buy_puts_itm, short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: THRESHOLD_SENSITIVE_FAT_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: 0.69%
+- VaR Breach 95: 0
+- Breach Margin 95: -2.39pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.067
+- EVT Xi Max: +0.326
+- EVT Xi Range: 0.259
+- EVT VaR99 Range: 0.16pp
+- EVT ES99 Range: 0.66pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.0%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.183
+- EVT Xi P50: +0.390
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.90%
+- EVT VaR99 P50: -3.83%
+- EVT VaR99 P95: -3.22%
+- EVT ES99 P05: -12.54%
+- EVT ES99 P50: -6.70%
+- EVT ES99 P95: -4.91%
+
+=== AI CIO DIRECT METRICS: var_cvar_vnindex ===
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "source": "direct_quantitative",
+  "metrics": {
+    "historical_var_pct": -1.691867298119048,
+    "expected_shortfall_pct": -3.0958621619566964,
+    "tail_regime": "THRESHOLD_SENSITIVE_FAT_TAIL",
+    "tail_risk_level": "ELEVATED",
+    "var_breach_95": false,
+    "breach_margin_95_pp": -2.3850809660590784,
+    "evt_xi": 0.3454435282173134,
+    "evt_var_99_pct": -3.686071917742771,
+    "evt_es_99_pct": -6.149344442740661,
+    "hill_index": 0.44693722633432414,
+    "evt_xi_min": 0.06728218013982155,
+    "evt_xi_max": 0.3263191266569856,
+    "evt_xi_range": 0.259036946517164,
+    "evt_var99_range_pp": 0.1649364086847696,
+    "evt_es99_range_pp": 0.65674767984987,
+    "evt_threshold_stable": 0,
+    "evt_xi_p05": 0.18298667414955452,
+    "evt_xi_p50": 0.3903008947848988,
+    "evt_xi_p95": 0.6508831499781828
+  }
+}
+```

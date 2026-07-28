@@ -1,0 +1,52 @@
+## 1. Observations  
+- **MA20 (9.6%)**: Cực kỳ thấp, chỉ hơn 40 mã duy trì trên đường trung bình 1 tháng – thị trường rơi vào oversold sâu.  
+- **MA60 (10.8%)**: Số mã xác nhận xu hướng trung hạn rất ít, điều chỉnh chưa có dấu hiệu kết thúc.  
+- **MA125 (13.2%)**: Sức mạnh chu kỳ kinh doanh 6 tháng suy yếu toàn diện, gần chạm đáy lịch sử.  
+- **MA252 (14.1%)**: Chỉ số mã giữ được xu hướng năm rất thấp, xác nhận thị trường đang trong secular bear mạnh.
+
+## 2. Structural Health  
+Toàn bộ 4 đường MA đều đồng thuận lao dốc, không có phân kỳ. MA20 < 30% và MA252 < 40% khớp chính xác mẫu **Bear Confirmed** – suy yếu dài hạn lan rộng. Đây không phải Bear Trap vì MA252 cũng quá thấp, không còn túi đỡ uptrend. Cấu trúc thị trường cực kém, dòng tiền rút cạn, không đủ điều kiện gọi là “rũ bỏ”.
+
+## 3. Money Flow Leadership  
+- **Top volume MA20**: Các mã dẫn đầu ngắn hạn rải rác nhiều nhóm (ABB – Ngân hàng, ASP – Chứng khoán, BSA – Vật liệu xây dựng, CRE – BĐS, CSM – Cao su, DBT – Dược, DHB – Đồ uống, DXP – Cảng). Không có ngành nào chiếm ưu thế rõ rệt, phản ánh dòng tiền đầu cơ “đánh nhanh rút gọn” ở vài mã thanh khoản lẻ.  
+- **Top volume MA252**: Xuất hiện các tên như ABB, ASP, BSR (Lọc hóa dầu), C32, CDC (Xây dựng/hạ tầng) cùng CSM, DBT – có sự trùng lặp nhất định với nhóm ngắn hạn (ABB, ASP, CSM, DBT). Điều này cho thấy dòng tiền dài hạn đang neo vào một số mã phòng thủ (Ngân hàng, Dược, Hạ tầng) hoặc đầu cơ có câu chuyện riêng, nhưng không lan tỏa.  
+- **Smart money** ưu tiên defensive, ẩn mình ở các mã có dòng tiền đều (ngân hàng, dược, cảng), hoàn toàn không có dấu hiệu vào các nhóm aggressive như Thép, Môi giới.
+
+## 4. Verdict  
+Strategy: **Defensive cash-up** – phòng thủ tuyệt đối. Môi trường Bear Confirmed không phù hợp trend-following hay mean-reversion T+ do rủi ro bục vùng oversold kéo dài. Đòn bẩy đề xuất: 0% margin. Không có divergences hỗ trợ bắt đáy, MA252 dưới ngưỡng an toàn. Khuyến nghị giữ tiền mặt, chờ khi MA20 vượt lại 20% kèm xác nhận dòng tiền mới ở các ngành dẫn dắt.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 9.6,
+  "ma60_pct": 10.8,
+  "ma125_pct": 13.2,
+  "ma252_pct": 14.1,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 9.647058823529411,
+    "breadth_ma60_pct": 10.823529411764705,
+    "breadth_ma125_pct": 13.176470588235295,
+    "breadth_ma252_pct": 14.117647058823529,
+    "above_ma20_count": 41,
+    "above_ma60_count": 46,
+    "above_ma125_count": 56,
+    "above_ma252_count": 60,
+    "breadth_universe_size": 425,
+    "snapshot_date": "28/07/2026"
+  }
+}
+```

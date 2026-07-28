@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Chênh lệch lớn: Upside Breadth hiện tại 22.44%, cao gấp đôi Mu dài hạn (11.27%) → cầu áp đảo dài hạn.
+- Downside Breadth 6.73% thấp hơn hẳn Mu 13.24% → áp lực bán đang nén chặt.
+- Cả hai chiều đều trong chế độ momentum: Phi\(_{up}\) = 0.137, Phi\(_{dn}\) = 0.179 → đà tiếp diễn ở cả mua lẫn bán.
+
+## 2. Supply-Demand Dynamics
+- Trạng thái dòng tiền: **tích lũy** (up >> mu, down << mu). Nhà đầu tư đang gom hàng khi cung sẵn sàng thấp.
+- Bên cung (downside) giữ momentum thực sự mạnh hơn (\(|\)Phi\(_{dn}\)| = 0.179 > \(|\)Phi\(_{up}\)| = 0.137), cho thấy nếu bán ra, đà có thể tự gia tăng nhanh hơn đà mua.
+
+## 3. Stress-Test Read
+- P95 Downside = 22.69%, cao hơn P95 Upside 19.38% → đuôi rủi ro nghiêng về phía giảm sâu (panic sell potential dày hơn kịch bản bùng nổ mua).
+- Breadth stress score 22.1/100 (NORMAL), không có tín hiệu cực đoan, nhưng asymmetry từ Monte Carlo nhấn mạnh downside risk đáng lưu ý.
+
+## 4. Verdict
+- Tỷ trọng giải ngân đề xuất: **40%**.
+- Strategy: **phòng thủ** – giữ tỷ trọng thấp, sẵn sàng mua thêm nếu xuất hiện nhịp điều chỉnh, nhưng không đuổi theo momentum do đà bán có thể tự củng cố nhanh hơn.
+- Lý do: Tích lũy đang hình thành nhưng đuôi rủi ro giảm vượt trội; ưu tiên kiểm soát rủi ro hơn là tận dụng upside.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 22.69,
+  "p95_upside_pct": 19.38,
+  "deployment_pct": 40,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: UPSIDE_EXPANSION
+- Breadth Stress Score: 22.1
+- Downside Rank: 0.27
+- Net Sell Pressure: -15.7 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 22.443890274314214,
+    "downside_current_pct": 6.733167082294264,
+    "p95_upside_pct": 19.381186901079214,
+    "p95_downside_pct": 22.69424152570061,
+    "phi_up": 0.13721394613320617,
+    "phi_down": 0.17915785577955498,
+    "breadth_stress_score": 22.10272928789138,
+    "net_sell_pressure_pct": -15.71072319201995,
+    "breadth_regime": "UPSIDE_EXPANSION"
+  }
+}
+```

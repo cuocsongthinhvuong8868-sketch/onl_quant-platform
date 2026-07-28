@@ -1,0 +1,80 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## PHÂN TÍCH HỆ THỐNG TIN TỨC – CẢM XÚC VIỆT NAM (AI CIO)
+
+### 1. Trạng thái cảm xúc tin tức (News Sentiment Regime)
+- **Cửa sổ 1 ngày (28/07/2026):** Regime `risk_on`. P(sentiment mean > 0) = 83% → nằm trong ngưỡng 65–85% → mức **“Nghiêng về / Dấu hiệu ban đầu”** của xu hướng ưa thích rủi ro. Chưa đủ độ tin cậy để khẳng định chắc chắn.
+- **Cửa sổ 7 ngày:** Regime `strong_risk_on`. P_conf = 100% → **"Khẳng định chắc chắn"** xu hướng rất mạnh mẽ, ưa thích rủi ro cao.
+- **Cửa sổ 30 ngày:** Regime `strong_risk_on`. P_conf = 100% → **"Khẳng định chắc chắn"** ở tầm nhìn dài hạn, xác nhận bối cảnh vĩ mô ủng hộ tài sản rủi ro.
+
+### 2. Các kênh dẫn dắt (Channels kéo Risk-on / Risk-off mạnh nhất)
+Hai kênh chi phối rõ rệt với độ tin cậy 100%:
+- **fx_external (Tỷ giá):** Cực kỳ tích cực, score +2.00 trên tất cả các cửa sổ. Tỷ giá trung tâm liên tục tăng (từ 25.206 → 25.306), phản ánh kỳ vọng ổn định tiền tệ và có thể là dòng vốn vào.
+- **commodity (Hàng hóa):** Tiêu cực mạnh, score -2.00 (1d), -0.29 (7d), -0.31 (30d). Giá heo hơi Việt Nam, quặng sắt, phân Ure Trung Quốc giảm mạnh – kéo sentiment xuống, nhưng theo chiều tích cực giảm áp lực lạm phát.
+
+Các kênh đáng chú ý khác:
+- **earnings:** +1.63 (1d), +1.37 (7d) → hỗ trợ mạnh từ kỳ vọng lợi nhuận doanh nghiệp.
+- **monetary_policy:** +1.51 (7d) – lãi suất huy động tăng nhẹ, được thể hiện là tín hiệu ổn định hệ thống.
+- **liquidity:** -0.75 (1d), -0.44 (7d) – NHNN hút ròng, hơi tiêu cực nhưng không đủ để lấn át bức tranh chung.
+
+### 3. Các động lực chính (Top Drivers) – tóm tắt từ dữ liệu
+**Tích cực:**
+- Tỷ giá trung tâm ngày 28/07/2026 tăng 13 đồng lên 25.306 (fx_external, +1.464) – củng cố niềm tin về ổn định tỷ giá.
+- Chuỗi tỷ giá liên tục tăng từ 24–28/07 và từ cuối tháng 6 đến nay (fx_external giữ điểm tối đa +2.00).
+- Lợi suất trái phiếu chính phủ đi ngang phiên 28/07 (credit_stress +0.348) – thị trường nợ không có căng thẳng.
+- Lãi suất huy động 1-3 tháng nhóm NHTM khác tăng 1 bps (monetary_policy +1.557 ngày 13/07) – tín hiệu ổn định hệ thống ngân hàng.
+
+**Tiêu cực:**
+- Giá heo hơi giảm xuống đáy 6 tháng còn 62.500 đ/kg (commodity -1.301) – yếu tố giảm phát nông sản, có thể ảnh hưởng thu nhập nông thôn nhưng tốt cho lạm phát.
+- NHNN hút ròng 1.961,4 tỷ qua OMO phiên 28/07 (liquidity -0.218) – thanh khoản thắt chặt nhẹ.
+- Giá quặng sắt, phân Ure Trung Quốc lao dốc (commodity âm liên tục từ 30/06 đến 28/07) – phản ánh nhu cầu bên ngoài yếu, rủi ro xuất khẩu nguyên liệu.
+
+### 4. Kết luận tác động đến AI CIO
+- **Hỗ trợ** (Supports) cho các vị thế rủi ro trung hạn: cả 7d và 30d đều strong_risk_on với P_conf 100%. Kênh tỷ giá và chính sách tiền tệ đóng vai trò neo niềm tin.
+- **Tín hiệu ngắn hạn** (1d) chỉ **nghiêng về** risk_on – chưa đủ xác quyết để hành động theo tín hiệu xã hội. Cần chờ xác nhận thêm từ phiên tiếp theo.
+- **Xung đột nhẹ** (minor conflict): thanh khoản bị hút ròng và giá hàng hóa giảm có thể báo hiệu nhu cầu toàn cầu chậm lại, nhưng impact bị lu mờ bởi các kênh tỷ giá và earnings.
+- **Khuyến nghị cho AI CIO**: giữ nguyên trạng thái rủi ro hiện tại dựa trên tín hiệu 7d/30d. Đối với giao dịch rất ngắn hạn, có thể chờ thêm xác nhận từ cửa sổ 1d khi P_conf vượt 85%.
+
+### 5. Cảnh báo & Độ phủ nguồn (Caveats)
+- **Nguồn thông tin**: Cửa sổ 1d chủ yếu là `widata` (87/121), đáng tin cậy. Cửa sổ 7d và 30d có sự hiện diện lớn từ `mozyfin_social` (374/831 và 1331/4420 tương ứng). Mặc dù không chiếm ưu thế tuyệt đối, nhưng yếu tố xã hội có thể khuếch đại cảm xúc. Cần diễn giải các tín hiệu này như một lớp phủ “mềm”, tốc độ cao hơn.
+- **Rủi ro nhiễu (headline noise)**: Tín hiệu commodity giảm mạnh có thể bị chi phối bởi dữ liệu Trung Quốc, không phản ánh hoàn toàn nội tại Việt Nam. Kênh lợi nhuận (earnings) hiện chưa có driver cụ thể, chỉ là tổng hợp từ tin tức – cần theo dõi thêm.
+- **Thời gian hệ thống**: Feed được tạo lúc 16:40 ngày 28/07/2026 – coi là tươi (fresh), không bị trễ.
+- Tóm lại, bức tranh vĩ mô từ tin tức đang ủng hộ trạng thái risk-on một cách mạnh mẽ và nhất quán ở tầm nhìn tuần và tháng; tín hiệu ngày tuy lạc quan nhưng chưa đạt ngưỡng hành động quyết liệt.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.2825,
+    "news_confidence_1d": 0.8286,
+    "news_count_1d": 121,
+    "news_regime_1d": "risk_on",
+    "news_source_counts_1d": {
+      "widata": 87,
+      "mozyfin_social": 34
+    },
+    "news_macro_composite_7d": 0.7709,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 831,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 257,
+      "mozyfin": 200,
+      "mozyfin_social": 374
+    },
+    "news_macro_composite_30d": 0.622,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4420,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 786,
+      "mozyfin": 2303,
+      "mozyfin_social": 1331
+    },
+    "news_macro_composite": 0.2825,
+    "news_confidence": 0.8286,
+    "news_count": 121
+  }
+}
+```

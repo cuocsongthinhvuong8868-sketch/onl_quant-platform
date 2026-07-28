@@ -1,0 +1,63 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 37.6, nằm trong dải FEAR (20–40), tăng +3.3 so với phiên trước.
+- EGARCH Vol (chuẩn hóa) 94.4% — trên ngưỡng phân vị cao (80%), tăng +5.2% so với phiên liền trước.
+- Rolling Skewness -0.09, hơi âm (dưới 0), cho thấy đuôi phân phối lệch trái nhẹ.
+- Downside Correlation (norm) 2.6%, thấp; Upside Correlation (norm) 18.3%, thấp nhưng cao hơn Downside.
+- Shock Regime Flag = NONE; CSV Rank = 0.23; Signal Confidence = 0.51.
+
+## 2. Interpretation
+Thị trường đang trong pha FEAR: biến động thực tế rất cao (94.4% phân vị), độ lệch âm củng cố rủi ro giảm điểm, nhưng mức độ tương quan phía giảm rất thấp (2.6%) cho thấy chưa có làn sóng bán tháo đồng loạt. Trên dữ liệu hiện tại, xác suất cao đây là trạng thái tiêu cực có phân hóa, không phải panic lan rộng.
+
+## 3. Cross-Check
+- **Divergence điểm số – biến động**: EGARCH vol cực cao (94.4%) nhưng Score chỉ 37.6, chưa rơi vào EXTREME FEAR. Nguyên nhân do các yếu tố khác (đặc biệt tương quan và phân tán cổ phiếu) chưa xác nhận sự đồng thuận bán.
+- **Skewness vs. Correlation**: Skew âm (-0.09) trong khi Downside Correlation chỉ 2.6%, Upside Correlation lên tới 18.3% → thể hiện dòng tiền bắt đáy phân hóa, các nhịp hồi có độ lan tỏa cao hơn nhịp giảm. Đây là tín hiệu phân kỳ tích cực đáng lưu ý.
+
+## 4. Verdict
+Với FEAR phân hóa và không có shock hệ thống, duy trì beta thấp hơn trung bình nhưng không cần phòng thủ tối đa.  
+- **Beta mục tiêu**: 0.6 cho danh mục VN-Index.  
+- **Hành động**: Tăng tỷ trọng tiền mặt, giảm đòn bẩy; ưu tiên nắm giữ các cổ phiếu có Upside Correlation cao, hạn chế những mã nhạy cảm với thanh khoản. Chưa đủ tín hiệu để chuyển sang tấn công do chênh lệch giữa biến động và tương quan còn lớn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "28/07/2026",
+  "regime": "FEAR",
+  "score": 37.6,
+  "confidence": "medium",
+  "beta_target": 0.6,
+  "key_signals": [
+    "Vol EGARCH 94.4% – cực cao",
+    "Upside Correlation (18.3%) > Downside Correlation (2.6%) – phân hóa, chưa có bán tháo đồng thuận"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 37.6
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: FEAR
+- Signal Confidence: 0.51
+- CSV Rank: 0.23
+- Acute Shock: 0.88
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 37.59459093007166,
+    "sentiment_regime": "FEAR",
+    "signal_confidence": 0.5109766131674339,
+    "acute_shock": 0.876984126984127,
+    "csv_rank": 0.2261904761904762,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

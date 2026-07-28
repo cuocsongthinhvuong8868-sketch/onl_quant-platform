@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-07-28T13:29:38",
+  "t_data_date": "2026-07-28",
+  "target_report_date": "2026-07-27",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_270726.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_270726.txt",
+  "report_mtime": "report:2026-07-28T13:20:06|sidecar:2026-07-28T13:20:06",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_270726.txt:58cc107036766f18c447636f18cdef815e4c63a3|sidecar:ai_cio_humility_rules_deepseek-v4-pro_270726.json:fd50e9cdcfeb2af0829f4845b230ec8b87e89ba0",
+  "parsed": {
+    "report_date": "2026-07-27",
+    "composite_score": 32.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 4.0,
+        "unit": "sessions",
+        "description": "VNIBOR stress sessions below 5 falsifies the domestic funding stress pillar of the bearish thesis."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 30.0,
+        "unit": "%",
+        "description": "Breadth MA20 rising above 45% would reverse the bearish breadth signal."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.4,
+        "unit": "%",
+        "description": "SSI dropping below 55% indicates systemic stress has abated."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.325,
+        "unit": "",
+        "description": "Fat-tail risk is falsified if xi_max falls below 0.25 across sensitivity thresholds."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": null,
+        "unit": "th pct",
+        "description": "If Vingroup coupling stays low, concentration risk is contained – current data MISSING."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.9,
+        "unit": "th pct",
+        "description": "CQS percentile moving below 80% would signal global credit stress easing."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-07-27",
+      "composite_score": 32.0,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 4,
+          "unit": "sessions",
+          "description": "VNIBOR stress sessions below 5 falsifies the domestic funding stress pillar of the bearish thesis."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 30,
+          "unit": "%",
+          "description": "Breadth MA20 rising above 45% would reverse the bearish breadth signal."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.4,
+          "unit": "%",
+          "description": "SSI dropping below 55% indicates systemic stress has abated."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.325,
+          "unit": "",
+          "description": "Fat-tail risk is falsified if xi_max falls below 0.25 across sensitivity thresholds."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": null,
+          "unit": "th pct",
+          "description": "If Vingroup coupling stays low, concentration risk is contained – current data MISSING."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.9,
+          "unit": "th pct",
+          "description": "CQS percentile moving below 80% would signal global credit stress easing."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-07-27",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "4 sessions",
+      "T actual": 4.0,
+      "T actual display": "4 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-07-27",
+      "Description": "VNIBOR stress sessions below 5 falsifies the domestic funding stress pillar of the bearish thesis.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "30.0%",
+      "T actual": 9.647058823529411,
+      "T actual display": "9.647%",
+      "Delta": -20.352941176470587,
+      "Delta display": "-20.4%",
+      "Status": "Intact",
+      "Data date": "2026-07-28",
+      "Description": "Breadth MA20 rising above 45% would reverse the bearish breadth signal.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.4%",
+      "T actual": 63.28328037160589,
+      "T actual display": "63.3%",
+      "Delta": -0.1167196283941081,
+      "Delta display": "-0.117%",
+      "Status": "Intact",
+      "Data date": "2026-07-28",
+      "Description": "SSI dropping below 55% indicates systemic stress has abated.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.325",
+      "T actual": 0.3263191266569856,
+      "T actual display": "0.326",
+      "Delta": 0.0013191266569855808,
+      "Delta display": "+0.001",
+      "Status": "Intact",
+      "Data date": "2026-07-28",
+      "Description": "Fat-tail risk is falsified if xi_max falls below 0.25 across sensitivity thresholds.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "N/A",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "If Vingroup coupling stays low, concentration risk is contained – current data MISSING.",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.9 th pct",
+      "T actual": 99.93386243386243,
+      "T actual display": "99.9 th pct",
+      "Delta": 0.03386243386242427,
+      "Delta display": "+0.034 th pct",
+      "Status": "Intact",
+      "Data date": "2026-07-27",
+      "Description": "CQS percentile moving below 80% would signal global credit stress easing.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 4,
+      "date": "2026-07-27",
+      "error": ""
+    },
+    "breadth": {
+      "value": 9.647058823529411,
+      "date": "2026-07-28",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.28328037160589,
+      "date": "2026-07-28",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-07-28",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3263191266569856,
+      "date": "2026-07-28",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.93386243386243,
+      "date": "2026-07-27",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

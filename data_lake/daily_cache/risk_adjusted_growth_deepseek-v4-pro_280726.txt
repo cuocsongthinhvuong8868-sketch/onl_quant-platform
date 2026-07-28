@@ -1,0 +1,57 @@
+## 1. Scenario Assessment  
+Bộ tham số hiện tại (K=1.0, CoE=14%, stress test không kích hoạt) là mức trung lập tiêu chuẩn cho ngành ngân hàng VN. Trong kịch bản này, mặt bằng chung đa phần đốt vốn cổ đông: chỉ duy nhất SHB tạo Alpha dương (4.7%), còn lại Alpha ≤ 0. Nhìn toàn ngành, chất lượng thực sự chưa bù đắp được chi phí vốn, phản ánh tình trạng “mắc kẹt giá trị” – định giá không còn quá rẻ để tự động sinh lợi thặng dư.
+
+## 2. Top Alpha Decomposition  
+- **SHB (Alpha +4.7%)**: Hiện thân của “Fortress”. P/B cực rẻ (0.78) kết hợp ROE khá (17.5%), biến động ROE cực thấp (σ=1.9%) và tỉ lệ chi trả thấp (8.6%) → phần lớn lợi nhuận được tái đầu tư, hiệu quả vốn ổn định. Disciplined Return vượt trội so với CoE.  
+- **MBB (Alpha -0.1%)**: Chất lượng cao (ROE 21.8%, σ=1.6%, payout 6.7%) nhưng định giá P/B 1.31 không còn rẻ → lợi nhuận điều chỉnh rủi ro gần như chạm ngưỡng hòa vốn. Đây là “Quality at Fair Price”, chưa phải Fortress vì thiếu yếu tố giá rẻ.  
+- **ACB (Alpha -1.0%)**: ROE rất cao (23%) song σ tương đối (2.7%) và tỉ lệ chi trả cao hơn (15.9%) khiến lợi nhuận giữ lại giảm; P/B 1.23 khiến Alpha chớm âm. Gần giống MBB nhưng kém hơn một chút do risk penalty cao hơn.
+
+## 3. Value Traps Warning  
+- **LPB (Alpha -12.8%)**: “Premium Burn” rõ rệt. P/B 3.39 quá đắt, ROE 21.1% không đủ bù đắp rủi ro (σ=3.8%) và tỉ lệ chi trả cao (21%) → đốt vốn nặng.  
+- **EIB (Alpha -10.1%)**: “Cheap Trap”. P/B 1.24 tưởng rẻ nhưng ROE èo uột (10%), σ cao (3.8%) → Disciplined Return quá thấp.  
+- **VPB (Alpha -9.6%)**: “Growth Trap”. Biến động ROE lớn nhất nhóm (σ=4.7%), ROE chỉ trung bình (14.1%), payout cao (24.6%) kết hợp P/B 1.16 → risk penalty phá hủy toàn bộ phần bù.
+
+## 4. Portfolio Construction  
+- **Core Holding (Fortress)**: **SHB** – tỉ trọng 60‑70% cho nhóm ngân hàng.  
+- **Tactical**: Có thể xem xét MBB/ACB (tỉ trọng thấp ~20‑30%) nếu nhà đầu tư tin vào khả năng cải thiện định giá hoặc giảm σ, nhưng hiện tại chưa đạt Alpha dương bền vững.  
+- **Cấm mua / Underweight**: LPB, EIB, VPB – cả ba đều Alpha âm sâu, bẫy giá trị hoặc premium.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.742865041267841,
+    "median_economic_alpha_pct": -3.2265586010582012,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```
