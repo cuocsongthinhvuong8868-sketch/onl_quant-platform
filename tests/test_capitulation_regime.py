@@ -94,11 +94,13 @@ def test_price_breadth_and_forced_selling_gates_create_true_climax() -> None:
 
     assert snapshot.phase is CapitulationPhase.CAPITULATION_CLIMAX
     assert snapshot.action_eligible is False
+    assert snapshot.sessions_after_three_gate_climax == 0
     assert snapshot.required_gates_met == {
         "price_shock": True,
         "breadth_shock": True,
         "forced_selling": True,
         "three_gate_climax": True,
+        "climax_continuation": False,
         "post_climax_exhaustion": False,
     }
     assert snapshot.features["return_1d"] < -0.035
@@ -152,7 +154,7 @@ def test_abm_cascade_metrics_can_supply_independent_forced_selling_gate() -> Non
     assert any("ABM metrics" in reason for reason in snapshot.trigger_reasons)
 
 
-def test_dated_abm_only_climax_can_transition_to_confirmed_exhaustion() -> None:
+def test_dated_abm_only_climax_opens_numbered_continuation_window() -> None:
     index_close, close, volume = _climax_market(with_confirmation=True)
     climax_date = index_close.index[-3]
     volume.iloc[-3] = volume.iloc[-4]
@@ -184,8 +186,10 @@ def test_dated_abm_only_climax_can_transition_to_confirmed_exhaustion() -> None:
     assert climax.phase is CapitulationPhase.CAPITULATION_CLIMAX
     assert climax.required_gates_met["forced_selling"] is True
     assert climax.features["selling_volume_shock"] < 1.50
-    assert confirmed.phase is CapitulationPhase.EXHAUSTION_CONFIRMED
+    assert confirmed.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
     assert confirmed.action_eligible is True
+    assert confirmed.sessions_after_three_gate_climax == 2
+    assert confirmed.required_gates_met["climax_continuation"] is True
     assert confirmed.features["recent_climax_sessions_ago"] == 2.0
 
     future_date = index_close.index[-1] + pd.offsets.BDay()
@@ -213,20 +217,23 @@ def test_dated_abm_only_climax_can_transition_to_confirmed_exhaustion() -> None:
     assert same_as_of.required_gates_met == confirmed.required_gates_met
 
 
-def test_exhaustion_requires_post_climax_price_and_breadth_confirmation() -> None:
+def test_exhaustion_remains_diagnostic_during_actionable_continuation() -> None:
     index_close, close, volume = _climax_market(with_confirmation=True)
 
     snapshot = analyze_capitulation(index_close, close, constituent_volume=volume)
 
-    assert snapshot.phase is CapitulationPhase.EXHAUSTION_CONFIRMED
+    assert snapshot.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
     assert snapshot.action_eligible is True
+    assert snapshot.sessions_after_three_gate_climax == 2
+    assert snapshot.required_gates_met["climax_continuation"] is True
+    assert snapshot.required_gates_met["post_climax_exhaustion"] is True
     assert snapshot.features["recent_climax_sessions_ago"] == 2.0
     assert snapshot.exhaustion_evidence_score_uncalibrated >= 60
     assert any("price bounced" in reason for reason in snapshot.confirmation_reasons)
     assert any("downside participation receded" in reason for reason in snapshot.confirmation_reasons)
 
 
-def test_current_forced_selling_blocks_exhaustion_action_even_after_price_bounce() -> None:
+def test_continuation_action_does_not_require_forced_selling_to_clear() -> None:
     index_close, close, volume = _climax_market(with_confirmation=True)
 
     snapshot = analyze_capitulation(
@@ -241,8 +248,73 @@ def test_current_forced_selling_blocks_exhaustion_action_even_after_price_bounce
 
     assert snapshot.required_gates_met["forced_selling"] is True
     assert snapshot.required_gates_met["post_climax_exhaustion"] is False
-    assert snapshot.phase is not CapitulationPhase.EXHAUSTION_CONFIRMED
-    assert snapshot.action_eligible is False
+    assert snapshot.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert snapshot.sessions_after_three_gate_climax == 2
+    assert snapshot.action_eligible is True
+
+
+def test_each_post_climax_session_is_numbered_from_one() -> None:
+    index_close, close, volume = _climax_market(with_confirmation=True)
+
+    first = analyze_capitulation(
+        index_close,
+        close,
+        constituent_volume=volume,
+        as_of=index_close.index[-2],
+    )
+    second = analyze_capitulation(
+        index_close,
+        close,
+        constituent_volume=volume,
+    )
+
+    assert first.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert first.sessions_after_three_gate_climax == 1
+    assert first.action_eligible is True
+    assert second.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert second.sessions_after_three_gate_climax == 2
+    assert second.action_eligible is True
+
+
+def test_continuation_window_ends_after_session_five() -> None:
+    index_close, close, volume = _climax_market(with_confirmation=True)
+    future_index = pd.date_range(
+        index_close.index[-1] + pd.offsets.BDay(),
+        periods=4,
+        freq="B",
+    )
+    future_close = pd.DataFrame(
+        [close.iloc[-1].to_numpy() * (1.001**step) for step in range(1, 5)],
+        index=future_index,
+        columns=close.columns,
+    )
+    future_volume = pd.DataFrame(
+        np.repeat(volume.iloc[[-1]].to_numpy(), 4, axis=0),
+        index=future_index,
+        columns=volume.columns,
+    )
+    extended_close = pd.concat([close, future_close])
+    extended_volume = pd.concat([volume, future_volume])
+    extended_index_close = extended_close.mean(axis=1).rename("INDEX")
+
+    fifth = analyze_capitulation(
+        extended_index_close,
+        extended_close,
+        constituent_volume=extended_volume,
+        as_of=future_index[-2],
+    )
+    sixth = analyze_capitulation(
+        extended_index_close,
+        extended_close,
+        constituent_volume=extended_volume,
+    )
+
+    assert fifth.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert fifth.sessions_after_three_gate_climax == 5
+    assert fifth.action_eligible is True
+    assert sixth.phase is not CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert sixth.sessions_after_three_gate_climax is None
+    assert sixth.action_eligible is False
 
 
 def test_as_of_snapshot_is_invariant_to_appended_future_data() -> None:
@@ -290,20 +362,26 @@ def test_as_of_snapshot_is_invariant_to_appended_future_data() -> None:
     assert first.liquidation_risk_score_uncalibrated == second.liquidation_risk_score_uncalibrated
 
 
-def test_actual_coverage_is_reported_and_insufficient_data_is_never_actionable() -> None:
+def test_insufficient_data_quality_does_not_block_continuation_action() -> None:
     index_close, close, volume = _climax_market(with_confirmation=True)
-    # Four consecutive missing sessions exceed the engine's bounded ffill and
-    # leave only five names eligible for the live 252-session breadth reading.
-    close.iloc[-4:, :25] = np.nan
-    volume.iloc[-4:, :25] = np.nan
-    index_close = close.mean(axis=1).rename("INDEX")
+    # Keep enough prior observations to detect the climax, but fewer than the
+    # 200 sessions required for a complete structural-quality assessment.
+    index_close = index_close.iloc[-190:]
+    close = close.iloc[-190:]
+    volume = volume.iloc[-190:]
 
-    snapshot = analyze_capitulation(index_close, close, constituent_volume=volume)
+    snapshot = analyze_capitulation(
+        index_close,
+        close,
+        constituent_volume=volume,
+    )
 
-    assert snapshot.data_quality.constituent_count == 5
-    assert snapshot.data_quality.current_breadth_coverage == 5 / 30
+    assert snapshot.data_quality.constituent_count == 30
+    assert snapshot.data_quality.index_observations == 190
     assert snapshot.data_quality.status == "INSUFFICIENT"
-    assert snapshot.action_eligible is False
+    assert snapshot.phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
+    assert snapshot.sessions_after_three_gate_climax == 2
+    assert snapshot.action_eligible is True
 
 
 def test_snapshot_dict_is_json_friendly_and_labels_scores_as_uncalibrated() -> None:

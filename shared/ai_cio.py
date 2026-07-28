@@ -25,6 +25,7 @@ CSV_HISTORY_HEADER = [
     "provider",
     "stress_regime",
     "capitulation_phase",
+    "sessions_after_three_gate_climax",
     "capitulation_action_eligible",
 ]
 AI_CIO_HISTORY_PROVIDER = "deepseek-v4-pro"
@@ -49,7 +50,7 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "upside_ratio": "upside_ratio_v2_stress_prompt",
     "var_cvar_vnindex": "var_cvar_vnindex_v3_prior_window_prompt",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
-    "executive_summary": "ai_cio_methodology_v6_updated_tool_prompt_discipline",
+    "executive_summary": "ai_cio_methodology_v7_climax_continuation",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -223,9 +224,9 @@ TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "capitulation_regime": {
         "domain": "price_path_capitulation_phase_gate",
         "horizon": "sessions_to_weeks",
-        "primary_metric": "three_gate_climax_then_exhaustion_confirmation",
+        "primary_metric": "three_gate_climax_then_post_climax_continuation_window",
         "score_direction": "Gate-only state; its uncalibrated evidence scores are not probabilities or composite-score inputs.",
-        "limits": "FRAGILE, LIQUIDATION and CAPITULATION_CLIMAX are not bottom signals. Only action-eligible EXHAUSTION_CONFIRMED can activate the CAPITULATION decision override.",
+        "limits": "FRAGILE, LIQUIDATION and the live CAPITULATION_CLIMAX session are non-actionable. Sessions 1-5 after a detected three-gate climax are CAPITULATION_CLIMAX_CONTINUATION and can activate the CAPITULATION decision override.",
         "authority": "Deterministic phase/action_eligible are authoritative for capitulation policy; the LLM cannot relabel them.",
     },
 }
@@ -375,6 +376,7 @@ def upsert_history_csv(
     target_date: date = None,
     stress_regime: str = "",
     capitulation_phase: str = "",
+    sessions_after_three_gate_climax: int | None = None,
     capitulation_action_eligible: bool | None = None,
 ) -> bool:
     """Upsert score, resolved regime, and independent capitulation phase history.
@@ -430,6 +432,11 @@ def upsert_history_csv(
         'provider': provider,
         'stress_regime': stress_regime,
         'capitulation_phase': capitulation_phase,
+        'sessions_after_three_gate_climax': (
+            ""
+            if sessions_after_three_gate_climax is None
+            else str(int(sessions_after_three_gate_climax))
+        ),
         'capitulation_action_eligible': (
             ""
             if capitulation_action_eligible is None
@@ -520,9 +527,14 @@ from tools.va_res.report import snapshot as vares_snapshot
 from tools.var_cvar_vnindex.report import snapshot as var_cvar_snapshot
 # Import Humility/Falsification audit context
 from tools.humility_falsification.page import get_humility_falsification_context
-from tools.capitulation_regime import METHODOLOGY_VERSION as CAPITULATION_METHODOLOGY_VERSION
-from tools.capitulation_regime import analyze_capitulation
+from tools.capitulation_regime import (
+    METHODOLOGY_VERSION as CAPITULATION_METHODOLOGY_VERSION,
+    CapitulationConfig,
+    analyze_capitulation,
+)
 from shared.ai_cio_scoring import derive_metric_implied_scores, regime_from_score, score_tool_packet
+
+CAPITULATION_CONTINUATION_SESSIONS = CapitulationConfig().climax_continuation_sessions
 
 def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     today_str = date.today().strftime('%d%m%y')
@@ -864,7 +876,7 @@ def _score_band_for_regime(regime: str) -> tuple[int, int] | None:
 
 
 def _capitulation_action_eligible(decision_state: dict[str, Any] | None) -> bool:
-    """Fail closed unless exhaustion is confirmed with usable detector data."""
+    """Allow only a fresh, explicitly actionable post-climax continuation."""
     if not isinstance(decision_state, dict):
         return False
 
@@ -877,21 +889,19 @@ def _capitulation_action_eligible(decision_state: dict[str, Any] | None) -> bool
     phase = state.get("phase")
     if hasattr(phase, "value"):
         phase = phase.value
-    if str(phase or "").strip().upper() != "EXHAUSTION_CONFIRMED":
+    if str(phase or "").strip().upper() != "CAPITULATION_CLIMAX_CONTINUATION":
         return False
 
     explicit_eligibility = state.get("action_eligible")
     if explicit_eligibility is not True:
         return False
 
-    data_quality: Any = state.get("data_quality")
-    if hasattr(data_quality, "to_dict"):
-        data_quality = data_quality.to_dict()
-    if isinstance(data_quality, dict):
-        quality_status = data_quality.get("status")
-    else:
-        quality_status = getattr(data_quality, "status", None)
-    if str(quality_status or "").strip().upper() not in {"GOOD", "LIMITED"}:
+    sessions_after = _safe_float(state.get("sessions_after_three_gate_climax"))
+    if (
+        sessions_after is None
+        or not float(sessions_after).is_integer()
+        or not 1 <= sessions_after <= CAPITULATION_CONTINUATION_SESSIONS
+    ):
         return False
 
     freshness_status = state.get("freshness_status")
@@ -1953,6 +1963,7 @@ def _insufficient_capitulation_state(reason: str, expected_as_of: Any = None) ->
         "expected_as_of": expected,
         "freshness_status": "UNAVAILABLE",
         "phase": "DATA_INSUFFICIENT",
+        "sessions_after_three_gate_climax": None,
         "stress_risk_score_uncalibrated": None,
         "liquidation_risk_score_uncalibrated": None,
         "exhaustion_evidence_score_uncalibrated": None,
@@ -1963,6 +1974,7 @@ def _insufficient_capitulation_state(reason: str, expected_as_of: Any = None) ->
             "breadth_shock": False,
             "forced_selling": False,
             "three_gate_climax": False,
+            "climax_continuation": False,
             "post_climax_exhaustion": False,
         },
         "trigger_reasons": ("Capitulation detector unavailable",),
@@ -2105,6 +2117,9 @@ def _build_capitulation_evidence_packet(state: dict[str, Any]) -> dict[str, Any]
             "exhaustion_evidence_score_uncalibrated"
         ),
         "required_gates_met": state.get("required_gates_met"),
+        "sessions_after_three_gate_climax": state.get(
+            "sessions_after_three_gate_climax"
+        ),
         "action_eligible": state.get("action_eligible") is True,
         "freshness_status": state.get("freshness_status"),
         "market_data_lag_business_days": state.get("market_data_lag_business_days"),
@@ -2174,17 +2189,22 @@ def _attach_capitulation_policy(
     constraints = list(decision_state.get("hard_constraints") or [])
     if phase in {"LIQUIDATION", "CAPITULATION_CLIMAX"}:
         constraints.append(
-            f"Bottom-fishing prohibited: capitulation phase is {phase}; exhaustion is not confirmed"
+            f"Bottom-fishing prohibited: capitulation phase is {phase}; the post-climax continuation window has not started"
         )
     elif phase == "FRAGILE":
         constraints.append("Capitulation gate is FRAGILE; no bottom or short-closing override")
-    elif phase == "EXHAUSTION_CONFIRMED" and action_eligible:
+    elif phase == "CAPITULATION_CLIMAX_CONTINUATION" and action_eligible:
+        sessions_after = capitulation_state.get("sessions_after_three_gate_climax")
         constraints.append(
-            "CAPITULATION override active: exhaustion confirmed with usable data; close shorts and use tranche-only equity"
+            f"CAPITULATION override active: session {sessions_after} after three-gate climax; close shorts and use tranche-only equity"
+        )
+    elif phase == "CAPITULATION_CLIMAX_CONTINUATION":
+        constraints.append(
+            "Capitulation override prohibited: continuation state is stale or not explicitly action-eligible"
         )
     elif phase in {"EXHAUSTION_CONFIRMED", "DATA_INSUFFICIENT"}:
         constraints.append(
-            "Capitulation override prohibited: confirmation data are insufficient, stale, or not action-eligible"
+            "Capitulation override prohibited: phase is not an actionable post-climax continuation"
         )
     decision_state["hard_constraints"] = sorted(set(constraints))
 
@@ -2193,8 +2213,8 @@ def _attach_capitulation_policy(
         [
             "Do not interpret capitulation evidence scores as probabilities.",
             "Do not add the capitulation gate to the composite score or consensus; it reuses price, breadth, ESR, and ABM evidence.",
-            "Use CAPITULATION only when capitulation_state.phase is EXHAUSTION_CONFIRMED and action_eligible is true.",
-            "LIQUIDATION and CAPITULATION_CLIMAX prohibit bottom-fishing; they are not reversal confirmations.",
+            "Use CAPITULATION only when capitulation_state.phase is CAPITULATION_CLIMAX_CONTINUATION, sessions_after_three_gate_climax >= 1, freshness is CURRENT, and action_eligible is true.",
+            "LIQUIDATION and the live CAPITULATION_CLIMAX session prohibit bottom-fishing; the action window begins on continuation session 1.",
         ]
     )
     decision_state["writer_rules"] = list(dict.fromkeys(writer_rules))
@@ -2261,6 +2281,9 @@ def _build_history_rollup(
             value = row.get(key)
             if value not in (None, ""):
                 compact_row[key] = value
+        sessions_after = _safe_float(row.get("sessions_after_three_gate_climax"))
+        if sessions_after is not None:
+            compact_row["sessions_after_three_gate_climax"] = int(round(sessions_after))
         action_eligible = optional_bool(row.get("capitulation_action_eligible"))
         if action_eligible is not None:
             compact_row["capitulation_action_eligible"] = action_eligible
@@ -2570,6 +2593,9 @@ def _read_recent_summary_ledger(provider_key: str = "kimi-2.6", n_past: int = AI
                     optional_fields = {
                         "stress_regime": row.get("stress_regime", ""),
                         "capitulation_phase": row.get("capitulation_phase", ""),
+                        "sessions_after_three_gate_climax": row.get(
+                            "sessions_after_three_gate_climax", ""
+                        ),
                         "capitulation_action_eligible": row.get(
                             "capitulation_action_eligible", ""
                         ),
@@ -5397,6 +5423,9 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
                 provider=provider_key,
                 stress_regime=final_stress_regime,
                 capitulation_phase=str(cap_state.get("phase") or ""),
+                sessions_after_three_gate_climax=cap_state.get(
+                    "sessions_after_three_gate_climax"
+                ),
                 capitulation_action_eligible=cap_state.get("action_eligible"),
             )
             if ok:

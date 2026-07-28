@@ -58,7 +58,11 @@ def _phase_tone(phase: str) -> str:
         return "danger"
     if normalized == "FRAGILE":
         return "warning"
-    if normalized in {"EXHAUSTION_CONFIRMED", "REPAIR"}:
+    if normalized in {
+        "CAPITULATION_CLIMAX_CONTINUATION",
+        "EXHAUSTION_CONFIRMED",
+        "REPAIR",
+    }:
         return "positive"
     return "neutral"
 
@@ -97,6 +101,7 @@ def render():
         "provider",
         "stress_regime",
         "capitulation_phase",
+        "sessions_after_three_gate_climax",
         "capitulation_action_eligible",
     ):
         if col not in df.columns:
@@ -120,7 +125,19 @@ def render():
         render_signal_card("🎯 Regime", latest["regime"], tone=_regime_tone(str(latest["regime"])))
     with col4:
         phase = str(latest.get("capitulation_phase") or "LEGACY / N/A")
-        render_signal_card("Capitulation Phase", phase, tone=_phase_tone(phase))
+        sessions_after = str(
+            latest.get("sessions_after_three_gate_climax") or ""
+        ).strip()
+        phase_display = (
+            f"{phase} · phiên +{sessions_after} sau climax"
+            if sessions_after
+            else phase
+        )
+        render_signal_card(
+            "Capitulation Phase",
+            phase_display,
+            tone=_phase_tone(phase),
+        )
     with col5:
         st.metric("📊 Số ngày", f"{len(df)}")
 
@@ -148,12 +165,19 @@ def render():
                 line=dict(width=2, color="#ffffff"),
                 symbol="circle",
             ),
-            customdata=df[["regime", "capitulation_phase"]].to_numpy(),
+            customdata=df[
+                [
+                    "regime",
+                    "capitulation_phase",
+                    "sessions_after_three_gate_climax",
+                ]
+            ].to_numpy(),
             hovertemplate=(
                 "<b>%{x|%d/%m/%Y}</b><br>"
                 "Score: <b>%{y}/100</b><br>"
                 "Regime: <b>%{customdata[0]}</b><br>"
                 "Capitulation phase: <b>%{customdata[1]}</b><br>"
+                "Sessions after climax: <b>%{customdata[2]}</b><br>"
                 "<extra></extra>"
             ),
         )
@@ -234,6 +258,7 @@ def render():
                 "score",
                 "regime",
                 "capitulation_phase",
+                "sessions_after_three_gate_climax",
                 "capitulation_action_eligible",
                 "source",
                 "provider",
@@ -243,6 +268,9 @@ def render():
         display_df["source"] = display_df["source"].map(_source_badge)
         display_df["provider"] = display_df["provider"].replace("", "—")
         display_df["capitulation_phase"] = display_df["capitulation_phase"].replace("", "—")
+        display_df["sessions_after_three_gate_climax"] = display_df[
+            "sessions_after_three_gate_climax"
+        ].replace("", "—")
         display_df["capitulation_action_eligible"] = (
             display_df["capitulation_action_eligible"]
             .str.lower()
@@ -254,6 +282,7 @@ def render():
             "Score",
             "Regime",
             "Capitulation Phase",
+            "Phiên sau Climax",
             "Action Eligible",
             "Nguồn",
             "Model",
@@ -270,6 +299,7 @@ def render():
                 "Score": st.column_config.NumberColumn("📈 Score", format="%d", width="small"),
                 "Regime": st.column_config.TextColumn("🎯 Regime", width="large"),
                 "Capitulation Phase": st.column_config.TextColumn("Capitulation Phase", width="medium"),
+                "Phiên sau Climax": st.column_config.TextColumn("Phiên sau Climax", width="small"),
                 "Action Eligible": st.column_config.TextColumn("Action Eligible", width="small"),
                 "Nguồn": st.column_config.TextColumn("🔧 Nguồn", width="small",
                                                       help="Auto = cron GitHub Actions; Manual = user chạy từ app"),

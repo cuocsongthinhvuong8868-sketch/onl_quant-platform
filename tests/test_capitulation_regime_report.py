@@ -20,6 +20,7 @@ def test_capitulation_report_snapshot_flattens_engine_output(monkeypatch) -> Non
             return {
                 "as_of": "2026-07-22T00:00:00",
                 "phase": "CAPITULATION_CLIMAX",
+                "sessions_after_three_gate_climax": 0,
                 "stress_risk_score_uncalibrated": 82.44,
                 "liquidation_risk_score_uncalibrated": 91.22,
                 "exhaustion_evidence_score_uncalibrated": 12.0,
@@ -39,6 +40,7 @@ def test_capitulation_report_snapshot_flattens_engine_output(monkeypatch) -> Non
                     "breadth_shock": True,
                     "forced_selling": True,
                     "three_gate_climax": True,
+                    "climax_continuation": False,
                     "post_climax_exhaustion": False,
                 },
                 "data_quality": {
@@ -51,7 +53,7 @@ def test_capitulation_report_snapshot_flattens_engine_output(monkeypatch) -> Non
                 "trigger_reasons": ["price shock"],
                 "confirmation_reasons": [],
                 "action_eligible": False,
-                "methodology_version": "capitulation_state_machine_v1.0.0",
+                "methodology_version": "capitulation_state_machine_v2.0.0",
             }
 
     def fake_analyze(**kwargs):
@@ -70,6 +72,7 @@ def test_capitulation_report_snapshot_flattens_engine_output(monkeypatch) -> Non
 
     assert row["snapshot_date"] == "2026-07-22"
     assert row["phase"] == "CAPITULATION_CLIMAX"
+    assert row["sessions_after_three_gate_climax"] == 0
     assert row["action_eligible"] is False
     assert row["stress_risk_score_uncalibrated"] == 82.4
     assert row["liquidation_risk_score_uncalibrated"] == 91.2
@@ -78,6 +81,7 @@ def test_capitulation_report_snapshot_flattens_engine_output(monkeypatch) -> Non
     assert row["breadth_ma20_pct"] == 14.0
     assert row["downside_participation_pct"] == 83.0
     assert row["price_shock_gate"] is True
+    assert row["climax_continuation_gate"] is False
     assert row["post_climax_exhaustion_gate"] is False
     assert row["data_quality_status"] == "GOOD"
     assert row["volume_coverage_pct"] == 90.0

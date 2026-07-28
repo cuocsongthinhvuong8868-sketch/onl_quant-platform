@@ -324,13 +324,15 @@ def test_history_csv_only_accepts_deepseek_provider(tmp_path, monkeypatch):
         provider="deepseek-v4-pro",
         stress_regime="PRE-CRASH / PANIC",
         capitulation_phase="FRAGILE",
+        sessions_after_three_gate_climax=None,
         capitulation_action_eligible=False,
     )
     history_text = history_path.read_text(encoding="utf-8")
     assert "deepseek-v4-pro" in history_text
     assert "kimi-2.6-local" not in history_text
     assert "capitulation_phase" in history_text
-    assert "PRE-CRASH / PANIC,FRAGILE,false" in history_text
+    assert "sessions_after_three_gate_climax" in history_text
+    assert "PRE-CRASH / PANIC,FRAGILE,,false" in history_text
 
 
 def test_evidence_packet_compacts_verbose_report_and_extracts_metrics():
@@ -471,7 +473,7 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
     master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
 
-    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v6_updated_tool_prompt_discipline"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v7_climax_continuation"
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
     assert "mozyfin_social" in card["limits"]
     assert "source_counts" in card["authority"]
@@ -659,13 +661,14 @@ def test_final_regime_enforcement_rejects_unconfirmed_capitulation():
     assert ai_cio.parse_score_regime(enforced) == ("7", "EXTREME CRISIS")
 
 
-def test_final_regime_enforcement_allows_only_actionable_exhaustion():
+def test_final_regime_enforcement_allows_actionable_climax_continuation():
     import shared.ai_cio as ai_cio
 
     report = "final score & regime : 12 ; regime : EXTREME CRISIS"
     eligible_state = {
         "capitulation_state": {
-            "phase": "EXHAUSTION_CONFIRMED",
+            "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+            "sessions_after_three_gate_climax": 2,
             "action_eligible": True,
             "data_quality": {"status": "LIMITED"},
             "freshness_status": "CURRENT",
@@ -673,7 +676,8 @@ def test_final_regime_enforcement_allows_only_actionable_exhaustion():
     }
     insufficient_state = {
         "capitulation_state": {
-            "phase": "EXHAUSTION_CONFIRMED",
+            "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+            "sessions_after_three_gate_climax": 2,
             "action_eligible": True,
             "data_quality": {"status": "INSUFFICIENT"},
             "freshness_status": "CURRENT",
@@ -681,20 +685,21 @@ def test_final_regime_enforcement_allows_only_actionable_exhaustion():
     }
 
     eligible = ai_cio._enforce_final_score_regime(report, eligible_state)
-    insufficient = ai_cio._enforce_final_score_regime(
+    insufficient_quality = ai_cio._enforce_final_score_regime(
         eligible,
         insufficient_state,
     )
 
     assert ai_cio.parse_score_regime(eligible) == ("12", "CAPITULATION")
-    assert ai_cio.parse_score_regime(insufficient) == ("12", "EXTREME CRISIS")
+    assert ai_cio.parse_score_regime(insufficient_quality) == ("12", "CAPITULATION")
 
 
-def test_capitulation_policy_fails_closed_on_bad_quality_or_stale_data():
+def test_capitulation_policy_ignores_quality_but_requires_fresh_continuation():
     import shared.ai_cio as ai_cio
 
     base_state = {
-        "phase": "EXHAUSTION_CONFIRMED",
+        "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+        "sessions_after_three_gate_climax": 2,
         "action_eligible": True,
         "data_quality": {"status": "GOOD"},
         "freshness_status": "CURRENT",
@@ -705,12 +710,22 @@ def test_capitulation_policy_fails_closed_on_bad_quality_or_stale_data():
     missing_freshness = {
         key: value for key, value in base_state.items() if key != "freshness_status"
     }
+    missing_counter = {
+        key: value
+        for key, value in base_state.items()
+        if key != "sessions_after_three_gate_climax"
+    }
+    out_of_window = {**base_state, "sessions_after_three_gate_climax": 6}
+    fractional_counter = {**base_state, "sessions_after_three_gate_climax": 1.5}
 
     assert ai_cio._capitulation_action_eligible({"capitulation_state": base_state}) is True
-    assert ai_cio._capitulation_action_eligible({"capitulation_state": insufficient}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": insufficient}) is True
     assert ai_cio._capitulation_action_eligible({"capitulation_state": stale}) is False
     assert ai_cio._capitulation_action_eligible({"capitulation_state": missing_flag}) is False
     assert ai_cio._capitulation_action_eligible({"capitulation_state": missing_freshness}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": missing_counter}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": out_of_window}) is False
+    assert ai_cio._capitulation_action_eligible({"capitulation_state": fractional_counter}) is False
 
 
 def test_allocation_guard_clamps_false_capitulation_body_and_keeps_final_line_last():
@@ -744,7 +759,7 @@ def test_allocation_guard_clamps_false_capitulation_body_and_keeps_final_line_la
     )
 
 
-def test_allocation_guard_closes_short_only_for_confirmed_exhaustion_override():
+def test_allocation_guard_closes_short_for_climax_continuation_override():
     import shared.ai_cio as ai_cio
 
     report = (
@@ -756,7 +771,8 @@ def test_allocation_guard_closes_short_only_for_confirmed_exhaustion_override():
     )
     decision_state = {
         "capitulation_state": {
-            "phase": "EXHAUSTION_CONFIRMED",
+            "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+            "sessions_after_three_gate_climax": 1,
             "action_eligible": True,
             "data_quality": {"status": "GOOD"},
             "freshness_status": "CURRENT",
@@ -1177,7 +1193,8 @@ def test_drift_audit_accepts_actionable_capitulation_override():
         "metric_implied_score": 12,
         "metric_implied_regime": "EXTREME CRISIS",
         "capitulation_state": {
-            "phase": "EXHAUSTION_CONFIRMED",
+            "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+            "sessions_after_three_gate_climax": 2,
             "action_eligible": True,
             "data_quality": {"status": "GOOD"},
             "freshness_status": "CURRENT",

@@ -354,6 +354,7 @@ def _compact_score_anchor(raw_anchor: Any) -> dict[str, Any]:
         for key in (
             "as_of",
             "phase",
+            "sessions_after_three_gate_climax",
             "stress_risk_score_uncalibrated",
             "liquidation_risk_score_uncalibrated",
             "exhaustion_evidence_score_uncalibrated",

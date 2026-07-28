@@ -222,7 +222,8 @@ def test_capitulation_builder_disables_actions_beyond_previous_business_session(
         def to_dict(self):
             return {
                 "as_of": self.as_of.isoformat(),
-                "phase": "EXHAUSTION_CONFIRMED",
+                "phase": "CAPITULATION_CLIMAX_CONTINUATION",
+                "sessions_after_three_gate_climax": 1,
                 "data_quality": {"status": "GOOD", "warnings": []},
                 "action_eligible": True,
                 "features": {},
@@ -342,8 +343,9 @@ def test_capitulation_builder_uses_point_in_time_abm_history_for_prior_climax(
         report_as_of=as_of,
     )
 
-    assert confirmed["phase"] == "EXHAUSTION_CONFIRMED"
+    assert confirmed["phase"] == "CAPITULATION_CLIMAX_CONTINUATION"
     assert confirmed["action_eligible"] is True
+    assert confirmed["sessions_after_three_gate_climax"] == 2
     assert confirmed["features"]["recent_climax_sessions_ago"] == 2.0
     assert confirmed["features"]["selling_volume_shock"] < 1.50
 

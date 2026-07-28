@@ -103,6 +103,9 @@ def snapshot(df_close=None, load_custom=None) -> dict:
     return {
         "snapshot_date": str(state.get("as_of", ""))[:10],
         "phase": str(state.get("phase", "")),
+        "sessions_after_three_gate_climax": state.get(
+            "sessions_after_three_gate_climax"
+        ),
         "action_eligible": state.get("action_eligible") is True,
         "stress_risk_score_uncalibrated": _float_or_none(
             state.get("stress_risk_score_uncalibrated"),
@@ -129,6 +132,7 @@ def snapshot(df_close=None, load_custom=None) -> dict:
         "breadth_shock_gate": _gate(gates, "breadth_shock"),
         "forced_selling_gate": _gate(gates, "forced_selling"),
         "three_gate_climax_gate": _gate(gates, "three_gate_climax"),
+        "climax_continuation_gate": _gate(gates, "climax_continuation"),
         "post_climax_exhaustion_gate": _gate(gates, "post_climax_exhaustion"),
         "data_quality_status": str(quality.get("status", "")),
         "constituent_count": int(quality.get("constituent_count", 0) or 0),

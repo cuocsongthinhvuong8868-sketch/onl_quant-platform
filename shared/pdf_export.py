@@ -44,6 +44,7 @@ class HistoryPoint:
     provider: str = ""
     stress_regime: str = ""
     capitulation_phase: str = ""
+    sessions_after_three_gate_climax: int | None = None
     capitulation_action_eligible: bool | None = None
 
 
@@ -187,6 +188,11 @@ def _safe_optional_bool(value: Any) -> bool | None:
     return None
 
 
+def _safe_optional_int(value: Any) -> int | None:
+    number = _safe_float(value)
+    return None if number is None else int(round(number))
+
+
 def _load_json(path: Path) -> dict[str, Any]:
     try:
         return json.loads(path.read_text(encoding="utf-8"))
@@ -241,6 +247,7 @@ def load_ai_cio_history(
     final_regime: str = "",
     final_stress_regime: str = "",
     final_capitulation_phase: str = "",
+    final_sessions_after_three_gate_climax: int | None = None,
     final_capitulation_action_eligible: bool | None = None,
 ) -> list[HistoryPoint]:
     """Load AI CIO score history and tolerate malformed conflict-marker rows."""
@@ -271,6 +278,9 @@ def load_ai_cio_history(
                         provider=str(row.get("provider", "") or ""),
                         stress_regime=str(row.get("stress_regime", "") or ""),
                         capitulation_phase=str(row.get("capitulation_phase", "") or ""),
+                        sessions_after_three_gate_climax=_safe_optional_int(
+                            row.get("sessions_after_three_gate_climax")
+                        ),
                         capitulation_action_eligible=_safe_optional_bool(
                             row.get("capitulation_action_eligible")
                         ),
@@ -293,6 +303,10 @@ def load_ai_cio_history(
                 existing.stress_regime = final_stress_regime
             if not existing.capitulation_phase:
                 existing.capitulation_phase = final_capitulation_phase
+            if existing.sessions_after_three_gate_climax is None:
+                existing.sessions_after_three_gate_climax = (
+                    final_sessions_after_three_gate_climax
+                )
             if existing.capitulation_action_eligible is None:
                 existing.capitulation_action_eligible = final_capitulation_action_eligible
         else:
@@ -305,6 +319,9 @@ def load_ai_cio_history(
                     provider=provider_key,
                     stress_regime=final_stress_regime,
                     capitulation_phase=final_capitulation_phase,
+                    sessions_after_three_gate_climax=(
+                        final_sessions_after_three_gate_climax
+                    ),
                     capitulation_action_eligible=final_capitulation_action_eligible,
                 )
             )
@@ -604,6 +621,9 @@ def _build_model(
         final_regime=regime,
         final_stress_regime=final_stress_regime,
         final_capitulation_phase=str(capitulation_state.get("phase") or ""),
+        final_sessions_after_three_gate_climax=_safe_optional_int(
+            capitulation_state.get("sessions_after_three_gate_climax")
+        ),
         final_capitulation_action_eligible=_safe_optional_bool(
             capitulation_state.get("action_eligible")
         ),
@@ -1272,9 +1292,11 @@ def _page_tail_consensus(pdf: _AiCioPDF, model: dict[str, Any]) -> None:
             "Capitulation gate",
             str(model.get("capitulation_state", {}).get("phase") or "DATA GAP"),
             (
-                "Action eligible; exhaustion confirmation can override the stress regime."
+                "Action eligible on continuation session "
+                f"{model.get('capitulation_state', {}).get('sessions_after_three_gate_climax')} "
+                "after Three-Gate Climax; the phase override can be used."
                 if model.get("capitulation_state", {}).get("action_eligible") is True
-                else "No bottom override; evidence scores are uncalibrated diagnostics."
+                else "No continuation action override; evidence scores are uncalibrated diagnostics."
             ),
             _status_color(str(model.get("capitulation_state", {}).get("phase") or "DATA GAP")),
             (

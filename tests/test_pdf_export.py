@@ -113,8 +113,8 @@ def test_load_ai_cio_history_preserves_persisted_capitulation_fields(tmp_path):
     data_lake = tmp_path / "data_lake"
     data_lake.mkdir()
     (data_lake / "Ai_cio_report.csv").write_text(
-        "ddmmyyyy,score,regime,source,provider,stress_regime,capitulation_phase,capitulation_action_eligible\n"
-        "12072026,12,CAPITULATION,auto,deepseek-v4-pro,EXTREME CRISIS,EXHAUSTION_CONFIRMED,true\n",
+        "ddmmyyyy,score,regime,source,provider,stress_regime,capitulation_phase,sessions_after_three_gate_climax,capitulation_action_eligible\n"
+        "12072026,12,CAPITULATION,auto,deepseek-v4-pro,EXTREME CRISIS,CAPITULATION_CLIMAX_CONTINUATION,2,true\n",
         encoding="utf-8",
     )
 
@@ -125,7 +125,8 @@ def test_load_ai_cio_history_preserves_persisted_capitulation_fields(tmp_path):
 
     assert len(history) == 1
     assert history[0].stress_regime == "EXTREME CRISIS"
-    assert history[0].capitulation_phase == "EXHAUSTION_CONFIRMED"
+    assert history[0].capitulation_phase == "CAPITULATION_CLIMAX_CONTINUATION"
+    assert history[0].sessions_after_three_gate_climax == 2
     assert history[0].capitulation_action_eligible is True
 
 
@@ -145,12 +146,14 @@ def test_load_ai_cio_history_enriches_legacy_selected_report_row(tmp_path):
         final_score=12,
         final_regime="CAPITULATION",
         final_stress_regime="EXTREME CRISIS",
-        final_capitulation_phase="EXHAUSTION_CONFIRMED",
+        final_capitulation_phase="CAPITULATION_CLIMAX_CONTINUATION",
+        final_sessions_after_three_gate_climax=1,
         final_capitulation_action_eligible=True,
     )
 
     assert history[0].stress_regime == "EXTREME CRISIS"
-    assert history[0].capitulation_phase == "EXHAUSTION_CONFIRMED"
+    assert history[0].capitulation_phase == "CAPITULATION_CLIMAX_CONTINUATION"
+    assert history[0].sessions_after_three_gate_climax == 1
     assert history[0].capitulation_action_eligible is True
 
 

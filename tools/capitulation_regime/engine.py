@@ -21,7 +21,7 @@ import numpy as np
 import pandas as pd
 
 
-METHODOLOGY_VERSION = "capitulation_state_machine_v1.0.0"
+METHODOLOGY_VERSION = "capitulation_state_machine_v2.0.0"
 
 
 class CapitulationPhase(str, Enum):
@@ -31,6 +31,9 @@ class CapitulationPhase(str, Enum):
     FRAGILE = "FRAGILE"
     LIQUIDATION = "LIQUIDATION"
     CAPITULATION_CLIMAX = "CAPITULATION_CLIMAX"
+    CAPITULATION_CLIMAX_CONTINUATION = "CAPITULATION_CLIMAX_CONTINUATION"
+    # Kept for backwards-compatible reads of historical snapshots. V2 no longer
+    # requires this phase before the action window opens.
     EXHAUSTION_CONFIRMED = "EXHAUSTION_CONFIRMED"
     REPAIR = "REPAIR"
 
@@ -71,6 +74,7 @@ class CapitulationConfig:
     abm_margin_distance: float = 0.05
     abm_forced_share: float = 0.25
     abm_liquidation_share: float = 0.60
+    climax_continuation_sessions: int = 5
     exhaustion_lookback: int = 5
     exhaustion_min_bounce: float = 0.012
     repair_lookback: int = 60
@@ -100,12 +104,15 @@ class CapitulationSnapshot:
     """Typed output for one as-of date.
 
     The three ``*_uncalibrated`` fields are evidence scores, not probabilities.
-    ``action_eligible`` is fail-closed: it is true only for confirmed exhaustion
-    with non-insufficient data quality, never for an active selling climax.
+    ``action_eligible`` is true on post-climax continuation sessions, beginning
+    with session 1 after a detected three-gate climax. The live climax session
+    itself remains non-actionable. Data quality is disclosed but does not gate
+    continuation eligibility in methodology v2.
     """
 
     as_of: pd.Timestamp
     phase: CapitulationPhase
+    sessions_after_three_gate_climax: int | None
     stress_risk_score_uncalibrated: float
     liquidation_risk_score_uncalibrated: float
     exhaustion_evidence_score_uncalibrated: float
@@ -793,8 +800,13 @@ class CapitulationRegimeEngine:
         exhaustion = False
         exhaustion_score = 0.0
         climax_offset = None
+        climax_continuation = False
         if len(features) > 1:
-            search_start = max(0, len(features) - 1 - config.exhaustion_lookback)
+            search_lookback = max(
+                config.exhaustion_lookback,
+                config.climax_continuation_sessions,
+            )
+            search_start = max(0, len(features) - 1 - search_lookback)
             prior_climax_positions = np.flatnonzero(
                 historical_climax.iloc[search_start:-1].to_numpy(dtype=bool)
             )
@@ -802,6 +814,9 @@ class CapitulationRegimeEngine:
                 climax_position = search_start + int(prior_climax_positions[-1])
                 climax_offset = len(features) - 1 - climax_position
                 climax = features.iloc[climax_position]
+                climax_continuation = (
+                    1 <= climax_offset <= config.climax_continuation_sessions
+                )
                 bounce = current["index_close"] / climax["index_close"] - 1.0
                 positive_price = bool(
                     bounce >= config.exhaustion_min_bounce or current["return_1d"] >= 0.008
@@ -830,16 +845,20 @@ class CapitulationRegimeEngine:
                     )
                 confirmation_reasons.extend(passed)
                 acute_pressure_cleared = not forced_evidence and not esr_liquidation
-                exhaustion = (
-                    positive_price
-                    and len(passed) >= 2
-                    and not current_climax
-                    and acute_pressure_cleared
-                )
-                exhaustion_score = _weighted_score(
-                    [(1.0 if positive_price else 0.0, 2.0)]
-                    + [(1.0 if condition else 0.0, 1.0) for condition in easing_checks.values()]
-                )
+                if climax_offset <= config.exhaustion_lookback:
+                    exhaustion = (
+                        positive_price
+                        and len(passed) >= 2
+                        and not current_climax
+                        and acute_pressure_cleared
+                    )
+                    exhaustion_score = _weighted_score(
+                        [(1.0 if positive_price else 0.0, 2.0)]
+                        + [
+                            (1.0 if condition else 0.0, 1.0)
+                            for condition in easing_checks.values()
+                        ]
+                    )
 
         recent_stress = bool(
             flags["core_fragile"].iloc[-config.repair_lookback : -1].any()
@@ -856,8 +875,8 @@ class CapitulationRegimeEngine:
 
         if current_climax:
             phase = CapitulationPhase.CAPITULATION_CLIMAX
-        elif exhaustion:
-            phase = CapitulationPhase.EXHAUSTION_CONFIRMED
+        elif climax_continuation:
+            phase = CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
         elif liquidation:
             phase = CapitulationPhase.LIQUIDATION
         elif repair:
@@ -896,8 +915,10 @@ class CapitulationRegimeEngine:
             reasons.append(f"ESR systemic stress is elevated ({esr_ssi:.0%})")
         if phase in {CapitulationPhase.FRAGILE, CapitulationPhase.NORMAL}:
             reasons.extend(active_structural)
-        if phase == CapitulationPhase.EXHAUSTION_CONFIRMED:
-            reasons.append("a prior three-gate climax has been followed by price and breadth confirmation")
+        if phase == CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION:
+            reasons.append(
+                f"action window: session {climax_offset} after the latest three-gate climax"
+            )
         if phase == CapitulationPhase.REPAIR:
             reasons.append("trend and breadth repair followed recent stress")
 
@@ -955,8 +976,17 @@ class CapitulationRegimeEngine:
             key: _finite_float(value) for key, value in current.to_dict().items()
         }
         current_features.update(external)
+        sessions_after_climax = (
+            0
+            if current_climax
+            else int(climax_offset)
+            if climax_continuation and climax_offset is not None
+            else None
+        )
         current_features["recent_climax_sessions_ago"] = (
-            float(climax_offset) if climax_offset is not None else None
+            float(sessions_after_climax)
+            if sessions_after_climax is not None
+            else None
         )
         current_percentile_dict = {
             key: _finite_float(value) for key, value in current_percentiles.to_dict().items()
@@ -975,16 +1005,15 @@ class CapitulationRegimeEngine:
             "breadth_shock": bool(now_flags["breadth_shock"]),
             "forced_selling": forced_evidence,
             "three_gate_climax": current_climax,
+            "climax_continuation": climax_continuation and not current_climax,
             "post_climax_exhaustion": exhaustion,
         }
-        action_eligible = (
-            phase is CapitulationPhase.EXHAUSTION_CONFIRMED
-            and data_quality.status in {"GOOD", "LIMITED"}
-        )
+        action_eligible = phase is CapitulationPhase.CAPITULATION_CLIMAX_CONTINUATION
 
         return CapitulationSnapshot(
             as_of=features.index[-1],
             phase=phase,
+            sessions_after_three_gate_climax=sessions_after_climax,
             stress_risk_score_uncalibrated=stress_score,
             liquidation_risk_score_uncalibrated=liquidation_score,
             exhaustion_evidence_score_uncalibrated=exhaustion_score,

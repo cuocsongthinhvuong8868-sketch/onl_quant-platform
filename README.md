@@ -62,11 +62,11 @@ CodeGraph da duoc sync trong lan review nay:
 
 | Metric | Gia tri |
 | --- | ---: |
-| Indexed files | 283 |
-| Nodes | 3,024 |
-| Edges | 6,903 |
-| Python files | 274 |
-| YAML files | 9 |
+| Indexed files | 343 |
+| Nodes | 4,201 |
+| Edges | 9,948 |
+| Python files | 333 |
+| YAML files | 10 |
 
 Luong phu thuoc chinh:
 
@@ -117,6 +117,7 @@ CodeGraph cung cho thay cac hot paths can can trong khi sua:
 | Behavioral | News Sentiment Factor | `tools/sentiment_factor_news` | Mozyfin/WiData feed, taxonomy, channel scores, headline drivers |
 | Behavioral | PVGO | `tools/pvgo` | VNINDEX P/E, cost of equity, growth expectation context |
 | Behavioral | ABM Simulator | `tools/abm_simulator` | Leverage stress, forced-selling amplification, cascade distance |
+| Behavioral | Capitulation Regime | `tools/capitulation_regime` | Point-in-time Three-Gate Climax, post-climax continuation counter va action gate |
 | Behavioral | Backtest | `tools/backtest` | Composite risk signal, allocation overlay, strategy diagnostics |
 | Data | Data Health | `pages/D_Data_Health.py` | Freshness, missing-date timeline, JSON/CSV health report |
 
@@ -278,6 +279,20 @@ Core behavior:
 - Optional Telegram delivery va GitHub Actions automation.
 
 LLM chi nen duoc doc nhu mot analyst tong hop bang chung. Cac score/regime va risk constraints can duoc review lai bang metrics goc.
+
+### Capitulation action gate (methodology v2)
+
+Capitulation la phase gate doc lap voi composite score. Score thap chi the hien stress nang; no khong tu dong chung minh thi truong da tao day.
+
+- `CAPITULATION_CLIMAX` chi xuat hien khi dong thoi dat ba gate: price shock, breadth shock va forced-selling evidence. Day la phien moc `sessions_after_three_gate_climax = 0` va `action_eligible = false`.
+- Nam phien giao dich ke tiep duoc danh so `+1` den `+5`, co phase `CAPITULATION_CLIMAX_CONTINUATION` va `action_eligible = true`.
+- Tu phien `+6`, continuation window ket thuc va detector quay lai phase duoc xac dinh boi liquidation/repair/fragility thong thuong.
+- `EXHAUSTION_CONFIRMED` khong con la dieu kien mo action window. Exhaustion evidence score va confirmation reasons van duoc giu lai nhu diagnostic, khong phai xac suat.
+- `data_quality.status`, ke ca `INSUFFICIENT`, duoc cong bo de audit nhung khong chan action neu detector da xac dinh duoc continuation. Truong hop detector khong chay duoc hoac state bi stale van fail closed.
+- AI-CIO chi kich hoat decision regime `CAPITULATION` khi phase dung, counter la so nguyen trong khoang `1-5`, `action_eligible` la boolean `true` va freshness la `CURRENT`.
+- History ledger, metrics snapshot, evidence packet, Data Agent, UI va PDF cung luu/hien `sessions_after_three_gate_climax` de biet dang la phien thu may sau climax.
+
+Methodology version hien tai: `capitulation_state_machine_v2.0.0`. Executive-summary cache version duoc bump khi quy tac gate thay doi de tranh tai su dung bao cao theo logic cu.
 
 ## AI-CIO Chat
 
