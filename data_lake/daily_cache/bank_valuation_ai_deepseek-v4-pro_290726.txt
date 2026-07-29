@@ -1,0 +1,49 @@
+Ngày báo cáo AI: 29/07/2026
+
+**Phân loại regime**  
+Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng: **Định giá cao, cần chọn lọc**  
+Điểm độ rộng định giá: **-34.8%** (ngưỡng -50% đến -25%)  
+Cơ cấu: 10 mã định giá cao (43.5%), 9 mã hợp lý (39.1%), 0 mã rẻ rõ rệt, 4 mã rẻ nhưng rủi ro (17.4%) trên tổng 23 mã hợp lệ. Kết luận: biên an toàn toàn nhóm hẹp, phần lớn cổ phiếu đang giao dịch trên hoặc sát giá trị cơ bản; cơ hội chỉ tồn tại ở một số ít mã rẻ nhưng đi kèm rủi ro đáng kể.
+
+**Luận điểm chính**  
+- Độ rộng định giá âm sâu (-34.8%) phản ánh tình trạng không có mã nào thực sự rẻ rõ rệt; toàn bộ các mã “rẻ” đều nằm trong nhóm rủi ro cao, làm suy yếu chất lượng tín hiệu mua.  
+- Gap trung vị (-3.3%) và trimmed mean (-7.7%) cùng âm, cho thấy ngay cả nhóm định giá hợp lý cũng đang tiến gần hoặc vượt nhẹ fair value, không còn dư địa hấp thụ sai số.  
+- Gap theo vốn hóa (-14.2%) âm mạnh hơn, báo hiệu các ngân hàng vốn hóa lớn (thường dẫn dắt thị trường) đang ở vùng định giá cao tương đối, hạn chế khả năng bứt phá của chỉ số ngành.  
+- Chỉ 4 mã rẻ nhưng rủi ro (KLB, NAB, VAB, SHB) được mô hình coi là có upside, song tất cả đều thuộc diện rủi ro cao (overall risk score 42–52), không có xác nhận từ hành động giá (Unconfirmed Undervalued).  
+- Thị trường chưa đồng thuận với định giá rẻ: toàn bộ 9 mã fair value và 4 mã undervalued đều mang nhãn “Fair, Weak Price Action” hoặc “Unconfirmed Undervalued” – xác nhận giá đang yếu, thiếu động lượng mua.
+
+**Kiểm tra chéo**  
+Định giá tương đối (relative valuation label) và market mispricing score nhất quán với regime: các mã vốn hóa lớn như VCB (-0.419), BID (-0.256), LPB (-0.565) đều có mispricing âm sâu và được gắn nhãn Relatively Expensive. Điểm định giá tương đối toàn nhóm (-6.5%) củng cố nhận định mặt bằng giá đang nghiêng về đắt. Thị trường xác nhận yếu trên diện rộng (market confirmation score trung bình thấp) phủ định luận điểm “mua giá rẻ” một cách thuyết phục.
+
+**Tín hiệu theo mã**  
+- *Đáng theo dõi nhưng cần kiên nhẫn*: KLB (gap +65.6%, risk 42.6, confirmation 0.3 – unconfirmed), SHB (+28.4%, risk 47.4, confirmation 3.3), NAB (+60.3%, risk 51.9, confirmation 13.3). Upside cao nhưng hành động giá không hỗ trợ, chỉ nên đưa vào danh sách chờ xác nhận kỹ thuật.  
+- *Hợp lý nhưng đà giá yếu*: ACB, CTG, MBB, TCB đều ở vùng fair value với confirmation score thấp (2.6–12.4) và return 20/60 ngày âm. Chưa có điểm kích hoạt mua ngay.  
+- *Rủi ro/value‑trap*: NVB (gap -87.6%, risk 68.3), EIB (-58.6%, risk 58.4), BVB (-57.1%, risk 63.5) – định giá quá đắt, chất lượng tài sản kém; LPB (-52.1%, risk 46.3) dù rủi ro thấp hơn nhưng vẫn đắt và xác nhận yếu; VPB (-29.5%, risk 60.5) nằm trong nhóm rủi ro cao nhất.  
+- *Mã đang bị thị trường xác nhận yếu nhất*: EIB, OCB, BID (confirmation = 0.0–0.1) – giá không phản ánh bất kỳ kỳ vọng hồi phục nào, cần hạn chế phân bổ.
+
+**Rủi ro dữ liệu & bước tiếp theo**  
+- Dữ liệu không đầy đủ: BAB và SGB thiếu giá thị trường, beta mặc định – loại khỏi quyết định phân bổ ngay. NVB thiếu CAR, ước lượng rủi ro pha loãng vốn phải dùng giả định (confidence 95%). Cần cập nhật thông tin CAR trước khi đánh giá lại.  
+- Các mã rẻ nhưng rủi ro (KLB, NAB, VAB, SHB) đều có overall risk score > 40, cần phân tích sâu hơn về credit cycle, nợ xấu (NPL) và bao phủ dự phòng trước khi giải ngân.  
+- Hành động giá cần được theo dõi sát: toàn bộ fair/undervalued đều có return 20 ngày âm hoặc đi ngang, volume ratio thấp – chỉ tăng tỉ trọng khi ít nhất market confirmation cải thiện lên trên ngưỡng 30–40 và xuất hiện tín hiệu kỹ thuật đảo chiều.  
+- Mô hình gợi ý tiếp tục giữ trạng thái phòng thủ: ưu tiên nắm giữ các mã chất lượng cao, rủi ro thấp (TCB, VCB, ACB, CTG) nhưng chỉ mở mua khi giá chiết khấu về dưới fair value 5–10% và xác nhận giá mạnh lên.
+
+=== AI CIO DIRECT METRICS: bank_valuation ===
+```json
+{
+  "tool": "bank_valuation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "eligible_banks": 23,
+    "bank_valuation_breadth_score": -0.34782608695652173,
+    "median_valuation_gap_pct": -0.03299193586900573,
+    "valuation_regime": "Định giá cao, cần chọn lọc",
+    "overvalued_count": 10,
+    "fair_count": 9,
+    "undervalued_count": 4,
+    "best_ticker": "KLB",
+    "best_valuation_gap_pct": 0.6563925799609884,
+    "worst_ticker": "NVB",
+    "worst_valuation_gap_pct": -0.8755952355313031
+  }
+}
+```

@@ -1,0 +1,59 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- **Tương quan vs. trung bình dài hạn**: Lực cầu (14.96%) vượt mu 11.34% (+3.62pp), lực cung (5.99%) thấp hơn mu 12.97% (−6.98pp). Cấu trúc up >> mu & down << mu → tích lũy.
+- **Chế độ momentum**: Cả hai chiều đều đang trong pha momentum – lực cầu Phi = 0.138 (đà mua rõ rệt), lực cung Phi = 0.100 (chạm ngưỡng đà bán). Cầu đang dẫn dắt quán tính.
+- **V2 diagnostics**: Áp lực mua chiếm ưu thế (BUY_PRESSURE), stress score 13.8/100 (NORMAL), net sell pressure −9.0pp (dòng tiền vào ròng), MA5 sell pressure +4.2pp – rủi ro tăng thấp.
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại là **tích lũy**: cầu vượt trung bình, cung co hẹp mạnh. Mặc dù cả hai chiều đều có quán tính (Phi > 0.10), lực cầu giữ momentum thực sự mạnh hơn (|0.138| > |0.100|). Lực cung ở mức thấp kỷ lục, nên áp lực bán rất yếu. Điều này tương đồng với pha tích luỹ cổ phiếu ở vùng giá thấp với dòng tiền âm thầm đi vào.
+
+## 3. Stress-Test Read
+P95 Downside = 20.49% cho thấy nếu kịch bản panic xảy ra, tỷ lệ mã giảm mạnh có thể bùng phát, nhưng đang ở mức sát với P95 Upside 19.51%. Đuôi rủi ro hai bên gần cân xứng, nhưng đuôi giảm nhỉnh hơn chút (dày hơn 0.98pp). Tuy nhiên, trong bối cảnh stress score bình thường và độ rộng cung hiện tại rất thấp, xác suất kích hoạt panic ngay lập tức là thấp.
+
+## 4. Verdict
+**Tỷ trọng giải ngân đề xuất: 70%**  
+**Chiến lược: mua đuổi (chase momentum)** – cầu đang có quán tính mạnh, cung không đáng kể. Không hành động chờ điều chỉnh sâu sẽ bỏ lỡ pha tăng. Confidence: **trung bình**, vì đà bán (Phi = 0.100) là đường biên, vẫn có thể chuyển pha nếu xuất hiện xấu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "demand",
+  "p95_downside_pct": 20.49,
+  "p95_upside_pct": 19.51,
+  "deployment_pct": 70,
+  "strategy": "chase_momentum",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: BUY_PRESSURE
+- Breadth Stress Score: 13.8
+- Downside Rank: 0.17
+- Net Sell Pressure: -9.0 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 14.962593516209477,
+    "downside_current_pct": 5.985037406483791,
+    "p95_upside_pct": 19.509603477939343,
+    "p95_downside_pct": 20.486941475855495,
+    "phi_up": 0.1378200613346333,
+    "phi_down": 0.10047288645403296,
+    "breadth_stress_score": 13.849196453311164,
+    "net_sell_pressure_pct": -8.977556109725686,
+    "breadth_regime": "BUY_PRESSURE"
+  }
+}
+```

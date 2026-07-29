@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 40.8/100 (NEUTRAL), tăng +3.2 từ phiên trước, nằm sát ngưỡng dưới vùng trung tính.
+- EGARCH Vol chuẩn hóa 90.5% (giảm -4.0%), cho thấy biến động vẫn ở phân vị cao nhưng đang hạ nhiệt.
+- Rolling Skewness -0.11 (hơi âm, không sâu); Downside Correlation 2.8% (rất thấp), Upside Correlation 17.9% (cao hơn hẳn).
+- CSV Rank 0.21, Acute Shock 0.60, Shock Regime Flag = NONE.
+
+## 2. Interpretation
+Dữ liệu hiện tại xác nhận pha NEUTRAL/STOCK-PICKING: điểm số trung tính dù biến động cao, nhờ tương quan giảm điểm thấp (rủi ro hệ thống thấp) và phân hóa mạnh giữa các cổ phiếu. Thị trường không đồng pha khi bán tháo, tạo điều kiện cho chọn cổ phiếu (alpha) nhưng cần cảnh giác với biến động tổng thể cao.
+
+## 3. Cross-Check
+- **Phân kỳ Score – Vol**: Score trung tính trong khi EGARCH Vol ở mức cao (90.5%). Thường vol cao đi kèm Fear, nhưng Downside Correlation cực thấp đã “giải cứu” điểm số, ngăn vào vùng Fear. Đây là tín hiệu phân kỳ: thị trường biến động mạnh nhưng không lan tỏa khi giảm.
+- **Skewness vs Correlation**: Skewness -0.11 và Downside Correlation 2.8% nhất quán: độ lệch âm nhẹ nhưng không đi kèm tương quan giảm cao, cho thấy các nhịp giảm chủ yếu là câu chuyện riêng lẻ.
+
+## 4. Verdict
+Với pha Stock-picking, biến động cao nhưng rủi ro hệ thống thấp, đề xuất **beta exposure 0.7** cho danh mục VN-Index. Hành động: giảm nhẹ đòn bẩy, tập trung vào cổ phiếu có yếu tố cơ bản riêng biệt; không đánh lớn theo chỉ số. Không có tín hiệu đủ mạnh để chuyển sang phòng thủ hoàn toàn hay tấn công mạnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "29/07/2026",
+  "regime": "NEUTRAL",
+  "score": 40.8,
+  "confidence": "medium",
+  "beta_target": 0.7,
+  "key_signals": [
+    "Score 40.8, cận dưới vùng trung tính",
+    "EGARCH Vol 90.5% nhưng Downside Correlation chỉ 2.8%",
+    "Rolling Skewness -0.11, không quá tiêu cực",
+    "Upside Correlation 17.9% cao gấp 6 lần Downside"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 40.8
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: STOCK PICKING
+- Signal Confidence: 0.44
+- CSV Rank: 0.21
+- Acute Shock: 0.60
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 40.8381739260078,
+    "sentiment_regime": "STOCK PICKING",
+    "signal_confidence": 0.4420970132751946,
+    "acute_shock": 0.5952380952380952,
+    "csv_rank": 0.21031746031746032,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

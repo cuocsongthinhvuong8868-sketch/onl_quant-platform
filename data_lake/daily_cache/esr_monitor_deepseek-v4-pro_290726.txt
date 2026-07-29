@@ -1,0 +1,50 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- **SSI 63.2%**: vùng WARNING, cận trên tiệm cận ngưỡng CRITICAL (0.80).
+- **Market State**: ACTIVE STRESS – áp lực bán kéo dài, VN30 đóng cửa dưới MA125.
+- **Top 3 driver**: S_LIQ (35%), S_VAL (31%), S_COR (18%).
+- **PCA Concentration**: PC1 EVR 38.1%, tương quan hệ thống tăng mạnh khi thị trường suy yếu.
+
+## 2. Risk Decomposition (Bóc tách)
+Hiện tượng dẫn dắt là **Volume Dry-Up (S_LIQ)**: thanh khoản co hẹp nghiêm trọng so với định mức 1 năm, phản ánh dòng tiền rút lui và khả năng hấp thụ lệnh bán kém. Kết hợp với **S_VAL** (định giá vẫn căng so với lãi suất tiết kiệm) và **S_COR** (tương quan hệ thống ở mức cao) cho thấy thị trường đang trong pha “khô thanh khoản – bán đồng loạt”. Đây là cấu trúc điển hình của suy giảm kéo dài: nhà đầu tư co cụm phòng thủ, định giá chưa chiết khấu đủ rủi ro, và các cổ phiếu di chuyển cùng chiều khi giảm.
+
+## 3. Cross-Check
+- **Không có divergence trái chiều**: VN30 lùi dưới MA125 trong khi SSI duy trì trên 0.50 – phù hợp với kịch bản ACTIVE STRESS.
+- HMM regime khớp với SSI level, không có cảnh báo lệch pha. Tuy nhiên, nếu SSI tăng vượt 0.80 trong vài phiên tới, rủi ro crash ngắn hạn sẽ hiện hữu.
+
+## 4. Verdict
+- **Tỉ lệ tiền mặt khuyến nghị**: 75% danh mục. Nắm giữ tiền mặt cao để chờ cơ hội giải ngân khi stress hạ nhiệt.
+- **Hành động phòng hộ**: Giảm beta danh mục (ưu tiên hạ tỉ trọng cổ phiếu vốn hóa lớn có độ nhạy cao với VN30). Có thể xem xét vị thế short VN30F1M như một lớp bảo hiểm cục bộ, nhưng không khuyến nghị đòn bẩy.
+- Lưu ý: Chưa có tín hiệu đảo chiều từ các pillar, do đó việc “bắt đáy” sớm tiềm ẩn rủi ro đuối thanh khoản.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.2,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 75,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.188289667275086,
+    "pca_concentration_pct": 38.05110712316204,
+    "market_state": "ACTIVE STRESS",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.42823139416732
+  }
+}
+```

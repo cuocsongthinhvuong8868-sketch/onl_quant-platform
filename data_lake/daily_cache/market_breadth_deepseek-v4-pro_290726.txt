@@ -1,0 +1,53 @@
+## 1. Observations
+- **MA20 (1M):**: 9.6% – *Oversold* cực đoan (<20%), chỉ 41 mã giữ được xu hướng ngắn hạn.
+- **MA60 (1Q):**: 11.1% – *Rất thấp*, gần như không có tín hiệu điều chỉnh kết thúc.
+- **MA125 (½Y):**: 12.9% – *Suy yếu*, chu kỳ kinh doanh nửa năm đổ vỡ.
+- **MA252 (1Y):**: 14.8% – *Secular bear* rõ rệt (<40%), thị trường trong downtrend kéo dài.
+
+## 2. Structural Health
+Cả 4 đường MA đồng loạt ở mức đáy lịch sử, không có divergence. Mô hình **Bear Confirmed** kích hoạt: MA20 < 30% và MA252 < 40% → suy yếu mang tính cấu trúc, không phải Bear Trap (MA252 không >50%). Xu hướng dài hạn tiêu cực, không có điểm tựa kỹ thuật nào đáng tin cậy.
+
+## 3. Money Flow Leadership
+- **Top volume MA20 (ngắn hạn):** Ngành hỗn hợp – Ngân hàng (ABB), Chứng khoán (ASP), Năng lượng (BSR), Bất động sản (CRE), Sản xuất (CSM). Không có nhóm dẫn dắt rõ ràng, dòng tiền đầu cơ phân tán.
+- **Top volume MA252 (dài hạn):** Trùng lặp đáng kể với nhóm ngắn hạn (ABB, ASP, BSR, CSM, DBT) – củng cố vai trò phòng thủ của Ngân hàng và Năng lượng.
+- **Smart money** ưu tiên *defensive* (Ngân hàng, Tiện ích – BSR được coi là cổ phiếu phòng thủ tại Việt Nam), hạn chế nhóm chu kỳ nhạy cảm (Thép, Môi giới).
+
+## 4. Verdict
+**Chiến lược: Defensive cash-up.** Độ rộng đáy toàn diện, không có dấu hiệu phân kỳ hỗ trợ mean-reversion. Mọi giao dịch T+ đều tiềm ẩn rủi ro bắt dao rơi.  
+**Đòn bẩy đề xuất: 0% margin.** MA252 chỉ 14.8%, secular bear chưa có dấu hiệu thoái lui. Chờ xác nhận (WAIT FOR CONFIRMATION) khi MA20 hồi phục trên 30% *và* MA252 vượt 40% mới xét lại xu hướng.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 9.6,
+  "ma60_pct": 11.1,
+  "ma125_pct": 12.9,
+  "ma252_pct": 14.8,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 9.647058823529411,
+    "breadth_ma60_pct": 11.058823529411764,
+    "breadth_ma125_pct": 12.941176470588237,
+    "breadth_ma252_pct": 14.823529411764705,
+    "above_ma20_count": 41,
+    "above_ma60_count": 47,
+    "above_ma125_count": 55,
+    "above_ma252_count": 63,
+    "breadth_universe_size": 425,
+    "snapshot_date": "29/07/2026"
+  }
+}
+```
