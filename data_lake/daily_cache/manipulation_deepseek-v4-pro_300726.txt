@@ -1,0 +1,49 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+## 1. Observations
+- OLS Slope hiện tại 0.32 (percentile 22.4), nằm ở vùng thấp nhưng chưa cực đoan (<20). Độ dốc yếu cho thấy mỗi biến động của composite Vingroup ít tác động lên VNINDEX.
+- Correlation 0.79 (percentile 65.2), tương quan còn duy trì nhưng ở trạng thái “lỏng”, không đủ mạnh để khẳng định VIN đang dẫn dắt chỉ số.
+- Event study xác lập trạng thái **DECOUPLING** với ΔCorr = -0.37, ΔSlope = -0.48 — cả hai đồng loạt giảm mạnh, đúng tiêu chí cả ΔCorr và ΔSlope đều < -0.15.
+
+## 2. Microstructure Read
+Vai trò của nhóm VIC/VHM/VRE lên VNINDEX đang suy yếu rõ rệt. Với slope ở ngưỡng dưới trung bình và correlation không còn ở vùng cao, dòng tiền nhiều khả năng đang tập trung vào các nhóm ngành khác như Ngân hàng, Chứng khoán hoặc Thép. Không có dấu hiệu can thiệp bất thường vì cả hai percentile đều trong khoảng 20–80, nhưng sự sụt giảm đồng thuận của cả ΔCorr và ΔSlope báo hiệu Vingroup đã mất vai trò động lực chính cho VNINDEX.
+
+## 3. Event Study Interpretation
+Trạng thái DECOUPLING ngụ ý sự phân kỳ đang tiếp diễn: biến động của VIC/VHM/VRE không còn giải thích biến động của VNINDEX một cách đáng tin cậy. Trong phiên giao dịch intraday hoặc overnight, nhà đầu tư nên chuyển trọng tâm quan sát sang diễn biến của các mã dẫn dắt phi Vingroup (VCB, BID, FPT…) và các chỉ số ngành tương ứng. Không phải TÍN HIỆU GIẢ, tín hiệu đủ tin cậy để định vị lại góc nhìn thị trường.
+
+## 4. Verdict
+- Market read: **index-led-by-other-sectors**.
+- Leading indicators cần theo dõi: chỉ số ngành Ngân hàng, Chứng khoán; các cổ phiếu vốn hóa lớn ngoài Vingroup như VCB, BID, CTG, FPT.
+- Stop-loss reference (chỉ mang tính tham khảo kỹ thuật): nếu đang nắm giữ các mã họ Vingroup với kỳ vọng bám sát chỉ số, có thể đặt ngưỡng rủi ro 3% từ giá đóng cửa. Cụ thể: VIC stop-loss tại 220.00 × 0.97 ≈ 213.4 (213,400 VND); VHM stop-loss tại 147.90 × 0.97 ≈ 143.5 (143,500 VND). Mức này không phải khuyến nghị giao dịch.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "30/07/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 22.4,
+  "corr_percentile": 65.2,
+  "market_read": "other_sector_led",
+  "confidence": "medium"
+}
+```
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.322; corr=0.788; regime=DECOUPLING
+
+=== AI CIO DIRECT METRICS: manipulation ===
+```json
+{
+  "tool": "manipulation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "manip_slope": 0.321613198691994,
+    "manip_corr": 0.7882469632691063,
+    "manip_slope_percentile": 22.388805597201397,
+    "manip_corr_percentile": 65.21739130434783,
+    "regime": "DECOUPLING",
+    "delta_corr_percentile": -0.3666666666666667,
+    "delta_slope_percentile": -0.4833333333333333
+  }
+}
+```

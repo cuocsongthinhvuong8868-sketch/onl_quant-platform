@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-30",
+  "composite_score": 25.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 3,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING của VNIBOR giảm bền vững dưới 5, báo hiệu thanh khoản nội địa hạ nhiệt thực sự"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 19.5,
+      "unit": "%",
+      "description": "Độ rộng trên MA20 vọt qua 45%, xác nhận phục hồi thị trường rộng khắp"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.2,
+      "unit": "%",
+      "description": "Chỉ số stress hệ thống ESR giảm dưới 55%, thoát khỏi vùng WARNING"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.326,
+      "unit": "",
+      "description": "Hệ số đuôi EVT xi max hạ dưới 0.25, đuôi trái không còn bất thường"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 22.39,
+      "unit": "th pct",
+      "description": "Tương quan coupling của Vingroup giảm bền vững dưới phân vị 70, giảm thiểu rủi ro méo mó chỉ số"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.93,
+      "unit": "th pct",
+      "description": "Chỉ số căng thẳng tín dụng toàn cầu CQS giảm dưới phân vị 80, tín hiệu hạ nhiệt rủi ro thị trường quốc tế"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-30",
+  "source": "ai_cio_executive_summary"
+}

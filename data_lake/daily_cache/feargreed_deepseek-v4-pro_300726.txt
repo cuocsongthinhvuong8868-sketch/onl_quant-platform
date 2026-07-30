@@ -1,0 +1,63 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 47.9, tăng +7.1 phiên, nằm trong vùng trung tính 40–60.
+- EGARCH Vol (chuẩn hóa) 85.7%, giảm -4.8% so với phiên trước – vẫn duy trì mức biến động cao.
+- Rolling Skewness -0.11, hơi lệch về đuôi trái nhưng không sâu.
+- Downside Correlation 3.0% (rất thấp) > Upside Correlation 26.2% (trung bình) – phân hóa rõ rệt giữa hai chiều.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha STOCK PICKING (trung tính, phân hóa). Biến động tổng thể cao nhưng rủi ro hệ thống thấp do tương quan giảm mạnh lúc thị trường giảm; không xuất hiện tín hiệu bán tháo đồng loạt.
+
+## 3. Cross-Check
+- Divergence giữa Score trung tính và EGARCH Vol cao: biến động lớn nhưng được bù trừ bởi độ phân tán và tương quan thấp, ngăn điểm số rơi vào vùng Sợ hãi.
+- Skewness hơi âm không nhất quán với Upside Correlation vượt trội so với Downside, cho thấy phần bù rủi ro vẫn nghiêng về nhóm cổ phiếu tăng giá, nhưng phân phối lợi nhuận tổng thể có đuôi trái nhẹ.
+- Tín hiệu trái chiều ở mức thấp, phù hợp với bối cảnh phân hóa.
+
+## 4. Verdict
+- Beta mục tiêu: 0.7 cho danh mục VN-Index.
+- Hành động: giảm nhẹ rủi ro hệ thống bằng cách hạ tỷ trọng cổ phiếu beta cao hoặc phòng hộ một phần qua hợp đồng tương lai; ưu tiên chọn lọc cổ phiếu có yếu tố cơ bản vững và tương quan thấp với chỉ số.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "30/07/2026",
+  "regime": "NEUTRAL",
+  "score": 47.9,
+  "confidence": "medium",
+  "beta_target": 0.7,
+  "key_signals": [
+    "Score 47.9 trong vùng trung tính, phân hóa mạnh",
+    "EGARCH Vol cao 85.7% nhưng Downside Correlation chỉ 3.0%",
+    "Upside Correlation 26.2% trội hơn hẳn, không còn dấu hiệu bán tháo đồng loạt"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 47.9
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: STOCK PICKING
+- Signal Confidence: 0.60
+- CSV Rank: 0.23
+- Acute Shock: 0.00
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 47.93632896937952,
+    "sentiment_regime": "STOCK PICKING",
+    "signal_confidence": 0.5970096919380865,
+    "acute_shock": 0.0,
+    "csv_rank": 0.23412698412698413,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

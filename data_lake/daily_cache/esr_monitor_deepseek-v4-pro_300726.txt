@@ -1,0 +1,60 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations  
+- SSI ở mức **63.2% — WARNING**, rủi ro hệ thống tích lũy dưới ngưỡng khủng hoảng.  
+- Market State: **ACTIVE STRESS** (stress cao + xu hướng giảm, phù hợp với vị thế VN30 dưới MA125).  
+- PCA Concentration: PC1 giải thích **38.0%** biến động chung (S_COR tăng nhẹ).  
+- Top 3 pillar đóng góp: **S_LIQ (35%)**, S_VAL (31%), S_COR (18%) — downside mode chỉ lấy phiên giảm.
+
+## 2. Risk Decomposition (Bóc tách)  
+**Dẫn dắt: S_LIQ — Volume Dry-Up**  
+Pillar này đo mức cạn kiệt thanh khoản so với chuẩn 1 năm. Giá trị cao (35% trọng số) phản ánh tổng dollar volume giao dịch sụt giảm mạnh, khô cạn bất thường. Trong môi trường ACTIVE STRESS, hiện tượng này báo hiệu lực mua vắng bóng, thị trường mong manh — chỉ cần áp lực bán nhỏ cũng có thể khuếch đại sụt giảm.  
+
+**Tiếp theo: S_VAL — Valuation Tension**  
+Căng thẳng định giá ở mức cao (31%) cho thấy lợi nhuận 1 năm của VN30 vẫn vượt xa lãi suất tiền gửi, bất chấp xu hướng giảm gần đây. Định giá chưa co về vùng hấp dẫn, tạo rủi ro điều chỉnh thêm khi stress leo thang.  
+
+**Bổ trợ: S_COR — Systemic Correlation**  
+Hệ số tương quan hệ thống 18% phản ánh cổ phiếu di chuyển cùng chiều (herding). Trong phiên giảm, hiệu ứng bán đồng loạt gia tăng, làm giảm khả năng phòng vệ bằng đa dạng hóa danh mục.
+
+## 3. Cross-Check  
+- **Không có divergence**: Giá VN30 dưới MA125, SSI vào WARNING, HMM xác nhận ACTIVE STRESS — toàn bộ các tín hiệu đồng nhất với bức tranh suy yếu có hệ thống.  
+- Regime HMM khớp với SSI level, không cảnh báo lệch pha. Không có dấu hiệu bẫy tăng giá (bull trap) vì thị trường đang trong xu hướng giảm thực sự.
+
+## 4. Verdict  
+**Cash target: 70% danh mục.**  
+Mức stress hiện tại (WARNING, dẫn dắt bởi cạn thanh khoản) khuyến nghị ưu tiên bảo toàn vốn. Phần còn lại 30% chỉ giữ các vị thế phòng thủ có beta thấp.  
+
+**Hedge action**: Giảm beta danh mục (reduce beta) bằng cách thoát bớt cổ phiếu vốn hóa lớn/chu kỳ. Có thể cân nhắc mua quyền chọn bán (buy puts) bảo vệ cho phần nắm giữ còn lại; không khuyến nghị bán khống hợp đồng tương lai vì cấu trúc nhà đầu tư không phù hợp đòn bẩy mạnh.  
+
+**Lý do**: Dù chưa đến CRITICAL, sự chi phối của cạn thanh khoản và định giá căng trong môi trường ACTIVE STRESS làm tăng xác suất sụt giảm đột ngột. Hành động giảm rủi ro sớm là phù hợp.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.2,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.176907654908746,
+    "pca_concentration_pct": 38.04320408926062,
+    "market_state": "ACTIVE STRESS",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.43863054623054
+  }
+}
+```

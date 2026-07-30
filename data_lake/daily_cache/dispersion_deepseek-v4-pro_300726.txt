@@ -1,0 +1,59 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread_Z đạt –0.68σ: chênh lệch CSSD–CSAD đang thu hẹp so với trung bình 60 phiên, phản ánh mức độ phân tán thấp trong ngắn hạn.
+- DPI ở 46.7% – dưới ngưỡng 70%, không cho thấy chế độ phân tán kéo dài (regime persistent).
+- Hệ số tương quan trung bình (Ledoit-Wolf) cực thấp 0.044: các cổ phiếu biến động gần như độc lập, môi trường phân hóa mạnh.
+- Cross-sectional skewness –0.13 (gần đối xứng) và kurtosis 2.12 (đuôi mỏng hơn phân phối chuẩn) – không có dấu hiệu đuôi béo hay bất cân xứng rõ rệt.
+
+## 2. Structural State
+Thị trường đang ở trạng thái bình thường, không có căng thẳng hệ thống. DPI thấp kết hợp Spread_Z âm cho thấy không có stress cục bộ cũng như không có chế độ phân tán kéo dài. V2 broad-stress score 14.6/100 (NORMAL) củng cố thêm nhận định này. Mức CSAD_Z +1.09σ và CSSD_Z +0.40σ cho thấy thành phần hệ thống (CSAD) nhích nhẹ trên trung bình, nhưng sự gia tăng này không đủ để tạo ra phân tán cực đoan (Spread_Z vẫn âm). Do đó, mọi tín hiệu stress trên diện rộng hiện không tồn tại.
+
+## 3. Cross-Check & Tail Direction
+CS Skewness gần bằng 0, không có đuôi trái hay phải bị gãy. Kurtosis 2.12 nằm dưới mức fat-tail (5.0), cho thấy xác suất xảy ra outlier thấp – mô hình phân phối chuẩn vẫn còn ứng dụng tạm thời. Kết hợp với downside participation chỉ 5.2% (rất ít cổ phiếu giảm mạnh), cấu trúc thị trường thiên về ổn định và phân hóa, không phải dạng crash một vài cổ phiếu hay đẩy điên cuồng.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D (DPI × Correlation): DPI 46.7% (thấp) và tương quan 0.044 (rất thấp) đặt thị trường vào ô **Healthy Stock‑Picking**. Tại đây, cơ hội chọn cổ phiếu cao nhờ phân hóa rõ nét, rủi ro hệ thống thấp. V2 macro regime xác nhận STOCK_PICKING, không có dấu hiệu capitulation hay distribution top.
+
+Rủi ro lớn nhất cho Portfolio Manager trong chế độ này là **concentration risk** khi quá tập trung vào một nhóm cổ phiếu riêng lẻ trong lúc tương quan vẫn thấp. Một cú sốc bất ngờ có thể làm tương quan tăng vọt (break in correlation regime), biến danh mục đang phân tán thành rủi ro tập trung nếu không có hedging. Hiện tại chưa có tín hiệu nào về liquidity dry‑up hay herding crash, nhưng cần theo dõi nếu broad-stress score tăng đột biến.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "30/07/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.68,
+  "dpi_pct": 46.7,
+  "avg_corr": 0.044,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 14.6
+- Broad Stress Level: NORMAL
+- CSAD Z: +1.09
+- CSSD Z: +0.40
+- Downside Participation: 5.2%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing
+
+=== AI CIO DIRECT METRICS: dispersion ===
+```json
+{
+  "tool": "dispersion",
+  "source": "direct_quantitative",
+  "metrics": {
+    "dispersion_spread_z": -0.6821854607680834,
+    "dispersion_dpi_pct": 46.666666666666664,
+    "dispersion_avg_corr": 0.04358472859155888,
+    "dispersion_broad_stress_score": 14.615842162258556,
+    "downside_participation_pct": 5.236907730673317,
+    "macro_regime": "STOCK_PICKING",
+    "broad_stress_level": "NORMAL"
+  }
+}
+```

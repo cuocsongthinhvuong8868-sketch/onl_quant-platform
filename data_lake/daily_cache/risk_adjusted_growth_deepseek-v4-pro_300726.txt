@@ -1,0 +1,56 @@
+## 1. Scenario Assessment  
+Kịch bản Trung lập (K=1.0, CoE=14%) là baseline phổ biến cho ngành ngân hàng VN, không quá khắc nghiệt. Tuy nhiên, mặt bằng chung cho thấy phần lớn các mã đang đốt vốn cổ đông (Alpha < 0), chỉ duy nhất SHB tạo ra giá trị thặng dư. Stress test bằng 0 không ảnh hưởng. Nhìn tổng thể, khu vực ngân hàng kém hấp dẫn về mặt định lượng cơ bản, cần rất chọn lọc.
+
+## 2. Top Alpha Decomposition  
+- **SHB (Alpha +4.1%)**: Là điểm sáng duy nhất. Động lực chính đến từ định giá P/B rẻ (0.80) và rủi ro cực thấp (σROE 1.9%), kết hợp ROE khá cao (17.5%) và tỷ lệ chi trả thấp (8.6%), giúp lợi nhuận tái đầu tư hiệu quả. Phân loại: **Fortress** (bền vững, P/B rẻ, ROE cao, ổn định).  
+- **MBB (Alpha -0.4%)** và **ACB (Alpha -0.9%)**: Cả hai đều có ROE cao (21.8% và 23.0%) và σROE thấp (1.6% và 2.7%), chất lượng thực sự tốt. Tuy nhiên, P/B hiện tại (1.33 và 1.22) không đủ rẻ để chuyển hóa thành lợi nhuận vượt trội sau khi trừ phí rủi ro. Đây là những “Fortress không biên an toàn”, cận kề điểm hòa vốn, cần thêm yếu tố định giá hấp dẫn hơn để vào danh mục cốt lõi.
+
+## 3. Value Traps Warning  
+- **LPB (Alpha -12.7%)**: P/B quá cao (3.33) so với ROE 21.1%, biến động σROE 3.8% tạo phí rủi ro đáng kể. Đây là **Premium Burn** điển hình – nhà đầu tư trả giá quá đắt cho tăng trưởng, dẫn đến phá hủy giá trị.  
+- **EIB (Alpha -10.4%)**: ROE thấp (10.0%), P/B 1.28 không hề rẻ, đẩy lợi nhuận kỷ luật xuống chỉ còn ~3.6%, thua xa CoE. Bẫy giá trị ở chỗ kỳ vọng vào sự hồi phục ROE nhưng rủi ro thực thi rất lớn.  
+- **VPB (Alpha -9.7%)**: ROE 14.1% và σROE cao 4.7% khiến phí rủi ro (K × σ) ăn mòn toàn bộ lợi nhuận giữ lại. Dù P/B tưởng chừng hợp lý (1.18), đây là **Growth Trap** – chất lượng tăng trưởng không bù đắp được biến động mạnh.
+
+## 4. Portfolio Construction  
+- **Core Holding (Fortress)**: SHB, chiếm tỷ trọng đề xuất 60–70% cho phân bổ ngân hàng.  
+- **Tactical**: Không có mã nào thực sự rẻ mà không bẫy. Có thể cân nhắc MBB và ACB với trọng số nhỏ nếu kỳ vọng P/B thu hẹp, nhưng hiện tại chưa đủ Alpha.  
+- **Cấm mua / underweight**: LPB, EIB, VPB. Rút vốn khỏi những mã này cho đến khi cấu trúc rủi ro cải thiện rõ rệt.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.129039073605339,
+    "median_economic_alpha_pct": -3.6836081950315487,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

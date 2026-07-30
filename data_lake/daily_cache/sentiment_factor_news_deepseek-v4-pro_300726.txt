@@ -1,0 +1,90 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## 1. Chế độ cảm xúc (Regime) tin tức hiện tại
+
+- **Khung 1 ngày**: **Khẳng định chắc chắn Risk‑On** (P_conf: 92% – vượt ngưỡng 85%). Tâm lý tích cực rõ rệt với điểm tổng hợp +0.4257.
+- **Khung 7 ngày**: **Khẳng định chắc chắn Risk‑On** (P_conf: 100%). Điểm tổng hợp rất cao +0.7428, tín hiệu mạnh.
+- **Khung 30 ngày**: **Khẳng định chắc chắn Risk‑On** (P_conf: 100%). Điểm tổng hợp +0.6666, xu hướng duy trì ổn định.
+
+Cả ba khung đều cho thấy một môi trường tin tức vĩ mô ủng hộ chấp nhận rủi ro, với độ tin cậy thống kê cao.
+
+## 2. Kênh dẫn dắt Risk‑On / Risk‑Off mạnh nhất
+
+**Kéo Risk‑On** (P_conf từ 91% đến 100%):
+- **fx_external** (+2.000 ở khung 7d, 30d) – tỷ giá trung tâm tăng liên tục được hệ thống đánh giá là tín hiệu tích cực nhất.
+- **earnings** (+1.752 ở 1d, +1.786 ở 7d) – xác nhận triển vọng lợi nhuận tốt.
+- **credit_stress** (+1.216 ở 1d) – thị trường trái phiếu ổn định, không có dấu hiệu căng thẳng tín dụng.
+- **monetary_policy** (+1.536 ở 7d) – chính sách tiền tệ đang được nhìn nhận là hỗ trợ.
+- **liquidity** (+0.752 ở 1d) – thanh khoản hệ thống dồi dào qua kênh OMO.
+- **banking_system** (+0.672 ở 30d) – sức khỏe ngành ngân hàng được củng cố.
+
+**Kéo Risk‑Off** (P_conf 100%):
+- **commodity** là kênh tiêu cực duy nhất nhưng rất mạnh: -2.000 (1d), -1.566 (7d), -0.415 (30d). Giá hàng hóa cơ bản (heo hơi, quặng sắt, phân bón, nhựa PVC…) giảm sâu tạo áp lực ngược, nhưng chưa đủ sức đảo chiều tâm lý chung.
+- Các kênh khác (growth, inflation, fiscal…) chưa có tín hiệu rõ ràng (P_conf 50%–54%).
+
+## 3. Các động lực tích cực/tiêu cực quan trọng
+
+**Tích cực (3–5 điểm):**
+1. Tỷ giá trung tâm tăng đều đặn từ 25.206 lên 25.320 trong 30 ngày (kênh fx_external, điểm +1.46 đến +1.47 mỗi ngày).
+2. NHNN bơm ròng 4.900,2 tỷ đồng qua OMO phiên 30/07 (liquidity, +0.219).
+3. Lợi suất TPCP đi ngang, không có áp lực bán tháo (credit_stress, +0.348).
+4. Lãi suất huy động kỳ hạn 1–3 tháng nhóm NHTM khác tăng nhẹ (monetary_policy, +1.557 ở 30d) – tín hiệu sức khỏe ngân hàng.
+5. Giá cước vận chuyển dầu thô Anh vượt đỉnh tháng (commodity, +0.606 ở 7d) – ngoại lệ hiếm hoi trong kênh commodity.
+
+**Tiêu cực (3–5 điểm):**
+1. Giá heo hơi Việt Nam giảm đáy 6 tháng (62.500–62.833 đồng/kg) vào 27–28/07 (commodity, -1.301 và -1.287).
+2. Giá quặng sắt Trung Quốc giảm đáy 1 năm (708,89–710,67 CNY/tấn) vào 24–27/07 (commodity, -1.038 và -1.032).
+3. Giá nhựa PVC Trung Quốc giảm đáy 10 năm (4.265 CNY/tấn) phiên 03/07 (commodity, -1.295).
+4. Giá khí thiên nhiên Hoa Kỳ thủng đáy tháng (2,85 USD/MMBtu) ngày 26/07 (commodity, -1.021).
+5. Giá đường cát trắng Trung Quốc đáy 1 năm (5.186,67 CNY/tấn) phiên 30/07 (commodity, -0.570).
+
+## 4. Kết luận tác động lên AI CIO
+
+**Hỗ trợ (supports) mạnh** cho lớp vĩ mô (macro layer) và các công cụ phân tích thị trường nội bộ nếu chúng cũng chỉ báo Risk‑On. Tín hiệu tin tức đồng thuận tuyệt đối ở cả ba khung thời gian, với sự dẫn dắt của tỷ giá, thanh khoản và chính sách tiền tệ. Kênh commodity tiêu cực đơn độc, nhưng mức độ không đủ để đảo chiều tâm lý chung. Nhà đầu tư được khuyến khích duy trì hoặc gia tăng vị thế rủi ro phù hợp với macro layer. Nếu có xung đột (ví dụ tín hiệu kỹ thuật/định lượng cho thấy phân phối), ưu tiên tin tức vĩ mô tích cực này để giữ vị thế.
+
+## 5. Cảnh báo (Caveat)
+
+- **Nguồn dữ liệu**:  
+  - Khung 1 ngày: widata chiếm 78%, mozyfin_social chỉ 22% – tín hiệu đáng tin cậy cao.  
+  - Khung 7 ngày: **mozyfin_social chiếm ~50%** tổng nguồn – tín hiệu có thể bị nhiễu từ ý kiến mạng xã hội, cần giảm trọng số.  
+  - Khung 30 ngày: mozyfin_social chiếm ~34%, mozyfin (bài phân tích) 48% – mức nhiễu xã hội trung bình, vẫn có thể tác động nhưng không lấn át.  
+- **Độ trễ**: Dữ liệu được tạo lúc 16:35 ngày 30/07/2026 – còn tươi, không có độ trễ đáng kể.  
+- **Rủi ro tiêu đề**: Các tiêu đề commodity rất tiêu cực có thể tạo ra những cú giật tâm lý, nhưng mô hình tổng hợp cho thấy chúng chưa làm suy yếu xu hướng Risk‑On mạnh. Cảnh giác nếu commodity tiếp tục lao dốc trên diện rộng.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.4257,
+    "news_confidence_1d": 0.9237,
+    "news_count_1d": 143,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 111,
+      "mozyfin_social": 32
+    },
+    "news_macro_composite_7d": 0.7428,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 754,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 278,
+      "mozyfin_social": 376,
+      "mozyfin": 100
+    },
+    "news_macro_composite_30d": 0.6666,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4406,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 825,
+      "mozyfin": 2104,
+      "mozyfin_social": 1477
+    },
+    "news_macro_composite": 0.4257,
+    "news_confidence": 0.9237,
+    "news_count": 143
+  }
+}
+```
