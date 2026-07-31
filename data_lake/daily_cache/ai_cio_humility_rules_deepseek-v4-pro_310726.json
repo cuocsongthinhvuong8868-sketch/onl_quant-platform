@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-07-31",
+  "composite_score": 25.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.93,
+      "unit": "th pct",
+      "description": "Điều kiện tài chính toàn cầu hạ nhiệt mạnh, rời khỏi vùng cực kỳ căng thẳng."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 20.0,
+      "unit": "%",
+      "description": "Thị trường xác nhận đảo chiều tăng khi có trên 45% mã vượt đường MA20."
+    },
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 2,
+      "unit": "sessions",
+      "description": "Xu hướng thanh khoản liên ngân hàng VNIBOR duy trì ổn định, không có cú sốc mới."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.32,
+      "unit": "",
+      "description": "Nguy cơ đuôi dày cực đoan được toàn bộ các ngưỡng đo lường xác nhận đã biến mất."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 22.3,
+      "unit": "th pct",
+      "description": "Mức độ ảnh hưởng của nhóm cổ phiếu Vingroup lên chỉ số VN-Index ở mức thấp."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.1,
+      "unit": "%",
+      "description": "Rủi ro hệ thống tích lũy giảm xuống dưới ngưỡng an toàn."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-07-31",
+  "source": "ai_cio_executive_summary"
+}

@@ -1,0 +1,56 @@
+## 1. Scenario Assessment  
+Bộ tham số hiện tại (K=1.0, CoE=14%, stress test chuẩn) là mức nền chưa quá khắc nghiệt đối với ngành ngân hàng Việt Nam. Tuy nhiên, chỉ duy nhất SHB tạo ra Economic Alpha dương (+4.6%), toàn bộ các mã còn lại đều đang đốt vốn cổ đông (nổi bật là LPB, EIB, VPB với alpha âm hai chữ số). Điều này phản ánh mặt bằng định giá hiện tại phần lớn đã phản ánh kỳ vọng tăng trưởng, khiến nhiều ngân hàng mất khả năng tạo giá trị thặng dư bền vững. Kết luận: **môi trường stock-picking khó khăn, chỉ hấp dẫn với cổ phiếu thực sự rẻ và chất lượng cao**.
+
+## 2. Top Alpha Decomposition  
+- **SHB (Alpha +4.6%)** – điển hình của **Fortress**: P/B 0.78 – định giá rẻ nhất nhóm dẫn đầu; ROE 17.5% kết hợp σROE 1.9% cực thấp cho thấy lợi nhuận ổn định; payout 8.6% giúp giữ lại phần lớn lợi nhuận để tái đầu tư. Cả ba yếu tố cùng đẩy Disciplined Return vượt xa CoE.  
+- **MBB (Alpha -0.4%)** và **ACB (Alpha -0.5%)** – đây là những ngân hàng chất lượng cao (ROE >21%, σROE thấp) nhưng P/B lần lượt 1.33 và 1.20 không đủ rẻ. Chúng thuộc kiểu “Fortress nhưng định giá đúng giá trị”, không phải bẫy, nhưng cũng không tạo alpha dương ở mức giá hiện tại.
+
+## 3. Value Traps Warning  
+- **LPB (Alpha -12.7%)**: P/B 3.28 quá đắt – đây là **Premium Burn** điển hình, dù ROE 21% cũng không thể bù đắp rủi ro và định giá quá cao.  
+- **EIB (Alpha -10.3%)**: ROE vỏn vẹn 10% (thấp hơn nhiều so với CoE 14%) dù P/B 1.27 không quá cao – dạng “cheap trap” với lợi nhuận kém hấp dẫn.  
+- **VPB (Alpha -9.6%)**: ROE 14.1% + σROE 4.7% cao cho thấy rủi ro biến động lợi nhuận ăn mòn phần lớn lợi nhuận giữ lại, kết hợp P/B 1.17 không rẻ đủ để bảo vệ nhà đầu tư.
+
+## 4. Portfolio Construction  
+- **Core Holding (60-70%)**: **SHB** – Fortress duy nhất với alpha dương, rủi ro thấp và định giá rẻ.  
+- **Tactical (0-20%)**: Có thể cân nhắc theo dõi **MBB, ACB** nếu giá điều chỉnh về P/B hấp dẫn hơn; hiện tại chưa đủ điều kiện alpha dương.  
+- **Cấm mua/Underweight**: LPB, EIB, VPB – các mã đang đốt vốn rõ ràng dưới khung phân tích này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.563673609714192,
+    "median_economic_alpha_pct": -3.6342038658417333,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

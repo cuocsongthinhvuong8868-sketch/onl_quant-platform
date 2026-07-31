@@ -1,0 +1,55 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI hiện tại: **63.1%** — phân vùng **WARNING** (tích lũy rủi ro ngầm)
+- Market State (HMM): **CALM CORRECTION** — tín hiệu low stress nhưng downtrend đang chi phối
+- Top 3 pillar drivers: **S_LIQ 35%, S_VAL 31%, S_COR 18%**
+- VN30 closing dưới MA125, xác nhận xu hướng giảm; pillar mode đang đo lường các phiên giảm (downside)
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ (Volume Dry‑Up)** là driver chính. Chỉ số này đo độ khô cạn thanh khoản so với trung bình 1 năm (‑log(MA20/MA252)). Giá trị cao cho thấy dòng tiền đang rút mạnh khỏi thị trường trong các phiên giảm, độ sâu thị trường suy yếu – một tín hiệu mong manh (fragility) cổ điển.
+- **S_VAL (Valuation tension)** đứng thứ hai: mức sinh lời 252 ngày của VN30 vẫn còn cao đáng kể so với lãi suất tiền gửi, bất chấp downtrend gần đây. Đây là rủi ro định giá chưa được giải tỏa hết.
+- **S_COR (Systemic correlation)** ở mức 18% – chưa gây lo ngại herding, nhưng khi thanh khoản khô cạn, những cú bán tháo đồng loạt có thể đẩy tương quan tăng đột biến.
+
+Tổ hợp **S_LIQ cao + S_VAL căng** phản ánh một đợt pullback mà định giá vẫn chưa hấp dẫn, thanh khoản rút cạn – dễ làm tăng biên độ sụt giảm nếu có cú sốc mới.
+
+## 3. Cross-Check
+- **Không có phân kỳ tăng giá – SSI**: VN30 đang dưới MA125, không tạo đỉnh mới nên không có dấu hiệu bull-trap classic.
+- **Mâu thuẫn HMM vs. SSI**: Market State từ HMM là CALM CORRECTION (hàm ý low stress), nhưng SSI thực tế đang ở 63.1% (WARNING = stress cao). Đây là **cờ đỏ** – mô hình HMM có thể đang trễ hoặc bỏ sót áp lực từ thanh khoản và định giá. Cần ưu tiên SSI hơn trong bối cảnh này.
+
+## 4. Verdict
+Cấu trúc rủi ro thiên về stress tiềm ẩn, dù chưa đến ngưỡng CRITICAL. Khuyến nghị phòng thủ rõ rệt:
+- **Cash weight đề xuất**: 45% danh mục (tăng mạnh so với trạng thái bình thường).
+- **Hedge action**: **Giảm beta tổng thể** (reduce_beta), ưu tiên cắt giảm các vị thế nhạy với thanh khoản. Chưa đủ cơ sở để short outright vì SSI <80% và chưa có tín hiệu crash cận kề, nhưng không loại trừ mua put bảo vệ nếu SSI tiếp tục tăng.
+- Signal có thể hành động nhưng độ tin cậy bị giảm do mâu thuẫn HMM/SSI.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.1,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.095721058723974,
+    "pca_concentration_pct": 38.0350795571971,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.447848938527336
+  }
+}
+```

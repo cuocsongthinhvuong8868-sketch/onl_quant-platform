@@ -1,0 +1,105 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+## 1. Observations  
+- Historical VaR 95% ở mức **–1.69%**, nhẹ hơn Parametric VaR (**–2.25%**) – dấu hiệu đầu tiên cho thấy phân phối lợi suất không đối xứng, đuôi trái dày hơn Gaussian.  
+- EVT VaR 99% (POT/GPD) ước tính ngày xấu nhất 1/100 là **–3.69%**, sâu hơn hẳn mức VAR thông thường, báo động cho các vị thế dùng VaR 95% làm điểm dừng.  
+- Hệ số đuôi ξ (MLE) đạt **+0.345**, hậu nghiệm MCMC trung vị **+0.390**, cả hai đều vượt ngưỡng 0.30 – rơi thẳng vào vùng **fat tail**, nơi các ước lượng Gaussian trở nên không tin cậy.  
+- Hill index **+0.447** xác nhận cùng chiều, dù chênh lệch nhỏ với ξ, củng cố tín hiệu đuôi béo; số lần vượt ngưỡng (top 10% lỗ) là 76 trong 3 năm, đủ mẫu cho EVT.
+
+## 2. Tail Thickness Diagnosis  
+ξ trung vị +0.390 thuộc bracket **fat (ξ > 0.30)**, cảnh báo rủi ro cực đoan cao, ES có thể không hội tụ. Hill index +0.447 đồng hướng và cùng biên độ, xác nhận robust về xu hướng đuôi dày, nhưng có sự khác biệt nhỏ (0.1) – tín hiệu vẫn đáng tin cậy.  
+
+Chỉ số ES–VaR spread 95% đạt **–1.40%** (lớn hơn σ₃₀ 1.27%), corroborating fat tail trên thực nghiệm: khi xảy ra sự kiện ngoài VaR 95%, tổn thất trung bình nghiêm trọng hơn độ biến động thông thường.  
+
+Tuy nhiên, phân tích độ nhạy EVT cho thấy **threshold‑sensitive**: ξ thay đổi mạnh từ **+0.067** (near‑Gaussian) đến **+0.326** (fat) khi thay đổi ngưỡng POT. MCMC posterior khoảng 90% CI [0.183, 0.651] trải từ **heavy** sang **fat**. Do đó, dù điểm trung tâm là fat tail, phân loại đuôi thiếu vững chắc – đây là **cảnh báo fat‑tail nhạy ngưỡng (threshold‑sensitive fat‑tail warning)**, không phải tín hiệu béo chắc chắn. EVT VaR99 ổn định (biên độ 0.16pp), nhưng hình dạng đuôi thì bất định, giảm mức tin cậy.
+
+## 3. Gaussian Gap  
+Gaussian VaR 99% tính từ μ – 2.33σ cho ra **–3.12%**. So với EVT VaR 99% (–3.69%), khoảng cách (gap) chỉ **0.57 điểm phần trăm (< 1pp)**. Điều này không đủ để kết luận Gaussian “broken”, nhưng vẫn thể hiện EVT sâu hơn, báo hiệu Gaussian đang **đánh giá thấp** mức lỗ đuôi. Với môi trường fat‑tail hiện tại, việc chỉ dựa vào mô hình chuẩn để phân bổ vốn rủi ro có thể dẫn đến thiếu dự phòng cho các kịch bản cực đoan.
+
+## 4. Verdict — Hedging Implications  
+ξ trung vị > 0.30 kết hợp với ES–VaR spread > σ, nhưng có threshold sensitivity → tín hiệu thị trường đang ở trạng thái **đuôi béo nhưng chưa ổn định hoàn toàn**.  
+
+Áp dụng khung hành động:  
+- **Tránh** các chiến lược momentum/thuận xu hướng (trend‑following), vì đuôi dày dễ gây sụt giảm mạnh bất ngờ.  
+- **Mua quyền chọn bán sâu trong tiền (ITM puts)** để bảo vệ danh mục trước rủi ro đuôi; OTM quá xa có thể không đủ hiệu quả nếu xi cao.  
+- **Short hợp đồng tương lai (futures)** để hedge danh mục cổ phiếu, đồng thời giảm đòn bẩy (leverage) xuống tối thiểu 30–50% để giảm thiệt hại trong các cú sốc.  
+
+Do độ nhạy ngưỡng và khoảng hậu nghiệm MCMC trải rộng, lời khuyên này có **confidence ở mức trung bình** – không phải cảnh báo đỏ tuyệt đối, nhưng đủ để hành động phòng ngừa sớm.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "31/07/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.067,
+  "xi_max": 0.326,
+  "xi_range": 0.259,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.57,
+  "hedge_action": "reduce_leverage, buy_puts_itm, short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: THRESHOLD_SENSITIVE_FAT_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: -0.51%
+- VaR Breach 95: 0
+- Breach Margin 95: -1.18pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.067
+- EVT Xi Max: +0.326
+- EVT Xi Range: 0.259
+- EVT VaR99 Range: 0.16pp
+- EVT ES99 Range: 0.66pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.0%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.183
+- EVT Xi P50: +0.390
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.90%
+- EVT VaR99 P50: -3.83%
+- EVT VaR99 P95: -3.22%
+- EVT ES99 P05: -12.54%
+- EVT ES99 P50: -6.70%
+- EVT ES99 P95: -4.91%
+
+=== AI CIO DIRECT METRICS: var_cvar_vnindex ===
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "source": "direct_quantitative",
+  "metrics": {
+    "historical_var_pct": -1.691867298119048,
+    "expected_shortfall_pct": -3.0958621619566955,
+    "tail_regime": "THRESHOLD_SENSITIVE_FAT_TAIL",
+    "tail_risk_level": "ELEVATED",
+    "var_breach_95": false,
+    "breach_margin_95_pp": -1.1815858814798308,
+    "evt_xi": 0.3454435282173134,
+    "evt_var_99_pct": -3.686071917742771,
+    "evt_es_99_pct": -6.149344442740661,
+    "hill_index": 0.44693722633432414,
+    "evt_xi_min": 0.06728218013982155,
+    "evt_xi_max": 0.3263191266569856,
+    "evt_xi_range": 0.259036946517164,
+    "evt_var99_range_pp": 0.1649364086847696,
+    "evt_es99_range_pp": 0.65674767984987,
+    "evt_threshold_stable": 0,
+    "evt_xi_p05": 0.18298667414955452,
+    "evt_xi_p50": 0.3903008947848988,
+    "evt_xi_p95": 0.6508831499781828
+  }
+}
+```

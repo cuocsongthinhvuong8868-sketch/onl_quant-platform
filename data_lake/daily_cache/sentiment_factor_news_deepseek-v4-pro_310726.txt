@@ -1,0 +1,79 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái news sentiment (Regime)**  
+Cả ba cửa sổ (1d, 7d, 30d) đều ở chế độ **strong_risk_on** với độ tin cậy posterior cùng chiều P_conf = 100% (>85%) → **Khẳng định chắc chắn** tâm lý tin tức đang nghiêng mạnh về rủi ro.  
+- 1d: mean +0.77, CI 90% [+0.36, +1.19]  
+- 7d: mean +0.84, CI [+0.57, +1.12]  
+- 30d: mean +0.69, CI [+0.62, +0.77]  
+
+**2. Kênh dẫn dắt risk-on / risk-off rõ nhất**  
+- **Risk‑on mạnh**:  
+  - `liquidity` (+2.00, P_conf 100%) – hỗ trợ thanh khoản từ NHNN.  
+  - `earnings` (+2.00, P_conf 100%) – tín hiệu lợi nhuận tích cực.  
+  - `fx_external` (+2.00 ở 7d/30d, +0.74 ở 1d, P_conf ≥91%) – tỷ giá ổn định, tăng nhẹ.  
+  - `credit_stress` (+1.22 ở 1d, +1.30 ở 7d, P_conf 99‑100%) – lợi suất TPCP đi ngang, không căng thẳng.  
+  - `monetary_policy` (+1.48 ở 7d, P_conf 100%) – xu hướng lãi suất huy động tăng nhẹ.  
+- **Risk‑off đáng chú ý**:  
+  - `commodity` (‑1.90 ở 1d, ‑2.00 ở 7d, P_conf 100%) – giá hàng hóa cơ bản lao dốc.  
+  - `inflation` (‑0.41 ở 30d, P_conf 90%) – có dấu hiệu giảm phát hàng hóa.  
+  - Các kênh `growth`, `fiscal_public_investment`, `real_estate`… đang trung tính (mean=0, P_conf=50%) → chưa đủ thông tin để đánh giá.
+
+**3. Các driver chính (chắt lọc từ input)**  
+*Tích cực:*  
+- NHNN bơm ròng 23,3 nghìn tỷ qua OMO phiên 31/07 (liquidity, score +0.73).  
+- Tỷ giá trung tâm liên tục được điều chỉnh tăng (các ngày 27–31/07, score từ +0.22 đến +1.46).  
+- Lợi suất TPCP đi ngang, không có dấu hiệu căng thẳng tín dụng (credit_stress).  
+- Lãi suất huy động kỳ hạn 1‑3 tháng nhóm NHTM khác tăng nhẹ (monetary_policy, score +1.56 – cửa sổ 30d).  
+*Tiêu cực:*  
+- Giá thép HRC Trung Quốc thủng đáy tháng, giảm 1.1% (31/07, commodity, score ‑0.65).  
+- Giá heo hơi Việt Nam giảm về đáy 6 tháng (62.500 đ/kg, 27‑28/07, score ‑1.30).  
+- Giá quặng sắt Trung Quốc thủng đáy 1 năm (khoảng 700 CNY/tấn, các ngày 27‑30/07, score ‑1.03).  
+- Khí thiên nhiên Mỹ giảm 10.4% về 2.85 USD/MMBtu (26/07).  
+
+**4. Kết luận cho AI CIO**  
+Tín hiệu từ tin tức **hỗ trợ (supports)** quan điểm rủi ro‑on ở tầng vĩ mô và các công cụ nội bộ thị trường. Dòng tiền nội địa dồi dào, tỷ giá ổn định và lợi suất trái phiếu không căng thẳng – đây là các neo tâm lý tích cực chính. Áp lực duy nhất đến từ kênh hàng hóa (giảm giá diện rộng), nhưng nó phản ánh yếu tố cầu toàn cầu yếu, chưa lấn át được sức mạnh nội tại. **Do đó, phân bổ vẫn có thể nghiêng về tài sản rủi ro trong ngắn hạn.**  
+
+**5. Caveat (Cảnh báo chất lượng tín hiệu)**  
+- Nguồn xã hội (mozyfin_social) chiếm tỉ trọng cao: 1d 30% (56/185), 7d 49% (416/856), 30d 35% (1577/4510). Đây là bằng chứng dạng ý kiến / quan sát xã hội có độ tin cậy thấp hơn so với dữ liệu cứng (WiData). Độ mạnh của tín hiệu cần được chiết khấu một phần vì rủi ro nhiễu mạng xã hội.  
+- Các kênh vĩ mô then chốt như tăng trưởng, lạm phát tiêu dùng, chính sách tài khóa vẫn ở trạng thái “giằng co” (P_conf 50%) → bức tranh chưa hoàn chỉnh.  
+- Thời điểm sinh dữ liệu (31/07/2026) là mới, không có độ trễ đáng kể.  
+
+=> Duy trì độ tin cậy cao với xu hướng tích cực, nhưng giảm nhẹ sức nặng của các tín hiệu đến từ mạng xã hội khi ra quyết định cuối cùng.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.7745,
+    "news_confidence_1d": 0.9989,
+    "news_count_1d": 185,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 129,
+      "mozyfin_social": 56
+    },
+    "news_macro_composite_7d": 0.8433,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 856,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 341,
+      "mozyfin_social": 416,
+      "mozyfin": 99
+    },
+    "news_macro_composite_30d": 0.691,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4510,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 921,
+      "mozyfin": 2012,
+      "mozyfin_social": 1577
+    },
+    "news_macro_composite": 0.7745,
+    "news_confidence": 0.9989,
+    "news_count": 185
+  }
+}
+```

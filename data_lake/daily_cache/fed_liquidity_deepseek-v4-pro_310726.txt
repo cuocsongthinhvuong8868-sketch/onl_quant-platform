@@ -1,0 +1,61 @@
+## 1. Mechanical Decomposition  
+Tuần này, Net Liquidity ghi nhận **−92.5 tỷ USD**, với cấu trúc thành phần:  
+- **WALCL** vẫn ở mức $6,738 tỷ – động lực chính từ chính sách thắt chặt định lượng (QT) đang rút dần Bảng cân đối tài sản của Fed.  
+- **TGA (Treasury General Account)** ở mức $911 tỷ – việc TGA tăng so với tuần trước (ngầm hiểu từ impulse âm) cho thấy Kho bạc đang tích lũy tiền mặt, tương đương *hút thanh khoản* khỏi hệ thống ngân hàng.  
+- **RRP** chỉ còn $2.6 tỷ, gần bằng 0, nên đóng góp biến động gần như không đáng kể.  
+
+Như vậy, phần lớn sự sụt giảm Net Liquidity xuất phát từ **QT (WALCL giảm) và sự gia tăng của TGA**, phản ánh một môi trường thanh khoản đang bị siết lại từ cả hai kênh.
+
+## 2. Cycle Positioning  
+- **Pha thanh khoản**: Nằm trong chế độ **QT chủ động** – Fed vẫn tiếp tục rút bớt tài sản, không có dấu hiệu tạm dừng.  
+- **RRP**: Đã cạn kiệt (< $10 tỷ), không còn vai trò điều tiết cận biên. Thanh khoản giờ đây phụ thuộc hoàn toàn vào tốc độ giảm WALCL và biến động TGA.  
+- **TGA**: Treasury đang trong giai đoạn *tích lũy* (hoặc ít nhất chưa xả) – TGA ở mức trên $900 tỷ là cao hơn nhiều so với mục tiêu thông thường ~$600–700 tỷ, gây áp lực hút thêm.  
+- **Net Liquidity hiện tại** ($5,825 tỷ) thấp hơn đáng kể so với đỉnh hậu QE 2022 (khi RRP còn cao và TGA thấp). So với đáy 2024, mức này đang tiến gần về vùng thắt chặt tối đa nhưng chưa phải cực hạn. Đường đi vẫn là giảm dần, chưa có tín hiệu đảo chiều.
+
+## 3. Signal Strength  
+- Tín hiệu: **CUT** – khớp cả hai điều kiện (Impulse_EMA < 0, Z ≤ −1σ).  
+- **Z-Score** = −1.35, ở mức *cận biên rủi ro* nhưng chưa cực đoan (< −2). Điều này hàm ý xu hướng rút thanh khoản đang hiện diện rõ, nhưng chưa ở pha hoảng loạn.  
+- **Impulse_EMA** âm liên tục xác nhận đà giảm không chỉ là nhiễu tuần. Dấu hiệu đủ mạnh để gắn nhãn “CUT” và duy trì bias thận trọng.
+
+## 4. Cross-Asset Spillover (1–4 tuần)  
+- **SPX/NDX**: Bias tiêu cực – thanh khoản rút làm tăng chi phí vốn, sức ép định giá. Kỳ vọng biến động tăng, nhóm tăng trưởng/công nghệ chịu áp lực nhiều hơn.  
+- **DXY**: Có xu hướng mạnh lên do môi trường USD khan hiếm hơn. **Gold**: có thể gặp khó trong ngắn hạn (lợi suất thực tăng). **Crypto**: rủi ro giảm điểm, tương quan dương với thanh khoản toàn cầu.  
+- **VN-Index**: Với độ trễ 4–8 tuần, kênh truyền dẫn qua DXY mạnh → áp lực lên tỷ giá VND → dòng vốn ngoại vào chứng khoán Việt Nam có thể yếu đi. Bias **tiêu cực** trong tầm nhìn 1–2 tháng tới, dù không phải dạng sụp đổ.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)  
+- **RRP đã về 0**: Trước đây, CUT thường dựa vào RRP cạn làm tín hiệu dừng rút; nay yếu tố đó không còn. Tín hiệu dễ bị giảm độ tin cậy khi RRP không thể bơm ngược trở lại.  
+- **TGA bất thường**: Trong tháng 7, không phải mùa thuế lớn, nhưng các đợt phát hành nợ để tái cấp vốn có thể tạo ra biến động TGA một lần, gây nhiễu.  
+- **Fed emergency facility**: Nếu có sự kiện thanh khoản căng thẳng, Fed có thể can thiệp (repo facility, mua tài sản) phá vỡ xu hướng hiện tại.
+
+## 6. KẾT LUẬN  
+Chế độ thanh khoản hiện tại là **QT chặt, CUT kéo dài** – môi trường không thuận lợi cho risk assets trong 2–4 tuần tới. Áp lực lan tỏa từ đồng USD mạnh lên và dòng vốn co lại sẽ tạo gió ngược cho VN-Index, dù độ trễ cho phép đánh giá thêm dữ liệu.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5825,
+  "signal": "CUT",
+  "z_score": -1.35,
+  "regime": "QT_active",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5824838.0,
+    "fed_liquidity_impulse": -92541.0,
+    "fed_liquidity_impulse_ema": -39563.3087477442,
+    "fed_liquidity_zscore": -1.346817245956799,
+    "signal": "CUT",
+    "walcl": 6738190.0,
+    "wtregen": 910776.0,
+    "rrpontsyd": 2576.0
+  }
+}
+```

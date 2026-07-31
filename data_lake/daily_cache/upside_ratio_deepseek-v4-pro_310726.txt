@@ -1,0 +1,61 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Delta cầu: –1.22pp (10.22% vs. mu 11.44%), lực mua đang yếu hơn trung bình dài hạn.
+- Delta cung: +6.44pp (18.95% vs. mu 12.51%), áp lực bán vượt xa mức cân bằng.
+- Phi cầu = 0.026 (nhiễu, random walk); Phi cung = 0.177 (momentum bán rõ rệt).
+
+## 2. Supply-Demand Dynamics
+- Dòng tiền đang ở trạng thái **phân phối** (distribution): cầu co lại dưới mu, cung mở rộng trên mu – đặc trưng của pha phân phối cổ phiếu.
+- Momentum thực sự thuộc về **cung** (|0.177| >> |0.026|). Đà bán đang tự củng cố, trong khi cầu không có quán tính để đảo chiều.
+
+## 3. Stress-Test Read
+- P95 Downside = 20.68% (kịch bản panic sell T+19) cao hơn P95 Upside = 18.60%, cho thấy tail risk lệch về phía giảm mạnh. Biên độ rủi ro giảm dày hơn rủi ro tăng, phản ánh bất đối xứng tiêu cực.
+- V2 diagnostics xác nhận breadth stress ELEVATED (52/100), net sell pressure +8.7pp, downside rank vượt trội (0.83 vs. 0.57).
+
+## 4. Verdict
+- Tỷ trọng giải ngân đề xuất: **20%** (phòng thủ cao).
+- Chiến lược: **phòng thủ** – duy trì tiền mặt, hạn chế mua đuổi, chỉ mở vị thế nhỏ nếu có tín hiệu kiệt cung đáng tin cậy. Không “rình bắt đáy” sớm khi đà bán còn thịnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "distribution",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 20.68,
+  "p95_upside_pct": 18.60,
+  "deployment_pct": 20,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: SELL_PRESSURE
+- Breadth Stress Score: 52.0
+- Downside Rank: 0.83
+- Net Sell Pressure: +8.7 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 10.224438902743142,
+    "downside_current_pct": 18.952618453865338,
+    "p95_upside_pct": 18.59599868768407,
+    "p95_downside_pct": 20.677576597624242,
+    "phi_up": 0.025666122590324046,
+    "phi_down": 0.17681924588861087,
+    "breadth_stress_score": 52.02777777777777,
+    "net_sell_pressure_pct": 8.728179551122196,
+    "breadth_regime": "SELL_PRESSURE"
+  }
+}
+```
