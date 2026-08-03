@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- **Độ lệch so với trung bình dài hạn**: Lực cầu hiện tại (40.15%) cao gấp >3 lần Mu (11.36%), delta +28.79pp – dòng tiền mua rất mạnh. Lực cung (4.49%) thấp hơn đáng kể so với Mu (12.53%), delta -8.04pp – áp lực bán suy yếu.
+- **Chế độ tự hồi quy**: Lực cầu có Phi = 0.032 → **Random Walk** (không đà). Lực cung có Phi = 0.171 → **Momentum** (đà bán tiếp diễn) – duy nhất bên bán mang quán tính thực sự.
+- **V2 diagnostics**: Điểm stress breadth chỉ 3.4/100 (BÌNH THƯỜNG), nhưng kiểm soát định hướng lại nhấn mạnh “downside stress dominates” – mặc dù net sell pressure âm sâu (-35.7pp) thể hiện mua ròng mạnh, tín hiệu rủi ro giảm giá vẫn ẩn dưới bề mặt.
+
+## 2. Supply-Demand Dynamics
+- **Trạng thái dòng tiền**: Cả hai delta ngược chiều (up >> mu và down << mu) → **Tích lũy (Accumulation)** – dòng tiền chủ đạo mua ròng, thanh khoản chưa cạn.
+- **Bên thắng momentum**: |Phi_cung| = 0.171 > |Phi_cầu| = 0.032 → **Cung** là bên nắm đà thực tế. Dù lực bán hiện tại yếu, nó có tiềm năng lan rộng nếu xúc tác tiêu cực xuất hiện, tạo rủi ro đột biến.
+
+## 3. Stress-Test Read
+- **P95 Downside = 20.34%** – biên độ giảm cực đoan kỳ vọng nếu thị trường gãy, cao hơn P95 Upside (19.13%). Đuôi rủi ro giảm giá dày hơn.
+- **Asymmetry** nghiêng về phía giảm, cộng hưởng với cảnh báo từ V2: net sell pressure âm nhưng stress vẫn bị chi phối bởi bên bán, phản ánh nguy cơ điều chỉnh sâu khi đà bán kích hoạt.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất**: **30%** – phòng thủ là ưu tiên.
+- **Chiến lược**: **Phòng thủ** – không mua đuổi vì cầu không có đà, chưa phải thời điểm bắt đáy vì cung đang momentum. Chờ tín hiệu suy yếu của Phi bên bán hoặc bùng nổ thanh khoản mua kèm phá vỡ ngưỡng kháng cự.
+- **Confidence**: Trung bình (medium) – tín hiệu tích lũy mạnh nhưng bị nhiễu bởi đà bán và tail risk downside lớn hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 20.34,
+  "p95_upside_pct": 19.13,
+  "deployment_pct": 30,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: UPSIDE_EXPANSION
+- Breadth Stress Score: 3.4
+- Downside Rank: 0.06
+- Net Sell Pressure: -35.7 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 40.14962593516209,
+    "downside_current_pct": 4.488778054862843,
+    "p95_upside_pct": 19.13367026077652,
+    "p95_downside_pct": 20.341358536528475,
+    "phi_up": 0.032359858846493894,
+    "phi_down": 0.171140655810937,
+    "breadth_stress_score": 3.3888888888888893,
+    "net_sell_pressure_pct": -35.66084788029925,
+    "breadth_regime": "UPSIDE_EXPANSION"
+  }
+}
+```

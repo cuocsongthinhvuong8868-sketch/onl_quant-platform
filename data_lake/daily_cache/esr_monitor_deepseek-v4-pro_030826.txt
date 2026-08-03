@@ -1,0 +1,54 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI ở mức **63.4%** — vùng **WARNING** (tích lũy rủi ro ngầm).
+- Market State (HMM × trend): **CALM CORRECTION** — downtrend nhưng stress vĩ mô thấp theo mô hình.
+- Top 3 pillar drivers: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**.
+- Pillar Mode **downside** — chỉ đo trên các phiên giảm, phản ánh áp lực bán thực sự.
+
+## 2. Risk Decomposition (Bóc tách)
+Trụ cột dẫn dắt là **S_LIQ** — **Volume Dry-Up**. Hệ số −log(MA20/MA252) của tổng dollar volume cho thấy thanh khoản đang khô cạn so với chuẩn 1 năm. Trong một pullback có trật tự, hiện tượng này báo hiệu người mua gần như biến mất, trong khi người bán chưa hoảng loạn – một trạng thái “chờ vỡ” nguy hiểm.  
+
+**S_VAL** đứng thứ hai, phản ánh căng thẳng định giá: lợi nhuận 252 phiên của VN30 trừ lãi suất tiền gửi đang dương. Chỉ số dưới MA125 nhưng định giá vẫn chưa hạ nhiệt, tạo rủi ro khi áp lực giảm kéo dài.  
+
+**S_COR** ở 18% (tương đương EVR PC1 38%, thấp hơn ngưỡng 50% báo hiệu herding mạnh) – các mã chưa rơi đồng loạt nhưng correlation đang nhích lên, tiềm ẩn chuyển pha sang bán tháo hệ thống nếu liquid khô kéo dài.
+
+## 3. Cross-Check
+- **Price action vs SSI**: Giá VN30 hiện nằm dưới MA125, không có đỉnh mới → không phải chữ ký bull-trap. Pullback này vẫn lành mạnh bề ngoài, nhưng SSI 63.4% đang ở WARNING – rủi ro đang tích tụ ngầm.
+- **HMM regime vs SSI**: HMM gán **CALM CORRECTION** (stress thấp) trong khi SSI đã vào WARNING (stress vừa). Độ lệch này là cờ vàng: mô hình HMM có thể chậm phản ứng với liquidity dry‑up và valuation tension. Tôi gắn cờ cảnh báo.
+
+## 4. Verdict
+- **Cash weight đề xuất**: 35% danh mục, tăng so với mức bình thường.
+- **Hành động phòng hộ**: Giảm beta tổng thể (reduce_beta) bằng cách hạ tỷ trọng các cổ phiếu có độ nhạy cao với VN30. Chưa short futures hay mua put vì chưa đến mức CRITICAL, nhưng không mua thêm cho đến khi SSI giảm bền vững dưới 50%.
+- Không có tín hiệu mâu thuẫn đến mức “NO ACTIONABLE SIGNAL”; rủi ro từ liquidity và valuation đủ rõ để hành động giảm thiểu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.4,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 35,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.36238674648187,
+    "pca_concentration_pct": 38.02687279710392,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.45999582628982
+  }
+}
+```

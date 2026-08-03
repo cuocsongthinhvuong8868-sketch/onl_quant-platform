@@ -1,0 +1,45 @@
+Ngày báo cáo AI: 03/08/2026
+
+**Phân loại regime:** Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng – **Định giá cao, cần chọn lọc**.  
+Điểm độ rộng định giá: **-41.3%** (dưới -25%, trên -50%). Số mã: 11 định giá cao, 9 hợp lý, 0 rẻ rõ rệt, 3 rẻ nhưng rủi ro. Biên an toàn hiện tại rất mỏng, thị trường đang ở vùng định giá đắt đỏ trên diện rộng, không có cổ phiếu nào thực sự rẻ một cách an toàn.
+
+**Luận điểm chính:**
+- Gần một nửa danh sách (11/23) nằm trong vùng định giá cao, bao gồm nhiều trụ cột vốn hóa lớn như VCB, BID, VPB, LPB – nơi giá thị trường vượt xa giá trị nội tại.
+- Không có mã nào thuộc nhóm “rẻ rõ rệt”; 3 mã rẻ nhất (KLB, NAB, VAB) đều gắn với điểm rủi ro cao (42.6–51.9), phản ánh rủi ro tín dụng, nguồn vốn hoặc chất lượng tài sản yếu.
+- Gap trung vị -9.5% và trimmed mean -11.2% cho thấy ngay cả ngân hàng điển hình cũng đang bị định giá cao hơn giá trị hợp lý khoảng 10%.
+- Tín hiệu thị trường không xác nhận nhóm hợp lý/rẻ: 8/12 mã fair value có hành động giá yếu, 3 mã rẻ đều ở trạng thái “unconfirmed undervalued” (xác nhận bằng 0 hoặc rất thấp), chỉ 1 mã có xác nhận trung tính. Điều này củng cố nhận định thị trường chưa ủng hộ dòng tiền vào nhóm định giá thấp.
+
+**Kiểm tra chéo:**  
+Điểm định giá tương đối theo peer labels toàn nhóm là -6.5% (hơi đắt so với trung vị ngành), nhất quán với bức tranh định giá cao. Các mã định giá cao như ABB, LPB, VCB lại có market confirmation score rất mạnh (79.5–96.4), cho thấy xu hướng giá vẫn đang củng cố chiều đắt đỏ, trong khi các mã rẻ/rủi ro không có xác nhận kỹ thuật. Hành động giá yếu và thiếu xác nhận đối với toàn bộ nhóm fair/undervalued phủ định khả năng đảo chiều tăng ngay lập tức, khớp với kết luận regime cần chọn lọc.
+
+**Tín hiệu theo mã:**
+- *Đáng theo dõi trong nhóm hợp lý*: MBB (fair, xác nhận trung tính duy nhất) – nếu hành động giá cải thiện có thể xem xét; nhưng hiện tại vẫn hơi đắt nhẹ (-1.5% gap). Các mã chất lượng thấp rủi ro như TCB, ACB, CTG (fair, rủi ro thấp) đều có hành động giá yếu, chưa cho điểm vào lệnh rõ ràng.
+- *Rủi ro/bẫy giá trị*: Nhóm rẻ nhưng rủi ro (KLB, NAB, VAB) có upside lớn (gap +32% đến +62%) nhưng xác nhận thị trường gần như bằng không, dễ rơi vào bẫy “falling knife”. Các mã định giá cao với xác nhận mạnh (ABB, LPB, VCB) không phải bẫy giá trị nhưng tiềm ẩn rủi ro điều chỉnh mạnh nếu regime quay đầu; các mã định giá cao xác nhận yếu (NVB, EIB, BVB) có thể tiếp tục suy giảm.
+- *Xác nhận yếu nhất*: KLB (0.0), EIB (4.7), OCB (4.8) – tránh hành động sớm khi chưa có tín hiệu đảo chiều kỹ thuật.
+
+**Rủi ro dữ liệu và bước tiếp theo:**
+- BAB và SGB thiếu giá thị trường, không tính được valuation gap, không nên sử dụng trong phân bổ cho đến khi có dữ liệu bổ sung.
+- NVB thiếu CAR, dùng giả định fallback; tín hiệu định giá cực đoan (-87.8%) có thể bị nhiễu, tuy nhiên rủi ro tổng thể đã rất cao (68.3).
+- Điểm rủi ro chu kỳ tín dụng cao ở OCB (60), VPB (80), EIB (52.5), BVB (55), NVB (55) cần được giám sát chặt – không nên mua ngay cả khi giá rẻ nếu chu kỳ tín dụng xấu đi.
+- Trước khi sử dụng bất kỳ tín hiệu rẻ nào, cần chờ xác nhận kỹ thuật (khối lượng lớn, đáy cao dần) và kiểm tra xúc tác cơ bản (xu hướng trích lập, kế hoạch tăng vốn). Với bối cảnh phần lớn xác nhận yếu, phân bổ hiện tại nên thiên về phòng thủ, chỉ nắm giữ những tên tuổi chất lượng cao (TCB, ACB, CTG) ở trạng thái chờ tín hiệu thị trường cải thiện.
+
+=== AI CIO DIRECT METRICS: bank_valuation ===
+```json
+{
+  "tool": "bank_valuation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "eligible_banks": 23,
+    "bank_valuation_breadth_score": -0.41304347826086957,
+    "median_valuation_gap_pct": -0.09494804896107911,
+    "valuation_regime": "Định giá cao, cần chọn lọc",
+    "overvalued_count": 11,
+    "fair_count": 9,
+    "undervalued_count": 3,
+    "best_ticker": "KLB",
+    "best_valuation_gap_pct": 0.6149644834618802,
+    "worst_ticker": "NVB",
+    "worst_valuation_gap_pct": -0.8777325487744919
+  }
+}
+```

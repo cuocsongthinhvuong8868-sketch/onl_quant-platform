@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-08-03",
+  "composite_score": 29.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 2,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING xuống dưới 5 cho thấy căng thẳng thanh khoản ngắn hạn đã giải tỏa."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 29.9,
+      "unit": "%",
+      "description": "Độ rộng cải thiện lên trên 45% báo hiệu thị trường thoát khỏi trạng thái suy yếu diện rộng."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.4,
+      "unit": "%",
+      "description": "SSI giảm dưới 55% cho thấy rủi ro hệ thống không còn ở mức cảnh báo cao."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.326,
+      "unit": "",
+      "description": "Đuôi phân phối tổn thất trở lại mức Gaussian, giảm rủi ro cực đoan."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 22.5,
+      "unit": "th pct",
+      "description": "Vingroup decoupling ổn định, giảm rủi ro lan truyền từ nhóm cổ phiếu họ Vingroup."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.8,
+      "unit": "th pct",
+      "description": "CQS hạ nhiệt khỏi vùng cực đoan, xoa dịu căng thẳng tín dụng toàn cầu."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-08-03",
+  "source": "ai_cio_executive_summary"
+}
