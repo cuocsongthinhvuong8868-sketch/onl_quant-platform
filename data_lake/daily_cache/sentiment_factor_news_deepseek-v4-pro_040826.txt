@@ -1,0 +1,69 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+1. **Trạng thái News Sentiment hiện tại**
+   - 1d: **Strong Risk‑On** – P_conf = 100% (>85%) → Khẳng định chắc chắn.
+   - 7d: **Strong Risk‑On** – P_conf = 100% → Khẳng định chắc chắn.
+   - 30d: **Strong Risk‑On** – P_conf = 100% → Khẳng định chắc chắn.  
+   → Cả ba khung thời gian đều cho tín hiệu risk‑on với độ tin cậy tuyệt đối từ mô hình.
+
+2. **Kênh dẫn dắt chính**
+   - Kéo risk‑on mạnh nhất: `credit_stress` (1d +2.000, P_conf 100%), `fx_external` (1d +1.761, 7d +1.739, P_conf 100%), `earnings` (1d +1.444, 7d +2.000, P_conf 100%), `monetary_policy` (7d +2.000, 30d +1.251, P_conf 100%), `liquidity` (7d +1.915, P_conf 100%).
+   - Kéo risk‑off duy nhất đáng kể: `commodity` (1d ‑0.973, 7d ‑1.670, 30d ‑0.506, P_conf 96‑100%). Tín hiệu tiêu cực từ hàng hóa mạnh nhưng chưa thể lấn át tổng thể.
+
+3. **Động lực quan trọng**
+   - *Tích cực:*
+     + Thanh khoản dồi dào: NHNN bơm ròng liên tục qua OMO (7d +23.288tỷ, +15.067tỷ; 1d +7.117tỷ).
+     + Lợi suất TPCP tăng (1d) phản ánh kỳ vọng tăng trưởng / giảm rủi ro.
+     + Tỷ giá trung tâm được điều chỉnh tăng nhẹ, ổn định – không gây sốc.
+     + Lãi suất liên ngân hàng ON tăng mạnh (7d +497bps lên 5.72%) cho thấy kiểm soát thanh khoản chủ động.
+   - *Tiêu cực:*
+     + Giá quặng sắt, thép HRC Trung Quốc thủng đáy một năm (7d: -1.032, -1.031, -0.649).
+     + Giá đường, phân Ure, heo hơi Việt Nam giảm về đáy nhiều tháng (30d: -1.306, -1.301, -1.287).
+     + Những yếu tố này báo hiệu nhu cầu nguyên liệu yếu từ Trung Quốc và sức cầu nội địa một số mặt hàng giảm.
+
+4. **Kết luận cho AI CIO**
+   - **Hỗ trợ (supports) thiên hướng vĩ mô risk‑on**: dòng tiền nội, chính sách tiền tệ thực tế nới lỏng qua OMO, tỷ giá ổn định và kỳ vọng lợi nhuận đều cho tín hiệu tích cực.
+   - Cảnh báo từ `commodity`: giá nguyên liệu giảm sâu có thể là dấu hiệu sớm của suy thoái cầu toàn cầu. Tạm thời chỉ là tín hiệu đơn lẻ, chưa lan sang `growth` hay `credit_stress` nên chưa phủ định được risk‑on.
+   - Nếu các công cụ market‑internal (như chỉ báo kỹ thuật, dòng tiền tổ chức) đang ở vùng quá mua hoặc phân kỳ, tín hiệu news sentiment này xác nhận xu hướng nhưng cần quản trị rủi ro chặt chẽ.
+
+5. **Caveat**
+   - Bao phủ nguồn: tỷ lệ tin từ mạng xã hội (`mozyfin_social`) rất cao (1d 46%, 7d 50%, 30d 40% + thêm `mozyfin`). Mặc dù tín hiệu mạnh, cần chiết khấu độ tin cậy vì đây là bằng chứng xã hội/opinion, độ nhiễu cao hơn dữ liệu cứng từ `widata`.
+   - Dữ liệu không trễ: generated_at 04/08/2026, cập nhật trong ngày.
+   - Rủi ro headline noise: các tiêu đề lẻ (giá nhựa đường, USD/RUB) có thể gây nhiễu; đã được lọc qua mô hình nhưng vẫn cần cân nhắc khi kết hợp với các lớp phân tích khác.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.7563,
+    "news_confidence_1d": 0.9988,
+    "news_count_1d": 134,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 72,
+      "mozyfin_social": 62
+    },
+    "news_macro_composite_7d": 1.1752,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 888,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 440,
+      "mozyfin_social": 448
+    },
+    "news_macro_composite_30d": 0.7198,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4526,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1056,
+      "mozyfin": 1655,
+      "mozyfin_social": 1815
+    },
+    "news_macro_composite": 0.7563,
+    "news_confidence": 0.9988,
+    "news_count": 134
+  }
+}
+```

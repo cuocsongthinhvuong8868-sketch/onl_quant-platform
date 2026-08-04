@@ -1,0 +1,57 @@
+## 1. Mechanical Decomposition  
+Tuần này Net Liquidity giảm mạnh –$92.5B, đẩy chỉ báo Impulse EMA(4) về –$39.6B. RRP chỉ còn $2.6B (gần zero), không còn đóng góp đáng kể vào biến động biên. Do đó, cú sốc tập trung vào hai kênh chính:  
+
+- **WALCL (Fed balance sheet)**: ước giảm ~$8–10B từ QT (runoff Treasury/MBS), đúng tiến độ thắt chặt.  
+- **TGA (Tài khoản Kho bạc)**: phần còn lại ~$82–84B tăng mạnh, phản ánh Treasury tích tụ tiền mặt (có thể do seasonal tax flows quý III hoặc điều chỉnh sau trần nợ). Khi TGA tăng, thanh khoản rút khỏi hệ thống ngân hàng – đây là tác nhân chính của tuần này.  
+
+## 2. Cycle Positioning  
+Hệ thống đang ở pha **QT chủ động** (Fed thu hẹp bảng cân đối). RRP đã cạn kiệt (<$100B), đóng lại van buffer từng bơm thanh khoản trong giai đoạn 2023. So với đỉnh thanh khoản ròng 2022 (~$6.3T) và đáy 2024 (~$5.3T), mức $5.82T hiện tại nằm ở vùng trung bình thấp, trong xu hướng giảm. Hiện tượng này giống giai đoạn cuối của QT cycle: buffer biến mất, mọi chuyển động TGA & QT tác động trực tiếp gấp 2-3 lần lên thị trường tiền tệ.  
+
+## 3. Signal Strength  
+- Tín hiệu: **CUT** (Impulse EMA âm, Z-score -1.35 ≤ -1σ).  
+- Z-score -1.35 nằm trong vùng cận biên (không cực đoan >2σ), nhưng vẫn phản ánh áp lực rút thanh khoản rõ rệt.  
+- Độ mạnh trung bình – không phải cú sốc sâu, nhưng đủ để kích hoạt cơ chế risk-off trong ngắn hạn. Impulse EMA và signal khớp nhau, củng cố tín hiệu.  
+
+## 4. Cross-Asset Spillover (1–4 tuần)  
+- **SPX/NDX**: bias tiêu cực; định giá cao gặp thanh khoản thu hẹp làm tăng xác suất điều chỉnh.  
+- **DXY**: có xu hướng mạnh lên do khan hiếm USD, gây áp lực lên EM FX.  
+- **Gold/Crypto**: vàng chịu áp lực từ lãi suất thực tăng nhẹ, nhưng có thể được mua phòng hộ nếu rủi ro gia tăng. Crypto nhạy cảm với thanh khoản, bias giảm.  
+- **VN-Index**: với độ trễ 4–8 tuần, dòng vốn ngoại có thể chững lại khi EM FX yếu và thanh khoản toàn cầu suy giảm. Bias âm trung hạn.  
+
+## 5. Risk Factors (tín hiệu có thể sai)  
+- **RRP ≈ 0**: không còn dư địa để sụt thêm – một khi van cạn, các tín hiệu CUT dựa trên đà rút RRP sẽ yếu dần vì tính chất biên thay đổi.  
+- **TGA spike tạm thời**: nếu TGA giảm trở lại trong vài tuần tới (Treasury chi tiêu), thanh khoản sẽ được bơm lại đột ngột, đảo ngược tín hiệu.  
+- **Adjustments của Fed**: nếu QT được giảm tốc hoặc có emergency facility, CUT sẽ bị vô hiệu hóa.  
+
+## 6. Kết luận  
+Regime **QT_active** – thanh khoản ròng đang suy yếu. Trong 2–4 tuần tới, môi trường short-term bias risk-off, áp lực lên EM bao gồm VN-Index ở mức trung bình; tuy nhiên, mức độ tin cậy ở ngưỡng **medium** do RRP cạn và biến số TGA có thể đảo chiều nhanh.  
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5825,
+  "signal": "CUT",
+  "z_score": -1.35,
+  "regime": "QT_active",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5824838.0,
+    "fed_liquidity_impulse": -92541.0,
+    "fed_liquidity_impulse_ema": -39563.3087477442,
+    "fed_liquidity_zscore": -1.346817245956799,
+    "signal": "CUT",
+    "walcl": 6738190.0,
+    "wtregen": 910776.0,
+    "rrpontsyd": 2576.0
+  }
+}
+```

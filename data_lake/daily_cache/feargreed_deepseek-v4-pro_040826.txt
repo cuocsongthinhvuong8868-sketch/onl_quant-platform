@@ -1,0 +1,65 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score ở mức 58.6/100 – nằm trong vùng NEUTRAL / STOCK-PICKING (40–60), sát ngưỡng GREED.
+- EGARCH Vol chuẩn hóa đạt phân vị 81.3% – vượt ngưỡng 80% thường gắn với pha biến động cao, khác biệt so với score trung tính.
+- Rolling Skewness = -0.01, gần như đối xứng; không có dấu hiệu lệch đuôi tiêu cực hay tích cực rõ rệt.
+- Downside Correlation norm chỉ 2.4% (cực thấp); Upside Correlation norm ở 27.4% – tương quan tăng điểm chiếm ưu thế, nhưng chưa đạt mức crowding của GREED.
+
+## 2. Interpretation
+Thị trường đang trong pha phân hoá cổ phiếu điển hình (stock-picking). Dữ liệu chỉ ra một môi trường biến động cao nhưng không hoảng loạn, dòng tiền vẫn chọn lọc cổ phiếu tăng thay vì bán tháo đồng loạt. Không phát hiện tín hiệu xu hướng giảm hệ thống.
+
+## 3. Cross-Check
+- Phân kỳ giữa Score (58.6, nghiêng về trung tính/cận greedy) và EGARCH Vol (81.3%): thường vol cao đi kèm score thấp (fear). Sự lệch này cảnh báo thị trường “vol cao nhưng không panic”, có thể do luân chuyển dòng tiền mạnh giữa các nhóm ngành. Cần thận trọng, không nên coi đây là tín hiệu tăng beta toàn diện.
+- Skewness trung tính cùng Upside Correlation vượt trội Downside cho thấy dòng tiền ưu tiên phía tăng, nhất quán với trạng thái STOCK PICKING, không mâu thuẫn.
+
+## 4. Verdict
+Beta mục tiêu đề xuất cho danh mục VN-Index: **0.80** (dưới full beta). Trên dữ liệu hiện tại, xác suất cao đây là môi trường thích hợp để duy trì chiến lược tập trung vào alpha từng cổ phiếu, hạn chế vị thế chỉ số.  
+Hành động cụ thể:
+- Giảm nhẹ các vị thế phụ thuộc chỉ số (index futures/ETF), giữ tỷ trọng cổ phiếu riêng lẻ có câu chuyện riêng.
+- Có thể xem xét mua quyền chọn bảo vệ (protective puts) trên các vị thế lớn, tận dụng mặt bằng vol còn cao để có phí bảo hiểm hợp lý.
+- Không có tín hiệu đủ mạnh để chuyển sang phòng thủ toàn diện hay tăng beta quyết liệt — **NO ACTIONABLE SIGNAL** cho thay đổi lớn danh mục.
+
+```json
+{
+  "tool": "fear_greed",
+  "date": "04/08/2026",
+  "regime": "NEUTRAL",
+  "score": 58.6,
+  "confidence": "medium",
+  "beta_target": 0.80,
+  "key_signals": [
+    "Risk Score 58.6 (cận trên NEUTRAL)",
+    "EGARCH Vol 81.3% – phân kỳ với score",
+    "Upside Correlation 27.4% >> Downside 2.4%",
+    "Skewness = -0.01 (đối xứng)"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 58.6
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: STOCK PICKING
+- Signal Confidence: 0.61
+- CSV Rank: 0.23
+- Acute Shock: 0.00
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 58.61483780137228,
+    "sentiment_regime": "STOCK PICKING",
+    "signal_confidence": 0.6100946126466928,
+    "acute_shock": 0.0,
+    "csv_rank": 0.23412698412698413,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

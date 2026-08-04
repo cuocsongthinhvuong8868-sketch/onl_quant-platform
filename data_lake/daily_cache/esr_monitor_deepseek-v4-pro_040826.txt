@@ -1,0 +1,54 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI 63.6% – regime **WARNING**, tích lũy rủi ro ngầm.
+- Market State: **ACTIVE STRESS** (high stress + downtrend).
+- Top 3 pillar drivers: **S_LIQ (35%)**, S_VAL (31%), S_COR (18%).
+- VN30 đóng cửa dưới MA125 – xác nhận xu hướng giảm kỹ thuật.
+
+## 2. Risk Decomposition (Bóc tách)
+S_LIQ đang là driver chính (35%). Đây là tín hiệu **volume khô cạn nghiêm trọng so với chuẩn 1 năm** – thanh khoản dollar volume trung bình 20 phiên thấp hơn hẳn MA252, cho thấy dòng tiền rời bỏ thị trường, không phải chỉ là biến động giá. Khi volume cạn đi trong downtrend, rủi ro xảy ra các nhịp giảm mạnh do thiếu lực cầu đỡ tăng lên rõ rệt.
+
+S_VAL (31%) đứng thứ hai – valuation tension vẫn cao, mặc dù chỉ số đã giảm. Điều này cảnh báo mặt bằng định giá sau 1 năm vẫn chưa thực sự hấp dẫn nếu so với lãi suất tiền gửi, tạo dư địa cho dòng vốn tiếp tục dịch chuyển khỏi cổ phiếu.
+
+S_COR (18%) tương quan hệ thống còn tương đối cao, cho thấy các cổ phiếu trong VN30 di chuyển đồng pha khi giảm, làm giảm hiệu quả phòng ngừa bằng đa dạng hóa nội bộ.
+
+Tổ hợp S_LIQ + S_VAL + S_COR trong bối cảnh ACTIVE STRESS mang đặc điểm của **một đợt suy giảm kéo dài do cạn kiệt thanh khoản**, không phải bull-trap (vì không có uptrend).
+
+## 3. Cross-Check
+- **Price action vs SSI**: Không có divergence – giá dưới MA125, SSI vào WARNING, phù hợp với áp lực stress hiện hữu. Loại trừ kịch bản bull-trap.
+- **HMM regime khớp hoàn toàn** với SSI level (cùng chỉ ACTIVE STRESS) → tín hiệu nhất quán, không cần flag cảnh báo lệch.
+
+## 4. Verdict
+Đề xuất nâng tỷ trọng tiền mặt lên **75%** danh mục. Với volume khô cạn dẫn dắt stress, việc phòng thủ là ưu tiên tuyệt đối. Hành động hedge: **giảm beta tổng thể danh mục** – ưu tiên bán bớt các vị thế có hệ số beta cao, chưa vội short futures hay mua put vì SSI chưa vào vùng CRITICAL. Theo dõi nếu S_LIQ tiếp tục tăng và SSI vượt 80% sẽ kích hoạt hành động mạnh hơn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.6,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 75,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.615110271935436,
+    "pca_concentration_pct": 38.016220432473155,
+    "market_state": "ACTIVE STRESS",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.465552889303545
+  }
+}
+```

@@ -1,0 +1,58 @@
+## 1. Scenario Assessment
+K=1.0 và CoE=14% là bộ tham số trung tính, không quá khắc nghiệt đối với ngành ngân hàng Việt Nam. Tuy nhiên, mặt bằng hiện tại cho thấy đa số ngân hàng đang **đốt vốn** – chỉ duy nhất SHB tạo ra Economic Alpha dương. Rủi ro chính đến từ định giá P/B cao kết hợp với biến động ROE, khiến lợi nhuận giữ lại không đủ bù đắp chi phí vốn. Ngành đang lệch về phía tiêu cực dù có điểm sáng đơn lẻ.
+
+## 2. Top Alpha Decomposition
+- **SHB** – Alpha +4.0%: **Fortress** điển hình. Driver lớn nhất là P/B chỉ 0.80 (định giá rẻ) cùng ROE 17.5% ổn định với σ(ROE) cực thấp 1.9%. Payout thấp (8.6%) giúp tái đầu tư mạnh, củng cố compounding. Chất lượng tài sản sinh lời và định giá hấp dẫn giúp vượt trội so với CoE.
+- **ACB** – Alpha -0.9%: ROE 23% cao nhưng P/B 1.23 không còn rẻ; σ(ROE) 2.7% tạo risk penalty đáng kể. Đây là **Growth Trap** – tăng trưởng cao nhưng không đủ bù rủi ro để tạo giá trị dương. Alpha gần bằng 0 phản ánh trạng thái “hòa vốn” về mặt kinh tế.
+- **MBB** – Alpha -1.5%: Chất lượng rất tốt (σ(ROE) 1.6% siêu thấp, payout 6.7%), nhưng P/B 1.45 khiến định giá đắt. ROE 21.8% chưa đủ để biện minh cho mức phí bảo hiểm này → **Premium Burn**, đốt vốn bất chấp nền tảng ổn định.
+
+## 3. Value Traps Warning
+- **LPB** (-12.9%): **Premium Burn** nghiêm trọng nhất. P/B 3.40 cực đắt, dù ROE 21.1% nhưng σ(ROE) 3.8% và payout 21% khiến lợi nhuận điều chỉnh rủi ro quá thấp. Rủi ro “vỡ định giá” nếu ROE suy giảm.
+- **EIB** (-10.5%): **Cheap Trap** – P/B 1.30 có vẻ khiêm tốn nhưng ROE chỉ 10%, lại biến động mạnh (σ=3.8%). Mức sinh lời thấp không đủ bù đắp rủi ro, nhà đầu tư có thể mắc kẹt với kỳ vọng hồi phục không thành.
+- **VPB** (-9.9%): **Growth Trap** – ROE 14.1% sát CoE, σ(ROE) 4.7% quá cao khiến risk penalty ăn mòn hết phần thặng dư. Payout 24.6% càng làm chậm tích lũy vốn, dễ tổn thương khi môi trường thay đổi.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress):** **SHB** chiếm 60–70% phân bổ ngành ngân hàng.
+- **Tactical (Cheap-but-not-trap):** Không có. ACB, MBB tuy alpha âm nhẹ nhưng không đủ rẻ và vẫn đốt vốn – khuyến nghị **underweight**, không mở mới.
+- **Cấm mua / tránh hoàn toàn:** LPB, EIB, VPB do alpha âm sâu.
+- Toàn ngành chỉ có SHB tạo giá trị thặng dư, nên góc nhìn tổng thể là **Bearish**, tập trung phòng thủ vào duy nhất Fortress.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.044322172499376,
+    "median_economic_alpha_pct": -4.185103321766672,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "ACB",
+      "MBB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

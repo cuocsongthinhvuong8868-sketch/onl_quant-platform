@@ -1,0 +1,61 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- **Δ Cầu so với Mu:** +5.03pp (16.46% vs 11.43%) → lực cầu mở rộng mạnh mẽ, vượt trội hơn đáng kể.
+- **Δ Cung so với Mu:** -5.24pp (7.23% vs 12.47%) → lực cung nén sâu, co hẹp dưới mức trung bình dài hạn.
+- **Phi phân kỳ:** Cầu Phi=0.055 (nhiễu ngẫu nhiên, không tín hiệu); Cung Phi=0.175 (quán tính – momentum rõ nét, đà bán duy trì ở mức thấp).  
+
+## 2. Supply-Demand Dynamics
+Trạng thái dòng tiền hiện tại mang mẫu hình **tích lũy** (accumulation): cầu vượt Mu, cung dưới Mu, cho thấy dòng tiền chủ động hấp thụ hàng.  
+Momentum thực sự thuộc về **cung**, nhưng theo hướng có lợi – quán tính giữ áp lực bán ở vùng thấp bất thường, hỗ trợ nền giá. Cầu không có quán tính (random walk), vai trò dẫn dắt thuộc về sự co hẹp cung.
+
+## 3. Stress-Test Read
+P95 Downside = **20.49%**, gấp gần 3 lần hiện tại, phản ánh viễn cảnh bán tháo cực đoan nếu thị trường gãy.  
+**Bất đối xứng đuôi rủi ro:** P95 Down 20.49% > P95 Up 19.03% – rủi ro đuôi phía cung dày hơn phía cầu, dù xác suất thấp nhưng không thể bỏ qua.
+
+## 4. Verdict
+**Tỷ trọng giải ngân đề xuất: 50%**  
+Chiến lược: **rình bắt đáy** (bottom fishing). Mặc dù tín hiệu tích lũy và momentum cung thấp khá thuận lợi, đuôi rủi ro dày bên bán cảnh báo không nên triển khai toàn bộ. Hành động mua vào chỉ khi xuất hiện nhịp sụt giảm đột biến do cung tăng vọt, tận dụng cơ hội từ kịch bản stress ngắn hạn.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "accumulation",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 20.49,
+  "p95_upside_pct": 19.03,
+  "deployment_pct": 50,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: BUY_PRESSURE
+- Breadth Stress Score: 19.4
+- Downside Rank: 0.33
+- Net Sell Pressure: -9.2 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 16.458852867830423,
+    "downside_current_pct": 7.231920199501247,
+    "p95_upside_pct": 19.032604893559096,
+    "p95_downside_pct": 20.485506408814626,
+    "phi_up": 0.054572569511127156,
+    "phi_down": 0.17487889481722008,
+    "breadth_stress_score": 19.36111111111111,
+    "net_sell_pressure_pct": -9.226932668329177,
+    "breadth_regime": "BUY_PRESSURE"
+  }
+}
+```

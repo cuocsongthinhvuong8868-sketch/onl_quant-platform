@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-08-04T13:37:35",
+  "t_data_date": "2026-08-04",
+  "target_report_date": "2026-08-03",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_030826.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_030826.txt",
+  "report_mtime": "report:2026-08-04T13:25:29|sidecar:2026-08-04T13:25:29",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_030826.txt:c124c5553b286ef19efd2cf8a8a4ad27327ffd5c|sidecar:ai_cio_humility_rules_deepseek-v4-pro_030826.json:34f901e3e9b7c83e1368495d782f30ac661af4ac",
+  "parsed": {
+    "report_date": "2026-08-03",
+    "composite_score": 29.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 2.0,
+        "unit": "sessions",
+        "description": "Số phiên STRESS/WARNING xuống dưới 5 cho thấy căng thẳng thanh khoản ngắn hạn đã giải tỏa."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 29.9,
+        "unit": "%",
+        "description": "Độ rộng cải thiện lên trên 45% báo hiệu thị trường thoát khỏi trạng thái suy yếu diện rộng."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.4,
+        "unit": "%",
+        "description": "SSI giảm dưới 55% cho thấy rủi ro hệ thống không còn ở mức cảnh báo cao."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.326,
+        "unit": "",
+        "description": "Đuôi phân phối tổn thất trở lại mức Gaussian, giảm rủi ro cực đoan."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 22.5,
+        "unit": "th pct",
+        "description": "Vingroup decoupling ổn định, giảm rủi ro lan truyền từ nhóm cổ phiếu họ Vingroup."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.8,
+        "unit": "th pct",
+        "description": "CQS hạ nhiệt khỏi vùng cực đoan, xoa dịu căng thẳng tín dụng toàn cầu."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-08-03",
+      "composite_score": 29.0,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 2,
+          "unit": "sessions",
+          "description": "Số phiên STRESS/WARNING xuống dưới 5 cho thấy căng thẳng thanh khoản ngắn hạn đã giải tỏa."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 29.9,
+          "unit": "%",
+          "description": "Độ rộng cải thiện lên trên 45% báo hiệu thị trường thoát khỏi trạng thái suy yếu diện rộng."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.4,
+          "unit": "%",
+          "description": "SSI giảm dưới 55% cho thấy rủi ro hệ thống không còn ở mức cảnh báo cao."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.326,
+          "unit": "",
+          "description": "Đuôi phân phối tổn thất trở lại mức Gaussian, giảm rủi ro cực đoan."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 22.5,
+          "unit": "th pct",
+          "description": "Vingroup decoupling ổn định, giảm rủi ro lan truyền từ nhóm cổ phiếu họ Vingroup."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.8,
+          "unit": "th pct",
+          "description": "CQS hạ nhiệt khỏi vùng cực đoan, xoa dịu căng thẳng tín dụng toàn cầu."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-08-03",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "2 sessions",
+      "T actual": 2.0,
+      "T actual display": "2 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-03",
+      "Description": "Số phiên STRESS/WARNING xuống dưới 5 cho thấy căng thẳng thanh khoản ngắn hạn đã giải tỏa.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "29.9%",
+      "T actual": 36.0,
+      "T actual display": "36.0%",
+      "Delta": 6.100000000000001,
+      "Delta display": "+6.1%",
+      "Status": "Intact",
+      "Data date": "2026-08-04",
+      "Description": "Độ rộng cải thiện lên trên 45% báo hiệu thị trường thoát khỏi trạng thái suy yếu diện rộng.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.4%",
+      "T actual": 63.615110271935436,
+      "T actual display": "63.6%",
+      "Delta": 0.21511027193543697,
+      "Delta display": "+0.215%",
+      "Status": "Intact",
+      "Data date": "2026-08-04",
+      "Description": "SSI giảm dưới 55% cho thấy rủi ro hệ thống không còn ở mức cảnh báo cao.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.326",
+      "T actual": 0.3263191266569856,
+      "T actual display": "0.326",
+      "Delta": 0.00031912665698557996,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-08-04",
+      "Description": "Đuôi phân phối tổn thất trở lại mức Gaussian, giảm rủi ro cực đoan.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "22.5 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Vingroup decoupling ổn định, giảm rủi ro lan truyền từ nhóm cổ phiếu họ Vingroup.",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.8 th pct",
+      "T actual": 99.73544973544973,
+      "T actual display": "99.7 th pct",
+      "Delta": -0.06455026455026314,
+      "Delta display": "-0.065 th pct",
+      "Status": "Intact",
+      "Data date": "2026-08-03",
+      "Description": "CQS hạ nhiệt khỏi vùng cực đoan, xoa dịu căng thẳng tín dụng toàn cầu.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 2,
+      "date": "2026-08-03",
+      "error": ""
+    },
+    "breadth": {
+      "value": 36.0,
+      "date": "2026-08-04",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.615110271935436,
+      "date": "2026-08-04",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-08-04",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3263191266569856,
+      "date": "2026-08-04",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.73544973544973,
+      "date": "2026-08-03",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

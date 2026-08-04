@@ -1,0 +1,55 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- **VN30 Stress Index**: 0.00% – dưới xa ngưỡng cảnh báo 40%, không có áp lực lây lan hệ thống.
+- **Số mã thủng VaR 95%**: 0/30 – không mã nào rơi vào vùng đuôi biến động nghiêm trọng.
+- **Complacency Index**: 4.67% – rất thấp so với ngưỡng nguy hiểm 80%; 5 mã bị định giá sai (top 3: VIC, BMP, LPB).
+
+## 2. Contagion Assessment (Module B)
+Stress Index = 0%, không mã breach → không có hiện tượng lây lan đuôi real‑time trong rổ VN30. Rủi ro hệ thống tức thời ở mức thấp nhất. Không có sự cố cá biệt hay dấu hiệu đầu sóng nào.
+
+## 3. Complacency Assessment (Module C) – Đúng bản chất
+Complacency chỉ 4.67%, khẳng định thị trường **không ở regime ngủ quên** (nơi spread bị nén cực đoan và bù rủi ro bị định giá sai trên diện rộng). Điều này **không đồng nghĩa** với “thị trường ổn định” hay “không có áp lực bán”. Thị trường có thể đang trong uptrend mạnh, điều chỉnh sâu hoặc bất kỳ chế độ nào khiến spread giãn tự nhiên.
+
+Kết hợp với Stress = 0%, chưa thấy tín hiệu hoảng loạn hay sụp đổ, nhưng cũng không thể kết luận thị trường “bình thường”. Hai chỉ báo đều thấp cho thấy giai đoạn hiện tại không có căng thẳng hệ thống lẫn nguy cơ “ngủ quên” tập thể – về mặt kỹ thuật, có thể coi là chế độ **spread bình thường**.
+
+## 4. Stock‑Level Risk Calls
+- **Top 3 Crash (Module B)**: rỗng → không có khuyến nghị bán/giảm tỷ trọng khẩn cấp từ tín hiệu phá vỡ VaR.
+- **Top 3 Mispriced (Module C)**: VIC, BMP, LPB – spread bị nén chặt nhất toàn thị trường, tức phần bù rủi ro đang được định giá thấp bất thường. Nếu dòng tiền đảo chiều, nhóm này có thể điều chỉnh nhanh hơn mặt bằng chung. Đưa vào danh sách **theo dõi rủi ro tiềm ẩn**; chưa phát tín hiệu hành động ngay. Khuyến nghị đặt cảnh báo nếu giá thủng MA20 trên khung ngày hoặc giảm trên 5% so với giá hiện tại (không dùng mức giá tuyệt đối).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 4.67,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "BMP", "LPB"],
+  "confidence": "high"
+}
+```
+
+*Confidence high cho việc phân loại chế độ “spread_normal” (không contagion, không complacency nguy hiểm). Dù vậy, sự tồn tại của 5 mã mispriced – dù ít – nhắc nhở rằng một số nơi đang định giá rủi ro quá thấp; cần giám sát thêm.*
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=0.00% (0/30); complacency=4.67% (5/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 0.0,
+    "vares_complacency_pct": 4.672897196261682,
+    "vares_breach_count": 0,
+    "vares_mispriced_count": 5,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

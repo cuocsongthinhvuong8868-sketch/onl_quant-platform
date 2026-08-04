@@ -1,0 +1,60 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread annualized 10.60%, Z-score –0.58σ so với cửa sổ 60 phiên (dưới trung bình).
+- DPI (Dispersion Persistence Index) ở mức 41.7%, thấp hơn xa ngưỡng persistence 70%.
+- Tương quan cặp trung bình (Ledoit‑Wolf) chỉ 0.043, gần như bằng 0, phản ánh sự phân hóa cực mạnh.
+- Cross‑Sectional Skewness +1.01, Kurtosis 3.54; Broad stress score V2 5.2/100 (NORMAL), CSAD_Z +0.18, CSSD_Z –0.31, downside participation 7.2%.
+
+## 2. Structural State
+DPI thấp và Spread Z âm nhẹ (–0.58σ) cho thấy thị trường không nằm trong trạng thái căng thẳng phân hóa (không có stress persistent). Các chỉ báo V2 đồng thuận: không có dấu hiệu bầy đàn (CSAD_Z ~0, tương quan thấp) hay bán tháo diện rộng (stress score rất thấp, downside participation nhỏ).  
+Thị trường ở trạng thái bình thường; stress không xuất hiện cả ở cấp độ cục bộ (DPI thấp) lẫn hệ thống. Môi trường phân hóa lành mạnh.
+
+## 3. Cross‑Check & Tail Direction
+CS Skewness +1.01, vừa vượt nhẹ mốc +1, ám chỉ có một vài outlier tăng giá mạnh (đuôi phải dương nhẹ), nhưng chưa đến mức “cú đẩy điên rồ” cực đoan. Kurtosis 3.54 sát phân phối chuẩn (3), không có phần đuôi béo bất thường.  
+Như vậy đuôi không bị gãy theo hướng tiêu cực hay tích cực quá đà; mô hình normal vẫn áp dụng được. Hướng đuôi là positive nhẹ, hòa hợp với tương quan thấp – cổ phiếu phân hóa và một số ít có hiệu suất vượt trội.
+
+## 4. Regime Mapping
+Đối chiếu bản đồ 2D: DPI thấp (41.7%) × Tương quan thấp (0.043) → ô **Healthy Stock‑Picking**. Trùng khớp với V2 macro regime nhận định là STOCK_PICKING.  
+Rủi ro lớn nhất cho PM không phải là sập cấu trúc hay cạn thanh khoản, mà là **rủi ro tập trung** (concentration risk). Trong môi trường phân hóa sâu, lợi thế thuộc về người chọn đúng cổ phiếu; nếu portfolio quá tập trung vào nhóm tăng trưởng kém hoặc bỏ lỡ các tên dẫn dắt, sẽ dễ bị underperform. Cần đề phòng khả năng chuyển đột ngột sang trending nếu tương quan tăng vọt từ một cú sốc vĩ mô – nhưng hiện xác suất rất thấp.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "04/08/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.58,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.043,
+  "tail_skew_direction": "positive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 5.2
+- Broad Stress Level: NORMAL
+- CSAD Z: +0.18
+- CSSD Z: -0.31
+- Downside Participation: 7.2%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing
+
+=== AI CIO DIRECT METRICS: dispersion ===
+```json
+{
+  "tool": "dispersion",
+  "source": "direct_quantitative",
+  "metrics": {
+    "dispersion_spread_z": -0.5789766838321202,
+    "dispersion_dpi_pct": 41.66666666666667,
+    "dispersion_avg_corr": 0.04339505610157132,
+    "dispersion_broad_stress_score": 5.217108407077053,
+    "downside_participation_pct": 7.231920199501247,
+    "macro_regime": "STOCK_PICKING",
+    "broad_stress_level": "NORMAL"
+  }
+}
+```

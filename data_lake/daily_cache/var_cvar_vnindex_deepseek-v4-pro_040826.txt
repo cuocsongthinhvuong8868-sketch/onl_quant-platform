@@ -1,0 +1,97 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+## 1. Observations
+- Historical VaR 95% ở mức –1.69%, phản ánh tổn thất cực đoan vừa phải trong cửa sổ luân chuyển 3 năm.
+- EVT VaR 99% lên tới –3.69%, chỉ ra kịch bản 1/100 phiên tồi tệ có thể sụt giảm gần gấp đôi so với mô hình lịch sử đơn thuần.
+- Tham số hình dạng đuôi ξ (MLE 0.345, trung vị posterior 0.390) nằm rõ trong vùng **FAT TAIL** (> 0.30), với khoảng tin cậy 90% MCMC [0.183, 0.651] trải từ heavy đến fat, cho thấy tham số chưa ổn định.
+- Chỉ số Hill +0.447 xác nhận hướng đuôi dày, nhưng xi biến động mạnh theo ngưỡng POT (0.067–0.326) → phân loại đuôi nhạy với cách chọn ngưỡng.
+
+## 2. Chẩn đoán độ dày đuôi
+- ξ MLE 0.345 > 0.30 → **đuôi cực dày (fat tail)**, rủi ro cực đoan vượt xa Gaussian. Tuy nhiên, cảnh báo: đây là **threshold‑sensitive fat‑tail warning**, do xi thay đổi từ gần Gaussian (0.067) sang fat (0.326) khi thay đổi ngưỡng POT, và posterior MCMC xi vắt qua ranh giới heavy‑fat, làm giảm độ tin cậy của con số điểm.
+- Hill (0.447) cùng dấu, cùng biên độ với xi → tín hiệu đuôi dày vẫn có trọng số, nhưng không thể xem là robust vì độ nhạy ngưỡng.
+- Chênh lệch ES – VaR lịch sử (1.40%) vượt σ₃₀ (1.26%) → thực nghiệm khẳng định đuôi dày hơn Gaussian.
+
+## 3. Khoảng cách Gaussian
+- Gaussian VaR 99% ước tính: μ + z₀.₀₁·σ = –0.18% – 2.33×1.26% = **–3.11%**.
+- EVT VaR 99% = –3.69%, sâu hơn Gaussian **0.58 điểm phần trăm**. Khoảng cách chưa vượt ngưỡng 1pp nên Gaussian chưa bị coi là “broken” hoàn toàn, nhưng vẫn đánh giá thấp rủi ro đuôi ở mức đáng kể khi thị trường ở chế độ đuôi dày.
+
+## 4. Đánh giá – Hàm ý phòng hộ
+- Với ξ > 0.30 (dù nhạy ngưỡng), khuyến nghị: **tránh các chiến lược momentum**, **mua quyền chọn bán ITM** và **bán khống hợp đồng tương lai** để bảo vệ danh mục trước các sự kiện cực đoan. Định vị kích thước vị thế chỉ dựa trên σ sẽ không đủ. Do tham số xi chưa ổn định, niềm tin trong hành động phòng hộ ở mức **trung bình**, cần theo dõi sát diễn biến đuôi và cập nhật mô hình.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "04/08/2026",
+  "evt_var_99_pct": -3.69,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.345,
+  "hill": 0.447,
+  "xi_min": 0.067,
+  "xi_max": 0.326,
+  "xi_range": 0.259,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.58,
+  "hedge_action": "buy_puts_itm",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: THRESHOLD_SENSITIVE_FAT_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: 0.81%
+- VaR Breach 95: 0
+- Breach Margin 95: -2.50pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.345
+- EVT Hill: +0.447
+- EVT Xi Min: +0.067
+- EVT Xi Max: +0.326
+- EVT Xi Range: 0.259
+- EVT VaR99 Range: 0.16pp
+- EVT ES99 Range: 0.66pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.0%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.183
+- EVT Xi P50: +0.390
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.90%
+- EVT VaR99 P50: -3.83%
+- EVT VaR99 P95: -3.22%
+- EVT ES99 P05: -12.54%
+- EVT ES99 P50: -6.70%
+- EVT ES99 P95: -4.91%
+
+=== AI CIO DIRECT METRICS: var_cvar_vnindex ===
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "source": "direct_quantitative",
+  "metrics": {
+    "historical_var_pct": -1.691867298119048,
+    "expected_shortfall_pct": -3.0958621619566955,
+    "tail_regime": "THRESHOLD_SENSITIVE_FAT_TAIL",
+    "tail_risk_level": "ELEVATED",
+    "var_breach_95": false,
+    "breach_margin_95_pp": -2.504850050310338,
+    "evt_xi": 0.3454435282173134,
+    "evt_var_99_pct": -3.686071917742771,
+    "evt_es_99_pct": -6.149344442740661,
+    "hill_index": 0.44693722633432414,
+    "evt_xi_min": 0.06728218013982155,
+    "evt_xi_max": 0.3263191266569856,
+    "evt_xi_range": 0.259036946517164,
+    "evt_var99_range_pp": 0.1649364086847696,
+    "evt_es99_range_pp": 0.65674767984987,
+    "evt_threshold_stable": 0,
+    "evt_xi_p05": 0.18298667414955452,
+    "evt_xi_p50": 0.3903008947848988,
+    "evt_xi_p95": 0.6508831499781828
+  }
+}
+```

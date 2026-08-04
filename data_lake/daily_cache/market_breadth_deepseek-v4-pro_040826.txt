@@ -1,0 +1,53 @@
+## 1. Observations
+- **MA20** (1 tháng): 36.0% mã > MA20 – ở mức *thấp*, dưới ngưỡng trung tính 50%, nhưng chưa đạt ngưỡng bán tháo (<20%).
+- **MA60** (1 quý): 19.3% mã > MA60 – *rất thấp*, xác nhận điều chỉnh vẫn đang tiếp diễn, chưa có tín hiệu kết thúc.
+- **MA125** (6 tháng): 15.8% mã > MA125 – *cực thấp*, sức mạnh chu kỳ kinh doanh nửa năm gần như không tồn tại.
+- **MA252** (1 năm): 17.6% mã > MA252 – *suy yếu trường kỳ*, chỉ số chìm sâu trong vùng thị trường gấu (bear regime).
+
+## 2. Structural Health
+Bốn đường MA thiếu đồng thuận nghiêm trọng. MA20 (36.0%) tuy cao hơn MA252 (17.6%) nhưng vẫn ở mức thấp tuyệt đối, tạo ra **phân kỳ (divergence)**: xung lực ngắn hạn có vẻ nhỉnh hơn nhưng nền tảng dài hạn vô cùng yếu. Không có tín hiệu Bull Trap (MA20 không quá mua) cũng không phải Bear Trap (MA20 chưa quá bán). Đây là môi trường **không ổn định**, nơi những pha hồi phục ngắn dễ trở thành bẫy tăng giá trong xu hướng giảm chính. Nhìn chung, cấu trúc thị trường mang tính giảm giá mạnh.
+
+## 3. Money Flow Leadership
+- **Dẫn dắt ngắn hạn (Top vol MA20):** Đa phần là các mã nông nghiệp – thực phẩm (AAA, AGG, BAF) và chứng khoán (ASP). Hỗn hợp giữa phòng thủ (nông nghiệp) và đầu cơ.
+- **Dẫn dắt dài hạn (Top vol MA252):** Xuất hiện rõ các mã ngân hàng (ABB), năng lượng (BSR), phân bón (BFC), xây dựng hạ tầng (C32, C69, CDC). Điểm trùng lặp duy nhất với nhóm ngắn hạn là **AFX** (nông nghiệp) và **ASP** (chứng khoán).
+- Dòng tiền thông minh (smart money) chưa nghiêng hẳn về phòng thủ hay tấn công; phân bổ dàn trải, không có ngành dẫn dắt rõ rệt. Sự hiện diện yếu ớt của các bluechip trụ cột cho thấy dòng tiền lớn vẫn đứng ngoài.
+
+## 4. Verdict
+- **Chiến lược:** Phòng thủ, ưu tiên nắm giữ tiền mặt. Không phù hợp để trend-follow (thiếu xu hướng), cũng không nên lướt sóng T+ mean-reversion vì chưa có tín hiệu quá bán rõ rệt.  
+- **Đòn bẩy:** **0% margin.** MA252 < 70% kèm phân kỳ nghiêm trọng, việc sử dụng margin là cực kỳ rủi ro.  
+- **Hành động:** **WAIT FOR CONFIRMATION** – Chờ đợi tín hiệu breadth cải thiện đồng bộ, ít nhất MA60 vượt lại trên 30% hoặc MA20 bứt phá trên 50% trước khi xem xét giải ngân trở lại.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 36.0,
+  "ma60_pct": 19.3,
+  "ma125_pct": 15.8,
+  "ma252_pct": 17.6,
+  "regime": "divergence",
+  "leadership_sector": "mixed",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 36.0,
+    "breadth_ma60_pct": 19.294117647058822,
+    "breadth_ma125_pct": 15.764705882352942,
+    "breadth_ma252_pct": 17.647058823529413,
+    "above_ma20_count": 153,
+    "above_ma60_count": 82,
+    "above_ma125_count": 67,
+    "above_ma252_count": 75,
+    "breadth_universe_size": 425,
+    "snapshot_date": "04/08/2026"
+  }
+}
+```
