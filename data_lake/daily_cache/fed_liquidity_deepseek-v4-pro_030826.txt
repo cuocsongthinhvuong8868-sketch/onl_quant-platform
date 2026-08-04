@@ -1,0 +1,62 @@
+## 1. Mechanical Decomposition
+Net Liquidity tuần này đạt 5,824.8 tỷ USD, giảm mạnh 92.5 tỷ USD so với tuần trước (Impulse = -92.5 tỷ).  
+- **RRP (Reverse Repo)** chỉ còn 2.6 tỷ USD, gần như biến mất khỏi hệ thống — không còn đóng vai trò hấp thụ/phân phối thanh khoản đáng kể.  
+- **TGA** ở mức 910.8 tỷ USD, cao hơn nhiều so với mục tiêu thận trọng (~700 tỷ USD), cho thấy Kho bạc đang tích lũy tiền mặt (hút thanh khoản).  
+- **WALCL** (bảng cân đối Fed) nhiều khả năng tiếp tục giảm theo lộ trình QT (thắt chặt định lượng), rút ròng tài sản khỏi hệ thống ngân hàng.  
+
+=> Nhân tố chính kéo Net Liquidity đi xuống: QT khiến WALCL thu hẹp, cộng thêm TGA tăng lên hút thêm dự trữ ngân hàng. RRP cạn kiệt khiến mọi biến động thanh khoản giờ đây tác động trực tiếp lên dự trữ.
+
+## 2. Cycle Positioning
+- **Regime hiện tại: QT_active** – Fed vẫn đang rút thanh khoản, chưa có dấu hiệu dừng hoặc đảo chiều.  
+- **RRP đã cạn (< 3 tỷ USD)** – vùng đệm không còn, nghĩa là các đợt hút thanh khoản tiếp theo từ QT hoặc TGA sẽ đánh thẳng vào bank reserves, khiến điều kiện tài chính thắt chặt hơn.  
+- **TGA tích lũy**: mức 910 tỷ USD cho thấy Kho bạc đang tái xây dựng đệm tiền mặt, đây là tín hiệu hút ròng trong ngắn hạn.  
+- So với lịch sử: Net Liquidity 5,825 tỷ USD thấp hơn đỉnh 2022 (~6.5-6.6 tỷ USD) nhưng vẫn cao hơn đáy giữa 2024 (~5.4-5.5 tỷ USD). Thanh khoản đang trong xu hướng giảm dần từ mức trung bình.
+
+## 3. Signal Strength
+- Tín hiệu hiện tại: **CUT** – cả Impulse tuần và EMA(4) đều âm, Z-Score -1.35 nằm dưới ngưỡng -1σ, thỏa mãn đồng thời hai điều kiện.  
+- Cường độ ở mức **cận biên** (-1.35σ), chưa phải cực đoan (< -2σ), nhưng đủ mạnh để xác nhận xu hướng rút thanh khoản có ý nghĩa thống kê.  
+- Impulse EMA(4) -39.6 tỷ USD khớp hoàn toàn với tín hiệu CUT, không có phân kỳ. Tín hiệu đáng tin cậy trong bối cảnh hiện tại.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+- **US Equities (SPX/NDX):** Bias tiêu cực. Thanh khoản rút khiến điều kiện tài chính thắt chặt, định giá cao dễ bị áp lực, đặc biệt với cổ phiếu công nghệ/vốn hóa lớn.  
+- **DXY:** Tăng nhẹ (USD mạnh lên) do nguồn cung USD thu hẹp tương đối, hỗ trợ bởi TGA hút tiền.  
+- **Gold/Crypto:** Áp lực giảm ngắn hạn. Vàng chịu sức ép từ USD mạnh và lợi suất thực tăng; crypto hoạt động như tài sản rủi ro, nhạy với thanh khoản toàn cầu.  
+- **VN-Index (lag 4-8 tuần):** Bias tiêu cực. Kênh truyền dẫn: Fed liquidity ↓ → DXY ↑ → áp lực lên VND và dòng vốn ngoại vào thị trường chứng khoán Việt Nam. Tương quan lịch sử dương 0.25-0.35 với độ trễ 1 tháng cho thấy khả năng điều chỉnh hoặc ít nhất hạn chế đà tăng của VN-Index trong 1-2 tháng tới.
+
+## 5. Risk Factors (signal có thể sai vì)
+- **RRP cạn kiệt:** Khi RRP gần zero, tín hiệu CUT từ mô hình Z-Score có thể yếu đi vì kênh bơm từ RRP không còn; thanh khoản chỉ còn phụ thuộc vào QT và TGA, độ nhiễu tăng.  
+- **TGA spike không theo mùa:** Đây là cuối tháng 7, không phải mùa thuế (tháng 4/6/9/12), nên động thái tăng TGA có thể là hành vi tạm thời của Kho bạc, có thể đảo chiều và bơm trả lại thanh khoản trong vài tuần tới.  
+- **Fed buyback đặc biệt/emergency facility:** Nếu xuất hiện cú sốc thị trường bắt buộc Fed can thiệp, QT có thể bị tạm dừng đột ngột, đảo ngược hoàn toàn tín hiệu.
+
+## 6. KẾT LUẬN
+Regime QT_active đang chi phối, thanh khoản tiếp tục rút ròng với xác nhận từ tín hiệu CUT. Triển vọng 2-4 tuần cho tài sản rủi ro (US, crypto, EM, VN-Index) nghiêng về tiêu cực, cần theo dõi hành vi TGA và phản ứng của Fed nếu dự trữ ngân hàng giảm quá nhanh.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5824.8,
+  "signal": "CUT",
+  "z_score": -1.35,
+  "regime": "QT_active",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5824838.0,
+    "fed_liquidity_impulse": -92541.0,
+    "fed_liquidity_impulse_ema": -39563.3087477442,
+    "fed_liquidity_zscore": -1.346817245956799,
+    "signal": "CUT",
+    "walcl": 6738190.0,
+    "wtregen": 910776.0,
+    "rrpontsyd": 2576.0
+  }
+}
+```

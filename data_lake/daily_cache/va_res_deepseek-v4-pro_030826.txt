@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- Stress Index (Module B): **0.00%** – không ghi nhận áp lực lây lan real-time trên rổ VN30.
+- Số mã thủng VaR 95%: **0/30** – hoàn toàn không có breach, hệ số rủi ro mô hình không bị xuyên thủng.
+- Complacency Index (Module C): **5.61%** – rất thấp so với ngưỡng cảnh báo 80%, chỉ 6/107 mã có spread bị nén đáng kể (VIC, BMP, LPB dẫn đầu).
+
+## 2. Contagion Assessment (Module B)
+VN30 Stress ở mức 0.00% cho thấy **không có dấu hiệu lây lan hệ thống**. Việc không mã nào thủng VaR 95% phản ánh một ngày trading mà biến động cực đoan chưa xuất hiện trên các cổ phiếu vốn hóa lớn. Do không có breach nào, danh sách “Top 3 crash” trống → không có sự cố cá biệt cũng như đầu sóng systemic nào đáng quan ngại trong phiên này.
+
+## 3. Complacency Assessment (Module C)
+Complacency thấp (5.61%) **chỉ có một ý nghĩa duy nhất**: thị trường không đang ở chế độ “ngủ quên” với spread bị nén trên diện rộng. Nó **không** đồng nghĩa thị trường vận hành ổn định hay an toàn. Thực tế, một thị trường có thể đang hoảng loạn hoặc uptrend mạnh cũng cho Complacency thấp do spread giãn rộng.  
+Trong bối cảnh hôm nay, kết hợp với Stress Index bằng 0, bức tranh hiện tại là: không có căng thẳng lây lan, cũng không có sự tự mãn định giá sai rủi ro tập thể. Tuy nhiên, cần tránh kết luận “thị trường bình thường” – đây chỉ là khoảnh khắc tạm thời không có tín hiệu bất thường từ hai mô-đun, các chế độ rủi ro khác (thanh khoản, vĩ mô) vẫn có thể tiềm ẩn.
+
+## 4. Stock-Level Risk Calls
+- **Top 3 Crash**: không có (danh sách rỗng). Không có khuyến nghị bán/giảm tỷ trọng khẩn cấp từ Module B.  
+- **Top 3 Mispriced (VIC, BMP, LPB)**: Spread của ba mã này bị nén chặt nhất thị trường, dù mức độ tổng thể thấp. Đây là những cổ phiếu đáng theo dõi vì tiềm ẩn định giá sai rủi ro cục bộ – nếu spread tiếp tục hẹp mà vol giảm, có thể hình thành “túi” complacency riêng lẻ. Cảnh báo mang tính giám sát hơn là hành động ngay. Không đưa ra mức giá tuyệt đối; nếu quản trị vị thế, có thể tham chiếu stop-loss theo phần trăm từ giá hiện tại hoặc việc phá vỡ MA20/MA50 trên khung ngày.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.61,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=0.00% (0/30); complacency=5.61% (6/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 0.0,
+    "vares_complacency_pct": 5.607476635514018,
+    "vares_breach_count": 0,
+    "vares_mispriced_count": 6,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

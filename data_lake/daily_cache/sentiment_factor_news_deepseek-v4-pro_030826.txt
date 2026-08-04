@@ -1,0 +1,76 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái news sentiment hiện tại (có guardrail P_conf)**  
+- **Khung 1 ngày (03/08/2026):** `strong_risk_on` – **Khẳng định chắc chắn** (P_conf = 100%, >85%). Tâm lý rủi ro áp đảo trong phiên, xác suất sentiment vĩ mô dương đạt 100%, khoảng tin cậy 90% hoàn toàn trên 0 (+0.321 đến +1.189).  
+- **Khung 7 ngày:** `strong_risk_on` – **Khẳng định chắc chắn** (P_conf = 100%). Sentiment trung bình rất cao (+1.08), biên độ hẹp và ổn định.  
+- **Khung 30 ngày:** `strong_risk_on` – **Khẳng định chắc chắn** (P_conf = 100%). Xu hướng risk-on bền vững trong tháng, mean +0.71, CI hẹp (+0.63 đến +0.79).
+
+**2. Các kênh dẫn dắt risk-on/risk-off mạnh nhất**  
+- **Kéo risk-on:**  
+  - `fx_external` (P_conf = 100% ở 7d, 30d; 90% ở 1d): Tỷ giá trung tâm tăng liên tục, phản ánh dòng vốn và niềm tin vào VND.  
+  - `liquidity` (P_conf = 100% ở 1d, 7d): NHNN bơm ròng OMO quy mô lớn, thanh khoản dồi dào.  
+  - `monetary_policy` (P_conf = 100% ở 7d, 30d): Lãi suất điều hành ổn định, không gây sốc.  
+  - `earnings` (P_conf = 100% ở 1d, 7d, 30d): Kỳ vọng lợi nhuận tích cực.  
+- **Kéo risk-off:**  
+  - `commodity` (P_conf = 100% ở 7d, 30d): Giá hàng hóa (thép, quặng sắt, heo hơi…) giảm sâu, cảnh báo nhu cầu toàn cầu yếu. Tuy nhiên, áp lực này bị lấn át bởi các yếu tố nội tại.
+
+**3. Các drivers quan trọng (trích từ input)**  
+**Tích cực:**  
+- NHNN bơm ròng 15.067 tỷ đồng qua OMO phiên 03/08 (liquidity, score +0.713) – duy trì thanh khoản dồi dào.  
+- Tỷ giá trung tâm 03/08 tăng 20 đồng lên 25.358 (fx_external, +0.214) – tín hiệu dòng vốn ngoại ổn định.  
+- Lợi suất TPCP đi ngang (credit_stress, +0.346) – không có căng thẳng tín dụng.  
+- Lãi suất ON 31/07 tăng 497 bps lên 5.72% (monetary_policy, +0.676) – được diễn giải như chính sách kiểm soát lạm phát chứ không thắt chặt đột ngột.  
+- Tỷ giá 28/07 tăng 13 đồng (fx_external, +1.464) – củng cố niềm tin vào VND.
+
+**Tiêu cực:**  
+- Giá heo hơi Việt Nam giảm về đáy 6 tháng (62.500 đ/kg) (commodity, -1.301).  
+- Giá quặng sắt Trung Quốc thủng đáy 1 năm (699.44 CNY/tấn) (commodity, -1.031).  
+- Giá thép HRC, cotton, đường đồng loạt giảm sâu – phản ánh suy yếu cầu toàn cầu.  
+(Lưu ý: không xuất hiện driver tiêu cực nào ở các kênh tài chính thuần tuý)
+
+**4. Kết luận tác động đến AI CIO**  
+- Tín hiệu news sentiment đồng thuận mạnh mẽ **hỗ trợ (supports)** trạng thái risk-on hiện tại trên cả ba khung thời gian.  
+- Tuy nhiên, cần xác nhận từ macro layer (growth, inflation, fiscal_public_investment đều có P_conf = 50%, tức là chưa có tín hiệu rõ ràng). Market-internal tools nên được dùng để kiểm tra sự đồng pha.  
+- Đây **không phải tín hiệu phân bổ cứng**, mà là lớp phủ sentiment nhanh, gợi ý duy trì thiên hướng tích cực ngắn hạn.
+
+**5. Cảnh báo (caveat)**  
+- **Nguồn social chiếm tỉ trọng đáng kể:** 1d có 56/123 (45.5%), 7d có 434/863 (50.3%), 30d có 1740/4452 (39.1%) là `mozyfin_social`. Đây là bằng chứng social/opinion có độ tin cậy thấp hơn so với dữ liệu WiData, cần chiết khấu một phần cường độ tín hiệu. Tuy không chiếm áp đảo, nhưng rủi ro thiên lệch tâm lý đám đông vẫn hiện hữu.  
+- Dữ liệu được tạo lúc 17:50 ngày 03/08/2026, không bị trễ.  
+- Headline noise: các driver được chọn từ nguồn định lượng, nhưng tín hiệu kênh `growth`, `inflation` trung tính có thể khiến bức tranh vĩ mô chưa đầy đủ. Cần theo dõi thêm dữ liệu thực.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.7551,
+    "news_confidence_1d": 0.9979,
+    "news_count_1d": 123,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 67,
+      "mozyfin_social": 56
+    },
+    "news_macro_composite_7d": 1.0807,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 863,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 429,
+      "mozyfin_social": 434
+    },
+    "news_macro_composite_30d": 0.7097,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4452,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1000,
+      "mozyfin": 1712,
+      "mozyfin_social": 1740
+    },
+    "news_macro_composite": 0.7551,
+    "news_confidence": 0.9979,
+    "news_count": 123
+  }
+}
+```
