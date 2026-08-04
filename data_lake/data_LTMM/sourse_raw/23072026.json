@@ -2659,89 +2659,269 @@
       "notes": "Transmission Efficiency index: rolling 60-day beta of delta MLI vs delta FLI.",
       "state": "breakdown",
       "quality_state": "high"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FLI",
+      "index_value": -0.0359622658842561,
+      "quality_score": 0.7620370370370373,
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.9885708286407932, \"base_weight\": 0.12, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 5, \"expired\": false}, {\"table\": \"gold_imf_reserves\", \"latest_observation_date\": \"2025-12-31\", \"normalized_driver\": 0.7959505395356603, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 203, \"expired\": false}, {\"table\": \"gold_sbv_interbank\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.1109775421839276, \"base_weight\": 0.15, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.7724471519208344, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_usdvnd_deviation_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.9886227982354804, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_term_interbank_volume_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.180208234855003, \"base_weight\": 0.06, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.2469056439628437, \"base_weight\": 0.04, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_omo_net_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 1.1960114780033144, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_overnight_lending_rate\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 5.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 5.0, \"methodology\": \"sbv_overnight_on_lending_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_m2\", \"latest_observation_date\": \"2026-05-01\", \"normalized_driver\": -1.2037198323437996, \"base_weight\": 0.08, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 82, \"expired\": false}, {\"table\": \"gold_sbv_required_reserve_ratios\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.0, \"base_weight\": 0.08, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 3.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 3.0, \"methodology\": \"sbv_required_reserve_other_banks_vnd_below_12m_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_bop_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.071097248073596, \"base_weight\": 0.07, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_banking",
+      "index_value": -0.2064880543290993,
+      "quality_score": 0.6080000000000001,
+      "components_used": "[{\"table\": \"gold_deposit_rate_dispersion_daily\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": -0.183370996153051, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_deposit_hiking_ratio_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": -0.7959171428571428, \"base_weight\": 0.1, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 3, \"expired\": false, \"raw_driver_value\": 0.071429, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 0.35}, {\"table\": \"gold_casa_stress_nowcast_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": 0.8853265210875638, \"base_weight\": 0.12, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 3, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.7724471519208344, \"base_weight\": 0.13, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_bank_ldr\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.943736439766989, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 22, \"expired\": false}, {\"table\": \"gold_bank_deposit_average\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": 1.328645126766622, \"base_weight\": 0.07, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_bank_solvency\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 1.3328519237367014, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 22, \"expired\": false}, {\"table\": \"gold_bank_credit_liquidity\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.2556278456223835, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 22, \"expired\": false}, {\"table\": \"gold_casa_velocity_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.4247644936936454, \"base_weight\": 0.13, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_collateral",
+      "index_value": 0.4143469961453973,
+      "quality_score": 0.57,
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.4, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 12, \"expired\": false}, {\"table\": \"gold_bond_yields\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 1.0695666013291754, \"base_weight\": 0.3, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_bank_asset_quality\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.3850045564118189, \"base_weight\": 0.3, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_counterparty",
+      "index_value": -0.5833320900005898,
+      "quality_score": 0.55,
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.45, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 12, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": -1.1186164833215162, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 113, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_intermediary",
+      "index_value": 0.6101761153544267,
+      "quality_score": 0.5,
+      "components_used": "[{\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.7760237019679306, \"base_weight\": 0.25, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.25, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 113, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}, {\"table\": \"gold_margin_demand_pressure_nowcast_weekly\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.336921248499911, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"margin_demand_pressure_nowcast_weekly\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false, \"methodology\": \"margin_demand_pressure_nowcast_weekly_v1_active_fallback\"}, {\"table\": \"gold_margin_call_wave_proxy_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 2.5905267799742027, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_ctck_margin\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 2.0289836994754675, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 113, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_regulatory",
+      "index_value": 0.1144461538461538,
+      "quality_score": 0.5,
+      "components_used": "[{\"table\": \"gold_regulatory_event_exposure\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.11444615384615384, \"base_weight\": 1.0, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.07439, \"fallback_mode\": \"zero_to_threshold\", \"fallback_threshold\": 0.65, \"methodology\": \"event_exposure_alert_gate_scaled_fallback_v1\", \"status\": \"provisional_event_exposure_scaled_fallback\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "FRI_risk",
+      "index_value": 0.1130792979629589,
+      "quality_score": 0.6500000000000001,
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": 0.8496763125577298, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": -1.1186164833215162, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_wedge_risk_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 1.8283103832478511, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.1585368368635781, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"vn30_realized_vol_20d\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.1585368368635781, \"fallback_mode\": \"threshold_centered\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "MLI",
+      "index_value": -0.1940791161315211,
+      "quality_score": 0.6080000000000001,
+      "components_used": "[{\"table\": \"gold_vn30_volume\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -2.802831056802732, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_market_breadth_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 1.5774462272904266, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"market_breadth_z\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 0.2469056439628437, \"base_weight\": 0.12, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_vn30f_basis_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -1.897410091134768, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_atc_sell_pressure_proxy_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 5.53848666631719, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": 0.8496763125577298, \"base_weight\": 0.04, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"mli_compressed_vol_flag\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.0, \"fallback_mode\": \"identity\"}, {\"table\": \"gold_fund_system_cash_weight\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.4341867810319602, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 22, \"expired\": false}, {\"table\": \"gold_fund_system_aum\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 0.073837932831906, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 22, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-22",
+      "index_name": "TE",
+      "index_value": -0.5615257577688999,
+      "quality_score": 1.0,
+      "components_used": "[{\"table\": \"gold_fli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.0359622658842561, \"quality_multiplier\": 0.7620370370370373, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_mli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.1940791161315211, \"quality_multiplier\": 0.6080000000000001, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}]",
+      "notes": "Transmission Efficiency index: rolling 60-day beta of delta MLI vs delta FLI.",
+      "state": "breakdown",
+      "quality_state": "high"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FLI",
+      "index_value": -0.1682128956734451,
+      "quality_score": 0.7620370370370373,
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.9885708286407932, \"base_weight\": 0.12, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 6, \"expired\": false}, {\"table\": \"gold_imf_reserves\", \"latest_observation_date\": \"2025-12-31\", \"normalized_driver\": 0.7959505395356603, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 204, \"expired\": false}, {\"table\": \"gold_sbv_interbank\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -1.2113120562907205, \"base_weight\": 0.15, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.5364002244167582, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_usdvnd_deviation_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.9907523419671632, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_term_interbank_volume_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.2611420639930424, \"base_weight\": 0.06, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1342538087939718, \"base_weight\": 0.04, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_omo_net_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0716597819267899, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_overnight_lending_rate\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 5.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 5.0, \"methodology\": \"sbv_overnight_on_lending_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_m2\", \"latest_observation_date\": \"2026-05-01\", \"normalized_driver\": -1.2037198323437996, \"base_weight\": 0.08, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 83, \"expired\": false}, {\"table\": \"gold_sbv_required_reserve_ratios\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0, \"base_weight\": 0.08, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 3.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 3.0, \"methodology\": \"sbv_required_reserve_other_banks_vnd_below_12m_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_bop_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.071097248073596, \"base_weight\": 0.07, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_banking",
+      "index_value": -0.1912862929225494,
+      "quality_score": 0.6080000000000001,
+      "components_used": "[{\"table\": \"gold_deposit_rate_dispersion_daily\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": -0.183370996153051, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 5, \"expired\": false}, {\"table\": \"gold_deposit_hiking_ratio_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": -0.7959171428571428, \"base_weight\": 0.1, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 4, \"expired\": false, \"raw_driver_value\": 0.071429, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 0.35}, {\"table\": \"gold_casa_stress_nowcast_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": 0.8853265210875638, \"base_weight\": 0.12, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.5364002244167582, \"base_weight\": 0.13, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_bank_ldr\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.9407417295945637, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_bank_deposit_average\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": 1.328645126766622, \"base_weight\": 0.07, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 5, \"expired\": false}, {\"table\": \"gold_bank_solvency\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 1.3274720408942604, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_bank_credit_liquidity\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.2527821634208254, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_casa_velocity_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.4247644936936454, \"base_weight\": 0.13, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_collateral",
+      "index_value": 0.4056209664465376,
+      "quality_score": 0.57,
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.4, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 13, \"expired\": false}, {\"table\": \"gold_bond_yields\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 1.052987144901342, \"base_weight\": 0.3, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_bank_asset_quality\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.3850045564118189, \"base_weight\": 0.3, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_counterparty",
+      "index_value": -0.5694181082361726,
+      "quality_score": 0.55,
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.45, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 13, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.0880057234397982, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 114, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_intermediary",
+      "index_value": 0.4568246916145133,
+      "quality_score": 0.5,
+      "components_used": "[{\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.7760237019679306, \"base_weight\": 0.25, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.25, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 114, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}, {\"table\": \"gold_margin_demand_pressure_nowcast_weekly\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0732800442138873, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"margin_demand_pressure_nowcast_weekly\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false, \"methodology\": \"margin_demand_pressure_nowcast_weekly_v1_active_fallback\"}, {\"table\": \"gold_margin_call_wave_proxy_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.4301315240713488, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_ctck_margin\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 2.0289836994754675, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_regulatory",
+      "index_value": 0.1664338461538461,
+      "quality_score": 0.5,
+      "components_used": "[{\"table\": \"gold_regulatory_event_exposure\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.16643384615384615, \"base_weight\": 1.0, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.108182, \"fallback_mode\": \"zero_to_threshold\", \"fallback_threshold\": 0.65, \"methodology\": \"event_exposure_alert_gate_scaled_fallback_v1\", \"status\": \"provisional_event_exposure_scaled_fallback\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "warning"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "FRI_risk",
+      "index_value": -0.190281911864567,
+      "quality_score": 0.6500000000000001,
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.252010662232223, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.0880057234397982, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_wedge_risk_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 2.9962799381520897, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1669717376121193, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"vn30_realized_vol_20d\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.1669717376121193, \"fallback_mode\": \"threshold_centered\"}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "neutral",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "MLI",
+      "index_value": -1.025107829066971,
+      "quality_score": 0.6080000000000001,
+      "components_used": "[{\"table\": \"gold_vn30_volume\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -2.1365933227562133, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_market_breadth_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.979047415534529, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"market_breadth_z\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1342538087939718, \"base_weight\": 0.12, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_vn30f_basis_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.8704475260837834, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_atc_sell_pressure_proxy_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.5248430613758827, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.252010662232223, \"base_weight\": 0.04, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"mli_compressed_vol_flag\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.0, \"fallback_mode\": \"identity\"}, {\"table\": \"gold_fund_system_cash_weight\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.4341867810319602, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_fund_system_aum\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 0.073837932831906, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}]",
+      "notes": "Components without 30 observations initialize at neutral zero; quality_score preserves their thin-data discount.",
+      "state": "easy",
+      "quality_state": "usable"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "index_name": "TE",
+      "index_value": -0.4432766936992999,
+      "quality_score": 1.0,
+      "components_used": "[{\"table\": \"gold_fli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.1682128956734451, \"quality_multiplier\": 0.7620370370370373, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_mli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -1.025107829066971, \"quality_multiplier\": 0.6080000000000001, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}]",
+      "notes": "Transmission Efficiency index: rolling 60-day beta of delta MLI vs delta FLI.",
+      "state": "breakdown",
+      "quality_state": "high"
     }
   ],
   "latest_indices": [
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FLI",
-      "index_value": -0.1179147567375654,
+      "index_value": -0.1682128956734451,
       "state": "neutral",
       "quality_score": 0.7620370370370373,
       "quality_state": "usable",
-      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.9885708286407932, \"base_weight\": 0.12, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_imf_reserves\", \"latest_observation_date\": \"2025-12-31\", \"normalized_driver\": 0.7959505395356603, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 202, \"expired\": false}, {\"table\": \"gold_sbv_interbank\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": -0.9721546349050268, \"base_weight\": 0.15, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": -1.03353331396125, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_usdvnd_deviation_daily\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": -1.1082190420824307, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_term_interbank_volume_daily\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.7152882730173261, \"base_weight\": 0.06, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": -0.2052060482840656, \"base_weight\": 0.04, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_sbv_omo_net_daily\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": 0.2127665100613988, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_sbv_overnight_lending_rate\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 5.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 5.0, \"methodology\": \"sbv_overnight_on_lending_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_m2\", \"latest_observation_date\": \"2026-04-01\", \"normalized_driver\": -1.0934985007200342, \"base_weight\": 0.08, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 111, \"expired\": false}, {\"table\": \"gold_sbv_required_reserve_ratios\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.0, \"base_weight\": 0.08, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 3.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 3.0, \"methodology\": \"sbv_required_reserve_other_banks_vnd_below_12m_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_bop_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.071097248073596, \"base_weight\": 0.07, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.9885708286407932, \"base_weight\": 0.12, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 6, \"expired\": false}, {\"table\": \"gold_imf_reserves\", \"latest_observation_date\": \"2025-12-31\", \"normalized_driver\": 0.7959505395356603, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 204, \"expired\": false}, {\"table\": \"gold_sbv_interbank\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -1.2113120562907205, \"base_weight\": 0.15, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.5364002244167582, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_usdvnd_deviation_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.9907523419671632, \"base_weight\": 0.1, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_term_interbank_volume_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.2611420639930424, \"base_weight\": 0.06, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1342538087939718, \"base_weight\": 0.04, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_omo_net_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0716597819267899, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_sbv_overnight_lending_rate\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 5.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 5.0, \"methodology\": \"sbv_overnight_on_lending_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_m2\", \"latest_observation_date\": \"2026-05-01\", \"normalized_driver\": -1.2037198323437996, \"base_weight\": 0.08, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 83, \"expired\": false}, {\"table\": \"gold_sbv_required_reserve_ratios\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0, \"base_weight\": 0.08, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 3.0, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 3.0, \"methodology\": \"sbv_required_reserve_other_banks_vnd_below_12m_raw_threshold_fallback_v1\", \"status\": \"flat_policy_series_raw_fallback_until_zscore_variation\"}, {\"table\": \"gold_sbv_bop_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.071097248073596, \"base_weight\": 0.07, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_banking",
-      "index_value": -0.223235357486297,
+      "index_value": -0.1912862929225494,
       "state": "neutral",
       "quality_score": 0.6080000000000001,
       "quality_state": "usable",
-      "components_used": "[{\"table\": \"gold_deposit_rate_dispersion_daily\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": -0.183370996153051, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 3, \"expired\": false}, {\"table\": \"gold_deposit_hiking_ratio_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": -0.7959171428571428, \"base_weight\": 0.1, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 2, \"expired\": false, \"raw_driver_value\": 0.071429, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 0.35}, {\"table\": \"gold_casa_stress_nowcast_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": 0.8853265210875638, \"base_weight\": 0.12, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": -1.03353331396125, \"base_weight\": 0.13, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_bank_ldr\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.943736439766989, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 21, \"expired\": false}, {\"table\": \"gold_bank_deposit_average\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": 1.328645126766622, \"base_weight\": 0.07, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 3, \"expired\": false}, {\"table\": \"gold_bank_solvency\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 1.3328519237367014, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 21, \"expired\": false}, {\"table\": \"gold_bank_credit_liquidity\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.2556278456223835, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 21, \"expired\": false}, {\"table\": \"gold_casa_velocity_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.4247644936936454, \"base_weight\": 0.13, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_deposit_rate_dispersion_daily\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": -0.183370996153051, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 5, \"expired\": false}, {\"table\": \"gold_deposit_hiking_ratio_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": -0.7959171428571428, \"base_weight\": 0.1, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 4, \"expired\": false, \"raw_driver_value\": 0.071429, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 0.35}, {\"table\": \"gold_casa_stress_nowcast_weekly\", \"latest_observation_date\": \"2026-07-19\", \"normalized_driver\": 0.8853265210875638, \"base_weight\": 0.12, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_iltp_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": -0.5364002244167582, \"base_weight\": 0.13, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_bank_ldr\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.9407417295945637, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_bank_deposit_average\", \"latest_observation_date\": \"2026-07-18\", \"normalized_driver\": 1.328645126766622, \"base_weight\": 0.07, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 5, \"expired\": false}, {\"table\": \"gold_bank_solvency\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 1.3274720408942604, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_bank_credit_liquidity\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.2527821634208254, \"base_weight\": 0.1, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_casa_velocity_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.4247644936936454, \"base_weight\": 0.13, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_collateral",
-      "index_value": 0.4165690716991484,
+      "index_value": 0.4056209664465376,
       "state": "neutral",
       "quality_score": 0.57,
       "quality_state": "warning",
-      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.4, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 11, \"expired\": false}, {\"table\": \"gold_bond_yields\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 1.0737885448813025, \"base_weight\": 0.3, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_bank_asset_quality\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.3850045564118189, \"base_weight\": 0.3, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.4, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 13, \"expired\": false}, {\"table\": \"gold_bond_yields\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 1.052987144901342, \"base_weight\": 0.3, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_bank_asset_quality\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.3850045564118189, \"base_weight\": 0.3, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_counterparty",
-      "index_value": -0.2894864855730228,
+      "index_value": -0.5694181082361726,
       "state": "neutral",
       "quality_score": 0.55,
       "quality_state": "warning",
-      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.45, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 11, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": -0.4721561535808688, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 112, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}]"
+      "components_used": "[{\"table\": \"gold_lacss_monthly\", \"latest_observation_date\": \"2026-07-10\", \"normalized_driver\": -0.2245125761175277, \"base_weight\": 0.45, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 13, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.0880057234397982, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 114, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_intermediary",
-      "index_value": 0.1859438553992765,
+      "index_value": 0.4568246916145133,
       "state": "neutral",
       "quality_score": 0.5,
       "quality_state": "warning",
-      "components_used": "[{\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.7760237019679306, \"base_weight\": 0.25, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.25, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 112, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}, {\"table\": \"gold_margin_demand_pressure_nowcast_weekly\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.842817400759305, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"margin_demand_pressure_nowcast_weekly\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false, \"methodology\": \"margin_demand_pressure_nowcast_weekly_v1_active_fallback\"}, {\"table\": \"gold_margin_call_wave_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.2104029120561437, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_ctck_margin\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 2.0289836994754675, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 112, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.7760237019679306, \"base_weight\": 0.25, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_capital_proxy\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": -0.1781512275971633, \"base_weight\": 0.15, \"quality_multiplier\": 0.8, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false, \"methodology\": \"equity_loans_proxy_1_1\", \"status\": \"active\"}, {\"table\": \"gold_ctck_loans_equity_pressure_quarterly\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 0.23352925372401012, \"base_weight\": 0.25, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"ctck_loans_equity_pressure_proxy\", \"value_fallback_used\": true, \"age_days\": 114, \"expired\": false, \"raw_driver_value\": 2.158676194017018, \"fallback_mode\": \"threshold_centered\", \"fallback_threshold\": 1.75, \"methodology\": \"max_loans_div_equity_across_usable_vci_universe_v1\"}, {\"table\": \"gold_margin_demand_pressure_nowcast_weekly\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.0732800442138873, \"base_weight\": 0.15, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"margin_demand_pressure_nowcast_weekly\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false, \"methodology\": \"margin_demand_pressure_nowcast_weekly_v1_active_fallback\"}, {\"table\": \"gold_margin_call_wave_proxy_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.4301315240713488, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_ctck_margin\", \"latest_observation_date\": \"2026-03-31\", \"normalized_driver\": 2.0289836994754675, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 114, \"expired\": false}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_regulatory",
-      "index_value": 0.1154030769230769,
+      "index_value": 0.1664338461538461,
       "state": "neutral",
       "quality_score": 0.5,
       "quality_state": "warning",
-      "components_used": "[{\"table\": \"gold_regulatory_event_exposure\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.11540307692307691, \"base_weight\": 1.0, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.075012, \"fallback_mode\": \"zero_to_threshold\", \"fallback_threshold\": 0.65, \"methodology\": \"event_exposure_alert_gate_scaled_fallback_v1\", \"status\": \"provisional_event_exposure_scaled_fallback\"}]"
+      "components_used": "[{\"table\": \"gold_regulatory_event_exposure\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.16643384615384615, \"base_weight\": 1.0, \"quality_multiplier\": 0.5, \"baseline_neutral_no_z\": false, \"driver_column\": \"raw_value\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.108182, \"fallback_mode\": \"zero_to_threshold\", \"fallback_threshold\": 0.65, \"methodology\": \"event_exposure_alert_gate_scaled_fallback_v1\", \"status\": \"provisional_event_exposure_scaled_fallback\"}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_risk",
-      "index_value": 0.3534088419279451,
+      "index_value": -0.190281911864567,
       "state": "neutral",
       "quality_score": 0.6500000000000001,
       "quality_state": "usable",
-      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.8997616505442578, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": -0.4721561535808688, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_wedge_risk_daily\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": 1.5496099627146815, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.1385337014875347, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"vn30_realized_vol_20d\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.1385337014875347, \"fallback_mode\": \"threshold_centered\"}]"
+      "components_used": "[{\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.252010662232223, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -1.0880057234397982, \"base_weight\": 0.25, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_wedge_risk_daily\", \"latest_observation_date\": \"2026-07-22\", \"normalized_driver\": 2.9962799381520897, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1669717376121193, \"base_weight\": 0.2, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"vn30_realized_vol_20d\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.1669717376121193, \"fallback_mode\": \"threshold_centered\"}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "MLI",
-      "index_value": 0.6063597220954582,
-      "state": "neutral",
+      "index_value": -1.025107829066971,
+      "state": "easy",
       "quality_score": 0.6080000000000001,
       "quality_state": "usable",
-      "components_used": "[{\"table\": \"gold_vn30_volume\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 2.309339923328172, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_market_breadth_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.5106007676200316, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"market_breadth_z\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-20\", \"normalized_driver\": -0.2052060482840656, \"base_weight\": 0.12, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 1, \"expired\": false}, {\"table\": \"gold_vn30f_basis_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.1326376523342329, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_atc_sell_pressure_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.5548431058440959, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-17\", \"normalized_driver\": 0.8997616505442578, \"base_weight\": 0.04, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 4, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"mli_compressed_vol_flag\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.0, \"fallback_mode\": \"identity\"}, {\"table\": \"gold_fund_system_cash_weight\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.4341867810319602, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 21, \"expired\": false}, {\"table\": \"gold_fund_system_aum\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 0.073837932831906, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 21, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_vn30_volume\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -2.1365933227562133, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_market_breadth_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.979047415534529, \"base_weight\": 0.2, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"market_breadth_z\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_foreign_flow_5d_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.1342538087939718, \"base_weight\": 0.12, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_vn30f_basis_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": 0.8704475260837834, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_atc_sell_pressure_proxy_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.5248430613758827, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_etf_discount_proxy_daily\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.7175251053394721, \"base_weight\": 0.08, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_fred_series\", \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.252010662232223, \"base_weight\": 0.04, \"quality_multiplier\": 1.0, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 2, \"expired\": false}, {\"table\": \"gold_mli_volatility_regime_daily\", \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.0, \"base_weight\": 0.1, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"mli_compressed_vol_flag\", \"value_fallback_used\": true, \"age_days\": 0, \"expired\": false, \"raw_driver_value\": 0.0, \"fallback_mode\": \"identity\"}, {\"table\": \"gold_fund_system_cash_weight\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": -1.4341867810319602, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}, {\"table\": \"gold_fund_system_aum\", \"latest_observation_date\": \"2026-06-30\", \"normalized_driver\": 0.073837932831906, \"base_weight\": 0.05, \"quality_multiplier\": 0.3, \"baseline_neutral_no_z\": false, \"driver_column\": \"z_score\", \"value_fallback_used\": false, \"age_days\": 23, \"expired\": false}]"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "TE",
-      "index_value": -0.487541474462085,
+      "index_value": -0.4432766936992999,
       "state": "breakdown",
       "quality_score": 1.0,
       "quality_state": "high",
-      "components_used": "[{\"table\": \"gold_fli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": -0.1179147567375654, \"quality_multiplier\": 0.7620370370370373, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_mli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-21\", \"normalized_driver\": 0.6063597220954582, \"quality_multiplier\": 0.6080000000000001, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}]"
+      "components_used": "[{\"table\": \"gold_fli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -0.1682128956734451, \"quality_multiplier\": 0.7620370370370373, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}, {\"table\": \"gold_mli_daily\", \"base_weight\": 0.5, \"driver_column\": \"index_value\", \"value_fallback_used\": false, \"latest_observation_date\": \"2026-07-23\", \"normalized_driver\": -1.025107829066971, \"quality_multiplier\": 0.6080000000000001, \"baseline_neutral_no_z\": false, \"age_days\": 0, \"expired\": false}]"
     }
   ],
   "components": [
@@ -2768,8 +2948,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_sbv_interbank",
-      "observation_date": "2026-07-17",
-      "normalized_driver": -0.9721546349050268,
+      "observation_date": "2026-07-22",
+      "normalized_driver": -1.2113120562907205,
       "base_weight": 0.15,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -2778,8 +2958,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_iltp_daily",
-      "observation_date": "2026-07-17",
-      "normalized_driver": -1.03353331396125,
+      "observation_date": "2026-07-22",
+      "normalized_driver": -0.5364002244167582,
       "base_weight": 0.08,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -2788,8 +2968,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_usdvnd_deviation_daily",
-      "observation_date": "2026-07-20",
-      "normalized_driver": -1.1082190420824307,
+      "observation_date": "2026-07-22",
+      "normalized_driver": -0.9907523419671632,
       "base_weight": 0.1,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -2798,8 +2978,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_term_interbank_volume_daily",
-      "observation_date": "2026-07-17",
-      "normalized_driver": 0.7152882730173261,
+      "observation_date": "2026-07-22",
+      "normalized_driver": -0.2611420639930424,
       "base_weight": 0.06,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -2808,8 +2988,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_foreign_flow_5d_daily",
-      "observation_date": "2026-07-20",
-      "normalized_driver": -0.2052060482840656,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.1342538087939718,
       "base_weight": 0.04,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -2818,8 +2998,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_sbv_omo_net_daily",
-      "observation_date": "2026-07-20",
-      "normalized_driver": 0.2127665100613988,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.0716597819267899,
       "base_weight": 0.1,
       "quality_multiplier": 0.8,
       "expired": false,
@@ -2828,7 +3008,7 @@
     {
       "index_name": "FLI",
       "source_table": "gold_sbv_overnight_lending_rate",
-      "observation_date": "2026-07-21",
+      "observation_date": "2026-07-23",
       "normalized_driver": 0.0,
       "base_weight": 0.1,
       "quality_multiplier": 0.8,
@@ -2838,8 +3018,8 @@
     {
       "index_name": "FLI",
       "source_table": "gold_sbv_m2",
-      "observation_date": "2026-04-01",
-      "normalized_driver": -1.0934985007200342,
+      "observation_date": "2026-05-01",
+      "normalized_driver": -1.2037198323437996,
       "base_weight": 0.08,
       "quality_multiplier": 0.5,
       "expired": false,
@@ -2848,7 +3028,7 @@
     {
       "index_name": "FLI",
       "source_table": "gold_sbv_required_reserve_ratios",
-      "observation_date": "2026-07-21",
+      "observation_date": "2026-07-23",
       "normalized_driver": 0.0,
       "base_weight": 0.08,
       "quality_multiplier": 0.8,
@@ -2898,8 +3078,8 @@
     {
       "index_name": "FRI_banking",
       "source_table": "gold_iltp_daily",
-      "observation_date": "2026-07-17",
-      "normalized_driver": -1.03353331396125,
+      "observation_date": "2026-07-22",
+      "normalized_driver": -0.5364002244167582,
       "base_weight": 0.13,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -2909,7 +3089,7 @@
       "index_name": "FRI_banking",
       "source_table": "gold_bank_ldr",
       "observation_date": "2026-06-30",
-      "normalized_driver": -1.943736439766989,
+      "normalized_driver": -1.9407417295945637,
       "base_weight": 0.1,
       "quality_multiplier": 0.8,
       "expired": false,
@@ -2929,7 +3109,7 @@
       "index_name": "FRI_banking",
       "source_table": "gold_bank_solvency",
       "observation_date": "2026-06-30",
-      "normalized_driver": 1.3328519237367014,
+      "normalized_driver": 1.3274720408942604,
       "base_weight": 0.1,
       "quality_multiplier": 0.8,
       "expired": false,
@@ -2939,7 +3119,7 @@
       "index_name": "FRI_banking",
       "source_table": "gold_bank_credit_liquidity",
       "observation_date": "2026-06-30",
-      "normalized_driver": -1.2556278456223835,
+      "normalized_driver": -1.2527821634208254,
       "base_weight": 0.1,
       "quality_multiplier": 0.8,
       "expired": false,
@@ -2968,8 +3148,8 @@
     {
       "index_name": "FRI_collateral",
       "source_table": "gold_bond_yields",
-      "observation_date": "2026-07-21",
-      "normalized_driver": 1.0737885448813025,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 1.052987144901342,
       "base_weight": 0.3,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -2998,8 +3178,8 @@
     {
       "index_name": "FRI_counterparty",
       "source_table": "gold_fred_series",
-      "observation_date": "2026-07-17",
-      "normalized_driver": -0.4721561535808688,
+      "observation_date": "2026-07-21",
+      "normalized_driver": -1.0880057234397982,
       "base_weight": 0.25,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3058,8 +3238,8 @@
     {
       "index_name": "FRI_intermediary",
       "source_table": "gold_margin_demand_pressure_nowcast_weekly",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -1.842817400759305,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.0732800442138873,
       "base_weight": 0.15,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3068,8 +3248,8 @@
     {
       "index_name": "FRI_intermediary",
       "source_table": "gold_margin_call_wave_proxy_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -1.2104029120561437,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.4301315240713488,
       "base_weight": 0.1,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3088,8 +3268,8 @@
     {
       "index_name": "FRI_regulatory",
       "source_table": "gold_regulatory_event_exposure",
-      "observation_date": "2026-07-21",
-      "normalized_driver": 0.11540307692307691,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.16643384615384615,
       "base_weight": 1.0,
       "quality_multiplier": 0.5,
       "expired": false,
@@ -3098,8 +3278,8 @@
     {
       "index_name": "FRI_risk",
       "source_table": "gold_fred_series",
-      "observation_date": "2026-07-17",
-      "normalized_driver": 0.8997616505442578,
+      "observation_date": "2026-07-21",
+      "normalized_driver": -0.252010662232223,
       "base_weight": 0.25,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3108,8 +3288,8 @@
     {
       "index_name": "FRI_risk",
       "source_table": "gold_fred_series",
-      "observation_date": "2026-07-17",
-      "normalized_driver": -0.4721561535808688,
+      "observation_date": "2026-07-21",
+      "normalized_driver": -1.0880057234397982,
       "base_weight": 0.25,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3118,8 +3298,8 @@
     {
       "index_name": "FRI_risk",
       "source_table": "gold_wedge_risk_daily",
-      "observation_date": "2026-07-20",
-      "normalized_driver": 1.5496099627146815,
+      "observation_date": "2026-07-22",
+      "normalized_driver": 2.9962799381520897,
       "base_weight": 0.2,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3138,8 +3318,8 @@
     {
       "index_name": "FRI_risk",
       "source_table": "gold_mli_volatility_regime_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": 0.1385337014875347,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.1669717376121193,
       "base_weight": 0.2,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3148,8 +3328,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_vn30_volume",
-      "observation_date": "2026-07-21",
-      "normalized_driver": 2.309339923328172,
+      "observation_date": "2026-07-23",
+      "normalized_driver": -2.1365933227562133,
       "base_weight": 0.2,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3158,8 +3338,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_market_breadth_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -0.5106007676200316,
+      "observation_date": "2026-07-23",
+      "normalized_driver": -0.979047415534529,
       "base_weight": 0.2,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3168,8 +3348,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_foreign_flow_5d_daily",
-      "observation_date": "2026-07-20",
-      "normalized_driver": -0.2052060482840656,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.1342538087939718,
       "base_weight": 0.12,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3178,8 +3358,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_vn30f_basis_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -0.1326376523342329,
+      "observation_date": "2026-07-23",
+      "normalized_driver": 0.8704475260837834,
       "base_weight": 0.08,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3188,8 +3368,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_atc_sell_pressure_proxy_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -0.5548431058440959,
+      "observation_date": "2026-07-23",
+      "normalized_driver": -0.5248430613758827,
       "base_weight": 0.08,
       "quality_multiplier": 0.3,
       "expired": false,
@@ -3208,8 +3388,8 @@
     {
       "index_name": "MLI",
       "source_table": "gold_fred_series",
-      "observation_date": "2026-07-17",
-      "normalized_driver": 0.8997616505442578,
+      "observation_date": "2026-07-21",
+      "normalized_driver": -0.252010662232223,
       "base_weight": 0.04,
       "quality_multiplier": 1.0,
       "expired": false,
@@ -3218,7 +3398,7 @@
     {
       "index_name": "MLI",
       "source_table": "gold_mli_volatility_regime_daily",
-      "observation_date": "2026-07-21",
+      "observation_date": "2026-07-23",
       "normalized_driver": -0.0,
       "base_weight": 0.1,
       "quality_multiplier": 0.3,
@@ -3248,8 +3428,8 @@
     {
       "index_name": "TE",
       "source_table": "gold_fli_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": -0.1179147567375654,
+      "observation_date": "2026-07-23",
+      "normalized_driver": -0.1682128956734451,
       "base_weight": 0.5,
       "quality_multiplier": 0.7620370370370373,
       "expired": false,
@@ -3258,8 +3438,8 @@
     {
       "index_name": "TE",
       "source_table": "gold_mli_daily",
-      "observation_date": "2026-07-21",
-      "normalized_driver": 0.6063597220954582,
+      "observation_date": "2026-07-23",
+      "normalized_driver": -1.025107829066971,
       "base_weight": 0.5,
       "quality_multiplier": 0.6080000000000001,
       "expired": false,
@@ -3270,12 +3450,22 @@
     {
       "overlay": "Equity-rate wedge",
       "node": "BND",
-      "observation_date": "2026-07-20",
-      "raw_value": 1.5496099627146815,
-      "stress_score": 1.5496099627146815,
+      "observation_date": "2026-07-22",
+      "raw_value": 2.9962799381520897,
+      "stress_score": 2.9962799381520897,
       "state": "stress",
       "quality_flag": "LOW_VNINDEX_PE_PROXY",
       "source_table": "gold_wedge_risk_daily"
+    },
+    {
+      "overlay": "VN30F basis pressure",
+      "node": "MLI",
+      "observation_date": "2026-07-23",
+      "raw_value": -0.8704475260837834,
+      "stress_score": 0.8704475260837834,
+      "state": "tightening",
+      "quality_flag": "LOW",
+      "source_table": "gold_vn30f_basis_daily"
     },
     {
       "overlay": "ETF price-stress proxy",
@@ -3288,14 +3478,24 @@
       "source_table": "gold_etf_discount_proxy_daily"
     },
     {
-      "overlay": "Term interbank volume contraction",
-      "node": "FRI_counterparty",
-      "observation_date": "2026-07-17",
-      "raw_value": -0.7152882730173261,
-      "stress_score": 0.7152882730173261,
+      "overlay": "Margin call wave footprint",
+      "node": "FRI_intermediary",
+      "observation_date": "2026-07-23",
+      "raw_value": 0.4301315240713488,
+      "stress_score": 0.4301315240713488,
+      "state": "neutral",
+      "quality_flag": "LOW",
+      "source_table": "gold_margin_call_wave_proxy_daily"
+    },
+    {
+      "overlay": "Foreign flow 5d pressure",
+      "node": "MLI",
+      "observation_date": "2026-07-23",
+      "raw_value": -0.1342538087939718,
+      "stress_score": 0.1342538087939718,
       "state": "neutral",
       "quality_flag": "LOW_SHORT_BASELINE",
-      "source_table": "gold_term_interbank_volume_daily"
+      "source_table": "gold_foreign_flow_5d_daily"
     },
     {
       "overlay": "Fund system AUM contraction",
@@ -3308,16 +3508,6 @@
       "source_table": "gold_fund_system_aum"
     },
     {
-      "overlay": "VN30F basis pressure",
-      "node": "MLI",
-      "observation_date": "2026-07-21",
-      "raw_value": 0.1326376523342329,
-      "stress_score": -0.1326376523342329,
-      "state": "neutral",
-      "quality_flag": "LOW",
-      "source_table": "gold_vn30f_basis_daily"
-    },
-    {
       "overlay": "Deposit rate dispersion",
       "node": "FRI_banking",
       "observation_date": "2026-07-18",
@@ -3328,31 +3518,21 @@
       "source_table": "gold_deposit_rate_dispersion_daily"
     },
     {
-      "overlay": "Foreign flow 5d pressure",
-      "node": "MLI",
-      "observation_date": "2026-07-20",
-      "raw_value": 0.2052060482840656,
-      "stress_score": -0.2052060482840656,
+      "overlay": "Term interbank volume contraction",
+      "node": "FRI_counterparty",
+      "observation_date": "2026-07-22",
+      "raw_value": 0.2611420639930424,
+      "stress_score": -0.2611420639930424,
       "state": "neutral",
       "quality_flag": "LOW_SHORT_BASELINE",
-      "source_table": "gold_foreign_flow_5d_daily"
-    },
-    {
-      "overlay": "Market breadth deterioration",
-      "node": "MLI",
-      "observation_date": "2026-07-21",
-      "raw_value": 0.5106007676200316,
-      "stress_score": -0.5106007676200316,
-      "state": "neutral",
-      "quality_flag": "OPERATOR_ACCEPTED_UNIVERSE_USABLE",
-      "source_table": "gold_market_breadth_daily"
+      "source_table": "gold_term_interbank_volume_daily"
     },
     {
       "overlay": "ATC sell pressure footprint",
       "node": "MLI",
-      "observation_date": "2026-07-21",
-      "raw_value": -0.5548431058440959,
-      "stress_score": -0.5548431058440959,
+      "observation_date": "2026-07-23",
+      "raw_value": -0.5248430613758827,
+      "stress_score": -0.5248430613758827,
       "state": "neutral",
       "quality_flag": "LOW",
       "source_table": "gold_atc_sell_pressure_proxy_daily"
@@ -3360,32 +3540,32 @@
     {
       "overlay": "Interbank line tightness proxy",
       "node": "Hard gap",
-      "observation_date": "2026-07-17",
-      "raw_value": -1.03353331396125,
-      "stress_score": -1.03353331396125,
-      "state": "easy",
+      "observation_date": "2026-07-22",
+      "raw_value": -0.5364002244167582,
+      "stress_score": -0.5364002244167582,
+      "state": "neutral",
       "quality_flag": "LOW",
       "source_table": "gold_iltp_daily"
     },
     {
+      "overlay": "Market breadth deterioration",
+      "node": "MLI",
+      "observation_date": "2026-07-23",
+      "raw_value": 0.979047415534529,
+      "stress_score": -0.979047415534529,
+      "state": "easy",
+      "quality_flag": "OPERATOR_ACCEPTED_UNIVERSE_USABLE",
+      "source_table": "gold_market_breadth_daily"
+    },
+    {
       "overlay": "FX offshore stress footprint",
       "node": "FLI",
-      "observation_date": "2026-07-20",
-      "raw_value": -1.1082190420824307,
-      "stress_score": -1.1082190420824307,
+      "observation_date": "2026-07-22",
+      "raw_value": -0.9907523419671632,
+      "stress_score": -0.9907523419671632,
       "state": "easy",
       "quality_flag": "HIGH",
       "source_table": "gold_usdvnd_deviation_daily"
-    },
-    {
-      "overlay": "Margin call wave footprint",
-      "node": "FRI_intermediary",
-      "observation_date": "2026-07-21",
-      "raw_value": -1.2104029120561437,
-      "stress_score": -1.2104029120561437,
-      "state": "easy",
-      "quality_flag": "LOW",
-      "source_table": "gold_margin_call_wave_proxy_daily"
     },
     {
       "overlay": "Fund system cash posture",
@@ -3402,10 +3582,18 @@
     {
       "constraint": "Equity-rate wedge",
       "layer": "BND",
-      "stress_score": 1.5496099627146815,
+      "stress_score": 2.9962799381520897,
       "state": "stress",
       "quality": "LOW_VNINDEX_PE_PROXY",
-      "observation_date": "2026-07-20"
+      "observation_date": "2026-07-22"
+    },
+    {
+      "constraint": "VN30F basis pressure",
+      "layer": "MLI",
+      "stress_score": 0.8704475260837834,
+      "state": "tightening",
+      "quality": "LOW",
+      "observation_date": "2026-07-23"
     },
     {
       "constraint": "ETF price-stress proxy",
@@ -3416,44 +3604,44 @@
       "observation_date": "2026-07-21"
     },
     {
-      "constraint": "Term interbank volume contraction",
-      "layer": "FRI_counterparty",
-      "stress_score": 0.7152882730173261,
+      "constraint": "FRI_intermediary",
+      "layer": "FRI vector",
+      "stress_score": 0.4568246916145133,
       "state": "neutral",
-      "quality": "LOW_SHORT_BASELINE",
-      "observation_date": "2026-07-17"
+      "quality": "warning",
+      "observation_date": "2026-07-23"
+    },
+    {
+      "constraint": "Margin call wave footprint",
+      "layer": "FRI_intermediary",
+      "stress_score": 0.4301315240713488,
+      "state": "neutral",
+      "quality": "LOW",
+      "observation_date": "2026-07-23"
     },
     {
       "constraint": "FRI_collateral",
       "layer": "FRI vector",
-      "stress_score": 0.4165690716991484,
+      "stress_score": 0.4056209664465376,
       "state": "neutral",
       "quality": "warning",
-      "observation_date": "2026-07-21"
-    },
-    {
-      "constraint": "FRI_risk",
-      "layer": "FRI vector",
-      "stress_score": 0.3534088419279451,
-      "state": "neutral",
-      "quality": "usable",
-      "observation_date": "2026-07-21"
-    },
-    {
-      "constraint": "FRI_intermediary",
-      "layer": "FRI vector",
-      "stress_score": 0.1859438553992765,
-      "state": "neutral",
-      "quality": "warning",
-      "observation_date": "2026-07-21"
+      "observation_date": "2026-07-23"
     },
     {
       "constraint": "FRI_regulatory",
       "layer": "FRI vector",
-      "stress_score": 0.1154030769230769,
+      "stress_score": 0.1664338461538461,
       "state": "neutral",
       "quality": "warning",
-      "observation_date": "2026-07-21"
+      "observation_date": "2026-07-23"
+    },
+    {
+      "constraint": "Foreign flow 5d pressure",
+      "layer": "MLI",
+      "stress_score": 0.1342538087939718,
+      "state": "neutral",
+      "quality": "LOW_SHORT_BASELINE",
+      "observation_date": "2026-07-23"
     },
     {
       "constraint": "Fund system AUM contraction",
@@ -3464,14 +3652,6 @@
       "observation_date": "2026-06-30"
     },
     {
-      "constraint": "VN30F basis pressure",
-      "layer": "MLI",
-      "stress_score": -0.1326376523342329,
-      "state": "neutral",
-      "quality": "LOW",
-      "observation_date": "2026-07-21"
-    },
-    {
       "constraint": "Deposit rate dispersion",
       "layer": "FRI_banking",
       "stress_score": -0.183370996153051,
@@ -3480,167 +3660,167 @@
       "observation_date": "2026-07-18"
     },
     {
-      "constraint": "Foreign flow 5d pressure",
-      "layer": "MLI",
-      "stress_score": -0.2052060482840656,
+      "constraint": "FRI_risk",
+      "layer": "FRI vector",
+      "stress_score": -0.190281911864567,
       "state": "neutral",
-      "quality": "LOW_SHORT_BASELINE",
-      "observation_date": "2026-07-20"
+      "quality": "usable",
+      "observation_date": "2026-07-23"
     },
     {
       "constraint": "FRI_banking",
       "layer": "FRI vector",
-      "stress_score": -0.223235357486297,
+      "stress_score": -0.1912862929225494,
       "state": "neutral",
       "quality": "usable",
-      "observation_date": "2026-07-21"
+      "observation_date": "2026-07-23"
+    },
+    {
+      "constraint": "Term interbank volume contraction",
+      "layer": "FRI_counterparty",
+      "stress_score": -0.2611420639930424,
+      "state": "neutral",
+      "quality": "LOW_SHORT_BASELINE",
+      "observation_date": "2026-07-22"
     },
     {
       "constraint": "FRI_counterparty",
       "layer": "FRI vector",
-      "stress_score": -0.2894864855730228,
+      "stress_score": -0.5694181082361726,
       "state": "neutral",
       "quality": "warning",
-      "observation_date": "2026-07-21"
-    },
-    {
-      "constraint": "Market breadth deterioration",
-      "layer": "MLI",
-      "stress_score": -0.5106007676200316,
-      "state": "neutral",
-      "quality": "OPERATOR_ACCEPTED_UNIVERSE_USABLE",
-      "observation_date": "2026-07-21"
+      "observation_date": "2026-07-23"
     }
   ],
   "triggers": [
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "bank_collateral_haircut_risk",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 3.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 3,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (0/3 fresh conditions true); duration_not_yet_met",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "banking_funding_squeeze",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 1.0,
-      "fresh_conditions_total": 3.0,
-      "conditions_excluded": 1.0,
-      "non_fire_reason": "not_all_conditions_met (1/3 fresh conditions true)",
+      "fresh_conditions_met": 1,
+      "fresh_conditions_total": 4,
+      "conditions_excluded": 0,
+      "non_fire_reason": "not_all_conditions_met (1/4 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "collateral_chain_breakdown",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 3.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 3,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (0/3 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "complacency_risk_pattern",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 2.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 2,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (0/2 fresh conditions true); duration_not_yet_met",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "developer_cashflow_to_bank_stress",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 1.0,
-      "fresh_conditions_total": 3.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 1,
+      "fresh_conditions_total": 3,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (1/3 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "forced_deleveraging",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 4.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 4,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (0/4 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "fx_liquidity_drain_alert",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 4.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 4,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (0/4 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "intermediary_balance_sheet_stress",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 2.0,
-      "fresh_conditions_total": 4.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 2,
+      "fresh_conditions_total": 4,
+      "conditions_excluded": 0,
       "non_fire_reason": "not_all_conditions_met (2/4 fresh conditions true); duration_not_yet_met",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "margin_pre_shock",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 2.0,
-      "conditions_excluded": 1.0,
-      "non_fire_reason": "not_all_conditions_met (0/2 fresh conditions true); duration_not_yet_met",
+      "fresh_conditions_met": 1,
+      "fresh_conditions_total": 2,
+      "conditions_excluded": 1,
+      "non_fire_reason": "not_all_conditions_met (1/2 fresh conditions true); duration_not_yet_met",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "real_estate_collateral_stress",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 0.0,
-      "fresh_conditions_total": 4.0,
-      "conditions_excluded": 0.0,
-      "non_fire_reason": "not_all_conditions_met (0/4 fresh conditions true); proxy_confirmation_failed",
+      "fresh_conditions_met": 0,
+      "fresh_conditions_total": 4,
+      "conditions_excluded": 0,
+      "non_fire_reason": "not_all_conditions_met (0/4 fresh conditions true)",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "risk_premium_repricing",
       "signal_state": "non-fire",
-      "fresh_conditions_met": 1.0,
-      "fresh_conditions_total": 1.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 1,
+      "fresh_conditions_total": 1,
+      "conditions_excluded": 0,
       "non_fire_reason": "duration_not_yet_met",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "trigger_id": "transmission_breakdown",
       "signal_state": "FIRE",
-      "fresh_conditions_met": 1.0,
-      "fresh_conditions_total": 1.0,
-      "conditions_excluded": 0.0,
+      "fresh_conditions_met": 1,
+      "fresh_conditions_total": 1,
+      "conditions_excluded": 0,
       "non_fire_reason": "fired",
       "seasonal_flag": "normal",
       "seasonal_filter_applied": "none"
@@ -3648,7 +3828,7 @@
   ],
   "sources": [
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "bank_deposit_rate_matrix",
       "source_name": "cafef",
       "table_name": "bank_deposit_rates",
@@ -3662,7 +3842,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "bank_pillar3",
       "source_name": "bank_ir",
       "table_name": "bank_pillar3",
@@ -3676,13 +3856,13 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vn_bond_yield_curve",
       "source_name": "investing.com",
       "table_name": "bond_yields_vn",
       "registry_status": "live",
-      "row_count": 560,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 574,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -3690,7 +3870,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "cafef_deposit_hiking_weekly",
       "source_name": "cafef",
       "table_name": "cafef_deposit_hiking_weekly",
@@ -3704,7 +3884,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "ctck_capital_metrics",
       "source_name": "vnstock",
       "table_name": "ctck_capital_metrics",
@@ -3718,7 +3898,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "ctck_margin_equity_secondary_reviewed",
       "source_name": "markettimes_cafef",
       "table_name": "ctck_margin_equity_secondary_reviewed",
@@ -3732,7 +3912,7 @@
       "quality_state": "not_applicable"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "ctck_pillar3",
       "source_name": "ubck",
       "table_name": "ctck_pillar3",
@@ -3746,7 +3926,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "ctck_vci_loans_equity_proxy",
       "source_name": "vnstock",
       "table_name": "ctck_vci_loans_equity_proxy",
@@ -3760,21 +3940,21 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "daily_market_flows",
       "source_name": "cafef, vietstock, 24hmoney",
       "table_name": "daily_market_flows",
       "registry_status": "live_partial",
-      "row_count": 437,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 442,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
-      "null_pct": 0.304348,
+      "null_pct": 0.304412,
       "quarantine_count": 0,
-      "quality_score": 0.695652,
+      "quality_score": 0.695588,
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "etf_price_history",
       "source_name": "vnstock",
       "table_name": "etf_price_history",
@@ -3788,12 +3968,26 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "event_metric_map",
       "source_name": "manual",
       "table_name": "event_metric_map",
       "registry_status": "live",
       "row_count": 48,
+      "latest_observation_date": "2026-07-23",
+      "staleness_status": "fresh",
+      "null_pct": 0.0,
+      "quarantine_count": 0,
+      "quality_score": 1.0,
+      "quality_state": "healthy"
+    },
+    {
+      "as_of_date": "2026-07-23",
+      "driver_id": "fred_dxy|fred_ust_2y|fred_ust_10y|fred_fed_funds|fred_vix|fred_us_hy_oas",
+      "source_name": "fred",
+      "table_name": "fred_series",
+      "registry_status": "live",
+      "row_count": 14854,
       "latest_observation_date": "2026-07-21",
       "staleness_status": "fresh",
       "null_pct": 0.0,
@@ -3802,21 +3996,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
-      "driver_id": "fred_dxy|fred_ust_2y|fred_ust_10y|fred_fed_funds|fred_vix|fred_us_hy_oas",
-      "source_name": "fred",
-      "table_name": "fred_series",
-      "registry_status": "live",
-      "row_count": 14840,
-      "latest_observation_date": "2026-07-17",
-      "staleness_status": "fresh",
-      "null_pct": 0.0,
-      "quarantine_count": 0,
-      "quality_score": 1.0,
-      "quality_state": "healthy"
-    },
-    {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "gso_gdp_quarterly",
       "source_name": "gso",
       "table_name": "gso_gdp_quarterly",
@@ -3830,7 +4010,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "gso_macro_monthly",
       "source_name": "gso",
       "table_name": "gso_macro_monthly",
@@ -3844,27 +4024,27 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "hnx_cbis_per_bond",
       "source_name": "hnx",
       "table_name": "hnx_cbis_per_bond",
       "registry_status": "live_partial",
-      "row_count": 2500,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 2700,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
-      "null_pct": 0.327333,
+      "null_pct": 0.327778,
       "quarantine_count": 0,
-      "quality_score": 0.672667,
+      "quality_score": 0.672222,
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "hnx_corp_bond_outstanding",
       "source_name": "hnx",
       "table_name": "hnx_corp_bond_outstanding",
       "registry_status": "live_partial",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.4,
       "quarantine_count": 0,
@@ -3872,7 +4052,7 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "hnx_corp_bond_trading",
       "source_name": "hnx",
       "table_name": "hnx_corp_bond_trading",
@@ -3886,13 +4066,13 @@
       "quality_state": "not_applicable"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "hnx_govt_bond_turnover_daily",
       "source_name": "hnx",
       "table_name": "hnx_govt_bond_turnover_daily",
       "registry_status": "live",
-      "row_count": 49,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 52,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -3900,7 +4080,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "imf_vn_reserves",
       "source_name": "imf",
       "table_name": "imf_vn_reserves",
@@ -3914,21 +4094,21 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "insider_transactions",
       "source_name": "vietstock",
       "table_name": "insider_transactions",
       "registry_status": "live_partial",
-      "row_count": 50,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 51,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
-      "null_pct": 0.04,
+      "null_pct": 0.041667,
       "quarantine_count": 0,
-      "quality_score": 0.96,
+      "quality_score": 0.958333,
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "kbnn_tga",
       "source_name": "kbnn",
       "table_name": "kbnn_tga",
@@ -3942,7 +4122,7 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "mof_fiscal_monthly",
       "source_name": "mof",
       "table_name": "mof_fiscal_monthly",
@@ -3950,13 +4130,13 @@
       "row_count": 44,
       "latest_observation_date": "2026-06-01",
       "staleness_status": "fresh",
-      "null_pct": 0.381818,
+      "null_pct": 0.363636,
       "quarantine_count": 0,
-      "quality_score": 0.618182,
+      "quality_score": 0.636364,
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "mpi_fdi_monthly",
       "source_name": "mpi",
       "table_name": "mpi_fdi_monthly",
@@ -3970,7 +4150,7 @@
       "quality_state": "failed"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "smoney_funds",
       "source_name": "smoney",
       "table_name": "mutual_fund_exposure",
@@ -3984,12 +4164,12 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "news_signal_counts_weekly",
       "source_name": "news",
       "table_name": "news_signal_counts_weekly",
       "registry_status": "live_partial",
-      "row_count": 52,
+      "row_count": 55,
       "latest_observation_date": "2026-07-26",
       "staleness_status": "fresh",
       "null_pct": 0.0,
@@ -3998,13 +4178,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "news_signals",
       "source_name": "news",
       "table_name": "news_signals",
       "registry_status": "live_partial",
-      "row_count": 279,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 332,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4012,7 +4192,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "regime_event_flags",
       "source_name": "manual",
       "table_name": "regime_event_flags",
@@ -4026,7 +4206,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_bop_quarterly",
       "source_name": "sbv",
       "table_name": "sbv_bop_quarterly",
@@ -4040,13 +4220,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_central_rate",
       "source_name": "sbv",
       "table_name": "sbv_central_rate",
       "registry_status": "live",
-      "row_count": 545,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 547,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4054,41 +4234,41 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_interbank_by_tenor",
       "source_name": "sbv",
       "table_name": "sbv_interbank_by_tenor",
       "registry_status": "live",
-      "row_count": 1686,
-      "latest_observation_date": "2026-07-17",
+      "row_count": 1701,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
-      "null_pct": 0.177106,
+      "null_pct": 0.175544,
       "quarantine_count": 0,
-      "quality_score": 0.822894,
+      "quality_score": 0.824456,
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_monetary_aggregates",
       "source_name": "sbv",
       "table_name": "sbv_monetary_aggregates",
       "registry_status": "live_partial",
-      "row_count": 18,
-      "latest_observation_date": "2026-04-01",
+      "row_count": 19,
+      "latest_observation_date": "2026-05-01",
       "staleness_status": "fresh",
-      "null_pct": 0.566667,
+      "null_pct": 0.536842,
       "quarantine_count": 0,
-      "quality_score": 0.433333,
+      "quality_score": 0.463158,
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_omo_daily",
       "source_name": "sbv",
       "table_name": "sbv_omo_daily",
       "registry_status": "live",
-      "row_count": 239,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 242,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4096,27 +4276,27 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_omo_operations_detail",
       "source_name": "widata",
       "table_name": "sbv_omo_operations_detail",
       "registry_status": "live",
-      "row_count": 1239,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 1273,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
-      "null_pct": 0.004977,
+      "null_pct": 0.006023,
       "quarantine_count": 0,
-      "quality_score": 0.995023,
+      "quality_score": 0.993977,
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_overnight_lending_rate_daily",
       "source_name": "widata",
       "table_name": "sbv_overnight_lending_rate_daily",
       "registry_status": "live",
-      "row_count": 47,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 49,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4124,13 +4304,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_policy_rates",
       "source_name": "sbv",
       "table_name": "sbv_policy_rates",
       "registry_status": "live",
       "row_count": 4,
-      "latest_observation_date": "2026-07-21",
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4138,13 +4318,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "sbv_required_reserve_ratios",
       "source_name": "widata",
       "table_name": "sbv_required_reserve_ratios",
       "registry_status": "live",
-      "row_count": 376,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 392,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4152,7 +4332,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "ssi_marginable_universe",
       "source_name": "ssi",
       "table_name": "ssi_marginable_universe",
@@ -4166,21 +4346,21 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "usd_vnd_market_rates",
       "source_name": "sbv",
       "table_name": "usd_vnd_market_rates",
       "registry_status": "live",
-      "row_count": 538,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 540,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
-      "null_pct": 0.003098,
+      "null_pct": 0.003086,
       "quarantine_count": 0,
-      "quality_score": 0.996902,
+      "quality_score": 0.996914,
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vamc_special_bonds",
       "source_name": "vamc",
       "table_name": "vamc_special_bonds",
@@ -4194,7 +4374,7 @@
       "quality_state": "not_applicable"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_corp_bond_issuance_detail",
       "source_name": "vbma",
       "table_name": "vbma_corp_bond_issuance_detail",
@@ -4208,7 +4388,7 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_corp_bond_maturity_weekly",
       "source_name": "vbma",
       "table_name": "vbma_corp_bond_maturity_weekly",
@@ -4222,7 +4402,7 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_corp_bond_primary",
       "source_name": "vbma",
       "table_name": "vbma_corp_bond_primary",
@@ -4236,7 +4416,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_corp_bond_redemption",
       "source_name": "vbma",
       "table_name": "vbma_corp_bond_redemption",
@@ -4250,7 +4430,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_corp_bond_yields",
       "source_name": "vbma",
       "table_name": "vbma_corp_bond_yields",
@@ -4264,7 +4444,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_distressed_issuers",
       "source_name": "vbma",
       "table_name": "vbma_distressed_issuers",
@@ -4278,7 +4458,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_govt_bond_auction",
       "source_name": "vbma",
       "table_name": "vbma_govt_bond_auction",
@@ -4292,7 +4472,7 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_govt_yield_curve",
       "source_name": "vbma",
       "table_name": "vbma_govt_yield_curve",
@@ -4306,7 +4486,7 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vbma_repo_mma",
       "source_name": "vbma",
       "table_name": "vbma_repo_mma",
@@ -4320,13 +4500,13 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vn30_earnings_yield",
       "source_name": "vnstock",
       "table_name": "vn30_earnings_yield",
       "registry_status": "live",
-      "row_count": 26,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 28,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4334,13 +4514,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vn30_market_history",
       "source_name": "vnstock",
       "table_name": "vn30_market_history",
       "registry_status": "live",
-      "row_count": 412,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 414,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4348,13 +4528,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vn30f_front_month_history",
       "source_name": "vnstock",
       "table_name": "vn30f_front_month_history",
       "registry_status": "live_candidate_proxy",
-      "row_count": 434,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 436,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4362,13 +4542,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vnindex_market_history",
       "source_name": "vnstock",
       "table_name": "vnindex_market_history",
       "registry_status": "live",
-      "row_count": 411,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 413,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4376,13 +4556,13 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vnindex_valuation_history",
       "source_name": "24hmoney",
       "table_name": "vnindex_valuation_history",
       "registry_status": "live_candidate_proxy",
-      "row_count": 280,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 282,
+      "latest_observation_date": "2026-07-22",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4390,27 +4570,27 @@
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vnstock_bank_ratios",
       "source_name": "vnstock",
       "table_name": "vnstock_bank_ratios",
       "registry_status": "live_partial",
-      "row_count": 830,
+      "row_count": 831,
       "latest_observation_date": "2026-06-30",
       "staleness_status": "fresh",
-      "null_pct": 0.00809,
+      "null_pct": 0.010315,
       "quarantine_count": 0,
-      "quality_score": 0.99191,
+      "quality_score": 0.989685,
       "quality_state": "healthy"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vnstock_bond_funds",
       "source_name": "vnstock",
       "table_name": "vnstock_bond_funds",
       "registry_status": "live_partial",
-      "row_count": 667,
-      "latest_observation_date": "2026-07-20",
+      "row_count": 736,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.428571,
       "quarantine_count": 0,
@@ -4418,13 +4598,13 @@
       "quality_state": "warning"
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "driver_id": "vnstock_breadth_constituent_history",
       "source_name": "vnstock",
       "table_name": "vnstock_breadth_constituent_history",
       "registry_status": "live_operator_accepted_universe",
-      "row_count": 157955,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 158749,
+      "latest_observation_date": "2026-07-23",
       "staleness_status": "fresh",
       "null_pct": 0.0,
       "quarantine_count": 0,
@@ -4434,80 +4614,80 @@
   ],
   "indices": [
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FLI",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.762037,
       "quality_state": "healthy",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_banking",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.608,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_collateral",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.57,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_counterparty",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.55,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_intermediary",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.5,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": "ACCR is a directional proxy: equity / (VCI reported Loans_total x 1.1). It is not regulatory CAR or a verified margin-only balance."
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_regulatory",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.5,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "FRI_risk",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.65,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
       "methodology_note": ""
     },
     {
-      "as_of_date": "2026-07-21",
+      "as_of_date": "2026-07-23",
       "index_name": "MLI",
-      "row_count": 30,
-      "latest_observation_date": "2026-07-21",
+      "row_count": 32,
+      "latest_observation_date": "2026-07-23",
       "quality_score": 0.608,
       "quality_state": "warning",
       "notes": "Read from materialized Phase 2 index output.",
@@ -4516,74 +4696,802 @@
   ],
   "scheduler": [
     {
-      "job_name": "weekly",
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-07-23 11:17:44",
+      "finished_at": "2026-07-23 11:17:44",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
       "command_name": "build_phase5_quality_monitoring",
-      "started_at": "2026-07-21 05:10:28",
-      "finished_at": "2026-07-21 05:10:28",
+      "started_at": "2026-07-23 11:17:37",
+      "finished_at": "2026-07-23 11:17:41",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "run_abm_pipeline",
-      "started_at": "2026-07-21 05:10:25",
-      "finished_at": "2026-07-21 05:10:25",
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-07-23 11:17:30",
+      "finished_at": "2026-07-23 11:17:34",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-07-23 11:17:25",
+      "finished_at": "2026-07-23 11:17:26",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
       "command_name": "build_phase2_gold",
-      "started_at": "2026-07-21 05:10:21",
-      "finished_at": "2026-07-21 05:10:21",
+      "started_at": "2026-07-23 11:16:48",
+      "finished_at": "2026-07-23 11:17:22",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "hnx_distressed",
-      "started_at": "2026-07-21 05:10:18",
-      "finished_at": "2026-07-21 05:10:18",
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-07-23 11:16:39",
+      "finished_at": "2026-07-23 11:16:44",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-07-23 11:16:35",
+      "finished_at": "2026-07-23 11:16:36",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-07-23 11:16:30",
+      "finished_at": "2026-07-23 11:16:31",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-07-23 11:16:18",
+      "finished_at": "2026-07-23 11:16:26",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-07-23 11:05:12",
+      "finished_at": "2026-07-23 11:16:13",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-07-23 11:04:56",
+      "finished_at": "2026-07-23 11:05:08",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_financials",
+      "started_at": "2026-07-23 11:02:14",
+      "finished_at": "2026-07-23 11:04:52",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_funds",
+      "started_at": "2026-07-23 11:01:33",
+      "finished_at": "2026-07-23 11:02:10",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "hnx_bonds",
+      "started_at": "2026-07-23 11:01:27",
+      "finished_at": "2026-07-23 11:01:29",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "scrape_folder_sources",
+      "started_at": "2026-07-23 11:01:17",
+      "finished_at": "2026-07-23 11:01:23",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "started_at": "2026-07-23 11:01:06",
+      "finished_at": "2026-07-23 11:01:12",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "sbv_snapshot",
+      "started_at": "2026-07-23 11:00:47",
+      "finished_at": "2026-07-23 11:01:02",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "tradingview_yields",
+      "started_at": "2026-07-23 11:00:21",
+      "finished_at": "2026-07-23 11:00:42",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-07-23 02:16:38",
+      "finished_at": "2026-07-23 02:16:38",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-07-23 02:16:31",
+      "finished_at": "2026-07-23 02:16:35",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-07-23 02:16:24",
+      "finished_at": "2026-07-23 02:16:28",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-07-23 02:16:19",
+      "finished_at": "2026-07-23 02:16:20",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-07-23 02:15:42",
+      "finished_at": "2026-07-23 02:16:16",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-07-23 02:15:33",
+      "finished_at": "2026-07-23 02:15:38",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-07-23 02:15:28",
+      "finished_at": "2026-07-23 02:15:30",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-07-23 02:15:24",
+      "finished_at": "2026-07-23 02:15:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-07-23 02:15:03",
+      "finished_at": "2026-07-23 02:15:20",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-07-23 02:03:46",
+      "finished_at": "2026-07-23 02:14:59",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-07-23 02:03:29",
+      "finished_at": "2026-07-23 02:03:41",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_financials",
+      "started_at": "2026-07-23 02:00:27",
+      "finished_at": "2026-07-23 02:03:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_funds",
+      "started_at": "2026-07-23 01:59:59",
+      "finished_at": "2026-07-23 02:00:23",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "hnx_bonds",
+      "started_at": "2026-07-23 01:59:49",
+      "finished_at": "2026-07-23 01:59:56",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "scrape_folder_sources",
+      "started_at": "2026-07-23 01:59:39",
+      "finished_at": "2026-07-23 01:59:45",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "started_at": "2026-07-23 01:59:30",
+      "finished_at": "2026-07-23 01:59:36",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "sbv_snapshot",
+      "started_at": "2026-07-23 01:59:16",
+      "finished_at": "2026-07-23 01:59:27",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "tradingview_yields",
+      "started_at": "2026-07-23 01:58:53",
+      "finished_at": "2026-07-23 01:59:13",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "imf_reserves",
+      "started_at": "2026-07-23 01:58:40",
+      "finished_at": "2026-07-23 01:58:42",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "fred",
+      "started_at": "2026-07-23 01:58:30",
+      "finished_at": "2026-07-23 01:58:36",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-07-22 11:17:22",
+      "finished_at": "2026-07-22 11:17:22",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-07-22 11:17:14",
+      "finished_at": "2026-07-22 11:17:18",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-07-22 11:17:07",
+      "finished_at": "2026-07-22 11:17:11",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-07-22 11:17:03",
+      "finished_at": "2026-07-22 11:17:04",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-07-22 11:16:25",
+      "finished_at": "2026-07-22 11:16:59",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-07-22 11:16:16",
+      "finished_at": "2026-07-22 11:16:21",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-07-22 11:16:11",
+      "finished_at": "2026-07-22 11:16:12",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-07-22 11:16:07",
+      "finished_at": "2026-07-22 11:16:08",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-07-22 11:15:55",
+      "finished_at": "2026-07-22 11:16:03",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-07-22 11:05:05",
+      "finished_at": "2026-07-22 11:15:52",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-07-22 11:04:50",
+      "finished_at": "2026-07-22 11:05:02",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_financials",
+      "started_at": "2026-07-22 11:01:43",
+      "finished_at": "2026-07-22 11:04:47",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_funds",
+      "started_at": "2026-07-22 11:01:15",
+      "finished_at": "2026-07-22 11:01:40",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "hnx_bonds",
+      "started_at": "2026-07-22 11:01:09",
+      "finished_at": "2026-07-22 11:01:11",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "scrape_folder_sources",
+      "started_at": "2026-07-22 11:01:00",
+      "finished_at": "2026-07-22 11:01:06",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "started_at": "2026-07-22 11:00:50",
+      "finished_at": "2026-07-22 11:00:56",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "sbv_snapshot",
+      "started_at": "2026-07-22 11:00:36",
+      "finished_at": "2026-07-22 11:00:47",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "tradingview_yields",
+      "started_at": "2026-07-22 11:00:13",
+      "finished_at": "2026-07-22 11:00:32",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-07-22 03:07:35",
+      "finished_at": "2026-07-22 03:07:35",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-07-22 03:07:28",
+      "finished_at": "2026-07-22 03:07:32",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-07-22 03:07:21",
+      "finished_at": "2026-07-22 03:07:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-07-22 03:07:16",
+      "finished_at": "2026-07-22 03:07:17",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-07-22 03:06:37",
+      "finished_at": "2026-07-22 03:07:12",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-07-22 03:06:28",
+      "finished_at": "2026-07-22 03:06:34",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-07-22 03:06:23",
+      "finished_at": "2026-07-22 03:06:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-07-22 03:06:18",
+      "finished_at": "2026-07-22 03:06:20",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-07-22 03:06:01",
+      "finished_at": "2026-07-22 03:06:15",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-07-22 02:55:09",
+      "finished_at": "2026-07-22 03:05:57",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-07-22 02:54:54",
+      "finished_at": "2026-07-22 02:55:06",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_financials",
+      "started_at": "2026-07-22 02:52:12",
+      "finished_at": "2026-07-22 02:54:51",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_funds",
+      "started_at": "2026-07-22 02:51:47",
+      "finished_at": "2026-07-22 02:52:08",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "hnx_bonds",
+      "started_at": "2026-07-22 02:51:37",
+      "finished_at": "2026-07-22 02:51:43",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "scrape_folder_sources",
+      "started_at": "2026-07-22 02:51:27",
+      "finished_at": "2026-07-22 02:51:34",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "started_at": "2026-07-22 02:51:18",
+      "finished_at": "2026-07-22 02:51:24",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "sbv_snapshot",
+      "started_at": "2026-07-22 02:51:04",
+      "finished_at": "2026-07-22 02:51:15",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "tradingview_yields",
+      "started_at": "2026-07-22 02:50:41",
+      "finished_at": "2026-07-22 02:51:01",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "imf_reserves",
+      "started_at": "2026-07-22 02:50:28",
+      "finished_at": "2026-07-22 02:50:30",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "fred",
+      "started_at": "2026-07-22 02:50:18",
+      "finished_at": "2026-07-22 02:50:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "imf_reserves",
+      "started_at": "2026-07-21 06:13:07",
+      "finished_at": "2026-07-21 06:13:09",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "fred",
+      "started_at": "2026-07-21 06:12:58",
+      "finished_at": "2026-07-21 06:13:03",
       "status": "success",
       "error_message": null
     },
     {
       "job_name": "weekly",
       "command_name": "ssi_marginable_universe",
-      "started_at": "2026-07-21 05:10:14",
-      "finished_at": "2026-07-21 05:10:14",
+      "started_at": "2026-07-21 06:05:29",
+      "finished_at": "2026-07-21 06:05:40",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "vbma_weekly",
-      "started_at": "2026-07-21 05:10:11",
-      "finished_at": "2026-07-21 05:10:11",
+      "job_name": "monthly",
+      "command_name": "mof_fiscal",
+      "started_at": "2026-07-21 06:05:07",
+      "finished_at": "2026-07-21 06:05:25",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "cafef_deposit_hiking",
-      "started_at": "2026-07-21 05:10:08",
-      "finished_at": "2026-07-21 05:10:08",
+      "job_name": "monthly",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-07-21 04:13:16",
+      "finished_at": "2026-07-21 04:13:20",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "cafef_duckdb_validator",
-      "started_at": "2026-07-21 05:10:04",
-      "finished_at": "2026-07-21 05:10:04",
+      "job_name": "monthly",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-07-21 04:12:38",
+      "finished_at": "2026-07-21 04:13:13",
       "status": "success",
       "error_message": null
     },
     {
-      "job_name": "weekly",
-      "command_name": "cafef_deposits",
-      "started_at": "2026-07-21 05:09:57",
-      "finished_at": "2026-07-21 05:09:57",
+      "job_name": "monthly",
+      "command_name": "gso_macro",
+      "started_at": "2026-07-21 04:12:33",
+      "finished_at": "2026-07-21 04:12:35",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "monthly",
+      "command_name": "mpi_fdi",
+      "started_at": "2026-07-21 04:12:28",
+      "finished_at": "2026-07-21 04:12:30",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "monthly",
+      "command_name": "mof_fiscal",
+      "started_at": "2026-07-21 04:11:57",
+      "finished_at": "2026-07-21 04:12:20",
+      "status": "failed",
+      "error_message": "2026-07-21 11:11:58.466 | INFO     | __main__:run:141 - START scrape -> https://mof.gov.vn\n2026-07-21 11:11:58.662 | INFO     | __main__:_load_widata_fiscal_history:1091 - Loading fiscal history from local WiData Excel files...\n2026-07-21 11:11:58.989 | WARNING  | scrapers.base:_check_robots:174 - robots.txt disallows https://ckns.mof.gov.vn/_vti_bin/ReportService.svc/GetReportV4 for our UA â€” review needed\n2026-07-21 11:11:59.595 | INFO     | __main__:scrape_ckns_fiscal:237 - fetch CKNS workbook -> TH-2026-Q1-B24-TT343-NN001.xls\n2026-07-21 11:12:00.990 | WARNING  | scrapers.base:_check_robots:174 - robots.txt disallows https://ckns.mof.gov.vn/_layouts/LacViet.App/Pages/DownloadFilePage.aspx?FileUrl=DimGz0CuQR3d%2fUSI%2bkkUcbxj5%2biPtoWNhTO8jL6ZBvDALJeqRukgbxO6DfQ8jyuteHKahU0d2OAXKn6P5yCxYnHqzNiluxUTB5Q9OyYEHRS2BfeWgUSVpFcN7URkpgcAFkQ34o2dWh%2f0fYwne1jiCmTxuw2xqYARu1tITTYcMAQyLe5bsisIiuYUceyXQZ%2b4wy2dazj%2biER6Ilq9vlN5LM9iNEizuQwgRbIuJdQ8I%2f8%3d for our UA â€” review needed\n2026-07-21 11:12:01.352 | INFO     | __main__:scrape_ckns_fiscal:237 - fetch CKNS workbook -> TH-2026-Q1-B25-TT343-NN001.xls\n2026-07-21 11:12:02.992 | WARNING  | scrapers.base:_check_robots:174 - robots.txt disallows https://ckns.mof.gov.vn/_layouts/LacViet.App/Pages/DownloadFilePage.aspx?FileUrl=DimGz0CuQR3d%2fUSI%2bkkUcbxj5%2biPtoWNhTO8jL6ZBvDALJeqRukgbxO6DfQ8jyuteHKahU0d2OAXKn6P5yCxYnHqzNiluxUTB5Q9OyYEHRS2BfeWgUSVpFcN7URkpgcAW8DK%2boI90NC4HnsoadN680IP9owKMH2scZSvEtNjQUpie0AMaqDuWPPA7%2bgMvkPA6TFgXdN5Y4%2b8fWIWyB%2fLoC0QWdnxghY8ILnjiDpPBxw%3d for our UA â€” review needed\n2026-07-21 11:12:05.106 | WARNING  | scrapers.base:_check_robots:174 - robots.txt disallows https://ckns.mof.gov.vn/_layouts/LacViet.App/Pages/DownloadFilePage.aspx?FileUrl=DimGz0CuQR3d%2fUSI%2bkkUcbxj5%2biPtoWNhTO8jL6ZBvDALJeqRukgbxO6DfQ8jyuteHKahU0d2OAXKn6P5yCxYnHqzNiluxUTB5Q9OyYEHRS2BfeWgUSVpFcN7URkpgcAW8DK%2boI90NC4HnsoadN680IP9owKMH2scZSvEtNjQUpie0AMaqDuWPPA7%2bgMvkPA6TFgXdN5Y4%2b8fWIWyB%2fLoC0QWdnxghY8ILnjiDpPBxw%3d fo...[truncated]"
+    },
+    {
+      "job_name": "monthly",
+      "command_name": "vbma",
+      "started_at": "2026-07-21 04:11:41",
+      "finished_at": "2026-07-21 04:11:53",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "monthly",
+      "command_name": "sbv_bop",
+      "started_at": "2026-07-21 04:11:35",
+      "finished_at": "2026-07-21 04:11:37",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "imf_reserves",
+      "started_at": "2026-07-21 04:11:14",
+      "finished_at": "2026-07-21 04:11:15",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-macro",
+      "command_name": "fred",
+      "started_at": "2026-07-21 04:11:04",
+      "finished_at": "2026-07-21 04:11:10",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-07-21 03:36:58",
+      "finished_at": "2026-07-21 03:36:58",
+      "status": "failed",
+      "error_message": "ssi_marginable_universe: source transitioned to expired"
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-07-21 03:36:51",
+      "finished_at": "2026-07-21 03:36:55",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-07-21 03:36:43",
+      "finished_at": "2026-07-21 03:36:47",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-07-21 03:36:38",
+      "finished_at": "2026-07-21 03:36:39",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-07-21 03:35:59",
+      "finished_at": "2026-07-21 03:36:35",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-07-21 03:35:49",
+      "finished_at": "2026-07-21 03:35:55",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-07-21 03:35:44",
+      "finished_at": "2026-07-21 03:35:46",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-07-21 03:35:40",
+      "finished_at": "2026-07-21 03:35:41",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-07-21 03:35:25",
+      "finished_at": "2026-07-21 03:35:36",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-07-21 03:24:14",
+      "finished_at": "2026-07-21 03:35:21",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-07-21 03:23:58",
+      "finished_at": "2026-07-21 03:24:11",
       "status": "success",
       "error_message": null
     }
@@ -4610,8 +5518,8 @@
       "message": "monthly job failed: mof_fiscal",
       "alert_type": "scheduler_command",
       "subject": "monthly/mof_fiscal",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-07-18T02:42:30Z",
@@ -4718,8 +5626,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-27T02:05:56Z",
@@ -4730,8 +5638,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-25T04:10:53Z",
@@ -4742,8 +5650,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-25T04:10:57Z",
@@ -4754,8 +5662,8 @@
       "message": "daily-market job failed on two consecutive days: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-24T01:02:01Z",
@@ -4766,8 +5674,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-24T01:02:04Z",
@@ -4778,8 +5686,8 @@
       "message": "daily-market job failed on two consecutive days: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-23T01:37:48Z",
@@ -4790,8 +5698,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-23T01:41:33Z",
@@ -4802,8 +5710,8 @@
       "message": "daily-market job failed: vnstock_financials",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_financials",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-23T01:54:27Z",
@@ -4850,8 +5758,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-23T02:23:09Z",
@@ -4898,8 +5806,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-19T06:11:31Z",
@@ -4910,8 +5818,8 @@
       "message": "daily-market job failed on two consecutive days: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-18T02:52:12Z",
@@ -4922,8 +5830,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-18T03:09:13Z",
@@ -4946,8 +5854,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-16T05:33:18Z",
@@ -4958,8 +5866,8 @@
       "message": "daily-market job failed on two consecutive days: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-15T00:26:40Z",
@@ -4970,8 +5878,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-15T00:54:48Z",
@@ -4982,8 +5890,8 @@
       "message": "daily-market job failed: refresh_widata_exports",
       "alert_type": "scheduler_command",
       "subject": "daily-market/refresh_widata_exports",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-12T23:42:38Z",
@@ -4994,8 +5902,8 @@
       "message": "daily-macro job failed: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-13T00:01:26Z",
@@ -5114,8 +6022,8 @@
       "message": "daily-macro job failed: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-13T00:07:58Z",
@@ -5126,8 +6034,8 @@
       "message": "daily-macro job failed on two consecutive days: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-13T00:25:59Z",
@@ -5426,8 +6334,8 @@
       "message": "daily-macro job failed: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-01T05:19:53Z",
@@ -5438,8 +6346,8 @@
       "message": "daily-macro job failed on two consecutive days: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-01T05:22:29Z",
@@ -5450,8 +6358,8 @@
       "message": "daily-market job failed: vnstock_financials",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_financials",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-06-01T05:34:23Z",
@@ -5546,8 +6454,8 @@
       "message": "daily-macro job failed: fred",
       "alert_type": "scheduler_command",
       "subject": "daily-macro/fred",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-31T01:03:47Z",
@@ -5558,8 +6466,8 @@
       "message": "daily-market job failed: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-31T01:03:50Z",
@@ -5570,8 +6478,8 @@
       "message": "daily-market job failed on two consecutive days: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-31T01:05:04Z",
@@ -5642,8 +6550,8 @@
       "message": "daily-market job failed: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:29:13Z",
@@ -5654,8 +6562,8 @@
       "message": "daily-market job failed on two consecutive days: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:30:15Z",
@@ -5690,8 +6598,8 @@
       "message": "daily-market job failed: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:34:28Z",
@@ -5702,8 +6610,8 @@
       "message": "daily-market job failed on two consecutive days: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:35:24Z",
@@ -5738,8 +6646,8 @@
       "message": "daily-market job failed: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:39:42Z",
@@ -5750,8 +6658,8 @@
       "message": "daily-market job failed on two consecutive days: vnstock_breadth",
       "alert_type": "scheduler_command",
       "subject": "daily-market/vnstock_breadth",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:40:31Z",
@@ -5762,8 +6670,8 @@
       "message": "daily-market job failed: evaluate_p3_triggers",
       "alert_type": "scheduler_command",
       "subject": "daily-market/evaluate_p3_triggers",
-      "resolution_status": "unknown",
-      "resolution_reason": "command has no current scheduler status"
+      "resolution_status": "resolved",
+      "resolution_reason": "latest scheduler run succeeded"
     },
     {
       "ts": "2026-05-30T01:40:42Z",
