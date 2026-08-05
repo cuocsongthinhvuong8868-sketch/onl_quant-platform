@@ -26,16 +26,119 @@ def test_default_fetch_limits_match_daily_ingestion_target(monkeypatch):
     assert reloaded.FETCH_LIMIT_WIDATA == 500
 
 
-def test_mozyfin_connector_skips_without_access_token(monkeypatch, tmp_path):
+def test_mozyfin_connector_can_disable_anonymous_access(monkeypatch, tmp_path):
     monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "")
     monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
     monkeypatch.setattr(mozyfin_connector, "TOKEN_CACHE_FILE", tmp_path / "missing_token.txt")
+    monkeypatch.setattr(mozyfin_connector, "ANON_TOKEN_CACHE_FILE", tmp_path / "missing_anon_token.txt")
+    monkeypatch.setattr(mozyfin_connector, "_refresh_from_available_cookies", lambda: "")
     monkeypatch.delenv("MOZYFIN_ACCESS_TOKEN", raising=False)
     monkeypatch.delenv("MOZYFIN_TOKEN", raising=False)
     monkeypatch.delenv("MOZYFIN_API_KEY", raising=False)
     monkeypatch.delenv("MOZYFIN_COOKIES_JSON", raising=False)
+    monkeypatch.setenv("MOZYFIN_ENABLE_ANONYMOUS_TOKEN", "false")
 
     assert mozyfin_connector.fetch_mozyfin_news(limit=10) == []
+
+
+def test_mozyfin_connector_fetches_anonymous_token_by_default(monkeypatch, tmp_path):
+    calls = {"post": 0, "get": 0}
+
+    class FakeResponse:
+        status_code = 200
+        text = ""
+
+        def __init__(self, payload):
+            self._payload = payload
+
+        def json(self):
+            return self._payload
+
+        def raise_for_status(self):
+            return None
+
+    def fake_post(url, **kwargs):
+        calls["post"] += 1
+        assert url.endswith("/api/v1/auth/anonymous")
+        assert kwargs["json"]["fingerprint"] == "quant-platform-sentiment-bot"
+        return FakeResponse({"data": {"token": "anonymous-token"}})
+
+    def fake_get(url, **kwargs):
+        calls["get"] += 1
+        assert url.endswith("/api/v2/news")
+        assert kwargs["headers"]["Authorization"] == "Bearer anonymous-token"
+        return FakeResponse({"data": [{"id": 1, "title": "ok"}]})
+
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
+    monkeypatch.setattr(mozyfin_connector, "TOKEN_CACHE_FILE", tmp_path / "mozyfin_token.txt")
+    monkeypatch.setattr(mozyfin_connector, "ANON_TOKEN_CACHE_FILE", tmp_path / "mozyfin_anon_token.txt")
+    monkeypatch.setattr(
+        mozyfin_connector,
+        "_refresh_from_available_cookies",
+        lambda: (_ for _ in ()).throw(AssertionError("cookie refresh should be a fallback")),
+    )
+    monkeypatch.setattr(mozyfin_connector.requests, "post", fake_post)
+    monkeypatch.setattr(mozyfin_connector.requests, "get", fake_get)
+    monkeypatch.delenv("MOZYFIN_ACCESS_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_API_KEY", raising=False)
+    monkeypatch.delenv("MOZYFIN_COOKIES_JSON", raising=False)
+    monkeypatch.delenv("MOZYFIN_ENABLE_ANONYMOUS_TOKEN", raising=False)
+
+    assert mozyfin_connector.fetch_mozyfin_news(limit=10) == [{"id": 1, "title": "ok"}]
+    assert calls == {"post": 1, "get": 1}
+
+
+def test_mozyfin_connector_retries_unauthorized_token_with_anonymous_token(monkeypatch, tmp_path):
+    calls = {"post": 0, "get": 0}
+
+    class FakeResponse:
+        text = ""
+
+        def __init__(self, status_code, payload=None):
+            self.status_code = status_code
+            self._payload = payload or {}
+
+        def json(self):
+            return self._payload
+
+        def raise_for_status(self):
+            if self.status_code >= 400:
+                raise AssertionError(f"unexpected HTTP {self.status_code}")
+
+    def fake_post(url, **kwargs):
+        calls["post"] += 1
+        assert url.endswith("/api/v1/auth/anonymous")
+        return FakeResponse(201, {"data": {"token": "fresh-anonymous-token"}})
+
+    def fake_get(url, **kwargs):
+        calls["get"] += 1
+        if calls["get"] == 1:
+            assert kwargs["headers"]["Authorization"] == "Bearer expired-token"
+            return FakeResponse(401)
+        assert kwargs["headers"]["Authorization"] == "Bearer fresh-anonymous-token"
+        return FakeResponse(200, {"data": [{"id": 2, "title": "retried"}]})
+
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_ACCESS_TOKEN", "expired-token")
+    monkeypatch.setattr(mozyfin_connector, "MOZYFIN_API_KEY", "")
+    monkeypatch.setattr(mozyfin_connector, "TOKEN_CACHE_FILE", tmp_path / "mozyfin_token.txt")
+    monkeypatch.setattr(mozyfin_connector, "ANON_TOKEN_CACHE_FILE", tmp_path / "mozyfin_anon_token.txt")
+    monkeypatch.setattr(
+        mozyfin_connector,
+        "_refresh_from_available_cookies",
+        lambda: (_ for _ in ()).throw(AssertionError("cookie refresh should be a fallback")),
+    )
+    monkeypatch.setattr(mozyfin_connector.requests, "post", fake_post)
+    monkeypatch.setattr(mozyfin_connector.requests, "get", fake_get)
+    monkeypatch.delenv("MOZYFIN_ACCESS_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_TOKEN", raising=False)
+    monkeypatch.delenv("MOZYFIN_API_KEY", raising=False)
+    monkeypatch.delenv("MOZYFIN_COOKIES_JSON", raising=False)
+    monkeypatch.delenv("MOZYFIN_ENABLE_ANONYMOUS_TOKEN", raising=False)
+
+    assert mozyfin_connector.fetch_mozyfin_news(limit=10) == [{"id": 2, "title": "retried"}]
+    assert calls == {"post": 1, "get": 2}
 
 
 def test_mozyfin_connector_authorization_header(monkeypatch, tmp_path):
@@ -163,6 +266,7 @@ def test_mozyfin_fetch_uses_cookie_refresh_without_static_token(monkeypatch, tmp
     monkeypatch.delenv("MOZYFIN_API_KEY", raising=False)
     monkeypatch.delenv("MOZYFIN_AUTH_HEADER", raising=False)
     monkeypatch.setenv("MOZYFIN_COOKIES_JSON", json.dumps([{"name": "session", "value": "abc"}]))
+    monkeypatch.setenv("MOZYFIN_ENABLE_ANONYMOUS_TOKEN", "false")
 
     assert mozyfin_connector.fetch_mozyfin_news(limit=1000) == [{"id": 1, "title": "ok"}]
     assert calls == {"post": 1, "get": 1}
