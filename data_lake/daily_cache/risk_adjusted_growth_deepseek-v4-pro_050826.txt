@@ -1,0 +1,58 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14%) là thước đo baseline tiêu chuẩn cho ngành ngân hàng VN, không quá khắc nghiệt. Tuy nhiên, mặt bằng ngành cho thấy bức tranh ảm đạm: trong top 6 cổ phiếu được phân tích, **chỉ duy nhất SHB tạo ra Economic Alpha dương (+4.0%)**. Các ngân hàng còn lại đều có Alpha âm, từ mức khiêm tốn đến rất sâu, phản ánh đa số đang "đốt vốn" cổ đông dù bối cảnh không có stress test nào được áp dụng. Điều này cho thấy thị trường đang định giá cao kỳ vọng tăng trưởng trong khi chất lượng lợi nhuận (rủi ro biến động) và khả năng tái đầu tư (payout) chưa thực sự thuyết phục.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +4.0%)** — **Fortress**: SHB là đại diện duy nhất cho vị thế pháo đài. Driver chính là **P/B cực rẻ (0.80)** kết hợp với **chất lượng lợi nhuận vượt trội (ROE 17.5%)** và độ ổn định cao nhất nhóm (σROE 1.9%). Công thức Disciplined Return = (17.5%*91.4%)/0.80 - 1.9% = 18.1%, vượt xa CoE 14%, chứng minh đây là cỗ máy compounding thực thụ nhờ Payout thấp và nền vốn vững chắc.
+- **ACB (Alpha -0.9%)** — **Tiệm cận Growth Trap**: ROE rất cao (23.0%), nhưng không đủ bù đắp cho P/B đã tương đối đầy đủ (1.23) và mức Risk Penalty từ σROE 2.7%. Dù chất lượng tốt, định giá hiện tại chưa để lại biên an toàn để vượt qua chi phí vốn.
+- **MBB (Alpha -1.5%)** — **Trung tính**: Sở hữu sự ổn định đáng nể (σROE thấp nhất nhóm 1.6%), nhưng Payout quá thấp (6.7%) không bù đắp nổi mức P/B (1.44) đã phản ánh khá đầy đủ kỳ vọng. Khi P/B trên 1.4 mà Alpha âm, đây là tín hiệu nên chờ đợi định giá hấp dẫn hơn.
+
+## 3. Value Traps Warning
+Top 3 đội sổ phản ánh ba biến thể khác nhau của giá trị sụt giảm:
+- **LPB (Alpha -12.8%)** — **Premium Burn cực đoan**: P/B 3.35 là mức định giá quá đắt. Dù ROE cao (21.1%), Disciplined Return sau khi trừ Risk Penalty (3.8%) và chia cho P/B khổng lồ chỉ còn không đáng kể, trong khi CoE vẫn là ngưỡng cao 14%.
+- **EIB (Alpha -10.5%)** — **Cheap Trap**: P/B 1.30 tưởng chừng rẻ, nhưng ROE chỉ 10.0% — quá thấp để tạo compounding. Bẫy ở đây là giá cổ phiếu đang "neo" vào giá trị sổ sách kém hiệu quả.
+- **VPB (Alpha -9.9%)** — **Growth Trap**: Payout cao nhất nhóm (24.6%) không tưởng thưởng cho cổ đông, mà làm thui chột năng lực tái đầu tư. Kết hợp với σROE cao nhất (4.7%), Risk Penalty cực lớn, ăn mòn toàn bộ lợi nhuận giữ lại. Đây là cổ phiếu có chất lượng tăng trưởng mong manh nhất.
+
+## 4. Portfolio Construction
+- **Core Holding (60-70%)**: **SHB** — Pháo đài duy nhất với Alpha dương rõ ràng, biên an toàn cao nhờ P/B rẻ và chất lượng ổn định. Xứng đáng là vị thế trụ cột trong danh mục ngân hàng.
+- **Tactical (~20-30%)**: **MBB (nếu P/B giảm sâu hơn)** — Có thể cân nhắc giải ngân khi P/B xuống dưới 1.2 để tận dụng sự ổn định vượt trội. Hiện tại vẫn nên chờ đợi điểm entry an toàn hơn.
+- **Cấm mua / Underweight**: **LPB (Premium Burn)**, **EIB (Cheap Trap)**, **VPB (Growth Trap)**. Không nắm giữ cho đến khi P/B của LPB co lại quyết liệt, ROE của EIB cải thiện, hoặc VPB giảm Risk Penalty qua việc giảm Payout và ổn định ROE.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.044322172499376,
+    "median_economic_alpha_pct": -4.152122877617584,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "ACB",
+      "MBB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

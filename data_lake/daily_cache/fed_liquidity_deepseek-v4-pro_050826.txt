@@ -1,0 +1,58 @@
+## 1. Mechanical Decomposition  
+Net Liquidity tuần này giảm mạnh –92.5 tỷ USD, dù RRP đã gần như biến mất (chỉ còn 2.58 tỷ USD) và không thể hút thêm thanh khoản từ kênh này. Do đó, áp lực rút thanh khoản chủ yếu đến từ hai nguồn:  
+- **TGA (Treasury General Account)**: giữ ở mức cao ~910.8 tỷ USD, phản ánh Kho bạc đang tích lũy tiền mặt (rút khỏi hệ thống ngân hàng) thay vì chi tiêu bơm trở lại.  
+- **WALCL (Fed Balance Sheet)**: nhiều khả năng tiếp tục giảm nhẹ theo lộ trình QT, dù tốc độ có thể chậm lại khi RRP cạn.  
+
+Sự kết hợp TGA cao và WALCL thu hẹp đã khiến thanh khoản ròng (WALCL – TGA – RRP) tụt về 5,824.8 tỷ USD – mức thấp đáng kể so với vài tuần trước.
+
+## 2. Cycle Positioning  
+- RRP đã cạn dưới 100 tỷ USD từ lâu và hiện chỉ còn vài tỷ, đánh dấu kết thúc hoàn toàn pha QE “mềm” (nơi thanh khoản được bơm qua việc rút tiền từ RRP). Hệ thống đang chuyển sang pha **QT_active** – thanh khoản bị siết trực tiếp khi dự trữ ngân hàng chịu tác động từ TGA và QT.  
+- So sánh: Net Liquidity hiện tại (5,825 tỷ) thấp hơn rõ rệt so với đỉnh 2022 (~6,500–6,700 tỷ), và tiến gần về đáy 2024 (quanh 5,700 tỷ). Đà giảm cho thấy tình trạng thanh khoản đang bị thắt chặt hơn qua từng tuần.
+
+## 3. Signal Strength  
+- **Tín hiệu**: CUT, xác nhận bởi Impulse EMA(4) âm (–39.6 tỷ USD) và Z-score –1.35 (dưới ngưỡng –1σ).  
+- **Mức độ**: chỉ cận biên (chưa vượt –2σ), nên sức mạnh tín hiệu ở mức trung bình. Tuy nhiên, Impulse EMA(4) liên tục âm củng cố xu hướng rút thanh khoản.  
+- Tổng thể, tín hiệu đáng tin cậy nhưng không phải cực đoan, phản ánh áp lực thanh khoản tiêu cực đang gia tăng.
+
+## 4. Cross-Asset Spillover (1-4 tuần)  
+- **SPX/NDX**: Bias tiêu cực. Thanh khoản Fed thu hẹp thường tạo sức ép lên định giá cổ phiếu Mỹ trong vài tuần tới.  
+- **DXY**: xu hướng mạnh lên do thanh khoản toàn cầu thu hẹp, gây áp lực lên Gold và Crypto.  
+- **VN-Index**: với lag 4–8 tuần so với Fed liquidity, tín hiệu CUT và DXY mạnh có thể gây bất lợi cho dòng vốn ngoại và tâm lý thị trường, khiến VN-Index chịu rủi ro điều chỉnh hoặc ít nhất là mất động lực tăng.
+
+## 5. Risk Factors (tín hiệu có thể sai vì)  
+- **RRP đã gần zero**: đó cũng là con dao hai lưỡi – CUT có thể yếu đi vì không còn dư địa hút thanh khoản qua kênh này; biến động TGA sẽ quyết định phần lớn.  
+- **Mùa thuế/thu chi ngân sách**: TGA có thể biến động mạnh, làm nhiễu tín hiệu thực của thanh khoản (dù hiện tại chưa phải tháng cao điểm).  
+- **Công cụ khẩn cấp của Fed**: nếu thị trường căng thẳng, Fed có thể kích hoạt standing repo facility hoặc mua tài sản, đảo ngược tín hiệu nhanh chóng.
+
+## 6. KẾT LUẬN  
+Regime đang ở **QT_active** với tín hiệu CUT cận biên, hàm ý thanh khoản rút dần và gây áp lực lên tài sản rủi ro trong ngắn hạn. Triển vọng 2–4 tuần tới cho risk assets (Mỹ, crypto, VN-Index) thiên về **tiêu cực**, trong bối cảnh chưa có yếu tố bơm thanh khoản bù đắp.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5824.8,
+  "signal": "CUT",
+  "z_score": -1.35,
+  "regime": "QT_active",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5824838.0,
+    "fed_liquidity_impulse": -92541.0,
+    "fed_liquidity_impulse_ema": -39563.3087477442,
+    "fed_liquidity_zscore": -1.346817245956799,
+    "signal": "CUT",
+    "walcl": 6738190.0,
+    "wtregen": 910776.0,
+    "rrpontsyd": 2576.0
+  }
+}
+```

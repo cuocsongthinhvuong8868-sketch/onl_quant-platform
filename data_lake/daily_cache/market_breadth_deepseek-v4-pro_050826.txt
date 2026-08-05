@@ -1,0 +1,49 @@
+## 1. Observations
+- MA20: 37.2% mã trên đường trung bình – thấp, nằm dưới ngưỡng 50% nhưng chưa rơi vào vùng quá bán (<20%).
+- MA60: 19.3% – rất thấp, chỉ một phần năm rổ còn giữ được xu hướng trung hạn.
+- MA125: 16.0% – cực thấp, báo hiệu suy giảm đồng thuận kéo dài nửa năm.
+- MA252: 18.1% – rất thấp, chưa đến 1/5 doanh nghiệp đứng trên đường MA một năm, xác nhận xu hướng dài hạn tiêu cực.
+
+## 2. Structural Health
+Cấu trúc breadth hiện tại hoàn toàn đồng thuận theo chiều giảm: cả bốn đường MA đều rất thấp và xếp lớp từ ngắn hạn xuống dài hạn (37% → 19% → 16% → 18%). Không có phân kỳ giữa MA20 và MA252 vì cả hai cùng yếu. Xét theo mẫu hình tham chiếu, chưa chạm chính xác Bear Confirmed (MA20 cần <30%), nhưng thị trường đang tiệm cận trạng thái này khi MA252 quá thấp; diễn biến hiện tại phản ánh thị trường giá xuống rõ nét với số ít cổ phiếu giữ được xu thế tích cực.
+
+## 3. Money Flow Leadership
+Dòng tiền ngắn hạn (top volume giữ MA20) tập trung vào nhóm chứng khoán nhỏ, nhựa, và một vài đại diện bất động sản – mang tính đầu cơ, không hình thành ngành dẫn dắt rõ ràng. Trong khi đó, các mã dẫn dắt dài hạn (giữ MA252) đến từ ngân hàng (ABB), bảo hiểm (BVH), phân bón (BFC), lọc hóa dầu (BSR) và xây dựng (C32, C69, CDC) – thuộc nhóm phòng thủ/giá trị. Sự chồng lấn chỉ xuất hiện ở ASP. Dòng tiền thông minh ưu tiên defensive, tránh xa nhóm tăng trưởng chu kỳ như thép hay môi giới.
+
+## 4. Verdict
+Toàn bộ bức tranh breadth yếu, xu hướng dài hạn suy giảm (MA252 ≈ 18%), dòng tiền phòng thủ. Không có tín hiệu phân kỳ nào để canh đảo chiều. Chiến lược phù hợp: **defensive – ưu tiên nắm tiền mặt, không giải ngân mới.** Hoàn toàn không sử dụng đòn bẩy (margin 0%) do MA252 quá thấp, tránh rủi ro khi chưa có xác nhận hồi phục breadth. Đợi tín hiệu MA20 vượt ít nhất 50% kèm cải thiện MA60 mới xem xét giải ngân trở lại.
+
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 37.2,
+  "ma60_pct": 19.3,
+  "ma125_pct": 16.0,
+  "ma252_pct": 18.1,
+  "regime": "bear_confirmed",
+  "leadership_sector": "defensive",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 37.1764705882353,
+    "breadth_ma60_pct": 19.294117647058822,
+    "breadth_ma125_pct": 16.0,
+    "breadth_ma252_pct": 18.11764705882353,
+    "above_ma20_count": 158,
+    "above_ma60_count": 82,
+    "above_ma125_count": 68,
+    "above_ma252_count": 77,
+    "breadth_universe_size": 425,
+    "snapshot_date": "05/08/2026"
+  }
+}
+```

@@ -1,0 +1,106 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái tín hiệu tin tức (news sentiment regime)**
+
+- **Khung 1d**: `STRONG_RISK_ON` – **KHẲNG ĐỊNH CHẮC CHẮN**  
+  Posterior trung bình: +0.409, P_conf cùng chiều = 93% > 85% → Tín hiệu rủi ro mở rộng (risk-on) rõ ràng trong ngày.
+
+- **Khung 7d**: `STRONG_RISK_ON` – **KHẲNG ĐỊNH CHẮC CHẮN**  
+  Posterior trung bình: +1.197, P_conf = 100% → Tâm lý thị trường dương cực mạnh, không có nghi ngờ.
+
+- **Khung 30d**: `STRONG_RISK_ON` – **KHẲNG ĐỊNH CHẮC CHẮN**  
+  Posterior trung bình: +0.728, P_conf = 100% → Rủi ro mở rộng được duy trì bền vững trong tháng qua.
+
+> **Lưu ý**: P_conf và P(sentiment mean > 0) là xác suất về giá trị trung bình của sentiment ẩn, không phải xác suất VN‑Index tăng. Tuy nhiên với mức tin cậy ≥93%, các khung đều đủ mạnh để dùng giọng khẳng định.
+
+---
+
+**2. Kênh kéo risk‑on/risk‑off mạnh nhất**
+
+- **Kéo risk‑on**:  
+  - `earnings` (1d: +1.325, P_conf 100% | 7d/30d: +2.000/+1.842, P_conf 100%) – lợi nhuận doanh nghiệp.  
+  - `fx_external` (1d: +1.096, P_conf 100% | 7d: +1.344 | 30d: +2.000, P_conf 100%) – tỷ giá ổn định, tăng nhẹ.  
+  - `monetary_policy` (7d: +2.000, P_conf 100% | 30d: +1.375) – mặt bằng lãi suất liên ngân hàng tăng, nhưng phản ánh điều hành chủ động.  
+  - `credit_stress` (cả 3 khung đều +1.2 đến +1.9, P_conf 99–100%) – căng thẳng tín dụng thấp, lợi suất TPCP đi ngang/tăng nhẹ.  
+  - `liquidity` (7d: +2.000, P_conf 100% nhờ bơm OMO mạnh) nhưng 30d lại âm nhẹ (−0.189, P_conf 100%) → tín hiệu thanh khoản có phân hoá thời điểm.
+
+- **Kéo risk‑off**:  
+  - `commodity` (tất cả khung đều −2.000 đến −0.733, P_conf 100%) – giá hàng hoá lao dốc, phản ánh cầu nguyên liệu yếu.  
+  - `inflation` (30d: −0.295, P_conf 79% – chỉ Nghiêng về tiêu cực, chưa đủ độ tin cậy để khẳng định).
+
+---
+
+**3. Động lực quan trọng (5 positive, 3 negative)**
+
+**Tích cực nhất**  
+- Liên tục tỷ giá trung tâm tăng (từ 25.206 → 25.405) – kênh fx_external, nguồn Data Wi.  
+- NHNN bơm ròng mạnh qua OMO (31/07: +23,288 tỷ; 03/08: +15,067 tỷ) – kênh liquidity 7d.  
+- Lãi suất ON tăng vọt 497 bps vào 31/07, lên 6.22% ngày 03/08 – phản ánh tín hiệu định hướng lãi suất.  
+- Nghị quyết 10 mở đường FDI chất lượng cao + nền kinh tế duy trì xu hướng tích cực – kênh growth.  
+- Lợi nhuận doanh nghiệp (earnings) dương mạnh và ổn định xuyên suốt 3 khung (P_conf 100%).
+
+**Tiêu cực nhất**  
+- Giá heo hơi, than cốc, phân Ure đồng loạt thủng đáy 6 tháng – kênh commodity với score −1.301, nguồn Data Wi, xuất hiện liên tục trong 1d/7d/30d.  
+- Giá quặng sắt Trung Quốc giảm về đáy 1 năm (dưới 680 CNY/tấn) – commodity.  
+- Thanh khoản dài hạn (30d) hơi âm (−0.189, P_conf 100%), trái ngược với bơm ròng 7d → cần theo dõi sự bền vững của thanh khoản.
+
+---
+
+**4. Đánh giá tác động đến AI CIO**
+
+- **Supports**: Tâm lý risk‑on mạnh mẽ đồng thuận với các channel tài chính cốt lõi (tỷ giá, lợi nhuận, chính sách tiền tệ, tín dụng). Điều này ủng hộ việc giữ hoặc tăng tỉ trọng tài sản rủi ro trong danh mục, nhất là khi cả 3 khung đều khẳng định chắc chắn.  
+- **Neutral / cần giám sát**: Giá hàng hoá suy yếu (commodity) là tín hiệu ngược với chu kỳ kinh tế mở rộng, có thể chỉ là yếu tố kỹ thuật bên ngoài (Trung Quốc). Thanh khoản 30d hơi âm – nếu tiếp diễn có thể hạn chế độ rộng của rally.  
+- **Conflict**: Không có xung đột trực tiếp với các công cụ internal nếu macro‑layer cũng xác nhận tăng trưởng; tuy nhiên nếu internal tools chỉ ra rủi ro thị trường quá mua, cần cân nhắc phòng vệ một phần bởi tín hiệu hàng hoá yếu.
+
+---
+
+**5. Cảnh báo (caveats)**
+
+- **Nguồn dữ liệu xã hội chiếm tỉ trọng cao**:  
+  - 1d: `mozyfin_social` = 45/218 (~21%)  
+  - 7d: `mozyfin_social` = 430/956 (~45%)  
+  - 30d: `mozyfin_social` = 1.877/4.626 (~41%)  
+  → Các bài đăng từ mạng xã hội Mozyfin được xếp hạng là bằng chứng **có độ tin cậy thấp hơn** (ý kiến/quan điểm), có thể làm nhiễu tín hiệu. Dù vậy, kênh dữ liệu cứng (widata, tin chính thống) vẫn dẫn dắt hướng tích cực với P_conf cao.
+
+- **Tin tức mới cập nhật** (generated_at 05/08/2026, 16:41) → không có độ trễ đáng kể.
+
+- **Rủi ro headline noise**: Một số tín hiệu commodity giảm sâu có thể là biến động giá ngắn hạn, không nhất thiết phản ánh suy thoái nhu cầu nội địa Việt Nam. Cần lọc qua các kênh vĩ mô sâu hơn trước khi hành động.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.409,
+    "news_confidence_1d": 0.9273,
+    "news_count_1d": 218,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 73,
+      "mozyfin": 100,
+      "mozyfin_social": 45
+    },
+    "news_macro_composite_7d": 1.1971,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 956,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 426,
+      "mozyfin_social": 430,
+      "mozyfin": 100
+    },
+    "news_macro_composite_30d": 0.7275,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4626,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1075,
+      "mozyfin": 1674,
+      "mozyfin_social": 1877
+    },
+    "news_macro_composite": 0.409,
+    "news_confidence": 0.9273,
+    "news_count": 218
+  }
+}
+```

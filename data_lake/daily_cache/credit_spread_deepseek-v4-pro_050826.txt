@@ -1,0 +1,60 @@
+<!-- ai-cio-cache-version: primary_issuance_equal_weight_v1 -->
+## 1. Credit snapshot  
+Tại ngày 31/07/2026, lợi suất trái phiếu sơ cấp bình quân của nhóm Ngân hàng đạt 8.57%, trong khi nhóm Bất động sản ở mức 12.50%. Chênh lệch tuyệt đối (Bank – BĐS) là -3.93 điểm phần trăm, đồng nghĩa risk premium của BĐS so với Bank neo tại 393.3 bps. Mức bù rủi ro này đang ở ngưỡng cực kỳ cao nếu so với lịch sử 23 kỳ khớp dữ liệu, phản ánh áp lực chi phí huy động phân hóa mạnh giữa hai nhóm phát hành.
+
+## 2. Direction và persistence  
+Kỳ gần nhất ghi nhận widening +15.8 bps (từ 378 bps lên 393 bps), khớp với tín hiệu direction “WIDENING”. Liên tiếp ba kỳ báo cáo, risk premium đã mở rộng tổng cộng +52.5 bps, được hệ thống gắn trend “WIDENING_3P” – cho thấy xu hướng nới rộng không phải nhiễu đơn lẻ mà có tính bền vững trong ngắn hạn. Percentile 95.7% trên tập matched 23 kỳ nhấn mạnh rằng chỉ chưa đến 5% số kỳ có mức bù cao hơn hiện tại, nhưng z-score chỉ +0.90 nên mức độ chưa đạt cực đoan thống kê (2-sigma). Như vậy, widening hiện tại vừa bền, vừa chưa quá “giãn” theo nghĩa biến động bất thường, mà đang ở vùng cao kéo dài.
+
+## 3. Cơ chế truyền dẫn tới tài sản rủi ro  
+Risk premium BĐS – Bank mở rộng hàm ý chi phí biên của doanh nghiệp bất động sản tăng nhanh hơn mặt bằng ngân hàng. Trong điều kiện không có thêm biến kiểm soát, đây là tín hiệu overlay tiêu cực cho khẩu vị rủi ro: nhà đầu tư sơ cấp yêu cầu mức bù cao hơn để nắm giữ trái phiếu BĐS, có thể làm thu hẹp kênh tài trợ cho nhóm này và lan tỏa tâm lý thận trọng sang các lớp tài sản rủi ro khác. Ngược lại, nếu premium thu hẹp (như kỳ 24/07), áp lực tương đối giảm bớt. Cần nhấn mạnh rằng quan hệ này chỉ là chỉ báo điều kiện tài trợ, không phải dự báo nhân quả lên chỉ số chứng khoán, bởi còn nhiều yếu tố khác như thanh khoản thứ cấp, kỳ vọng lãi suất điều hành và dòng vốn ngoại.
+
+## 4. Data quality và falsification  
+Chất lượng dữ liệu được xếp mức MEDIUM. Mẫu matched chỉ 23 kỳ – khá mỏng để xác lập quy luật dài hạn. Kỳ này số đợt phát hành Bank là 6, BĐS là 3, đủ để tính bình quân nhưng vẫn dễ bị chi phối bởi một issuer riêng lẻ. Coverage coupon Bank chỉ đạt 56.6% do loại trừ toàn bộ trái phiếu thả nổi – có thể làm sai lệch mặt bằng lợi suất nếu tỷ trọng thả nổi đáng kể. Coverage BĐS tốt hơn (91.0%). Ba điều kiện có thể đảo ngược nhận định hiện tại: (1) nếu kỳ tới có một đợt phát hành BĐS quy mô lớn với coupon thấp hơn bất thường do cấu trúc riêng (có tài sản đảm bảo mạnh hoặc bảo lãnh), premium có thể giảm đột ngột; (2) nếu dữ liệu đầy đủ hơn cho thấy coupon thả nổi của Bank thực tế cao hơn nhiều, kéo Bank yield lên và thu hẹp spread; (3) nếu mẫu khớp mở rộng về quá khứ và xuất hiện những giai đoạn premium >400 bps kéo dài, mức 393 bps hiện tại sẽ không còn ở phân vị cao như hiểu biết 23 kỳ.
+
+## 5. Kết luận  
+Với risk premium 393 bps, percentile 95.7% trong tập matched và trend widening 3 kỳ, chế độ tín dụng tương đối giữa BĐS và Ngân hàng đang ở trạng thái **ELEVATED**. Tín hiệu risk‑on/risk‑off overlay mang màu sắc **negative**, phản ánh sự phân biệt giá tài trợ ngày càng sâu, tuy nhiên chưa đạt ngưỡng STRESSED do z‑score chỉ +0.90 và chất lượng dữ liệu chưa cao. Quan sát này nên được sử dụng như một lớp lọc bổ trợ, không thay thế phân tích nền tảng về room tín dụng, thanh khoản thứ cấp hay đặc điểm từng trái phiếu.
+
+```json
+{
+  "tool": "credit_spread",
+  "risk_premium_bps": 393.3,
+  "direction": "WIDENING",
+  "trend_3p": "WIDENING_3P",
+  "credit_regime": "ELEVATED",
+  "risk_asset_overlay": "negative",
+  "confidence": "medium"
+}
+```
+final score & regime : 78 ; regime : ELEVATED
+
+=== AI CIO STRUCTURED METRICS: credit_spread_canonical ===
+Credit Spread Data Date: 31/07/2026
+Credit Spread Risk Premium: 393.3 bps
+Credit Spread Risk Premium Change: +15.8 bps
+Credit Spread Risk Premium 3P Change: +52.5 bps
+Credit Spread Risk Premium Percentile: 95.7
+Credit Spread Matched Periods: 23
+Credit Spread Bank Issuance Count: 6
+Credit Spread Real Estate Issuance Count: 3
+Credit Spread Direction: WIDENING
+Credit Spread Data Quality: MEDIUM
+
+=== AI CIO DIRECT METRICS: credit_spread ===
+```json
+{
+  "tool": "credit_spread",
+  "source": "direct_quantitative",
+  "metrics": {
+    "credit_spread_risk_premium_bps": 393.33333333333337,
+    "credit_spread_change_bps": 15.833333333333314,
+    "credit_spread_3p_change_bps": 52.53333333333342,
+    "credit_spread_percentile": 95.65217391304348,
+    "credit_spread_matched_periods": 23,
+    "credit_spread_bank_count": 6,
+    "credit_spread_real_estate_count": 3,
+    "direction": "WIDENING",
+    "trend_3p": "WIDENING_3P",
+    "data_quality": "MEDIUM"
+  }
+}
+```

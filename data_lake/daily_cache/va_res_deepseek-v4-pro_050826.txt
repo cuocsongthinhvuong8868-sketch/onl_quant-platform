@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index: **0.00%** (ngưỡng cảnh báo 40%)  
+- Số mã trong VN30 thủng VaR 95%: **0 / 30** (không có breach)  
+- Complacency Index toàn thị trường: **5.61%** (ngưỡng nguy hiểm 80%), với **6 mã bị mispriced**
+
+## 2. Contagion Assessment (Module B)
+Stress Index = 0.00% – không có dấu hiệu lây lan hệ thống real‑time. Không mã nào trong VN30 để mất hơn VaR 95%, do đó không có đầu sóng systemic xuất phát từ các cổ phiếu lớn. Các chỉ số stress đang ở trạng thái thấp nhất, phản ánh biến động giá cực đoan chưa xuất hiện. Top 3 crash trống, không ghi nhận sự cố cá biệt đáng kể.
+
+## 3. Complacency Assessment (Module C)
+Complacency 5.61% – thị trường **không** ở chế độ “ngủ quên” (distribution top hay accumulation kéo dài). Điều này **không** đồng nghĩa thị trường ổn định hay an toàn; nó chỉ cho biết cấu trúc bù rủi ro hiện chưa bị nén trên diện rộng, spread chưa co hẹp bất thường. Kết hợp với Stress Index = 0, có thể thấy không tồn tại đồng thời rủi ro lây lan đang diễn ra cũng như rủi ro che giấu lớn. Tuy nhiên, thị trường vẫn có thể đang trong uptrend mạnh hoặc dao động biên độ lớn – đều là các chế độ tự nhiên khiến Complacency thấp – nên không được phép suy luận “bình thường” hay “không có áp lực bán”.
+
+## 4. Stock‑Level Risk Calls
+- **Top 3 Crash (Module B):** không có, do đó không phát sinh lệnh bán/giảm tỉ trọng khẩn cấp từ breach.  
+- **Top 3 Mispriced (VIC, BMP, LPB):** Spread của các mã này đang bị nén chặt nhất toàn thị trường, hàm ý phần bù rủi ro bị định giá thấp. Nhà đầu tư nắm giữ nên thắt chặt trailing stop (ví dụ: một cú close dưới MA20 hoặc thủng hỗ trợ gần nhất trên D1, không đặt mức giá tuyệt đối). Đây là cảnh báo tiềm ẩn, chưa phải tín hiệu bán ngay.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.61,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=0.00% (0/30); complacency=5.61% (6/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 0.0,
+    "vares_complacency_pct": 5.607476635514018,
+    "vares_breach_count": 0,
+    "vares_mispriced_count": 6,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

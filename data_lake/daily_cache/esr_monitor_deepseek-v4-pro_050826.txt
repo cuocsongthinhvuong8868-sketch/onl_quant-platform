@@ -1,0 +1,56 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI hiện tại **63.9%** – nằm trong vùng **WARNING** (tích lũy rủi ro ngầm).
+- Trạng thái thị trường HMM: **ACTIVE STRESS** (stress cao + xu hướng giảm).
+- Top 3 trụ cột dẫn dắt SSI: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**.
+- VN30 đóng cửa dưới MA125, xác nhận phe bán chiếm ưu thế kỹ thuật.
+
+## 2. Risk Decomposition (Bóc tách)
+**S_LIQ đang là driver chính của stress.** Chỉ báo này đo lường sự khô cạn thanh khoản – volume dollar giao dịch đang thu hẹp nghiêm trọng so với chuẩn 1 năm (norm 252 phiên). Hiện tượng giảm volume trong xu hướng giảm củng cố rủi ro thanh khoản, dễ dẫn đến biến động mạnh khi có dòng tiền lớn cần thoát hàng.  
+
+**S_VAL (định giá căng thẳng)** đứng thứ hai, phản ánh chênh lệch giữa lợi nhuận 252 ngày của VN30 và lãi suất tiền gửi vẫn ở mức cao, cho thấy mặt bằng định giá chưa hạ nhiệt hẳn dù giá đã điều chỉnh.  
+
+**S_COR (tương quan hệ thống)** tăng cao (EVR PC1 toàn thị trường 38%) là dấu hiệu đồng pha mạnh – nhà đầu tư hành xử theo bầy đàn, khuếch đại đà bán khi thị trường yếu.  
+
+Sự kết hợp S_LIQ khô cạn + S_COR cao hình thành cấu trúc rủi ro đặc trưng cho sụt giảm kéo dài, không phải bull trap do thị trường đã ở xu hướng giảm rõ nét.
+
+## 3. Cross-Check
+- **VN30 dưới MA125, không có phân kỳ tạo đỉnh.** Giá không tạo đỉnh mới trong khi SSI leo cao, do đó loại trừ kịch bản bull-trap thường thấy khi SSI vào WARNING/CRITICAL kèm giá tăng. Đà giảm hiện tại đã phản ánh rủi ro hệ thống, không có dấu hiệu “gấu ngụy trang”.
+- **HMM regime ACTIVE STRESS khớp với mức SSI WARNING** – mô hình xác nhận stress cao đi cùng downtrend, không có mâu thuẫn cần flag.  
+
+## 4. Verdict
+Với SSI ở WARNING, trạng thái ACTIVE STRESS và driver chính là thanh khoản khô cạn, quan điểm bảo thủ được kích hoạt.  
+- **Tỉ trọng tiền mặt đề xuất: 65%** danh mục – giảm thiểu rủi ro sụt giảm kéo dài, chờ thanh khoản hồi phục hoặc SSI về SAFE mới giải ngân trở lại.  
+- **Hedge action: reduce_beta** – giảm beta danh mục bằng cách hạ tỉ trọng cổ phiếu vốn hóa lớn có hệ số tương quan cao, chưa cần thiết short futures trực tiếp vì SSI chưa vượt CRITICAL. Nếu SSI tiếp tục tăng qua 80%, cân nhắc mua put bảo vệ phần nắm giữ còn lại.  
+- Không có mâu thuẫn giữa các pillar drivers, tín hiệu hành động rõ ràng theo hướng phòng thủ.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.9,
+  "regime": "WARNING",
+  "market_state": "ACTIVE_STRESS",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 65,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.86278221045212,
+    "pca_concentration_pct": 38.005732949764784,
+    "market_state": "ACTIVE STRESS",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.46806405321828
+  }
+}
+```
