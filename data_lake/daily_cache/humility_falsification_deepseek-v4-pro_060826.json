@@ -1,0 +1,265 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-08-06T13:31:29",
+  "t_data_date": "2026-08-06",
+  "target_report_date": "2026-08-05",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_050826.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_050826.txt",
+  "report_mtime": "report:2026-08-06T13:21:38|sidecar:2026-08-06T13:21:38",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_050826.txt:65717c6954a8f977d54b1daf7d0f04ea9c2a31f6|sidecar:ai_cio_humility_rules_deepseek-v4-pro_050826.json:62672448d136ec938681beedb46acf55a7bf2c99",
+  "parsed": {
+    "report_date": "2026-08-05",
+    "composite_score": 28.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 2.0,
+        "unit": "sessions",
+        "description": ""
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 37.2,
+        "unit": "%",
+        "description": ""
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.9,
+        "unit": "%",
+        "description": ""
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.326,
+        "unit": "",
+        "description": ""
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 23.6,
+        "unit": "th pct",
+        "description": ""
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.9,
+        "unit": "th pct",
+        "description": ""
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-08-05",
+      "composite_score": 28.0,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 2,
+          "unit": "sessions"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 37.2,
+          "unit": "%"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.9,
+          "unit": "%"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.326,
+          "unit": ""
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 23.6,
+          "unit": "th pct"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.9,
+          "unit": "th pct"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-08-05",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "2 sessions",
+      "T actual": 3.0,
+      "T actual display": "3 sessions",
+      "Delta": 1.0,
+      "Delta display": "+1 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-05",
+      "Description": "",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "37.2%",
+      "T actual": 33.1764705882353,
+      "T actual display": "33.2%",
+      "Delta": -4.023529411764706,
+      "Delta display": "-4.024%",
+      "Status": "Intact",
+      "Data date": "2026-08-06",
+      "Description": "",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.9%",
+      "T actual": 64.12568238265511,
+      "T actual display": "64.1%",
+      "Delta": 0.22568238265511553,
+      "Delta display": "+0.226%",
+      "Status": "Intact",
+      "Data date": "2026-08-06",
+      "Description": "",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.326",
+      "T actual": 0.3263191266569856,
+      "T actual display": "0.326",
+      "Delta": 0.00031912665698557996,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-08-06",
+      "Description": "",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "23.6 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.9 th pct",
+      "T actual": 99.66931216931218,
+      "T actual display": "99.7 th pct",
+      "Delta": -0.2306878306878275,
+      "Delta display": "-0.231 th pct",
+      "Status": "Intact",
+      "Data date": "2026-08-05",
+      "Description": "",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 3,
+      "date": "2026-08-05",
+      "error": ""
+    },
+    "breadth": {
+      "value": 33.1764705882353,
+      "date": "2026-08-06",
+      "error": ""
+    },
+    "ssi": {
+      "value": 64.12568238265511,
+      "date": "2026-08-06",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.3454435282173134,
+      "date": "2026-08-06",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3263191266569856,
+      "date": "2026-08-06",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.66931216931218,
+      "date": "2026-08-05",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

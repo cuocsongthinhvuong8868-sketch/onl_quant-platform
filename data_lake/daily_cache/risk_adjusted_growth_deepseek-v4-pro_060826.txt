@@ -1,0 +1,64 @@
+# Phân Tích Alpha Ngành Ngân Hàng – Kịch Bản Trung Lập (K=1.0, CoE=14%)
+
+## 1. Scenario Assessment  
+Kịch bản hiện tại không khắc nghiệt – K trung lập, không có stress test. Dù vậy, bức tranh Alpha cho thấy **ngành đang đốt vốn**: chỉ duy nhất SHB có Alpha dương (+4.0%), còn lại toàn bộ các mã (kể cả Top 3) đều âm hoặc sát 0. Mặt bằng chung, cổ đông không được bù đắp xứng đáng cho chi phí vốn 14%. Đây là tín hiệu “avoid sector” rõ ràng trừ khi xuất hiện kịch bản mềm hơn.
+
+## 2. Top Alpha Decomposition  
+
+- **SHB (Alpha +4.0%) – Fortress**: Bộ ba hoàn hảo: P/B rẻ (0.80x) khuếch đại tỷ suất thu nhập, ROE 17.5% khá bền vững, σROE cực thấp (1.9%) và payout khiêm tốn (8.6%) giúp tái đầu tư lãi kép. Disciplined Return ~18.1%, vượt CoE một cách vững chắc.  
+- **ACB (Alpha -0.7%) – Growth Trap**: ROE cao nhất nhóm (23.0%) nhưng P/B 1.21x và σ 2.7% làm bào mòn lợi thế. Disciplined Return chỉ đạt 13.3%, thiếu một chút để chiến thắng CoE. Dù tăng trưởng tốt, định giá và rủi ro khiến cổ phiếu không tạo giá trị thặng dư.  
+- **MBB (Alpha -1.3%) – Premium Burn**: Chất lượng rất tốt (σ 1.6%, ROE 21.8%), nhưng thị trường đã trả giá cao (P/B 1.42x), đẩy Disciplined Return xuống 12.7%. Đây là cái giá của sự “quá an toàn” – Premium Burn điển hình.
+
+## 3. Value Traps Warning  
+
+- **LPB (Alpha -12.7%)**: P/B 3.29x phản ánh kỳ vọng phi thực tế. ROE 21.1% không đủ sức gánh định giá trên trời, cộng thêm σ cao 3.8% → hủy diệt giá trị.  
+- **EIB (Alpha -10.5%)**: Bẫy giá trị kinh điển: ROE chỉ 10% và σ 3.8%, mẫu số P/B 1.30 không cứu nổi tử số èo uột.  
+- **VPB (Alpha -9.8%)**: ROE 14.1% sát CoE nhưng payout cao (24.6%) rút cạn nội lực, σ 4.7% lớn nhất nhóm, biến cổ phiếu thành “bom nổ chậm” dù bề ngoài P/B 1.18x trông có vẻ hợp lý.
+
+## 4. Portfolio Construction  
+
+- **Core Holding (Fortress)**: SHB – nên chiếm 100% nếu buộc phân bổ vào ngành.  
+- **Tactical**: Không mã nào đạt tiêu chí rẻ-mà-không-bẫy. ACB, MBB đều không tạo Alpha.  
+- **Cấm mua / Underweight**: ACB, MBB, LPB, EIB, VPB.  
+- **Kết luận**: Chỉ nên nắm SHB, hoặc tốt hơn là tạm đứng ngoài ngành khi 5/6 mã đốt vốn.
+
+## 5. Structured Tail
+
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["ACB", "MBB", "LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.044322172499376,
+    "median_economic_alpha_pct": -4.056952389030826,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "ACB",
+      "MBB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

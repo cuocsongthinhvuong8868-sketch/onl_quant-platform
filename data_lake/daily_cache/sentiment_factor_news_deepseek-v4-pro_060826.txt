@@ -1,0 +1,114 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**Báo cáo News Sentiment – AI CIO Vietnam**
+*Ngày phân tích: 06/08/2026 | Dữ liệu cập nhật đến 16:44*
+
+---
+
+### 1. Trạng thái News Sentiment (Regime)
+
+- **Cửa sổ 1 ngày**: **Khẳng định chắc chắn** `strong_risk_on`  
+  *Posterior mean +0.51, P_conf 99% (>85%) → Tin hiệu tâm lý thị trường tích cực rõ ràng.*  
+  Nguồn: mozyfin=99, mozyfin_social=55, widata=81 (tỷ trọng social lớn, cần lưu ý nhiễu).
+
+- **Cửa sổ 7 ngày**: **Khẳng định chắc chắn** `strong_risk_on`  
+  *Posterior mean +1.17, P_conf 100%. Sức mạnh tín hiệu rất cao.*  
+  Nguồn: mozyfin=200, mozyfin_social=433, widata=411 (mozyfin_social chiếm ~41%).
+
+- **Cửa sổ 30 ngày**: **Khẳng định chắc chắn** `strong_risk_on`  
+  *Posterior mean +0.74, P_conf 100%. Tín hiệu bền vững dài hạn.*  
+  Nguồn: mozyfin=1663, mozyfin_social=1953, widata=1121 (social ~41%).
+
+**Kết luận xuyên suốt**: Tâm lý risk-on chiếm ưu thế tuyệt đối ở mọi khung thời gian, củng cố niềm tin vào xu hướng tích cực.
+
+---
+
+### 2. Kênh dẫn dắt chính
+
+**Kéo Risk-On mạnh nhất (P_conf >85%, khẳng định chắc chắn):**
+- `earnings` (1d: +1.35, 7d: +2.00, 30d: +1.87) – Kỳ vọng lợi nhuận doanh nghiệp rất lạc quan.
+- `fx_external` (1d: +1.21, 7d: +1.40, 30d: +2.00) – Tỷ giá ổn định, kênh ngoại hối tích cực.
+- `credit_stress` (1d: +1.22, 7d: +1.89, 30d: +1.26) – Căng thẳng tín dụng thấp, rủi ro vỡ nợ giảm.
+- `liquidity` (1d: +0.75 với P_conf 91%, 7d: +1.83 với P_conf 100%) – Thanh khoản hệ thống dồi dào (OMO trung tính/bơm ròng trong 7d).
+
+**Kéo Risk-Off / Gây nhiễu:**
+- `commodity` (1d: -0.45, P_conf 92% → **Khẳng định chắc chắn suy yếu**; 7d: -1.47, P_conf 100%) – Giá hàng hóa Trung Quốc lao dốc (ure, than cốc, quặng sắt).  
+  *Lưu ý: Có điểm sáng từ giá vàng thế giới quy đổi (+0.57 trong 1d), nhưng kênh tổng thể vẫn âm nặng.*
+- `monetary_policy` (1d: -0.58, P_conf 85% → **Nghiêng về tiêu cực**; nhưng 7d lại +2.00) – Đảo chiều trong ngắn hạn (có thể do mặt bằng lãi suất liên ngân hàng tăng nhẹ gần đây).
+- `inflation` (30d: -0.30, P_conf 79% → **Nghiêng về giảm phát**) – Áp lực lạm phát thấp, chưa đủ độ tin cậy cao.
+
+---
+
+### 3. Các động lực chính (Drivers)
+
+**Tích cực (toàn cửa sổ):**
+- Tỷ giá trung tâm tăng đều đặn các phiên, 06/08 tăng 28đ lên 25,433 – củng cố niềm tin VND ổn định.
+- Lợi suất TPCP đi ngang (06/08) – tín hiệu không có căng thẳng trái phiếu, kênh `credit_stress` tích cực.
+- NHNN không hút ròng OMO phiên 06/08 (cân bằng 0 tỷ) – thanh khoản vẫn được giữ ở mức thoải mái.
+- Khu kinh tế mở Chu Lai đón dòng vốn tỷ USD – thông tin tăng trưởng (`growth`) tích cực từ báo chí.
+- Trong 7 ngày: NHNN liên tục bơm ròng lượng lớn (23.3k tỷ 31/7, 15.1k tỷ 03/8) và lãi suất ON tăng → phản ánh nhu cầu vốn cao, nhưng được đáp ứng đầy đủ (tín hiệu `monetary_policy` dương dài hạn).
+
+**Tiêu cực/Đối trọng:**
+- Giá urê Trung Quốc đáy 6 tháng (1,737.5 CNY/tấn 06/08), than cốc đáy tháng, quặng sắt đáy 1 năm – hàng loạt hàng hóa cơ bản giảm sâu, gây áp lực lên kênh `commodity`.
+- Cảnh giác lừa đảo vay vốn (bài báo an ninh tiền tệ) – tín hiệu cảnh báo `banking_system` nhẹ, không đáng kể so với mặt bằng tích cực.
+- Lãi suất ON tăng 50-10bps trong 7 ngày gần đây, khiến `monetary_policy` 1d trở nên tiêu cực tạm thời.
+
+---
+
+### 4. Kết luận cho AI CIO
+
+- **Hỗ trợ (Supports)**: Tâm lý tin tức đồng thuận `strong_risk_on` trên cả ba khung thời gian, các kênh lõi (earnings, fx, credit, liquidity) đều xanh với độ tin cậy cao. Điều này hỗ trợ việc duy trì vị thế chấp nhận rủi ro, phù hợp với macro layer đang tích cực.
+- **Xung đột (Conflicts)**:  
+  - Hàng hóa Trung Quốc giảm giá mạnh (kênh `commodity` âm sâu) – rủi ro giảm phát đầu vào, có thể ảnh hưởng tới xuất khẩu và sản xuất công nghiệp Việt Nam.  
+  - Chính sách tiền tệ lưỡng tính: dài hạn nới lỏng (bơm ròng) nhưng ngắn hạn có tín hiệu thắt chặt nhẹ (lãi suất ON tăng) → cần theo dõi thêm.
+- **Trung lập (Neutral)**: Kênh `inflation` và `real_estate_collateral` không có tín hiệu rõ ràng (P_conf 50%) → chưa ảnh hưởng đến quyết định.
+
+**Hành động đề xuất**: Giữ thiên hướng risk-on, nhưng giảm nhẹ tỷ trọng các tài sản nhạy cảm với chu kỳ hàng hóa (vật liệu xây dựng, phân bón, năng lượng). Theo dõi diễn biến lãi suất ON và động thái OMO của NHNN – nếu đảo chiều hút ròng trở lại có thể làm giảm sức mạnh của liquidity.
+
+---
+
+### 5. Cảnh báo (Caveats)
+
+- **Tin xã hội chiếm tỷ trọng lớn**: Cả ba cửa sổ đều có >40% nguồn là `mozyfin_social` (diễn đàn, mạng xã hội). Đây là bằng chứng có độ tin cậy thấp hơn, dễ nhiễu và phản ánh tâm lý đám đông. Tín hiệu thị trường có thể bị phóng đại.
+- **Kênh `commodity` từ dữ liệu Trung Quốc**: Giá hàng hóa phần lớn do WiData cung cấp, có độ trễ và chịu ảnh hưởng bởi thị trường nước ngoài, cần đối chiếu với diễn biến trong nước.
+- **Dữ liệu tươi (generated_at hôm nay)**: Không có độ trễ, phù hợp cho quyết định ngắn hạn.
+- **Nguy cơ nhiễu headline**: Tin “lừa đảo vay vốn” là một ví dụ về nhiễu không liên quan trực tiếp đến vĩ mô, nên được lọc bỏ khi tổng hợp.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.5065,
+    "news_confidence_1d": 0.9901,
+    "news_count_1d": 235,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 81,
+      "mozyfin": 99,
+      "mozyfin_social": 55
+    },
+    "news_macro_composite_7d": 1.1682,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1044,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 411,
+      "mozyfin_social": 433,
+      "mozyfin": 200
+    },
+    "news_macro_composite_30d": 0.7378,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4737,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1121,
+      "mozyfin": 1663,
+      "mozyfin_social": 1953
+    },
+    "news_macro_composite": 0.5065,
+    "news_confidence": 0.9901,
+    "news_count": 235
+  }
+}
+```

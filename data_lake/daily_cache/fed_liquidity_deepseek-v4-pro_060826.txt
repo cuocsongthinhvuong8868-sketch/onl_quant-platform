@@ -1,0 +1,71 @@
+## 1. Mechanical Decomposition
+
+**Net Liquidity tuần này giảm -92.5B USD**, chạm 5,824.8B. Trong tuần dữ liệu 2026-07-29, cấu phần chi phối là **TGA (WTREGEN)**.
+
+- **WALCL**: Tiếp tục xu hướng giảm nhẹ do QT (Quantitative Tightening) vẫn đang vận hành ở chế độ nền, hút thanh khoản thụ động qua việc không tái đầu tư đầy đủ MBS/UST đáo hạn.
+- **WTREGEN (TGA)**: Đứng ở 910.8B – mức tích lũy cao. Treasury đang *rút ròng* thanh khoản khỏi hệ thống ngân hàng để xây dựng lại đệm tiền mặt (có thể phục vụ nhu cầu chi tiêu tài khóa hoặc chuẩn bị cho trần nợ). Đây là **lực hút chính** tuần này.
+- **RRPONTSYD**: Chỉ còn 2.58B, gần như cạn kiệt hoàn toàn. Tiền từ Money Market Funds đã quay trở lại thị trường T-bills/repo, nhưng tác động bơm biên từ RRP không còn đủ sức bù đắp cho sức hút từ TGA và QT.
+
+**Kết luận**: Biến động TGA chi phối toàn bộ impulse âm. RRP đã hết vai trò van xả.
+
+## 2. Cycle Positioning
+
+- **Pha thanh khoản**: Hệ thống đang ở **cuối pha QT**, chuyển tiếp dần sang trung tính. WALCL giảm chậm, không còn room để hút qua RRP.
+- **RRP**: Đã cạn dưới 3B (<< ngưỡng 100B). Đây là tín hiệu kỹ thuật cho thấy room hút từ "hồ chứa ngầm" không còn. Mọi áp lực TGA tăng hoặc QT tiếp diễn sẽ trực tiếp rút từ bank reserves.
+- **TGA**: Đang trong chế độ tích lũy. Treasury hành xử như đang giữ tiền mặt, chưa xả ra nền kinh tế.
+- **So sánh lịch sử**:
+    - Đỉnh 2022: Net Liquidity ~6,500B (QE hậu COVID).
+    - Đáy 2024: ~5,500B (RRP cạn, TGA vọt, QT peak).
+    - Hiện tại 5,824.8B nằm ở phân vị thấp hơn trung bình, sát vùng đáy 2024 hơn là vùng đỉnh.
+
+## 3. Signal Strength
+
+- **Tín hiệu**: **CUT** (Impulse_EMA = -39.6B < 0 **và** Z-score = -1.35 < -1.0).
+- **Độ mạnh**: Cận biên dưới (borderline bearish). Z-score -1.35 nằm giữa ngưỡng -1.0σ và -2.0σ, chưa đạt mức extreme drain. Impulse_EMA âm nhưng biên độ hẹp.
+- **Khớp tín hiệu**: Có, Impulse_EMA và Z-score đều đồng thuận với signal CUT. Tuy nhiên, đà giảm đang suy yếu dần do RRP không còn room để tạo cú sốc hút như giai đoạn 2023.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX**: Bias **tiêu cực nhẹ** trong ngắn hạn. Thanh khoản rút ròng + TGA tích lũy tạo áp lực lên định giá, đặc biệt các cổ phiếu vốn hóa lớn nhạy với reserves.
+- **DXY/Gold/Crypto**: DXY có bias **tăng nhẹ** (thanh khoản USD khan hiếm tương đối). Gold và Crypto chịu áp lực **điều chỉnh hoặc sideway** do môi trường tiền tệ thắt chặt biên.
+- **VN-Index (lag 4-8 tuần)**: Bias **hơi tiêu cực** cho tháng 8-9/2026. Với độ trễ 1 tháng, dòng vốn ngoại vào EM có thể chậm lại khi DXY mạnh lên. Tương quan dương ~0.25-0.35 từ Fed liquidity sang VN-Index dự báo lực cản nhẹ, không phải sụp đổ.
+
+## 5. Risk Factors (Tín hiệu có thể sai vì)
+
+- **RRP cạn kiệt**: Đây là yếu tố quan trọng nhất làm **yếu tín hiệu CUT**. Khi RRP gần 0, mọi đợt TGA xả sau này (nếu Treasury chi tiêu) sẽ bơm thẳng vào reserves, tạo lực đẩy nhanh hơn dự kiến.
+- **Noise từ TGA**: Mức 910.8B có thể là tích lũy tạm thời. Nếu Treasury đảo chiều giải ngân mạnh, impulse sẽ quay lại ADD.
+- **Fed pivot ngầm**: Dù chưa có QE công khai, Fed có thể điều chỉnh tốc độ QT mà không báo trước, làm chậm đà giảm WALCL.
+
+## 6. KẾT LUẬN
+
+Thanh khoản trong chế độ **QT cận biên với tín hiệu CUT yếu dần**. Rủi ro ngắn hạn cho risk assets hiện hữu nhưng không còn điều kiện cho một đợt rút cạn dữ dội như 2023.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5824.838,
+  "signal": "CUT",
+  "z_score": -1.35,
+  "regime": "QT_active",
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5824838.0,
+    "fed_liquidity_impulse": -92541.0,
+    "fed_liquidity_impulse_ema": -39563.3087477442,
+    "fed_liquidity_zscore": -1.346817245956799,
+    "signal": "CUT",
+    "walcl": 6738190.0,
+    "wtregen": 910776.0,
+    "rrpontsyd": 2576.0
+  }
+}
+```

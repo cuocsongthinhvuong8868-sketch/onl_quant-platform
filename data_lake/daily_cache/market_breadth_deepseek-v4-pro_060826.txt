@@ -1,0 +1,53 @@
+## 1. Observations
+- Tỷ lệ mã trên MA20 đạt 33.2%, ở vùng thấp nhưng chưa rơi vào trạng thái quá bán (<20%).
+- MA60 chỉ còn 16.9% – cực kỳ yếu, phản ánh điều chỉnh trung hạn sâu rộng.
+- MA125 và MA252 lần lượt 14.8% và 17.4%, đều ở mức rất thấp, báo hiệu xu hướng giảm kéo dài trên cả nửa năm và một năm.
+
+## 2. Structural Health
+Cả bốn khung thời gian đồng loạt suy yếu, không xuất hiện phân kỳ (divergence). Dù MA20 chưa thủng ngưỡng 30% theo định nghĩa cổ điển, nhưng với MA252 chỉ 17.4% – thấp hơn nhiều mốc 40% – thị trường đang khớp với mô hình **Bear Confirmed** (thị trường gấu được xác nhận). Sự tham gia của cổ phiếu vào xu hướng tăng là rất hạn chế, breadth co hẹp trên diện rộng.
+
+## 3. Money Flow Leadership
+- Dòng tiền ngắn hạn (top volume MA20) tập trung vào nhóm tài chính – ngân hàng (AAN), chứng khoán (APS, APG, ASP), cùng một vài mã nhựa/bất động sản (AAA). Mang tính đầu cơ, xoay vòng nhanh.
+- Dòng tiền dài hạn (top volume MA252) nghiêng về các ngành phòng thủ và thiết yếu: lọc hóa dầu (BSR), phân bón (BFC), cao su (CSM), ngân hàng nhỏ (ABB), xây dựng (C69, CDC). ASP là mã duy nhất xuất hiện ở cả hai danh sách, cho thấy phân hóa rõ nét giữa tiền nóng và tiền dài hạn.
+- Smart money ưu tiên nhóm phòng thủ, tránh xa các cổ phiếu tăng trưởng nóng như thép hay chứng khoán đầu cơ.
+
+## 4. Verdict
+- **Chiến lược:** Phòng thủ – giữ tiền mặt (Defensive cash-up). Không phù hợp cho trend-following hay mean-reversion T+ khi breadth toàn diện suy yếu và chưa có tín hiệu tạo đáy.
+- **Đòn bẩy:** 0% margin. MA252 quá thấp, vi phạm điều kiện an toàn tối thiểu.
+- **Xác nhận:** Cần chờ đợi MA20 vượt mốc 50% và MA252 cải thiện rõ rệt trước khi xem xét giải ngân trở lại. Hiện tại là “WAIT FOR CONFIRMATION”.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 33.2,
+  "ma60_pct": 16.9,
+  "ma125_pct": 14.8,
+  "ma252_pct": 17.4,
+  "regime": "bear_confirmed",
+  "leadership_sector": "mixed",
+  "strategy": "defensive",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 33.1764705882353,
+    "breadth_ma60_pct": 16.941176470588236,
+    "breadth_ma125_pct": 14.823529411764705,
+    "breadth_ma252_pct": 17.41176470588235,
+    "above_ma20_count": 141,
+    "above_ma60_count": 72,
+    "above_ma125_count": 63,
+    "above_ma252_count": 74,
+    "breadth_universe_size": 425,
+    "snapshot_date": "06/08/2026"
+  }
+}
+```

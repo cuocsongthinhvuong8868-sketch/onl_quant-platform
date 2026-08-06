@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- **Stress Index**: 3.33% (vn30) – dưới ngưỡng cảnh báo 40%, mức rất thấp.
+- **Mã thủng VaR 95%**: Chỉ 1/30 (VRE) – không có hiện tượng lây lan diện rộng.
+- **Complacency Index**: 4.67% (full market) – dưới ngưỡng nguy hiểm 80%, chỉ 5 mã bị nén spread (VIC, BMP, LPB).
+
+## 2. Contagion Assessment (Module B)
+VN30 hiện tại không có tín hiệu stress hệ thống. Stress index 3.33% phản ánh chỉ một cổ phiếu duy nhất (VRE) rơi vào vùng thủng VaR 95%, chứ không phải một đợt bán tháo đồng loạt. VRE breach là sự kiện cá biệt (idiosyncratic), có thể do thông tin riêng về ngành bán lẻ hoặc dòng tiền ngắn hạn. Không có mầm mống contagion, nhưng vẫn cần giám sát nếu VRE tiếp tục yếu và lôi kéo các mã liên quan.
+
+## 3. Complacency Assessment (Module C)
+Complacency ở mức cực thấp (4.67%). Điều này chỉ có nghĩa: **thị trường KHÔNG ở regime “ngủ quên” (spread bị nén)**, không phải thị trường đang ổn định hay an toàn. Cần loại trừ mọi diễn giải kiểu “thị trường vận hành bình thường” – vì ở pha hoảng loạn hay downtrend mạnh, spread thường giãn rộng, kéo Complacency xuống thấp. Kết hợp với Module B, ta thấy stress real-time không cao, do đó bức tranh hiện tại là: thị trường không tích tụ rủi ro định giá sai trên diện rộng, nhưng cũng không có nghĩa rủi ro tail events đã biến mất. Cần tiếp tục theo dõi diễn biến thanh khoản và biến động.
+
+## 4. Stock-Level Risk Calls
+- **VRE (Crash)**: Thủng VaR 95%, phá vỡ cấu trúc rủi ro ngắn hạn. Hành động: giảm tỷ trọng hoặc đặt stop-loss động (ví dụ: dưới MA20 trên D1, mức dừng ~5–7% dưới giá hiện tại nếu muốn giữ). Không dùng mức giá tuyệt đối.
+- **VIC, BMP, LPB (Mispriced)**: Spread bị nén bất thường, gợi ý rủi ro định giá đang bị che giấu. Đây là watchlist cảnh báo sớm, không phải tín hiệu bán ngay. Hạn chế mua thêm ở vùng này, theo dõi nếu giá bắt đầu mở rộng spread đi kèm khối lượng đột biến.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 3.33,
+  "breach_count": 1,
+  "complacency_pct": 4.67,
+  "mispriced_count": 5,
+  "regime": "spread_normal",
+  "watchlist_short": ["VRE", "VIC", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=3.33% (1/30); complacency=4.67% (5/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 3.3333333333333335,
+    "vares_complacency_pct": 4.672897196261682,
+    "vares_breach_count": 1,
+    "vares_mispriced_count": 5,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

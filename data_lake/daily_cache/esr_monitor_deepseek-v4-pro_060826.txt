@@ -1,0 +1,54 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI ở mức **64.1%** – nằm trong vùng **WARNING** (0.50–0.80).
+- Market State (HMM): **CALM CORRECTION** – downtrend với stress thấp.
+- Top 3 pillar dẫn dắt: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**.
+- VN30 đóng cửa **dưới MA125**, xác nhận xu hướng giảm giá trung hạn.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ** là driver lớn nhất, chiếm 35% trọng số. Chỉ báo này đo lường **volume khô cạn** so với chuẩn 1 năm (MA20/MA252). Giá trị cao cho thấy dòng tiền đang rút mạnh, thanh khoản thị trường teo lại, đặc trưng của pha phân phối hoặc mất niềm tin.
+- **S_VAL** (31%) phản ánh **căng thẳng định giá**: chênh lệch giữa tổng lợi nhuận 252 ngày của VN30 và lãi suất tiền gửi đang ở mức cao, tạo áp lực điều chỉnh khi dòng tiền rút.
+- **S_COR** (18%) với PCA EVR 38% cho thấy **tương quan hệ thống cao** – các cổ phiếu di chuyển đồng pha mạnh. Trong downtrend, điều này tiềm ẩn rủi ro bán tháo lan tỏa nếu xuất hiện cú sốc.
+
+Tổ hợp: Volume khô cạn + định giá căng + tương quan cao → môi trường dễ kích hoạt nhịp giảm sâu khi dòng tiền kiệt quệ, dù thị trường hiện giảm trong trật tự.
+
+## 3. Cross-Check
+- **SSI vs Market State**: SSI đang ở WARNING (64.1%) nhưng HMM gán nhãn CALM CORRECTION – vốn giả định stress thấp (<50%). Đây là **divergence đáng lưu ý**: rủi ro ngầm đang tích lũy dưới bề mặt một đợt điều chỉnh có vẻ “bình tĩnh”. Không có bull trap (vì không có uptrend), nhưng nguy cơ chuyển pha thành ACTIVE STRESS là hiện hữu.
+- **Price action**: VN30 dưới MA125 củng cố xu hướng downtrend, không có tín hiệu đảo chiều từ giá. SSI tăng trong khi giá giảm có trật tự – đây không phải phân kỳ tạo đỉnh, mà là xác nhận rủi ro ngầm đang lan rộng.
+
+## 4. Verdict
+- **Cash weight đề xuất**: **60%** danh mục. Tăng nắm giữ tiền mặt để phòng ngừa rủi ro thanh khoản và chuyển pha.
+- **Hedge action**: **Giảm beta** tổng thể danh mục (ví dụ: bán bớt cổ phiếu có hệ số beta cao, chuyển sang cổ phiếu phòng thủ hoặc tiền mặt). Chưa khuyến nghị short futures hay mua put vì SSI chưa đến ngưỡng CRITICAL; tuy nhiên, nếu S_LIQ tiếp tục tăng và SSI vượt 80%, có thể kích hoạt các biện pháp mạnh hơn.
+- **Lưu ý**: Các pillar driver đồng thuận về chiều hướng tiêu cực – không có mâu thuẫn để trì hoãn hành động.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.1,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 64.12568238265511,
+    "pca_concentration_pct": 37.994737911222934,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.468479427128216
+  }
+}
+```
