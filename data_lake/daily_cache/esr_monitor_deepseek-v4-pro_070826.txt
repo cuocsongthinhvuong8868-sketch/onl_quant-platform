@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: **64.1%** → **WARNING** – rủi ro hệ thống tích lũy trên nền thị trường đang suy yếu.
+- Market State: **CALM CORRECTION** – áp lực điều chỉnh trong môi trường biến động thấp (theo phân loại HMM).
+- Top 3 driver: **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)** – thanh khoản khô cạn dẫn dắt căng thẳng.
+- Pillar Mode: **downside** – chỉ ghi nhận tín hiệu từ các phiên giảm, gia tăng độ nhạy với áp lực bán.
+
+## 2. Risk Decomposition
+- **S_LIQ (Volume Dry-Up)** là driver trọng yếu, cao bất thường: thanh khoản tổng dollar volume đang teo tóp đáng kể so với trung bình 1Y (volume khô cạn vs 1Y norm). Trong downtrend (VN30 dưới MA125), hiện tượng này hàm ý lực cầu suy kiệt, có thể khiến thị trường trượt dần trong trạng thái “mất thanh khoản”, rủi ro bị bán tháo đột ngột khi xuất hiện cú sốc.
+- **S_VAL** đứng thứ hai, phản ánh sức ép định giá: lợi nhuận 252d (chủ yếu âm do thị trường giảm) chênh lệch lớn với lãi suất tiền gửi. Trong bối cảnh Pillar Mode chỉ tính phiên giảm, chỉ số này tiếp tục neo cao, cho thấy định giá chưa thực sự “rẻ” so với kỳ vọng chi phí vốn.
+- **S_COR** (PCA EVR ~38%) ở mức trung bình, chưa bùng nổ tương quan hệ thống như giai đoạn hoảng loạn. Tổ hợp **S_LIQ khô + S_COR vừa phải** chưa phải là herding crash, nhưng là tín hiệu “hấp thủy” nguy hiểm nếu thanh khoản tiếp tục cạn.
+
+## 3. Cross-Check
+- **VN30 price action vs SSI**: Giá đang dưới MA125, không tạo đỉnh mới → không xuất hiện phân kỳ bull-trap. Áp lực đang tiệm tiến, phù hợp với CALM CORRECTION.
+- **Bất nhất HMM vs SSI**: HMM gán nhãn “low stress” cho CALM CORRECTION, nhưng SSI ở mức WARNING (0.64). Có khả năng HMM dùng ngưỡng phân loại nội tại khác; tuy nhiên, đây là flag cần theo dõi – nếu SSI tiếp tục tăng vượt 0.80 (CRITICAL) trong khi HMM vẫn ở trạng thái “low stress” sẽ tạo ra lỗ hổng cảnh báo sớm.
+
+## 4. Verdict
+- **Cash target đề xuất: 50%** danh mục – tăng tỷ trọng tiền mặt để phòng ngừa cú sốc thanh khoản từ volume dry‑up.
+- **Hedge action**: Giảm beta tổng thể (reduce_beta), cắt giảm các vị thế có hệ số nhạy cao với VN30. Chưa khuyến nghị short future hoặc mua put vì SSI chưa vào vùng CRITICAL và tương quan hệ thống còn trung bình. Nếu S_LIQ tiếp tục leo thang, sẽ nâng mức phòng vệ.
+- **Lưu ý**: Không sử dụng margin dù thị trường đang điều chỉnh có trật tự; rủi ro đòn bẩy khi thanh khoản khô cạn luôn ở mức cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.1,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 50,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 64.1269746852893,
+    "pca_concentration_pct": 37.984415027361905,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.469590479971615
+  }
+}
+```

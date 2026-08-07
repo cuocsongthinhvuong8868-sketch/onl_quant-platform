@@ -1,0 +1,100 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+## 1. Observations
+- Historical VaR 95% (–1.69%) nông hơn parametric VaR 95% (–2.25%), phản ánh đuôi thực tế tại ngưỡng 95% chưa thực sự dày; tuy nhiên rủi ro tập trung ở vùng cực đoan hơn.
+- EVT VaR 99% (–3.77%) sâu hơn rõ rệt, báo hiệu cấu trúc đuôi không bình thường; EVT ES 99% (–6.15%) càng nhấn mạnh tổn thất kỳ vọng trong những kịch bản 1/100 rất lớn.
+- Hệ số đuôi ξ (GPD) MLE 0.325, MCMC trung vị 0.390, cùng > 0.30 – xếp vào vùng fat‑tail, cảnh báo đuôi cực dày.
+- Hill index 0.456 cùng dấu và nằm trong vùng fat‑tail, xác nhận tín hiệu từ ξ, mặc dù mức chênh lệch khá lớn giữa hai ước lượng.
+
+## 2. Tail Thickness Diagnosis
+ξ trung vị hậu nghiệm (0.390) thuộc bracket **FAT TAIL** (>0.30). Tuy nhiên, kiểm định độ nhạy ngưỡng cho thấy ước lượng không ổn định: ξ dao động từ 0.067 (near‑Gaussian) đến 0.326 (fat tail) khi thay đổi ngưỡng POT, flag threshold_stable = 0. Như vậy, tín hiệu fat‑tail chỉ xuất hiện ở một số ngưỡng – phân loại “**threshold‑sensitive fat‑tail warning**”.  
+Hill cross‑check cùng hướng fat‑tail; ES−VaR spread (95%) 1.40 pp lớn hơn σ₃₀ (1.26 pp) cũng xác nhận thực nghiệm có đuôi dày. Tuy nhiên, do sự nhạy cảm ngưỡng, mức độ tin cậy giảm một bậc.
+
+## 3. Gaussian Gap
+Gaussian VaR 99% (ước lượng từ μ ≈ –0.18%, σ₃₀ = 1.26%) bằng **–3.11%**. So với EVT VaR 99% (–3.77%), mức chênh lệch **0.66 pp** < 1 pp. Chưa đạt ngưỡng “broken”, song Gaussian vẫn đánh giá thấp rủi ro đuôi. Nếu chỉ dùng Gaussian cho phân bổ vốn rủi ro, doanh nghiệp có thể chịu cú sốc ngoài dự kiến. Khuyến nghị bổ sung EVT cho các quyết định ở đuôi.
+
+## 4. Verdict — Hedging Implications
+Với ξ > 0.30 (fat‑tail), khung hành động mạnh được kích hoạt:  
+- Tránh xa các chiến lược momentum, carry‑trade;  
+- Mua quyền chọn bán **ITM** để bảo vệ danh mục;  
+- Phòng hộ bằng **short futures** để giảm thiệt hại khi thị trường sụt sâu.  
+
+Do tính nhạy ngưỡng và khoảng tin cậy MCMC của ξ cắt qua ranh giới heavy/fat (p05 = 0.183, p95 = 0.651), hành động này được khuyến nghị với **mức tin cậy trung bình**. Nhà quản trị rủi ro nên cập nhật lại ngay khi có thêm dữ liệu để xác nhận sự ổn định của đuôi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "date": "07/08/2026",
+  "evt_var_99_pct": -3.77,
+  "evt_es_99_pct": -6.15,
+  "xi": 0.390,
+  "hill": 0.456,
+  "xi_min": 0.067,
+  "xi_max": 0.326,
+  "xi_range": 0.259,
+  "threshold_stable": 0,
+  "tail_regime": "fat",
+  "gaussian_gap_pp": 0.66,
+  "hedge_action": "buy_puts_itm,short_futures",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: THRESHOLD_SENSITIVE_FAT_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: 0.19%
+- VaR Breach 95: 0
+- Breach Margin 95: -1.88pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.325
+- EVT Hill: +0.456
+- EVT Xi Min: +0.067
+- EVT Xi Max: +0.326
+- EVT Xi Range: 0.259
+- EVT VaR99 Range: 0.16pp
+- EVT ES99 Range: 0.66pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 80.0%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.183
+- EVT Xi P50: +0.390
+- EVT Xi P95: +0.651
+- EVT VaR99 P05: -4.90%
+- EVT VaR99 P50: -3.83%
+- EVT VaR99 P95: -3.22%
+- EVT ES99 P05: -12.54%
+- EVT ES99 P50: -6.70%
+- EVT ES99 P95: -4.91%
+
+=== AI CIO DIRECT METRICS: var_cvar_vnindex ===
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "source": "direct_quantitative",
+  "metrics": {
+    "historical_var_pct": -1.691867298119048,
+    "expected_shortfall_pct": -3.0958621619566955,
+    "tail_regime": "THRESHOLD_SENSITIVE_FAT_TAIL",
+    "tail_risk_level": "ELEVATED",
+    "var_breach_95": false,
+    "breach_margin_95_pp": -1.8775536548426774,
+    "evt_xi": 0.32520846567672185,
+    "evt_var_99_pct": -3.769977326772805,
+    "evt_es_99_pct": -6.150470756653424,
+    "hill_index": 0.455685052659228,
+    "evt_xi_min": 0.06728218013982155,
+    "evt_xi_max": 0.3263191266569856,
+    "evt_xi_range": 0.259036946517164,
+    "evt_var99_range_pp": 0.1649364086847696,
+    "evt_es99_range_pp": 0.65674767984987,
+    "evt_threshold_stable": 0,
+    "evt_xi_p05": 0.18298667414955452,
+    "evt_xi_p50": 0.3903008947848988,
+    "evt_xi_p95": 0.6508831499781828
+  }
+}
+```

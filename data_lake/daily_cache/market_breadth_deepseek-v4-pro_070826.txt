@@ -1,0 +1,53 @@
+## 1. Observations
+- MA20: 42.8% – vùng trung tính, không quá mua cũng không quá bán, nhưng yếu hơn so với ngưỡng uptrend bền vững (>70%).
+- MA60: 17.9% – cực thấp, gần như toàn bộ rổ đang dưới trung bình 1 quý, xác nhận suy yếu trung hạn sâu.
+- MA125: 16.7% – dưới 20%, thể hiện xu hướng nửa năm rất tiêu cực, không có dấu hiệu phục hồi chu kỳ kinh doanh.
+- MA252: 18.8% – secular bear rõ rệt, chưa đến 1/5 số mã giữ được xu hướng dài hạn.
+
+## 2. Structural Health
+Bốn đường MA không đồng thuận: MA20 cao hơn hẳn ba đường dài, tạo divergence cổ điển. MA20 42.8% không đủ mạnh để gọi bull trap, nhưng rõ ràng trái chiều với MA252 18.8% – dấu hiệu bất ổn. Đối chiếu các mẫu hình: không phải Strong Bull, không phải Bear Confirmed vì MA20 chưa xuống <30%. Khớp **Divergence** – pha hồi kỹ thuật ngắn hạn trong xu hướng giảm dài hạn. Thị trường thiếu nền tảng để bứt phá bền vững.
+
+## 3. Money Flow Leadership
+- Top volume giữ MA20 (ngắn hạn) gồm AAA, ACV, APH, ASM… thiên về sản xuất nhựa, hạ tầng, bất động sản – không tập trung vào một ngành dẫn dắt.
+- Top volume giữ MA252 (dài hạn) nổi bật ABB (ngân hàng), BSR (lọc hóa dầu), BVH (bảo hiểm), BFC (phân bón) – nhóm phòng thủ/năng lượng/xây dựng, không trùng lặp với short-term.
+- Dòng tiền thông minh đang ưu tiên **defensive**, trú ẩn ở ngân hàng, bảo hiểm, năng lượng, tránh xa nhóm đầu cơ chu kỳ như thép, chứng khoán.
+
+## 4. Verdict
+Divergence MA20 – MA252 yêu cầu WAIT FOR CONFIRMATION. Không nên giải ngân theo trend-following khi nền dài hạn quá yếu (MA252 18.8%). Mean-reversion T+ có thể áp dụng từng phiên với tỉ trọng rất nhỏ, nhưng chiến lược chính lúc này là **defensive cash-up**: giữ tỉ lệ tiền mặt cao, hạn chế rủi ro.  
+Đòn bẩy đề xuất: **0% margin**. Tuyệt đối không vay mượn khi chưa có xác nhận cải thiện bền vững của MA252 hoặc sự đồng thuận MA20 >70% và MA252 >60%.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 42.8,
+  "ma60_pct": 17.9,
+  "ma125_pct": 16.7,
+  "ma252_pct": 18.8,
+  "regime": "divergence",
+  "leadership_sector": "defensive",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 42.8235294117647,
+    "breadth_ma60_pct": 17.88235294117647,
+    "breadth_ma125_pct": 16.705882352941178,
+    "breadth_ma252_pct": 18.823529411764707,
+    "above_ma20_count": 182,
+    "above_ma60_count": 76,
+    "above_ma125_count": 71,
+    "above_ma252_count": 80,
+    "breadth_universe_size": 425,
+    "snapshot_date": "07/08/2026"
+  }
+}
+```

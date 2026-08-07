@@ -1,0 +1,64 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 58.8/100, giảm nhẹ 0.7 điểm, rơi vào vùng Trung tính – Phân hóa cổ phiếu
+- EGARCH Vol chuẩn hóa 59.5%, giảm 2.0 điểm phần trăm so với phiên trước, vẫn ở mức cao tương đối
+- Rolling Skewness -0.01, gần như đối xứng; không có đuôi trái dày
+- Downside Correlation norm 1.8% (rất thấp); Upside Correlation norm 27.4% (trung bình)
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường đang trong pha Trung tính đặc trưng bởi sự phân hóa cổ phiếu mạnh. Biến động cao nhưng tương quan giảm cực thấp cho thấy các nhịp giảm điểm mang tính cục bộ, ít lan tỏa hệ thống. Điều này nhất quán với trạng thái Stock Picking, nơi tác động từ yếu tố riêng lẻ (idiosyncratic risk) chiếm ưu thế hơn rủi ro thị trường chung.
+
+## 3. Cross-Check
+- **Score vs EGARCH Vol**: Score trung tính trong khi vol vẫn cao – không tạo phân kỳ mạnh vì vol chủ yếu đến từ rủi ro đặc thù, phù hợp với tương quan giảm thấp.
+- **Skewness vs Correlation**: Skewness gần zero và downside correlation rất thấp là tín hiệu đồng thuận, xác nhận thị trường không có trạng thái bán tháo đồng loạt hay đuôi trái dày.
+- **Toàn cảnh**: Không phát hiện phân kỳ nghiêm trọng; các chỉ báo cùng củng cố bức tranh phân hóa.
+
+## 4. Verdict
+- **Beta exposure đề xuất**: 0.5 – danh mục VN‑Index có thể duy trì mức rủi ro thị trường một nửa, tập trung vào lựa chọn cổ phiếu cá biệt.
+- **Hành động cụ thể**: Không cần gấp phòng thủ toàn danh mục. Ưu tiên tìm kiếm alpha từ cổ phiếu riêng lẻ; có thể dùng công cụ phòng hộ một phần nếu danh mục có độ nhạy cao với biến động. Dừng canh mua đòn bẩy vì môi trường vol cao dễ bị whipsaw.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "07/08/2026",
+  "regime": "NEUTRAL",
+  "score": 58.8,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Risk Score 58.8 – phân hóa cổ phiếu",
+    "Downside Correlation 1.8% – rủi ro hệ thống thấp",
+    "Upside Correlation 27.4% – cơ hội chọn lọc",
+    "EGARCH Vol 59.5% giảm dần – biến động còn cao nhưng không bùng nổ"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 58.8
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: STOCK PICKING
+- Signal Confidence: 0.52
+- CSV Rank: 0.20
+- Acute Shock: 0.54
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 58.78370542946608,
+    "sentiment_regime": "STOCK PICKING",
+    "signal_confidence": 0.5200951888279036,
+    "acute_shock": 0.5396825396825397,
+    "csv_rank": 0.20238095238095238,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

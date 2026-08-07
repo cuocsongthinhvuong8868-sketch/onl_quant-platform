@@ -1,0 +1,77 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+1. **Trạng thái sentiment tin tức hiện tại (1d, 7d, 30d)**  
+   - **1d (ngày 07/08)**: regime = **risk_on**, nhưng P_conf = 75% → mức **Nghiêng về risk‑on** (tín hiệu ban đầu, chưa đủ mạnh để khẳng định).  
+   - **7d**: regime = **strong_risk_on**, P_conf = 100% → **Khẳng định chắc chắn** tâm lý tích cực mạnh.  
+   - **30d**: regime = **strong_risk_on**, P_conf = 100% → **Khẳng định chắc chắn** xu hướng tích cực bền vững.  
+
+2. **Các kênh dẫn dắt (channel) mạnh nhất**  
+   - **Kéo risk‑on**:  
+     - *earnings*: +1.285 (1d, P_conf 100%), +1.857 (7d, 100%), +1.887 (30d, 100%) – tín hiệu lợi nhuận doanh nghiệp rất tích cực.  
+     - *fx_external*: +0.534→+1.291→+2.000 (P_conf 89‑100%) – tỷ giá trung tâm tăng liên tục được mô hình đánh giá là tích cực cho tâm lý thị trường.  
+     - *credit_stress*: +1.225→+1.894→+1.242 (P_conf 99‑100%) – lợi suất TPCP đi ngang hoặc tăng nhẹ, không gây áp lực tín dụng.  
+     - *monetary_policy* (7d, 30d): +1.679, +1.369 (P_conf 100%) – lãi suất liên ngân hàng tăng, OMO bơm ròng được đọc là chính sách tự tin, hỗ trợ tâm lý.  
+   - **Kéo risk‑off / gây lưu ý**:  
+     - *commodity*: –2.000 (1d, 100%), –1.680 (7d, 100%), –0.779 (30d, 100%) – giá hàng hoá (heo hơi, than cốc, ure) lao dốc mạnh, phản ánh cầu yếu.  
+     - *liquidity*: –0.709 (1d, P_conf 94%) và –0.135 (30d, P_conf 97%) – thanh khoản hệ thống có dấu hiệu thắt chặt (dù OMO bơm ròng trong 7d).  
+
+3. **Động lực (drivers) quan trọng – tóm lược 3‑5 yếu tố mỗi chiều**  
+   - **Tích cực (kéo risk‑on)**:  
+     1. Chuỗi tin về lợi nhuận doanh nghiệp khả quan (*earnings*, P_conf 100%).  
+     2. Tỷ giá trung tâm tăng đều đặn (25,463 ngày 07/08, tăng 30đ) – được đọc là ổn định vĩ mô.  
+     3. Lợi suất trái phiếu Chính phủ đi ngang / tăng nhẹ, không gây áp lực lên chi phí vốn.  
+     4. Đầu tư công và câu chuyện tăng trưởng (Khu kinh tế Chu Lai, xuất khẩu sầu riêng tỷ USD).  
+     5. Lãi suất liên ngân hàng tăng và NHNN bơm ròng qua OMO – chính sách tiền tệ chủ động.  
+   - **Tiêu cực (kéo risk‑off)**:  
+     1. Giá heo hơi trong nước giảm về đáy 6 tháng (60,000đ/kg, thấp hơn cùng kỳ 3.5%) – kênh *commodity* giảm sâu.  
+     2. Giá than cốc, ure Trung Quốc liên tục phá đáy 6 tháng – tín hiệu cầu công nghiệp suy yếu.  
+     3. Thanh khoản có dấu hiệu thắt chặt (điểm thanh khoản âm trong 1d và 30d, dù OMO hỗ trợ ngắn hạn).  
+     4. Một vài tin lẻ về xuất khẩu số sang EU mất ưu đãi thuế và giá vàng/dầu biến động – tác động hạn chế.  
+
+4. **Kết luận tác động đến AI CIO**  
+   - Sentiment tin tức **hỗ trợ mạnh** (supports) cho một định vị risk‑on trong các tài sản Việt Nam. Tầm nhìn 7‑30 ngày có xác suất cao duy trì chế độ *strong_risk_on*, giúp củng cố lớp vĩ mô và công cụ nội bộ thị trường.  
+   - Lưu ý duy nhất: Kênh *commodity* âm sâu có thể tạo sức ép lên nhóm cổ phiếu nguyên vật liệu/nông sản; cần giám sát thêm nhưng không lấn át được bức tranh chung đang tích cực.  
+
+5. **Caveat (cảnh báo kỹ thuật)**  
+   - **Nguồn tin social/opinion chiếm ưu thế**: Tỷ lệ mozyfin + mozyfin_social rất cao so với widata (1d: 175/80, 7d: 722/310, 30d: 3662/1153). Các tín hiệu đến từ social/opinion được coi là có độ tin cậy thấp hơn, độ nhiễu cao hơn. Mặc dù posterior Bayesian vẫn đạt mức tin cậy cao nhờ số lượng mẫu lớn, cần lưu ý rằng tín hiệu có thể bị ảnh hưởng bởi xu hướng đám đông hơn là thực tế cứng.  
+   - Dữ liệu được sinh lúc 15:18 ngày 07/08/2026, không bị trễ (không stale).  
+   - Rủi ro headline noise luôn hiện hữu ở các kênh tần suất cao; nhà đầu tư nên kết hợp với các lớp phân tích định lượng khác.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.1539,
+    "news_confidence_1d": 0.7544,
+    "news_count_1d": 255,
+    "news_regime_1d": "risk_on",
+    "news_source_counts_1d": {
+      "widata": 80,
+      "mozyfin": 118,
+      "mozyfin_social": 57
+    },
+    "news_macro_composite_7d": 0.846,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1032,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 310,
+      "mozyfin_social": 422,
+      "mozyfin": 300
+    },
+    "news_macro_composite_30d": 0.7223,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4815,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1153,
+      "mozyfin_social": 1995,
+      "mozyfin": 1667
+    },
+    "news_macro_composite": 0.1539,
+    "news_confidence": 0.7544,
+    "news_count": 255
+  }
+}
+```

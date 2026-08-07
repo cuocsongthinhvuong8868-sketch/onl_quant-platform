@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-08-07",
+  "composite_score": 28.0,
+  "regime": "PRE-CRASH / PANIC",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 3,
+      "unit": "sessions",
+      "description": "Số phiên cảnh báo thanh khoản dưới 5 cho thấy áp lực đã hạ nhiệt, phá vỡ luận điểm khủng hoảng."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 42.8,
+      "unit": "%",
+      "description": "Tỉ lệ cổ phiếu trên MA20 vượt 45% báo hiệu độ rộng phục hồi, làm yếu luận điểm bearish."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 64.1,
+      "unit": "%",
+      "description": "SSI rơi xuống dưới 55% chứng tỏ rủi ro hệ thống giảm mạnh, phủ định chế độ PRE‑CRASH."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.326,
+      "unit": "",
+      "description": "Xi max toàn bộ dải ngưỡng dưới 0.25 cho thấy đuôi mỏng trở lại, tail risk không còn nguy hiểm."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 5.0,
+      "unit": "th pct",
+      "description": "Coupling Vingroup thấp dưới 70th pct khẳng định VN-Index không bị kéo lê bởi nhóm này, thị trường dẫn dắt bởi ngành khác – dấu hiệu lành mạnh hơn."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.7,
+      "unit": "th pct",
+      "description": "CQS rơi khỏi vùng cực đoan (dưới 80th pct) chấm dứt gọng kìm tín dụng toàn cầu, mở đường cho risk‑on."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-08-07",
+  "source": "ai_cio_executive_summary"
+}

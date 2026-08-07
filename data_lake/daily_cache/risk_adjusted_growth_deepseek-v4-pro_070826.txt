@@ -1,0 +1,62 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14%) là baseline chuẩn cho ngành ngân hàng VN, không khắc nghiệt cũng không quá dễ dãi. Với mặt bằng hiện tại, chỉ 1/6 mã được phân tích có Alpha dương. Đa số ngành đang đốt vốn cổ đông, phản ánh định giá P/B bị đẩy lên quá cao so với chất lượng lợi nhuận thực tế. Stress test không áp penalty thêm cho thấy đây là trạng thái bình thường đã kém hấp dẫn.
+
+## 2. Top Alpha Decomposition
+**SHB (Alpha +4.2%, Fortress):** Duy nhất tạo giá trị thặng dư. Driver chính: P/B 0.80 (định giá rẻ nhất nhóm) kết hợp σROE 1.9% (ổn định nhất). ROE 17.5% không cao nhất nhưng retention rate 91.4% (Payout 8.6%) giúp compounding hiệu quả trên nền vốn rẻ. Đây là Fortress thực thụ: P/B dưới book, biến động thấp, tăng trưởng bền vững.
+
+**ACB (Alpha -0.9%, Growth Trap):** ROE 23.0% xuất sắc nhưng P/B 1.22 đã định giá phần lớn triển vọng. σROE 2.7% (cao hơn SHB 42%) khiến risk penalty ăn mòn disciplined return. Retention 84.1% vẫn tốt nhưng không đủ bù đắp định giá cao. Đây là Growth Trap điển hình: chất lượng cao nhưng giá đã phản ánh hết.
+
+**MBB (Alpha -1.4%, Premium Burn):** ROE 21.8% + σROE 1.6% thấp nhất nhóm đáng lẽ là Fortress, nhưng P/B 1.43 quá đắt khiến disciplined return tụt xuống dưới CoE. Payout 6.7% cho thấy ngân hàng giữ lại gần hết lợi nhuận để tái đầu tư, nhưng định giá premium đã giết chết Alpha.
+
+## 3. Value Traps Warning
+**LPB (Alpha -12.8%, Premium Burn):** P/B 3.35 là mức định giá phi lý dù ROE 21.1% khá tốt. Risk penalty từ σROE 3.8% (cao nhất nhóm) cộng với payout 21.0% làm xói mòn nặng disciplined return. Đây là bẫy premium cực đoan, không phải bẫy giá trị.
+
+**EIB (Alpha -10.4%, Cheap Trap):** P/B 1.29 tưởng rẻ nhưng ROE 10.0% quá thấp kết hợp σROE 3.8% làm risk-adjusted return sụp đổ. Đây là Cheap Trap: giá không đủ rẻ để bù đắp chất lượng kém. ROE thấp hơn cả CoE khiến ngân hàng này đốt vốn ngay cả trước khi tính risk penalty.
+
+**VPB (Alpha -9.7%, Growth Trap):** P/B 1.18 khá hợp lý nhưng ROE 14.1% chỉ vừa bằng CoE. σROE 4.7% cao nhất trong tất cả mã gây risk penalty khổng lồ. Payout 24.6% cao làm giảm retention, biến đây thành Growth Trap với biến động giết chết lợi nhuận.
+
+## 4. Portfolio Construction
+- **Core Holding (70%):** SHB — Fortress duy nhất với Alpha dương bền vững
+- **Tactical (30%):** ACB — chỉ nắm nếu K giảm xuống 0.8 hoặc P/B điều chỉnh về 1.05-1.10
+- **Cấm mua:** LPB (P/B ảo tưởng), VPB (σ quá cao), EIB (ROE thua cả CoE)
+- MBB chỉ xem xét nếu P/B về dưới 1.3
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB"],
+  "avoid_list": ["LPB", "VPB", "EIB"],
+  "sector_view": "bearish",
+  "confidence": "high"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.214480050789132,
+    "median_economic_alpha_pct": -4.2714666703053785,
+    "positive_alpha_count": 1,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "ACB",
+      "MBB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

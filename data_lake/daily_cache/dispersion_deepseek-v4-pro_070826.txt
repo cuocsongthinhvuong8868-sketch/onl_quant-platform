@@ -1,0 +1,61 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread_Z = -0.06σ, nằm sát trung vị 60 ngày, không có dấu hiệu căng cứng cấu trúc.
+- DPI = 41.7%, dưới ngưỡng persistence (70%), cho thấy dispersion hiện tại không kéo dài thành regime.
+- Avg Pairwise Correlation = 0.073, rất thấp, thị trường phân hóa mạnh, môi trường thuận lợi cho chọn cổ phiếu.
+- CS Skew = +0.81 (dương nhẹ), Kurtosis = 5.20 (>5) – xuất hiện fat-tail outliers nhưng chưa đạt ngưỡng bất cân xứng cực đoan (±1).
+
+## 2. Structural State
+Thị trường ở trạng thái **bình thường**, không có stress hệ thống. Spread_Z gần zero và DPI dưới 50% khẳng định không tồn tại stress cục bộ hay persistent regime. Dispersion hiện tại chỉ là biến động ngẫu nhiên trong ngày, không phải tín hiệu chuyển pha cấu trúc.
+
+## 3. Cross-Check & Tail Direction
+- CS Skew dương nhưng <1: chưa có “cú đẩy điên rồ” diện rộng; đuôi phải hơi dày hơn đuôi trái, có thể do một vài cổ phiếu tăng đột biến riêng lẻ.
+- Kurtosis >5: phân phối lợi suất có đuôi béo, tức vẫn tồn tại các quan sát ngoại lai (cả hai phía). Mô hình giả định phân phối chuẩn không còn phù hợp để ước lượng rủi ro đuôi.
+- Dấu hiệu từ V2 (broad stress score 3.9, CSAD_Z/CSSD_Z âm, downside participation 7.7%) xác nhận không có áp lực bán tháo đồng thuận.
+
+## 4. Regime Mapping
+Trên bản đồ 2D (DPI × Corr): DPI thấp (~42%) và Corr rất thấp (~0.07) đặt thị trường vào ô **Healthy Stock-Picking**. Đây là môi trường lý tưởng cho chiến lược long/short dựa trên chọn lọc cổ phiếu, vì các tài sản di chuyển độc lập, ít rủi ro lây lan.
+
+**Rủi ro lớn nhất cho PM**: không phải là herding crash hay liquidity dry-up, mà là *concentration risk ngầm* từ các fat-tail outliers. Một vài cổ phiếu riêng lẻ có thể gây biến động lớn vượt ngoài ước lượng VaR thông thường, đòi hỏi giám sát chặt chẽ vị thế tập trung và kiểm soát kích thước lệnh.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "07/08/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -0.06,
+  "dpi_pct": 41.7,
+  "avg_corr": 0.073,
+  "tail_skew_direction": "positive",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 3.9
+- Broad Stress Level: NORMAL
+- CSAD Z: -0.45
+- CSSD Z: -0.42
+- Downside Participation: 7.7%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing
+
+=== AI CIO DIRECT METRICS: dispersion ===
+```json
+{
+  "tool": "dispersion",
+  "source": "direct_quantitative",
+  "metrics": {
+    "dispersion_spread_z": -0.06246548122082451,
+    "dispersion_dpi_pct": 41.66666666666667,
+    "dispersion_avg_corr": 0.07345621958633841,
+    "dispersion_broad_stress_score": 3.865336658354115,
+    "downside_participation_pct": 7.73067331670823,
+    "macro_regime": "STOCK_PICKING",
+    "broad_stress_level": "NORMAL"
+  }
+}
+```
