@@ -1,0 +1,55 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index: **0.00%** – không ghi nhận mã nào thủng VaR 95% trong rổ 30 bluechip (0/30)
+- Complacency Index: **5.61%** – thấp xa so với ngưỡng nguy hiểm 80%, chỉ 6/107 mã bị mispriced
+- Top 3 mispriced (spread bị nén cục bộ): **VIC, BMP, LPB**; không có breach sâu nào
+
+## 2. Contagion Assessment (Module B)
+VN30 đang ở chế độ không lây nhiễm (Stress = 0%). Không xuất hiện sự kiện đuôi béo lan truyền trong nhóm cổ phiếu trụ. Không có cú sốc hệ thống từ phía vốn hoá lớn. Rủi ro contagion **không hiện hữu**, không cần kích hoạt các biện pháp phòng vệ danh mục chéo.
+
+## 3. Complacency Assessment (Module C)
+Với Complacency ở 5.61%, kết luận duy nhất được phép rút ra: **thị trường KHÔNG đang ở chế độ ngủ quên, mất cảnh giác** (không có contango định giá sai trên diện rộng). Điều này hoàn toàn **không đồng nghĩa** thị trường ổn định hay vận hành bình thường.  
+
+Khi kết hợp với Stress Index = 0%, bức tranh trở nên rõ ràng hơn: thị trường hiện không trong pha hoảng loạn lây lan, cũng không bị nén rủi ro một cách hệ thống. Cấu trúc bù rủi ro đang ở trạng thái “giãn” lành mạnh (spread không bị bóp méo), phản ánh việc định giá rủi ro có chiều sâu.  
+
+Tuy nhiên, sự xuất hiện 6 mã mispriced (dẫn đầu là VIC, BMP, LPB) cho thấy vẫn tồn tại những điểm nóng cục bộ nơi spread bị nén bất thường. Đây là các “pocket of complacency” – có thể tiềm ẩn điều chỉnh đột ngột nếu thanh khoản rút hoặc tin xấu xảy ra, nhưng không mang tính lây lan toàn thị trường.
+
+## 4. Stock-Level Risk Calls
+- **Module B (Breach)**: Không có mã nào thủng VaR, do đó không phát sinh tín hiệu bán/giảm tỷ trọng khẩn cấp từ kênh này.
+- **Module C (Mispriced)**: VIC, BMP, LPB đang có spread nén chặt nhất. Cảnh báo: rủi ro đảo chiều mạnh nếu các mã này phá vỡ hỗ trợ kỹ thuật (ví dụ thủng MA20 hoặc MA50 trên khung D1 kèm volume tăng đột biến). Theo dõi sát, nhưng chưa kích hoạt lệnh chủ động cắt giảm nếu chưa xuất hiện tín hiệu phân phối/xác nhận giá.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.00,
+  "breach_count": 0,
+  "complacency_pct": 5.61,
+  "mispriced_count": 6,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "BMP", "LPB"],
+  "confidence": "medium"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=0.00% (0/30); complacency=5.61% (6/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 0.0,
+    "vares_complacency_pct": 5.607476635514018,
+    "vares_breach_count": 0,
+    "vares_mispriced_count": 6,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

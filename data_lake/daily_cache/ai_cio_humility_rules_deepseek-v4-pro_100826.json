@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-08-10",
+  "composite_score": 31.0,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 3,
+      "unit": "sessions",
+      "description": "Tín hiệu thanh khoản nội địa sẽ cải thiện nếu số phiên stress duy trì dưới 5"
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 54.1,
+      "unit": "%",
+      "description": "Thị trường sẽ tăng độ rộng nếu tỷ lệ cổ phiếu trên MA20 vượt 45% (đã vượt, cần vượt bền vững)"
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 64.1,
+      "unit": "%",
+      "description": "Stress hệ thống chỉ giảm khi SSI dưới 55%"
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.326,
+      "unit": "",
+      "description": "Rủi ro đuôi chỉ hạ khi hệ số đuôi max ở mọi ngưỡng dưới 0.25"
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": 5,
+      "unit": "th pct",
+      "description": "Dòng tiền Vingroup dẫn dắt quay trở lại nếu coupling vượt phân vị 70"
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.5,
+      "unit": "th pct",
+      "description": "Điều kiện tài chính toàn cầu chỉ bớt nguy khi CQS tụt khỏi phân vị 80"
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-08-10",
+  "source": "ai_cio_executive_summary"
+}

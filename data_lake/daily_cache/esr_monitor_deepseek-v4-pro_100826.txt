@@ -1,0 +1,46 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI đạt 64.1% – nằm trong vùng WARNING (0.50–0.80).
+- Market State được HMM phân loại là CALM CORRECTION (stress thấp + downtrend).
+- Ba pillar dẫn dắt rủi ro (tính riêng phiên giảm): S_LIQ (35%), S_VAL (31%), S_COR (18%).
+- VN30 đóng cửa dưới MA125, PCA concentration (EVR PC1) 38.0%.
+
+## 2. Risk Decomposition
+S_LIQ là driver chính với trọng số 35%, báo hiệu **volume khô cạn so với chuẩn 1 năm** – dòng tiền đang rút mạnh khỏi thị trường trong các phiên giảm. S_VAL chiếm 31% phản ánh căng thẳng định giá: tỷ suất sinh lời 252 ngày của VN30 cao hơn lãi suất tiền gửi nhưng điều chỉnh định giá vẫn bị nén khi thị trường yếu. S_COR đóng góp 18% với mức tương quan hệ thống vừa phải, chưa hình thành herding cực đoan. Tổ hợp này cho thấy thanh khoản khô kiệt trong bối cảnh định giá kéo căng, tạo nền cho những cú sụt giảm mạnh nếu áp lực bán gia tăng, dù chưa đạt đến ngưỡng hoảng loạn đồng bộ.
+
+## 3. Cross-Check
+HMM gán trạng thái CALM CORRECTION (stress thấp) trong khi SSI đã chạm WARNING (căng thẳng hệ thống ngầm tích luỹ) – đây là điểm lệch đáng chú ý. Ngưỡng quyết định HMM 0.538 gần biên, khiến mô hình có thể đánh giá thấp mức độ stress thực. Giá VN30 nằm dưới MA125 giữa xu hướng giảm, không có hiện tượng đỉnh mới phân kỳ với SSI, do đó rủi ro bull-trap không rõ nét. Tuy nhiên, việc HMM lạc quan tương đối so với chỉ báo SSI là tín hiệu cần giám sát thêm.
+
+## 4. Verdict
+Với SSI trong vùng WARNING, thanh khoản khô cạn dẫn dắt và thị trường đang trong downtrend, khuyến nghị giảm mạnh rủi ro danh mục. Tỷ trọng tiền mặt đề xuất: **70%**. Hành động phòng hộ: **giảm beta** – cắt bớt cổ phiếu có độ nhạy cao với VN30, chuyển sang tiền mặt. Chưa áp dụng bán khống hay mua put vì stress chưa chạm CRITICAL, và HMM còn duy trì CALM CORRECTION, tạo độ trễ có thể gây nhiễu.
+
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 64.1,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 70,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 64.06293506076418,
+    "pca_concentration_pct": 37.975329546415935,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.47723225592389
+  }
+}
+```

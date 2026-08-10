@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-08-10T12:45:36",
+  "t_data_date": "2026-08-10",
+  "target_report_date": "2026-08-09",
+  "report_match": "fallback:2026-08-07",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_070826.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_070826.txt",
+  "report_mtime": "report:2026-08-10T12:33:41|sidecar:2026-08-10T12:33:41",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_070826.txt:ac2bff9621669deb04cf457baea870188d475787|sidecar:ai_cio_humility_rules_deepseek-v4-pro_070826.json:ae2da208c323c704d8d9b22b7172f042e3de3339",
+  "parsed": {
+    "report_date": "2026-08-07",
+    "composite_score": 28.0,
+    "regime": "PRE-CRASH / PANIC",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 3.0,
+        "unit": "sessions",
+        "description": "Số phiên cảnh báo thanh khoản dưới 5 cho thấy áp lực đã hạ nhiệt, phá vỡ luận điểm khủng hoảng."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 42.8,
+        "unit": "%",
+        "description": "Tỉ lệ cổ phiếu trên MA20 vượt 45% báo hiệu độ rộng phục hồi, làm yếu luận điểm bearish."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 64.1,
+        "unit": "%",
+        "description": "SSI rơi xuống dưới 55% chứng tỏ rủi ro hệ thống giảm mạnh, phủ định chế độ PRE‑CRASH."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.326,
+        "unit": "",
+        "description": "Xi max toàn bộ dải ngưỡng dưới 0.25 cho thấy đuôi mỏng trở lại, tail risk không còn nguy hiểm."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 5.0,
+        "unit": "th pct",
+        "description": "Coupling Vingroup thấp dưới 70th pct khẳng định VN-Index không bị kéo lê bởi nhóm này, thị trường dẫn dắt bởi ngành khác – dấu hiệu lành mạnh hơn."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.7,
+        "unit": "th pct",
+        "description": "CQS rơi khỏi vùng cực đoan (dưới 80th pct) chấm dứt gọng kìm tín dụng toàn cầu, mở đường cho risk‑on."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-08-07",
+      "composite_score": 28.0,
+      "regime": "PRE-CRASH / PANIC",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 3,
+          "unit": "sessions",
+          "description": "Số phiên cảnh báo thanh khoản dưới 5 cho thấy áp lực đã hạ nhiệt, phá vỡ luận điểm khủng hoảng."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 42.8,
+          "unit": "%",
+          "description": "Tỉ lệ cổ phiếu trên MA20 vượt 45% báo hiệu độ rộng phục hồi, làm yếu luận điểm bearish."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 64.1,
+          "unit": "%",
+          "description": "SSI rơi xuống dưới 55% chứng tỏ rủi ro hệ thống giảm mạnh, phủ định chế độ PRE‑CRASH."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.326,
+          "unit": "",
+          "description": "Xi max toàn bộ dải ngưỡng dưới 0.25 cho thấy đuôi mỏng trở lại, tail risk không còn nguy hiểm."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 5.0,
+          "unit": "th pct",
+          "description": "Coupling Vingroup thấp dưới 70th pct khẳng định VN-Index không bị kéo lê bởi nhóm này, thị trường dẫn dắt bởi ngành khác – dấu hiệu lành mạnh hơn."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.7,
+          "unit": "th pct",
+          "description": "CQS rơi khỏi vùng cực đoan (dưới 80th pct) chấm dứt gọng kìm tín dụng toàn cầu, mở đường cho risk‑on."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-08-07",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "3 sessions",
+      "T actual": 3.0,
+      "T actual display": "3 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-06",
+      "Description": "Số phiên cảnh báo thanh khoản dưới 5 cho thấy áp lực đã hạ nhiệt, phá vỡ luận điểm khủng hoảng.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "42.8%",
+      "T actual": 54.11764705882353,
+      "T actual display": "54.1%",
+      "Delta": 11.317647058823532,
+      "Delta display": "+11.3%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-10",
+      "Description": "Tỉ lệ cổ phiếu trên MA20 vượt 45% báo hiệu độ rộng phục hồi, làm yếu luận điểm bearish.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "64.1%",
+      "T actual": 64.06293506076418,
+      "T actual display": "64.1%",
+      "Delta": -0.03706493923581888,
+      "Delta display": "-0.037%",
+      "Status": "Intact",
+      "Data date": "2026-08-10",
+      "Description": "SSI rơi xuống dưới 55% chứng tỏ rủi ro hệ thống giảm mạnh, phủ định chế độ PRE‑CRASH.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.326",
+      "T actual": 0.3263191266569856,
+      "T actual display": "0.326",
+      "Delta": 0.00031912665698557996,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-08-10",
+      "Description": "Xi max toàn bộ dải ngưỡng dưới 0.25 cho thấy đuôi mỏng trở lại, tail risk không còn nguy hiểm.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "5 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Coupling Vingroup thấp dưới 70th pct khẳng định VN-Index không bị kéo lê bởi nhóm này, thị trường dẫn dắt bởi ngành khác – dấu hiệu lành mạnh hơn.",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.7 th pct",
+      "T actual": 99.53703703703704,
+      "T actual display": "99.5 th pct",
+      "Delta": -0.16296296296296475,
+      "Delta display": "-0.163 th pct",
+      "Status": "Intact",
+      "Data date": "2026-08-07",
+      "Description": "CQS rơi khỏi vùng cực đoan (dưới 80th pct) chấm dứt gọng kìm tín dụng toàn cầu, mở đường cho risk‑on.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 3,
+      "date": "2026-08-06",
+      "error": ""
+    },
+    "breadth": {
+      "value": 54.11764705882353,
+      "date": "2026-08-10",
+      "error": ""
+    },
+    "ssi": {
+      "value": 64.06293506076418,
+      "date": "2026-08-10",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.32520846567672185,
+      "date": "2026-08-10",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3263191266569856,
+      "date": "2026-08-10",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.53703703703704,
+      "date": "2026-08-07",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 5,
+  "total": 6
+}
