@@ -1,0 +1,89 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Chế độ tin tức hiện tại (News Sentiment Regime)**
+
+- **1d**: `strong_risk_on` – Xác suất đồng thuận posterior cùng chiều (P_conf) đạt **100%**. Khẳng định chắc chắn tâm lý thị trường đang tích cực mạnh.
+- **7d**: `strong_risk_on` – P_conf **100%**. Xu hướng tích cực được duy trì nhất quán.
+- **30d**: `strong_risk_on` – P_conf **100%**. Rủi ro giảm thấp, niềm tin kéo dài sang trung hạn.
+
+→ **Guardrail**: Với P_conf > 85%, toàn bộ kết luận dùng giọng **“Khẳng định chắc chắn”**, không có dấu hiệu giằng co.
+
+**2. Kênh kéo Risk-On / Risk-Off mạnh nhất**
+
+- **Kênh kéo Risk‑On** (P_conf ≥ 99%):
+  - `fx_external` (tỷ giá đối ngoại): +1.512 (1d) → +2.000 (30d)
+  - `earnings` (kết quả kinh doanh): +1.366 → +1.917
+  - `credit_stress` (căng thẳng tín dụng): +1.226 → +1.406
+  - `monetary_policy` (chính sách tiền tệ) xuất hiện rõ từ 7d: +0.799 → +1.407 (30d)
+- **Kênh kéo Risk‑Off duy nhất đáng kể**:
+  - `commodity` (hàng hóa): -0.568 (7d, P_conf 100%), -0.662 (30d, P_conf 100%). Phản ánh giá heo hơi, ure, than cốc giảm sâu. Tuy nhiên, tác động bị lấn át hoàn toàn bởi các kênh tích cực.
+
+Các kênh còn lại (lạm phát, bất động sản, thanh khoản) có P_conf ≤ 65% hoặc giá trị gần 0 → **giằng co, không kết luận được xu hướng**.
+
+**3. Các động lực chính (Drivers)**
+
+*Tích cực (kéo Risk‑On)*:
+- Tỷ giá trung tâm liên tục tăng nhẹ (25.516 ngày 11/8, các phiên trước 14-28/7) → tín hiệu ổn định tỷ giá, hỗ trợ kênh fx_external.
+- Lợi suất TPCP đi ngang → giảm căng thẳng tín dụng (credit_stress tích cực).
+- Cam kết đầu tư 20 tỷ USD vào Trung tâm Tài chính quốc tế TP.HCM; báo chí Australia đưa tin đậm về chuyến thăm của Tổng Bí thư, Chủ tịch nước → thúc đẩy tăng trưởng (growth).
+- Lãi suất ON tăng 139 bps (07/08) được ghi nhận tích cực trong kênh monetary_policy (có thể phản ánh niềm tin vào điều hành thanh khoản chủ động).
+
+*Tiêu cực (kéo Risk‑Off)*:
+- Giá heo hơi trong nước giảm đáy 6 tháng (60.000 đ/kg, thấp hơn cùng kỳ 3.5%).
+- Giá phân Ure, than cốc Trung Quốc giảm về đáy tháng/6 tháng → áp lực kênh hàng hóa.
+
+Các biến động này chỉ ảnh hưởng biên, không đảo ngược bức tranh chung.
+
+**4. Kết luận tác động đến AI CIO**
+
+- **Supports** lớp vĩ mô (macro layer) đang theo hướng risk‑on. Tín hiệu sentiment đồng thuận mạnh ở cả ba cửa sổ, không có mâu thuẫn.
+- **Neutral / confirm** với các công cụ nội tại thị trường (market‑internal tools): không phát sinh xung đột, có thể dùng làm lớp phủ xác nhận.
+- **Cảnh báo**: Đây là dữ liệu mềm (soft sentiment), không dùng làm quy tắc phân bổ cứng.
+
+**5. Caveat (Cảnh báo nguồn & dữ liệu)**
+
+- **Nguồn tin social chiếm tỷ trọng đáng chú ý**: `mozyfin_social` chiếm 22% (1d), 28% (7d) và 39% (30d). Do đó, tín hiệu có yếu tố khuếch đại từ quan điểm/dư luận xã hội, độ tin cậy thấp hơn so với dữ liệu cứng (WiData). Tác nhân này cần được chiết khấu khi diễn giải cường độ.
+- `generated_at` 2026-08-11T15:12:54+07:00 – dữ liệu không bị trễ, không có rủi ro stale feed.
+- Hệ thống dựa trên tin tức, dễ nhiễu tiêu đề (headline noise); các kênh như `commodity` có độ trễ và biến động giá toàn cầu không nhất thiết phản ánh nội tại Việt Nam.
+
+**6. Gắn nhãn `mozyfin_social`**  
+Đã nhận diện rõ: `mozyfin_social` là bằng chứng xã hội/ý kiến với mức độ tin cậy thấp hơn, đặc biệt ở cửa sổ 30d (39%). Tín hiệu tích cực mạnh có thể bị thổi phồng nhẹ, cần theo dõi thêm xác nhận từ dữ liệu vĩ mô cứng.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.6366,
+    "news_confidence_1d": 0.9979,
+    "news_count_1d": 223,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 71,
+      "mozyfin": 102,
+      "mozyfin_social": 50
+    },
+    "news_macro_composite_7d": 0.6163,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1315,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 242,
+      "mozyfin_social": 373,
+      "mozyfin": 700
+    },
+    "news_macro_composite_30d": 0.7451,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4869,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1206,
+      "mozyfin": 1776,
+      "mozyfin_social": 1887
+    },
+    "news_macro_composite": 0.6366,
+    "news_confidence": 0.9979,
+    "news_count": 223
+  }
+}
+```

@@ -1,0 +1,53 @@
+## 1. Observations
+- **MA20 (59.8%)**: Mức bình thường, không overbought cũng không oversold, phản ánh dòng tiền ngắn hạn vẫn duy trì ở nhóm dẫn dắt.
+- **MA60 (22.6%)**: Rất thấp, chưa đến ¼ rổ vượt đường trung bình 1 quý – pha điều chỉnh trung hạn chưa xác nhận kết thúc.
+- **MA125 (19.8%)**: Thấp, sức mạnh chu kỳ kinh doanh nửa năm yếu, hầu hết cổ phiếu chưa tạo nền.
+- **MA252 (20.2%)**: Rất thấp, xu hướng dài hạn (secular) vẫn trong trạng thái suy yếu, chỉ 1/5 mã còn giữ được MA năm.
+
+## 2. Structural Health
+Bốn horizon lệch pha rõ rệt: MA20 ở mức tương đối khá (59.8%) trong khi MA60–MA125–MA252 đều dưới 25%. Đây là **Divergence** kiểu “ngắn mạnh – dài yếu”. Không đạt tiêu chí Bull Trap (vì MA20 chưa > 80%) nhưng tín hiệu nền dài hạn quá mỏng, thị trường đang unstable. Diễn biến hiện tại giống một nhịp hồi kỹ thuật trong downtrend hơn là khởi đầu uptrend bền vững.
+
+## 3. Money Flow Leadership
+- **Top volume giữ MA20**: Xuất hiện các mã tài chính – chứng khoán (AAS, AGR), ngân hàng (ACB) và một số cổ phiếu đầu cơ (AAA, AMS). Dòng tiền ngắn hạn có thiên hướng vào nhóm tài chính nhưng còn phân tán, không hình thành sector leadership rõ nét.
+- **Top volume giữ MA252**: Các leader dài hạn như ABB (ngân hàng), BSR (lọc hóa dầu), BVH (bảo hiểm), C69, CDC (xây dựng) – khá trùng với nhóm defensive (bank, energy). Không có sự trùng lặp với danh sách ngắn hạn, cho thấy dòng tiền đầu cơ đổ vào các mã thiếu nền dài hạn.
+- **Smart money** nghiêng về phòng thủ ở danh mục dài hạn, trong khi dòng tiền nóng chủ yếu giao dịch T+. Leadership chung là **mixed**, không có nhóm dẫn dắt nhất quán.
+
+## 4. Verdict
+- **Strategy**: **WAIT FOR CONFIRMATION**. Không theo xu hướng ngắn hạn khi nền dài hạn quá yếu. Ưu tiên quản trị rủi ro, giảm thiểu giao dịch T+ nếu không có lợi thế thông tin.
+- **Đòn bẩy đề xuất**: **0%**. MA252 chỉ đạt 20.2%, divergence rõ, hoàn toàn không đủ điều kiện sử dụng margin. Giải ngân mới chỉ nên cân nhắc khi MA60 và MA252 cải thiện trên 40% và xác nhận đồng pha.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 59.8,
+  "ma60_pct": 22.6,
+  "ma125_pct": 19.8,
+  "ma252_pct": 20.2,
+  "regime": "divergence",
+  "leadership_sector": "mixed",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 59.76470588235294,
+    "breadth_ma60_pct": 22.58823529411765,
+    "breadth_ma125_pct": 19.76470588235294,
+    "breadth_ma252_pct": 20.235294117647058,
+    "above_ma20_count": 254,
+    "above_ma60_count": 96,
+    "above_ma125_count": 84,
+    "above_ma252_count": 86,
+    "breadth_universe_size": 425,
+    "snapshot_date": "11/08/2026"
+  }
+}
+```

@@ -1,0 +1,59 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 61.2/100, nằm trong vùng GREED (60–80), tăng +1.0 điểm so với phiên trước.
+- EGARCH Vol (chuẩn hóa) ở mức 54.8%, tăng +4.4%.
+- Rolling Skewness đạt -0.01, gần trung tính và hơi nghiêng âm.
+- Downside Correlation (norm) chỉ 1.8%, Upside Correlation (norm) lên tới 20.2%.
+
+## 2. Interpretation
+Dữ liệu cho thấy một pha GREED không thuần nhất: điểm số vào vùng GREED, nhưng biến động vẫn ở mức khá cao và phân phối lợi nhuận thiên lệch nhẹ về đuôi trái (skew âm). Điều này báo hiệu thị trường đang trong trạng thái lạc quan mong manh – dòng tiền tập trung vào nhóm cổ phiếu tăng, xong rủi ro đảo chiều đột ngột chưa được phản ánh vào mặt bằng biến động.
+
+## 3. Cross-Check
+Xuất hiện phân kỳ rõ: Score GREED yêu cầu vol thấp, nhưng EGARCH Vol hiện tại khá cao (54.8%) và tăng nhanh (+4.4%). Thêm vào đó, Skewness âm nhẹ trái dấu với Upside Correlation cao (20.2%) — đám đông đang có tương quan mạnh khi giá tăng, nhưng cấu trúc phân phối hàm ý xác suất xuất hiện cú sốc giảm vẫn đáng kể. Điều này hạ thấp độ tin cậy của tín hiệu GREED thuần túy.
+
+## 4. Verdict
+Với các tín hiệu mâu thuẫn và độ tin cậy chỉ ở mức trung bình (Signal Confidence = 0.60), ưu tiên giảm thiểu rủi ro danh mục. Khuyến nghị giảm beta exposure xuống 0.5, đồng thời hạn chế mở mới các vị thế mua chủ động cho đến khi có xác nhận vol hạ nhiệt hoặc skew chuyển dương bền vững. Nếu đã nắm giữ cổ phiếu dẫn dắt, có thể cân nhắc chốt lời một phần hoặc mua bảo vệ nhẹ.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "11/08/2026",
+  "regime": "GREED",
+  "score": 61.2,
+  "confidence": "medium",
+  "beta_target": 0.5,
+  "key_signals": [
+    "Score GREED đi kèm EGARCH Vol cao 54.8% và skew -0.01 – phân kỳ với cấu trúc GREED lý tưởng",
+    "Upside correlation 20.2% vượt trội so với downside correlation 1.8% nhưng chưa đủ bù đắp rủi ro đuôi"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 61.2
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: GREED
+- Signal Confidence: 0.60
+- CSV Rank: 0.14
+- Acute Shock: 0.00
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 61.20862614143359,
+    "sentiment_regime": "GREED",
+    "signal_confidence": 0.5997078094951425,
+    "acute_shock": 0.0,
+    "csv_rank": 0.14285714285714285,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

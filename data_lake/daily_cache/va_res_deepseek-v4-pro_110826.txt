@@ -1,0 +1,51 @@
+<!-- ai-cio-cache-version: vares_v2_prior_window_prompt -->
+## 1. Observations
+- VN30 Stress Index: 0.00% — không có mã nào thủng VaR 95%.
+- Số mã breached: 0/30 — không có tín hiệu bán tháo real‑time.
+- Complacency Index: 6.54% — far below danger threshold (80%), với 7 mã bị định giá sai tập trung ở VIC, BMP, LPB.
+
+## 2. Contagion Assessment (Module B)
+Stress Index bằng 0 phản ánh không có sự kiện gây “đổ vỡ” lan truyền trong rổ VN30. Không ghi nhận breach nào nên không thể phân loại là systemic hay cá biệt. Rủi ro lây lan tức thời ở mức tối thiểu — không có sóng giảm đồng loạt.
+
+## 3. Complacency Assessment (Module C) — ĐÚNG BẢN CHẤT
+Complacency thấp chỉ có nghĩa thị trường **không** rơi vào trạng thái “ngủ quên” (vol thấp, spread bị nén trên diện rộng). **Không đồng nghĩa** thị trường vận hành ổn định hay không có áp lực bán. Khi kết hợp với Stress Index 0%, bức tranh hiện tại cho thấy không có cơn hoảng loạn nào đang diễn ra, nhưng cấu trúc bù rủi ro cũng không bị bóp méo nguy hiểm. Dù vậy, 7 cổ phiếu bị mispriced (đứng đầu là VIC, BMP, LPB) cảnh báo vùng cục bộ nơi spread đang bị nén chặt, tiềm ẩn điều chỉnh nếu có cú sốc bất ngờ.
+
+## 4. Stock‑Level Risk Calls
+- **Module B**: Không có breach → không có lệnh bán/giảm tỷ trọng khẩn cấp nào.
+- **Module C** (top mispriced): VIC, BMP, LPB có mức bù rủi ro hiện tại quá thấp. Nếu thị trường xuất hiện biến động, khả năng giãn spread đột ngột là cao. Khuyến nghị đặt cảnh báo khi giá thủng MA20/MA50 trên khung D1, hoặc dừng lỗ ở mức -5% đến -7% so với giá đóng cửa ngày 11/08 để quản trị rủi ro đường đuôi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "va_res",
+  "stress_index_pct": 0.0,
+  "breach_count": 0,
+  "complacency_pct": 6.54,
+  "mispriced_count": 7,
+  "regime": "spread_normal",
+  "watchlist_short": ["VIC", "BMP", "LPB"],
+  "confidence": "high"
+}
+```
+
+---
+vares_methodology: vares_v2.0.0; regime=NO_VARES_STRESS; stress=0.00% (0/30); complacency=6.54% (7/107); prior_window_no_lookahead=true; bad_tick_abs_return_gt_50pct=null
+
+=== AI CIO DIRECT METRICS: va_res ===
+```json
+{
+  "tool": "va_res",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vares_stress_index_pct": 0.0,
+    "vares_complacency_pct": 6.5420560747663545,
+    "vares_breach_count": 0,
+    "vares_mispriced_count": 7,
+    "valid_vn30_count": 30,
+    "valid_market_count": 107,
+    "vares_regime": "NO_VARES_STRESS",
+    "stress_level": "LOW",
+    "complacency_level": "LOW"
+  }
+}
+```

@@ -1,0 +1,46 @@
+Ngày báo cáo AI: 11/08/2026
+
+Trạng thái thị trường hàm ý từ định giá nhóm ngân hàng: **Định giá cao, cần chọn lọc**.  
+Điểm độ rộng định giá: **-45.7%** (ngưỡng -50% đến -25%). Số mã hợp lệ: 23, trong đó 12 mã định giá cao (+52.2%), 8 mã hợp lý (+34.8%), 3 mã rẻ nhưng rủi ro, 0 mã rẻ rõ rệt. Biên an toàn hiện tại rất thấp, thị trường đang chiết khấu rủi ro thay vì mở rộng định giá.
+
+**Luận điểm chính (valuation breadth → regime):**
+- Nhóm định giá cao áp đảo (12/23) với không có mã nào thực sự rẻ rõ rệt; 3 mã có upside toàn bộ đều nằm trong phân loại “rẻ nhưng rủi ro”, cho thấy rủi ro tín dụng và chất lượng tài sản bị định giá tiêu cực.
+- Điểm độ rộng -45.7% nằm sát vùng dưới của phân loại “Định giá cao, cần chọn lọc”, phản ánh mặt bằng định giá nhóm ngân hàng đắt đỏ trên diện rộng.
+- Gap trung vị -13.0% và gap theo vốn hóa -19.6% cho thấy ngay cả mức chiết khấu bình quân cũng âm; thị trường không ghi nhận biên an toàn đáng kể.
+- Điểm đánh giá tương đối peer labels -8.7% củng cố rằng nhóm ngân hàng niêm yết hiện đang giao dịch đắt hơn trung bình so với các ngân hàng tương quan.
+
+**Kiểm tra chéo (định giá tương đối & xác nhận giá):**
+- Điểm định giá tương đối -8.7%: nhất quán với bức tranh định giá cao, nhóm đang bị “overpriced” nhẹ so với peer group nội bộ.
+- Xác nhận thị trường: toàn bộ các mã fair/undervalued trong watchlist đều có xác nhận yếu hoặc chưa xác nhận (7 mã “Fair, Weak Price Action”, 1 mã “Neutral Confirmation”, 3 mã “Unconfirmed Undervalued”). Không có mã nào được thị trường xác nhận mạnh, phủ định khả năng có cơ hội mua sớm đáng tin cậy. Điều này củng cố chế độ chọn lọc, không có tín hiệu đảo chiều định giá.
+
+**Tín hiệu theo mã (đáng theo dõi/rủi ro):**
+- Nhóm rẻ (Undervalued but Risky): NAB (gap +58.2%), KLB (+46.5%), VAB (+31.7%) có upside lý thuyết lớn, nhưng rủi ro cao (risk score 51.9–42.6), xác nhận giá cực yếu (confirmation 19–25, “Unconfirmed”). Cần chờ xác nhận mạnh hơn hoặc cải thiện rủi ro nội tại.
+- Nhóm hợp lý (Fair): SHB, TPB, MBB, ACB, SSB, CTG, VIB đều mang nhãn “Fair, Weak Price Action”, điểm xác nhận rất thấp (MBB 6.9, SHB 18.4, thậm chí PGB ngoài bảng cũng 6.2). Nếu muốn chọn lọc, ưu tiên những mã có risk score thấp + nền tảng chất lượng: ACB, CTG, nhưng phải đợi market confirmation cải thiện.
+- Rủi ro/value-trap: NVB (gap -87.4%, risk score 68.3, CAR missing), EIB (-60.4%, risk 58.4), BVB (-57.5%, risk 63.5) – định giá phá hủy, xác nhận giá yếu (NVB 13.7, BVB 12.5, EIB 16.4). Gần như chắc chắn là bẫy giá rẻ.
+- Ngay cả các mã overvalued dẫn dắt: LPB, VCB, BID, HDB đều có mispricing score âm rất sâu, củng cố xu hướng định giá giảm hoặc đi ngang dài.
+
+**Rủi ro dữ liệu & bước tiếp theo:**
+- Dữ liệu thiếu: BAB, SGB (không có giá thị trường, không tính được gap, beta fallback, confidence 90); NVB (thiếu CAR, dùng giả định suy giảm vốn, confidence 95 nhưng rủi ro cực cao). Cần xác minh báo cáo tài chính gốc và dữ liệu giá trước khi sử dụng cho allocation.
+- Cảnh báo hệ thống: các ngân hàng nhỏ/ngoại biên (NVB, BVB, EIB, KLB, VAB) có rủi ro tín dụng, chất lượng tài sản và thanh khoản kém; các chỉ số cần được đối chiếu thực tế (CAR, NPL aged, provision coverage thực chi).
+- Hành động khuyến nghị: duy trì tỉ trọng thấp đối với nhóm ngân hàng trong danh mục. Chỉ giải ngân khi xuất hiện ít nhất 2 yếu tố: (1) điểm độ rộng cải thiện lên vùng Trung tính (trên -25%), và (2) có ít nhất 1–2 mã rẻ thực sự xuất hiện xác nhận giá mạnh (market confirmation > 70). Không mua đuổi các mã định giá cao đang giảm, trừ khi có tín hiệu kỹ thuật đảo chiều rõ ràng và khối lượng xác nhận.
+
+=== AI CIO DIRECT METRICS: bank_valuation ===
+```json
+{
+  "tool": "bank_valuation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "eligible_banks": 23,
+    "bank_valuation_breadth_score": -0.45652173913043476,
+    "median_valuation_gap_pct": -0.1297651105489892,
+    "valuation_regime": "Định giá cao, cần chọn lọc",
+    "overvalued_count": 12,
+    "fair_count": 8,
+    "undervalued_count": 3,
+    "best_ticker": "NAB",
+    "best_valuation_gap_pct": 0.5819089953700103,
+    "worst_ticker": "NVB",
+    "worst_valuation_gap_pct": -0.873745564919769
+  }
+}
+```

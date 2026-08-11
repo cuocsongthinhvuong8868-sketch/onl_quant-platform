@@ -1,0 +1,57 @@
+## 1. Scenario Assessment
+K=1.0 & CoE=14% là baseline phản ánh đúng rủi ro ngành ngân hàng VN hiện tại – không quá khắc nghiệt. Trong 6 cổ phiếu được xét, chỉ SHB và MBB tạo được Alpha dương, còn lại đều đốt vốn (Alpha < 0). Điều này cho thấy mặt bằng ngành đang phân hóa mạnh: cơ hội chỉ tập trung ở những ngân hàng vừa có chất lượng lợi nhuận cao vừa được định giá hợp lý. Nhìn chung, ngành không còn rẻ để mua đại trà, buộc phải chọn lọc kỹ.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha 3.9%)** – Điển hình của **Fortress**: P/B chỉ 0.81 (rẻ nhất nhóm), ROE 17.5% khá cao, σROE cực thấp (1.9%) và payout 8.6% giúp giữ lại phần lớn lợi nhuận để tái đầu tư. Định giá rẻ + chất lượng ổn định là driver chính.
+- **MBB (Alpha 1.3%)** – Cũng là **Fortress**: ROE lên tới 21.8%, σROE thấp kỷ lục (1.6%), payout chỉ 6.7%. Dù P/B 1.21 không quá rẻ, nhưng sự bền vững của ROE đã bù đắp và tạo ra giá trị thặng dư.
+- **ACB (Alpha -1.1%)** – ROE cao nhất nhóm (23.0%) nhưng σROE 2.7% và payout 15.9% khá lớn, cộng thêm P/B 1.24 khiến Alpha âm nhẹ. Đây là trường hợp **Premium Burn** nhẹ: chất lượng tốt nhưng định giá đã phản ánh gần hết, không còn dư địa tạo alpha.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.8%)**: P/B 3.40 là mức định giá ảo tưởng, ROE dù cao (21.1%) cũng không thể bù đắp. Đây là **Growth Trap** điển hình – giá đã chiết khấu quá nhiều kỳ vọng, rủi ro sụt giảm mạnh nếu ROE suy yếu.
+- **EIB (Alpha -10.4%)**: ROE thấp (10.0%) và σ cao (3.8%) khiến ngay cả P/B 1.29 cũng không rẻ – **Cheap Trap** kinh điển.
+- **VPB (Alpha -9.9%)**: ROE trung bình (14.1%) nhưng rủi ro biến động lớn (σ 4.7%) và payout cao (24.6%) làm xói mòn lợi nhuận giữ lại. Không phải bẫy giá rẻ mà là **chất lượng kém bị định giá quá cao**.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress) – 60-70% phân bổ**: SHB & MBB, với SHB chiếm ưu thế nhờ P/B rẻ hơn hẳn.
+- **Tactical – 20-30%**: ACB có thể cân nhắc nếu giá điều chỉnh thêm, nhưng hiện tại chưa đủ hấp dẫn để đưa vào core.
+- **Cấm mua / underweight**: LPB, EIB, VPB – Alpha âm sâu, rủi ro cao.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB", "MBB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 3.8770240904834,
+    "median_economic_alpha_pct": -4.311639316763895,
+    "positive_alpha_count": 2,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Cầu (Upside Breadth) lệch -1.73pp so với trung bình dài hạn (9.48% vs 11.21%) – lực mua suy yếu, thiếu động lực.
+- Cung (Downside Breadth) lệch -3.42pp (8.98% vs 12.40%) – bên bán cũng bị nén mạnh, cả hai chiều đều dưới kỳ vọng.
+- Phi cầu = 0.061 (Random Walk – nhiễu), Phi cung = 0.186 (Momentum – đà bán duy trì) → phía cung đang chi phối xu hướng ngắn hạn.
+
+## 2. Supply-Demand Dynamics
+Cả cầu và cung đều nén dưới mức trung bình dài hạn → trạng thái **zombification** (thanh khoản cạn, dòng tiền ì ạch).  
+Bên cung giữ momentum thực sự (|Phi_cung| = 0.186 >> 0.10), trong khi cầu chỉ là nhiễu. Do đó, sức ép bán có xu hướng tự duy trì, dù mức độ tuyệt đối hiện thấp.
+
+## 3. Stress-Test Read
+P95 Downside = 20.62%: nếu thị trường gãy, tỷ lệ mã giảm >2% có thể nhảy lên 1/5 thị trường – biên độ panic đáng kể.  
+Bất cân xứng đuôi: P95 Down (20.62%) > P95 Up (19.05%), rủi ro đuôi phía cung dày hơn ~1.57pp. Kịch bản bùng nổ mua (P95 Up) vẫn khả dĩ nhưng xác suất thấp hơn một chút so với rủi ro sụt giảm.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân đề xuất:** 30%
+- **Chiến lược:** Phòng thủ – ưu tiên quản trị rủi ro, giảm đòn bẩy. Zombification kết hợp đà bán cho thấy thị trường nghiêng về suy yếu hơn là đột biến tăng.
+- Không hành động “bắt đáy” vì chưa có tín hiệu đảo chiều đà cung; cũng không “mua đuổi” vì cầu chỉ là nhiễu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 20.62,
+  "p95_upside_pct": 19.05,
+  "deployment_pct": 30,
+  "strategy": "defensive",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: BUY_PRESSURE
+- Breadth Stress Score: 34.1
+- Downside Rank: 0.49
+- Net Sell Pressure: -0.5 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 9.476309226932669,
+    "downside_current_pct": 8.977556109725686,
+    "p95_upside_pct": 19.048844857140462,
+    "p95_downside_pct": 20.623661870248473,
+    "phi_up": 0.061154916757448614,
+    "phi_down": 0.18610207648620555,
+    "breadth_stress_score": 34.05555555555556,
+    "net_sell_pressure_pct": -0.49875311720698257,
+    "breadth_regime": "BUY_PRESSURE"
+  }
+}
+```

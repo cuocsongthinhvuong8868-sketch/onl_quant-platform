@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-08-11T12:37:52",
+  "t_data_date": "2026-08-11",
+  "target_report_date": "2026-08-10",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_100826.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_100826.txt",
+  "report_mtime": "report:2026-08-11T12:29:24|sidecar:2026-08-11T12:29:24",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_100826.txt:a03549577873b14c3a4faf13144fa93b5ddafefd|sidecar:ai_cio_humility_rules_deepseek-v4-pro_100826.json:fc2f61cc371db6022796f55ee35dbfb0d90ba096",
+  "parsed": {
+    "report_date": "2026-08-10",
+    "composite_score": 31.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 3.0,
+        "unit": "sessions",
+        "description": "Tín hiệu thanh khoản nội địa sẽ cải thiện nếu số phiên stress duy trì dưới 5"
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 54.1,
+        "unit": "%",
+        "description": "Thị trường sẽ tăng độ rộng nếu tỷ lệ cổ phiếu trên MA20 vượt 45% (đã vượt, cần vượt bền vững)"
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 64.1,
+        "unit": "%",
+        "description": "Stress hệ thống chỉ giảm khi SSI dưới 55%"
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.326,
+        "unit": "",
+        "description": "Rủi ro đuôi chỉ hạ khi hệ số đuôi max ở mọi ngưỡng dưới 0.25"
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 5.0,
+        "unit": "th pct",
+        "description": "Dòng tiền Vingroup dẫn dắt quay trở lại nếu coupling vượt phân vị 70"
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.5,
+        "unit": "th pct",
+        "description": "Điều kiện tài chính toàn cầu chỉ bớt nguy khi CQS tụt khỏi phân vị 80"
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-08-10",
+      "composite_score": 31.0,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 3,
+          "unit": "sessions",
+          "description": "Tín hiệu thanh khoản nội địa sẽ cải thiện nếu số phiên stress duy trì dưới 5"
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 54.1,
+          "unit": "%",
+          "description": "Thị trường sẽ tăng độ rộng nếu tỷ lệ cổ phiếu trên MA20 vượt 45% (đã vượt, cần vượt bền vững)"
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 64.1,
+          "unit": "%",
+          "description": "Stress hệ thống chỉ giảm khi SSI dưới 55%"
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.326,
+          "unit": "",
+          "description": "Rủi ro đuôi chỉ hạ khi hệ số đuôi max ở mọi ngưỡng dưới 0.25"
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": 5,
+          "unit": "th pct",
+          "description": "Dòng tiền Vingroup dẫn dắt quay trở lại nếu coupling vượt phân vị 70"
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.5,
+          "unit": "th pct",
+          "description": "Điều kiện tài chính toàn cầu chỉ bớt nguy khi CQS tụt khỏi phân vị 80"
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-08-10",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "3 sessions",
+      "T actual": 4.0,
+      "T actual display": "4 sessions",
+      "Delta": 1.0,
+      "Delta display": "+1 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-07",
+      "Description": "Tín hiệu thanh khoản nội địa sẽ cải thiện nếu số phiên stress duy trì dưới 5",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "54.1%",
+      "T actual": 59.76470588235294,
+      "T actual display": "59.8%",
+      "Delta": 5.664705882352941,
+      "Delta display": "+5.665%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-11",
+      "Description": "Thị trường sẽ tăng độ rộng nếu tỷ lệ cổ phiếu trên MA20 vượt 45% (đã vượt, cần vượt bền vững)",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "64.1%",
+      "T actual": 63.461826836788624,
+      "T actual display": "63.5%",
+      "Delta": -0.6381731632113699,
+      "Delta display": "-0.638%",
+      "Status": "Intact",
+      "Data date": "2026-08-11",
+      "Description": "Stress hệ thống chỉ giảm khi SSI dưới 55%",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.326",
+      "T actual": 0.3263191266569856,
+      "T actual display": "0.326",
+      "Delta": 0.00031912665698557996,
+      "Delta display": "+0",
+      "Status": "Intact",
+      "Data date": "2026-08-11",
+      "Description": "Rủi ro đuôi chỉ hạ khi hệ số đuôi max ở mọi ngưỡng dưới 0.25",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "5 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Dòng tiền Vingroup dẫn dắt quay trở lại nếu coupling vượt phân vị 70",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.5 th pct",
+      "T actual": 99.27248677248677,
+      "T actual display": "99.3 th pct",
+      "Delta": -0.2275132275132279,
+      "Delta display": "-0.228 th pct",
+      "Status": "Intact",
+      "Data date": "2026-08-10",
+      "Description": "Điều kiện tài chính toàn cầu chỉ bớt nguy khi CQS tụt khỏi phân vị 80",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 4,
+      "date": "2026-08-07",
+      "error": ""
+    },
+    "breadth": {
+      "value": 59.76470588235294,
+      "date": "2026-08-11",
+      "error": ""
+    },
+    "ssi": {
+      "value": 63.461826836788624,
+      "date": "2026-08-11",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.32520846567672185,
+      "date": "2026-08-11",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3263191266569856,
+      "date": "2026-08-11",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.27248677248677,
+      "date": "2026-08-10",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 5,
+  "total": 6
+}
