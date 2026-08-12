@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-08-12",
+  "composite_score": 35.0,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Dưới 5 phiên STRESS/WARNING trong 20 phiên thì cảnh báo thanh khoản hạ nhiệt."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 63.8,
+      "unit": "%",
+      "description": "Nếu Breadth MA20 duy trì trên 45% thì thị trường nội tại cải thiện."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 63.2,
+      "unit": "%",
+      "description": "SSI dưới 55% sẽ triệt tiêu cảnh báo hệ thống."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.326,
+      "unit": "",
+      "description": "Xi max dưới 0.25 ở mọi threshold thì đuôi béo biến mất."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": null,
+      "unit": "th pct",
+      "description": "Dưới 70th pct thì ảnh hưởng coupling không còn đáng kể."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.3,
+      "unit": "th pct",
+      "description": "CQS dưới 80th pct thì stress tín dụng toàn cầu hạ nhiệt."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-08-12",
+  "source": "ai_cio_executive_summary"
+}

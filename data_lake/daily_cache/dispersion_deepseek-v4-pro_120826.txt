@@ -1,0 +1,59 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+## 1. Observations
+- Spread_Z: –1.07σ – độ phân tán thấp hơn trung bình 60 ngày, Spread thực tế 8.21% (annualized).
+- DPI: 38.3% – dưới ngưỡng bền vững 70%, xác nhận không có chế độ phân tán kéo dài.
+- Average Pairwise Correlation: 0.073 – mức rất thấp, môi trường phân hoá cao.
+- Cross-Sectional Skewness: +0.87; Kurtosis: 7.33 – đối xứng nhẹ về phía dương, đuôi béo rõ rệt.
+- Broad Stress Score: 3.1/100 (BÌNH THƯỜNG), Downside Participation chỉ 6.2%; CSAD/CSSD z-score gần zero – không có áp lực bán tháo đồng loạt.
+
+## 2. Structural State
+Thị trường ở trạng thái bình thường, không stress. Spread_Z âm phản ánh mức phân tán thấp hơn bối cảnh 60 ngày gần nhất, đồng thời DPI thấp loại bỏ nguy cơ một regime phân tán dai dẳng. Không có dấu hiệu của stress cục bộ (khi chỉ Spread cao mà DPI thấp) hay stress hệ thống kéo dài. Cấu trúc hiện tại an toàn cho hoạt động định vị dựa trên chọn lựa cổ phiếu.
+
+## 3. Cross-Check & Tail Direction
+Skewness +0.87 chưa vượt ±1, vì thế không ghi nhận sự cố gãy đuôi một chiều (không có “cú sập cá biệt” hay “cú đẩy điên rồ”). Tuy nhiên, Kurtosis 7.33 vượt xa 5 – xác nhận tồn tại các outlier đuôi béo. Điều này khiến mô hình phân phối chuẩn trở nên kém tin cậy: rủi ro đuôi vẫn hiện hữu dù không nghiêng hẳn về một phía. Hướng đuôi hiện tại coi là đối xứng.
+
+## 4. Regime Mapping
+Với DPI thấp (38.3%) và Tương quan thấp (0.073), bản đồ 2D đặt thị trường vào ô **Healthy Stock-Picking**. Chẩn đoán này trùng khớp với kết luận từ V2 diagnostics (Macro regime: STOCK_PICKING). Đây là môi trường lý tưởng cho các chiến lược chọn cổ phiếu: các mã di chuyển theo câu chuyện riêng, độ phân tán đủ để tạo alpha nhưng không quá cao gây bất ổn.  
+Rủi ro lớn nhất với PM: **concentration risk** – niềm tin thái quá vào một vài ý tưởng đơn lẻ có thể bị trừng phạt bởi các sự kiện đuôi béo không lường trước. Ngoài ra, nếu môi trường vĩ mô thay đổi đột ngột, thanh khoản ở các cổ phiếu vốn hoá nhỏ có thể co hẹp, nhưng xác suất này hiện thấp do điểm căng thẳng tổng thể chỉ 3.1/100.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "dispersion",
+  "date": "12/08/2026",
+  "regime": "STOCK_PICKING",
+  "spread_z": -1.07,
+  "dpi_pct": 38.3,
+  "avg_corr": 0.073,
+  "tail_skew_direction": "symmetric",
+  "confidence": "high"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 3.1
+- Broad Stress Level: NORMAL
+- CSAD Z: -0.09
+- CSSD Z: -0.90
+- Downside Participation: 6.2%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing
+
+=== AI CIO DIRECT METRICS: dispersion ===
+```json
+{
+  "tool": "dispersion",
+  "source": "direct_quantitative",
+  "metrics": {
+    "dispersion_spread_z": -1.0699451368975976,
+    "dispersion_dpi_pct": 38.333333333333336,
+    "dispersion_avg_corr": 0.07264023608074623,
+    "dispersion_broad_stress_score": 3.117206982543641,
+    "downside_participation_pct": 6.234413965087282,
+    "macro_regime": "STOCK_PICKING",
+    "broad_stress_level": "NORMAL"
+  }
+}
+```

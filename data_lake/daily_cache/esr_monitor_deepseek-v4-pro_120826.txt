@@ -1,0 +1,55 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI composite: **63.2%** → vào vùng **WARNING**
+- Market state (4‑state): **CALM CORRECTION** (low stress + downtrend)
+- VN30 close: 1936.46, **dưới MA125** – xu hướng giảm rõ nét
+- Top 3 pillar drivers (downside mode): **S_LIQ (35%)**, **S_VAL (31%)**, **S_COR (18%)**
+
+## 2. Risk Decomposition
+- **S_LIQ** là driver chính – chỉ số Volume Dry‑Up (‑log(MA20/MA252) của tổng dollar volume). Trị số cao cho thấy thanh khoản **khô cạn rõ rệt so với norm 1 năm**. Dòng tiền sụt giảm trong downtrend làm tăng rủi ro trượt giá và mất kiểm soát khi có biến động bán.
+- **S_VAL** cao thứ hai – lợi nhuận 1 năm của VN30 vẫn vượt đáng kể so với lãi suất tiền gửi, tạo áp lực định giá (valuation tension). Dù thị trường đã điều chỉnh, hệ số này cảnh báo mức premium còn neo khá cao.
+- **S_COR** (EVR PC1 = 38.0%) ở mức trung bình‑cao – cổ phiếu biến động đồng pha, thiếu phân hoá, làm yếu khả năng phòng thủ của danh mục.
+
+Tổ hợp **thanh khoản cạn + định giá căng + tương quan cao** là signature của pha phân phối thiếu lực đỡ, dễ dẫn đến nhịp giảm biên độ lớn nếu stress leo thang lên CRITICAL.
+
+## 3. Cross‑Check
+- **HMM regime ghi CALM CORRECTION** (stress thấp) nhưng SSI thực tế đang ở **WARNING**. Sự lệch pha này là một flag cần theo dõi: có thể mô hình HMM chậm nhạy hơn hoặc threshold 0.539 chưa đủ nhanh để bắt chuyển trạng thái.
+- Price action: VN30 dưới MA125, không hề tạo đỉnh mới → **không có divergence bull‑trap**. SSI warning diễn ra song hành với xu hướng giảm, xác nhận rủi ro ngầm đang tích luỹ thay vì bị bỏ qua.
+- Dấu hiệu chưa tới ACTIVE_STRESS, nhưng SSI đã ở nửa trên WARNING – nếu chạm ngưỡng 0.80, khả năng xảy ra nhịp bán tháo trong 5‑20 phiên tăng mạnh.
+
+## 4. Verdict
+- **Cash weight**: 60% danh mục. Tỉ trọng cổ phiếu rủi ro cao cần được hạ xuống, không sử dụng margin dưới bất kỳ hình thức nào.
+- **Hedge action**: Reduce beta toàn danh mục – ưu tiên cắt giảm các vị thế có thanh khoản thấp và beta >1. Mua put chỉ cân nhắc nếu SSI tiến sát CRITICAL, hiện tại chưa cần thiết vì chi phí hedge cao.
+- Lý do hành động: WARNING là giai đoạn “tích luỹ rủi ro ngầm”, hoàn toàn hợp lý để thu hẹp exposure trước khi stress chuyển biến xấu.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 63.2,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 60,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 63.17024441238222,
+    "pca_concentration_pct": 37.96455564188687,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.49214091430243
+  }
+}
+```

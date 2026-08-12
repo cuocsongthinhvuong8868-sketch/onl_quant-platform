@@ -1,0 +1,62 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+## 1. Observations
+- Lực cầu hiện tại 9.48% thấp hơn mu dài hạn 11.26% (nén), Phi 0.056 nằm trong ngưỡng nhiễu – không có xu hướng rõ rệt.
+- Lực cung 6.23% cũng thấp hơn mu 12.22% (nén), nhưng Phi 0.166 vượt +0.10 – xác nhận chế độ momentum bán, thể hiện đà giảm có quán tính.
+- Cả hai chiều đồng thời nén tạo trạng thái “zombification” – thanh khoản cạn, tín hiệu định hướng yếu.
+
+## 2. Supply-Demand Dynamics
+- Dòng tiền hiện tại rơi vào zombification: cả cung và cầu đều dưới mức trung bình dài hạn, cho thấy thị trường trầm lắng, thiếu động lực bứt phá.
+- Bên cung giữ momentum thực sự nhờ |Phi_dn| = 0.166 (đà bán tiếp diễn), trong khi cầu chỉ là random walk (|Phi_up| = 0.056). Đà bán đang chi phối dù bối cảnh chung còn yên ắng.
+
+## 3. Stress-Test Read
+- P95 Downside = 20.03%: nếu thị trường gãy, tỷ lệ mã giảm mạnh có thể tăng vọt từ mức nén hiện tại lên cao, báo hiệu một pha bán tháo tiềm tàng.
+- Bất đối xứng tail: P95 Downside (20.03%) nhỉnh hơn P95 Upside (18.81%), cho thấy đuôi rủi ro phía giảm dày hơn – rủi ro panic sell cao hơn cơ hội bùng nổ mua.
+
+## 4. Verdict
+- **Tỷ trọng giải ngân:** 20% – phần lớn tiền mặt chờ cơ hội rõ ràng hơn.
+- **Chiến lược:** Rình bắt đáy. Thị trường đang zombification với đà bán tiềm ẩn; nhà đầu tư nên kiên nhẫn đợi một nhịp rũ mạnh định hình đáy, không vội giải ngân khi động lực mua chưa xuất hiện.
+- **Ghi chú:** Dù V2 diagnostics ghi nhận chế độ BUY_PRESSURE (áp lực bán ròng âm, upside rank cao hơn), nhưng stress test ở mức NORMAL và đà bán thắng thế về mặt thống kê khiến tôi ưu tiên phòng thủ. Tín hiệu từ V2 chưa đủ mạnh để lấn át phân tích cung–cầu cốt lõi.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "upside_ratio",
+  "regime": "zombification",
+  "momentum_winner": "supply",
+  "p95_downside_pct": 20.03,
+  "p95_upside_pct": 18.81,
+  "deployment_pct": 20,
+  "strategy": "bottom_fishing",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: BUY_PRESSURE
+- Breadth Stress Score: 18.6
+- Downside Rank: 0.21
+- Net Sell Pressure: -3.2 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 9.476309226932669,
+    "downside_current_pct": 6.234413965087282,
+    "p95_upside_pct": 18.806361657443297,
+    "p95_downside_pct": 20.026690172856554,
+    "phi_up": 0.05605629121555528,
+    "phi_down": 0.166325983727654,
+    "breadth_stress_score": 18.555555555555554,
+    "net_sell_pressure_pct": -3.2418952618453867,
+    "breadth_regime": "BUY_PRESSURE"
+  }
+}
+```

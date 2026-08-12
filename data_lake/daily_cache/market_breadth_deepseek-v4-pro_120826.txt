@@ -1,0 +1,53 @@
+## 1. Observations
+- **MA20 (63.8%)** – mức bình thường, phản ánh một đợt hồi phục ngắn hạn nhưng chưa rơi vào trạng thái quá mua (trên 80%).
+- **MA60 (24.7%)** – thấp (dưới 30%), cho thấy xu hướng trung hạn vẫn chưa thoát khỏi trạng thái suy yếu.
+- **MA125 (18.8%)** – rất thấp, xác nhận động lượng bán niên kém, phần lớn cổ phiếu vẫn nằm dưới đường trung bình nửa năm.
+- **MA252 (20.7%)** – cực thấp, chỉ khoảng 1/5 mã giữ được xu hướng dài hạn; thị trường đang trong chế độ gấu (bear regime).
+
+## 2. Structural Health
+Cấu trúc thị trường đang thể hiện **phân kỳ rõ nét**: đường MA20 tương đối khoẻ (63.8%) nhưng các đường MA60, MA125 và đặc biệt là MA252 ở mức rất thấp. Đây là mẫu **Divergence** – ngắn hạn có sức bật nhưng nền tảng dài hạn suy yếu, tạo nên môi trường không ổn định, tiềm ẩn rủi ro quay đầu bất ngờ.
+
+## 3. Money Flow Leadership
+- **Top vol MA20 (ngắn hạn)**: Sự hiện diện của ACB (ngân hàng), ACV (hạ tầng), AAA (công nghiệp) và ANV (thuỷ sản) cho thấy dòng tiền đầu cơ ngắn hạn phân tán, chưa tập trung vào một ngành dẫn dắt rõ rệt.
+- **Top vol MA252 (dài hạn)**: Gồm ABB (ngân hàng), BSR (năng lượng), BVH (bảo hiểm) – trùng với nhóm ngân hàng nhưng tổng thể nghiêng hẳn về tài chính – phòng thủ.  
+- **Smart money** ưu tiên nhóm cổ phiếu phòng thủ (tài chính, bảo hiểm, năng lượng), không có dấu hiệu dịch chuyển sang các nhóm tăng trưởng hay đầu cơ mạnh (thép, chứng khoán). Sự xen kẽ giữa ngắn hạn và dài hạn là thấp.
+
+## 4. Verdict
+**Chiến lược: WAIT FOR CONFIRMATION (Chờ xác nhận).** Phân kỳ MA20 – MA252 là tín hiệu cảnh báo bất ổn, không phù hợp để giao dịch theo xu hướng hay mean-reversion. Ưu tiên phòng thủ, giữ tiền mặt, hạn chế tối đa rủi ro.  
+**Đòn bẩy đề xuất: 0% margin.** Với chế độ phân kỳ và MA252 dưới 70%, mọi vị thế đòn bẩy đều rất nguy hiểm. Chỉ xem xét giải ngân khi có xác nhận phá vỡ cấu trúc phân kỳ (MA20 giảm xuống hoặc MA252 tăng trở lại đồng pha).
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 63.8,
+  "ma60_pct": 24.7,
+  "ma125_pct": 18.8,
+  "ma252_pct": 20.7,
+  "regime": "divergence",
+  "leadership_sector": "financials",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 63.76470588235294,
+    "breadth_ma60_pct": 24.705882352941178,
+    "breadth_ma125_pct": 18.823529411764707,
+    "breadth_ma252_pct": 20.705882352941178,
+    "above_ma20_count": 271,
+    "above_ma60_count": 105,
+    "above_ma125_count": 80,
+    "above_ma252_count": 88,
+    "breadth_universe_size": 425,
+    "snapshot_date": "12/08/2026"
+  }
+}
+```

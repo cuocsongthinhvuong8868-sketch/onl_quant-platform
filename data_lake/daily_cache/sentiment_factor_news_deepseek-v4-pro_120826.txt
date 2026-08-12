@@ -1,0 +1,84 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+**1. Trạng thái tin tức – cảm xúc (News Sentiment Regime)**
+
+- **Khung 1 ngày:** `strong_risk_on`, trung bình hậu nghiệm +0.726 (P_conf = 100%, P(mean > 0) = 100%). → **Khẳng định chắc chắn** xu hướng risk‑on mạnh.
+- **Khung 7 ngày:** `strong_risk_on`, trung bình hậu nghiệm +0.739 (P_conf = 100%, P(mean > 0) = 100%). → **Khẳng định chắc chắn** xu hướng risk‑on ổn định.
+- **Khung 30 ngày:** `strong_risk_on`, trung bình hậu nghiệm +0.767 (P_conf = 100%, P(mean > 0) = 100%). → **Khẳng định chắc chắn** xu hướng risk‑on kéo dài.
+
+*Mọi khung thời gian đều có độ tin cậy đồng hướng tuyệt đối, cho phép kết luận dứt khoát về sentiment tài sản rủi ro tích cực.*
+
+**2. Các kênh dẫn dắt risk‑on/risk‑off mạnh nhất**
+
+- **Kênh kéo risk‑on mạnh (tin cậy cao):**
+  - `credit_stress` (+1.90 → +2.00, P_conf = 100%) – lợi suất trái phiếu chính phủ đi ngang/ổn định, tín hiệu không có căng thẳng tín dụng.
+  - `fx_external` (+1.46 → +2.00, P_conf = 100%) – tỷ giá trung tâm tăng nhẹ nhưng được đọc như tín hiệu môi trường ngoại hối thuận lợi.
+  - `earnings` (+1.47 → +1.93, P_conf = 100%) – kỳ vọng lợi nhuận doanh nghiệp tích cực.
+  - `growth` (+0.70 → +0.82, P_conf = 100%) – hợp tác tài chính, điện đàm cấp cao với Australia, Hà Lan hỗ trợ tăng trưởng.
+  - `monetary_policy` (khung 7/30 ngày +1.09 → +1.37, P_conf = 100%) – lãi suất qua đêm tăng được diễn giải tích cực (có thể phản ánh nhu cầu vốn, không phải thắt chặt).
+
+- **Kênh kéo risk‑off đáng chú ý (chỉ xuất hiện rõ ở khung 30 ngày):**
+  - `commodity` (−0.62, P_conf = 100%) – giá hàng hóa Trung Quốc (thép, phân ure, ngô,…) và heo hơi trong nước giảm sâu, xác nhận áp lực giảm phát hàng hóa toàn cầu. Tuy nhiên, tác động chưa đủ lấn át tổng thể risk‑on.
+
+**3. Các driver quan trọng (3–5 positive/negative)**
+
+- **Tích cực:**
+  - Lợi suất TPCP đi ngang phiên 12/08 – giữ cho `credit_stress` cao nhất (+2.00), phản ánh thị trường trái phiếu ổn định.
+  - Tỷ giá trung tâm liên tục tăng nhẹ (25,539 ngày 12/08, các phiên trước 25,2xxx) – củng cố `fx_external` ở mức rất cao.
+  - Hợp tác tài chính Việt Nam – Australia, điện đàm cấp cao với Hà Lan (ngày 12/08) – bơm thêm xung lực cho `growth`.
+  - Lãi suất qua đêm tăng mạnh (5.97 → 6.09%) trong tuần – được mô hình gán điểm cao cho `monetary_policy`, báo hiệu thanh khoản vẫn tốt.
+  - (Khung 30 ngày) hàng loạt tỷ giá tăng đều đặn, tạo thành nền tảng vững chắc cho `fx_external` +2.00.
+
+- **Tiêu cực:**
+  - Giá heo hơi nội địa chạm đáy 6 tháng, giá thép HRC Trung Quốc thủng đáy 1 năm, phân ure, ngô giảm sâu – kéo `commodity` xuống −0.62 (P_conf = 100%), cảnh báo sức cầu hàng hóa yếu đi.
+  - Trong ngày 12/08 không có driver tiêu cực nào; các tín hiệu xấu chỉ đến từ dữ liệu tuần trước (07‑08/08).
+
+**4. Kết luận tác động đến AI CIO**
+
+- **Hỗ trợ rõ rệt** cho các vị thế risk‑on (cổ phiếu, tín dụng) từ lớp sentiment tin tức. Mức độ nhất quán trên cả ba khung thời gian với độ tin cậy tuyệt đối cho phép AI CIO giữ hoặc gia tăng tỷ trọng tài sản rủi ro trong khẩu vị.
+- **Không xung đột** với các lớp phân tích vĩ mô hay công cụ nội bộ thị trường, miễn là các lớp đó cũng đồng thuận. Nếu có mâu thuẫn từ các chỉ báo kỹ thuật/định giá, sentiment vẫn là một lớp phủ mềm, không phải quy tắc phân bổ cứng.
+
+**5. Cảnh báo (Caveats)**
+
+- **Nguồn tin:** Dữ liệu có sự hiện diện lớn từ Mozyfin (bài đăng chuyên trang + xã hội). Trong khung 1 và 7 ngày, Mozyfin chiếm đa số nhưng `mozyfin_social` không vượt trội; tuy nhiên ở khung 30 ngày, `mozyfin_social` (1,894/4,932 ≈ 38%) là nguồn lớn nhất đơn lẻ. Xếp hạng sentiment có thể bị thổi phồng bởi tâm lý đám đông trên mạng xã hội ⇒ giảm nhẹ trọng số tín hiệu, coi đây như một lớp phủ mềm, nhanh nhạy chứ không phải xác nhận cứng.
+- **Tính kịp thời:** Báo cáo sinh lúc 15:23 ngày 12/08, phản ánh tin tức đến thời điểm đó. Các driver chính trong ngày còn tươi; các driver tiêu cực đến từ dữ liệu cuối tuần trước, có thể đã được giá hấp thụ.
+- **Rủi ro nhiễu tiêu đề (headline noise):** Mô hình dựa trên luật, gán điểm tự động cho tiêu đề – có thể phóng đại ý nghĩa của các con số đơn lẻ (vd: tỷ giá tăng vài đồng vẫn được gán +1.46). Cần kết hợp với phân tích định tính trước khi ra quyết định phân bổ cuối cùng.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.7263,
+    "news_confidence_1d": 0.9998,
+    "news_count_1d": 241,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 73,
+      "mozyfin": 100,
+      "mozyfin_social": 68
+    },
+    "news_macro_composite_7d": 0.739,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1348,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 241,
+      "mozyfin": 716,
+      "mozyfin_social": 391
+    },
+    "news_macro_composite_30d": 0.7667,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4932,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1235,
+      "mozyfin": 1803,
+      "mozyfin_social": 1894
+    },
+    "news_macro_composite": 0.7263,
+    "news_confidence": 0.9998,
+    "news_count": 241
+  }
+}
+```

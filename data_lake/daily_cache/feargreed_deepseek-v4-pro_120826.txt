@@ -1,0 +1,61 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+## 1. Observations
+- Risk Score 61.9, nằm trong vùng GREED (60–80), tăng nhẹ +0.7 so với phiên trước.
+- EGARCH Vol (chuẩn hóa) 38.5%, giảm mạnh –16.3% – biến động đang hạ thấp.
+- Rolling Skewness –0.04, âm nhẹ, trái với kỳ vọng skew dương điển hình của pha GREED.
+- Downside Correlation 2.0% (rất thấp), Upside Correlation 20.8% (cao): tăng đồng thuận, giảm phân hóa.
+
+## 2. Interpretation
+Trên dữ liệu hiện tại, thị trường ở trạng thái GREED với vol thu hẹp và tương quan tăng cao, phản ánh tâm lý ưa rủi ro lan rộng. Tuy nhiên điểm số còn sát biên dưới của vùng (61.9) và skewness âm cho thấy niềm tin chưa đồng nhất, tiềm ẩn nguy cơ điều chỉnh bất ngờ.
+
+## 3. Cross-Check
+- Score tăng + Vol giảm: nhất quán, củng cố pha GREED.
+- Skewness âm vs Upside Correlation cao: phân kỳ. Thông thường GREED đi cùng skew dương, nhưng đây chỉ có độ lệch âm nhẹ – flag rằng đà tăng dễ bị ảnh hưởng nếu xuất hiện cú sốc nhỏ, dù tương quan giảm thấp đang giảm rủi ro lây lan khi giảm.
+
+## 4. Verdict
+Beta exposure đề xuất 0.65 cho danh mục VN-Index. Duy trì trạng thái long nhưng không mở rộng quy mô rủi ro. Nếu skewness tiếp tục âm sâu hơn hoặc vol bật tăng trở lại, cân nhắc mua bảo hiểm đuôi (tail hedge). Tín hiệu hiện tại chưa đủ mạnh để hành động quyết liệt do Score ở biên GREED và độ tin cậy trung bình.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "fear_greed",
+  "date": "12/08/2026",
+  "regime": "GREED",
+  "score": 61.9,
+  "confidence": "medium",
+  "beta_target": 0.65,
+  "key_signals": [
+    "Vol giảm mạnh –16.3%, Score tăng vào vùng GREED",
+    "Skewness –0.04 phân kỳ với kỳ vọng skew dương",
+    "Upside correlation 20.8% – đà tăng đồng thuận, downside correlation rất thấp 2.0%"
+  ]
+}
+```
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 61.9
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: GREED
+- Signal Confidence: 0.60
+- CSV Rank: 0.13
+- Acute Shock: 0.00
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 61.93157168572067,
+    "sentiment_regime": "GREED",
+    "signal_confidence": 0.6007741063717246,
+    "acute_shock": 0.0,
+    "csv_rank": 0.1349206349206349,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

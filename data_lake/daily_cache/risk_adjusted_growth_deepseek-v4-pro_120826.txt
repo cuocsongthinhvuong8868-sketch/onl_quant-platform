@@ -1,0 +1,57 @@
+## 1. Scenario Assessment
+Kịch bản Trung lập (K=1.0, CoE=14.0%) là điều kiện cơ bản, không khắc nghiệt, phản ánh đúng mặt bằng rủi ro ngành ngân hàng. Tuy nhiên, bức tranh tổng thể cho thấy phần lớn đang "đốt vốn": chỉ 2/6 mã có Alpha dương, đa số âm sâu, cho thấy thị trường đang định giá sai hoặc chất lượng lợi nhuận không bù đắp đủ chi phí vốn.
+
+## 2. Top Alpha Decomposition
+- **SHB (Alpha +4.0%) – Fortress:** Driver chính đến từ định giá rẻ (P/B 0.81) và chất lượng ổn định (σROE chỉ 1.9%). Dù ROE 17.5% không cao nhất, mức P/B chiết khấu sâu giúp Disciplined Return bùng nổ. Đây là cổ phiếu tạo giá trị thặng dư bền vững.
+- **MBB (Alpha +1.2%) – Fortress:** Chất lượng dẫn dắt. ROE rất cao (21.8%) kết hợp σROE cực thấp (1.6%), cho thấy khả năng sinh lời vượt trội và ổn định. P/B 1.21 là hợp lý cho "cỗ máy compound" này. Payout thấp (6.7%) cho phép phần lớn lợi nhuận được tái đầu tư.
+- **ACB (Alpha -1.1%) – Growth at Reasonable Price:** Chất lượng rất tốt (ROE 23.0%), nhưng P/B đã tiệm cận mức "đắt" (1.24) và tỷ lệ Payout khá cao (15.9%) làm giảm tốc độ tái đầu tư. Alpha âm nhẹ, không phải bẫy, nhưng giá hiện tại đã phản ánh gần hết triển vọng.
+
+## 3. Value Traps Warning
+- **LPB (Alpha -12.9%) – Premium Burn:** Định giá "ảo tưởng" (P/B 3.40) là nguyên nhân chính. Dù ROE 21.1% là tốt, nhưng mức P/B quá cao khiến lợi nhuận thực tế trên mỗi đồng vốn bỏ ra quá mỏng. Rủi ro sụt giảm định giá rất lớn.
+- **EIB (Alpha -10.5%) – Cheap Trap:** ROE cực thấp (10.0%) là gốc rễ. P/B 1.30 không hề rẻ cho một ngân hàng tạo ra lợi nhuận chỉ ngang chi phí vốn. Rủi ro kinh doanh (σROE 3.8%) càng làm trầm trọng vấn đề.
+- **VPB (Alpha -10.0%) – Growth Trap:** ROE (14.1%) chỉ ở mức trung bình nhưng rủi ro lại quá cao (σROE 4.7%). Payout cao (24.6%) làm cạn kiệt vốn tái đầu tư, khiến cỗ máy compound yếu ớt. Risk Penalty ăn mòn toàn bộ lợi nhuận.
+
+## 4. Portfolio Construction
+- **Core Holding (Fortress – tối ưu 60-70%):** **SHB** (định giá rẻ, rủi ro thấp) và **MBB** (chất lượng siêu ổn định, compound bền vững). Đây là bộ đôi tạo nền tảng cho danh mục ngân hàng.
+- **Tactical:** Không có mã nào trong danh sách Top/Bottom thực sự phù hợp cho vị thế chiến thuật.
+- **Cấm mua / Underweight:** **LPB** (Premium Burn), **EIB** (Cheap Trap), **VPB** (Growth Trap). ACB chỉ phù hợp nắm giữ nếu đã có, không mua mới ở mức giá này.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB", "MBB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "bearish",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 3.9603201819512712,
+    "median_economic_alpha_pct": -4.357271773779649,
+    "positive_alpha_count": 2,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```
