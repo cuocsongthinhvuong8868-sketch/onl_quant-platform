@@ -1,0 +1,62 @@
+## 1. Mechanical Decomposition
+
+Net Liquidity tuần này đạt **$5,839.6 tỷ USD**, tăng **+$14.8 tỷ USD** so với tuần trước. Trong ba cấu phần, RRP gần như đã cạn kiệt: **$1.65 tỷ USD** — dưới ngưỡng $100 tỷ, nên đóng góp biên của RRP không còn đáng kể. Biến động dương chủ yếu đến từ hoặc **TGA giảm** (Kho bạc chi tiêu, bơm trở lại hệ thống) hoặc **WALCL tăng nhẹ** (tốc độ QT chậm lại). Với TGA đang ở **$907 tỷ USD** (vùng khá cao), khả năng hút ròng vẫn hiện hữu nếu Kho bạc tiếp tục tích lũy. Do RRP đã về zero, các dao động biên từ nay phụ thuộc gần như hoàn toàn vào TGA và WALCL.
+
+## 2. Cycle Positioning
+
+- **Pha QT:** Fed vẫn trong quá trình thu hẹp bảng cân đối (QT), nhưng ở giai đoạn cuối, không có tín hiệu QE mới.
+- **RRP:** Đã cạn dưới $100 tỷ, đồng nghĩa nguồn giải phóng thanh khoản từ RRP drawdown đã cạn kiệt. Đây là yếu tố quan trọng: giai đoạn bơm thanh khoản “miễn phí” từ RRP đã kết thúc, khiến xu hướng tăng của Net Liquidity khó duy trì nếu không có động thái mới từ Fed hoặc Treasury.
+- **TGA:** Ở mức cao, cho thấy Kho bạc vẫn nghiêng về tích lũy, tạo áp lực hút ròng nếu tiếp tục tăng.
+- **So sánh:** Net Liquidity hiện tại **thấp hơn đỉnh 2022** (khi WALCL lớn hơn, RRP chưa hút quá mạnh) nhưng **cao hơn đáy 2024**, cho thấy thanh khoản đã hồi phục phần nào nhưng chưa trở lại trạng thái nới lỏng rõ rệt.
+
+## 3. Signal Strength
+
+- **Tín hiệu: HOLD.**
+- **Z-Score +0.31σ:** gần trung bình, không đạt ngưỡng cận biên 1.0–1.5σ hay cực đoan >2σ. Độ mạnh rất yếu, không mang tính định hướng.
+- **Impulse EMA(4) = -17.8 tỷ USD:** âm, cho thấy xu hướng ngắn hạn vẫn nghiêng về rút thanh khoản, nhưng Z-Score chưa đủ âm để kích hoạt CUT. Sự mâu thuẫn nhẹ này củng cố trạng thái trung tính: không bùng nổ, không suy sụp.
+
+## 4. Cross-Asset Spillover (1-4 tuần)
+
+- **SPX/NDX:** Bias trung tính đến hơi tiêu cực, đặc biệt với NDX do độ nhạy cao với thanh khoản. Không có động lực tăng từ thanh khoản.
+- **DXY/Gold/Crypto:** DXY có thể được hỗ trợ nhẹ nếu thanh khoản ròng giảm thêm, nhưng biên độ không lớn. Gold trung tính; Crypto nhạy cảm với thanh khoản nên kém hấp dẫn nếu không có bơm mới.
+- **VN-Index (lag 4-8 tuần):** Bias trung tính đến hơi tiêu cực. Với HOLD và dòng EMA âm, dòng vốn ngoại vào EM có thể chững lại, nhưng mức tương quan dương 0.25–0.35 không đủ mạnh để gây biến động lớn; khả năng cao VN-Index đi ngang hoặc rung lắc nhẹ.
+
+## 5. Risk Factors (signal có thể sai vì)
+
+- **RRP đã quá thấp:** Khi RRP gần zero, tín hiệu CUT từ thanh khoản yếu đi vì không còn nguồn dự trữ để rút tiếp; ngược lại cũng mất nguồn bơm tiềm năng.
+- **TGA spike do tax season:** TGA $907 tỷ có thể là tích lũy tạm thời (tháng 4/6/9/12), khiến impulse dương tuần này là nhiễu và có thể đảo chiều.
+- **Fed buyback đặc biệt / emergency facility:** Bất kỳ chương trình thanh khoản khẩn cấp nào cũng làm sai lệch WALCL và phá vỡ giả định QT.
+
+## 6. KẾT LUẬN
+
+Regime: **QT giai đoạn cuối, thanh khoản trung tính** — không có xung lực rõ ràng cho risk-on hay risk-off. Outlook 2-4 tuần: risk assets nghiêng về đi ngang với nhịp điều chỉnh nhẹ ở nhóm nhạy thanh khoản (growth/crypto); VN-Index chịu tác động trung tính, cần theo dõi DXY và dòng vốn ngoại.
+
+```json
+{
+  "tool": "fed_liquidity",
+  "net_liquidity_usd_bn": 5839.593,
+  "signal": "HOLD",
+  "z_score": 0.31,
+  "regime": "QT_active",
+  "spillover_vnindex": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5839593.0,
+    "fed_liquidity_impulse": 14755.0,
+    "fed_liquidity_impulse_ema": -17835.98524864652,
+    "fed_liquidity_zscore": 0.3143830326157731,
+    "signal": "HOLD",
+    "walcl": 6748567.0,
+    "wtregen": 907324.0,
+    "rrpontsyd": 1650.0
+  }
+}
+```

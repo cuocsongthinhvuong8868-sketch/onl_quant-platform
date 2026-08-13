@@ -1,0 +1,49 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+## 1. Observations
+- OLS Slope = 0.07, percentile lịch sử 0.3th — 🟢 Thấp, độ dốc gần như phẳng; VIC/VHM/VRE gần như không kéo VNINDEX.
+- Correlation = 0.25, percentile lịch sử 0.7th — 🟢 Phân kỳ cực thấp; tương quan đồng pha rất yếu.
+- Event Study từ 22/05/2026: trạng thái áp đảo **DECOUPLING**, ΔCorr = -0.87, ΔSlope = -0.80 — cả hai cùng âm sâu, đúng ngưỡng phân kỳ.
+
+## 2. Microstructure Read
+Cả hai percentile đều < 20th (0.3 và 0.7) → **market đã rời VIN**. VIC/VHM/VRE mất quyền dẫn dắt VNINDEX; diễn biến chỉ số đang được quyết định bởi nhóm khác, nhiều khả năng Bank/Chứng/Thép. Không có dấu hiệu can thiệp (percentile cao > 80th), mà là phân kỳ tự nhiên của dòng tiền.
+
+## 3. Event Study Interpretation
+DECOUPLING kéo dài từ cuối tháng 5 cho thấy VNINDEX không còn phản ứng nhạy với VIC/VHM/VRE. Intraday nên theo dõi nhóm dẫn dắt thay thế; overnight rủi ro đến từ biến động Bank/Chứng/Thép, không phải VIN. Vì regime không phải TÍN HIỆU GIẢ, không bắt buộc NO TRADE — nhưng **không chuyển thành lệnh phái sinh trực tiếp**, chỉ dùng làm bằng chứng phân kỳ.
+
+## 4. Verdict
+- **Market read: other_sector_led** — VNINDEX do nhóm ngành khác dẫn dắt, không phải VIN-led.
+- **Leading indicator cần theo dõi:** nhóm Bank, Chứng, Thép (đặc biệt các mã vốn hóa lớn đầu ngành).
+- **Stop-loss reference (nếu dùng VIC làm proxy):** VIC tại 207.90 × (1 − 3%) ≈ 201.66 (≈ 201,700 VND), hoặc dưới MA20/MA50. Không dùng mức giá cũ từ dữ liệu ngoài INPUT.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "manipulation",
+  "date": "13/08/2026",
+  "regime": "DECOUPLING",
+  "slope_percentile": 0.3,
+  "corr_percentile": 0.7,
+  "market_read": "other_sector_led",
+  "confidence": "medium"
+}
+```
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.073; corr=0.254; regime=DECOUPLING
+
+=== AI CIO DIRECT METRICS: manipulation ===
+```json
+{
+  "tool": "manipulation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "manip_slope": 0.07253811799768825,
+    "manip_corr": 0.25362495870773016,
+    "manip_slope_percentile": 0.34808552958727,
+    "manip_corr_percentile": 0.7458975634012929,
+    "regime": "DECOUPLING",
+    "delta_corr_percentile": -0.8666666666666667,
+    "delta_slope_percentile": -0.8
+  }
+}
+```

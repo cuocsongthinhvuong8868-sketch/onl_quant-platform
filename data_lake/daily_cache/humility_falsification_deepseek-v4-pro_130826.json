@@ -1,0 +1,271 @@
+{
+  "provider_key": "deepseek-v4-pro",
+  "generated_at": "2026-08-13T12:46:49",
+  "t_data_date": "2026-08-13",
+  "target_report_date": "2026-08-12",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_deepseek-v4-pro_120826.txt",
+  "report_name": "executive_summary_deepseek-v4-pro_120826.txt",
+  "report_mtime": "report:2026-08-13T12:34:45|sidecar:2026-08-13T12:34:45",
+  "report_signature": "report:executive_summary_deepseek-v4-pro_120826.txt:c842d3a1083fe287e0da8cdf889ac401ffb09bfb|sidecar:ai_cio_humility_rules_deepseek-v4-pro_120826.json:e48aaa7edb10e3824b5960d3a65deb7154d5ede4",
+  "parsed": {
+    "report_date": "2026-08-12",
+    "composite_score": 35.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 5.0,
+        "unit": "sessions",
+        "description": "Dưới 5 phiên STRESS/WARNING trong 20 phiên thì cảnh báo thanh khoản hạ nhiệt."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 63.8,
+        "unit": "%",
+        "description": "Nếu Breadth MA20 duy trì trên 45% thì thị trường nội tại cải thiện."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 63.2,
+        "unit": "%",
+        "description": "SSI dưới 55% sẽ triệt tiêu cảnh báo hệ thống."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.326,
+        "unit": "",
+        "description": "Xi max dưới 0.25 ở mọi threshold thì đuôi béo biến mất."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": null,
+        "unit": "th pct",
+        "description": "Dưới 70th pct thì ảnh hưởng coupling không còn đáng kể."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.3,
+        "unit": "th pct",
+        "description": "CQS dưới 80th pct thì stress tín dụng toàn cầu hạ nhiệt."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-08-12",
+      "composite_score": 35.0,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "current_value": 5,
+          "unit": "sessions",
+          "description": "Dưới 5 phiên STRESS/WARNING trong 20 phiên thì cảnh báo thanh khoản hạ nhiệt."
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "current_value": 63.8,
+          "unit": "%",
+          "description": "Nếu Breadth MA20 duy trì trên 45% thì thị trường nội tại cải thiện."
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "current_value": 63.2,
+          "unit": "%",
+          "description": "SSI dưới 55% sẽ triệt tiêu cảnh báo hệ thống."
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "current_value": 0.326,
+          "unit": "",
+          "description": "Xi max dưới 0.25 ở mọi threshold thì đuôi béo biến mất."
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "current_value": null,
+          "unit": "th pct",
+          "description": "Dưới 70th pct thì ảnh hưởng coupling không còn đáng kể."
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "current_value": 99.3,
+          "unit": "th pct",
+          "description": "CQS dưới 80th pct thì stress tín dụng toàn cầu hạ nhiệt."
+        }
+      ],
+      "provider_key": "deepseek-v4-pro",
+      "saved_at": "2026-08-12",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "5 sessions",
+      "T actual": 5.0,
+      "T actual display": "5 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "Intact",
+      "Data date": "2026-08-12",
+      "Description": "Dưới 5 phiên STRESS/WARNING trong 20 phiên thì cảnh báo thanh khoản hạ nhiệt.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "63.8%",
+      "T actual": 53.17647058823529,
+      "T actual display": "53.2%",
+      "Delta": -10.623529411764707,
+      "Delta display": "-10.6%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-08-13",
+      "Description": "Nếu Breadth MA20 duy trì trên 45% thì thị trường nội tại cải thiện.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "63.2%",
+      "T actual": 62.81885922022572,
+      "T actual display": "62.8%",
+      "Delta": -0.3811407797742845,
+      "Delta display": "-0.381%",
+      "Status": "Intact",
+      "Data date": "2026-08-13",
+      "Description": "SSI dưới 55% sẽ triệt tiêu cảnh báo hệ thống.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.326",
+      "T actual": 0.3787547665155894,
+      "T actual display": "0.379",
+      "Delta": 0.05275476651558941,
+      "Delta display": "+0.053",
+      "Status": "Intact",
+      "Data date": "2026-08-13",
+      "Description": "Xi max dưới 0.25 ở mọi threshold thì đuôi béo biến mất.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "N/A",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Dưới 70th pct thì ảnh hưởng coupling không còn đáng kể.",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.3 th pct",
+      "T actual": 99.93386243386243,
+      "T actual display": "99.9 th pct",
+      "Delta": 0.6338624338624328,
+      "Delta display": "+0.634 th pct",
+      "Status": "Intact",
+      "Data date": "2026-08-12",
+      "Description": "CQS dưới 80th pct thì stress tín dụng toàn cầu hạ nhiệt.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 5,
+      "date": "2026-08-12",
+      "error": ""
+    },
+    "breadth": {
+      "value": 53.17647058823529,
+      "date": "2026-08-13",
+      "error": ""
+    },
+    "ssi": {
+      "value": 62.81885922022572,
+      "date": "2026-08-13",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.32520846567672185,
+      "date": "2026-08-13",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.3787547665155894,
+      "date": "2026-08-13",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.93386243386243,
+      "date": "2026-08-12",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 1,
+  "available": 5,
+  "total": 6
+}

@@ -1,0 +1,98 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+## 1. Trạng thái News Sentiment (Regime)
+
+| Khung thời gian | Regime | Posterior mean | P_conf | P(mean > 0) | Giọng điệu bắt buộc |
+|---|---|---|---|---|---|
+| 1d | strong_risk_on | +0.4886 | 96% | 96% | **Khẳng định chắc chắn** |
+| 7d | strong_risk_on | +0.7636 | 100% | 100% | **Khẳng định chắc chắn** |
+| 30d | strong_risk_on | +0.7732 | 100% | 100% | **Khẳng định chắc chắn** |
+
+- Cả ba khung thời gian đều có **P_conf > 85%** → được phép khẳng định chắc chắn về hướng **tin tức vĩ mô tích cực (risk-on)**.  
+- Lưu ý: P_conf và P(mean > 0) là xác suất của **latent news-sentiment mean**, **không phải** xác suất VNINDEX tăng. Tín hiệu này nhất quán và mạnh, nhưng chỉ là soft overlay.
+
+## 2. Các kênh kéo risk-on / risk-off mạnh nhất
+
+### Kéo risk-on mạnh (P_conf cao, score dương)
+- **earnings**: P_conf 100% ở cả 1d, 7d, 30d; score +1.454 (1d), +1.755 (7d), +1.954 (30d).
+- **credit_stress**: P_conf 99–100%; score +1.224 (1d), +1.905 (7d), +1.479 (30d).
+- **fx_external**: P_conf 100%; score +1.220 (1d), +1.466 (7d), +1.850 (30d).
+- **monetary_policy**: P_conf 100% (7d, 30d); score +1.411 (7d), +1.520 (30d). Ở 1d P_conf 50%, score 0.000 → không có tín hiệu.
+- **growth**: P_conf 100%; score +0.815 (1d), +0.720 (7d).
+
+### Kéo risk-off mạnh
+- **commodity**: P_conf 100% và score âm rõ rệt ở cả ba khung: -2.000 (1d), -0.664 (30d, 7d cũng âm nhưng trong top negative).  
+  ⚠️ Lưu ý: kênh commodity có sự phân hóa mạnh — giá dầu, đồng tăng (driver tích cực) nhưng giá urê, heo hơi, ngô, cao su giảm sâu (driver tiêu cực). Tín hiệu âm tổng hợp chủ yếu do nhóm hàng nông sản/phân bón.
+- **fiscal_public_investment**: 1d P_conf 82% (nghiêng tiêu cực), 7d P_conf 79% (yếu) — chỉ là dấu hiệu ban đầu, không đủ mạnh để khẳng định.
+- Các kênh khác như **inflation** (P_conf 50–52%), **real_estate_collateral** (P_conf 51–60%), **liquidity** (P_conf 69–89%) có độ tin cậy thấp → **không kết luận xu hướng rõ ràng**, chỉ là nhiễu.
+
+## 3. Các driver quan trọng (positive / negative)
+
+### Positive drivers nổi bật
+- **Tỷ giá trung tâm tăng nhẹ** (13/08: 25,566, +27; 7d/30d nhiều phiên tăng) → kênh fx_external, nguồn Data Wi.
+- **Lợi suất TPCP đi ngang phiên 12/08** → kênh credit_stress, giảm áp lực chi phí vay.
+- **Lãi suất ON tăng mạnh** (10/08: 6.09%, +12 bps; 07/08: 5.97%, +139 bps) → kênh monetary_policy, phản ánh thanh khoản hệ thống thắt chặt nhẹ nhưng được đọc là tích cực trong bối cảnh hiện tại.
+- **Xuất khẩu nhựa sang Indonesia không bị áp thuế**; **Việt Nam – New Zealand thúc đẩy thương mại hướng tới 3 tỷ USD** → kênh growth.
+- **Giá dầu WTI đạt đỉnh tháng 87.57 USD/thùng**; **giá đồng Trung Quốc lập đỉnh 10 năm** → đóng góp tích cực cho kênh commodity dù kênh tổng thể âm.
+
+### Negative drivers nổi bật
+- **Giá phân Ure Trung Quốc giảm xuống đáy 6 tháng** (1,717.5 CNY/tấn, 13/08) → ảnh hưởng tiêu cực đến nhóm phân bón/hóa chất.
+- **Giá heo hơi trong nước giảm đáy 6 tháng** (60,000 đồng/kg, 07/08) → áp lực lên ngành chăn nuôi, thực phẩm.
+- **Quảng Ngãi chậm giải ngân vốn đầu tư công** (2 chủ đầu tư chưa giải ngân sau 7 tháng) → rủi ro chậm tiến độ hạ tầng.
+- **Giá ngô Trung Quốc giảm đáy 6 tháng** (2,238.6 CNY/tấn) và **giá cao su RSS3 Singapore thủng đáy tháng** → thêm áp lực lên nhóm nông sản.
+- **Xuất khẩu số sang EU: lợi nhuận không còn đến từ ưu đãi thuế** (7d) → tín hiệu yếu về biên lợi nhuận xuất khẩu.
+
+## 4. Kết luận tác động lên AI CIO
+
+- **News sentiment hiện tại supports trạng thái risk-on** ở mức độ mạnh và nhất quán trên cả 1d, 7d, 30d.  
+- Nếu **macro layer** và **market-internal tools** cũng xác nhận risk-on → tăng độ tin cậy, có thể xem xét duy trì hoặc gia tăng tỷ trọng rủi ro.  
+- Nếu các layer khác đang **thận trọng hoặc xung đột** → cần điều tra sự phân kỳ; không nên dùng news sentiment làm cơ sở duy nhất để tăng rủi ro, đặc biệt khi tín hiệu từ social chiếm tỷ lệ đáng kể (xem caveat).  
+- **Tổng thể: supports risk-on, nhưng cần đối chiếu với dữ liệu giá, thanh khoản và định giá.**
+
+## 5. Caveat & rủi ro
+
+- **Source coverage & social overlay**:  
+  - 1d: mozyfin_social 54/221 (~24%), 7d: 391/1343 (~29%), **30d: mozyfin_social 1861/4887 (~38%)** và mozyfin 1776 (~36%) → tổng nguồn Mozyfin chiếm ~74% ở 30d.  
+  - → **Các tín hiệu dài hạn (30d) bị ảnh hưởng bởi nguồn social/opinion, cần discount mạnh.** Đây là dữ liệu ý kiến, độ tin cậy thấp hơn WiData (dữ liệu định lượng).  
+- **Stale feed**: generated_at 2026-08-13 15:26, rất mới → không bị stale.  
+- **Rủi ro headline noise**: các tiêu đề “đi ngang”, “tăng nhẹ”, “giảm đáy” có thể gây nhiễu; cần xem xét độ lớn thay đổi và tần suất thực tế trước khi ra quyết định.  
+- **Không ngoại suy P_conf thành xác suất thị trường tăng**; chỉ dùng để đánh giá độ tin cậy của tín hiệu news sentiment.
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.4886,
+    "news_confidence_1d": 0.9551,
+    "news_count_1d": 221,
+    "news_regime_1d": "strong_risk_on",
+    "news_source_counts_1d": {
+      "widata": 67,
+      "mozyfin": 100,
+      "mozyfin_social": 54
+    },
+    "news_macro_composite_7d": 0.7636,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1343,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 234,
+      "mozyfin": 718,
+      "mozyfin_social": 391
+    },
+    "news_macro_composite_30d": 0.7732,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4887,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1250,
+      "mozyfin": 1776,
+      "mozyfin_social": 1861
+    },
+    "news_macro_composite": 0.4886,
+    "news_confidence": 0.9551,
+    "news_count": 221
+  }
+}
+```

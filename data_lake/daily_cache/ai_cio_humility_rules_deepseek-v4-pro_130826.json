@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-08-13",
+  "composite_score": 31.0,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "current_value": 5,
+      "unit": "sessions",
+      "description": "Số phiên STRESS/WARNING 20D giảm xuống dưới 5 cho thấy thanh khoản liên ngân hàng nới lỏng bền vững, làm yếu luận điểm stress."
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "current_value": 53.2,
+      "unit": "%",
+      "description": "Breadth MA20 vượt 45% với xu hướng cải thiện MA60 sẽ thách thức luận điểm phân phối hiện tại."
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "current_value": 62.8,
+      "unit": "%",
+      "description": "SSI giảm xuống dưới 55% cho thấy căng thẳng hệ thống hạ nhiệt, báo cáo cần nâng lại mức chấp nhận rủi ro."
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "current_value": 0.379,
+      "unit": "",
+      "description": "Toàn bộ lưới threshold EVT giảm xuống dưới 0.25 sẽ bác bỏ giả thuyết đuôi trái dày."
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "current_value": null,
+      "unit": "th pct",
+      "description": "Coupling Vingroup xuống dưới phân vị 70 làm giảm rủi ro tập trung, hỗ trợ luận điểm phân hóa lành mạnh."
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "current_value": 99.9,
+      "unit": "th pct",
+      "description": "CQS giảm xuống dưới 80th percentile cho thấy điều kiện tài chính toàn cầu nới lỏng đủ để giảm rủi ro tín dụng."
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-08-13",
+  "source": "ai_cio_executive_summary"
+}

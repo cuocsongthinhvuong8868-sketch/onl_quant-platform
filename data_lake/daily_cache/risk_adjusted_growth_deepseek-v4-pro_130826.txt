@@ -1,0 +1,58 @@
+## 1. Scenario Assessment  
+K=1.0, CoE=14%, stress test bằng 0 là mức baseline – không khắc nghiệt. Tuy nhiên chỉ 2/6 mã có Alpha dương; nhóm bottom âm sâu khiến bình quân mẫu ở vùng âm. Ngành đang phân hóa mạnh, cơ hội chỉ nằm ở một số cổ phiếu riêng lẻ, không phải toàn ngành.
+
+## 2. Top Alpha Decomposition  
+- **SHB** (+4.0%): Driver chính là P/B 0.80 rẻ, σROE 1.9% thấp và payout chỉ 8.6% → compounding tốt, bền vững. Phân loại: **Fortress**.  
+- **MBB** (+1.4%): ROE 21.8% cao, σROE 1.6% rất thấp, payout 6.7% thấp. Tuy P/B 1.19 không rẻ bằng SHB nhưng vẫn tạo alpha dương. Phân loại: **Fortress**.  
+- **ACB** (-0.8%): ROE 23.0% cao nhưng σROE 2.7% và P/B 1.21 khiến disciplined return dưới CoE. Đây là dạng cận **Growth Trap** – chất lượng cao nhưng định giá không còn đủ biên an toàn.
+
+## 3. Value Traps Warning  
+- **LPB** (-12.9%): P/B 3.40 quá đắt, payout 21%, σROE 3.8%. Đây là **Premium Burn** rõ rệt – định giá ảo tưởng phá hủy toàn bộ alpha.  
+- **EIB** (-10.2%): ROE chỉ 10%, σROE 3.8%, P/B 1.25 không đủ rẻ. Bẫy lợi nhuận thấp – **Cheap Trap/Low-ROE trap**.  
+- **VPB** (-9.8%): σROE 4.7% quá cao, payout 24.6% lớn. Risk penalty chiếm gần hết return, thuộc nhóm **Growth Trap** rủi ro hiện hữu.
+
+## 4. Portfolio Construction  
+- **Core Holding (60–70%)**: SHB, MBB – ưu tiên SHB nhờ P/B rẻ và alpha cao hơn.  
+- **Tactical (20–30%)**: ACB chỉ nếu cần giữ beta ngành; nhưng alpha âm nên không nên core.  
+- **Cấm mua/underweight**: LPB, EIB, VPB.  
+- Không có kịch bản Avoid Sector vì vẫn còn SHB/MBB tạo alpha dương.
+
+## 5. Structured Tail  
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "scenario": "Trung lập",
+  "core_holdings": ["SHB", "MBB"],
+  "avoid_list": ["LPB", "EIB", "VPB"],
+  "sector_view": "neutral",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 4.044322172499376,
+    "median_economic_alpha_pct": -4.240784718044025,
+    "positive_alpha_count": 2,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "ACB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "EIB",
+      "VPB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

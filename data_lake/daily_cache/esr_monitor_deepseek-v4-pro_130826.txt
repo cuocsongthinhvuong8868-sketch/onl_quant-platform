@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+## 1. Observations
+- SSI: **62.8%** → vùng **WARNING** (0.50–0.80), chưa vào CRITICAL.
+- Market State: **CALM CORRECTION**; VN30 close nằm dưới MA125.
+- Top 3 drivers: **S_LIQ 36%**, **S_VAL 31%**, **S_COR 18%**.
+- PCA EVR PC1: **38.0%** — tương quan hệ thống mức trung bình.
+
+## 2. Risk Decomposition (Bóc tách)
+- **S_LIQ đang dẫn dắt** — “volume khô cạn vs 1Y norm”: thanh khoản sụt giảm so với trung bình 1 năm. Trong downtrend, hiện tượng này báo hiệu lực cầu hấp thụ yếu, có thể làm tăng độ nhạy với cú sốc bán.
+- **S_VAL** đứng thứ hai: định giá vẫn căng so với lãi suất tiền gửi, tạo dư địa chỉnh định giá nếu dòng tiền rút khỏi cổ phiếu.
+- **S_COR 18%** kết hợp EVR PC1 38%: chưa hình thành herding mạnh, không có signature bẫy tăng giá rõ ràng.
+
+## 3. Cross-Check
+- VN30 dưới MA125 phù hợp xu hướng giảm; chưa thấy phân kỳ giá đỉnh mới đi kèm SSI tăng, nên rủi ro bẫy tăng giá thấp.
+- **Lệch nhẹ**: HMM gán CALM CORRECTION (“low stress”) trong khi SSI đã ở WARNING. Do HMM có thể bị trễ nhịp hoặc bị trend filter làm mịn. Không nên đọc CALM CORRECTION là an toàn tuyệt đối.
+
+## 4. Verdict
+- **Cash target: 45%** danh mục — bảo thủ, không dùng đòn bẩy.
+- **Hedge action: reduce_beta** — giảm beta cổ phiếu vốn hóa lớn/nhóm cyclicals. Chưa cần short VN30F1M hay mua put vì SSI chưa vào CRITICAL.
+- Nếu SSI >80 và VN30 mất vùng hỗ trợ kỹ thuật gần nhất, cân nhắc nâng hedge lên short futures.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "esr_monitor",
+  "ssi_pct": 62.8,
+  "regime": "WARNING",
+  "market_state": "CALM_CORRECTION",
+  "top_driver": "S_LIQ",
+  "cash_target_pct": 45,
+  "hedge_action": "reduce_beta",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 62.81885922022572,
+    "pca_concentration_pct": 37.95905855842928,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.5025814331834
+  }
+}
+```

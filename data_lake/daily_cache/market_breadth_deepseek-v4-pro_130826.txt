@@ -1,0 +1,56 @@
+## 1. Observations
+- **MA20: 53.2%** → mức *normal* (không quá nóng, không quá lạnh) – phục hồi ngắn hạn nhưng chưa lan tỏa mạnh.
+- **MA60: 22.4%** → mức *low* – chỉ hơn 1/5 mã giữ được xu hướng trung hạn, xác nhận điều chỉnh trung hạn chưa kết thúc.
+- **MA125: 17.6%** → mức *low* – sức mạnh nửa năm rất yếu, chu kỳ kinh doanh chưa được cải thiện.
+- **MA252: 20.2%** → mức *low* – xu hướng dài hạn vẫn tiêu cực, phần lớn thị trường nằm dưới MA dài hạn.
+
+## 2. Structural Health
+- **Alignment**: MA20 (53.2%) cao hơn hẳn so với MA60/125/252 (22.4/17.6/20.2%) → **divergence rõ nét** giữa ngắn hạn và các horizon dài hơn.
+- **Pattern**: Khớp với **Divergence** (MA20 tương đối khỏe so với MA252 rất yếu). Không đủ điều kiện cho Strong Bull, Bear Trap/Bull Trap, hay Bear Confirmed.
+
+## 3. Money Flow Leadership
+- **Top volume MA20 (ngắn hạn)**: Dòng tiền tập trung vào các mã vừa & nhỏ, đa ngành (nhựa, hàng không, thủy sản) nhưng **không có ngành dẫn dắt rõ rệt** – nghiêng về đầu cơ ngắn hạn.
+- **Top volume MA252 (dài hạn)**: Xuất hiện các mã defensive như **ABB (ngân hàng), BVH (bảo hiểm), BSR (lọc hóa dầu)** – cho thấy nhà đầu tư dài hạn ưu tiên nhóm phòng thủ.
+- **Overlap**: Chỉ một mã chung là **APH** → dòng tiền ngắn hạn và dài hạn gần như không đồng thuận.
+- **Smart money**: Ưu tiên **defensive/quality** hơn aggressive (không thấy dấu hiệu dòng tiền đổ mạnh vào steel/brokers đầu cơ).
+
+## 4. Verdict
+- **Strategy**: **WAIT FOR CONFIRMATION** – do divergence rõ giữa MA20 và MA252. Không nên tham gia theo xung lực ngắn hạn khi nền tảng dài hạn còn yếu.
+- **Đòn bẩy đề xuất**: **0% margin** – không đủ điều kiện theo rule (MA252 << 70% và có divergence).
+- Chờ tín hiệu cải thiện breadth trung hạn hoặc sự hội tụ giữa MA20 và MA252 trước khi giải ngân.
+
+## 5. Structured Tail
+```json
+{
+  "tool": "market_breadth",
+  "ma20_pct": 53.2,
+  "ma60_pct": 22.4,
+  "ma125_pct": 17.6,
+  "ma252_pct": 20.2,
+  "regime": "divergence",
+  "leadership_sector": "mixed",
+  "strategy": "wait",
+  "margin_pct": 0,
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: market_breadth ===
+```json
+{
+  "tool": "market_breadth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "breadth_ma20_pct": 53.17647058823529,
+    "breadth_ma60_pct": 22.35294117647059,
+    "breadth_ma125_pct": 17.647058823529413,
+    "breadth_ma252_pct": 20.235294117647058,
+    "above_ma20_count": 226,
+    "above_ma60_count": 95,
+    "above_ma125_count": 75,
+    "above_ma252_count": 86,
+    "breadth_universe_size": 425,
+    "snapshot_date": "13/08/2026"
+  }
+}
+```

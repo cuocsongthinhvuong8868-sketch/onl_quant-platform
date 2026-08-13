@@ -1,0 +1,56 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+## 1. Snapshot hiện tại
+
+Phiên 12/08/2026, lãi suất VNIBOR kỳ hạn qua đêm (ON) ở mức **4.50%**, giảm **0.76 điểm phần trăm** so với phiên trước. Đây là mức giảm khá mạnh, đưa ON từ vùng căng thẳng về ngưỡng trên của dải trung tính (2.0–4.5%). Cấu trúc kỳ hạn **không còn đảo ngược**: lãi suất 1 tuần 5.20%, 2 tuần 5.80%, tạo các spread dương lần lượt **+0.70%** và **+1.30%** so với ON. Đường cong dương trở lại sau một phiên đảo ngược duy nhất trong chuỗi 20 phiên (31/07, spread 1W-ON = -0.89%), cho thấy áp lực squeeze cực ngắn hạn đã dịu đi, nhưng mức chênh lệch dương vẫn khá lớn phản ánh nhu cầu vốn kỳ hạn dài hơn vẫn ở mức cao.
+
+## 2. Trend 20 phiên
+
+Xu hướng 20 phiên vẫn nghiêng về **liquidity squeeze / stress building**. ON MA5 tăng **+1.10 điểm phần trăm** từ 4.18% lên 5.28%, với độ dốc trung bình +0.095%/phiên. Trong 20 phiên có **5 phiên** xuất hiện tín hiệu STRESS/WARNING và **1 phiên** đường cong đảo ngược, tập trung quanh giai đoạn cuối tháng 7–đầu tháng 8. Tuy nhiên, đuôi chuỗi gần nhất cho thấy dấu hiệu hạ nhiệt: ON MA5 giảm 3 phiên liên tiếp từ 5.56% (10/08) về 5.28% (12/08), ON thô giảm từ 6.09% về 4.50%, và signal hiện tại là **NEUTRAL** thay vì STRESS. Do đó, **phiên hiện tại hạ nhiệt nhưng trend 20 phiên vẫn mang tính liquidity squeeze / stress building**, chưa đủ dữ liệu để xác nhận trạng thái unwinding hoàn tất.
+
+## 3. Đánh giá Trạng thái Thanh khoản (Regime & Z-Score)
+
+Z-score của ON sau làm mượt MA5 là **+0.00**, percentile **0.544**, tức đã quay về gần trung vị của phân phối 1 năm. Điều này cho thấy mức lãi suất hiện tại không còn quá cực đoan so với quá khứ, dù vẫn cao hơn đáng kể so với giai đoạn EASY trước đó. Regime hiện tại là **ELEVATED**, nằm giữa NORMAL và TIGHT, phản ánh điều kiện vốn ngắn hạn không còn dồi dào nhưng chưa đến mức thắt chặt cực đoan. Input hiện tại không đủ dữ liệu để kết luận nguyên nhân của trạng thái này.
+
+## 4. Tác động Lan tỏa tới VN-Index
+
+Dữ liệu VNIBOR cho thấy chi phí vốn ngắn hạn đã tăng mạnh từ vùng dưới 1% (0.75% ngày 30/07) lên đỉnh trên 6% (6.32% ngày 04/08). Dù ON hiện tại đã giảm về 4.50%, nhưng MA5 vẫn neo trên 5% và regime ELEVATED, nên mặt bằng lãi suất liên ngân hàng vẫn cao hơn rõ rệt so với giai đoạn nửa đầu tháng 7. Với tương quan nghịch giữa VNIBOR và VN-Index có độ trễ 2–4 tuần, cú sốc thanh khoản vừa qua có thể tiếp tục tạo lực cản cho thị trường chứng khoán trong ngắn hạn, thông qua kênh chi phí cơ hội của dòng vốn margin và tâm lý dòng tiền nội. Tuy nhiên, việc ON hạ nhiệt và spread dương trở lại làm giảm bớt mức độ tiêu cực so với thời điểm đỉnh stress. Tác động tổng thể nghiêng về **tiêu cực** nhưng cường độ ở mức trung bình và có thể suy yếu nếu xu hướng hạ nhiệt tiếp tục.
+
+## 5. Rủi ro & Điều kiện cần theo dõi
+
+Các ngưỡng dữ liệu cần theo dõi tiếp: (i) ON có duy trì dưới 5.0% hay bật tăng trở lại; (ii) ON MA5 có tiếp tục giảm về dưới 4.5–5.0% hay không; (iii) spread 1W-ON có giữ dương và mở rộng hay xuất hiện đảo ngược; (iv) số phiên STRESS/WARNING trong những phiên tới có giảm về 0 không; (v) Regime có chuyển từ ELEVATED về NORMAL/EASY hay ngược lên TIGHT. Nếu ON vượt lại 6.0% kèm đường cong đảo ngược, rủi ro thanh khoản sẽ tăng trở lại. Mọi diễn biến liên quan SBV, tỷ giá, hay mùa vụ là dữ liệu ngoài phạm vi input cần kiểm chứng thêm, không được suy diễn từ dữ liệu VNIBOR.
+
+## 6. KẾT LUẬN & KHUYẾN NGHỊ
+
+Thanh khoản hệ thống đã qua đỉnh căng thẳng nhưng chưa trở lại trạng thái dồi dào; trong ngắn hạn nên duy trì quản trị rủi ro thanh khoản chặt chẽ, hạn chế gia tăng đòn bẩy cho đến khi các tín hiệu hạ nhiệt được xác nhận rõ ràng hơn.
+
+```json
+{
+  "tool": "vnibor",
+  "overnight_rate_pct": 4.50,
+  "trend_20d": "liquidity_squeeze",
+  "regime": "ELEVATED",
+  "signal": "NEUTRAL",
+  "spread_inverted": false,
+  "spillover_vnindex": "negative",
+  "confidence": "medium"
+}
+```
+
+=== AI CIO DIRECT METRICS: vnibor ===
+```json
+{
+  "tool": "vnibor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vnibor_on": 4.5,
+    "vnibor_zscore": 0.0016513747592605895,
+    "vnibor_percentile": 0.5436507936507936,
+    "vnibor_impulse": -0.7599999999999998,
+    "vnibor_spread_1w": 0.7000000000000002,
+    "vnibor_spread_2w": 1.2999999999999998,
+    "vnibor_regime": "ELEVATED",
+    "vnibor_signal": "NEUTRAL",
+    "vnibor_stress_warning_days_20d": "5"
+  }
+}
+```
