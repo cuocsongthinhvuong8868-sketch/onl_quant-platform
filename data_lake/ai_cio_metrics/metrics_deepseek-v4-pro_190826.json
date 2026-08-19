@@ -1,7 +1,7 @@
 {
   "metrics_version": "3.0",
   "provider": "deepseek-v4-pro",
-  "generated_at": "2026-08-19T05:43:12",
+  "generated_at": "2026-08-19T12:02:53",
   "report_date": "19/08/2026",
   "data_date": "19/08/2026",
   "authority_rules": [
@@ -26,36 +26,36 @@
       "as_of": "2026-08-19T00:00:00",
       "phase": "FRAGILE",
       "sessions_after_three_gate_climax": null,
-      "stress_risk_score_uncalibrated": 65.1,
-      "liquidation_risk_score_uncalibrated": 33.8,
+      "stress_risk_score_uncalibrated": 58.5,
+      "liquidation_risk_score_uncalibrated": 31.3,
       "exhaustion_evidence_score_uncalibrated": 0.0,
       "features": {
-        "index_close": 1724.13,
-        "return_1d": -0.004555374649253374,
-        "return_3d": -0.0028627940870288304,
-        "return_5d": -0.038507009893039124,
-        "downside_acceleration": -0.00350305178822777,
-        "ma200_gap": -0.029400228360852765,
-        "drawdown": -0.10571387076361294,
+        "index_close": 1726.69,
+        "return_1d": -0.003077331670534922,
+        "return_3d": -0.0013822379531310824,
+        "return_5d": -0.03707937853422416,
+        "downside_acceleration": -0.0039976203196933,
+        "ma200_gap": -0.02796607943944951,
+        "drawdown": -0.10438602861084889,
         "constituent_count": 397.0,
         "constituent_universe_size": 425.0,
-        "downside_participation": 0.5919395465994962,
-        "severe_downside_participation": 0.03526448362720403,
-        "breadth_ma20": 0.3979848866498741,
+        "downside_participation": 0.5667506297229219,
+        "severe_downside_participation": 0.05037783375314862,
+        "breadth_ma20": 0.3954659949622166,
         "breadth_ma20_coverage": 0.9341176470588235,
-        "breadth_ma60": 0.1561712846347607,
+        "breadth_ma60": 0.16624685138539042,
         "breadth_ma60_coverage": 0.9341176470588235,
-        "breadth_ma125": 0.14720812182741116,
+        "breadth_ma125": 0.1446700507614213,
         "breadth_ma125_coverage": 0.9270588235294117,
-        "breadth_ma252": 0.1928020565552699,
+        "breadth_ma252": 0.19794344473007713,
         "breadth_ma252_coverage": 0.9152941176470588,
-        "new_low_60": 0.1385390428211587,
-        "new_low_252": 0.10539845758354756,
-        "turnover": 4463013612.4,
-        "turnover_coverage": 0.8917647058823529,
-        "turnover_ratio_20": 0.2843674504647605,
-        "turnover_ratio_252": 0.17491877804772213,
-        "selling_volume_shock": 0.2843674504647605,
+        "new_low_60": 0.12846347607052896,
+        "new_low_252": 0.09254498714652956,
+        "turnover": 10994997156.1,
+        "turnover_coverage": 0.908235294117647,
+        "turnover_ratio_20": 0.7005623510671077,
+        "turnover_ratio_252": 0.43092664154993876,
+        "selling_volume_shock": 0.7005623510671077,
         "esr_ssi": 0.6112706921372544,
         "esr_state": "CALM CORRECTION",
         "abm_vulnerability": null,
@@ -66,14 +66,14 @@
         "recent_climax_sessions_ago": null
       },
       "percentiles": {
-        "daily_loss": 0.7486772486772486,
-        "five_day_loss": 0.9351851851851852,
-        "downside_acceleration": 0.294973544973545,
-        "drawdown_stress": 0.3478835978835979,
-        "downside_participation": 0.8227513227513228,
-        "severe_downside_participation": 0.49603174603174605,
-        "new_low_252": 0.9497354497354498,
-        "selling_volume_shock": 0.5555555555555556
+        "daily_loss": 0.6957671957671958,
+        "five_day_loss": 0.9325396825396826,
+        "downside_acceleration": 0.27645502645502645,
+        "drawdown_stress": 0.34523809523809523,
+        "downside_participation": 0.783068783068783,
+        "severe_downside_participation": 0.671957671957672,
+        "new_low_252": 0.9378306878306878,
+        "selling_volume_shock": 0.5952380952380952
       },
       "required_gates_met": {
         "price_shock": false,
@@ -96,7 +96,7 @@
         "index_observations": 2677,
         "constituent_count": 397,
         "current_breadth_coverage": 0.9152941176470588,
-        "current_volume_coverage": 0.8917647058823529,
+        "current_volume_coverage": 0.908235294117647,
         "volume_source": "constituent_dollar_turnover",
         "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
         "available_features": [
@@ -161,7 +161,9 @@
         "CQS >=85 (99.1)",
         "VNIBOR ON >=5% (5.80%)",
         "LTMM transmission_breakdown trigger FIRE",
-        "LTMM TE breakdown (-2.827)",
+        "LTMM FIRE trigger count >=2 (2)",
+        "LTMM TE breakdown (-2.637)",
+        "LTMM FRI_collateral bottleneck (+0.800)",
         "broad bearish evidence balance"
       ],
       "market_internal": [
@@ -213,9 +215,9 @@
         },
         {
           "tool": "ltmm",
-          "tool_score": 30,
+          "tool_score": 25,
           "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
-          "reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+          "reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)"
         },
         {
           "tool": "market_breadth",
@@ -552,7 +554,7 @@
     "vnibor": {
       "tool": "vnibor",
       "layer": "macro",
-      "as_of": "2026-08-17",
+      "as_of": "2026-08-18",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
@@ -588,7 +590,7 @@
         "vnibor_trend_label": "direct_quantitative"
       },
       "metric_consistency": {
-        "status": "PASS_DIRECT",
+        "status": "WARN_BLOCKED_LOWER_PRIORITY",
         "source_priority": [
           "direct_quantitative",
           "structured_tail_json",
@@ -597,8 +599,19 @@
         "sources_used": [
           "direct_quantitative"
         ],
-        "warnings": [],
-        "blocked_candidates": []
+        "warnings": [
+          "vnibor_on: kept direct_quantitative=5.8; blocked prose_regex_fallback=4.9"
+        ],
+        "blocked_candidates": [
+          {
+            "metric": "vnibor_on",
+            "authoritative_source": "direct_quantitative",
+            "authoritative_value": 5.8,
+            "blocked_source": "prose_regex_fallback",
+            "blocked_value": 4.9,
+            "absolute_delta": 0.8999999999999995
+          }
+        ]
       },
       "metric_authority": "direct_quantitative",
       "data_quality": "direct_quantitative"
@@ -611,24 +624,24 @@
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "ltmm_fli": -0.1820080356044417,
-        "ltmm_mli": -0.351095154288513,
-        "ltmm_te": -2.827179579660405,
-        "ltmm_fri_collateral": 0.6678476844164724,
-        "ltmm_fire_trigger_count": 1,
+        "ltmm_fli": 0.183033402644176,
+        "ltmm_mli": -0.3711122554889794,
+        "ltmm_te": -2.6365569683216585,
+        "ltmm_fri_collateral": 0.800281495498743,
+        "ltmm_fire_trigger_count": 2,
         "ltmm_transmission_breakdown_fire": 1,
         "fli_state": "neutral",
         "mli_state": "neutral",
-        "te_state": "breakdown",
-        "fri_collateral_state": "neutral"
+        "te_state": "easy",
+        "fri_collateral_state": "tightening"
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
       "adapter_available": true,
-      "tool_score": 30,
+      "tool_score": 25,
       "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
       "tool_bias": "bearish",
-      "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)",
+      "score_reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)",
       "metric_provenance": {
         "ltmm_fli": "direct_quantitative",
         "ltmm_mli": "direct_quantitative",
@@ -1452,8 +1465,8 @@
       "report_regime": "FRAGILE",
       "key_metrics": {
         "phase": "FRAGILE",
-        "stress_risk_score_uncalibrated": 65.1,
-        "liquidation_risk_score_uncalibrated": 33.8,
+        "stress_risk_score_uncalibrated": 58.5,
+        "liquidation_risk_score_uncalibrated": 31.3,
         "exhaustion_evidence_score_uncalibrated": 0.0,
         "required_gates_met": {
           "price_shock": false,
@@ -1486,7 +1499,7 @@
           "index_observations": 2677,
           "constituent_count": 397,
           "current_breadth_coverage": 0.9152941176470588,
-          "current_volume_coverage": 0.8917647058823529,
+          "current_volume_coverage": 0.908235294117647,
           "volume_source": "constituent_dollar_turnover",
           "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
           "available_features": [
@@ -1510,14 +1523,14 @@
           ]
         },
         "price_structure": {
-          "return_1d": -0.004555374649253374,
-          "return_5d": -0.038507009893039124,
-          "drawdown": -0.10571387076361294,
-          "ma200_gap": -0.029400228360852765,
-          "downside_participation": 0.5919395465994962,
-          "new_low_252": 0.10539845758354756,
-          "breadth_ma20": 0.3979848866498741,
-          "turnover_ratio_20": 0.2843674504647605
+          "return_1d": -0.003077331670534922,
+          "return_5d": -0.03707937853422416,
+          "drawdown": -0.10438602861084889,
+          "ma200_gap": -0.02796607943944951,
+          "downside_participation": 0.5667506297229219,
+          "new_low_252": 0.09254498714652956,
+          "breadth_ma20": 0.3954659949622166,
+          "turnover_ratio_20": 0.7005623510671077
         },
         "trigger_reasons": [
           "ESR systemic stress is elevated (61%)",

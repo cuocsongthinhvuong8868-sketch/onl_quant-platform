@@ -1,6 +1,6 @@
 {
   "provider": "deepseek-v4-pro",
-  "generated_at": "2026-08-19T05:43:12",
+  "generated_at": "2026-08-19T12:02:53",
   "decision_state": {
     "report_date": "19/08/2026",
     "data_date": "19/08/2026",
@@ -33,9 +33,9 @@
           },
           {
             "tool": "ltmm",
-            "tool_score": 30,
+            "tool_score": 25,
             "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
-            "reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+            "reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)"
           },
           {
             "tool": "market_breadth",
@@ -216,16 +216,16 @@
       "vnibor.vnibor_signal": "NEUTRAL",
       "vnibor.vnibor_stress_warning_days_20d": "5",
       "vnibor.vnibor_trend_label": "liquidity squeeze / stress building",
-      "ltmm.ltmm_fli": -0.1820080356044417,
-      "ltmm.ltmm_mli": -0.351095154288513,
-      "ltmm.ltmm_te": -2.827179579660405,
-      "ltmm.ltmm_fri_collateral": 0.6678476844164724,
-      "ltmm.ltmm_fire_trigger_count": 1,
+      "ltmm.ltmm_fli": 0.183033402644176,
+      "ltmm.ltmm_mli": -0.3711122554889794,
+      "ltmm.ltmm_te": -2.6365569683216585,
+      "ltmm.ltmm_fri_collateral": 0.800281495498743,
+      "ltmm.ltmm_fire_trigger_count": 2,
       "ltmm.ltmm_transmission_breakdown_fire": 1,
       "ltmm.fli_state": "neutral",
       "ltmm.mli_state": "neutral",
-      "ltmm.te_state": "breakdown",
-      "ltmm.fri_collateral_state": "neutral",
+      "ltmm.te_state": "easy",
+      "ltmm.fri_collateral_state": "tightening",
       "vn100_corporate_health.vn100_health_score": "50.5",
       "vn100_corporate_health.vn100_health_score_market_cap_weighted": "53.3",
       "vn100_corporate_health.valid_company_count": 99,
@@ -408,10 +408,10 @@
       },
       {
         "tool": "ltmm",
-        "tool_score": 30,
+        "tool_score": 25,
         "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
         "tool_bias": "bearish",
-        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+        "score_reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)"
       },
       {
         "tool": "market_breadth",
@@ -455,7 +455,9 @@
         "CQS >=85 (99.1)",
         "VNIBOR ON >=5% (5.80%)",
         "LTMM transmission_breakdown trigger FIRE",
-        "LTMM TE breakdown (-2.827)",
+        "LTMM FIRE trigger count >=2 (2)",
+        "LTMM TE breakdown (-2.637)",
+        "LTMM FRI_collateral bottleneck (+0.800)",
         "broad bearish evidence balance"
       ],
       "market_internal": [
@@ -503,36 +505,36 @@
       "as_of": "2026-08-19T00:00:00",
       "phase": "FRAGILE",
       "sessions_after_three_gate_climax": null,
-      "stress_risk_score_uncalibrated": 65.1,
-      "liquidation_risk_score_uncalibrated": 33.8,
+      "stress_risk_score_uncalibrated": 58.5,
+      "liquidation_risk_score_uncalibrated": 31.3,
       "exhaustion_evidence_score_uncalibrated": 0.0,
       "features": {
-        "index_close": 1724.13,
-        "return_1d": -0.004555374649253374,
-        "return_3d": -0.0028627940870288304,
-        "return_5d": -0.038507009893039124,
-        "downside_acceleration": -0.00350305178822777,
-        "ma200_gap": -0.029400228360852765,
-        "drawdown": -0.10571387076361294,
+        "index_close": 1726.69,
+        "return_1d": -0.003077331670534922,
+        "return_3d": -0.0013822379531310824,
+        "return_5d": -0.03707937853422416,
+        "downside_acceleration": -0.0039976203196933,
+        "ma200_gap": -0.02796607943944951,
+        "drawdown": -0.10438602861084889,
         "constituent_count": 397.0,
         "constituent_universe_size": 425.0,
-        "downside_participation": 0.5919395465994962,
-        "severe_downside_participation": 0.03526448362720403,
-        "breadth_ma20": 0.3979848866498741,
+        "downside_participation": 0.5667506297229219,
+        "severe_downside_participation": 0.05037783375314862,
+        "breadth_ma20": 0.3954659949622166,
         "breadth_ma20_coverage": 0.9341176470588235,
-        "breadth_ma60": 0.1561712846347607,
+        "breadth_ma60": 0.16624685138539042,
         "breadth_ma60_coverage": 0.9341176470588235,
-        "breadth_ma125": 0.14720812182741116,
+        "breadth_ma125": 0.1446700507614213,
         "breadth_ma125_coverage": 0.9270588235294117,
-        "breadth_ma252": 0.1928020565552699,
+        "breadth_ma252": 0.19794344473007713,
         "breadth_ma252_coverage": 0.9152941176470588,
-        "new_low_60": 0.1385390428211587,
-        "new_low_252": 0.10539845758354756,
-        "turnover": 4463013612.4,
-        "turnover_coverage": 0.8917647058823529,
-        "turnover_ratio_20": 0.2843674504647605,
-        "turnover_ratio_252": 0.17491877804772213,
-        "selling_volume_shock": 0.2843674504647605,
+        "new_low_60": 0.12846347607052896,
+        "new_low_252": 0.09254498714652956,
+        "turnover": 10994997156.1,
+        "turnover_coverage": 0.908235294117647,
+        "turnover_ratio_20": 0.7005623510671077,
+        "turnover_ratio_252": 0.43092664154993876,
+        "selling_volume_shock": 0.7005623510671077,
         "esr_ssi": 0.6112706921372544,
         "esr_state": "CALM CORRECTION",
         "abm_vulnerability": null,
@@ -543,14 +545,14 @@
         "recent_climax_sessions_ago": null
       },
       "percentiles": {
-        "daily_loss": 0.7486772486772486,
-        "five_day_loss": 0.9351851851851852,
-        "downside_acceleration": 0.294973544973545,
-        "drawdown_stress": 0.3478835978835979,
-        "downside_participation": 0.8227513227513228,
-        "severe_downside_participation": 0.49603174603174605,
-        "new_low_252": 0.9497354497354498,
-        "selling_volume_shock": 0.5555555555555556
+        "daily_loss": 0.6957671957671958,
+        "five_day_loss": 0.9325396825396826,
+        "downside_acceleration": 0.27645502645502645,
+        "drawdown_stress": 0.34523809523809523,
+        "downside_participation": 0.783068783068783,
+        "severe_downside_participation": 0.671957671957672,
+        "new_low_252": 0.9378306878306878,
+        "selling_volume_shock": 0.5952380952380952
       },
       "required_gates_met": {
         "price_shock": false,
@@ -573,7 +575,7 @@
         "index_observations": 2677,
         "constituent_count": 397,
         "current_breadth_coverage": 0.9152941176470588,
-        "current_volume_coverage": 0.8917647058823529,
+        "current_volume_coverage": 0.908235294117647,
         "volume_source": "constituent_dollar_turnover",
         "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
         "available_features": [
@@ -1104,7 +1106,7 @@
     {
       "tool": "vnibor",
       "layer": "macro",
-      "date": "2026-08-17",
+      "date": "2026-08-18",
       "scoring_eligible": true,
       "bias": "bearish",
       "score": null,
@@ -1134,7 +1136,7 @@
         "vnibor_trend_label": "direct_quantitative"
       },
       "metric_consistency": {
-        "status": "PASS_DIRECT",
+        "status": "WARN_BLOCKED_LOWER_PRIORITY",
         "source_priority": [
           "direct_quantitative",
           "structured_tail_json",
@@ -1143,10 +1145,21 @@
         "sources_used": [
           "direct_quantitative"
         ],
-        "warnings": [],
-        "blocked_candidates": []
+        "warnings": [
+          "vnibor_on: kept direct_quantitative=5.8; blocked prose_regex_fallback=4.9"
+        ],
+        "blocked_candidates": [
+          {
+            "metric": "vnibor_on",
+            "authoritative_source": "direct_quantitative",
+            "authoritative_value": 5.8,
+            "blocked_source": "prose_regex_fallback",
+            "blocked_value": 4.9,
+            "absolute_delta": 0.8999999999999995
+          }
+        ]
       },
-      "evidence_excerpt": "- === VNIBOR STRUCTURED SNAPSHOT + 20D TREND ===\n- - ON Z-Score: -0.21262768768192905\n- - Regime: NORMAL\n- 20-session trend:\n- - Trend label: liquidity squeeze / stress building\n- - ON MA5 slope/session: +0.150%\n- - STRESS/WARNING days: 5\n- - Regime counts: EASY: 11, ELEVATED: 7, NORMAL: 2\n- - Signal counts: NEUTRAL: 13, STRESS: 4, ACCOMMODATIVE: 2, WARNING: 1\n- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal",
+      "evidence_excerpt": "- === VNIBOR STRUCTURED SNAPSHOT + 20D TREND ===\n- - ON Z-Score: -0.2624064002449758\n- - Regime: NORMAL\n- 20-session trend:\n- - Trend label: liquidity squeeze / stress building\n- - ON MA5 slope/session: +0.159%\n- - STRESS/WARNING days: 5\n- - Regime counts: EASY: 10, ELEVATED: 7, NORMAL: 3\n- - Signal counts: NEUTRAL: 13, STRESS: 4, ACCOMMODATIVE: 2, WARNING: 1\n- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal",
       "adapter_score": {
         "tool_score": 25,
         "tool_regime": "PRE-CRASH / PANIC",
@@ -1163,16 +1176,16 @@
       "score": null,
       "regime": null,
       "key_metrics": {
-        "ltmm_fli": -0.1820080356044417,
-        "ltmm_mli": -0.351095154288513,
-        "ltmm_te": -2.827179579660405,
-        "ltmm_fri_collateral": 0.6678476844164724,
-        "ltmm_fire_trigger_count": 1,
+        "ltmm_fli": 0.183033402644176,
+        "ltmm_mli": -0.3711122554889794,
+        "ltmm_te": -2.6365569683216585,
+        "ltmm_fri_collateral": 0.800281495498743,
+        "ltmm_fire_trigger_count": 2,
         "ltmm_transmission_breakdown_fire": 1,
         "fli_state": "neutral",
         "mli_state": "neutral",
-        "te_state": "breakdown",
-        "fri_collateral_state": "neutral"
+        "te_state": "easy",
+        "fri_collateral_state": "tightening"
       },
       "metric_provenance": {
         "ltmm_fli": "direct_quantitative",
@@ -1199,12 +1212,12 @@
         "warnings": [],
         "blocked_candidates": []
       },
-      "evidence_excerpt": "- === LTMM STRUCTURED SNAPSHOT - LIQUIDITY TRANSMISSION ===\n- - LTMM FLI: -0.182 | state: neutral | quality: 0.7296296296296299\n- - LTMM MLI: -0.351 | state: neutral | quality: 0.6080000000000001\n- - LTMM TE: -2.827 | state: breakdown | quality: 1.0\n- - LTMM FRI_collateral: +0.668 | state: neutral | quality: warning\n- - LTMM divergence: FLI neutral (-0.182) -> MLI neutral (-0.351) | no large upstream/downstream spread\n- - LTMM Fire Trigger Count: 1\n- - LTMM transmission_breakdown FIRE: 1\n- Top bottlenecks by stress score:\n- | constraint | layer | stress_score | state | quality | observation_date |",
+      "evidence_excerpt": "- === LTMM STRUCTURED SNAPSHOT - LIQUIDITY TRANSMISSION ===\n- - LTMM FLI: +0.183 | state: neutral | quality: 0.6472222222222224\n- - LTMM MLI: -0.371 | state: neutral | quality: 0.6430000000000001\n- - LTMM TE: -2.637 | state: easy | quality: 1.0\n- - LTMM FRI_collateral: +0.800 | state: tightening | quality: warning\n- - LTMM divergence: FLI neutral (+0.183) -> MLI neutral (-0.371) | meaningful transmission gap\n- - LTMM Fire Trigger Count: 2\n- - LTMM transmission_breakdown FIRE: 1\n- Top bottlenecks by stress score:\n- | constraint | layer | stress_score | state | quality | observation_date |",
       "adapter_score": {
-        "tool_score": 30,
+        "tool_score": 25,
         "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
         "tool_bias": "bearish",
-        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+        "score_reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)"
       }
     },
     {
@@ -1275,7 +1288,7 @@
         "warnings": [],
         "blocked_candidates": []
       },
-      "evidence_excerpt": "- - Rules triggered: 0/6\n- - Cache: REFRESHED (/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/humility_falsification_deepseek-v4-pro_190826.json)\n- | VNIBOR Monitor | STRESS/WARNING sessions (20D) | < 5 sessions | 5 sessions | 5 sessions | 0 sessions | Intact | 2026-08-17 |\n- | Market Breadth | Breadth MA20 | > 45.0% | 53.2% | 37.2% | -16.0% | Intact | 2026-08-19 |\n- | ESR Monitor | Systemic Stress Index (SSI) | < 55.0% | 62.8% | 61.1% | -1.673% | Intact | 2026-08-19 |\n- | Tail Risk (EVT) | EVT Xi Max (5%-15% thresholds) | < 0.25 | 0.379 | 0.367 | -0.012 | Intact | 2026-08-19 |\n- | Manipulation / Coupling | Vingroup Slope Percentile | < 70.0 th pct | N/A | N/A | N/A | MISSING | |\n- | Global Financial Conditions | CQS Percentile | < 80.0 th pct | 99.9 th pct | 99.1 th pct | -0.76\n- [trimmed: raw report omitted]"
+      "evidence_excerpt": "- - Rules triggered: 0/6\n- - Cache: HIT (/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/humility_falsification_deepseek-v4-pro_190826.json)\n- | VNIBOR Monitor | STRESS/WARNING sessions (20D) | < 5 sessions | 5 sessions | 5 sessions | 0 sessions | Intact | 2026-08-17 |\n- | Market Breadth | Breadth MA20 | > 45.0% | 53.2% | 37.2% | -16.0% | Intact | 2026-08-19 |\n- | ESR Monitor | Systemic Stress Index (SSI) | < 55.0% | 62.8% | 61.1% | -1.673% | Intact | 2026-08-19 |\n- | Tail Risk (EVT) | EVT Xi Max (5%-15% thresholds) | < 0.25 | 0.379 | 0.367 | -0.012 | Intact | 2026-08-19 |\n- | Manipulation / Coupling | Vingroup Slope Percentile | < 70.0 th pct | N/A | N/A | N/A | MISSING | |\n- | Global Financial Conditions | CQS Percentile | < 80.0 th pct | 99.9 th pct | 99.1 th pct | -0.76 th pc\n- [trimmed: raw report omitted]"
     },
     {
       "tool": "fear_greed",
@@ -1928,8 +1941,8 @@
       "regime": "FRAGILE",
       "key_metrics": {
         "phase": "FRAGILE",
-        "stress_risk_score_uncalibrated": 65.1,
-        "liquidation_risk_score_uncalibrated": 33.8,
+        "stress_risk_score_uncalibrated": 58.5,
+        "liquidation_risk_score_uncalibrated": 31.3,
         "exhaustion_evidence_score_uncalibrated": 0.0,
         "required_gates_met": {
           "price_shock": false,
@@ -1962,7 +1975,7 @@
           "index_observations": 2677,
           "constituent_count": 397,
           "current_breadth_coverage": 0.9152941176470588,
-          "current_volume_coverage": 0.8917647058823529,
+          "current_volume_coverage": 0.908235294117647,
           "volume_source": "constituent_dollar_turnover",
           "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
           "available_features": [
@@ -1986,14 +1999,14 @@
           ]
         },
         "price_structure": {
-          "return_1d": -0.004555374649253374,
-          "return_5d": -0.038507009893039124,
-          "drawdown": -0.10571387076361294,
-          "ma200_gap": -0.029400228360852765,
-          "downside_participation": 0.5919395465994962,
-          "new_low_252": 0.10539845758354756,
-          "breadth_ma20": 0.3979848866498741,
-          "turnover_ratio_20": 0.2843674504647605
+          "return_1d": -0.003077331670534922,
+          "return_5d": -0.03707937853422416,
+          "drawdown": -0.10438602861084889,
+          "ma200_gap": -0.02796607943944951,
+          "downside_participation": 0.5667506297229219,
+          "new_low_252": 0.09254498714652956,
+          "breadth_ma20": 0.3954659949622166,
+          "turnover_ratio_20": 0.7005623510671077
         },
         "trigger_reasons": [
           "ESR systemic stress is elevated (61%)",
@@ -2004,14 +2017,14 @@
         ],
         "confirmation_reasons": []
       },
-      "evidence_excerpt": "- {\"phase\": \"FRAGILE\", \"stress_risk_score_uncalibrated\": 65.1, \"liquidation_risk_score_uncalibrated\": 33.8, \"exhaustion_evidence_score_uncalibrated\": 0.0, \"required_gates_met\": {\"price_shock\": false, \"breadth_shock\": false, \"forced_selling\": false, \"three_gate_climax\": false, \"climax_continuation\": false, \"post_climax_exhaustion\": false}, \"sessions_after_three_gate_climax\": null, \"action_eligible\": false, \"freshness_status\": \"CURRENT\", \"market_data_lag_business_days\": 0, \"external_metric_freshness\": {\"esr_monitor\": {\"packet_date\": \"19/08/2026\", \"session_lag\": 0, \"status\": \"CURRENT\", \"used\": true}, \"abm_simulator\": {\"packet_date\": \"2026-08-14\", \"session_lag\": 3, \"status\": \"STALE\", \"used\": false}}, \"data_quality\": {\"status\": \"LIMITED\", \"index_observations\": 2677, \"constituent_count\": 397, \"current_breadth_coverage\": 0.9152941176470588, \"current_volume_coverage\": 0.8917647058823529, \"volume_source\": \"constituent_dollar_turnover\", \"percentile_method\": \"prior-only rolling empirical CDF (756 sessions)\", \"available_features\": [\"return_1d\", \"return_5d\", \"downside_acceleration\", \"ma200_gap\", \"drawdown\", \"breadth_ma20\", \"breadth_ma60\", \"breadth_ma125\", \"breadth_ma252\", \"downside_participation\", \"new_low_252\", \"turnover_ratio_20\", \"turnover_ratio_252\"], \"missing_features\": [], \"warnings\": [\"external detector metrics excluded by as-of policy: abm_simulator\"]}, \"price_structure\": {\"return_1d\": -0.004555374649253374, \"return_5d\": -0.038507009893039124, \"drawdown\": -0.10571387076361294, \"ma200_gap\": -0.029400228360852765, \"downside_participation\": 0.5919395465994962, \"new_low_252\": 0.10539845758354756, \"breadth_ma20\": 0.3979848866498741, \"turnover_ratio_20\": 0.2843674504647605}, \"trigger_reasons\": [\"ESR systemic stress is elevated (61%)\", \"price_structure\", \"weak_breadth\", \"turnover_dry_up\", \"systemic_stress\"], \"confirmation_reasons\": []}"
+      "evidence_excerpt": "- {\"phase\": \"FRAGILE\", \"stress_risk_score_uncalibrated\": 58.5, \"liquidation_risk_score_uncalibrated\": 31.3, \"exhaustion_evidence_score_uncalibrated\": 0.0, \"required_gates_met\": {\"price_shock\": false, \"breadth_shock\": false, \"forced_selling\": false, \"three_gate_climax\": false, \"climax_continuation\": false, \"post_climax_exhaustion\": false}, \"sessions_after_three_gate_climax\": null, \"action_eligible\": false, \"freshness_status\": \"CURRENT\", \"market_data_lag_business_days\": 0, \"external_metric_freshness\": {\"esr_monitor\": {\"packet_date\": \"19/08/2026\", \"session_lag\": 0, \"status\": \"CURRENT\", \"used\": true}, \"abm_simulator\": {\"packet_date\": \"2026-08-14\", \"session_lag\": 3, \"status\": \"STALE\", \"used\": false}}, \"data_quality\": {\"status\": \"LIMITED\", \"index_observations\": 2677, \"constituent_count\": 397, \"current_breadth_coverage\": 0.9152941176470588, \"current_volume_coverage\": 0.908235294117647, \"volume_source\": \"constituent_dollar_turnover\", \"percentile_method\": \"prior-only rolling empirical CDF (756 sessions)\", \"available_features\": [\"return_1d\", \"return_5d\", \"downside_acceleration\", \"ma200_gap\", \"drawdown\", \"breadth_ma20\", \"breadth_ma60\", \"breadth_ma125\", \"breadth_ma252\", \"downside_participation\", \"new_low_252\", \"turnover_ratio_20\", \"turnover_ratio_252\"], \"missing_features\": [], \"warnings\": [\"external detector metrics excluded by as-of policy: abm_simulator\"]}, \"price_structure\": {\"return_1d\": -0.003077331670534922, \"return_5d\": -0.03707937853422416, \"drawdown\": -0.10438602861084889, \"ma200_gap\": -0.02796607943944951, \"downside_participation\": 0.5667506297229219, \"new_low_252\": 0.09254498714652956, \"breadth_ma20\": 0.3954659949622166, \"turnover_ratio_20\": 0.7005623510671077}, \"trigger_reasons\": [\"ESR systemic stress is elevated (61%)\", \"price_structure\", \"weak_breadth\", \"turnover_dry_up\", \"systemic_stress\"], \"confirmation_reasons\": []}"
     }
   ],
   "metrics_snapshot_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/ai_cio_metrics/metrics_deepseek-v4-pro_190826.json",
   "metrics_snapshot": {
     "metrics_version": "3.0",
     "provider": "deepseek-v4-pro",
-    "generated_at": "2026-08-19T05:43:12",
+    "generated_at": "2026-08-19T12:02:53",
     "report_date": "19/08/2026",
     "data_date": "19/08/2026",
     "authority_rules": [
@@ -2036,36 +2049,36 @@
         "as_of": "2026-08-19T00:00:00",
         "phase": "FRAGILE",
         "sessions_after_three_gate_climax": null,
-        "stress_risk_score_uncalibrated": 65.1,
-        "liquidation_risk_score_uncalibrated": 33.8,
+        "stress_risk_score_uncalibrated": 58.5,
+        "liquidation_risk_score_uncalibrated": 31.3,
         "exhaustion_evidence_score_uncalibrated": 0.0,
         "features": {
-          "index_close": 1724.13,
-          "return_1d": -0.004555374649253374,
-          "return_3d": -0.0028627940870288304,
-          "return_5d": -0.038507009893039124,
-          "downside_acceleration": -0.00350305178822777,
-          "ma200_gap": -0.029400228360852765,
-          "drawdown": -0.10571387076361294,
+          "index_close": 1726.69,
+          "return_1d": -0.003077331670534922,
+          "return_3d": -0.0013822379531310824,
+          "return_5d": -0.03707937853422416,
+          "downside_acceleration": -0.0039976203196933,
+          "ma200_gap": -0.02796607943944951,
+          "drawdown": -0.10438602861084889,
           "constituent_count": 397.0,
           "constituent_universe_size": 425.0,
-          "downside_participation": 0.5919395465994962,
-          "severe_downside_participation": 0.03526448362720403,
-          "breadth_ma20": 0.3979848866498741,
+          "downside_participation": 0.5667506297229219,
+          "severe_downside_participation": 0.05037783375314862,
+          "breadth_ma20": 0.3954659949622166,
           "breadth_ma20_coverage": 0.9341176470588235,
-          "breadth_ma60": 0.1561712846347607,
+          "breadth_ma60": 0.16624685138539042,
           "breadth_ma60_coverage": 0.9341176470588235,
-          "breadth_ma125": 0.14720812182741116,
+          "breadth_ma125": 0.1446700507614213,
           "breadth_ma125_coverage": 0.9270588235294117,
-          "breadth_ma252": 0.1928020565552699,
+          "breadth_ma252": 0.19794344473007713,
           "breadth_ma252_coverage": 0.9152941176470588,
-          "new_low_60": 0.1385390428211587,
-          "new_low_252": 0.10539845758354756,
-          "turnover": 4463013612.4,
-          "turnover_coverage": 0.8917647058823529,
-          "turnover_ratio_20": 0.2843674504647605,
-          "turnover_ratio_252": 0.17491877804772213,
-          "selling_volume_shock": 0.2843674504647605,
+          "new_low_60": 0.12846347607052896,
+          "new_low_252": 0.09254498714652956,
+          "turnover": 10994997156.1,
+          "turnover_coverage": 0.908235294117647,
+          "turnover_ratio_20": 0.7005623510671077,
+          "turnover_ratio_252": 0.43092664154993876,
+          "selling_volume_shock": 0.7005623510671077,
           "esr_ssi": 0.6112706921372544,
           "esr_state": "CALM CORRECTION",
           "abm_vulnerability": null,
@@ -2076,14 +2089,14 @@
           "recent_climax_sessions_ago": null
         },
         "percentiles": {
-          "daily_loss": 0.7486772486772486,
-          "five_day_loss": 0.9351851851851852,
-          "downside_acceleration": 0.294973544973545,
-          "drawdown_stress": 0.3478835978835979,
-          "downside_participation": 0.8227513227513228,
-          "severe_downside_participation": 0.49603174603174605,
-          "new_low_252": 0.9497354497354498,
-          "selling_volume_shock": 0.5555555555555556
+          "daily_loss": 0.6957671957671958,
+          "five_day_loss": 0.9325396825396826,
+          "downside_acceleration": 0.27645502645502645,
+          "drawdown_stress": 0.34523809523809523,
+          "downside_participation": 0.783068783068783,
+          "severe_downside_participation": 0.671957671957672,
+          "new_low_252": 0.9378306878306878,
+          "selling_volume_shock": 0.5952380952380952
         },
         "required_gates_met": {
           "price_shock": false,
@@ -2106,7 +2119,7 @@
           "index_observations": 2677,
           "constituent_count": 397,
           "current_breadth_coverage": 0.9152941176470588,
-          "current_volume_coverage": 0.8917647058823529,
+          "current_volume_coverage": 0.908235294117647,
           "volume_source": "constituent_dollar_turnover",
           "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
           "available_features": [
@@ -2171,7 +2184,9 @@
           "CQS >=85 (99.1)",
           "VNIBOR ON >=5% (5.80%)",
           "LTMM transmission_breakdown trigger FIRE",
-          "LTMM TE breakdown (-2.827)",
+          "LTMM FIRE trigger count >=2 (2)",
+          "LTMM TE breakdown (-2.637)",
+          "LTMM FRI_collateral bottleneck (+0.800)",
           "broad bearish evidence balance"
         ],
         "market_internal": [
@@ -2223,9 +2238,9 @@
           },
           {
             "tool": "ltmm",
-            "tool_score": 30,
+            "tool_score": 25,
             "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
-            "reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)"
+            "reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)"
           },
           {
             "tool": "market_breadth",
@@ -2562,7 +2577,7 @@
       "vnibor": {
         "tool": "vnibor",
         "layer": "macro",
-        "as_of": "2026-08-17",
+        "as_of": "2026-08-18",
         "bias": "bearish",
         "report_score": null,
         "report_regime": null,
@@ -2598,7 +2613,7 @@
           "vnibor_trend_label": "direct_quantitative"
         },
         "metric_consistency": {
-          "status": "PASS_DIRECT",
+          "status": "WARN_BLOCKED_LOWER_PRIORITY",
           "source_priority": [
             "direct_quantitative",
             "structured_tail_json",
@@ -2607,8 +2622,19 @@
           "sources_used": [
             "direct_quantitative"
           ],
-          "warnings": [],
-          "blocked_candidates": []
+          "warnings": [
+            "vnibor_on: kept direct_quantitative=5.8; blocked prose_regex_fallback=4.9"
+          ],
+          "blocked_candidates": [
+            {
+              "metric": "vnibor_on",
+              "authoritative_source": "direct_quantitative",
+              "authoritative_value": 5.8,
+              "blocked_source": "prose_regex_fallback",
+              "blocked_value": 4.9,
+              "absolute_delta": 0.8999999999999995
+            }
+          ]
         },
         "metric_authority": "direct_quantitative",
         "data_quality": "direct_quantitative"
@@ -2621,24 +2647,24 @@
         "report_score": null,
         "report_regime": null,
         "key_metrics": {
-          "ltmm_fli": -0.1820080356044417,
-          "ltmm_mli": -0.351095154288513,
-          "ltmm_te": -2.827179579660405,
-          "ltmm_fri_collateral": 0.6678476844164724,
-          "ltmm_fire_trigger_count": 1,
+          "ltmm_fli": 0.183033402644176,
+          "ltmm_mli": -0.3711122554889794,
+          "ltmm_te": -2.6365569683216585,
+          "ltmm_fri_collateral": 0.800281495498743,
+          "ltmm_fire_trigger_count": 2,
           "ltmm_transmission_breakdown_fire": 1,
           "fli_state": "neutral",
           "mli_state": "neutral",
-          "te_state": "breakdown",
-          "fri_collateral_state": "neutral"
+          "te_state": "easy",
+          "fri_collateral_state": "tightening"
         },
         "scoring_eligible": true,
         "diagnostic_gate_only": false,
         "adapter_available": true,
-        "tool_score": 30,
+        "tool_score": 25,
         "tool_regime": "LTMM TRANSMISSION BREAKDOWN",
         "tool_bias": "bearish",
-        "score_reason": "transmission_breakdown trigger FIRE; TE breakdown (-2.827)",
+        "score_reason": "transmission_breakdown trigger FIRE; FIRE trigger count >=2 (2); TE breakdown (-2.637); FRI_collateral bottleneck (+0.800)",
         "metric_provenance": {
           "ltmm_fli": "direct_quantitative",
           "ltmm_mli": "direct_quantitative",
@@ -3462,8 +3488,8 @@
         "report_regime": "FRAGILE",
         "key_metrics": {
           "phase": "FRAGILE",
-          "stress_risk_score_uncalibrated": 65.1,
-          "liquidation_risk_score_uncalibrated": 33.8,
+          "stress_risk_score_uncalibrated": 58.5,
+          "liquidation_risk_score_uncalibrated": 31.3,
           "exhaustion_evidence_score_uncalibrated": 0.0,
           "required_gates_met": {
             "price_shock": false,
@@ -3496,7 +3522,7 @@
             "index_observations": 2677,
             "constituent_count": 397,
             "current_breadth_coverage": 0.9152941176470588,
-            "current_volume_coverage": 0.8917647058823529,
+            "current_volume_coverage": 0.908235294117647,
             "volume_source": "constituent_dollar_turnover",
             "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
             "available_features": [
@@ -3520,14 +3546,14 @@
             ]
           },
           "price_structure": {
-            "return_1d": -0.004555374649253374,
-            "return_5d": -0.038507009893039124,
-            "drawdown": -0.10571387076361294,
-            "ma200_gap": -0.029400228360852765,
-            "downside_participation": 0.5919395465994962,
-            "new_low_252": 0.10539845758354756,
-            "breadth_ma20": 0.3979848866498741,
-            "turnover_ratio_20": 0.2843674504647605
+            "return_1d": -0.003077331670534922,
+            "return_5d": -0.03707937853422416,
+            "drawdown": -0.10438602861084889,
+            "ma200_gap": -0.02796607943944951,
+            "downside_participation": 0.5667506297229219,
+            "new_low_252": 0.09254498714652956,
+            "breadth_ma20": 0.3954659949622166,
+            "turnover_ratio_20": 0.7005623510671077
           },
           "trigger_reasons": [
             "ESR systemic stress is elevated (61%)",
