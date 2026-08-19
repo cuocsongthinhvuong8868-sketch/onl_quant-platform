@@ -8,6 +8,7 @@ from typing import Any
 
 import pandas as pd
 
+from shared.llm_policy import completion_options
 from .config import AI_CACHE_DIR, AI_PROVIDER_MAP, AI_TEMPERATURE, PROJECT_ROOT, PROMPT_DIR
 
 
@@ -569,12 +570,15 @@ def run_ai_analysis(
         timeout=cfg.get("timeout", 180),
     )
     response = client.chat.completions.create(
-        model=cfg["api_model"],
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=cfg.get("temperature", AI_TEMPERATURE),
+        **completion_options(
+            model=cfg["api_model"],
+            route="child_report",
+            temperature=cfg.get("temperature", AI_TEMPERATURE),
+        ),
     )
     result = response.choices[0].message.content or ""
     target_cache.parent.mkdir(parents=True, exist_ok=True)

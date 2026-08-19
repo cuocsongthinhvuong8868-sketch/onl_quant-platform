@@ -8,6 +8,7 @@ import streamlit as st
 from shared.data_loader import load_close_prices, load_custom, load_volumes
 from shared.daily_cache import load_daily_cache, save_daily_cache, get_cache_path, clear_daily_cache
 from shared.api_key_helper import resolve_api_key
+from shared.llm_policy import completion_options
 from shared.github_sync import render_sync_button
 from shared.page_layout import render_signal_card, tone_for_signal
 from tools.esr_monitor.quant.metrics import (
@@ -410,12 +411,15 @@ def render():
                             temperature = cfg.get("temperature", 1.0)
 
                             response = client.chat.completions.create(
-                                model=cfg["api_model"],
                                 messages=[
                                     {"role": "system", "content": system_prompt},
                                     {"role": "user", "content": user_prompt}
                                 ],
-                                temperature=temperature
+                                **completion_options(
+                                    model=cfg["api_model"],
+                                    route="child_report",
+                                    temperature=temperature,
+                                ),
                             )
 
                             result_text = response.choices[0].message.content

@@ -6,6 +6,7 @@ from typing import Iterable
 
 import pandas as pd
 
+from shared.llm_policy import completion_options
 from tools.bank_valuation.quant.engine.market_regime import calculate_bank_valuation_regime
 
 
@@ -285,11 +286,14 @@ def run_ai_analysis(
     system_prompt, user_prompt = build_bank_valuation_ai_prompt(data, ohlcv_source, focus_question)
     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
     response = client.chat.completions.create(
-        model=cfg["api_model"],
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=cfg.get("temperature", 0.5),
+        **completion_options(
+            model=cfg["api_model"],
+            route="child_report",
+            temperature=cfg.get("temperature", 0.5),
+        ),
     )
     return response.choices[0].message.content

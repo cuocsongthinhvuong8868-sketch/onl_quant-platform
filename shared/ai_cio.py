@@ -1,9 +1,11 @@
 import csv
+import hashlib
 import json
 import os
 import re
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from types import SimpleNamespace
 from typing import Any
 import pandas as pd
 import streamlit as st
@@ -12,6 +14,7 @@ from scipy.stats import percentileofscore
 from config import DATA_LAKE, ROOT_DIR, AI_MODEL, AI_TEMPERATURE
 from shared.ai_cio_metric_contract import append_direct_metrics as _append_direct_metrics
 from shared.ai_cio_metric_contract import resolve_tool_metrics
+from shared.llm_policy import completion_options
 
 # ── History CSV (Ai_cio_report.csv) ──
 # Score/stress regime plus the independent capitulation phase gate.
@@ -37,6 +40,7 @@ NON_SCORING_EVIDENCE_TOOLS = frozenset({"humility_falsification", "capitulation_
 TELEGRAM_SUMMARY_PREFIX = "telegram_summary"
 TELEGRAM_SUMMARY_CHAR_LIMIT = 3500
 AI_CIO_CACHE_VERSION_HEADER = "ai-cio-cache-version"
+AI_CIO_FINGERPRINT_MANIFEST = "ai_cio_fingerprint_manifest.json"
 AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "feargreed": "fear_greed_v2_prompt_shock_overlay",
     "global_financial_conditions": "indicator_pr3y_pca_point_in_time_v1",
@@ -50,7 +54,7 @@ AI_CIO_TOOL_CACHE_VERSIONS: dict[str, str] = {
     "upside_ratio": "upside_ratio_v2_stress_prompt",
     "var_cvar_vnindex": "var_cvar_vnindex_v3_prior_window_prompt",
     "sentiment_factor_news": "weighted_bayesian_posterior_social_overlay_v2",
-    "executive_summary": "ai_cio_methodology_v7_climax_continuation",
+    "executive_summary": "ai_cio_compact_single_call_v8",
 }
 TOOL_METHODOLOGY_CARDS: dict[str, dict[str, str]] = {
     "fed_liquidity": {
@@ -541,6 +545,45 @@ def _get_cache_path(tool_name: str, provider_key: str = "kimi-2.6") -> str:
     return DATA_LAKE / "daily_cache" / f"{tool_name}_{provider_key}_{today_str}.txt"
 
 
+def _fingerprint_manifest_path() -> Path:
+    return DATA_LAKE / "daily_cache" / AI_CIO_FINGERPRINT_MANIFEST
+
+
+def _fingerprint_manifest_key(tool_name: str, provider_key: str) -> str:
+    return f"{provider_key}:{tool_name}"
+
+
+def _load_fingerprint_manifest() -> dict[str, Any]:
+    path = _fingerprint_manifest_path()
+    if not path.exists():
+        return {}
+    try:
+        payload = json.loads(path.read_text(encoding="utf-8"))
+    except (OSError, json.JSONDecodeError):
+        return {}
+    return payload if isinstance(payload, dict) else {}
+
+
+def _save_fingerprint_manifest(payload: dict[str, Any]) -> None:
+    path = _fingerprint_manifest_path()
+    path.parent.mkdir(parents=True, exist_ok=True)
+    path.write_text(
+        json.dumps(payload, ensure_ascii=False, indent=2, sort_keys=True, default=str),
+        encoding="utf-8",
+    )
+
+
+def _payload_fingerprint(payload: Any) -> str:
+    canonical = json.dumps(
+        payload,
+        ensure_ascii=False,
+        sort_keys=True,
+        separators=(",", ":"),
+        default=str,
+    )
+    return hashlib.sha256(canonical.encode("utf-8")).hexdigest()
+
+
 def _cache_version_for_tool(tool_name: str) -> str | None:
     return AI_CIO_TOOL_CACHE_VERSIONS.get(str(tool_name or ""))
 
@@ -619,11 +662,41 @@ def _read_cache(tool_name: str, provider_key: str = "kimi-2.6") -> str | None:
     return None
 
 
-def _write_cache(tool_name: str, content: str, provider_key: str = "kimi-2.6"):
+def _read_fingerprint_cache(
+    tool_name: str,
+    provider_key: str,
+    fingerprint: str,
+) -> str | None:
+    entry = _load_fingerprint_manifest().get(
+        _fingerprint_manifest_key(tool_name, provider_key)
+    )
+    if not isinstance(entry, dict) or entry.get("fingerprint") != fingerprint:
+        return None
+    filename = Path(str(entry.get("filename") or "")).name
+    if not filename:
+        return None
+    return _read_cache_file(DATA_LAKE / "daily_cache" / filename, tool_name)
+
+
+def _write_cache(
+    tool_name: str,
+    content: str,
+    provider_key: str = "kimi-2.6",
+    *,
+    fingerprint: str | None = None,
+):
     path = _get_cache_path(tool_name, provider_key)
     path.parent.mkdir(parents=True, exist_ok=True)
     with open(path, "w", encoding="utf-8") as f:
         f.write(_encode_cache_content(tool_name, content))
+    if fingerprint:
+        manifest = _load_fingerprint_manifest()
+        manifest[_fingerprint_manifest_key(tool_name, provider_key)] = {
+            "fingerprint": fingerprint,
+            "filename": path.name,
+            "updated_at": datetime.now().isoformat(timespec="seconds"),
+        }
+        _save_fingerprint_manifest(manifest)
 
 
 def _get_humility_rules_path(provider_key: str, target_date: date | None = None) -> Path:
@@ -694,7 +767,7 @@ def summarize_executive_report_for_telegram(
     report_date: date | None = None,
     force: bool = False,
 ) -> str:
-    """Create a short Telegram-ready AI CIO brief and cache it by report date."""
+    """Render a Telegram brief deterministically; no second LLM call is needed."""
 
     target_date = report_date or _parse_report_date_from_text(report_text) or date.today()
     cache_path = get_telegram_summary_path(provider_key, target_date)
@@ -706,55 +779,76 @@ def summarize_executive_report_for_telegram(
             cache_path.write_text(cleaned, encoding="utf-8")
         return cleaned
 
-    cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["deepseek-v4-pro"])
-    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
-    model = cfg["api_model"]
-    temperature = 0.0
-    structured_context = _read_ai_cio_context_for_summary(provider_key, target_date)
+    try:
+        context = json.loads(_read_ai_cio_context_for_summary(provider_key, target_date))
+    except (TypeError, json.JSONDecodeError):
+        context = {}
+    baseline_score = context.get("metric_implied_score", score_val)
+    baseline_regime = context.get("metric_implied_regime") or regime_val
+    constraints = [
+        _clean_context_line(value)
+        for value in (context.get("hard_constraints") or [])
+        if _clean_context_line(value)
+    ][:3]
 
-    system_prompt = (
-        "You are a portfolio risk chief writing a concise Vietnamese Telegram brief. "
-        "Compress the AI CIO report into an action-oriented daily decision note. "
-        "Use only facts in the report. Do not add prices or new tickers. "
-        "When STRUCTURED DECISION CONTEXT is available, use metric_implied_score, "
-        "tool_scores, hard_constraints, and score_band_reason as the authoritative "
-        "source for the Overlay line and key drivers. "
-        "If the report contains section 5.5 LLM Overlay, explicitly summarize the "
-        "metric-implied score, overlay adjustment, and final CIO score in one line. "
-        "Never include source-report delimiters or a copied section of the full report. "
-        "Keep the output under 2300 Vietnamese characters. Plain text only; no Markdown tables, no JSON."
+    allocation_values: dict[str, str] = {}
+    for label, key in (
+        ("Cash", "cash"),
+        ("Equity", "equity"),
+        ("Short VN30F1M", "hedge"),
+    ):
+        match = re.findall(
+            rf"(?im)^\s*-\s*\*\*{re.escape(label)}\*\*\s*:\s*\**\s*(\d+(?:\.\d+)?)\s*%",
+            report_text,
+        )
+        if match:
+            allocation_values[key] = match[-1]
+    guardrail = context.get("allocation_guardrail") or {}
+    equity = allocation_values.get("equity") or _payload_number_as_text(
+        guardrail.get("max_equity_pct", 0)
     )
-    user_prompt = f"""
-REPORT DATE: {target_date.strftime('%d/%m/%Y')}
-PARSED SCORE: {score_val}
-PARSED REGIME: {regime_val}
+    hedge = allocation_values.get("hedge") or _payload_number_as_text(
+        guardrail.get("max_short_vn30f1m_pct", 0)
+    )
+    cash = allocation_values.get("cash")
+    if cash is None:
+        cash = _payload_number_as_text(100.0 - float(_safe_float(equity) or 0.0))
 
-STRUCTURED DECISION CONTEXT:
-{structured_context}
+    rules_path = _get_humility_rules_path(provider_key, target_date)
+    humility_status = "INTACT"
+    if rules_path.exists():
+        try:
+            rules = json.loads(rules_path.read_text(encoding="utf-8")).get(
+                "falsification_rules", []
+            )
+            if any(rule.get("current_value") is None for rule in rules):
+                humility_status = "WATCH"
+        except (OSError, json.JSONDecodeError, AttributeError):
+            humility_status = "WATCH"
 
-Write exactly this structure:
-AI CIO DAILY BRIEF - DD/MM/YYYY
-Score/Regime: <score>/100 - <regime>
-Overlay: <metric-implied score/regime> | <overlay adjustment> | <final CIO score/regime>
-Allocation: Cash X% | Equity Y% | Hedge Z%
-Verdict: <1 compact sentence>
-Key drivers:
-- <driver 1 with number>
-- <driver 2 with number>
-- <driver 3 with number>
-Action:
-- <portfolio action 1>
-- <portfolio action 2>
-- <risk trigger to monitor>
-Humility check: <INTACT/WATCH/FALSIFIED if available, plus 1 sentence>
-
-SOURCE REPORT BELOW. Use it only as input. Do not quote, copy, or include this section in your answer.
-<source_report>
-{report_text}
-</source_report>
-""".strip()
-
-    summary = call_ai(client, system_prompt, user_prompt, model=model, temperature=temperature)
+    driver_lines = constraints or ["Không có hard constraint mới trong snapshot hiện tại"]
+    driver_lines += ["Theo dõi thay đổi score, breadth, funding và tail risk ở phiên kế tiếp"]
+    driver_lines = driver_lines[:3]
+    verdict = (
+        "Ưu tiên bảo toàn vốn và tuân thủ guardrail định lượng."
+        if str(regime_val).upper() in {"EXTREME CRISIS", "PRE-CRASH / PANIC"}
+        else "Giữ phân bổ trong giới hạn định lượng và chỉ tăng rủi ro khi metrics xác nhận."
+    )
+    summary = (
+        f"AI CIO DAILY BRIEF - {target_date.strftime('%d/%m/%Y')}\n"
+        f"Score/Regime: {score_val}/100 - {regime_val}\n"
+        f"Overlay: {baseline_score}/100 - {baseline_regime} | deterministic 0 điểm | "
+        f"{score_val}/100 - {regime_val}\n"
+        f"Allocation: Cash {cash}% | Equity {equity}% | Hedge {hedge}%\n"
+        f"Verdict: {verdict}\n"
+        "Key drivers:\n"
+        + "\n".join(f"- {item}" for item in driver_lines)
+        + "\nAction:\n"
+        f"- Giữ Equity không vượt {equity}% NAV.\n"
+        f"- Giữ Hedge không vượt {hedge}% NAV.\n"
+        "- Chỉ thay đổi lệnh khi snapshot định lượng hoặc hard constraint thay đổi.\n"
+        f"Humility check: {humility_status} - đối chiếu lại các ngưỡng ở phiên kế tiếp."
+    )
     summary = _clean_telegram_summary(summary, target_date, score_val, regime_val)
     cache_path.parent.mkdir(parents=True, exist_ok=True)
     cache_path.write_text(summary, encoding="utf-8")
@@ -2871,14 +2965,66 @@ def _clear_all_tool_caches(provider_key: str = "kimi-2.6"):
         sidecar_path.unlink()
         print(f"[Cache Clear] Deleted: {sidecar_path.name}")
 
-def call_ai(client, system_prompt, user_prompt, model=None, temperature=None):
+    manifest = _load_fingerprint_manifest()
+    provider_prefix = f"{provider_key}:"
+    filtered = {
+        key: value
+        for key, value in manifest.items()
+        if not str(key).startswith(provider_prefix)
+    }
+    if filtered != manifest:
+        _save_fingerprint_manifest(filtered)
+
+class _DeterministicChildCompletions:
+    """OpenAI-compatible local completion used by the final AI-CIO pipeline."""
+
+    def create(self, **kwargs):
+        messages = kwargs.get("messages") or []
+        user_text = "\n".join(
+            str(message.get("content") or "")
+            for message in messages
+            if isinstance(message, dict) and message.get("role") == "user"
+        )
+        compact = _compact_text(user_text, max_chars=2_200)
+        content = (
+            "DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.\n"
+            f"{compact or 'DATA INSUFFICIENT'}"
+        )
+        return SimpleNamespace(
+            choices=[SimpleNamespace(message=SimpleNamespace(content=content))]
+        )
+
+
+class _DeterministicChildClient:
+    def __init__(self) -> None:
+        self.chat = SimpleNamespace(completions=_DeterministicChildCompletions())
+
+
+def call_ai(
+    client,
+    system_prompt,
+    user_prompt,
+    model=None,
+    temperature=None,
+    *,
+    route: str = "child_report",
+    max_tokens: int | None = None,
+    thinking: bool | None = None,
+):
+    resolved_model = model or AI_MODEL
+    options = completion_options(
+        model=resolved_model,
+        route=route,
+        temperature=temperature,
+        max_tokens=max_tokens,
+        thinking=thinking,
+    )
     response = client.chat.completions.create(
-        model=model or AI_MODEL,
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt}
         ],
-        temperature=temperature
+        **options,
     )
     return response.choices[0].message.content
 
@@ -5212,21 +5358,83 @@ def _build_ai_cio_structured_context(
     decision_state: dict[str, Any],
     metrics_snapshot: dict[str, Any] | None = None,
 ) -> str:
-    sections = [
-        f"=== REPORT METADATA ===\n{data_note}",
-        _format_json_context(
-            "DAILY METRICS SNAPSHOT - AUTHORITATIVE STRUCTURED INPUT",
-            _compact_metrics_snapshot_for_prompt(metrics_snapshot),
-        ) if metrics_snapshot else "",
-        _format_json_context(
-            "COMPACT TOOL METHODOLOGY CARDS - INTERPRETATION ONLY",
-            metrics_snapshot.get("methodology_cards", []),
-        ) if metrics_snapshot else "",
-        historical_block,
-        _format_json_context("DECISION STATE - DETERMINISTIC PRECHECK", decision_state),
-        _format_json_context("EVIDENCE PACKETS - BOUNDED CHILD TOOL OUTPUTS", evidence_packets),
-    ]
-    return "\n\n".join(section for section in sections if section)
+    """Build the single compact contract sent to the final narrative model."""
+
+    snapshot = metrics_snapshot or {}
+    packet_by_tool = {
+        str(packet.get("tool") or ""): packet
+        for packet in evidence_packets
+        if packet.get("tool")
+    }
+    compact_tools: list[dict[str, Any]] = []
+    for tool_id, tool in (snapshot.get("tools") or {}).items():
+        if not isinstance(tool, dict):
+            continue
+        packet = packet_by_tool.get(str(tool_id), {})
+        compact_tool = {
+            "id": tool_id,
+            "layer": tool.get("layer"),
+            "as_of": tool.get("as_of"),
+            "scoring_eligible": tool.get("scoring_eligible"),
+            "tool_score": tool.get("tool_score"),
+            "tool_regime": tool.get("tool_regime"),
+            "tool_bias": tool.get("tool_bias"),
+            "key_metrics": tool.get("key_metrics") or {},
+            "score_reason": tool.get("score_reason"),
+            "data_quality": tool.get("data_quality"),
+            "excerpt": _compact_text(
+                str(packet.get("evidence_excerpt") or ""),
+                max_chars=500,
+            ),
+        }
+        consistency = tool.get("metric_consistency") or {}
+        warnings = consistency.get("warnings") if isinstance(consistency, dict) else None
+        if warnings:
+            compact_tool["metric_warnings"] = warnings
+        compact_tools.append(
+            {
+                key: value
+                for key, value in compact_tool.items()
+                if value not in (None, "", [], {})
+            }
+        )
+
+    history = snapshot.get("history") or {}
+    score_anchor = snapshot.get("score_anchor") or {
+        key: decision_state.get(key)
+        for key in (
+            "metric_implied_score",
+            "metric_implied_regime",
+            "allocation_guardrail",
+            "metric_implied_subscores",
+            "score_band_reason",
+            "hard_constraints",
+            "capitulation_state",
+        )
+    }
+    contract = {
+        "schema": "ai_cio_final_input_v1",
+        "meta": {
+            "report_note": data_note,
+            "report_date": snapshot.get("report_date") or decision_state.get("report_date"),
+            "data_date": snapshot.get("data_date") or decision_state.get("data_date"),
+            "metrics_version": snapshot.get("metrics_version"),
+        },
+        "score_anchor": score_anchor,
+        "consensus": snapshot.get("consensus") or decision_state.get("consensus_map"),
+        "tools": compact_tools,
+        "history": {
+            "rolling_summary": history.get("rolling_summary"),
+            "recent": list(history.get("history_window") or [])[-10:],
+        },
+        "writer_rules": decision_state.get("writer_rules"),
+    }
+    return json.dumps(
+        contract,
+        ensure_ascii=False,
+        separators=(",", ":"),
+        default=str,
+    )
 
 
 def _write_ai_cio_context_sidecar(
@@ -5254,10 +5462,155 @@ def _write_ai_cio_context_sidecar(
     return path
 
 
+def _deterministic_confidence(decision_state: dict[str, Any]) -> str:
+    score_count = int(_safe_float(decision_state.get("tool_score_count")) or 0)
+    metric_values = decision_state.get("metric_values") or {}
+    missing_values = sum(value is None for value in metric_values.values())
+    if score_count < 8 or missing_values >= 6:
+        return "LOW"
+    consensus = decision_state.get("consensus_map") or {}
+    hard = consensus.get("hard_adapter_consensus") if isinstance(consensus, dict) else {}
+    hard = hard if isinstance(hard, dict) else {}
+    has_directional_conflict = bool(hard.get("bullish") and hard.get("bearish"))
+    return "MEDIUM" if has_directional_conflict else "HIGH"
+
+
+def _render_deterministic_report_fields(
+    report_text: str,
+    decision_state: dict[str, Any],
+    report_date: str,
+) -> str:
+    """Render score, regime, allocation and confidence from Python-owned state."""
+
+    score = _safe_float(decision_state.get("metric_implied_score"))
+    if score is None:
+        score = 0.0
+    score = max(0.0, min(100.0, score))
+    regime = "CAPITULATION" if _capitulation_action_eligible(decision_state) else regime_from_score(score)
+    confidence = _deterministic_confidence(decision_state)
+    decision_state["final_score"] = score
+    decision_state["final_stress_regime"] = regime_from_score(score)
+    decision_state["final_resolved_regime"] = regime
+    decision_state["stress_regime"] = regime_from_score(score)
+    decision_state["resolved_regime"] = regime
+    decision_state["final_confidence"] = confidence
+    decision_state["capitulation_override_active"] = regime == "CAPITULATION"
+
+    policy_state = dict(decision_state)
+    policy_state["final_confidence"] = confidence
+    policy = _allocation_policy_for_score(score, policy_state)
+    equity = float(policy["max_equity_pct"])
+    short = float(policy["max_short_vn30f1m_pct"])
+    cash = 100.0 - equity
+
+    def display(value: float) -> str:
+        return f"{value:.0f}" if float(value).is_integer() else f"{value:.1f}"
+
+    text = strip_wrapping_markdown_fence(report_text or "").strip()
+    text = re.sub(
+        r"(?im)^\s*\**\s*final\s+score\s*&\s*regime\s*[:=].*$",
+        "",
+        text,
+    )
+    text = re.sub(
+        r"(?im)^\s*-\s*\*\*(?:Ngày báo cáo \(Date\)|Điểm số tổng hợp \(Composite Score\)|"
+        r"Trạng thái quyết định \(Resolved Regime\))\*\*\s*:.*$",
+        "",
+        text,
+    )
+    bottom = re.search(r"(?im)^#{1,4}\s*📊?\s*EXECUTIVE BOTTOM LINE[^\n]*$", text)
+    summary_fields = (
+        f"- **Ngày báo cáo (Date)**: {report_date}\n"
+        f"- **Điểm số tổng hợp (Composite Score)**: {display(score)}/100\n"
+        f"- **Trạng thái quyết định (Resolved Regime)**: {regime}"
+    )
+    if bottom:
+        text = f"{text[:bottom.end()]}\n{summary_fields}{text[bottom.end():]}"
+    else:
+        text = f"### 📊 EXECUTIVE BOTTOM LINE\n{summary_fields}\n\n{text}"
+
+    order = re.search(
+        r"(?im)^#{1,4}\s*6(?:\.\d+)?\.?\s*(?:Deterministic\s+)?Executive\s+Order[^\n]*$",
+        text,
+    )
+    allocation_lines = (
+        f"- **Cash**: **{display(cash)}%**\n"
+        f"- **Equity**: **{display(equity)}%**\n"
+        f"- **Short VN30F1M**: **{display(short)}%**\n"
+        f"\n**Deterministic Allocation Guardrail**: {policy['label']}."
+    )
+    if order:
+        next_heading = re.search(r"(?im)^#{1,4}\s*[7-9](?:\.\d+)?\.?\s+", text[order.end():])
+        section_end = order.end() + next_heading.start() if next_heading else len(text)
+        section = text[order.end():section_end]
+        section = re.sub(
+            r"(?im)^\s*-\s*\*\*(?:Cash|Equity|Short VN30F1M)\*\*\s*:.*$",
+            "",
+            section,
+        )
+        section = re.sub(r"\n{3,}", "\n\n", section).strip()
+        replacement = f"{text[order.start():order.end()]}\n{allocation_lines}"
+        if section:
+            replacement += f"\n\n{section}"
+        text = f"{text[:order.start()]}{replacement}\n\n{text[section_end:].lstrip()}"
+    else:
+        text += f"\n\n### 6. Executive Order\n{allocation_lines}"
+
+    confidence_pattern = re.compile(r"(?im)^\s*(?:-\s*)?\**Final confidence\**\s*:\s*.*$")
+    if confidence_pattern.search(text):
+        text = confidence_pattern.sub(f"Final confidence: {confidence}", text)
+    else:
+        text += f"\n\n### 7. Confidence Note\nFinal confidence: {confidence}"
+
+    text = re.sub(r"\n{3,}", "\n\n", text).strip()
+    return (
+        f"{text}\n\nfinal score & regime : {display(score)} ; regime : {regime}"
+    )
+
+
+def _build_deterministic_humility_payload(
+    decision_state: dict[str, Any],
+    report_date: str,
+) -> dict[str, Any]:
+    metrics = decision_state.get("metric_values") or {}
+
+    def metric(*keys: str) -> float | None:
+        for key in keys:
+            value = _safe_float(metrics.get(key))
+            if value is not None:
+                return value
+        return None
+
+    try:
+        report_iso = datetime.strptime(report_date, "%d/%m/%Y").date().isoformat()
+    except ValueError:
+        report_iso = date.today().isoformat()
+    score = _safe_float(decision_state.get("final_score", decision_state.get("metric_implied_score"))) or 0.0
+    regime = str(decision_state.get("final_resolved_regime") or regime_from_score(score))
+    current_values = [
+        metric("vnibor.vnibor_stress_warning_days_20d"),
+        metric("market_breadth.breadth_ma20_pct"),
+        metric("esr_monitor.ssi_pct"),
+        metric("var_cvar_vnindex.evt_xi_max", "var_cvar_vnindex.evt_xi"),
+        metric("manipulation.manip_slope_percentile"),
+        metric("global_financial_conditions.cqs_percentile"),
+    ]
+    return {
+        "report_date": report_iso,
+        "composite_score": score,
+        "regime": regime,
+        "falsification_rules": [
+            {**rule, "current_value": current}
+            for rule, current in zip(HUMILITY_DEFAULT_RULES, current_values)
+        ],
+    }
+
+
 def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: bool = False,
                           source: str = "manual"):
     cfg = AI_PROVIDER_MAP.get(provider_key, AI_PROVIDER_MAP["kimi-2.6"])
-    client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
+    final_client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
+    child_client = _DeterministicChildClient()
     model = cfg["api_model"]
     temperature = cfg.get("temperature", 1.0)
     
@@ -5272,24 +5625,25 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     data_date = df_stocks.index[-1].strftime('%d/%m/%Y')
     report_date = date.today().strftime('%d/%m/%Y')
     
-    # Run tools (will use cache if already ran today)
-    r1 = run_fear_greed(client, df_stocks, provider_key, model)
-    r2 = run_manipulation(client, df_stocks, provider_key, model)
-    r3 = run_dispersion(client, df_stocks, provider_key, model)
-    r4 = run_upside_ratio(client, df_stocks, provider_key, model)
-    r5 = run_bank_valuation(client, df_stocks, provider_key, model)
-    r6 = run_market_breadth(client, df_stocks, provider_key, model)
-    r7 = run_esr_monitor(client, df_stocks, provider_key, model)
-    r8 = run_va_res(client, df_stocks, provider_key, model)
-    r9 = run_var_cvar_vnindex(client, df_stocks, provider_key, model)
-    r10 = run_sentiment_factor_news(client, provider_key, model)
-    r11 = run_risk_adjusted_growth(client, df_stocks, provider_key, model)
+    # Child tools keep their current calculation/cache contracts but use a local
+    # OpenAI-compatible client. No child report can consume remote model tokens.
+    r1 = run_fear_greed(child_client, df_stocks, provider_key, model)
+    r2 = run_manipulation(child_client, df_stocks, provider_key, model)
+    r3 = run_dispersion(child_client, df_stocks, provider_key, model)
+    r4 = run_upside_ratio(child_client, df_stocks, provider_key, model)
+    r5 = run_bank_valuation(child_client, df_stocks, provider_key, model)
+    r6 = run_market_breadth(child_client, df_stocks, provider_key, model)
+    r7 = run_esr_monitor(child_client, df_stocks, provider_key, model)
+    r8 = run_va_res(child_client, df_stocks, provider_key, model)
+    r9 = run_var_cvar_vnindex(child_client, df_stocks, provider_key, model)
+    r10 = run_sentiment_factor_news(child_client, provider_key, model)
+    r11 = run_risk_adjusted_growth(child_client, df_stocks, provider_key, model)
     pvgo_context = build_pvgo_ai_cio_metric_context(coe_pct=14.0)
     humility_context = get_humility_falsification_context(provider_key, force=force)
-    run_fed_liquidity_child_report(client, provider_key, model, force=force)
-    run_global_financial_conditions_child_report(client, provider_key, model, force=force)
-    run_credit_spread_child_report(client, provider_key, model, force=force)
-    run_vnibor_child_report(client, provider_key, model, force=force)
+    run_fed_liquidity_child_report(child_client, provider_key, model, force=force)
+    run_global_financial_conditions_child_report(child_client, provider_key, model, force=force)
+    run_credit_spread_child_report(child_client, provider_key, model, force=force)
+    run_vnibor_child_report(child_client, provider_key, model, force=force)
     
     data_note = f"📅 Ngày xuất bản: {report_date} | Dữ liệu gần nhất trong data_lake: {data_date}"
 
@@ -5382,15 +5736,44 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     sys_p = parts[0].strip()
     usr_p = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else master_full
     
-    raw_final_res = call_ai(client, sys_p, usr_p, model=model, temperature=temperature)
+    fingerprint_contract = json.loads(all_reports)
+    fingerprint_contract.pop("history", None)
+    fingerprint_meta = fingerprint_contract.get("meta") or {}
+    if isinstance(fingerprint_meta, dict):
+        fingerprint_meta.pop("report_date", None)
+        fingerprint_meta.pop("report_note", None)
+    final_fingerprint = _payload_fingerprint(
+        {
+            "cache_version": _cache_version_for_tool("executive_summary"),
+            "model": model,
+            "system_prompt": sys_p,
+            "decision_input": fingerprint_contract,
+        }
+    )
+    raw_final_res = None if force else _read_fingerprint_cache(
+        "executive_summary", provider_key, final_fingerprint
+    )
+    if raw_final_res:
+        print("[AI CIO] Reused content-fingerprint executive summary cache.")
+    else:
+        raw_final_res = call_ai(
+            final_client,
+            sys_p,
+            usr_p,
+            model=model,
+            temperature=temperature,
+            route="executive_summary",
+        )
     final_res, humility_rules_path = postprocess_executive_summary_report(
         raw_final_res,
         provider_key,
         decision_state=decision_state,
     )
-    final_res = _enforce_final_score_regime(final_res, decision_state)
-    final_res = _enforce_final_allocation_policy(final_res, decision_state)
-    final_res = _annotate_final_score_drift(final_res, decision_state)
+    final_res = _render_deterministic_report_fields(final_res, decision_state, report_date)
+    humility_rules_path = _write_humility_rules_payload(
+        _build_deterministic_humility_payload(decision_state, report_date),
+        provider_key,
+    )
     final_score_value, final_regime_value = parse_score_regime(final_res)
     metrics_snapshot["final_output"] = {
         "score": _safe_float(final_score_value),
@@ -5402,7 +5785,12 @@ def run_executive_summary(api_key: str, provider_key: str = "kimi-2.6", force: b
     metrics_snapshot_path = _write_ai_cio_metrics_snapshot(metrics_snapshot)
     if humility_rules_path:
         print(f"[Humility] Saved rules JSON: {humility_rules_path}")
-    _write_cache("executive_summary", final_res, provider_key)
+    _write_cache(
+        "executive_summary",
+        final_res,
+        provider_key,
+        fingerprint=final_fingerprint,
+    )
 
     # ── Cập nhật history CSV (Ai_cio_report.csv) ──
     # Same-day overwrite: source="manual" sẽ ghi đè kết quả "auto" cùng ngày,

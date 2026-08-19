@@ -10,6 +10,7 @@ import streamlit as st
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE
 from shared.api_key_helper import resolve_api_key
+from shared.llm_policy import completion_options
 from tools.sentiment_factor_news import config
 from tools.sentiment_factor_news.report import (
     FEED_DIR,
@@ -376,12 +377,15 @@ def _render_ai_analysis(ai_provider: str, api_key: str):
                             )
                             system_prompt, user_prompt = build_sentiment_factor_news_ai_prompt()
                             response = client.chat.completions.create(
-                                model=cfg["api_model"],
                                 messages=[
                                     {"role": "system", "content": system_prompt},
                                     {"role": "user", "content": user_prompt},
                                 ],
-                                temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                **completion_options(
+                                    model=cfg["api_model"],
+                                    route="child_report",
+                                    temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                ),
                             )
                             result_text = response.choices[0].message.content
 

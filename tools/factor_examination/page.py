@@ -24,6 +24,7 @@ from openai import OpenAI
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
 from shared.daily_cache import load_daily_cache, peek_data_date, save_daily_cache
+from shared.llm_policy import completion_options
 from shared.data_loader import (
     load_close_prices,
     load_volumes,
@@ -622,12 +623,15 @@ def _render_ai_section(scored: dict, agg: dict, port_pct: float, params: dict) -
                     system_prompt, user_prompt = _build_ai_prompt(scored, agg, port_pct, params)
                     client = OpenAI(api_key=api_key.strip(), base_url=cfg["base_url"], timeout=cfg.get("timeout", 180))
                     response = client.chat.completions.create(
-                        model=cfg["api_model"],
                         messages=[
                             {"role": "system", "content": system_prompt},
                             {"role": "user", "content": user_prompt},
                         ],
-                        temperature=cfg.get("temperature", AI_TEMPERATURE),
+                        **completion_options(
+                            model=cfg["api_model"],
+                            route="child_report",
+                            temperature=cfg.get("temperature", AI_TEMPERATURE),
+                        ),
                     )
                     result_text = response.choices[0].message.content
 

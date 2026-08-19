@@ -83,7 +83,7 @@ def test_insufficient_balance_without_valid_report_fails_before_generation(monke
     assert exc_info.value.code == 1
 
 
-def test_available_balance_runs_one_force_generation(monkeypatch):
+def test_available_balance_runs_one_fingerprint_aware_generation(monkeypatch):
     monkeypatch.setattr(auto, "DEEPSEEK_KEY", "test-key")
     monkeypatch.setattr(auto, "_read_cache", lambda *args: "old report")
     monkeypatch.setattr(auto, "_get_deepseek_account_status", lambda: "available")
@@ -99,7 +99,7 @@ def test_available_balance_runs_one_force_generation(monkeypatch):
 
     assert report == "fresh report"
     assert used_cache is False
-    assert calls == [("test-key", auto.PROVIDER_KEY, True, "auto")]
+    assert calls == [("test-key", auto.PROVIDER_KEY, False, "auto")]
 
 
 def test_force_generation_402_restores_state_then_reuses_report(monkeypatch):

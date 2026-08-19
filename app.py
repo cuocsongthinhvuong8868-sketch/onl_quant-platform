@@ -427,12 +427,16 @@ if st.session_state.show_cio_input:
                 with st.spinner(f"⏳ Đang kiểm tra API Key {AI_PROVIDER_MAP[cio_provider]['display']}..."):
                     try:
                         from openai import OpenAI
+                        from shared.llm_policy import completion_options
                         _cfg = AI_PROVIDER_MAP[cio_provider]
                         _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"], timeout=_cfg.get("timeout", 180))
                         _resp = _client.chat.completions.create(
-                            model=_cfg["api_model"],
                             messages=[{"role": "user", "content": "Hello"}],
-                            max_tokens=5
+                            **completion_options(
+                                model=_cfg["api_model"],
+                                route="auth_probe",
+                                temperature=0.0,
+                            ),
                         )
                         st.success(f"✅ API Key hợp lệ! Model: {_cfg['api_model']} — Phản hồi: {_resp.choices[0].message.content}")
                     except Exception as _test_err:
@@ -465,54 +469,21 @@ if st.session_state.show_cio_input:
             if not cio_key:
                 st.error("⚠️ Vui lòng nhập API Key!")
             else:
-                # ── Kiểm tra API Key trước khi chạy toàn bộ pipeline ──
-                with st.spinner(f"⏳ Đang xác thực API Key {AI_PROVIDER_MAP[cio_provider]['display']}..."):
-                    try:
-                        from openai import OpenAI
-                        _cfg = AI_PROVIDER_MAP[cio_provider]
-                        _client = OpenAI(api_key=cio_key.strip(), base_url=_cfg["base_url"], timeout=_cfg.get("timeout", 180))
-                        _client.chat.completions.create(
-                            model=_cfg["api_model"],
-                            messages=[{"role": "user", "content": "Hi"}],
-                            max_tokens=5
-                        )
-                    except Exception as _auth_e:
-                        _err_str = str(_auth_e)
-                        if "401" in _err_str or "Invalid Authentication" in _err_str:
-                            st.error(f"❌ API Key {AI_PROVIDER_MAP[cio_provider]['display']} không hợp lệ! Vui lòng kiểm tra lại key.")
-                            st.info("💡 Vào https://platform.moonshot.cn để lấy API Key Kimi hợp lệ.")
-                        elif "402" in _err_str or "insufficient_quota" in _err_str:
-                            st.error(f"❌ API Key đã hết quota! Vui lòng nạp thêm hoặc dùng key khác.")
-                        else:
-                            st.error(f"❌ Lỗi kết nối API: {_auth_e}")
-                        st.stop()
-                
                 with st.spinner("AI CIO đang tổng hợp macro, VN100 Corporate Health và 11 báo cáo định lượng/news... (Quá trình có thể mất 1-2 phút)"):
                     try:
-                        from shared.ai_cio import run_executive_summary, _read_cache, _clear_all_tool_caches
-                        import os as _os
-                        
-                        if refresh_btn:
-                            # Xoá toàn bộ cache của 9 tool con + executive_summary trước khi chạy
-                            _clear_all_tool_caches(cio_provider)
-                            st.info("🗑️ Đã xóa cache cũ của các báo cáo con và executive_summary, đang tạo mới từ đầu. VN100 sẽ được đọc từ snapshot output hiện tại.")
-                        
-                        cached_sum = _read_cache("executive_summary", cio_provider)
-                        if cached_sum and not refresh_btn:
-                            cached_sum = _normalize_cio_report_text(cached_sum)
-                            st.session_state["cio_report"] = cached_sum
-                            st.session_state["cio_provider"] = cio_provider
-                            st.success("Tải kết quả AI CIO từ bộ nhớ tạm!")
-                            st.markdown(cached_sum)
-                            report_text = cached_sum
-                        else:
-                            summary_report = run_executive_summary(cio_key, cio_provider)
-                            summary_report = _normalize_cio_report_text(summary_report)
-                            st.session_state["cio_report"] = summary_report
-                            st.session_state["cio_provider"] = cio_provider
-                            st.success("Hoàn thành Báo cáo Tổng lệnh!")
-                            st.markdown(summary_report)
-                            report_text = summary_report
+                        from shared.ai_cio import run_executive_summary
+
+                        summary_report = run_executive_summary(
+                            cio_key,
+                            cio_provider,
+                            force=bool(refresh_btn),
+                        )
+                        summary_report = _normalize_cio_report_text(summary_report)
+                        st.session_state["cio_report"] = summary_report
+                        st.session_state["cio_provider"] = cio_provider
+                        st.success("Hoàn thành Báo cáo Tổng lệnh!")
+                        st.markdown(summary_report)
+                        report_text = summary_report
                     except Exception as e:
                         st.error(f"Lỗi khi chạy AI CIO: {e}")
 

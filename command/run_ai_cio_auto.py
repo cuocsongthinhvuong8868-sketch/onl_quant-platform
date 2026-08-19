@@ -8,8 +8,8 @@ Environment variables (from GitHub Secrets):
 - TELEGRAM_CHAT_ID
 
 Logic (default mode — dùng cho cron):
-- Kiểm tra key/số dư DeepSeek trước khi xoá cache.
-- Nếu API khả dụng: force refresh toàn bộ tool con và executive summary.
+- Kiểm tra key/số dư DeepSeek trước khi chạy pipeline.
+- Nếu API khả dụng: tính structured context và tái sử dụng executive summary theo content fingerprint khi input không đổi.
 - Nếu hết số dư nhưng đã có report hợp lệ hôm nay: giữ cache và dùng report đó.
 - Nếu API lỗi giữa chừng: rollback cache/metrics; chỉ fallback khi lỗi là HTTP 402.
 - Tạo PDF → Gửi Telegram.
@@ -18,8 +18,7 @@ Lưu ý: Workflow bên ngoài (ai_cio_daily.yml) đã kiểm tra data VNINDEX tr
 Nếu thiếu data VNINDEX hôm nay → workflow tự chạy update_data.py trước.
 
 Usage:
-    python command/run_ai_cio_auto.py           # force mode (xoá cache cũ, gọi API mới)
-    python command/run_ai_cio_auto.py --force   # giống default (luôn force)
+    python command/run_ai_cio_auto.py           # fingerprint-aware; chỉ gọi model khi input đổi
 """
 
 import os
@@ -201,9 +200,7 @@ def _get_report_text() -> tuple[str, bool]:
         )
         sys.exit(1)
 
-    print(
-        "[RUN] Generating AI CIO Executive Summary via DeepSeek (FORCE, source=auto)..."
-    )
+    print("[RUN] Building AI CIO Executive Summary (fingerprint cache, source=auto)...")
     generation_snapshot = _snapshot_generation_state()
     try:
         # source="auto": ghi vào CSV với marker để phân biệt với user manual run.
@@ -211,7 +208,7 @@ def _get_report_text() -> tuple[str, bool]:
         report_text = run_executive_summary(
             DEEPSEEK_KEY,
             provider_key=PROVIDER_KEY,
-            force=True,
+            force=False,
             source="auto",
         )
     except Exception as e:
@@ -324,8 +321,8 @@ if __name__ == "__main__":
     score_val, regime_val = parse_score_regime(report_text)
     print(f"[PARSE] Score: {score_val} | Regime: {regime_val}")
 
-    # 4. Tạo Telegram summary ngắn bằng DeepSeek V4 Pro
-    print("[SUMMARY] Creating Telegram brief via DeepSeek V4 Pro...")
+    # 4. Render Telegram summary deterministically from the final report/context.
+    print("[SUMMARY] Rendering deterministic Telegram brief...")
     try:
         summary_text = summarize_executive_report_for_telegram(
             DEEPSEEK_KEY,

@@ -8,6 +8,7 @@ from typing import Any
 import pandas as pd
 
 from config import AI_PROVIDER_MAP, AI_TEMPERATURE, DATA_LAKE, ROOT_DIR
+from shared.llm_policy import completion_options
 from tools.credit_spread.quant.metrics import calculate_credit_spread, load_issuance_data
 
 
@@ -283,12 +284,15 @@ def run_ai_analysis(
     system_prompt = parts[0].strip()
     user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
     response = client.chat.completions.create(
-        model=model or cfg["api_model"],
         messages=[
             {"role": "system", "content": system_prompt},
             {"role": "user", "content": user_prompt},
         ],
-        temperature=cfg.get("temperature", AI_TEMPERATURE),
+        **completion_options(
+            model=model or cfg["api_model"],
+            route="child_report",
+            temperature=cfg.get("temperature", AI_TEMPERATURE),
+        ),
     )
     result = response.choices[0].message.content
     if not result:

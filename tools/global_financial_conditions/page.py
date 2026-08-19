@@ -13,6 +13,7 @@ import pandas as pd
 import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
+from shared.llm_policy import completion_options
 from shared.page_layout import render_signal_card, tone_for_signal
 from tools.global_financial_conditions.quant.metrics import (
     load_cached_gfcm,
@@ -486,12 +487,15 @@ def render():
                                 )
 
                                 response = client.chat.completions.create(
-                                    model=cfg["api_model"],
                                     messages=[
                                         {"role": "system", "content": system_prompt},
                                         {"role": "user", "content": user_prompt},
                                     ],
-                                    temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                    **completion_options(
+                                        model=cfg["api_model"],
+                                        route="child_report",
+                                        temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                    ),
                                 )
                                 result_text = response.choices[0].message.content
 

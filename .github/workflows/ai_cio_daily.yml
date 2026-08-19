@@ -13,6 +13,7 @@ jobs:
 
     env:
       DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
+      DEEPSEEK_FINAL_THINKING: 'true'
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
@@ -74,8 +75,8 @@ jobs:
       - name: Refresh PVGO valuation feed
         run: python command/update_pvgo_valuation.py
 
-      - name: 🤖 Chạy AI CIO (preflight + force refresh an toàn)
-        run: python command/run_ai_cio_auto.py --force
+      - name: 🤖 Chạy AI CIO (preflight + fingerprint cache)
+        run: python command/run_ai_cio_auto.py
 
       - name: 🗂️ Build AI-CIO data catalog
         run: python command/build_ai_cio_data_catalog.py

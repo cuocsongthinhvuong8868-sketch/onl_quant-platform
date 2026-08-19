@@ -211,6 +211,9 @@ Secrets/env variables phu thuoc vao feed ban muon dung:
 | `VNSTOCK_API_KEY` | vnstock market data khi source yeu cau |
 | `FRED_API_KEY` | Fed liquidity, GFCM, US margin/M2 |
 | `DEEPSEEK_API_KEY` | Scheduled AI-CIO automation |
+| `DEEPSEEK_FINAL_THINKING=true` | Optional: bat thinking chi cho luot tong hop AI-CIO cuoi; mac dinh tat |
+| `QUANT_PLATFORM_AI_QUERY_PLANNER=true` | Optional: bat lai remote query planner cua AI-CIO Chat; mac dinh dung deterministic router |
+| `QUANT_PLATFORM_NATIVE_TOOL_AGENT=true` | Optional: bat native multi-turn tool calling cho AI-CIO Chat |
 | `GITHUB_TOKEN` | Streamlit/GitHub cache sync va workflow commits |
 | `TELEGRAM_BOT_TOKEN`, `TELEGRAM_CHAT_ID` | Optional Telegram delivery |
 | `WIDATA_SIGN_TOKEN` | WiData sentiment feed |
@@ -271,9 +274,11 @@ AI-CIO la synthesis layer, khong phai replacement cho deterministic models.
 
 Core behavior:
 
-- Chay/lay cache child reports tu macro, risk, valuation, sentiment va market-internal tools.
+- Tinh/lay cache metrics tu macro, risk, valuation, sentiment va market-internal tools; child context duoc render cuc bo, khong goi LLM rieng.
 - Build evidence packets, decision-state, metrics snapshot va history ledger.
 - Apply humility/falsification context, hard constraints, confidence haircut va tail-risk guardrails.
+- Chi goi model mot lan de viet narrative cuoi; score, regime, allocation, confidence, humility JSON va Telegram brief do Python render deterministic.
+- Tai su dung executive summary theo content fingerprint khi input/prompt/model khong doi; refresh thu cong (`force=True`) moi xoa cache.
 - Ghi `data_lake/Ai_cio_report.csv`, `data_lake/ai_cio_metrics/*.json`, `data_lake/daily_cache/ai_cio_context_*.json`.
 - Export PDF qua `app.py` hoac `command/run_ai_cio_auto.py`.
 - Optional Telegram delivery va GitHub Actions automation.
@@ -299,11 +304,12 @@ Methodology version hien tai: `capitulation_state_machine_v2.0.0`. Executive-sum
 Trang `pages/E_AI_CIO_Chat.py` cung cap AI-CIO Data Agent v2 tren du lieu cua du an.
 
 - `shared/ai_cio_data_agent.py` chi expose sau native read-only tools: `search_project_data`, `read_timeseries`, `read_project_file`, `get_tool_metrics`, `get_data_health` va `list_quant_tools`.
-- Mac dinh moi provider deu di qua AI Query Planner: planner phan loai da nhan va tra JSON plan truoc khi nhin thay row values. Policy validator chan tool/path ngoai allowlist va bo sung mandatory tools; router rule-based chi con la fallback khi confidence thap hoac plan loi. Native tool-agent cu chi duoc opt-in bang `QUANT_PLATFORM_NATIVE_TOOL_AGENT=true`.
+- Mac dinh moi provider dung deterministic router phia server de chon read-only tools, sau do chi goi model mot lan de tong hop. Remote AI Query Planner la opt-in bang `QUANT_PLATFORM_AI_QUERY_PLANNER=true`; native tool-agent multi-turn la opt-in bang `QUANT_PLATFORM_NATIVE_TOOL_AGENT=true`.
 - Agent khong phai coding agent: khong co shell, Python executor, write tool, updater hay quyen truy cap duong dan ngoai allowlist.
 - Cau hoi theo thoi gian nhu "3 phien gan nhat" bat buoc parse va sap xep cot ngay qua `read_timeseries`, khong lay `tail()` theo thu tu file.
 - UI hien audit trail, file nguon, bang va bieu do ma agent da dung. Co the yeu cau file cu the bang cu phap `@data_lake/vnindex_cache.csv`.
-- Neu AI planner loi hoac confidence thap, compatibility router phia server van chay cung read-only tools va dua output da gioi han cho model tong hop. `shared/ai_cio_chat.py` chi la retrieval du phong cuoi cung khi tool evidence khong doc duoc.
+- Khi remote planner duoc bat ma loi/confidence thap, deterministic router phia server van chay cung read-only tools va dua output da gioi han cho model tong hop. `shared/ai_cio_chat.py` chi la retrieval du phong cuoi cung khi tool evidence khong doc duoc.
+- Context chat mac dinh toi da 16.000 ky tu, 8 nguon va hai message lich su gan nhat; output moi route duoc gioi han boi `shared/llm_policy.py`.
 - `command/build_ai_cio_data_catalog.py` tao `data_lake/ai_cio_data_catalog.json` deterministic, chi chua path/format/size/schema va khong chua row values.
 - Cac GitHub Actions data pipeline tai tao catalog sau khi update data. Streamlit Cloud doc catalog da commit thay vi scan toan bo data lake luc khoi dong.
 - Tren cloud, provider localhost tu dong bi an; co the force bang `QUANT_PLATFORM_CLOUD_RUNTIME=true`. API key cua provider remote can duoc luu trong Streamlit Secrets/GitHub Secrets.

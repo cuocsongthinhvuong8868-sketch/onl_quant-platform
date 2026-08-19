@@ -254,7 +254,6 @@ def test_data_agent_uses_compatibility_tools_when_provider_rejects_native_tools(
     client = _FakeClient(
         [
             TypeError("tools are not supported"),
-            _planner_message(latest_sessions=1),
             SimpleNamespace(content="Compatibility answer with source.", tool_calls=None),
         ]
     )
@@ -267,18 +266,17 @@ def test_data_agent_uses_compatibility_tools_when_provider_rejects_native_tools(
         client=client,
     )
 
-    assert result.mode == "planned_agent"
+    assert result.mode == "compatibility_agent"
     assert result.answer == "Compatibility answer with source."
     assert result.sources[0].relative_path == "data_lake/vnindex_cache.csv"
     assert [display["type"] for display in result.displays] == ["table"]
-    assert result.tool_traces[0]["tool"] == "ai_query_planner"
-    assert "native tool calling unavailable" in result.tool_traces[0]["reason"]
-    assert result.tool_traces[1]["tool"] == "policy_validator"
+    assert result.tool_traces[0]["tool"] == "deterministic_query_router"
+    assert result.tool_traces[1]["tool"] == "compatibility_router"
+    assert "native tool calling unavailable" in result.tool_traces[1]["reason"]
     assert result.tool_traces[2]["tool"] == "read_timeseries"
     assert "tools" not in client.completions.requests[1]
-    planner_messages = json.dumps(client.completions.requests[1]["messages"], ensure_ascii=False)
-    assert "1668.53" not in planner_messages
-    assert "tools" not in client.completions.requests[2]
+    synthesis_messages = json.dumps(client.completions.requests[1]["messages"], ensure_ascii=False)
+    assert "1668.53" in synthesis_messages
 
 
 def test_data_agent_uses_compatibility_tools_when_model_ignores_required_tool_call(
@@ -295,7 +293,6 @@ def test_data_agent_uses_compatibility_tools_when_model_ignores_required_tool_ca
     client = _FakeClient(
         [
             SimpleNamespace(content="Answer without tools", tool_calls=None),
-            _planner_message(latest_sessions=3),
             SimpleNamespace(content="Answer grounded by compatibility tools.", tool_calls=None),
         ]
     )
@@ -308,17 +305,17 @@ def test_data_agent_uses_compatibility_tools_when_model_ignores_required_tool_ca
         client=client,
     )
 
-    assert result.mode == "planned_agent"
+    assert result.mode == "compatibility_agent"
     assert [row["time"] for row in result.displays[0]["rows"]] == [
         "2026-07-22",
         "2026-07-21",
         "2026-07-20",
     ]
     assert [display["type"] for display in result.displays] == ["table", "line_chart"]
-    assert "model returned no tool call" in result.tool_traces[0]["reason"]
+    assert "model returned no tool call" in result.tool_traces[1]["reason"]
 
 
-def test_remote_provider_defaults_to_ai_query_planner(tmp_path: Path) -> None:
+def test_remote_provider_defaults_to_one_call_deterministic_router(tmp_path: Path) -> None:
     catalog = _catalog(tmp_path)
     (tmp_path / "data_lake/vnindex_cache.csv").write_text(
         "time,VNINDEX\n2026-07-22,1668.53\n",
@@ -327,7 +324,6 @@ def test_remote_provider_defaults_to_ai_query_planner(tmp_path: Path) -> None:
     catalog.refresh()
     client = _FakeClient(
         [
-            _planner_message(latest_sessions=1),
             SimpleNamespace(content="Local compatibility answer.", tool_calls=None),
         ]
     )
@@ -340,11 +336,10 @@ def test_remote_provider_defaults_to_ai_query_planner(tmp_path: Path) -> None:
         client=client,
     )
 
-    assert result.mode == "planned_agent"
-    assert "AI Query Planner is the primary execution mode" in result.tool_traces[0]["reason"]
-    assert len(client.completions.requests) == 2
+    assert result.mode == "compatibility_agent"
+    assert result.tool_traces[0]["tool"] == "deterministic_query_router"
+    assert len(client.completions.requests) == 1
     assert "tools" not in client.completions.requests[0]
-    assert "tools" not in client.completions.requests[1]
 
 
 def test_systemic_risk_question_uses_metrics_anchor_and_five_session_confirmation(
@@ -363,13 +358,6 @@ def test_systemic_risk_question_uses_metrics_anchor_and_five_session_confirmatio
     catalog.refresh()
     client = _FakeClient(
         [
-            _planner_message(
-                intents=["market_timeseries"],
-                required_tools=["read_timeseries"],
-                latest_sessions=1,
-                confidence=0.97,
-                reason="Incorrectly classified as a single market series",
-            ),
             SimpleNamespace(
                 content=(
                     "Rủi ro hệ thống ở mức PRE-CRASH / PANIC, do breadth và điều kiện tài chính "
@@ -388,18 +376,13 @@ def test_systemic_risk_question_uses_metrics_anchor_and_five_session_confirmatio
         client=client,
     )
 
-    assert result.mode == "planned_agent"
+    assert result.mode == "compatibility_agent"
     assert [trace["tool"] for trace in result.tool_traces] == [
-        "ai_query_planner",
-        "policy_validator",
+        "deterministic_query_router",
+        "compatibility_router",
         "get_tool_metrics",
         "read_timeseries",
     ]
-    validated_plan = result.tool_traces[0]["arguments"]
-    assert "systemic_risk" in validated_plan["intents"]
-    assert validated_plan["required_tools"] == ["get_tool_metrics", "read_timeseries"]
-    assert validated_plan["latest_sessions"] == 5
-    assert "policy override added systemic_risk intent" in validated_plan["warnings"]
     assert result.tool_traces[3]["arguments"]["latest_n"] == 5
     assert [display["type"] for display in result.displays] == [
         "table",
@@ -413,16 +396,18 @@ def test_systemic_risk_question_uses_metrics_anchor_and_five_session_confirmatio
         "data_lake/ai_cio_metrics/latest_chatgpt-local.json",
         "data_lake/vnindex_cache.csv",
     }
-    planner_prompt = json.dumps(client.completions.requests[0]["messages"], ensure_ascii=False)
-    assert "PRE-CRASH / PANIC" not in planner_prompt
-    assert "1668.53" not in planner_prompt
-    prompt = client.completions.requests[1]["messages"][-1]["content"]
+    assert len(client.completions.requests) == 1
+    prompt = client.completions.requests[0]["messages"][-1]["content"]
     assert "PRE-CRASH / PANIC" in prompt
     assert "Breadth MA20 <25% (6.1%)" in prompt
     assert "2026-07-22" in prompt
 
 
-def test_invalid_ai_plan_falls_back_to_deterministic_router(tmp_path: Path) -> None:
+def test_invalid_ai_plan_falls_back_to_deterministic_router(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("QUANT_PLATFORM_AI_QUERY_PLANNER", "true")
     catalog = _catalog(tmp_path)
     (tmp_path / "data_lake/vnindex_cache.csv").write_text(
         "time,VNINDEX\n2026-07-22,1668.53\n",
@@ -454,7 +439,11 @@ def test_invalid_ai_plan_falls_back_to_deterministic_router(tmp_path: Path) -> N
     assert "JSON object hợp lệ" in result.tool_traces[0]["error"]
 
 
-def test_low_confidence_ai_plan_falls_back_to_deterministic_router(tmp_path: Path) -> None:
+def test_low_confidence_ai_plan_falls_back_to_deterministic_router(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("QUANT_PLATFORM_AI_QUERY_PLANNER", "true")
     catalog = _catalog(tmp_path)
     (tmp_path / "data_lake/vnindex_cache.csv").write_text(
         "time,VNINDEX\n2026-07-22,1668.53\n",
@@ -504,7 +493,6 @@ def test_language_quality_gate_repairs_cyrillic_without_changing_evidence(tmp_pa
     )
     client = _FakeClient(
         [
-            _planner_message(latest_sessions=1),
             SimpleNamespace(content=broken_answer, tool_calls=None),
             SimpleNamespace(content=repaired_answer, tool_calls=None),
         ]
@@ -528,7 +516,7 @@ def test_language_quality_gate_repairs_cyrillic_without_changing_evidence(tmp_pa
         "ok": True,
         "arguments": {"issues": ["cyrillic"]},
     }
-    repair_prompt = json.dumps(client.completions.requests[2]["messages"], ensure_ascii=False)
+    repair_prompt = json.dumps(client.completions.requests[1]["messages"], ensure_ascii=False)
     assert "Không thêm, bớt hoặc suy diễn dữ kiện" in repair_prompt
     assert "data_lake/vnindex_cache.csv" in result.answer
 
@@ -580,6 +568,7 @@ def test_cloud_planned_stock_answer_receives_metrics_before_company_evidence(
     monkeypatch: pytest.MonkeyPatch,
 ) -> None:
     monkeypatch.setenv("QUANT_PLATFORM_NATIVE_TOOL_AGENT", "true")
+    monkeypatch.setenv("QUANT_PLATFORM_AI_QUERY_PLANNER", "true")
     catalog = _catalog(tmp_path)
     _write_systemic_risk_snapshot(tmp_path)
     (tmp_path / "reports/shb.md").write_text(
@@ -633,7 +622,11 @@ def test_cloud_planned_stock_answer_receives_metrics_before_company_evidence(
     assert "risk adapter" in client.completions.requests[1]["messages"][0]["content"]
 
 
-def test_evidence_gate_repairs_false_missing_metrics_claim(tmp_path: Path) -> None:
+def test_evidence_gate_repairs_false_missing_metrics_claim(
+    tmp_path: Path,
+    monkeypatch: pytest.MonkeyPatch,
+) -> None:
+    monkeypatch.setenv("QUANT_PLATFORM_AI_QUERY_PLANNER", "true")
     catalog = _catalog(tmp_path)
     _write_systemic_risk_snapshot(tmp_path)
     (tmp_path / "reports/shb.md").write_text(

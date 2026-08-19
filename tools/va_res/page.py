@@ -5,6 +5,7 @@ import numpy as np
 import os
 import datetime
 from shared.data_loader import load_close_prices
+from shared.llm_policy import completion_options
 from tools.va_res.quant.metrics import METHOD_VERSION, SystemicRiskEngine, summarize_vares_state
 from tools.va_res.ui.sidebar import render_sidebar
 from tools.va_res.ui.charts import plot_individual_risk, plot_systemic_risk, plot_complacency_index
@@ -364,11 +365,15 @@ def show():
                                     user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
                                     response = client.chat.completions.create(
-                                        model=cfg["api_model"],
                                         messages=[
                                             {"role": "system", "content": system_prompt},
                                             {"role": "user", "content": user_prompt}
                                         ],
+                                        **completion_options(
+                                            model=cfg["api_model"],
+                                            route="child_report",
+                                            temperature=cfg.get("temperature"),
+                                        ),
                                     )
                                     result_text = response.choices[0].message.content
 

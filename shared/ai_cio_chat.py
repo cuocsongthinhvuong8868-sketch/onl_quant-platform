@@ -14,13 +14,14 @@ from pathlib import Path, PurePosixPath
 from typing import Any, Iterable, Sequence
 
 from config import AI_PROVIDER_MAP, ROOT_DIR
+from shared.llm_policy import completion_options
 
 
-CHAT_METHODOLOGY_VERSION = "ai_cio_chat_v1.0.0"
+CHAT_METHODOLOGY_VERSION = "ai_cio_chat_v1.1.0"
 CATALOG_MANIFEST_VERSION = "1.0"
-DEFAULT_MAX_SOURCES = 12
-DEFAULT_CONTEXT_CHARS = 32_000
-DEFAULT_SOURCE_CHARS = 5_000
+DEFAULT_MAX_SOURCES = 8
+DEFAULT_CONTEXT_CHARS = 16_000
+DEFAULT_SOURCE_CHARS = 3_000
 
 READABLE_SUFFIXES = {
     ".csv",
@@ -1048,14 +1049,14 @@ def load_chat_system_prompt(prompt_path: Path | str | None = None) -> str:
 
 def _bounded_history(history: Sequence[dict[str, Any]] | None) -> list[dict[str, str]]:
     bounded = []
-    for item in list(history or [])[-8:]:
+    for item in list(history or [])[-2:]:
         role = str(item.get("role") or "").strip().lower()
         if role not in {"user", "assistant"}:
             continue
         content = str(item.get("content") or "").strip()
         if not content:
             continue
-        bounded.append({"role": role, "content": content[:4_000]})
+        bounded.append({"role": role, "content": content[:2_000]})
     return bounded
 
 
@@ -1109,10 +1110,12 @@ def ask_ai_cio_question(
         }
     )
     response = client.chat.completions.create(
-        model=cfg["api_model"],
         messages=messages,
-        temperature=cfg.get("temperature", 0.2),
-        max_tokens=int(cfg.get("chat_max_tokens", 2_200)),
+        **completion_options(
+            model=cfg["api_model"],
+            route="chat",
+            temperature=cfg.get("temperature", 0.2),
+        ),
     )
     answer = str(response.choices[0].message.content or "").strip()
     if not answer:

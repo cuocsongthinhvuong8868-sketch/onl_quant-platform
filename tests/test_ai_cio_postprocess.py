@@ -158,29 +158,15 @@ def test_clean_telegram_summary_strips_source_report_delimiter_echo():
     assert clean.endswith("Humility check: WATCH - rules mostly intact.")
 
 
-def test_telegram_summary_prompt_uses_source_delimiters_and_zero_temperature(tmp_path, monkeypatch):
+def test_telegram_summary_is_deterministic_and_uses_no_llm_call(tmp_path, monkeypatch):
     import shared.ai_cio as ai_cio
 
-    captured = {}
-
-    class DummyOpenAI:
-        def __init__(self, **kwargs):
-            captured["client_kwargs"] = kwargs
-
-    def fake_call_ai(client, system_prompt, user_prompt, model, temperature):
-        captured["system_prompt"] = system_prompt
-        captured["user_prompt"] = user_prompt
-        captured["model"] = model
-        captured["temperature"] = temperature
-        return (
-            "AI CIO DAILY BRIEF - 03/07/2026\n"
-            "Score/Regime: 31/100 - FEAR / DISTRIBUTION\n"
-            "Humility check: WATCH - rules mostly intact."
-        )
-
     monkeypatch.setattr(ai_cio, "DATA_LAKE", tmp_path / "data_lake")
-    monkeypatch.setattr(ai_cio, "OpenAI", DummyOpenAI)
-    monkeypatch.setattr(ai_cio, "call_ai", fake_call_ai)
+    monkeypatch.setattr(
+        ai_cio,
+        "call_ai",
+        lambda *args, **kwargs: (_ for _ in ()).throw(AssertionError("LLM must not be called")),
+    )
 
     report = (
         "- **Ngày báo cáo (Date)**: 03/07/2026\n"
@@ -197,11 +183,9 @@ def test_telegram_summary_prompt_uses_source_delimiters_and_zero_temperature(tmp
         force=True,
     )
 
-    assert captured["temperature"] == 0.0
-    assert "Full AI CIO report:" not in captured["user_prompt"]
-    assert "<source_report>" in captured["user_prompt"]
-    assert "Never include source-report delimiters" in captured["system_prompt"]
     assert result.startswith("AI CIO DAILY BRIEF - 03/07/2026")
+    assert "Score/Regime: 31/100 - FEAR / DISTRIBUTION" in result
+    assert "Allocation:" in result
 
 
 def test_telegram_summary_sanitizes_existing_cache(tmp_path, monkeypatch):
@@ -473,7 +457,7 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     card = ai_cio.TOOL_METHODOLOGY_CARDS["sentiment_factor_news"]
     master_prompt = Path("promt/executive_summary_promt.md").read_text(encoding="utf-8")
 
-    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_methodology_v7_climax_continuation"
+    assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["executive_summary"] == "ai_cio_compact_single_call_v8"
     assert ai_cio.AI_CIO_TOOL_CACHE_VERSIONS["sentiment_factor_news"] == "weighted_bayesian_posterior_social_overlay_v2"
     assert "mozyfin_social" in card["limits"]
     assert "source_counts" in card["authority"]
@@ -482,6 +466,102 @@ def test_ai_cio_prompt_and_methodology_discount_mozyfin_social():
     assert "UPDATED TOOL METHOD DISCIPLINE" in master_prompt
     assert "Manipulation v2" in master_prompt
     assert "PVGO Valuation" in master_prompt
+
+
+def test_compact_final_context_omits_duplicate_snapshot_blocks():
+    import shared.ai_cio as ai_cio
+
+    packets = [
+        {
+            "tool": "market_breadth",
+            "evidence_excerpt": "x" * 2_000,
+        }
+    ]
+    snapshot = {
+        "report_date": "19/08/2026",
+        "data_date": "18/08/2026",
+        "metrics_version": "3.0",
+        "score_anchor": {"metric_implied_score": 32},
+        "consensus": {"hard_adapter_consensus": {}},
+        "tools": {
+            "market_breadth": {
+                "layer": "current_tool",
+                "as_of": "18/08/2026",
+                "scoring_eligible": True,
+                "tool_score": 20,
+                "tool_regime": "weak",
+                "tool_bias": "bearish",
+                "key_metrics": {"breadth_ma20_pct": 24.0},
+                "score_reason": "Breadth below threshold",
+                "data_quality": "structured_adapter",
+            }
+        },
+        "history": {"history_window": [{"date": "18/08/2026", "score": 31}]},
+        "methodology_cards": ["must not be duplicated into the final prompt"],
+    }
+
+    compact = json.loads(
+        ai_cio._build_ai_cio_structured_context(
+            "report note",
+            "legacy historical block that must not be copied",
+            packets,
+            {"writer_rules": ["use structured metrics"]},
+            snapshot,
+        )
+    )
+
+    assert set(compact) == {
+        "schema",
+        "meta",
+        "score_anchor",
+        "consensus",
+        "tools",
+        "history",
+        "writer_rules",
+    }
+    assert compact["schema"] == "ai_cio_final_input_v1"
+    assert len(compact["tools"][0]["excerpt"]) <= 500
+    assert "methodology_cards" not in compact
+    assert "legacy historical block" not in json.dumps(compact)
+
+
+def test_python_renders_authoritative_score_regime_allocation_and_confidence():
+    import shared.ai_cio as ai_cio
+
+    decision_state = {
+        "metric_implied_score": 32,
+        "tool_score_count": 9,
+        "metric_values": {"market_breadth.breadth_ma20_pct": 24.0},
+        "consensus_map": {
+            "hard_adapter_consensus": {
+                "bullish": [{"tool": "fed_liquidity"}],
+                "bearish": [{"tool": "market_breadth"}],
+            }
+        },
+        "allocation_guardrail": {
+            "max_equity_pct": 35,
+            "max_short_vn30f1m_pct": 0,
+        },
+    }
+    narrative = (
+        "### EXECUTIVE BOTTOM LINE\nNarrative only.\n\n"
+        "### 6. Executive Order\n- Core list: none.\n\n"
+        "### 7. Confidence Note\nFinal confidence: HIGH"
+    )
+
+    result = ai_cio._render_deterministic_report_fields(
+        narrative,
+        decision_state,
+        "19/08/2026",
+    )
+
+    assert "**Điểm số tổng hợp (Composite Score)**: 32/100" in result
+    assert "**Trạng thái quyết định (Resolved Regime)**: FEAR / DISTRIBUTION" in result
+    assert "- **Cash**: **65%**" in result
+    assert "- **Equity**: **35%**" in result
+    assert "- **Short VN30F1M**: **0%**" in result
+    assert "Final confidence: MEDIUM" in result
+    assert result.endswith("final score & regime : 32 ; regime : FEAR / DISTRIBUTION")
 
 
 def test_telegram_summary_reads_structured_ai_cio_context(tmp_path, monkeypatch):

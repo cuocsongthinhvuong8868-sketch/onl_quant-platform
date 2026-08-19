@@ -120,11 +120,12 @@ command/
 
 **AI CIO pipeline** (`run_executive_summary`):
 1. `_clear_all_tool_caches(provider)` nếu `force=True`
-2. Chạy 9 `run_<tool>()` lần lượt (cache hit nếu cùng ngày)
-3. `_read_recent_summaries(provider, n_past=2)` đọc T-1, T-2
-4. Aggregate vào master prompt → 1 lần OpenAI call cuối
-5. Auto upsert `Ai_cio_report.csv`: same-day overwrite (manual ghi đè auto), T+1 append
-6. Cron `run_ai_cio_auto.py` 15:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
+2. Chạy deterministic quant/structured snapshots; child-report client là local adapter, không tiêu thụ remote LLM token
+3. Đọc compact history ledger, build evidence packets + metrics snapshot + decision state
+4. Nén input vào `ai_cio_final_input_v1`, sau đó chỉ 1 lần OpenAI call để viết narrative cuối
+5. Python render score/regime/allocation/confidence/humility JSON/Telegram brief deterministic; fingerprint cache tái sử dụng output khi input không đổi
+6. Auto upsert `Ai_cio_report.csv`: same-day overwrite (manual ghi đè auto), T+1 append
+7. Cron `run_ai_cio_auto.py` 15:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
 
 **Multi-provider** (`config.AI_PROVIDER_MAP`): `kimi-2.6` (Moonshot, temp 1.0) / `deepseek-v4-pro` (temp 0.5)
 

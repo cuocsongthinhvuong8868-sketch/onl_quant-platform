@@ -19,17 +19,19 @@ from shared.ai_cio_chat import (
     DEFAULT_MAX_SOURCES,
     ProjectDataCatalog,
     RetrievedSource,
+    _bounded_history,
     ask_ai_cio_question,
     load_chat_system_prompt,
 )
+from shared.llm_policy import completion_options
 from shared.tool_registry import BRANCHES, iter_tools
 from src.data_manager import DataManager
 
 
-DATA_AGENT_VERSION = "ai_cio_data_agent_v2.3.0"
+DATA_AGENT_VERSION = "ai_cio_data_agent_v2.4.0"
 MAX_AGENT_ITERATIONS = 4
-MAX_TOOL_RESULT_CHARS = 14_000
-PLANNER_MAX_TOKENS = 800
+MAX_TOOL_RESULT_CHARS = 10_000
+PLANNER_MAX_TOKENS = 400
 PLANNER_CONFIDENCE_THRESHOLD = 0.55
 LOCAL_PROVIDER_HOSTS = {"127.0.0.1", "localhost", "0.0.0.0", "::1"}
 VIETNAM_TIMEZONE = ZoneInfo("Asia/Ho_Chi_Minh")
@@ -920,7 +922,6 @@ def _ensure_vietnamese_answer(
         return answer, None
     try:
         response = client.chat.completions.create(
-            model=provider_config["api_model"],
             messages=[
                 {
                     "role": "system",
@@ -937,8 +938,11 @@ def _ensure_vietnamese_answer(
                     "content": f"ANSWER TO REPAIR:\n{answer[:24_000]}",
                 },
             ],
-            temperature=0.0,
-            max_tokens=int(provider_config.get("chat_max_tokens", 2_200)),
+            **completion_options(
+                model=provider_config["api_model"],
+                route="language_repair",
+                temperature=0.0,
+            ),
         )
         repaired = _message_content(response.choices[0].message)
         remaining_issues = _language_issues(repaired)
@@ -1366,7 +1370,6 @@ def _plan_question_with_ai(
         "catalog_candidates_metadata_only": candidate_metadata,
     }
     response = client.chat.completions.create(
-        model=cfg["api_model"],
         messages=[
             {
                 "role": "system",
@@ -1389,8 +1392,12 @@ def _plan_question_with_ai(
                 "content": json.dumps(planner_input, ensure_ascii=False, default=str),
             },
         ],
-        temperature=0.0,
-        max_tokens=PLANNER_MAX_TOKENS,
+        **completion_options(
+            model=cfg["api_model"],
+            route="query_planner",
+            temperature=0.0,
+            max_tokens=PLANNER_MAX_TOKENS,
+        ),
     )
     payload = _extract_json_object(_message_content(response.choices[0].message))
     return _validate_query_plan(payload, question, catalog)
@@ -1815,12 +1822,22 @@ def _planned_answer(
     toolbox = DataAgentToolbox(catalog, provider_key)
     plan: QueryPlan | None = None
     planner_error: str | None = None
-    execution_mode = "planned_agent"
+    planner_enabled = os.getenv("QUANT_PLATFORM_AI_QUERY_PLANNER", "").strip().lower() in {
+        "1",
+        "true",
+        "yes",
+        "on",
+    }
+    execution_mode = "compatibility_agent"
     compatibility_reason = reason
-    try:
-        plan = _plan_question_with_ai(client, provider_key, question, history, catalog)
-    except Exception as error:
-        planner_error = str(error)
+    if planner_enabled:
+        try:
+            plan = _plan_question_with_ai(client, provider_key, question, history, catalog)
+            execution_mode = "planned_agent"
+        except Exception as error:
+            planner_error = str(error)
+    else:
+        planner_error = "remote query planner disabled; deterministic router selected"
 
     try:
         if plan is not None and plan.confidence >= PLANNER_CONFIDENCE_THRESHOLD:
@@ -1915,13 +1932,22 @@ def _planned_answer(
                 },
             }
         )
-    else:
+    elif planner_enabled:
         traces.append(
             {
                 "tool": "ai_query_planner",
                 "status": "fallback",
                 "ok": False,
                 "error": planner_error or "planner unavailable",
+            }
+        )
+    else:
+        traces.append(
+            {
+                "tool": "deterministic_query_router",
+                "status": "used",
+                "ok": True,
+                "reason": planner_error,
             }
         )
     if execution_mode == "compatibility_agent":
@@ -1986,11 +2012,7 @@ def _planned_answer(
             ),
         }
     ]
-    for item in list(history or [])[-8:]:
-        role = str(item.get("role") or "")
-        content = str(item.get("content") or "")[:4_000]
-        if role in {"user", "assistant"} and content:
-            messages.append({"role": role, "content": content})
+    messages.extend(_bounded_history(history))
     messages.append(
         {
             "role": "user",
@@ -2005,10 +2027,12 @@ def _planned_answer(
     )
     try:
         response = client.chat.completions.create(
-            model=cfg["api_model"],
             messages=messages,
-            temperature=cfg.get("temperature", 0.2),
-            max_tokens=int(cfg.get("chat_max_tokens", 2_200)),
+            **completion_options(
+                model=cfg["api_model"],
+                route="chat",
+                temperature=cfg.get("temperature", 0.2),
+            ),
         )
         answer = _message_content(response.choices[0].message)
         if not answer:
@@ -2081,7 +2105,7 @@ def ask_ai_cio_data_agent(
         execution_reason = (
             "server policy requires validated system metrics"
             if requires_validated_metrics
-            else "AI Query Planner is the primary execution mode"
+            else "deterministic read-only router is the primary execution mode"
         )
         return _planned_answer(
             api_key,
@@ -2110,11 +2134,7 @@ def ask_ai_cio_data_agent(
         f"\nAGENT_VERSION: {DATA_AGENT_VERSION}"
     )
     messages: list[dict[str, Any]] = [{"role": "system", "content": system_prompt}]
-    for item in list(history or [])[-8:]:
-        role = str(item.get("role") or "")
-        content = str(item.get("content") or "")[:4_000]
-        if role in {"user", "assistant"} and content:
-            messages.append({"role": role, "content": content})
+    messages.extend(_bounded_history(history))
     messages.append(
         {
             "role": "user",
@@ -2134,12 +2154,14 @@ def ask_ai_cio_data_agent(
     for iteration in range(max_iterations):
         try:
             response = client.chat.completions.create(
-                model=cfg["api_model"],
                 messages=messages,
                 tools=AGENT_TOOL_SCHEMAS,
                 tool_choice="required" if not traces else "auto",
-                temperature=cfg.get("temperature", 0.2),
-                max_tokens=int(cfg.get("chat_max_tokens", 2_200)),
+                **completion_options(
+                    model=cfg["api_model"],
+                    route="chat",
+                    temperature=cfg.get("temperature", 0.2),
+                ),
             )
         except Exception as error:
             return _planned_answer(
@@ -2224,10 +2246,12 @@ def ask_ai_cio_data_agent(
         }
     )
     response = client.chat.completions.create(
-        model=cfg["api_model"],
         messages=messages,
-        temperature=cfg.get("temperature", 0.2),
-        max_tokens=int(cfg.get("chat_max_tokens", 2_200)),
+        **completion_options(
+            model=cfg["api_model"],
+            route="chat",
+            temperature=cfg.get("temperature", 0.2),
+        ),
     )
     answer = _message_content(response.choices[0].message)
     if not answer:

@@ -2,6 +2,7 @@ import streamlit as st
 
 from shared.data_loader import load_close_prices
 from shared.daily_cache import load_daily_cache, save_daily_cache
+from shared.llm_policy import completion_options
 from tools.risk_adjusted_growth.ui.sidebar import render_sidebar
 from tools.risk_adjusted_growth.quant.data_prep import (
     FINANCIAL_REPORT_JSON_DIR,
@@ -200,12 +201,15 @@ def render():
                             user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
                             response = client.chat.completions.create(
-                                model=cfg["api_model"],
                                 messages=[
                                     {"role": "system", "content": system_prompt},
                                     {"role": "user", "content": user_prompt}
                                 ],
-                                temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE)
+                                **completion_options(
+                                    model=cfg["api_model"],
+                                    route="child_report",
+                                    temperature=AI_PROVIDER_MAP[ai_provider].get("temperature", AI_TEMPERATURE),
+                                ),
                             )
 
                             result_text = response.choices[0].message.content

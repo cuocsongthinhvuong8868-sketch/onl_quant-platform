@@ -356,7 +356,7 @@ def test_widata_fx_pressure_scores_negative():
         "ai_translated_title": "Tỷ giá USD/VND tăng mạnh áp lực lớn",
         "ai_summary": "Tỷ giá tăng vượt mốc do chỉ số DXY tăng cao làm đồng VND mất giá mạnh.",
         "source": "WiData Signal",
-        "publish_date": "2026-06-14T03:00:00Z",
+        "publish_date": datetime.now(timezone.utc).isoformat(),
         "url": "https://widata.vn/news/2002",
         "category": "Vĩ mô",
         "tag_level_0": "Tỷ giá",

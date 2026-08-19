@@ -9,6 +9,7 @@ import streamlit as st
 
 from config import DATA_LAKE, ROOT_DIR, AI_TEMPERATURE
 from shared.page_layout import render_signal_card, tone_for_signal
+from shared.llm_policy import completion_options
 from tools.vnibor.quant.metrics import (
     load_vnibor_data,
     process_vnibor_logic,
@@ -249,12 +250,15 @@ def render():
                                 user_prompt = "# INPUT DATA" + parts[1].strip() if len(parts) > 1 else full_prompt
 
                                 response = client.chat.completions.create(
-                                    model=cfg["api_model"],
                                     messages=[
                                         {"role": "system", "content": system_prompt},
                                         {"role": "user", "content": user_prompt},
                                     ],
-                                    temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                    **completion_options(
+                                        model=cfg["api_model"],
+                                        route="child_report",
+                                        temperature=cfg.get("temperature", AI_TEMPERATURE),
+                                    ),
                                 )
                                 result_text = response.choices[0].message.content
 
