@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: fear_greed_v2_prompt_shock_overlay -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- - Risk Score: 52.0/100 (Δ phiên trước: -1.0)
+- - Score v2 includes CSV dispersion and acute-shock/margin-call overlay. If Shock Regime Flag is not NONE, do not treat a 40-60 score as ordinary Neutral; cap risk-on interpretation until shock cools.
+- - Score 0-20 : EXTREME FEAR — vol cao + skew âm sâu + down-corr cao
+- - Score 20-40 : FEAR — vol tăng + đám đông bán
+- - Score 40-60 : NEUTRAL / STOCK-PICKING — phân hoá
+- - Score 60-80 : GREED — vol thấp + skew dương + up-corr cao
+- - Score 80-100: EXTREME GREED — khả năng bull top (low vol + crowded long)
+- - (Tìm divergence: Score vs EGARCH-vol; Skewness vs Correlation. Nếu cùng dấu → consistent; nếu lệch → flag)
+- ## 5. Structured Tail
+- "regime": "<EXTREME_FEAR|FEAR|NEUTRAL|GREED|EXTREME_GREED>",
+
+=== AI CIO STRUCTURED METRICS: fear_greed_methodology ===
+- FearGreed Risk Score: 52.0
+- Methodology Version: fear_greed_v2.1.0
+- Sentiment Regime: STOCK PICKING
+- Signal Confidence: 0.33
+- CSV Rank: 0.10
+- Acute Shock: 0.81
+- Shock Regime Flag: NONE
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: fear_greed ===
+```json
+{
+  "tool": "fear_greed",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fear_greed_score": 52.01731822602926,
+    "sentiment_regime": "STOCK PICKING",
+    "signal_confidence": 0.3337613122738308,
+    "acute_shock": 0.8134920634920635,
+    "csv_rank": 0.10317460317460317,
+    "shock_regime_flag": "NONE"
+  }
+}
+```

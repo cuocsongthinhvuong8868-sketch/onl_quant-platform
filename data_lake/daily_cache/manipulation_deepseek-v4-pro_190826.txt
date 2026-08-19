@@ -1,0 +1,32 @@
+<!-- ai-cio-cache-version: manipulation_v2_vnindex_prompt_guardrail -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Quant Market Microstructure Analyst. Theo dõi composite VIC/VHM/VRE (PCA) vs VNINDEX bằng OLS slope + percentile rank. Tư duy xác suất, không biến tín hiệu coupling thành lệnh phái sinh trực tiếp.
+- - V2 target is cash VNINDEX, not VN30F1M. Treat this as index concentration/coupling evidence; never convert it directly into a futures trade without AI CIO allocation guardrail.
+- # REGIME DICTIONARY (5 trạng thái)
+- - (3 bullet: slope + corr + regime, kèm percentile)
+- - Nếu cả 2 percentile > 80th → bất thường, khả năng can thiệp; nếu < 20th → market đã rời VIN
+- - Nếu regime = "TÍN HIỆU GIẢ" → ghi rõ NO TRADE
+- - Market read: VIN-led index / index-led-by-other-sectors / false signal / no edge
+- ## 5. Structured Tail
+- "regime": "DECOUPLING",
+- "market_read": "<vin_led_index|other_sector_led|false_signal|no_edge>",
+
+---
+manipulation_methodology: manipulation_v2.0.0; target=VNINDEX; not_futures=true; slope=0.078; corr=0.267; regime=DECOUPLING
+
+=== AI CIO DIRECT METRICS: manipulation ===
+```json
+{
+  "tool": "manipulation",
+  "source": "direct_quantitative",
+  "metrics": {
+    "manip_slope": 0.0777450073354105,
+    "manip_corr": 0.26652920616567255,
+    "manip_slope_percentile": 0.6451612903225807,
+    "manip_corr_percentile": 1.0421836228287842,
+    "regime": "DECOUPLING",
+    "delta_corr_percentile": -0.6000000000000001,
+    "delta_slope_percentile": -0.5833333333333334
+  }
+}
+```

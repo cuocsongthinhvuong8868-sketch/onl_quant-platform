@@ -1,0 +1,30 @@
+<!-- ai-cio-cache-version: production_downside_ema20_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Chief Risk Officer định lượng. Theo dõi systemic stress qua PCA decomposition. Posture: bearish-on-stress, không cho phép confirmation bias từ price action.
+- - SSI (Systemic Stress Index): 61.1%
+- - Market Regime (HMM): CALM CORRECTION
+- - PCA Concentration (EVR PC1): 37.9%
+- - Market State (4-state): CALM CORRECTION
+- - S_VAL : Valuation tension — 252d return VN30 − deposit rate
+- ## SSI thresholds (calibrated cho VN30):
+- ## Market State (HMM × trend filter):
+- - HEALTHY : low stress + uptrend → ride trend
+- - EUPHORIC_RISK : high stress + uptrend → bull trap risk
+
+=== AI CIO DIRECT METRICS: esr_monitor ===
+```json
+{
+  "tool": "esr_monitor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "ssi_pct": 61.127069213725434,
+    "pca_concentration_pct": 37.9444340587489,
+    "market_state": "CALM CORRECTION",
+    "hmm_available": true,
+    "production_regime_method": "hmm",
+    "production_pillar_mode": "downside",
+    "top_pillar": "S_LIQ",
+    "top_pillar_weight_pct": 35.51574632210085
+  }
+}
+```
