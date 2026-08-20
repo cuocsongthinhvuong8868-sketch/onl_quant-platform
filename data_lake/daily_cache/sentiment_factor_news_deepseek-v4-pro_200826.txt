@@ -1,0 +1,52 @@
+<!-- ai-cio-cache-version: weighted_bayesian_posterior_social_overlay_v2 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Regime: risk_on
+- Macro composite posterior mean: +0.2385 (same-direction posterior confidence: 89%, P(sentiment mean > 0): 89%, 90% CI: -0.076 to +0.553)
+- Top positive channels: commodity=+1.994(P_conf:100%, CI:+1.08/+2.00), earnings=+1.313(P_conf:100%, CI:+1.15/+1.47), monetary_policy=+1.254(P_conf:100%, CI:+0.55/+1.96), credit_stress=+1.068(P_conf:99%, CI:+0.37/+1.77), banking_system=+0.707(P_conf:99%, CI:+0.22/+1.19)
+- Top negative channels: fx_external=-1.968(P_conf:100%, CI:-2.00/-1.26), inflation=+0.000(P_conf:50%, CI:-1.64/+1.64), real_estate_collateral=+0.000(P_conf:50%, CI:-1.64/+1.64), unknown=+0.000(P_conf:50%, CI:-1.64/+1.64), liquidity=+0.104(P_conf:59%, CI:-0.64/+0.85)
+- - PBoC giữ nguyên Lãi suất cho vay cơ bản kỳ hạn 1 năm (LPR 1Y) ở mức 3.00% (tháng 08/2026) | channel=monetary_policy | score=+0.778 | source=Data Wi | time=2026-08-20T07:00:00+07:00
+- - Giá vàng thế giới quy đổi vượt đỉnh một tháng, đạt mức 140.3 triệu đồng/lượng trong ngày 20/08/2026 | channel=commodity | score=+0.580 | source=Data Wi | time=2026-08-20T07:00:00+07:00
+- - Lợi suất TPCP đi ngang phiên 20/08/2026 | channel=credit_stress | score=+0.351 | source=Data Wi | time=2026-08-20T10:30:00+07:00
+- - Việt Nam tiếp tục thúc đẩy hợp tác kinh tế, thương mại với Hoa Kỳ | channel=growth | score=+0.166 | source=Báo Đầu Tư | time=2026-08-20T12:21:21+07:00
+- - Phó Thủ tướng: Đảm bảo Trung tâm Tài chính Quốc tế sớm hình thành các thương vụ cụ thể | channel=banking_system | score=+0.165 | source=VietStock - Kinh tế đầu tư | time=2026-08-20T09:42:00+07:00
+- - USD/RUB giảm mạnh 1.47% phiên 20/08/2026 | channel=fx_external | score=-0.745 | source=Data Wi | time=2026-08-20T07:00:00+07:00
+
+=== AI CIO DIRECT METRICS: sentiment_factor_news ===
+```json
+{
+  "tool": "sentiment_factor_news",
+  "source": "direct_quantitative",
+  "metrics": {
+    "news_macro_composite_1d": 0.2385,
+    "news_confidence_1d": 0.8936,
+    "news_count_1d": 221,
+    "news_regime_1d": "risk_on",
+    "news_source_counts_1d": {
+      "widata": 68,
+      "mozyfin": 100,
+      "mozyfin_social": 53
+    },
+    "news_macro_composite_7d": 0.3716,
+    "news_confidence_7d": 1.0,
+    "news_count_7d": 1283,
+    "news_regime_7d": "strong_risk_on",
+    "news_source_counts_7d": {
+      "widata": 213,
+      "mozyfin": 680,
+      "mozyfin_social": 390
+    },
+    "news_macro_composite_30d": 0.7788,
+    "news_confidence_30d": 1.0,
+    "news_count_30d": 4888,
+    "news_regime_30d": "strong_risk_on",
+    "news_source_counts_30d": {
+      "widata": 1269,
+      "mozyfin": 1809,
+      "mozyfin_social": 1810
+    },
+    "news_macro_composite": 0.2385,
+    "news_confidence": 0.8936,
+    "news_count": 221
+  }
+}
+```
