@@ -1,9 +1,12 @@
 from __future__ import annotations
 
+from types import SimpleNamespace
+
 import numpy as np
 import pandas as pd
 
 from tools.upside_ratio import report
+from tools.upside_ratio.quant import engine
 from tools.upside_ratio.quant.metrics import (
     METHOD_VERSION,
     build_breadth_series,
@@ -41,6 +44,26 @@ def test_upside_ratio_summary_flags_downside_stress() -> None:
     assert summary["breadth_regime"] == "DOWNSIDE_STRESS"
     assert summary["breadth_stress_level"] in {"HIGH", "EXTREME"}
     assert summary["net_pressure"] == 25.0
+
+
+def test_upside_ratio_autoreg_is_compatible_with_statsmodels_015(monkeypatch) -> None:
+    class AutoRegWithoutOldNames:
+        def __init__(self, endog, lags):
+            assert lags == 1
+            self.endog = np.asarray(endog)
+
+        def fit(self):
+            return SimpleNamespace(
+                params=np.array([0.05, 0.90]),
+                resid=np.diff(self.endog),
+            )
+
+    monkeypatch.setattr(engine, "AutoReg", AutoRegWithoutOldNames)
+    series = pd.Series(np.linspace(10.0, 70.0, 40))
+
+    result = engine.run_hybrid_ensemble_mc(series, days_to_sim=3, num_sims=20)
+
+    assert all(len(percentile) == 3 for percentile in result[:5])
 
 
 def test_upside_ratio_report_exposes_v2_stress_fields(monkeypatch) -> None:

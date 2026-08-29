@@ -27,7 +27,10 @@ def run_hybrid_ensemble_mc(
 
     # Engine 1: Logit bootstrap AR(1)
     y = np.log(p_raw / (1.0 - p_raw))
-    model_ar = AutoReg(y, lags=1, old_names=False).fit()
+    # ``old_names=False`` was the default in statsmodels 0.14 and the keyword
+    # was removed in 0.15. Omitting it preserves the same parameter naming and
+    # keeps the GitHub Actions dependency range (>=0.14,<0.16) compatible.
+    model_ar = AutoReg(y, lags=1).fit()
     c_emp = model_ar.params[0]
     phi_emp = model_ar.params[1]
     resid_emp = model_ar.resid
