@@ -485,6 +485,7 @@ def render():
     data_date = f"{price_date}|{source_signature}"
     cache_key = {
         "cache_version": 2,
+        "s_mozyfin_schema_method": "v2",
         "source_signature": source_signature,
         "price_date": price_date,
         "include_market_confirmation": True,

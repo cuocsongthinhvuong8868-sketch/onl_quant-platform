@@ -24,21 +24,17 @@ ACCOUNT_ALIASES = {
         "tiền gửi khách hàng",
         "tien_gui_khach_hang"
     ],
-    "npl_ratio": [
-        "npl_ratio",
-        "bad_debt_ratio",
-        "tỷ lệ nợ xấu",
-        "ty_le_no_xau"
-    ],
     "market_cap": [
         "Market Cap",
         "market_cap",
-        "vốn hóa"
+        "vốn hóa",
+        "vốn hóa thị trường"
     ],
     "shares_outstanding": [
         "Outstanding Shares",
         "shares_outstanding",
-        "khối lượng niêm yết"
+        "khối lượng niêm yết",
+        "cổ phiếu đang lưu hành"
     ],
     "pb": [
         "PB",
@@ -94,11 +90,13 @@ ACCOUNT_ALIASES = {
     ],
     "credit_cost": [
         "credit_cost",
-        "provision to outstanding loans (%)"
+        "provision to outstanding loans (%)",
+        "trích lập dự phòng trên cho vay (%)"
     ],
     "provision_coverage": [
         "provision_coverage",
-        "loan loss reserves/npls (%)"
+        "loan loss reserves/npls (%)",
+        "dự phòng rủi ro credit trên nợ xấu (%)"
     ],
     "ldr": [
         "ldr (%)",
@@ -109,6 +107,7 @@ ACCOUNT_ALIASES = {
         "npl ratio (%)",
         "bad_debt_ratio",
         "tỷ lệ nợ xấu",
+        "tỷ lệ nợ xấu (%)",
         "ty_le_no_xau"
     ],
     "npl_balance": [
@@ -154,34 +153,38 @@ def normalize_data(df: pd.DataFrame) -> pd.DataFrame:
         
     normalized_df = df.copy()
     
-    # Invert mapping for easier lookup
+    # Invert mapping for easier lookup.
     alias_to_std = {}
     for std_name, aliases in ACCOUNT_ALIASES.items():
         for alias in aliases:
             alias_to_std[alias.lower()] = std_name
-            
-    # Rename columns if they match an alias
-    rename_mapping = {}
-    pct_cols = []
-    
+
+    # A statement capture and its statistics API can expose the same metric
+    # under different aliases (for example ``CAR`` and ``car``).  Renaming both
+    # columns directly creates duplicate labels, so coalesce them row by row.
+    sources_by_std = {}
     for orig_col in normalized_df.columns:
-        col_lower = orig_col.lower()
-        if "(%)" in col_lower or "pct" in col_lower:
-            pct_cols.append(orig_col)
-            
-        if col_lower in alias_to_std:
-            rename_mapping[orig_col] = alias_to_std[col_lower]
-            
-    normalized_df.rename(columns=rename_mapping, inplace=True)
-    
-    # Auto-convert percentage columns (identified by original name) to decimals.
-    # parse_number strips a trailing "%" but leaves the number in percentage
-    # points, so the conversion belongs here where the metric name is known.
-    for orig_col in pct_cols:
-        col_name = rename_mapping.get(orig_col, orig_col)
-        if col_name in normalized_df.columns:
-            values = _to_numeric(normalized_df[col_name])
-            normalized_df[col_name] = values / 100.0
+        std_name = alias_to_std.get(str(orig_col).lower())
+        if std_name:
+            sources_by_std.setdefault(std_name, []).append(orig_col)
+
+    for std_name, sources in sources_by_std.items():
+        # Prefer an already-standardized API field, then fall back to statement
+        # or DOM aliases for rows where the API value is absent.
+        sources = sorted(sources, key=lambda col: str(col) != std_name)
+        candidates = []
+        for source in sources:
+            values = _to_numeric(normalized_df[source])
+            source_lower = str(source).lower()
+            # parse_number strips the percent sign but intentionally leaves
+            # percentage points; convert only display-labelled percentage data.
+            if "(%)" in source_lower or "pct" in source_lower:
+                values = values / 100.0
+            candidates.append(values)
+
+        combined = pd.concat(candidates, axis=1).bfill(axis=1).iloc[:, 0]
+        normalized_df.drop(columns=sources, inplace=True)
+        normalized_df[std_name] = combined
             
     if "shares_outstanding" in normalized_df.columns:
         shares = _to_numeric(normalized_df["shares_outstanding"])

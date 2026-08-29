@@ -11,6 +11,30 @@ from tools.bank_valuation.quant.engine.utils import parse_number
 logger = logging.getLogger(__name__)
 
 
+FINANCIAL_STATISTIC_FIELDS = {
+    "number_of_shares_market_cap": "shares_outstanding",
+    "market_cap": "market_cap",
+    "pb": "pb",
+    "roe": "roe",
+    "roa": "roa",
+    "ldr_loan_deposit_ratio": "ldr",
+    "npl": "npl_ratio",
+    "loans_loss_reserves_to_npls": "provision_coverage",
+    "provision_to_outstanding_loans": "credit_cost",
+    "car": "car",
+    "casa_ratio": "casa_ratio",
+}
+
+
+def _canonical_metric_name(value) -> str:
+    """Remove the live UI trend suffix appended to statement row labels."""
+    if value is None:
+        return ""
+    # New MozyFin captures append values such as ``\n▲ 4.2%`` to every
+    # statement label.  The first line remains the stable account name.
+    return str(value).splitlines()[0].strip()
+
+
 class DataLoader:
     def __init__(self, data_folder: str):
         self.data_folder = data_folder
@@ -52,8 +76,17 @@ class DataLoader:
             ticker = data.get("ticker")
             if not ticker:
                 return None
-                
+
+            api_statistics = self._load_financial_statistics_api(data, ticker)
+            if not api_statistics.empty:
+                return api_statistics
+
             fin_data = data.get("financialData", {})
+            if not fin_data:
+                dom_snapshot = data.get("financialStatistics", {}).get("domSnapshot", {})
+                if dom_snapshot.get("tableRows"):
+                    fin_data = {"Financial Statistics": dom_snapshot}
+
             all_records = {}
             
             for tab_name, tab_data in fin_data.items():
@@ -68,7 +101,9 @@ class DataLoader:
                 for row in table_rows[1:]:
                     if not row or len(row) == 0:
                         continue
-                    metric_name = row[0]
+                    metric_name = _canonical_metric_name(row[0])
+                    if not metric_name:
+                        continue
                     values = row[1:]
                     parsed_data[metric_name] = values
                     if len(values) > max_values_len:
@@ -77,7 +112,8 @@ class DataLoader:
                 offset = max(0, len(periods) - max_values_len)
                 
                 for i, period in enumerate(periods):
-                    if i < offset: continue 
+                    if i < offset:
+                        continue
                     if period not in all_records:
                         all_records[period] = {"ticker": ticker, "period": period}
                         
@@ -97,6 +133,38 @@ class DataLoader:
         except Exception:
             logger.exception("Error loading JSON file: %s", file_path)
             return None
+
+    def _load_financial_statistics_api(self, data: dict, ticker: str) -> pd.DataFrame:
+        """Read the structured statistics embedded in MozyFin v2 captures."""
+        responses = data.get("financialStatistics", {}).get("apiResponses", [])
+        records = []
+        for response in responses:
+            if "/financial-statistic" not in str(response.get("url", "")):
+                continue
+            parsed_body = response.get("parsedBody")
+            if not isinstance(parsed_body, dict):
+                continue
+            rows = parsed_body.get("data", [])
+            if not isinstance(rows, list):
+                continue
+            for row in rows:
+                if not isinstance(row, dict):
+                    continue
+                try:
+                    quarter = int(row.get("quarter"))
+                    year = int(row.get("year"))
+                except (TypeError, ValueError):
+                    continue
+                if quarter not in range(1, 5):
+                    continue
+
+                record = {"ticker": ticker, "period": f"Q{quarter} {year}"}
+                for source_name, target_name in FINANCIAL_STATISTIC_FIELDS.items():
+                    if source_name in row:
+                        record[target_name] = parse_number(row[source_name])
+                records.append(record)
+
+        return pd.DataFrame(records)
 
     def _infer_ticker(self, file_path: str) -> str:
         return Path(file_path).stem.split("_")[0].upper()
