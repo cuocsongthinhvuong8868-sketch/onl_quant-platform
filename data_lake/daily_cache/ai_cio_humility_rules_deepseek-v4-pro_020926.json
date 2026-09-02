@@ -1,0 +1,64 @@
+{
+  "report_date": "2026-09-02",
+  "composite_score": 32.0,
+  "regime": "FEAR / DISTRIBUTION",
+  "falsification_rules": [
+    {
+      "model": "VNIBOR Monitor",
+      "metric": "STRESS/WARNING sessions (20D)",
+      "threshold_operator": "<",
+      "threshold_value": 5,
+      "unit": "sessions",
+      "description": "Liquidity pressure is no longer persistent if stressed funding sessions fall below 5 of the last 20 observations.",
+      "current_value": 5.0
+    },
+    {
+      "model": "Market Breadth",
+      "metric": "Breadth MA20",
+      "threshold_operator": ">",
+      "threshold_value": 45,
+      "unit": "%",
+      "description": "Internal participation materially improves when more than 45% of covered tickers trade above MA20.",
+      "current_value": 47.294117647058826
+    },
+    {
+      "model": "ESR Monitor",
+      "metric": "Systemic Stress Index (SSI)",
+      "threshold_operator": "<",
+      "threshold_value": 55,
+      "unit": "%",
+      "description": "Systemic stress cools if SSI drops below 55%.",
+      "current_value": 58.028450995889
+    },
+    {
+      "model": "Tail Risk (EVT)",
+      "metric": "EVT Xi Max (5%-15% thresholds)",
+      "threshold_operator": "<",
+      "threshold_value": 0.25,
+      "unit": "",
+      "description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25.",
+      "current_value": 0.3670739860759914
+    },
+    {
+      "model": "Manipulation / Coupling",
+      "metric": "Vingroup Slope Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 70,
+      "unit": "th pct",
+      "description": "Index coupling risk eases when the Vingroup slope percentile falls below the 70th percentile.",
+      "current_value": 0.9396636993076163
+    },
+    {
+      "model": "Global Financial Conditions",
+      "metric": "CQS Percentile",
+      "threshold_operator": "<",
+      "threshold_value": 80,
+      "unit": "th pct",
+      "description": "External credit-quality stress eases when CQS drops below the 80th percentile.",
+      "current_value": 99.93386243386243
+    }
+  ],
+  "provider_key": "deepseek-v4-pro",
+  "saved_at": "2026-09-02",
+  "source": "ai_cio_executive_summary"
+}
