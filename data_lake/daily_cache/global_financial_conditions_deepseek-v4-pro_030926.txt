@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: indicator_pr3y_pca_point_in_time_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Senior Global Macro & Cross-Asset Strategist mang tầm vóc hàn lâm, học thuật chuyên sâu (academic-grade). Bạn phân tích Global Financial Conditions (FCI) thông qua hệ thống 11 chỉ báo cross-asset chia làm 3 nhóm: volatility (VIX/MOVE/SKEW/OVX/VVIX), credit (HY/CCC/IG/EM OAS), và macro overlay (2s10s curve, DXY). PCA composite 6-core (VIX, MOVE, SKEW, HY, CCC, IG) được tóm tắt thành nhân tố PC1 stress factor.
+- Tư duy của bạn là khoa học, chặt chẽ (mechanism-based), không cảm tính. Bạn đánh giá tác động lan tỏa sang risk assets (US equities, EM equities — đặc biệt VN-Index) với tính liên kết logic cao.
+- YÊU CẦU BẮT BUỘC: Để báo cáo học thuật này tiếp cận được với mọi đối tượng, trong từng phần phân tích, bạn PHẢI tích hợp 1 lớp diễn giải bằng tiếng Việt bình dân, dễ hiểu (Layman's terms) ngay dưới phân tích hàn lâm, làm sáng tỏ các cơ chế truyền dẫn vĩ mô phức tạp (ví dụ: làm rõ cách junk credit stress, oil shock, hay USD strength tạo thành các gọng kìm "headwind" ép lên thị trường mới nổi như thế nào).
+- - Z-scores and PC1 regime percentile remain rolling 1Y.
+- | Chỉ báo | Level | Z-score (1Y) | Percentile rank (3Y max) |
+- | VIX (CBOE Equity Vol) | 16.34 | -0.57σ | 49% |
+- | SKEW (CBOE Tail Risk Premium) | 144.1 | -0.11σ | 45% |
+- | Chỉ báo | Level | Z-score (1Y) | Percentile rank (3Y max) |
+- ## Macro Overlay (2)
+- - PC1 (stress factor, EMA(5) smoothed): +0.84σ — regime percentile rank 1Y: 69%
+
+=== AI CIO STRUCTURED METRICS: global_financial_conditions_methodology ===
+- CQS Percentile 3Y: 99.9
+- PC1 Regime Percentile 1Y: 69.0
+- Indicator Percentile Window: 756 sessions max, 252 sessions min
+- Z-Score Window: 252 sessions
+- PCA Method: expanding_point_in_time
+- PCA Full-History Fit: 0
+- PCA Refit Every Sessions: 21
+
+=== AI CIO DIRECT METRICS: global_financial_conditions ===
+```json
+{
+  "tool": "global_financial_conditions",
+  "source": "direct_quantitative",
+  "metrics": {
+    "cqs_percentile": 99.93386243386243,
+    "gfcm_pc1_percentile": 69.04761904761905,
+    "gfcm_pc1": 1.2741080915646226,
+    "gfcm_ccc_oas": 10.49,
+    "vix": 16.34,
+    "move": 79.71330261230469,
+    "hy_oas": 2.65,
+    "regime": "ELEVATED",
+    "driver": "CCC_CREDIT_DRIVEN"
+  }
+}
+```
