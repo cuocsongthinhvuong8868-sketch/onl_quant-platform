@@ -1,0 +1,39 @@
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Fundamental Quant Analyst chuyên ngành ngân hàng VN. Khung phân tích: Economic Alpha = Disciplined Return − Cost of Equity. Stock-picking style, không macro forecasting.
+- - Kịch bản K (risk penalty multiplier): Trung lập (1.0)
+- - Cost of Equity giả định: 14.0%
+- - Stress test: BVPS Δ 0.0% | P/B penalty 0.0%
+- - Top 3 Alpha cao nhất: 1. SHB (Alpha 3.6%, P/B 0.82, ROE 17.5%, σROE 1.9%, Payout 8.6%), 2. MBB (Alpha 1.1%, P/B 1.22, ROE 21.8%, σROE 1.6%, Payout 6.7%), 3. MSB (Alpha 0.8%, P/B 0.97, ROE 16.7%, σROE 2.5%, Payout 0.0%)
+- - Top 3 Alpha thấp nhất (âm sâu): 1. LPB (Alpha -12.4%, P/B 3.10, ROE 21.1%, σROE 3.8%, Payout 21.0%), 2. VPB (Alpha -10.6%, P/B 1.31, ROE 14.1%, σROE 4.7%, Payout 24.6%), 3. EIB (Alpha -10.0%, P/B 1.22, ROE 10.0%, σROE 3.8%, Payout 4.9%)
+- - P/B trong tool này là P/B daily: daily close price từ market_data.csv chia cho BVPS suy ra từ Statistics JSON. KHÔNG dùng PB quarterly trong Statistics JSON làm P/B Gốc.
+- - Payout là cash payout trailing 20 quý: abs(Dividends paid trong Cash Flow 20 quý gần nhất) / Net profit after tax 20 quý gần nhất, cap 50%. KHÔNG lấy từ profile dividend/eps.
+- - Economic Alpha = Disciplined Return − CoE
+- - Alpha > 0 = bank tạo giá trị thặng dư trên vốn cổ đông
+
+=== AI CIO DIRECT METRICS: risk_adjusted_growth ===
+```json
+{
+  "tool": "risk_adjusted_growth",
+  "source": "direct_quantitative",
+  "metrics": {
+    "top_ticker": "SHB",
+    "top_economic_alpha_pct": 3.631283339306407,
+    "median_economic_alpha_pct": -4.206893967983618,
+    "positive_alpha_count": 3,
+    "bank_count": 16,
+    "top_tickers": [
+      "SHB",
+      "MBB",
+      "MSB"
+    ],
+    "bottom_tickers": [
+      "LPB",
+      "VPB",
+      "EIB"
+    ],
+    "scenario_k": 1.0,
+    "coe_pct": 14.0,
+    "source_signature": "2026-06-05:093e467d1699"
+  }
+}
+```

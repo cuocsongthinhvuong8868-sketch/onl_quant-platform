@@ -1,0 +1,40 @@
+<!-- ai-cio-cache-version: dispersion_v2_broad_stress_prompt -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Quantitative Macro Strategist tại hedge fund. Tư duy cross-sectional dispersion + correlation regime. Tuyệt đối không đưa tín hiệu Buy/Sell hay dự báo VN-Index; chỉ chẩn đoán cấu trúc.
+- - V2 broad-stress overlay checks CSAD/CSSD z-scores and downside participation. Low Spread_Z does not mean safe when broad selloff stress is HIGH/EXTREME.
+- - Spread = CSSD − CSAD : dương = tail-driven dispersion (outliers chi phối)
+- - DPI > 70% : dispersion regime kéo dài → không phải sự cố 1 phiên
+- ## 2D Regime Map (DPI × Corr)
+- - DPI + Spread_Z: thị trường ở trạng thái bình thường hay stressed?
+- - Stress là cục bộ (Spread_Z cao nhưng DPI thấp) hay regime persistent (cả 2 đều cao)?
+- ## 3. Cross-Check & Tail Direction
+- - Tail nào đang gãy? CS Skew < -1 → cú sập cá biệt | CS Skew > +1 → cú đẩy điên rồ
+- - Kurt > 5 → fat-tail outliers, mô hình normal không còn ứng dụng
+
+=== AI CIO STRUCTURED METRICS: dispersion_methodology ===
+- Methodology Version: dispersion_v2.0.0
+- Macro Regime: STOCK_PICKING
+- Broad Stress Score: 16.7
+- Broad Stress Level: NORMAL
+- CSAD Z: +1.17
+- CSSD Z: +0.41
+- Downside Participation: 8.0%
+- Returns Fill Method: none
+- Bad Tick Filter: abs daily return >50% set to missing
+
+=== AI CIO DIRECT METRICS: dispersion ===
+```json
+{
+  "tool": "dispersion",
+  "source": "direct_quantitative",
+  "metrics": {
+    "dispersion_spread_z": -0.8797787928978382,
+    "dispersion_dpi_pct": 25.0,
+    "dispersion_avg_corr": 0.08302729895993143,
+    "dispersion_broad_stress_score": 16.747276139553406,
+    "downside_participation_pct": 7.98004987531172,
+    "macro_regime": "STOCK_PICKING",
+    "broad_stress_level": "NORMAL"
+  }
+}
+```

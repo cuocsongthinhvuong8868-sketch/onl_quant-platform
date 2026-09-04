@@ -1,0 +1,42 @@
+<!-- ai-cio-cache-version: upside_ratio_v2_stress_prompt -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Quant Risk Officer. Đã chạy Monte Carlo deterministic 5,000 simulations mỗi chiều (Hybrid Logit-AR + Beta-AR, fixed seed để tái lập) cho 2 chiều cung-cầu. Tư duy probabilistic, không kể chuyện cảm xúc.
+- LỰC CẦU (Upside Breadth — % mã tăng > +2% mỗi phiên):
+- LỰC CUNG (Downside Breadth — % mã giảm < -2% mỗi phiên):
+- TAIL PROJECTION (T+19):
+- - Treat P95 projections as deterministic stress scenarios, not standalone allocation authority.
+- - V2 breadth stress uses downside rank, net sell pressure and MA5 sell pressure. If downside stress is HIGH/EXTREME, supply pressure dominates even when Monte Carlo paths look balanced.
+- - Phi > +0.10 : Momentum regime (đà tiếp tục)
+- - (3 bullet: deltas current-vs-mu + Phi regime cả 2 chiều)
+- ## 3. Stress-Test Read
+- - Asymmetry: P95_Up vs P95_Dn, bên nào tail risk dày hơn?
+
+=== AI CIO STRUCTURED METRICS: upside_ratio_methodology ===
+- MC Seed Upside: 42
+- MC Seed Downside: 43
+- MC Simulations Per Side: 5000
+- MC Deterministic: 1
+- Breadth Regime: BUY_PRESSURE
+- Breadth Stress Score: 29.7
+- Downside Rank: 0.41
+- Net Sell Pressure: -1.5 pp
+- MC Interpretation: scenario_diagnostic_not_allocation_authority
+
+=== AI CIO DIRECT METRICS: upside_ratio ===
+```json
+{
+  "tool": "upside_ratio",
+  "source": "direct_quantitative",
+  "metrics": {
+    "upside_current_pct": 9.476309226932669,
+    "downside_current_pct": 7.98004987531172,
+    "p95_upside_pct": 17.264588944474724,
+    "p95_downside_pct": 20.432163410685952,
+    "phi_up": 0.10604318484829917,
+    "phi_down": 0.17437823630961133,
+    "breadth_stress_score": 29.707328899972293,
+    "net_sell_pressure_pct": -1.4962593516209486,
+    "breadth_regime": "BUY_PRESSURE"
+  }
+}
+```
