@@ -199,7 +199,7 @@ python -m streamlit run app.py
 Helper scripts:
 
 - `Run_App.bat` / `Run_App.command`: launch Streamlit helper.
-- `Run_All_Updates.bat` / `Run_All_Updates.command`: local multi-step data refresh.
+- `Run_All_Updates.bat` / `Run_All_Updates.command`: local multi-step data refresh, including ABM CSV and LTMM payload sync from the local LTMM repo when available.
 - `.github/workflows/*.yml`: scheduled/on-demand automation.
 
 ## Cau Hinh Tuy Chon
