@@ -1,0 +1,29 @@
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Senior Global Macro Strategist. Phân tích Fed liquidity dynamics + tác động lan tỏa sang risk assets (US equities, crypto, EM equities — đặc biệt VN-Index). Tư duy mechanism-based, không cảm xúc.
+- - Net Liquidity: 5,768,744 Million $
+- - Z-Score (52W): -0.10
+- Net Liquidity = WALCL − WTREGEN − RRPONTSYD
+- - ADD : Impulse_EMA > 0 AND Z ≥ +1σ → liquidity bùng nổ, risk-on bias
+- - CUT : Impulse_EMA < 0 AND Z ≤ -1σ → liquidity rút mạnh, risk-off bias
+- - Fed liquidity → DXY → EM FX → FDI flows + foreign equity flows
+- - Lag thường 1-4 tuần cho US equity, 4-8 tuần cho EM equity như VN
+- - Correlation Fed liquidity vs VN-Index 1M forward ≈ 0.25-0.35 (positive)
+- - Cấu phần nào chi phối Net Liquidity tuần này? (WALCL up/down? TGA bơm/hút? RRP cạn/đầy?)
+
+=== AI CIO DIRECT METRICS: fed_liquidity ===
+```json
+{
+  "tool": "fed_liquidity",
+  "source": "direct_quantitative",
+  "metrics": {
+    "fed_net_liquidity": 5768744.0,
+    "fed_liquidity_impulse": -10730.0,
+    "fed_liquidity_impulse_ema": -13888.66688822459,
+    "fed_liquidity_zscore": -0.1029564572573551,
+    "signal": "HOLD",
+    "walcl": 6737204.0,
+    "wtregen": 967935.0,
+    "rrpontsyd": 525.0
+  }
+}
+```
