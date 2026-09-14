@@ -1,36 +1,57 @@
-"""
-signal.py — Z-score 60d + entry/exit rule + quarantine flag.
-
-Spec §13.3:
-- Entry: |z| > 2 (long low-leg, short high-leg)
-- Exit: z crosses 0 hoặc time-stop 2× half-life
-- Stop: |z| > 3 → cointegration breakdown → quarantine pair 60 phiên
-"""
+"""Causal z-scores and a quarantine-aware pairs signal state machine."""
 from __future__ import annotations
 
-import logging
 from typing import Optional
 
 import numpy as np
 import pandas as pd
 
-logger = logging.getLogger(__name__)
-
 DEFAULT_Z_WINDOW = 60
 DEFAULT_ENTRY = 2.0
 DEFAULT_STOP = 3.0
-DEFAULT_QUARANTINE_DAYS = 60
+DEFAULT_QUARANTINE_DAYS = 60  # Backward-compatible name; interpreted as sessions.
 
 
-def z_score_60d(spread: pd.Series, window: int = DEFAULT_Z_WINDOW) -> pd.Series:
-    """Rolling z-score: (spread - mean_w) / std_w.
+def z_score_60d(
+    spread: pd.Series,
+    window: int = DEFAULT_Z_WINDOW,
+    *,
+    method: str = "standard",
+    lagged: bool = True,
+) -> pd.Series:
+    """Causal rolling z-score.
 
-    Window default 60d theo spec §13.3.
+    With ``lagged=True`` (default), the location and scale used at t are based
+    only on observations through t-1. ``robust`` uses median/MAD and ``ewma``
+    uses exponentially weighted moments.
     """
-    mean = spread.rolling(window).mean()
-    std = spread.rolling(window).std()
-    z = (spread - mean) / std.replace(0, np.nan)
-    return z.rename("z_score")
+    values = pd.to_numeric(spread, errors="coerce").replace([np.inf, -np.inf], np.nan)
+    history = values.shift(1) if lagged else values
+    method = str(method).lower()
+    if method == "robust":
+        center = history.rolling(window, min_periods=window).median()
+        mad = history.rolling(window, min_periods=window).apply(
+            lambda x: np.median(np.abs(x - np.median(x))), raw=True
+        )
+        scale = 1.4826 * mad
+    elif method == "ewma":
+        center = history.ewm(span=window, min_periods=window, adjust=False).mean()
+        scale = history.ewm(span=window, min_periods=window, adjust=False).std()
+    elif method == "standard":
+        center = history.rolling(window, min_periods=window).mean()
+        scale = history.rolling(window, min_periods=window).std()
+    else:
+        raise ValueError(f"z-score method không hợp lệ: {method}")
+    return ((values - center) / scale.replace(0, np.nan)).rename("z_score")
+
+
+def _value_at(value: float | pd.Series | None, index: pd.Index, i: int) -> float | None:
+    if isinstance(value, pd.Series):
+        selected = value.reindex(index).iloc[i]
+        return float(selected) if pd.notna(selected) else None
+    if value is None:
+        return None
+    return float(value)
 
 
 def entry_exit_rules(
@@ -38,74 +59,90 @@ def entry_exit_rules(
     entry: float = DEFAULT_ENTRY,
     exit_band: float = 0.0,
     stop: float = DEFAULT_STOP,
-    half_life: Optional[float] = None,
+    half_life: Optional[float | pd.Series] = None,
+    *,
+    eligible: pd.Series | None = None,
+    quarantine_bars: int = DEFAULT_QUARANTINE_DAYS,
+    exit_on_ineligible: bool = True,
 ) -> pd.DataFrame:
-    """Generate position track từ z-series.
+    """Generate positions with hard stop-before-entry and session quarantine.
 
-    State machine:
-      flat → (z < -entry) → long_spread (long P1, short β·P2)
-      flat → (z > +entry) → short_spread
-      long_spread → (z >= exit_band) → flat
-      short_spread → (z <= exit_band) → flat
-      ANY → (|z| > stop) → flat + flag quarantine
-      ANY → (bars_held >= 2·half_life) → flat (time stop)
-
-    Returns DataFrame index=z.index, cols:
-      position     : -1/0/+1 (vs spread convention: +1 = long spread = long P1)
-      entry_date   : NaT khi flat, ngày vào lệnh khi position != 0
-      exit_reason  : "" | "mean_revert" | "stop_loss" | "time_stop" tại điểm exit
+    ``eligible`` is a point-in-time gate (cointegration, stability, rho, data
+    quality). It blocks new positions and, when ``exit_on_ineligible`` is true,
+    closes an existing position at the first failed gate.
     """
-    z = z.dropna()
-    n = len(z)
-    position = np.zeros(n, dtype=int)
-    entry_idx = np.full(n, -1, dtype=int)
-    exit_reason = [""] * n
+    if not 0 <= exit_band < entry < stop:
+        raise ValueError("Cần 0 <= exit_band < entry < stop")
+    if quarantine_bars < 0:
+        raise ValueError("quarantine_bars phải >= 0")
+    values = pd.to_numeric(z, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    n = len(values)
+    positions = np.zeros(n, dtype=int)
+    entry_indices = np.full(n, -1, dtype=int)
+    exit_reasons = [""] * n
+    events = [""] * n
+    quarantine_remaining = np.zeros(n, dtype=int)
+    gate = eligible.reindex(values.index).fillna(False).astype(bool) if eligible is not None else pd.Series(True, index=values.index)
 
-    state = 0  # 0=flat, +1=long spread, -1=short spread
+    state = 0
     entry_i = -1
-    time_stop_bars: Optional[int] = None
-    if half_life is not None and np.isfinite(half_life):
-        time_stop_bars = int(2 * half_life)
-
-    for i, val in enumerate(z.values):
-        if state != 0:
-            bars_held = i - entry_i
-            if abs(val) > stop:
-                exit_reason[i] = "stop_loss"
-                state = 0
-                entry_i = -1
-            elif state > 0 and val >= exit_band:
-                exit_reason[i] = "mean_revert"
-                state = 0
-                entry_i = -1
+    quarantine_until = -1
+    for i, val in enumerate(values.to_numpy(dtype=float)):
+        # A breakdown is always processed before an entry decision.
+        if abs(val) >= stop:
+            if state != 0:
+                exit_reasons[i] = "stop_loss"
+            events[i] = "breakdown"
+            state = 0
+            entry_i = -1
+            quarantine_until = max(quarantine_until, i + quarantine_bars)
+        elif state != 0:
+            held = i - entry_i
+            current_half_life = _value_at(half_life, values.index, i)
+            time_stop = (
+                int(np.ceil(2 * current_half_life))
+                if current_half_life is not None and np.isfinite(current_half_life) and current_half_life > 0
+                else None
+            )
+            if exit_on_ineligible and not bool(gate.iloc[i]):
+                exit_reasons[i] = "eligibility_break"
+                state, entry_i = 0, -1
+            elif state > 0 and val >= -exit_band:
+                exit_reasons[i] = "mean_revert"
+                state, entry_i = 0, -1
             elif state < 0 and val <= exit_band:
-                exit_reason[i] = "mean_revert"
-                state = 0
-                entry_i = -1
-            elif time_stop_bars and bars_held >= time_stop_bars:
-                exit_reason[i] = "time_stop"
-                state = 0
-                entry_i = -1
+                exit_reasons[i] = "mean_revert"
+                state, entry_i = 0, -1
+            elif time_stop is not None and held >= time_stop:
+                exit_reasons[i] = "time_stop"
+                state, entry_i = 0, -1
 
-        if state == 0 and exit_reason[i] == "":
-            if val < -entry:
-                state = +1
-                entry_i = i
-            elif val > +entry:
-                state = -1
-                entry_i = i
+        can_enter = state == 0 and i > quarantine_until and bool(gate.iloc[i]) and not exit_reasons[i]
+        if can_enter:
+            if -stop < val <= -entry:
+                state, entry_i, events[i] = 1, i, "entry"
+            elif entry <= val < stop:
+                state, entry_i, events[i] = -1, i, "entry"
 
-        position[i] = state
-        entry_idx[i] = entry_i
+        positions[i] = state
+        entry_indices[i] = entry_i
+        quarantine_remaining[i] = max(0, quarantine_until - i + 1)
 
-    entry_dates = np.where(entry_idx >= 0, z.index.values[entry_idx], np.datetime64("NaT"))
+    entry_dates = np.where(
+        entry_indices >= 0,
+        values.index.values[np.maximum(entry_indices, 0)],
+        np.datetime64("NaT"),
+    )
     return pd.DataFrame(
         {
-            "position": position,
+            "position": positions,
             "entry_date": pd.to_datetime(entry_dates),
-            "exit_reason": exit_reason,
+            "exit_reason": exit_reasons,
+            "event": events,
+            "quarantine_remaining": quarantine_remaining,
+            "eligible": gate.to_numpy(dtype=bool),
         },
-        index=z.index,
+        index=values.index,
     )
 
 
@@ -114,21 +151,20 @@ def quarantine_flag(
     stop: float = DEFAULT_STOP,
     days: int = DEFAULT_QUARANTINE_DAYS,
 ) -> Optional[pd.Timestamp]:
-    """Detect khi pair bị quarantine. Returns ngày kết thúc quarantine HOẶC None.
-
-    Trigger: |z| > stop trong N ngày gần đây.
-    Pair sẽ bị block trade cho tới ngày trả về.
-    """
-    z = z_history.dropna()
-    if z.empty:
+    """Return the estimated end of a trading-session quarantine, or ``None``."""
+    values = pd.to_numeric(z_history, errors="coerce").replace([np.inf, -np.inf], np.nan).dropna()
+    if values.empty:
         return None
-    breach_mask = z.abs() > stop
-    if not breach_mask.any():
+    breach_positions = np.flatnonzero(values.abs().to_numpy() >= stop)
+    if len(breach_positions) == 0:
         return None
-    last_breach = z.index[breach_mask][-1]
-    return pd.Timestamp(last_breach) + pd.Timedelta(days=days)
+    last_position = int(breach_positions[-1])
+    elapsed_sessions = len(values) - 1 - last_position
+    if elapsed_sessions >= days:
+        return None
+    remaining = days - elapsed_sessions
+    return pd.Timestamp(values.index[-1]) + pd.offsets.BDay(remaining)
 
 
 def detect_breakout(z: pd.Series, stop: float = DEFAULT_STOP) -> pd.Series:
-    """Bool series: True khi |z| > stop (point-wise breakout signal)."""
-    return (z.abs() > stop).fillna(False).astype(bool)
+    return (z.abs() >= stop).fillna(False).astype(bool)

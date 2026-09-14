@@ -28,7 +28,7 @@
 | --- | --- | --- |
 | Macro liquidity | Fed Liquidity, GFCM, VNIBOR, LTMM | Net liquidity, interbank rates, 11-indicator global stress, PCA core, percentile regime, liquidity transmission |
 | Market internals & behavior | Fear & Greed, Breadth, Dispersion, ESR, VaRES, VaR/CVaR, ABM, sentiment feed | PCA, EGARCH/GARCH/EWMA fallback, HMM/rule regimes, CSAD/CSSD, EVT POT-GPD, Hill tail diagnostic, news taxonomy |
-| Micro research | Factor Examination, Pairs Trading, Risk-Adjusted Growth | Sector-neutral factor z-score, IC validation, Engle-Granger/Johansen, OU half-life, Hurst, bank growth quality |
+| Micro research | Factor Examination, Pairs Trading, Risk-Adjusted Growth | Sector-neutral factor z-score, IC validation, FDR-controlled cointegration, walk-forward pair portfolio, bank growth quality |
 | Valuation & fundamentals | Bank Valuation, VN100 Corporate Health, PVGO | Adjusted book value, sustainable ROE, residual income, justified P/B, earnings health matrix, P/E-PVGO context |
 | Reporting & audit | AI-CIO, Data Health, Humility/Falsification | Evidence packets, decision-state ledger, stale-data checks, falsification rules, PDF/Telegram/GitHub automation |
 
@@ -44,6 +44,6 @@
 
 - `shared/ai_cio.py` đang là module lớn, nên tách thành registry/adapters nếu thêm nhiều công cụ.
 - Một số path UI/report vẫn bắt `Exception` rộng; nên thay bằng exception cụ thể và logging có cấu trúc.
-- Pairs trading cần adjusted-price pipeline tốt hơn cho dividends/splits/corporate actions.
+- Pairs Trading hiện fail closed và yêu cầu xác minh corporate action thủ công; vẫn cần nguồn adjusted-price có provenance để tự động hóa gate này.
 - Cache một số report còn dựa vào ngày chạy local; data-date-aware cache sẽ tốt hơn cho cloud và timezone.
 - Kết quả strategy cần thêm out-of-sample, walk-forward, transaction-cost sensitivity và leakage audit trước khi dùng live.

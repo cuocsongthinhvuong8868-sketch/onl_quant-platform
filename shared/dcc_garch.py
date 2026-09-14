@@ -291,9 +291,11 @@ def _ewma_correlation(returns: pd.DataFrame, lambda_: float = EWMA_LAMBDA) -> pd
     T, N = x.shape
 
     # EWMA covariance recursion
-    cov = np.cov(x[: min(30, T)], rowvar=False)
-    for t in range(1, T):
-        cov = lambda_ * cov + (1.0 - lambda_) * np.outer(x[t - 1], x[t - 1])
+    seed_len = min(30, T)
+    cov = np.atleast_2d(np.cov(x[:seed_len], rowvar=False))
+    # Do not double-count the seed observations.
+    for t in range(seed_len, T):
+        cov = lambda_ * cov + (1.0 - lambda_) * np.outer(x[t], x[t])
 
     d = np.sqrt(np.diag(cov))
     corr = cov / np.outer(d, d)
@@ -311,10 +313,13 @@ def _ewma_pair_correlation_series(returns: pd.DataFrame, t1: str, t2: str, lambd
     # Seed với 30-obs sample cov
     cov_00, cov_11, cov_01 = np.cov(x[:30], rowvar=False).flatten()[[0, 3, 1]]
     rho = np.full(T, np.nan)
-    rho[0] = cov_01 / np.sqrt(cov_00 * cov_11)
-    for t in range(1, T):
-        r0 = x[t - 1, 0]
-        r1 = x[t - 1, 1]
+    seed_index = 29
+    rho[seed_index] = cov_01 / np.sqrt(cov_00 * cov_11)
+    # Values before seed_index remain NaN: emitting the 30-observation seed at
+    # the first timestamp would leak 29 future returns into history.
+    for t in range(30, T):
+        r0 = x[t, 0]
+        r1 = x[t, 1]
         cov_00 = lambda_ * cov_00 + (1 - lambda_) * r0 * r0
         cov_11 = lambda_ * cov_11 + (1 - lambda_) * r1 * r1
         cov_01 = lambda_ * cov_01 + (1 - lambda_) * r0 * r1

@@ -36,8 +36,15 @@ def render_sidebar(available_tickers: list[str]) -> dict:
     )
     z_stop = st.sidebar.number_input(
         "Stop-loss |z| threshold",
-        min_value=2.0, max_value=5.0, value=3.0, step=0.1,
+        min_value=float(z_entry + 0.1), max_value=6.0,
+        value=float(max(3.0, z_entry + 0.5)), step=0.1,
         help="Spec §13.3: |z|>3 → cointegration breakdown",
+    )
+    z_method = st.sidebar.selectbox(
+        "Z-score estimator",
+        options=["standard", "robust", "ewma"],
+        index=0,
+        help="Tất cả estimator dùng location/scale đến t-1. Robust=MAD; EWMA thích nghi volatility.",
     )
 
     st.sidebar.markdown("### Half-life filter")
@@ -49,7 +56,7 @@ def render_sidebar(available_tickers: list[str]) -> dict:
 
     st.sidebar.markdown("### DCC correlation filter")
     use_dcc_filter = st.sidebar.checkbox(
-        "Enable DCC ρ filter",
+        "Enable dynamic-correlation gate",
         value=False,
         help=(
             "Lọc pair theo dynamic correlation tại last date. "
@@ -76,6 +83,11 @@ def render_sidebar(available_tickers: list[str]) -> dict:
             "dcc: bivariate DCC(1,1) MLE per pair, ~5-30s/pair, dùng cho audit."
         ),
     )
+    require_stability = st.sidebar.checkbox(
+        "Require stable hedge ratio",
+        value=True,
+        help="Reject pair nếu rolling beta drift/CV vượt 25%.",
+    )
 
     st.sidebar.markdown("### Universe Scanner")
     same_sector_only = st.sidebar.checkbox(
@@ -99,12 +111,32 @@ def render_sidebar(available_tickers: list[str]) -> dict:
             "Lower = nhiều candidate hơn nhưng noise tăng. Default 0.75."
         ),
     )
+    min_adv_bn = st.sidebar.number_input(
+        "Min median ADV20 mỗi leg (tỷ VND)",
+        min_value=0.1, max_value=1_000.0, value=1.0, step=0.5,
+    )
 
     st.sidebar.markdown("### Backtest window")
     lookback_years = st.sidebar.slider(
         "Lookback (years)",
-        min_value=1, max_value=6, value=2,
+        min_value=2, max_value=8, value=3,
         help="2 năm default cho backtest panel",
+    )
+    formation_window = st.sidebar.select_slider(
+        "Formation window (sessions)",
+        options=[126, 252, 378, 504],
+        value=252,
+    )
+    refit_every = st.sidebar.select_slider(
+        "Refit cadence (sessions)",
+        options=[5, 10, 20, 40, 60],
+        value=20,
+    )
+    hedge_method = st.sidebar.selectbox(
+        "Hedge sizing model",
+        options=["ols", "rolling", "kalman"],
+        index=0,
+        help="Signal eligibility vẫn dùng EG OLS; rolling/Kalman là causal sizing challengers.",
     )
 
     st.sidebar.markdown("---")
@@ -139,15 +171,42 @@ def render_sidebar(available_tickers: list[str]) -> dict:
 
     st.sidebar.markdown("---")
     tc_bps = st.sidebar.number_input(
-        "Transaction cost (bps round-trip)",
-        min_value=5.0, max_value=50.0, value=15.0, step=1.0,
-        help="0.15% broker + 0% sell tax (BUY trade VN không tax)",
+        "Broker + slippage (bps one-way)",
+        min_value=0.0, max_value=100.0, value=15.0, step=1.0,
+        help="Áp trên traded notional ở cả entry/exit; không bao gồm thuế bán.",
+    )
+    sell_tax_bps = st.sidebar.number_input(
+        "Sell tax (bps)",
+        min_value=0.0, max_value=50.0, value=10.0, step=1.0,
+    )
+    borrow_bps_annual = st.sidebar.number_input(
+        "Borrow cost (bps/year)",
+        min_value=0.0, max_value=5_000.0, value=500.0, step=50.0,
     )
     capital = st.sidebar.number_input(
         "Capital cho order ticket (nghìn VND)",
         min_value=10_000, max_value=10_000_000, value=200_000, step=10_000,
         help="200_000 = 200 triệu VND. Đơn vị nghìn VND khớp với price data.",
     )
+    max_pair_weight = st.sidebar.slider(
+        "Portfolio max weight / pair",
+        min_value=0.05, max_value=1.0, value=0.25, step=0.05,
+    )
+
+    st.sidebar.markdown("---")
+    with st.sidebar.expander("Execution verification (required for ticket)"):
+        adjusted_verified = st.checkbox(
+            "Đã đối soát adjusted prices/corporate actions", value=False, key="pairs_adjusted_verified"
+        )
+        borrow_confirmed = st.checkbox(
+            "Đã xác nhận borrow inventory và fee", value=False, key="pairs_borrow_confirmed"
+        )
+        shortable = st.checkbox(
+            "Short leg thuộc danh sách được phép", value=False, key="pairs_shortable"
+        )
+        foreign_room_verified = st.checkbox(
+            "Đã xác minh FOL/foreign room", value=False, key="pairs_fol_verified"
+        )
 
     return {
         "cluster": cluster,
@@ -159,10 +218,23 @@ def render_sidebar(available_tickers: list[str]) -> dict:
         "custom_t1": ct1,
         "custom_t2": ct2,
         "tc_bps": float(tc_bps),
+        "sell_tax_bps": float(sell_tax_bps),
+        "borrow_bps_annual": float(borrow_bps_annual),
         "capital": int(capital),
         "use_dcc_filter": bool(use_dcc_filter),
         "min_rho": float(min_rho),
-        "dcc_method": str(dcc_method),
+        "dcc_method": str(dcc_method if use_dcc_filter else "ewma"),
+        "z_method": str(z_method),
+        "require_stability": bool(require_stability),
+        "formation_window": int(formation_window),
+        "refit_every": int(refit_every),
+        "hedge_method": str(hedge_method),
+        "min_adv_vnd": float(min_adv_bn) * 1_000_000_000.0,
+        "max_pair_weight": float(max_pair_weight),
+        "adjusted_verified": bool(adjusted_verified),
+        "borrow_confirmed": bool(borrow_confirmed),
+        "shortable": bool(shortable),
+        "foreign_room_verified": bool(foreign_room_verified),
         "same_sector_only": bool(same_sector_only),
         "cross_exchange": bool(cross_exchange),
         "min_rho_screen": float(min_rho_screen),

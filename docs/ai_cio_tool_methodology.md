@@ -163,7 +163,9 @@ The daily AI CIO prompt does not ingest this full document. It ingests compact m
 ## Pairs Trading
 
 - Domain: relative-value execution research.
-- Methodology control: order-ticket notionals are sized by the estimated hedge-ratio beta rather than split 50/50.
+- Methodology control: MacKinnon Engle-Granger p-values with I(1) validation, BH-FDR for pair families, guarded Johansen, causal z/correlation paths and periodic walk-forward refits.
+- Portfolio control: gross-normalized pair weights, shared-leg netting, explicit broker/slippage, sell-tax and borrow costs, plus trade-level ledger metrics.
+- Execution control: ticket generation fails closed unless adjusted-price, freshness/common quote, ADV, borrow/shortability, FOL and model-as-of checks pass.
 - AI CIO scope: excluded from regime consensus and asset allocation unless a dedicated structured packet is explicitly supplied.
 
 ## Sentiment Factor From News

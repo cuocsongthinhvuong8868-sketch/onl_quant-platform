@@ -1,5 +1,7 @@
 from __future__ import annotations
 
+from dataclasses import dataclass
+
 import numpy as np
 import pandas as pd
 
@@ -29,14 +31,40 @@ def test_pairs_trading_report_snapshot_scans_predefined_clusters(monkeypatch) ->
         }
 
     monkeypatch.setattr(report, "PREDEFINED_CLUSTERS", {"Test": ["AAA", "BBB", "CCC"]})
-    monkeypatch.setattr(report, "johansen_test", lambda prices_arg: {"n_coint_vectors": 1})
-    monkeypatch.setattr(report, "engle_granger", fake_engle_granger)
-    monkeypatch.setattr(report, "ou_half_life_raw", lambda resid: 12.3)
     monkeypatch.setattr(
         report,
-        "z_score_60d",
-        lambda resid: pd.Series([2.2] * len(resid), index=resid.index),
+        "johansen_test",
+        lambda prices_arg: {"n_coint_vectors": 1, "valid_system": True},
     )
+    monkeypatch.setattr(report, "engle_granger", fake_engle_granger)
+
+    @dataclass
+    class FakeResult:
+        t1: str
+        t2: str
+        p_value: float
+        q_value: float
+        eligible: bool
+        z_latest: float = 2.2
+
+        def to_record(self) -> dict:
+            return {
+                "pair": f"{self.t1}/{self.t2}",
+                "p_value": self.p_value,
+                "q_value": self.q_value,
+                "i1_valid": True,
+                "eligible": self.eligible,
+                "beta": 1.25,
+                "half_life": 12.3,
+                "z_score": self.z_latest,
+                "rho_now": 0.7,
+            }
+
+    def fake_analyze_pair(prices_arg, t1, t2, config, *, q_value):
+        p_value = 0.01 if {t1, t2} == {"AAA", "BBB"} else 0.2
+        return FakeResult(t1, t2, p_value, q_value, q_value < 0.05)
+
+    monkeypatch.setattr(report, "analyze_pair", fake_analyze_pair)
 
     row = report.snapshot(prices)
 

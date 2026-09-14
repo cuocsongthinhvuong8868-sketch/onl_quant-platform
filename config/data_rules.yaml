@@ -51,6 +51,14 @@ sources:
     frequency: business_daily
     date_columns: [time, date, DATE]
 
+  - name: ticker_metadata
+    category: raw/market
+    path: data_lake/ticker_metadata.csv
+    warning_days: 45
+    critical_days: 120
+    frequency: monthly
+    date_columns: [updated_at, date, DATE]
+
   - name: vnindex_cache
     category: raw/market
     path: data_lake/vnindex_cache.csv
@@ -176,7 +184,7 @@ sources:
     category: processed/tool_metrics/micro
     type: tool_metrics
     tool: Pairs Trading Research Lab
-    depends_on: [market_data]
+    depends_on: [market_data, market_volume, ticker_metadata]
     warning_days: 3
     critical_days: 10
 

@@ -1,809 +1,762 @@
-"""
-page.py — Pairs Trading Streamlit page.
-
-6 tabs:
-  1. Cluster Scan         — Johansen + half-life + dominant spread
-  2. Pairwise Heatmap     — NxN EG p-value matrix + current ρ heatmap
-  3. Universe Scanner     — 4-stage funnel (sector → ρ → EG → half-life) → top candidate
-  4. Custom Pair          — Full EG + OU + Hurst + z-score + DCC + 2yr backtest
-  5. Backtest aggregate   — All cointegrated pair trong cluster
-  6. Live Signals (P2)    — Current cointegrated pair với |z|, order ticket gen
-
-KHÔNG plug AI CIO (spec §13.5).
-"""
+"""Pairs Trading Research Lab — point-in-time methodology v2."""
 from __future__ import annotations
 
+import hashlib
+import json
 import logging
-from datetime import datetime, time as dtime
+from dataclasses import asdict, replace
+from datetime import datetime
+from itertools import combinations
+from pathlib import Path
 
 import numpy as np
 import pandas as pd
+import plotly.graph_objects as go
 import streamlit as st
 
-from shared.data_loader import load_close_prices
-from tools.pairs_trading.quant.clusters import (
-    PREDEFINED_CLUSTERS,
-    CLUSTER_DESCRIPTIONS,
-    validate_clusters_against_universe,
-)
+from config import MARKET_DATA, MARKET_VOLUME
+from shared.data_loader import load_close_prices, load_ticker_metadata, load_volumes
+from tools.pairs_trading.quant.clusters import CLUSTER_DESCRIPTIONS, PREDEFINED_CLUSTERS
 from tools.pairs_trading.quant.cointegration import (
-    engle_granger,
-    johansen_test,
-    ou_half_life_raw,
-    hurst,
-    pairwise_eg_matrix,
-    HALF_LIFE_MIN,
     HALF_LIFE_MAX,
+    HALF_LIFE_MIN,
+    hurst,
+    johansen_test,
+    pairwise_eg_details,
 )
-from tools.pairs_trading.quant.signal import (
-    z_score_60d,
-    entry_exit_rules,
-    quarantine_flag,
+from tools.pairs_trading.quant.data import (
+    MarketDataSnapshot,
+    assess_execution_readiness,
+    build_market_data_snapshot,
 )
-from tools.pairs_trading.quant.backtest import (
-    basket_pnl,
-    summary_stats,
-    generate_order_ticket,
-    order_ticket_to_json,
+from tools.pairs_trading.quant.engine import (
+    PairAnalysisResult,
+    PairResearchConfig,
+    analyze_pair,
+    walk_forward_backtest,
 )
-from tools.pairs_trading.quant.dcc_filter import (
-    cluster_rho_matrix,
-    pair_rho_now,
-    pair_rho_series,
-    passes_rho_filter,
-)
+from tools.pairs_trading.quant.portfolio import aggregate_pair_backtests
 from tools.pairs_trading.quant.scanner import run_universe_scan
-from tools.pairs_trading.ui.sidebar import render_sidebar
+from tools.pairs_trading.quant.signal import entry_exit_rules, quarantine_flag, z_score_60d
+from tools.pairs_trading.quant.backtest import generate_order_ticket, order_ticket_to_json
+from tools.pairs_trading.quant.dcc_filter import cluster_rho_matrix
 from tools.pairs_trading.ui.charts import (
-    render_spread_chart,
-    render_cluster_heatmap,
     render_backtest_equity,
-    render_residual_diagnostics,
-    render_pair_rho_chart,
+    render_cluster_heatmap,
     render_correlation_heatmap,
+    render_pair_rho_chart,
+    render_residual_diagnostics,
+    render_spread_chart,
 )
+from tools.pairs_trading.ui.sidebar import render_sidebar
 
 logger = logging.getLogger(__name__)
 
 
-# ─────────────────────────────────────────────────
-# Cached compute (Streamlit-side)
-# ─────────────────────────────────────────────────
+def _mtime(path: Path) -> int:
+    try:
+        return path.stat().st_mtime_ns
+    except OSError:
+        return 0
 
 
-@st.cache_data(ttl=86400, show_spinner=False)
-def _load_prices_for_pairs(lookback_years: int) -> pd.DataFrame:
-    """Load close prices restricted to lookback window."""
+@st.cache_data(ttl=3600, show_spinner=False)
+def _load_snapshot(
+    price_mtime: int,
+    volume_mtime: int,
+    metadata_mtime: int,
+) -> MarketDataSnapshot:
+    del price_mtime, volume_mtime, metadata_mtime
     prices = load_close_prices()
-    end = prices.index[-1]
-    start = end - pd.Timedelta(days=int(lookback_years * 365))
-    return prices.loc[start:]
-
-
-# ─────────────────────────────────────────────────
-# Helper: warnings (FOL, lunch break, refit stale)
-# ─────────────────────────────────────────────────
-
-
-def _show_global_warnings() -> None:
-    """Top-of-page banners — appear ở tất cả tab."""
-    st.info(
-        "⚠️ **Foreign Ownership Limit (FOL) check**: tool ASSUMES `foreign_room > 5%` cho tất cả ticker. "
-        "Free-tier vnstock không cung cấp daily FOL data — manual verify trước khi submit order thực.",
-        icon="ℹ️",
-    )
-    st.warning(
-        "⚠️ **Corp-action**: prices KHÔNG explicit-adjusted cho split/dividend. vnstock KBS source "
-        "thường default đã adjusted, nhưng edge case có thể fake-break cointegration tại corp-action date.",
-        icon="📋",
+    volumes = load_volumes()
+    metadata = load_ticker_metadata()
+    return build_market_data_snapshot(
+        prices,
+        volumes,
+        metadata,
+        adjusted_verified=False,
+        point_in_time_universe=False,
+        mask_stale_quotes_with_volume=True,
     )
 
-    # Lunch break ICT warning
-    now = datetime.now()
-    lunch_start = dtime(11, 30)
-    lunch_end = dtime(13, 0)
-    if lunch_start <= now.time() <= lunch_end:
-        st.warning(
-            f"🍱 **VN lunch break** ({now.strftime('%H:%M')}) — sàn nghỉ 11:30-13:00 ICT. "
-            "Orders sẽ queue tới 13:00. Không auto-execute.",
-            icon="⏰",
-        )
+
+def _config(params: dict, *, alpha: float = 0.05) -> PairResearchConfig:
+    return PairResearchConfig(
+        formation_window=params["formation_window"],
+        refit_every=params["refit_every"],
+        z_method=params["z_method"],
+        entry_z=params["z_entry"],
+        stop_z=params["z_stop"],
+        hl_min=params["hl_min"],
+        hl_max=params["hl_max"],
+        min_rho=params["min_rho"],
+        use_rho_filter=params["use_dcc_filter"],
+        rho_method=params["dcc_method"],
+        require_stability=params["require_stability"],
+        hedge_method=params["hedge_method"],
+        tc_bps_one_way=params["tc_bps"],
+        sell_tax_bps=params["sell_tax_bps"],
+        borrow_bps_annual=params["borrow_bps_annual"],
+        alpha=alpha,
+    )
 
 
-# ─────────────────────────────────────────────────
-# Tab 1: Cluster Scan (Johansen)
-# ─────────────────────────────────────────────────
+@st.cache_data(ttl=3600, show_spinner=False)
+def _walk_forward_cached(
+    data_fingerprint: str,
+    prices: pd.DataFrame,
+    t1: str,
+    t2: str,
+    config_values: dict,
+):
+    del data_fingerprint
+    return walk_forward_backtest(prices, t1, t2, PairResearchConfig(**config_values))
+
+
+def _window(snapshot: MarketDataSnapshot, years: int) -> pd.DataFrame:
+    start = snapshot.quality.as_of - pd.Timedelta(days=int(years * 365.25))
+    return snapshot.prices.loc[start:]
+
+
+def _quality_panel(snapshot: MarketDataSnapshot) -> None:
+    quality = snapshot.quality
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Data as-of", quality.as_of.strftime("%Y-%m-%d"))
+    c2.metric("Dataset", quality.fingerprint)
+    c3.metric("Invalid prices removed", quality.nonpositive_cells_removed)
+    c4.metric("Stale quotes masked", quality.volume_masked_cells)
+    if quality.warnings:
+        st.warning(" | ".join(quality.warnings))
+    st.caption(
+        "Live ticket is hard-gated until adjusted-price, borrow/shortability, FOL, "
+        "liquidity, common quote and model-as-of checks all pass."
+    )
+
+
+def _cluster_prices(prices: pd.DataFrame, cluster: str) -> tuple[pd.DataFrame, list[str]]:
+    tickers = [ticker for ticker in PREDEFINED_CLUSTERS[cluster] if ticker in prices]
+    if len(tickers) < 2:
+        raise ValueError("Cần >=2 ticker có dữ liệu trong cluster")
+    return prices[tickers].dropna(how="any"), tickers
 
 
 def _tab_cluster_scan(prices: pd.DataFrame, params: dict) -> None:
-    cluster_name = params["cluster"]
-    tickers_all = PREDEFINED_CLUSTERS[cluster_name]
-    available = [t for t in tickers_all if t in prices.columns]
-    missing = [t for t in tickers_all if t not in prices.columns]
-
-    st.markdown(f"### Cluster: **{cluster_name}**")
-    st.caption(CLUSTER_DESCRIPTIONS.get(cluster_name, ""))
-    col1, col2 = st.columns([2, 1])
-    with col1:
-        st.write(f"Tickers: `{', '.join(available)}`" + (f" (missing: {missing})" if missing else ""))
-    with col2:
-        if len(available) < 2:
-            st.error("Cần ≥2 ticker available")
-            return
-
-    if len(available) < 2:
-        return
-
-    # Johansen test
-    sub = prices[available].dropna(how="any").loc["2018-01-01":]
-    if len(sub) < 100:
-        st.error(f"Chỉ {len(sub)} obs sau dropna+2018-filter — không đủ cho Johansen")
-        return
-
+    cluster = params["cluster"]
+    st.markdown(f"### Cluster: **{cluster}**")
+    st.caption(CLUSTER_DESCRIPTIONS.get(cluster, ""))
     try:
-        joh = johansen_test(sub)
+        sub, tickers = _cluster_prices(prices, cluster)
+        result = johansen_test(sub)
     except Exception as exc:
-        st.error(f"Johansen fit fail: {exc}")
+        st.error(f"Johansen không chạy được: {exc}")
         return
-
-    # Display trace stat
-    n = len(available)
-    df_trace = pd.DataFrame(
+    trace = pd.DataFrame(
         {
-            "H0: r ≤": list(range(n)),
-            "Trace stat": joh["trace_stat"].round(3),
-            "Crit 95%": joh["trace_crit_95"].round(3),
-            "Reject H0?": joh["trace_stat"] > joh["trace_crit_95"],
+            "H0: rank <=": range(len(tickers)),
+            "Trace stat": result["trace_stat"],
+            "Crit 95%": result["trace_crit_95"],
+            "Reject": result["trace_stat"] > result["trace_crit_95"],
         }
     )
-    st.markdown("#### Johansen trace statistics")
-    st.dataframe(df_trace, use_container_width=True, hide_index=True)
-    st.metric("n_coint_vectors (95% CI)", joh["n_coint_vectors"])
+    st.dataframe(trace, width="stretch", hide_index=True)
+    c1, c2, c3 = st.columns(3)
+    c1.metric("Effective rank", result["n_coint_vectors"])
+    c2.metric("Raw rank", result["raw_rank"])
+    c3.metric("Selected Δ lags", result["k_ar_diff"])
+    for warning in result["warnings"]:
+        st.warning(warning)
+    if result["n_coint_vectors"] < 1:
+        st.info("Cluster không có cointegrating vector hợp lệ sau I(1)/full-rank guardrail.")
+        return
+    vector = result["eig_vectors"][:, 0]
+    normalizer = vector[np.argmax(np.abs(vector))]
+    normalized = vector / normalizer
+    st.dataframe(
+        pd.DataFrame({"Ticker": tickers, "Cointegrating weight": normalized}),
+        width="stretch",
+        hide_index=True,
+    )
+    spread = pd.Series(np.log(sub.to_numpy()) @ normalized, index=sub.index, name="spread")
+    z = z_score_60d(spread, method=params["z_method"], lagged=True)
+    half_life = float("nan")
+    from tools.pairs_trading.quant.cointegration import ou_half_life_raw
 
-    if joh["n_coint_vectors"] == 0:
-        st.warning(f"Cluster **{cluster_name}** không có cointegration vector ở 95% CI — pairs trade dùng cluster này có RISK.")
-
-    # Dominant eigenvector → spread series
-    if joh["n_coint_vectors"] >= 1:
-        beta_vec = joh["eig_vectors"][:, 0]
-        beta_norm = beta_vec / beta_vec[0]
-        st.markdown("#### Dominant cointegrating vector (normalized to β₁=1)")
-        df_beta = pd.DataFrame({"Ticker": available, "β": beta_norm.round(4)})
-        st.dataframe(df_beta, use_container_width=True, hide_index=True)
-
-        log_p = np.log(sub.values)
-        spread_arr = log_p @ beta_vec
-        spread = pd.Series(spread_arr, index=sub.index, name="spread")
-        hl_raw = ou_half_life_raw(spread)
-        z_series = z_score_60d(spread)
-        sig = entry_exit_rules(
-            z_series.dropna(),
-            entry=params["z_entry"], stop=params["z_stop"],
-            half_life=hl_raw,
-        )
-        col_hl, col_h = st.columns(2)
-        col_hl.metric("OU half-life (days)", f"{hl_raw:.1f}" if np.isfinite(hl_raw) else "NaN")
-        col_h.metric("Hurst H", f"{hurst(spread):.3f}")
-        if np.isfinite(hl_raw) and not (HALF_LIFE_MIN <= hl_raw <= HALF_LIFE_MAX):
-            st.warning(
-                f"Half-life {hl_raw:.1f}d ngoài band [{HALF_LIFE_MIN}, {HALF_LIFE_MAX}] — "
-                "<5d: noise (phí ăn hết); >30d: drift/regime change. Spec §13.3 → SKIP trade.",
-                icon="⚠️",
-            )
-
-        st.plotly_chart(
-            render_spread_chart(
-                spread, z_series, sig,
-                z_entry=params["z_entry"], z_stop=params["z_stop"],
-                title=f"{cluster_name} Johansen spread",
-            ),
-            use_container_width=True,
-        )
-
-
-# ─────────────────────────────────────────────────
-# Tab 2: Pairwise Heatmap
-# ─────────────────────────────────────────────────
+    half_life = ou_half_life_raw(spread)
+    signals = entry_exit_rules(
+        z.dropna(),
+        entry=params["z_entry"],
+        stop=params["z_stop"],
+        half_life=half_life,
+    )
+    c1, c2 = st.columns(2)
+    c1.metric("OU half-life", f"{half_life:.1f}" if np.isfinite(half_life) else "—")
+    c2.metric("Hurst", f"{hurst(spread):.3f}")
+    if not np.isfinite(half_life) or not HALF_LIFE_MIN <= half_life <= HALF_LIFE_MAX:
+        st.warning("Half-life ngoài execution band; chart chỉ dùng cho diagnostics.")
+    st.plotly_chart(
+        render_spread_chart(
+            spread,
+            z,
+            signals,
+            z_entry=params["z_entry"],
+            z_stop=params["z_stop"],
+            title=f"{cluster} Johansen spread",
+        ),
+        width="stretch",
+    )
 
 
 def _tab_pairwise(prices: pd.DataFrame, params: dict) -> None:
-    cluster_name = params["cluster"]
-    tickers = [t for t in PREDEFINED_CLUSTERS[cluster_name] if t in prices.columns]
-    if len(tickers) < 2:
-        st.error("Cần ≥2 ticker available trong cluster")
+    cluster = params["cluster"]
+    try:
+        sub, tickers = _cluster_prices(prices, cluster)
+        details = pairwise_eg_details(sub, tickers)
+    except Exception as exc:
+        st.error(f"Pairwise scan không chạy được: {exc}")
         return
-
-    st.markdown(f"### Pairwise EG p-value — {cluster_name}")
-    sub = prices[tickers].dropna(how="any").loc["2018-01-01":]
-    with st.spinner("Computing EG matrix..."):
-        M = pairwise_eg_matrix(sub, tickers)
-    st.plotly_chart(render_cluster_heatmap(M, threshold=0.05), use_container_width=True)
-
-    # DCC current correlation heatmap (cheap EWMA path, luôn show side-by-side)
+    if details.empty:
+        st.info("Không có pair đủ dữ liệu.")
+        return
+    q_matrix = pd.DataFrame(np.nan, index=tickers, columns=tickers)
+    np.fill_diagonal(q_matrix.values, 0.0)
+    for row in details.itertuples():
+        q_matrix.loc[row.t1, row.t2] = row.q_value
+        q_matrix.loc[row.t2, row.t1] = row.q_value
+    st.markdown(f"### Pairwise Engle–Granger FDR — {cluster}")
+    st.caption("Một orientation định trước cho mỗi pair; heatmap hiển thị q-value Benjamini–Hochberg.")
+    st.plotly_chart(render_cluster_heatmap(q_matrix, threshold=0.05), width="stretch")
     rho_matrix = cluster_rho_matrix(sub, tickers)
     if not rho_matrix.empty:
-        st.markdown("#### Current dynamic correlation (EWMA λ=0.94)")
-        st.caption(
-            "Pair có ρ cao + p-value EG thấp = ứng viên tốt nhất (cointegrated + co-moving). "
-            "Pair ρ thấp dù EG pass = stale relationship, regime đã đổi."
-        )
-        st.plotly_chart(render_correlation_heatmap(rho_matrix), use_container_width=True)
-
-    # Sort cointegrated pairs by p-value, thêm ρ column
-    rows = []
-    for i, t1 in enumerate(tickers):
-        for j, t2 in enumerate(tickers):
-            if i < j:
-                p = M.iloc[i, j]
-                if pd.notna(p):
-                    rho_val = (
-                        float(rho_matrix.loc[t1, t2])
-                        if not rho_matrix.empty
-                        and t1 in rho_matrix.index
-                        and t2 in rho_matrix.columns
-                        else np.nan
-                    )
-                    rows.append({
-                        "Pair": f"{t1}/{t2}",
-                        "p_value": p,
-                        "ρ_now": rho_val,
-                        "Cointegrated": p < 0.05,
-                    })
-    if rows:
-        df = pd.DataFrame(rows).sort_values("p_value")
-        st.markdown("#### Ranked pairs (low p = strong cointegration, high ρ = co-moving)")
-        st.dataframe(
-            df.style.format({"p_value": "{:.4f}", "ρ_now": "{:.3f}"}),
-            use_container_width=True, hide_index=True,
-        )
+        st.plotly_chart(render_correlation_heatmap(rho_matrix), width="stretch")
+    table = details[
+        ["orientation", "p_value", "q_value", "i1_valid", "fdr_cointegrated", "beta", "n_obs"]
+    ].copy()
+    table = table.rename(columns={"orientation": "Pair", "fdr_cointegrated": "FDR pass"})
+    st.dataframe(
+        table.sort_values("q_value"),
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "p_value": st.column_config.NumberColumn(format="%.4f"),
+            "q_value": st.column_config.NumberColumn(format="%.4f"),
+            "beta": st.column_config.NumberColumn(format="%.4f"),
+        },
+    )
 
 
-# ─────────────────────────────────────────────────
-# Tab 3: Custom Pair (full pipeline)
-# ─────────────────────────────────────────────────
+def _scanner_fingerprint(snapshot: MarketDataSnapshot, params: dict) -> str:
+    payload = {
+        "dataset": snapshot.quality.fingerprint,
+        "same_sector_only": params["same_sector_only"],
+        "cross_exchange": params["cross_exchange"],
+        "min_rho_screen": params["min_rho_screen"],
+        "hl_min": params["hl_min"],
+        "hl_max": params["hl_max"],
+        "formation_window": params["formation_window"],
+        "min_adv_vnd": params["min_adv_vnd"],
+        "require_stability": params["require_stability"],
+    }
+    return hashlib.sha256(json.dumps(payload, sort_keys=True).encode()).hexdigest()[:16]
+
+
+@st.cache_data(ttl=3600, show_spinner=False)
+def _run_scanner_cached(
+    data_fingerprint: str,
+    prices: pd.DataFrame,
+    volumes: pd.DataFrame | None,
+    metadata: pd.DataFrame | None,
+    params_json: str,
+) -> pd.DataFrame:
+    del data_fingerprint
+    return run_universe_scan(
+        prices,
+        json.loads(params_json),
+        volumes=volumes,
+        metadata=metadata,
+    )
+
+
+def _tab_universe_scanner(snapshot: MarketDataSnapshot, params: dict) -> None:
+    st.markdown("### Universe Scanner v2")
+    st.caption(
+        "Sector/exchange → return correlation → proper EG + I(1) → BH-FDR → "
+        "exact half-life → beta stability → ADV capacity."
+    )
+    fingerprint = _scanner_fingerprint(snapshot, params)
+    scan_params = {
+        "same_sector_only": params["same_sector_only"],
+        "cross_exchange": params["cross_exchange"],
+        "min_rho_screen": params["min_rho_screen"],
+        "hl_min": params["hl_min"],
+        "hl_max": params["hl_max"],
+        "formation_window": params["formation_window"],
+        "min_adv_vnd": params["min_adv_vnd"],
+        "require_stability": params["require_stability"],
+        "alpha": 0.05,
+    }
+    c1, c2 = st.columns([1, 4])
+    run = c1.button("Run scanner", type="primary", width="stretch")
+    c2.caption(f"Cache key {fingerprint}; tự stale khi data hoặc filter đổi.")
+    if run:
+        try:
+            with st.spinner("Scanning point-in-time universe..."):
+                result = _run_scanner_cached(
+                    snapshot.quality.fingerprint,
+                    snapshot.prices,
+                    snapshot.volumes,
+                    snapshot.metadata,
+                    json.dumps(scan_params, sort_keys=True),
+                )
+            st.session_state["pairs_scanner_result"] = result
+            st.session_state["pairs_scanner_fingerprint"] = fingerprint
+        except Exception as exc:
+            st.error(f"Scanner failed: {exc}")
+            logger.exception("Pairs scanner failed")
+            return
+    result = st.session_state.get("pairs_scanner_result")
+    stored_fingerprint = st.session_state.get("pairs_scanner_fingerprint")
+    if result is None:
+        st.info("Bấm Run scanner để tạo candidate set.")
+        return
+    if stored_fingerprint != fingerprint:
+        st.warning("Kết quả cũ không khớp data/filter hiện tại; hãy chạy lại scanner.")
+        return
+    funnel = result.attrs.get("funnel", {})
+    if funnel:
+        st.json(funnel, expanded=False)
+    if result.empty:
+        st.info("Không có pair pass toàn bộ statistical, stability và liquidity gates.")
+        return
+    st.dataframe(
+        result,
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "p_value": st.column_config.NumberColumn(format="%.4f"),
+            "q_value": st.column_config.NumberColumn(format="%.4f"),
+            "min_adv_vnd": st.column_config.NumberColumn(format="%.0f"),
+            "score": st.column_config.ProgressColumn(min_value=0.0, max_value=1.0),
+        },
+    )
+    selected = st.selectbox("Candidate để đưa sang Custom Pair", result["pair"].tolist())
+    if st.button("Pre-fill Custom Pair"):
+        t1, t2 = selected.split("/")
+        st.session_state["scanner_target_t1"] = t1
+        st.session_state["scanner_target_t2"] = t2
+        st.rerun()
+
+
+def _static_signal(result: PairAnalysisResult, params: dict) -> pd.DataFrame:
+    gate = pd.Series(result.eligible, index=result.z_score.index)
+    return entry_exit_rules(
+        result.z_score.dropna(),
+        entry=params["z_entry"],
+        stop=params["z_stop"],
+        half_life=result.half_life,
+        eligible=gate,
+        quarantine_bars=60,
+    )
 
 
 def _tab_custom_pair(prices: pd.DataFrame, params: dict) -> None:
     t1, t2 = params["custom_t1"], params["custom_t2"]
-    if t1 == t2:
-        st.error("Chọn 2 ticker khác nhau")
-        return
-    if t1 not in prices.columns or t2 not in prices.columns:
-        st.error(f"{t1} hoặc {t2} không có trong market_data")
-        return
-
-    st.markdown(f"### Custom pair: **{t1}** vs **{t2}**")
-    sub = prices[[t1, t2]].dropna(how="any").loc["2018-01-01":]
-    if len(sub) < 100:
-        st.error(f"Chỉ {len(sub)} obs sau align — cần ≥100")
-        return
-
+    st.markdown(f"### Custom pair: **{t1}/{t2}**")
     try:
-        eg = engle_granger(sub[t1], sub[t2])
+        result = analyze_pair(prices, t1, t2, _config(params))
     except Exception as exc:
-        st.error(f"EG fail: {exc}")
+        st.error(f"Pair analysis failed: {exc}")
         return
-
-    spread = eg["resid"]
-    hl_raw = ou_half_life_raw(spread)
-    h = hurst(spread)
-    z_series = z_score_60d(spread)
-    sig = entry_exit_rules(
-        z_series.dropna(),
-        entry=params["z_entry"], stop=params["z_stop"],
-        half_life=hl_raw,
-    )
-
-    # Compute current ρ (EWMA path always — cheap)
-    dcc_method = params.get("dcc_method", "ewma")
-    rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
-
-    # Metrics row (6 columns now, thêm ρ_now)
-    c1, c2, c3, c4, c5, c6 = st.columns(6)
-    c1.metric("β (hedge ratio)", f"{eg['beta']:.4f}")
-    c2.metric("ADF p-value", f"{eg['p_value']:.4f}",
-              delta="cointegrated" if eg["is_cointegrated"] else "NOT cointegrated",
-              delta_color="normal" if eg["is_cointegrated"] else "inverse")
-    c3.metric("Half-life (d)", f"{hl_raw:.1f}" if np.isfinite(hl_raw) else "NaN")
-    c4.metric("Hurst", f"{h:.3f}", delta="mean-revert" if h < 0.5 else "drift",
-              delta_color="normal" if h < 0.5 else "inverse")
-    c5.metric("Z latest", f"{z_series.dropna().iloc[-1]:.2f}" if z_series.notna().any() else "—")
-    if np.isfinite(rho_now):
-        passes = passes_rho_filter(rho_now, params.get("min_rho", 0.5))
-        c6.metric(
-            f"ρ_now ({dcc_method.upper()})",
-            f"{rho_now:.3f}",
-            delta="≥ min ρ" if passes else "< min ρ (decoupling)",
-            delta_color="normal" if passes else "inverse",
-        )
+    c1, c2, c3, c4, c5 = st.columns(5)
+    c1.metric("Beta", f"{result.beta:.4f}")
+    c2.metric("EG p/q", f"{result.p_value:.4f}")
+    c3.metric("Half-life", f"{result.half_life:.1f}" if np.isfinite(result.half_life) else "—")
+    c4.metric("Z now", f"{result.z_latest:.2f}" if np.isfinite(result.z_latest) else "—")
+    c5.metric("Stability", f"{result.stability_score:.0%}")
+    if result.eligible:
+        st.success("Current formation window passes the configured research gates.")
     else:
-        c6.metric(f"ρ_now ({dcc_method.upper()})", "NaN")
-
-    # Spread chart
+        st.warning("Diagnostic only — blocked by: " + ", ".join(result.eligibility_reasons))
+    for warning in result.warnings:
+        st.caption(f"Warning: {warning}")
+    signals = _static_signal(result, params)
     st.plotly_chart(
         render_spread_chart(
-            spread, z_series, sig,
-            z_entry=params["z_entry"], z_stop=params["z_stop"],
-            title=f"{t1}/{t2} spread & z-score",
+            result.spread,
+            result.z_score,
+            signals,
+            z_entry=params["z_entry"],
+            z_stop=params["z_stop"],
+            title=f"{result.pair} static formation diagnostics",
         ),
-        use_container_width=True,
+        width="stretch",
     )
-
-    # ρ_t time-series chart
-    rho_ts = pair_rho_series(sub, t1, t2, method=dcc_method)
-    if not rho_ts.dropna().empty:
+    if not result.rho_series.dropna().empty:
         st.plotly_chart(
             render_pair_rho_chart(
-                rho_ts.dropna(),
-                min_rho=params.get("min_rho", 0.5),
-                method=dcc_method,
-                title=f"{t1}/{t2} dynamic correlation",
+                result.rho_series.dropna(),
+                min_rho=params["min_rho"],
+                method=result.rho_method_actual,
+                title=f"{result.pair} correlation ({result.rho_method_actual.upper()})",
             ),
-            use_container_width=True,
+            width="stretch",
         )
-
-    # Diagnostic chart
-    with st.expander("📊 Residual diagnostics (ADF + ACF)"):
+    with st.expander("Residual and model diagnostics"):
         st.plotly_chart(
-            render_residual_diagnostics(spread, eg["adf_stat"], eg["p_value"]),
-            use_container_width=True,
+            render_residual_diagnostics(result.spread, result.coint_stat, result.p_value),
+            width="stretch",
         )
+        st.json(result.to_record(), expanded=False)
 
-    # Mini-backtest 2yr
-    st.markdown("---")
-    st.markdown(f"#### Mini-backtest {params['lookback_years']}yr")
-    backtest_start = sub.index[-1] - pd.Timedelta(days=int(params["lookback_years"] * 365))
-    bt_window = sub.loc[backtest_start:]
-    if len(bt_window) < 120:
-        st.warning("Backtest window <120 obs, skip")
-        return
+    st.markdown("#### Walk-forward out-of-sample backtest")
     try:
-        bt_eg = engle_granger(bt_window[t1], bt_window[t2])
-        bt_hl = ou_half_life_raw(bt_eg["resid"])
-        bt_z = z_score_60d(bt_eg["resid"])
-        bt_sig = entry_exit_rules(
-            bt_z.dropna(), entry=params["z_entry"],
-            stop=params["z_stop"], half_life=bt_hl,
+        cfg = _config(params)
+        wf = _walk_forward_cached(
+            f"{prices.index[-1]}-{prices.shape}",
+            prices,
+            t1,
+            t2,
+            asdict(cfg),
         )
-        eq = basket_pnl(bt_window, bt_eg["beta"], bt_sig, t1, t2, tc_bps=params["tc_bps"])
-        if eq.empty:
-            st.warning("Backtest empty — no overlap between signals and prices")
-            return
-        stats = summary_stats(eq)
-        m1, m2, m3, m4, m5 = st.columns(5)
-        m1.metric("Total return", f"{stats['total_return']:.1%}")
-        m2.metric("Sharpe", f"{stats['sharpe']:.2f}")
-        m3.metric("Max DD", f"{stats['max_dd']:.1%}")
-        m4.metric("Hit rate", f"{stats['hit_rate']:.1%}" if np.isfinite(stats["hit_rate"]) else "—")
-        m5.metric("# Trades", stats["n_trades"])
-        st.plotly_chart(render_backtest_equity(eq), use_container_width=True)
     except Exception as exc:
-        st.error(f"Backtest fail: {exc}")
-
-
-# ─────────────────────────────────────────────────
-# Tab 4: Aggregate Backtest (all cointegrated pair trong cluster)
-# ─────────────────────────────────────────────────
-
-
-def _tab_aggregate_backtest(prices: pd.DataFrame, params: dict) -> None:
-    cluster_name = params["cluster"]
-    tickers = [t for t in PREDEFINED_CLUSTERS[cluster_name] if t in prices.columns]
-    if len(tickers) < 2:
-        st.error("Cần ≥2 ticker available")
+        st.info(f"Walk-forward unavailable: {exc}")
         return
+    stats = wf.stats
+    m1, m2, m3, m4, m5 = st.columns(5)
+    m1.metric("Net return", f"{stats['total_return']:.1%}")
+    m2.metric("Sharpe", f"{stats['sharpe']:.2f}")
+    m3.metric("Max DD", f"{stats['max_dd']:.1%}")
+    m4.metric("Trade win rate", f"{stats['win_rate']:.1%}" if np.isfinite(stats["win_rate"]) else "—")
+    m5.metric("Completed trades", stats["n_trades"])
+    st.plotly_chart(render_backtest_equity(wf.equity), width="stretch")
+    with st.expander("Trade ledger / point-in-time refits"):
+        st.dataframe(wf.ledger, width="stretch", hide_index=True)
+        st.dataframe(wf.refits, width="stretch", hide_index=True)
 
-    st.markdown(f"### Aggregate backtest — {cluster_name}")
-    backtest_start = prices.index[-1] - pd.Timedelta(days=int(params["lookback_years"] * 365))
-    sub = prices.loc[backtest_start:, tickers].dropna(how="any")
-    if len(sub) < 120:
-        st.warning("Backtest window <120 obs, skip")
+
+def _tab_aggregate_backtest(
+    snapshot: MarketDataSnapshot,
+    prices: pd.DataFrame,
+    params: dict,
+) -> None:
+    cluster = params["cluster"]
+    try:
+        _, tickers = _cluster_prices(prices, cluster)
+    except Exception as exc:
+        st.error(str(exc))
         return
-
-    use_dcc = params.get("use_dcc_filter", False)
-    min_rho = params.get("min_rho", 0.5)
-    dcc_method = params.get("dcc_method", "ewma")
-
-    rows = []
-    equity_curves = {}
-    skipped_rho = 0
-    for i, t1 in enumerate(tickers):
-        for j, t2 in enumerate(tickers):
-            if i >= j:
-                continue
-            try:
-                eg = engle_granger(sub[t1], sub[t2])
-                if not eg["is_cointegrated"]:
-                    continue
-                hl = ou_half_life_raw(eg["resid"])
-                if not np.isfinite(hl) or not (params["hl_min"] <= hl <= params["hl_max"]):
-                    continue
-                rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
-                if use_dcc and not passes_rho_filter(rho_now, min_rho):
-                    skipped_rho += 1
-                    continue
-                z = z_score_60d(eg["resid"])
-                sig = entry_exit_rules(
-                    z.dropna(), entry=params["z_entry"],
-                    stop=params["z_stop"], half_life=hl,
-                )
-                eq = basket_pnl(sub, eg["beta"], sig, t1, t2, tc_bps=params["tc_bps"])
-                stats = summary_stats(eq)
-                rows.append({
-                    "Pair": f"{t1}/{t2}",
-                    "β": round(eg["beta"], 4),
-                    "p_value": round(eg["p_value"], 4),
-                    "ρ_now": round(rho_now, 3) if np.isfinite(rho_now) else float("nan"),
-                    "half_life": round(hl, 1),
-                    "total_ret": stats["total_return"],
-                    "sharpe": round(stats["sharpe"], 2),
-                    "max_dd": round(stats["max_dd"], 4),
-                    "n_trades": stats["n_trades"],
-                })
-                equity_curves[f"{t1}/{t2}"] = eq["equity"]
-            except Exception as exc:
-                logger.warning("Aggregate backtest fail %s/%s: %s", t1, t2, exc)
-
-    if use_dcc and skipped_rho:
-        st.caption(f"ℹ️ DCC filter active — skipped {skipped_rho} pair với ρ_now < {min_rho:.2f}")
-
-    if not rows:
-        filter_desc = (
-            f"cointegrated + half-life ∈ [{params['hl_min']}, {params['hl_max']}]"
-            + (f" + ρ ≥ {min_rho:.2f}" if use_dcc else "")
-        )
-        st.info(
-            f"Không có pair nào pass filter ({filter_desc}). "
-            "Thử relax filter trong sidebar."
-        )
-        return
-
-    df = pd.DataFrame(rows).sort_values("sharpe", ascending=False)
-    df["total_ret"] = df["total_ret"].apply(lambda x: f"{x:.1%}")
-    df["max_dd"] = df["max_dd"].apply(lambda x: f"{x:.1%}")
-    st.dataframe(df, use_container_width=True, hide_index=True)
-
-    # Overlay equity curves
-    if equity_curves:
-        import plotly.graph_objects as go
-        fig = go.Figure()
-        for name, eq_series in equity_curves.items():
-            fig.add_trace(go.Scatter(x=eq_series.index, y=eq_series.values, mode="lines", name=name))
-        fig.update_layout(
-            title=f"{cluster_name} — all qualifying pair equity",
-            yaxis_title="Equity (1 = initial)",
-            height=450, margin=dict(l=10, r=10, t=70, b=10),
-            hovermode="x unified",
-        )
-        st.plotly_chart(fig, use_container_width=True)
-
-
-# ─────────────────────────────────────────────────
-# Tab 5: Live Signals (P2)
-# ─────────────────────────────────────────────────
-
-
-def _tab_live_signals(prices: pd.DataFrame, params: dict) -> None:
-    cluster_name = params["cluster"]
-    tickers = [t for t in PREDEFINED_CLUSTERS[cluster_name] if t in prices.columns]
-    st.markdown(f"### Live signals — {cluster_name}")
-
-    # Refit info banner
-    last_refit_date = prices.index[-1]
-    days_since = (datetime.now().date() - last_refit_date.date()).days
-    col_a, col_b = st.columns([3, 1])
-    with col_a:
-        st.caption(f"Last data date: **{last_refit_date.strftime('%Y-%m-%d')}** "
-                   f"({days_since}d ago) — cointegration nên re-test mỗi 60 phiên")
-    with col_b:
-        if days_since > 60:
-            st.error("🔴 STALE — refit needed")
-        else:
-            st.success("🟢 Fresh")
-
-    # Compute live signal cho từng pair
-    sub = prices.loc["2018-01-01":, tickers].dropna(how="any")
-    if len(sub) < 120:
-        st.error("Insufficient data")
-        return
-
-    use_dcc = params.get("use_dcc_filter", False)
-    min_rho = params.get("min_rho", 0.5)
-    dcc_method = params.get("dcc_method", "ewma")
-
-    rows = []
-    for i, t1 in enumerate(tickers):
-        for j, t2 in enumerate(tickers):
-            if i >= j:
-                continue
-            try:
-                eg = engle_granger(sub[t1], sub[t2])
-                if not eg["is_cointegrated"]:
-                    continue
-                hl = ou_half_life_raw(eg["resid"])
-                if not (params["hl_min"] <= hl <= params["hl_max"]):
-                    continue
-                z = z_score_60d(eg["resid"]).dropna()
-                if z.empty:
-                    continue
-                z_last = float(z.iloc[-1])
-                quarantine = quarantine_flag(z, stop=params["z_stop"], days=60)
-                in_quarantine = quarantine is not None and quarantine > pd.Timestamp(datetime.now())
-                rho_now = pair_rho_now(sub, t1, t2, method=dcc_method)
-                rho_pass = passes_rho_filter(rho_now, min_rho)
-                # ρ filter là HARD GATE cho action: nếu use_dcc=True và ρ<min → FLAT
-                action = "FLAT"
-                if not in_quarantine and (not use_dcc or rho_pass):
-                    if z_last < -params["z_entry"]:
-                        action = f"LONG SPREAD (long {t1}, short {t2})"
-                    elif z_last > params["z_entry"]:
-                        action = f"SHORT SPREAD (short {t1}, long {t2})"
-                rows.append({
-                    "Pair": f"{t1}/{t2}",
-                    "β": round(eg["beta"], 4),
-                    "z_now": round(z_last, 2),
-                    "ρ_now": round(rho_now, 3) if np.isfinite(rho_now) else float("nan"),
-                    "half_life": round(hl, 1),
-                    "action": action,
-                    "quarantine_until": quarantine.strftime("%Y-%m-%d") if in_quarantine else "—",
-                    "_rho_pass": rho_pass,
-                })
-            except Exception as exc:
-                logger.warning("Live signal fail %s/%s: %s", t1, t2, exc)
-
-    if not rows:
-        st.info(f"Không có pair nào qualify trong cluster {cluster_name}.")
-        return
-
-    df = pd.DataFrame(rows).sort_values("z_now", key=lambda s: s.abs(), ascending=False)
-    if use_dcc:
-        st.caption(
-            f"ℹ️ DCC filter active: pair với ρ_now < {min_rho:.2f} ({dcc_method.upper()}) "
-            f"force action = FLAT bất kể z."
-        )
-    # Drop internal flag column trước khi hiển thị
-    st.dataframe(df.drop(columns=["_rho_pass"]), use_container_width=True, hide_index=True)
-
-    # Order ticket generator — actionable phải pass cả quarantine VÀ ρ filter (nếu enabled)
-    st.markdown("---")
-    st.markdown("#### Generate Order Ticket")
-    actionable = [
-        r for r in rows
-        if r["action"] != "FLAT" and r["quarantine_until"] == "—"
-        and (not use_dcc or r["_rho_pass"])
-    ]
-    if not actionable:
-        msg = "Không có pair nào actionable hiện tại (z chưa breach entry hoặc đang quarantine"
-        if use_dcc:
-            msg += f" hoặc ρ_now < {min_rho:.2f}"
-        msg += ")"
-        st.info(msg)
-        return
-
-    selected_pair = st.selectbox(
-        "Chọn pair để generate ticket",
-        options=[r["Pair"] for r in actionable],
+    pairs = list(combinations(tickers, 2))
+    family_alpha = 0.05 / max(1, len(pairs))
+    cfg = _config(params, alpha=family_alpha)
+    st.markdown(f"### Walk-forward portfolio — {cluster}")
+    st.caption(
+        f"{len(pairs)} pair, family-wise alpha={family_alpha:.4f}, fixed ex-ante pair allocation, "
+        "shared ticker exposures are netted."
     )
-    if st.button("📝 Generate Order Ticket JSON"):
-        chosen_row = next(r for r in actionable if r["Pair"] == selected_pair)
-        t1, t2 = chosen_row["Pair"].split("/")
-        side = +1 if "LONG SPREAD" in chosen_row["action"] else -1
-        ticket = generate_order_ticket(
-            t1=t1, t2=t2, side=side,
-            beta=chosen_row["β"],
-            # Price data và sidebar capital đều ở nghìn VND; ticket schema lưu VND.
-            price1=float(prices[t1].iloc[-1]) * 1_000,
-            price2=float(prices[t2].iloc[-1]) * 1_000,
-            capital=params["capital"] * 1_000,
-            z_at_entry=chosen_row["z_now"],
-            half_life=chosen_row["half_life"],
-            stop_z=params["z_stop"],
-            rho_at_entry=chosen_row.get("ρ_now"),
-            rho_method=dcc_method,
+    rows: list[dict] = []
+    curves: dict[str, pd.DataFrame] = {}
+    failures: list[str] = []
+    with st.spinner("Running point-in-time pair refits and portfolio aggregation..."):
+        for t1, t2 in pairs:
+            name = f"{t1}/{t2}"
+            try:
+                wf = _walk_forward_cached(
+                    snapshot.quality.fingerprint,
+                    prices,
+                    t1,
+                    t2,
+                    asdict(cfg),
+                )
+                eligible_refits = (
+                    float(wf.refits["eligible"].fillna(False).mean())
+                    if not wf.refits.empty and "eligible" in wf.refits
+                    else 0.0
+                )
+                rows.append(
+                    {
+                        "Pair": name,
+                        "net_return": wf.stats["total_return"],
+                        "sharpe": wf.stats["sharpe"],
+                        "max_dd": wf.stats["max_dd"],
+                        "win_rate": wf.stats["win_rate"],
+                        "trades": wf.stats["n_trades"],
+                        "eligible_refits": eligible_refits,
+                        "cost_drag": wf.stats["cost_drag"],
+                    }
+                )
+                # Keep every successfully specified pair in the ex-ante book.
+                # Excluding a pair because it happened not to trade in the full
+                # sample would use future outcomes to reallocate its cash weight.
+                curves[name] = wf.equity
+            except Exception as exc:
+                failures.append(f"{name}: {type(exc).__name__}")
+    if not rows:
+        st.info("Không có pair đủ lịch sử cho walk-forward.")
+        return
+    st.dataframe(
+        pd.DataFrame(rows).sort_values("sharpe", ascending=False),
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "net_return": st.column_config.NumberColumn(format="percent"),
+            "max_dd": st.column_config.NumberColumn(format="percent"),
+            "win_rate": st.column_config.NumberColumn(format="percent"),
+            "eligible_refits": st.column_config.NumberColumn(format="percent"),
+        },
+    )
+    if failures:
+        st.caption("Fit failures: " + "; ".join(failures))
+    if not curves:
+        st.info("Không có pair nào fit được cho portfolio walk-forward.")
+        return
+    portfolio = aggregate_pair_backtests(
+        curves,
+        max_pair_weight=params["max_pair_weight"],
+        tc_bps_one_way=params["tc_bps"],
+        sell_tax_bps=params["sell_tax_bps"],
+        borrow_bps_annual=params["borrow_bps_annual"],
+    )
+    s = portfolio.stats
+    c1, c2, c3, c4 = st.columns(4)
+    c1.metric("Portfolio net return", f"{s['total_return']:.1%}")
+    c2.metric("Portfolio Sharpe", f"{s['sharpe']:.2f}")
+    c3.metric("Portfolio max DD", f"{s['max_dd']:.1%}")
+    c4.metric("Max gross exposure", f"{s['gross_exposure_max']:.1%}")
+    st.plotly_chart(
+        render_backtest_equity(portfolio.equity, title=f"{cluster} walk-forward portfolio"),
+        width="stretch",
+    )
+    with st.expander("Allocation and netted ticker exposure"):
+        st.dataframe(
+            portfolio.pair_weights.rename("weight").to_frame(),
+            width="stretch",
         )
-        ticket_json = order_ticket_to_json(ticket)
-        st.code(ticket_json, language="json")
+        st.dataframe(
+            portfolio.latest_ticker_exposure.rename("latest_exposure").to_frame(),
+            width="stretch",
+        )
+
+
+def _current_cluster_results(
+    prices: pd.DataFrame,
+    params: dict,
+) -> list[PairAnalysisResult]:
+    _, tickers = _cluster_prices(prices, params["cluster"])
+    formation = prices[tickers].dropna(how="all").tail(params["formation_window"])
+    details = pairwise_eg_details(formation, tickers)
+    q_map = {
+        (row.t1, row.t2): float(row.q_value)
+        for row in details.itertuples()
+    }
+    results: list[PairAnalysisResult] = []
+    for t1, t2 in combinations(tickers, 2):
+        try:
+            results.append(
+                analyze_pair(
+                    prices,
+                    t1,
+                    t2,
+                    _config(params),
+                    q_value=q_map.get((t1, t2), float("nan")),
+                )
+            )
+        except Exception as exc:
+            logger.warning("Live pair analysis failed %s/%s: %s", t1, t2, exc)
+    return results
+
+
+def _tab_live_signals(
+    snapshot: MarketDataSnapshot,
+    prices: pd.DataFrame,
+    params: dict,
+) -> None:
+    st.markdown(f"### Current signals — {params['cluster']}")
+    st.caption(
+        "Signal eligibility uses proper EG + I(1) + cluster-level BH-FDR + half-life "
+        "+ optional stability/rho gates. Ticket eligibility adds execution checks."
+    )
+    try:
+        results = _current_cluster_results(prices, params)
+    except Exception as exc:
+        st.error(f"Live analysis failed: {exc}")
+        return
+    rows: list[dict] = []
+    result_map: dict[str, PairAnalysisResult] = {}
+    readiness_map = {}
+    for result in results:
+        result_map[result.pair] = result
+        quarantine_until = quarantine_flag(
+            result.z_score,
+            stop=params["z_stop"],
+            days=60,
+        )
+        in_quarantine = bool(
+            quarantine_until is not None
+            and quarantine_until > snapshot.quality.as_of
+        )
+        readiness = assess_execution_readiness(
+            snapshot,
+            result.t1,
+            result.t2,
+            model_as_of=result.as_of,
+            adjusted_override=params["adjusted_verified"],
+            borrow_confirmed=params["borrow_confirmed"],
+            foreign_room_verified=params["foreign_room_verified"],
+            shortable=params["shortable"],
+            min_adv_vnd=params["min_adv_vnd"],
+        )
+        readiness_map[result.pair] = readiness
+        signal = "MONITOR"
+        if in_quarantine:
+            signal = "QUARANTINE"
+        elif not result.eligible:
+            signal = "RESEARCH_BLOCKED"
+        elif np.isfinite(result.z_latest) and -params["z_stop"] < result.z_latest <= -params["z_entry"]:
+            signal = "ENTRY_LONG_SPREAD"
+        elif np.isfinite(result.z_latest) and params["z_entry"] <= result.z_latest < params["z_stop"]:
+            signal = "ENTRY_SHORT_SPREAD"
+        ticket_status = (
+            "READY"
+            if signal.startswith("ENTRY_") and readiness.ready
+            else "BLOCKED" if signal.startswith("ENTRY_") else "N/A"
+        )
+        rows.append(
+            {
+                "Pair": result.pair,
+                "p_value": result.p_value,
+                "q_value": result.q_value,
+                "beta": result.beta,
+                "half_life": result.half_life,
+                "z_now": result.z_latest,
+                "rho_now": result.rho_now,
+                "stability": result.stability_score,
+                "signal": signal,
+                "ticket": ticket_status,
+                "reason": (
+                    ", ".join(result.eligibility_reasons)
+                    if result.eligibility_reasons
+                    else "; ".join(readiness.reasons) if signal.startswith("ENTRY_") and not readiness.ready
+                    else ""
+                ),
+                "quarantine_until": (
+                    quarantine_until.strftime("%Y-%m-%d") if in_quarantine else ""
+                ),
+            }
+        )
+    if not rows:
+        st.info("Không có pair đủ dữ liệu.")
+        return
+    table = pd.DataFrame(rows).sort_values("z_now", key=lambda values: values.abs(), ascending=False)
+    st.dataframe(
+        table,
+        width="stretch",
+        hide_index=True,
+        column_config={
+            "p_value": st.column_config.NumberColumn(format="%.4f"),
+            "q_value": st.column_config.NumberColumn(format="%.4f"),
+            "z_now": st.column_config.NumberColumn(format="%.2f"),
+            "rho_now": st.column_config.NumberColumn(format="%.3f"),
+            "stability": st.column_config.ProgressColumn(min_value=0.0, max_value=1.0),
+        },
+    )
+    ready_pairs = [
+        row["Pair"]
+        for row in rows
+        if row["signal"].startswith("ENTRY_") and readiness_map[row["Pair"]].ready
+    ]
+    if not ready_pairs:
+        st.info(
+            "Không có ticket đủ điều kiện. Entry research vẫn hiển thị nhưng download bị khóa "
+            "cho tới khi mọi execution check pass."
+        )
+        return
+    selected = st.selectbox("Pair đủ điều kiện tạo ticket", ready_pairs)
+    if st.button("Generate audited research ticket", type="primary"):
+        result = result_map[selected]
+        readiness = readiness_map[selected]
+        pair_prices = snapshot.pair_prices(result.t1, result.t2)
+        last_quote = pair_prices.iloc[-1]
+        side = 1 if result.z_latest < 0 else -1
+        try:
+            ticket = generate_order_ticket(
+                result.t1,
+                result.t2,
+                side,
+                result.beta,
+                float(last_quote[result.t1]) * 1_000,
+                float(last_quote[result.t2]) * 1_000,
+                params["capital"] * 1_000,
+                result.z_latest,
+                result.half_life,
+                stop_z=params["z_stop"],
+                rho_at_entry=result.rho_now,
+                rho_method=result.rho_method_actual,
+                data_as_of=readiness.data_as_of,
+                model_as_of=result.as_of.strftime("%Y-%m-%d"),
+                adjusted_verified=params["adjusted_verified"],
+                borrow_confirmed=params["borrow_confirmed"],
+                foreign_room_verified=params["foreign_room_verified"],
+                shortable=params["shortable"],
+                execution_checks=readiness.checks,
+                require_execution_checks=True,
+            )
+            payload = order_ticket_to_json(ticket)
+        except Exception as exc:
+            st.error(f"Ticket rejected: {exc}")
+            return
+        st.code(payload, language="json")
         st.download_button(
-            "💾 Download JSON",
-            data=ticket_json,
-            file_name=f"order_ticket_{t1}_{t2}_{datetime.now().strftime('%Y%m%d_%H%M%S')}.json",
+            "Download JSON",
+            payload,
+            file_name=f"pair_ticket_{result.t1}_{result.t2}_{datetime.now():%Y%m%d_%H%M%S}.json",
             mime="application/json",
         )
 
 
-# ─────────────────────────────────────────────────
-# Tab: Universe Scanner (sector → ρ → EG → half-life funnel)
-# ─────────────────────────────────────────────────
-
-
-@st.cache_data(ttl=3600, show_spinner=False)
-def _run_universe_scan_cached(
-    prices_hash: int,
-    prices: pd.DataFrame,
-    same_sector_only: bool,
-    cross_exchange: bool,
-    min_rho_screen: float,
-    hl_min: int,
-    hl_max: int,
-) -> pd.DataFrame:
-    """Cache key = (prices last-date hash + 5 filter params). TTL 1h."""
-    return run_universe_scan(prices, {
-        "same_sector_only": same_sector_only,
-        "cross_exchange": cross_exchange,
-        "min_rho_screen": min_rho_screen,
-        "hl_min": hl_min,
-        "hl_max": hl_max,
-    })
-
-
-def _tab_universe_scanner(prices: pd.DataFrame, params: dict) -> None:
-    st.markdown("### 🔬 Universe Scanner")
-    st.caption(
-        f"Funnel 4-stage: **same-sector** → **ρ_60d ≥ {params['min_rho_screen']:.2f}** → "
-        f"**EG p<0.05** → **half-life ∈ [{params['hl_min']}, {params['hl_max']}]**. "
-        "Surface candidate từ ~245 mã universe, sau đó bạn validate sâu ở tab Custom Pair."
-    )
-
-    col_a, col_b, col_c = st.columns([1, 1, 3])
-    with col_a:
-        run = st.button("🔍 Run Scanner", type="primary", use_container_width=True)
-    with col_b:
-        clear = st.button(
-            "🗑️ Clear",
-            use_container_width=True,
-            disabled="scanner_result" not in st.session_state,
-        )
-    with col_c:
-        st.caption("Compute ~10-30s, cached 1h. Re-run khi đổi filter trong sidebar.")
-
-    if clear:
-        st.session_state.pop("scanner_result", None)
-        st.session_state.pop("scanner_last_validated", None)
-        st.rerun()
-
-    if run:
-        with st.spinner("Scanning ~245 mã universe (sector → ρ → EG → half-life)..."):
-            try:
-                prices_key = hash((str(prices.index[-1]), prices.shape))
-                result = _run_universe_scan_cached(
-                    prices_key, prices,
-                    same_sector_only=params["same_sector_only"],
-                    cross_exchange=params["cross_exchange"],
-                    min_rho_screen=params["min_rho_screen"],
-                    hl_min=params["hl_min"],
-                    hl_max=params["hl_max"],
-                )
-                st.session_state["scanner_result"] = result
-            except Exception as exc:
-                st.error(f"Scanner fail: {exc}")
-                logger.exception("Universe scan fail")
-                return
-
-    if "scanner_result" not in st.session_state:
-        st.info(
-            "👆 Click **'🔍 Run Scanner'** để bắt đầu funnel. "
-            "Workflow: scanner surface ~5-20 candidate → click **'Pre-fill Custom Pair'** → "
-            "switch sang tab **🎯 Custom Pair** để validate sâu (EG + OU + Hurst + DCC + backtest)."
-        )
-        return
-
-    df = st.session_state["scanner_result"]
-
-    if df.empty:
-        st.warning(
-            f"Không tìm thấy pair nào qualify với current params "
-            f"(ρ_60d ≥ {params['min_rho_screen']:.2f}, "
-            f"half-life ∈ [{params['hl_min']}, {params['hl_max']}]). "
-            "Thử relax threshold trong sidebar và Run Scanner lại."
-        )
-        return
-
-    st.success(
-        f"✅ Surfaced **{len(df)}** candidate pair. "
-        "Sorted by composite score = (1-p) × ρ × half_life_proximity_to_15. "
-        "High score = strong cointegration + co-moving + reasonable mean-revert horizon."
-    )
-
-    # Display ranked table
-    try:
-        styled = (
-            df.style
-            .format({
-                "ρ_60d": "{:.3f}",
-                "p_value": "{:.4f}",
-                "half_life": "{:.1f}",
-                "beta": "{:.4f}",
-                "score": "{:.4f}",
-            })
-            .background_gradient(subset=["score"], cmap="YlGn")
-        )
-        st.dataframe(styled, use_container_width=True, hide_index=True)
-    except Exception:
-        st.dataframe(df, use_container_width=True, hide_index=True)
-
-    # Validate workflow
-    st.markdown("---")
-    st.markdown("#### 🎯 Validate candidate trong Custom Pair tab")
-    col_pick, col_btn = st.columns([3, 1])
-    with col_pick:
-        selected = st.selectbox(
-            "Chọn pair",
-            options=df["pair"].tolist(),
-            key="scanner_selected_pair",
-            label_visibility="collapsed",
-        )
-    with col_btn:
-        if st.button("→ Pre-fill", type="primary", use_container_width=True):
-            t1, t2 = selected.split("/")
-            st.session_state["scanner_target_t1"] = t1
-            st.session_state["scanner_target_t2"] = t2
-            st.session_state["scanner_last_validated"] = f"{t1}/{t2}"
-            st.rerun()
-
-    if "scanner_last_validated" in st.session_state:
-        st.info(
-            f"📌 **{st.session_state['scanner_last_validated']}** đã pre-fill vào sidebar 'Custom pair'. "
-            "Switch sang tab **🎯 Custom Pair** để validate sâu."
-        )
-
-
-# ─────────────────────────────────────────────────
-# Main render
-# ─────────────────────────────────────────────────
-
-
 def render() -> None:
-    st.title("🔁 Pairs Trading Research Lab")
+    st.title("Pairs Trading Research Lab v2")
     st.caption(
-        "Cointegration + OU half-life + Z-score 60d signal trên VN cluster. "
-        "Research dashboard — KHÔNG plug AI CIO synthesis (spec §13.5)."
+        "Proper Engle–Granger/FDR, causal signals, walk-forward backtests, "
+        "portfolio exposure netting and audited execution gates."
     )
+    handbook = Path(__file__).resolve().parents[2] / "docs" / "pairs_trading_handbook.md"
+    if handbook.exists():
+        st.download_button(
+            "Download handbook",
+            handbook.read_bytes(),
+            file_name="pairs_trading_handbook.md",
+            mime="text/markdown",
+        )
+    try:
+        snapshot = _load_snapshot(
+            _mtime(MARKET_DATA),
+            _mtime(MARKET_VOLUME),
+            _mtime(Path("data_lake/ticker_metadata.csv")),
+        )
+    except Exception as exc:
+        st.error(f"Không tải được market snapshot: {exc}")
+        return
+    params = render_sidebar(list(snapshot.prices.columns))
+    prices = _window(snapshot, params["lookback_years"])
+    _quality_panel(snapshot)
 
-    # ── Handbook download (manual usage guide) ──
-    from pathlib import Path as _Path
-    _hb = _Path(__file__).resolve().parents[2] / "docs" / "pairs_trading_handbook.md"
-    if _hb.exists():
-        _c1, _c2 = st.columns([3, 1])
-        with _c1:
-            st.caption(
-                "📖 **Manual Handbook** — hướng dẫn setup, đọc hiểu 5 tab, "
-                "decision framework thủ công + cạm bẫy (Vingroup risk, FOL, T+2)."
-            )
-        with _c2:
-            st.download_button(
-                label="⬇️ Tải Handbook (.md)",
-                data=_hb.read_bytes(),
-                file_name="pairs_trading_handbook.md",
-                mime="text/markdown",
-                use_container_width=True,
-                key="pairs_trading_handbook_dl",
-            )
-
-    prices = load_close_prices()
-    params = render_sidebar(list(prices.columns))
-
-    # Restrict to lookback window
-    prices_window = _load_prices_for_pairs(params["lookback_years"])
-
-    _show_global_warnings()
-
-    tab1, tab2, tab_scan, tab3, tab4, tab5 = st.tabs([
-        "🔍 Cluster Scan",
-        "🗺️ Pairwise Heatmap",
-        "🔬 Universe Scanner",
-        "🎯 Custom Pair",
-        "📈 Aggregate Backtest",
-        "🚦 Live Signals",
-    ])
-    with tab1:
-        _tab_cluster_scan(prices_window, params)
-    with tab2:
-        _tab_pairwise(prices_window, params)
-    with tab_scan:
-        _tab_universe_scanner(prices, params)
-    with tab3:
-        _tab_custom_pair(prices_window, params)
-    with tab4:
-        _tab_aggregate_backtest(prices_window, params)
-    with tab5:
-        _tab_live_signals(prices_window, params)
+    labels = [
+        "Cluster Scan",
+        "Pairwise FDR",
+        "Universe Scanner",
+        "Custom Pair",
+        "Portfolio Backtest",
+        "Live Signals",
+    ]
+    tabs = st.tabs(labels, key="pairs_active_tab", on_change="rerun")
+    handlers = [
+        lambda: _tab_cluster_scan(prices, params),
+        lambda: _tab_pairwise(prices, params),
+        lambda: _tab_universe_scanner(snapshot, params),
+        lambda: _tab_custom_pair(prices, params),
+        lambda: _tab_aggregate_backtest(snapshot, prices, params),
+        lambda: _tab_live_signals(snapshot, prices, params),
+    ]
+    for tab, handler in zip(tabs, handlers):
+        if tab.open:
+            with tab:
+                handler()

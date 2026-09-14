@@ -168,8 +168,9 @@ TOOL_REGISTRY: tuple[ToolDefinition, ...] = (
         branch="micro",
         name="🔁 Pairs Trading Research Lab",
         desc=(
-            "Cointegration (Engle-Granger + Johansen) + OU half-life + Z-score 60d trên 7 cluster VN "
-            "(Vingroup, Big4 Bank, Steel, Securities, Private Bank, Oil&Gas, Utility) + custom pair UI."
+            "Point-in-time pair research: proper Engle-Granger/Johansen guardrails, BH-FDR, "
+            "causal signals, walk-forward costed backtests, liquidity/execution gates và "
+            "portfolio exposure netting trên 7 cluster VN + universe scanner."
         ),
         page_module="tools.pairs_trading.page",
         package="tools.pairs_trading",

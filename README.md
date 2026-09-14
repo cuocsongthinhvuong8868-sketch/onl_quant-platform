@@ -105,7 +105,7 @@ CodeGraph cung cho thay cac hot paths can can trong khi sua:
 | Macro | VN100 Corporate Health | `tools/vn100_earnings_health` | Financial statement normalization, quality/stress/diffusion matrix |
 | Macro | Humility/Falsification | `tools/humility_falsification` | Check dieu kien phu dinh cho AI-CIO T-1 |
 | Micro | Factor Examination | `tools/factor_examination` | 10 factor scorer, robust z-score, sector neutralization, IC validation |
-| Micro | Pairs Trading | `tools/pairs_trading` | Engle-Granger, Johansen, OU half-life, Hurst, z-score signal/backtest |
+| Micro | Pairs Trading | `tools/pairs_trading` | FDR-controlled cointegration, causal signals, walk-forward backtest, execution gates, portfolio netting |
 | Micro | Risk-Adjusted Growth | `tools/risk_adjusted_growth` | Economic Alpha, disciplined return, bank growth quality |
 | Behavioral | Fear & Greed | `tools/fear_greed` | PCA market factor, EGARCH/GARCH/EWMA fallback, Kelly skewness |
 | Behavioral | Market Breadth | `tools/market_breadth` | MA20/60/125/252 participation and breadth diagnostics |
@@ -335,7 +335,7 @@ Screenshots local:
 
 - `shared/ai_cio.py` la module lon; nen refactor sang registry/adapters neu tiep tuc them tool.
 - Mot so UI/report path con bat `Exception` rong; nen thay bang exception cu the va structured logging.
-- Pairs trading can adjusted-price pipeline tot hon cho dividends, splits va corporate actions.
+- Pairs Trading da fail closed bang manual corporate-action verification; van can adjusted-price source co provenance de tu dong hoa gate.
 - Mot so cache/report con dua vao local `date.today()`; data-date-aware keys se giam ambiguity timezone/stale data.
 - Long IC validation, aggregate backtest va visual report co the cham tren Streamlit Cloud; nen precompute/background job cho cloud reliability.
 - Strategy modules can them out-of-sample, walk-forward, transaction-cost sensitivity va leakage audit truoc khi dung live.

@@ -79,7 +79,7 @@ command/
 | 10 | A | Fed Liquidity | `fed_liquidity` | WALCL − TGA − RRP, Z-score 52W → ADD/CUT/HOLD | Standalone (AI tab trên page) |
 | 11 | A | **GFCM** | `global_financial_conditions` | VIX + MOVE + HY OAS + CCC OAS, indicator PR 3Y max, **expanding point-in-time PCA**, regime via PC1 percentile 1Y | Standalone (AI tab trên page) |
 | 12 | A | **Bank Valuation** | `bank_valuation` | Bottom-up bank valuation + valuation breadth regime proxy | Standalone |
-| 13 | B | **Pairs Trading** | `pairs_trading` | Engle-Granger + Johansen + OU half-life + Z-score 60d | KHÔNG plug AI CIO (orthogonal) |
+| 13 | B | **Pairs Trading** | `pairs_trading` | EG/I(1) + BH-FDR, guarded Johansen, causal z, walk-forward portfolio | KHÔNG plug AI CIO (orthogonal) |
 | 14 | B | **Factor Examination** | `factor_examination` | 10 cross-section factor, sector-neutral ICB, portfolio examination | Standalone |
 
 `PRODUCTION_REGIME_METHOD` (`tools/esr_monitor/quant/metrics.py:51`) = `'hmm'` cho live paths. Backtest dùng `'hmm_walk_forward'` riêng.
@@ -364,6 +364,16 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 
 ---
 
+### 2026-09-14 — Pairs Trading methodology v2
+
+- Proper MacKinnon Engle-Granger with I(1) validation, one fixed orientation and BH-FDR across scanned pair families.
+- Causal lagged z-score/EWMA correlation, walk-forward formation/refit engine, exact AR(1) half-life with CI and rolling/Kalman sizing challengers.
+- Gross-normalized P&L, explicit execution/sell-tax/borrow costs, trade ledger, shared-leg portfolio cost netting and exposure audit.
+- Validated market snapshot plus fail-closed adjusted-price, freshness/common quote, ADV, borrow/shortability, FOL and model-as-of ticket gates.
+- Six-tab lazy UI and report both consume the canonical v2 engine; full details in `docs/pairs_trading_handbook.md`.
+
+---
+
 ## 10. Known Issues & Roadmap
 
 **Open issues (đang track):**
@@ -371,9 +381,8 @@ RULES (anti-priming, anti-hallucination, no absolute VN stock prices)
 - 61 instances `except Exception` rộng — mất stacktrace prod fail
 - Cache key dùng `date.today()` — timezone bug Streamlit Cloud (UTC) vs VN (UTC+7) → đổi sang `df_stocks.index[-1]`
 - `_create_pdf` duplicate ở `app.py:193` và `command/run_ai_cio_auto.py:79` → extract `shared/pdf_export.py`
-- DCC-GARCH chưa có parity test runtime trên full 50-ticker × 2500-obs
-- Pairs Trading chưa wire DCC filter (defer V2)
-- Pairs Aggregate Backtest tab chưa stress-test cluster 6-way → có thể timeout Cloud
+- DCC-GARCH chưa có parity test runtime trên full 50-ticker × 2500-obs; Pair Trading v2 đã wire bivariate DCC diagnostics với explicit EWMA fallback.
+- Pairs Aggregate Backtest đã smoke-test local cluster 6-way; vẫn cần benchmark định kỳ trên Streamlit Cloud.
 - `promt/` typo — không rename vì hardcoded paths khắp `ai_cio.py`
 
 **Roadmap còn lại:**
