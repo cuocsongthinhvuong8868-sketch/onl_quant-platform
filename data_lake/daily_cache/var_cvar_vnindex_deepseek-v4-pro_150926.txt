@@ -1,0 +1,71 @@
+<!-- ai-cio-cache-version: var_cvar_vnindex_v3_prior_window_prompt -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- Bạn là Quant Risk Manager chuyên tail risk index-level. Tư duy probabilistic, không kể chuyện confident. Mục tiêu: chẩn đoán tail thickness + so sánh Gaussian vs EVT để báo "rủi ro ẩn".
+- ## Classic VaR/CVaR (95%)
+- - Parametric VaR 95% (Gaussian: μ + z·σ): -1.62%
+- - Historical VaR 95% (5th pct, 3Y rolling): -1.74%
+- - Expected Shortfall (CVaR) 95%: -3.03%
+- - ES − VaR Spread: -1.30%
+- ## EVT — POT/GPD (quantile cực đoan)
+- - EVT VaR 99% (1/100-event): -3.69%
+- - EVT VaR 99.5% (1/200-event): -4.82%
+- - EVT ES 99%: -5.75%
+
+=== AI CIO STRUCTURED METRICS: var_cvar_vnindex_methodology ===
+- Methodology: var_cvar_vnindex_v3.0.0
+- Tail Regime: ROBUST_HEAVY_TAIL
+- Tail Risk Level: ELEVATED
+- Current Return: 1.27%
+- VaR Breach 95: 0
+- Breach Margin 95: -3.01pp
+- EVT Method: POT_GPD_threshold_sensitivity_5_15pct_prior_window
+- EVT Xi MLE: +0.281
+- EVT Hill: +0.434
+- EVT Xi Min: +0.212
+- EVT Xi Max: +0.383
+- EVT Xi Range: 0.171
+- EVT VaR99 Range: 0.10pp
+- EVT ES99 Range: 0.57pp
+- EVT Threshold Stable: 0
+- EVT Sensitivity Status: threshold_sensitive
+- EVT Interval Method: gpd_random_walk_mcmc
+- EVT MCMC Acceptance: 79.3%
+- EVT MCMC Samples: 3000
+- EVT Xi P05: +0.151
+- EVT Xi P50: +0.356
+- EVT Xi P95: +0.593
+- EVT VaR99 P05: -4.74%
+- EVT VaR99 P50: -3.76%
+- EVT VaR99 P95: -3.15%
+- EVT ES99 P05: -10.64%
+- EVT ES99 P50: -6.27%
+- EVT ES99 P95: -4.65%
+
+=== AI CIO DIRECT METRICS: var_cvar_vnindex ===
+```json
+{
+  "tool": "var_cvar_vnindex",
+  "source": "direct_quantitative",
+  "metrics": {
+    "historical_var_pct": -1.73548985020405,
+    "expected_shortfall_pct": -3.0335817830838763,
+    "tail_regime": "ROBUST_HEAVY_TAIL",
+    "tail_risk_level": "ELEVATED",
+    "var_breach_95": false,
+    "breach_margin_95_pp": -3.0090597315385534,
+    "evt_xi": 0.2810751316761913,
+    "evt_var_99_pct": -3.6865711035069912,
+    "evt_es_99_pct": -5.747086928142679,
+    "hill_index": 0.43405270246034394,
+    "evt_xi_min": 0.2120436695399408,
+    "evt_xi_max": 0.38315141550948434,
+    "evt_xi_range": 0.17110774596954353,
+    "evt_var99_range_pp": 0.09550937732909354,
+    "evt_es99_range_pp": 0.5707669997845721,
+    "evt_threshold_stable": 0,
+    "evt_xi_p05": 0.1513478380998187,
+    "evt_xi_p50": 0.3560715192012536,
+    "evt_xi_p95": 0.5932737093504812
+  }
+}
+```
