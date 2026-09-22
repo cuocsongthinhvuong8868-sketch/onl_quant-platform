@@ -142,14 +142,19 @@ except ImportError:
         },
     }
 
+REPORT_PROVIDER_DISPLAY = {
+    key: value["display"] for key, value in AI_PROVIDER_MAP.items()
+}
+REPORT_PROVIDER_DISPLAY["quant-rules-v1"] = "Quant Rules (daily)"
+
 # ── AI CIO Report status ──
 TODAY_STR = date.today().strftime('%d%m%y')
 _available_cio = []
-for _pk, _pv in AI_PROVIDER_MAP.items():
+for _pk, _display in REPORT_PROVIDER_DISPLAY.items():
     _rp = DATA_LAKE / "daily_cache" / f"executive_summary_{_pk}_{TODAY_STR}.txt"
     if _rp.exists():
         _rm = datetime.fromtimestamp(_rp.stat().st_mtime)
-        _available_cio.append((_pk, _pv["display"], _rm))
+        _available_cio.append((_pk, _display, _rm))
 
 if _available_cio:
     for _pk, _disp, _rm in _available_cio:
@@ -185,9 +190,9 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
         st.caption("Đẩy toàn bộ file cache AI (executive_summary + các tool) lên GitHub. Chỉ bấm khi cần — tránh reload app không mong muốn.")
         
         _sync_provider = st.selectbox(
-            "Chọn model AI để đồng bộ:",
-            options=list(AI_PROVIDER_MAP.keys()),
-            format_func=lambda k: AI_PROVIDER_MAP[k]["display"],
+            "Chọn nguồn báo cáo để đồng bộ:",
+            options=list(REPORT_PROVIDER_DISPLAY),
+            format_func=lambda k: REPORT_PROVIDER_DISPLAY[k],
             key="gh_sync_provider",
         )
         
@@ -195,7 +200,7 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
             if not _github_token:
                 st.error("❌ Chưa có GITHUB_TOKEN trong Secrets. Vui lòng cấu hình trong Streamlit Cloud Dashboard → Secrets.")
             else:
-                with st.spinner(f"⏳ Đang đồng bộ cache {AI_PROVIDER_MAP[_sync_provider]['display']} lên GitHub..."):
+                with st.spinner(f"⏳ Đang đồng bộ cache {REPORT_PROVIDER_DISPLAY[_sync_provider]} lên GitHub..."):
                     try:
                         _cache_dir = DATA_LAKE / "daily_cache"
                         _sync_files = list(_cache_dir.glob(f"*{_sync_provider}*.txt"))
@@ -207,7 +212,7 @@ with st.expander("🔧 Kiểm tra & Đồng bộ GitHub"):
                         _sync_files = list(set(_sync_files))
                         
                         if not _sync_files:
-                            st.warning(f"⚠️ Không tìm thấy file cache nào cho {AI_PROVIDER_MAP[_sync_provider]['display']}.")
+                            st.warning(f"⚠️ Không tìm thấy file cache nào cho {REPORT_PROVIDER_DISPLAY[_sync_provider]}.")
                         else:
                             _success = 0
                             _fail_msgs = []
@@ -296,7 +301,7 @@ with col1:
                     _provider_parts = _parts[2:-1]
                     _provider = "_".join(_provider_parts)
                     _date_display = f"{_date_str[:2]}/{_date_str[2:4]}/{_date_str[4:]}"
-                    _provider_display = AI_PROVIDER_MAP.get(_provider, {}).get("display", _provider)
+                    _provider_display = REPORT_PROVIDER_DISPLAY.get(_provider, _provider)
                     _label = f"{_date_display} — {_provider_display}"
                     _cio_options[_label] = {
                         "path": _fp,

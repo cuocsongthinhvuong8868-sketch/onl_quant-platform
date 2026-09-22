@@ -19,7 +19,6 @@ from shared.ai_cio_data_agent import (
     available_provider_keys,
     is_cloud_runtime,
 )
-from shared.api_key_helper import resolve_api_key
 from shared.page_layout import setup_page
 
 
@@ -216,18 +215,11 @@ with st.sidebar:
     )
     if is_cloud_runtime():
         st.caption("Cloud mode: các provider localhost đã được ẩn.")
-    raw_api_key = st.text_input(
-        "API Key hoặc shortcut 4 số",
+    api_key = st.text_input(
+        "API Key của bạn",
         type="password",
         key="ai_cio_chat_api_key",
-    )
-    api_key, key_message, key_error = (
-        resolve_api_key(raw_api_key, provider_key) if raw_api_key else ("", "", False)
-    )
-    if key_error:
-        st.error(key_message)
-    elif key_message:
-        st.success(key_message)
+    ).strip()
     st.caption("Excerpt từ nguồn được chọn sẽ được gửi tới AI provider này. Dùng provider local nếu dữ liệu nhạy cảm.")
 
     max_sources = st.slider(
@@ -292,12 +284,8 @@ if question:
     messages.append({"role": "user", "content": question})
 
     with st.chat_message("assistant"):
-        if key_error:
-            error_message = "API key shortcut không hợp lệ. Hãy kiểm tra lại cấu hình Secrets."
-            st.error(error_message)
-            messages.append({"role": "assistant", "content": error_message, "sources": [], "error": True})
-        elif not api_key:
-            error_message = "Hãy nhập API key hoặc shortcut ở thanh bên để bắt đầu chat."
+        if not api_key:
+            error_message = "Hãy nhập API key của bạn ở thanh bên để bắt đầu chat."
             st.warning(error_message)
             messages.append({"role": "assistant", "content": error_message, "sources": [], "error": True})
         else:

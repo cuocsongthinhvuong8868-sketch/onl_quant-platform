@@ -177,7 +177,12 @@ def build_humility_falsification_payload(
     """
 
     t_data_date = _effective_t_data_date(current_metrics) if current_metrics is not None else _latest_close_data_date()
-    reports = _reports_by_provider().get(provider_key, [])
+    reports_by_provider = _reports_by_provider()
+    reports = reports_by_provider.get(provider_key, [])
+    if not reports and provider_key == "quant-rules-v1":
+        # Keep the T-1 audit available on the first rules-only run. Older
+        # DeepSeek reports already contain Python-owned scores and rule sidecars.
+        reports = reports_by_provider.get("deepseek-v4-pro", [])
 
     if t_data_date is not None and reports:
         report_path, target_report_date, report_match = _auto_tminus_report(reports, t_data_date)
@@ -497,7 +502,10 @@ def _md_cell(value: Any) -> str:
 
 def _provider_selector(reports_by_provider: dict[str, list[Path]]) -> str:
     available_keys = [key for key, paths in reports_by_provider.items() if paths]
-    preferred = next((key for key in ("deepseek-v4-pro", "kimi-2.6") if key in available_keys), available_keys[0])
+    preferred = next(
+        (key for key in ("quant-rules-v1", "deepseek-v4-pro", "kimi-2.6") if key in available_keys),
+        available_keys[0],
+    )
     labels = {
         key: f"{_provider_display_name(key)} ({len(reports_by_provider[key])})"
         for key in available_keys
@@ -514,7 +522,7 @@ def _provider_selector(reports_by_provider: dict[str, list[Path]]) -> str:
 def _reports_by_provider() -> dict[str, list[Path]]:
     daily_cache = DATA_LAKE / "daily_cache"
     reports: dict[str, list[Path]] = {}
-    for provider_key in AI_PROVIDER_MAP:
+    for provider_key in ("quant-rules-v1", *AI_PROVIDER_MAP):
         paths = sorted(
             daily_cache.glob(REPORT_GLOB.format(provider=provider_key)),
             key=lambda path: (_date_from_report_path(path) or date.min, path.name),
@@ -525,6 +533,8 @@ def _reports_by_provider() -> dict[str, list[Path]]:
 
 
 def _provider_display_name(provider_key: str) -> str:
+    if provider_key == "quant-rules-v1":
+        return "Quant Rules (daily)"
     provider_meta = AI_PROVIDER_MAP.get(provider_key, {})
     if isinstance(provider_meta, dict):
         return str(provider_meta.get("display") or provider_key)

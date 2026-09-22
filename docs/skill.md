@@ -10,7 +10,7 @@
 Streamlit-based quant platform cho thị trường VN, kiến trúc 3-tier:
 - `quant` (business logic, **không** Streamlit) / `ui` (chart, sidebar) / `page` (render glue)
 - Data pipeline `data_lake/`: app **đọc** CSV; updater scripts **gọi** API
-- AI CIO synthesis: 9 VN-equity tool → 1 executive summary qua Kimi/DeepSeek
+- AI CIO daily: Python tổng hợp score/report từ quant metrics; Executive Summary thủ công có thể dùng Kimi/DeepSeek với API key người dùng
 - Backtest pipeline isolated (look-ahead-free) khỏi live paths
 - Macro/regime tools (Fed Liquidity, GFCM, Bank Valuation) **đứng riêng** — AI analysis trên page nếu có, KHÔNG inject executive summary
 
@@ -122,14 +122,14 @@ command/
 1. `_clear_all_tool_caches(provider)` nếu `force=True`
 2. Chạy deterministic quant/structured snapshots; child-report client là local adapter, không tiêu thụ remote LLM token
 3. Đọc compact history ledger, build evidence packets + metrics snapshot + decision state
-4. Nén input vào `ai_cio_final_input_v1`, sau đó chỉ 1 lần OpenAI call để viết narrative cuối
-5. Python render score/regime/allocation/confidence/humility JSON/Telegram brief deterministic; fingerprint cache tái sử dụng output khi input không đổi
+4. Cron dùng `report_mode="deterministic"` để render report từ decision state và metrics snapshot, không gọi AI API. Executive Summary thủ công vẫn có thể gọi model do người dùng chọn.
+5. Python render score/regime/allocation/confidence/humility JSON/Telegram brief deterministic; nhánh LLM thủ công vẫn dùng fingerprint cache khi input không đổi
 6. Auto upsert `Ai_cio_report.csv`: same-day overwrite (manual ghi đè auto), T+1 append
-7. Cron `run_ai_cio_auto.py` 15:45 VN (Mon-Fri), DeepSeek, push Telegram + commit cache
+7. Cron `run_ai_cio_auto.py` 18:45 VN (Mon-Fri), `quant-rules-v1`, push Telegram + commit cache; không dùng API key AI
 
 **Multi-provider** (`config.AI_PROVIDER_MAP`): `kimi-2.6` (Moonshot, temp 1.0) / `deepseek-v4-pro` (temp 0.5)
 
-**API key shortcut** (`api_key_helper.py`): user gõ 4 số → lookup `AI_KEY_<NNNN>` trong Streamlit Secrets.
+**API key shortcut** (`api_key_helper.py`): chỉ còn dùng ở Executive Summary thủ công; AI-CIO Chat yêu cầu người dùng nhập API key của chính mình.
 
 **GitHub sync** (`github_sync.py`): `render_sync_button(path, label, help_text, ...)` đẩy file qua REST. Cần `GITHUB_TOKEN`.
 

@@ -210,8 +210,7 @@ Secrets/env variables phu thuoc vao feed ban muon dung:
 | --- | --- |
 | `VNSTOCK_API_KEY` | vnstock market data khi source yeu cau |
 | `FRED_API_KEY` | Fed liquidity, GFCM, US margin/M2 |
-| `DEEPSEEK_API_KEY` | Scheduled AI-CIO automation |
-| `DEEPSEEK_FINAL_THINKING=true` | Optional: bat thinking chi cho luot tong hop AI-CIO cuoi; mac dinh tat |
+| `DEEPSEEK_FINAL_THINKING=true` | Optional: thinking cho bao cao AI-CIO thu cong khi nguoi dung chon DeepSeek |
 | `QUANT_PLATFORM_AI_QUERY_PLANNER=true` | Optional: bat lai remote query planner cua AI-CIO Chat; mac dinh dung deterministic router |
 | `QUANT_PLATFORM_NATIVE_TOOL_AGENT=true` | Optional: bat native multi-turn tool calling cho AI-CIO Chat |
 | `GITHUB_TOKEN` | Streamlit/GitHub cache sync va workflow commits |
@@ -220,7 +219,7 @@ Secrets/env variables phu thuoc vao feed ban muon dung:
 | `MOZYFIN_ACCESS_TOKEN`, `MOZYFIN_API_KEY`, `MOZYFIN_COOKIES_JSON` | Mozyfin sentiment/fundamental feeds |
 | `KIMI_LOCAL_BASE_URL`, `KIMI_LOCAL_MODEL`, `KIMI_LOCAL_TEMPERATURE`, `KIMI_LOCAL_TIMEOUT` | Local Kimi-compatible endpoint |
 | `CHATGPT_LOCAL_BASE_URL`, `CHATGPT_LOCAL_MODEL`, `CHATGPT_LOCAL_TEMPERATURE` | Local ChatGPT-compatible endpoint |
-| `AI_KEY_1234` style Streamlit secrets | 4-digit API key shortcuts in UI |
+| `AI_KEY_1234` style Streamlit secrets | 4-digit API key shortcuts cho Executive Summary thu cong; AI-CIO Chat yeu cau nguoi dung nhap key cua minh |
 | `LTMM_GOLD_DIR` | Optional ABM/LTMM gold CSV sync source |
 
 Khong commit secrets. `.env` va `.streamlit/secrets.toml` duoc ignore.
@@ -277,8 +276,8 @@ Core behavior:
 - Tinh/lay cache metrics tu macro, risk, valuation, sentiment va market-internal tools; child context duoc render cuc bo, khong goi LLM rieng.
 - Build evidence packets, decision-state, metrics snapshot va history ledger.
 - Apply humility/falsification context, hard constraints, confidence haircut va tail-risk guardrails.
-- Chi goi model mot lan de viet narrative cuoi; score, regime, allocation, confidence, humility JSON va Telegram brief do Python render deterministic.
-- Tai su dung executive summary theo content fingerprint khi input/prompt/model khong doi; refresh thu cong (`force=True`) moi xoa cache.
+- Workflow AI-CIO hang ngay dung `quant-rules-v1`: Python tao report, score, regime, allocation, confidence, humility JSON va Telegram brief; khong can API key cua AI provider.
+- Executive Summary thu cong trong app co the dung model do nguoi dung chon; luong nay tai su dung narrative theo content fingerprint khi input/prompt/model khong doi.
 - Ghi `data_lake/Ai_cio_report.csv`, `data_lake/ai_cio_metrics/*.json`, `data_lake/daily_cache/ai_cio_context_*.json`.
 - Export PDF qua `app.py` hoac `command/run_ai_cio_auto.py`.
 - Optional Telegram delivery va GitHub Actions automation.
@@ -312,7 +311,7 @@ Trang `pages/E_AI_CIO_Chat.py` cung cap AI-CIO Data Agent v2 tren du lieu cua du
 - Context chat mac dinh toi da 16.000 ky tu, 8 nguon va hai message lich su gan nhat; output moi route duoc gioi han boi `shared/llm_policy.py`.
 - `command/build_ai_cio_data_catalog.py` tao `data_lake/ai_cio_data_catalog.json` deterministic, chi chua path/format/size/schema va khong chua row values.
 - Cac GitHub Actions data pipeline tai tao catalog sau khi update data. Streamlit Cloud doc catalog da commit thay vi scan toan bo data lake luc khoi dong.
-- Tren cloud, provider localhost tu dong bi an; co the force bang `QUANT_PLATFORM_CLOUD_RUNTIME=true`. API key cua provider remote can duoc luu trong Streamlit Secrets/GitHub Secrets.
+- Tren cloud, provider localhost tu dong bi an; co the force bang `QUANT_PLATFORM_CLOUD_RUNTIME=true`. Nguoi dung tu nhap API key cua provider remote trong AI-CIO Chat; cron hang ngay khong su dung key AI.
 - Path traversal, ten file secrets va instruction nam trong data source bi chan/vo hieu hoa boi system contract. Pickle/PDF chi duoc index metadata, khong deserialize trong chat.
 
 Tao lai catalog thu cong:

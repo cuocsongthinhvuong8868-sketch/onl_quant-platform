@@ -287,7 +287,15 @@ def load_ai_cio_history(
                     )
                 )
 
-    matching = [item for item in rows if provider_key and item.provider == provider_key]
+    if provider_key == "quant-rules-v1":
+        # Earlier daily reports used DeepSeek for prose, but their final score
+        # was already rendered by the same deterministic Python policy.
+        compatible_providers = {"", "deepseek-v4-pro", "quant-rules-v1"}
+    else:
+        compatible_providers = {provider_key}
+    matching = [
+        item for item in rows if provider_key and item.provider in compatible_providers
+    ]
     if len(matching) >= 3:
         rows = matching
 
@@ -630,13 +638,19 @@ def _build_model(
     )
 
     score_for_display = score if score is not None else 0
+    subscores = _metric_subscores(context_state, metrics)
+    tail_risk = _extract_tail_risk(report_text)
+    if tail_risk == "DATA GAP":
+        tail_score = _safe_float(subscores.get("tail_risk_score"))
+        if tail_score is not None:
+            tail_risk = f"{tail_score:g}/100 score"
     return {
         "report_date": report_date,
         "display_date": _display_date(report_date),
         "provider": provider_key or metrics.get("provider", ""),
         "score": score_for_display,
         "regime": regime or "DATA GAP",
-        "tail_risk": _extract_tail_risk(report_text),
+        "tail_risk": tail_risk,
         "capitulation_state": capitulation_state,
         "confidence": _extract_confidence(report_text)
         or _sanitize_text(final_output.get("confidence")).upper()
@@ -645,7 +659,7 @@ def _build_model(
         "summary": _extract_summary_paragraph(report_text),
         "orders": _extract_executive_order(report_text),
         "history": history,
-        "subscores": _metric_subscores(context_state, metrics),
+        "subscores": subscores,
         "rolling": _rolling_summary(metrics),
         "score_band_reason": _score_band_reason(context_state, metrics),
         "hard_constraints": _hard_constraints(context_state, metrics),

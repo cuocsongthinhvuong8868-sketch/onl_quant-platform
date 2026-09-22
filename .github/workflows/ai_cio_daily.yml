@@ -1,4 +1,4 @@
-name: 🤖 AI CIO Daily Report (DeepSeek)
+name: AI CIO Daily Quant Report
 
 on:
   schedule:
@@ -12,8 +12,6 @@ jobs:
     runs-on: ubuntu-latest
 
     env:
-      DEEPSEEK_API_KEY: ${{ secrets.DEEPSEEK_API_KEY }}
-      DEEPSEEK_FINAL_THINKING: 'true'
       TELEGRAM_BOT_TOKEN: ${{ secrets.TELEGRAM_BOT_TOKEN }}
       TELEGRAM_CHAT_ID: ${{ secrets.TELEGRAM_CHAT_ID }}
       VNSTOCK_API_KEY: ${{ secrets.VNSTOCK_API_KEY }}
@@ -75,7 +73,7 @@ jobs:
       - name: Refresh PVGO valuation feed
         run: python command/update_pvgo_valuation.py
 
-      - name: 🤖 Chạy AI CIO (preflight + fingerprint cache)
+      - name: Build deterministic AI CIO report
         run: python command/run_ai_cio_auto.py
 
       - name: 🗂️ Build AI-CIO data catalog
