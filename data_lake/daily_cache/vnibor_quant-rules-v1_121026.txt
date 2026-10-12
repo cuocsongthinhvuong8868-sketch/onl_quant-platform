@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- - Z-Score của ON (Mượt MA5, rolling 252 ngày): -2.02
+- - Trạng thái Thanh khoản (Regime): EASY
+- ## 20-session trend context
+- - Trend 20 phiên: liquidity squeeze / stress building
+- - Số phiên Signal = STRESS/WARNING: 5
+- - Regime counts 20 phiên: EASY: 16, NORMAL: 4
+- - Signal counts 20 phiên: NEUTRAL: 8, ACCOMMODATIVE: 7, WARNING: 3, STRESS: 2
+- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal
+- 2026-09-21 6.84 4.58 +2.16 -0.42 0.389 -0.41 +0.58 NORMAL STRESS
+- 2026-09-30 6.95 1.99 +6.39 -2.06 0.016 -0.07 -0.69 EASY STRESS
+
+=== AI CIO DIRECT METRICS: vnibor ===
+```json
+{
+  "tool": "vnibor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vnibor_on": 4.5,
+    "vnibor_zscore": -2.0195250765539288,
+    "vnibor_percentile": 0.017857142857142856,
+    "vnibor_impulse": 3.51,
+    "vnibor_spread_1w": 0.6500000000000004,
+    "vnibor_spread_2w": -0.5,
+    "vnibor_regime": "EASY",
+    "vnibor_signal": "WARNING",
+    "vnibor_stress_warning_days_20d": "5"
+  }
+}
+```
