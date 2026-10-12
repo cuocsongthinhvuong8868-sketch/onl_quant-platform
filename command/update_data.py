@@ -47,6 +47,89 @@ from config import (
 )
 
 os.environ["VNSTOCK_API_KEY"] = VNSTOCK_API_KEY
+if VNSTOCK_API_KEY:
+    try:
+        from vnstock.core import setup_api_key
+        setup_api_key(VNSTOCK_API_KEY)
+    except Exception:
+        pass
+    try:
+        import vnai
+        vnai.setup_api_key(VNSTOCK_API_KEY)
+    except Exception:
+        pass
+
+
+class SafeRateLimiter:
+    """
+    Bộ điều tiết tốc độ gọi API để không chạm trần Rate Limit (60 req/phút của Community tier,
+    hoặc 20 req/phút của Guest tier) và tự động phục hồi khi bị vượt hạn mức.
+    """
+    def __init__(self, max_requests_per_minute: int = 40, min_interval_seconds: float = 1.4):
+        self.max_requests_per_minute = max_requests_per_minute
+        self.min_interval_seconds = min_interval_seconds
+        self.timestamps: list[float] = []
+        self.last_call_time: float = 0.0
+
+    def wait_if_needed(self) -> None:
+        now = time.time()
+        # 1. Giãn cách tối thiểu giữa 2 request liên tiếp
+        elapsed = now - self.last_call_time
+        if elapsed < self.min_interval_seconds:
+            time.sleep(self.min_interval_seconds - elapsed)
+            now = time.time()
+
+        # 2. Xóa các request ngoài cửa sổ 60 giây
+        self.timestamps = [t for t in self.timestamps if now - t < 60.0]
+
+        # 3. Nếu số request trong 60 giây đạt ngưỡng an toàn, chủ động sleep
+        if len(self.timestamps) >= self.max_requests_per_minute:
+            oldest = self.timestamps[0]
+            sleep_time = max(1.0, 60.0 - (now - oldest) + 1.0)
+            logger.info(
+                "⏳ [Rate Limiter] Đạt %d requests trong 60s (ngưỡng an toàn %d). Tạm dừng %.1fs...",
+                len(self.timestamps),
+                self.max_requests_per_minute,
+                sleep_time,
+            )
+            time.sleep(sleep_time)
+            now = time.time()
+            self.timestamps = [t for t in self.timestamps if now - t < 60.0]
+
+        self.timestamps.append(time.time())
+        self.last_call_time = time.time()
+
+    def handle_rate_limit_exceeded(self, retry_after: float | None = None) -> None:
+        """Khi bị vnstock/vnai chặn rate limit: ngủ đủ thời gian để reset hoàn toàn cửa sổ 60s."""
+        wait_seconds = float(retry_after) if (retry_after and retry_after > 0) else 65.0
+        wait_seconds = max(wait_seconds, 65.0)
+        logger.warning(
+            "⚠️ [Rate Limit 60/phút] vnstock yêu cầu tạm dừng. Đang đợi %.0f giây để hạn mức làm mới...",
+            wait_seconds,
+        )
+        time.sleep(wait_seconds)
+        self.timestamps.clear()
+        self.last_call_time = time.time()
+
+
+rate_limiter = SafeRateLimiter(max_requests_per_minute=52, min_interval_seconds=1.15)
+
+
+def _is_rate_limit_error(exc: Exception) -> bool:
+    name = type(exc).__name__.lower()
+    msg = str(exc).lower()
+    keywords = ("ratelimit", "rate limit", "60", "giới hạn", "too many requests", "429", "quota")
+    return any(k in name or k in msg for k in keywords)
+
+
+def _extract_retry_after(exc: Exception) -> float | None:
+    retry_after = getattr(exc, "retry_after", None)
+    if retry_after is not None:
+        try:
+            return float(retry_after)
+        except (ValueError, TypeError):
+            pass
+    return None
 
 
 def load_tickers() -> list:
@@ -66,70 +149,90 @@ def load_tickers() -> list:
         return []
 
 
-def fetch_history(symbol: str, start: str, end: str, source: str = "VCI") -> pd.DataFrame | None:
+def fetch_history(symbol: str, start: str, end: str, source: str = "KBS", max_retries: int = 3) -> pd.DataFrame | None:
     """
-    Tải lịch sử OHLCV cho 1 mã, trả về DataFrame [close, volume] (index=date).
-    Hỗ trợ Unified UI (Market) của vnstock 4.0+ và fallback Quote cũ.
+    Tải lịch sử OHLCV cho 1 mã từ nguồn KBS (index=date).
+    Sử dụng Unified UI (Market) của vnstock 4.0+ và fallback Quote cũ.
+    Tích hợp SafeRateLimiter đảm bảo không vượt quá 55 req/phút.
     Trả về None nếu không tải được — KHÔNG raise exception.
 
     Volume = NaN nếu nguồn không cung cấp (vd. KBS cho index có thể thiếu);
     caller phải xử lý NaN volume (vd. fill 0 hoặc skip).
     """
     sym = str(symbol).strip().upper()
-    df = None
-    try:
-        # Cách gọi mới (Unified UI: vnstock 4.0+)
-        from vnstock import Market
-        mkt = Market()
-        if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
-            df = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
-        else:
-            df = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
-    except Exception as err:
-        logger.debug("%s Market API thử thất bại: %s — fallback sang Quote adapter", sym, err)
 
-    if df is None or df.empty:
+    for attempt in range(1, max_retries + 1):
+        rate_limiter.wait_if_needed()
+        df = None
+        rate_limited = False
+
+        # Thử 1: Gọi Market API mới
         try:
-            # Fallback sang Quote adapter cũ
-            from vnstock import Quote
-            df = Quote(symbol=sym, source=source).history(
-                start=start, end=end, interval="1D"
-            )
-        except Exception as e:
-            logger.warning("✗ %-8s [%s] — %s — bỏ qua.", sym, source, e)
-            return None
+            from vnstock import Market
+            mkt = Market()
+            if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+                df = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+            else:
+                df = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+        except Exception as err:
+            if _is_rate_limit_error(err):
+                rate_limited = True
+                wait_sec = _extract_retry_after(err)
+                rate_limiter.handle_rate_limit_exceeded(wait_sec)
+                logger.info("  %s bị rate limit (lần %d/%d), đang thử lại...", sym, attempt, max_retries)
+                continue
+            logger.debug("%s Market API thử thất bại: %s — fallback sang Quote adapter", sym, err)
 
-    try:
-        if df is None or df.empty:
-            logger.warning("%-6s — API trả về rỗng, bỏ qua.", sym)
-            return None
+        # Thử 2: Nếu Market không trả về và không bị rate limit, thử fallback Quote
+        if (df is None or df.empty) and not rate_limited:
+            try:
+                rate_limiter.wait_if_needed()
+                from vnstock import Quote
+                df = Quote(symbol=sym, source=source).history(
+                    start=start, end=end, interval="1D"
+                )
+            except Exception as e:
+                if _is_rate_limit_error(e):
+                    wait_sec = _extract_retry_after(e)
+                    rate_limiter.handle_rate_limit_exceeded(wait_sec)
+                    logger.info("  %s Quote bị rate limit (lần %d/%d), đang thử lại...", sym, attempt, max_retries)
+                    continue
+                logger.debug("  %s Quote thất bại: %s", sym, e)
 
-        # Chuẩn hóa tên cột chữ thường
-        df.columns = [str(c).lower() for c in df.columns]
+        if df is not None and not df.empty:
+            try:
+                # Chuẩn hóa tên cột chữ thường
+                df.columns = [str(c).lower() for c in df.columns]
 
-        keep_cols = ["time", "close"]
-        if "volume" in df.columns:
-            keep_cols.append("volume")
+                keep_cols = ["time", "close"]
+                if "volume" in df.columns:
+                    keep_cols.append("volume")
 
-        out = df[keep_cols].set_index("time")
-        out.index = pd.to_datetime(out.index).normalize().tz_localize(None)
-        out = out[~out.index.duplicated(keep="last")]
+                out = df[keep_cols].set_index("time")
+                out.index = pd.to_datetime(out.index).normalize().tz_localize(None)
+                out = out[~out.index.duplicated(keep="last")]
 
-        if "volume" not in out.columns:
-            out["volume"] = np.nan
-            logger.info("✓ %-8s [%s] — %d ngày (volume thiếu, fill NaN)", sym, source, len(out))
-        else:
-            logger.info("✓ %-8s [%s] — %d ngày (close+vol)", sym, source, len(out))
-        return out[["close", "volume"]]
+                if "volume" not in out.columns:
+                    out["volume"] = np.nan
+                    logger.info("✓ %-8s [%s] — %d ngày (volume thiếu, fill NaN)", sym, source, len(out))
+                else:
+                    logger.info("✓ %-8s [%s] — %d ngày (close+vol)", sym, source, len(out))
+                return out[["close", "volume"]]
+            except Exception as parse_err:
+                logger.warning("✗ %-8s [%s] — Lỗi chuẩn hóa dữ liệu: %s", sym, source, parse_err)
+                return None
 
-    except Exception as e:
-        logger.warning("✗ %-8s [%s] — %s — bỏ qua.", sym, source, e)
-        return None
+        # Nếu không có dữ liệu và không phải do rate limit thì không cần retry mã này
+        if not rate_limited:
+            break
+
+    logger.warning("✗ %-8s [%s] — Không lấy được dữ liệu sau %d lần thử.", sym, source, max_retries)
+    return None
 
 
 # Backwards-compat: code cũ vẫn import fetch_close
-def fetch_close(symbol: str, start: str, end: str, source: str = "VCI") -> pd.Series | None:
-    """Wrapper giữ tương thích — trả về Series close only."""
+def fetch_close(symbol: str, start: str, end: str, source: str = "KBS") -> pd.Series | None:
+    """Wrapper giữ tương thích — trả về Series close only từ KBS."""
     df = fetch_history(symbol, start, end, source)
     if df is None:
         return None
@@ -165,13 +268,13 @@ def _merge_and_save(df_new: pd.DataFrame, path: Path) -> pd.DataFrame:
     return df_merged
 
 
-def _fetch_index_with_fallback(symbol: str, start: str, end: str) -> pd.DataFrame | None:
-    """Fetch index (VNINDEX/VN30) với fallback VCI → KBS. Trả về DF [close, volume]."""
-    df = fetch_history(symbol, start, end, source="VCI")
-    if df is None:
-        logger.info("%s VCI thất bại, thử fallback KBS...", symbol)
-        df = fetch_history(symbol, start, end, source="KBS")
-    return df
+def _fetch_index(symbol: str, start: str, end: str) -> pd.DataFrame | None:
+    """Fetch index (VNINDEX/VN30) từ nguồn KBS duy nhất. Trả về DF [close, volume]."""
+    return fetch_history(symbol, start, end, source="KBS")
+
+
+# Alias giữ tương thích
+_fetch_index_with_fallback = _fetch_index
 
 
 def update_vnindex(start: str, end: str) -> bool:
@@ -298,16 +401,14 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
             symbol_start = full_lookback_start
             logger.info("[%d/%d] Đang tải %s (mã mới, tải đầy đủ từ %s)...", i, len(stock_tickers), symbol, symbol_start)
 
-        df_hist = fetch_history(symbol, symbol_start, end, source="VCI")
-        if df_hist is None:
-            logger.info("  %s VCI thất bại, thử fallback KBS...", symbol)
-            df_hist = fetch_history(symbol, symbol_start, end, source="KBS")
+        df_hist = fetch_history(symbol, symbol_start, end, source="KBS")
         if df_hist is not None:
             close_list.append(df_hist["close"].rename(symbol))
             volume_list.append(df_hist["volume"].rename(symbol))
         else:
             failed.append(symbol)
-        time.sleep(1)  # rate limit
+        # Giãn cách nhẹ (rate_limiter đảm bảo không bao giờ vượt 52 req/phút)
+        time.sleep(0.05)
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(close_list), len(stock_tickers))
@@ -316,6 +417,9 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
         logger.warning("Bỏ qua %d mã: %s", len(failed), ", ".join(failed))
 
     if len(close_list) < 2:
+        if df_existing is not None and not df_existing.empty:
+            logger.info("Dữ liệu hiện tại đã đầy đủ hoặc không có phiên giao dịch mới cần cập nhật.")
+            return
         logger.error("Chưa đủ dữ liệu (< 2 mã) — không lưu file.")
         return
 

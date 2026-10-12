@@ -34,10 +34,10 @@ def main():
         try:
             try:
                 from vnstock import Market
-                df = Market().equity(ticker).ohlcv(start=start, end=end, interval="1D", source="VCI")
+                df = Market().equity(ticker).ohlcv(start=start, end=end, interval="1D", source="KBS")
             except Exception:
                 from vnstock import Quote
-                df = Quote(symbol=ticker, source="VCI").history(start=start, end=end, interval="1D")
+                df = Quote(symbol=ticker, source="KBS").history(start=start, end=end, interval="1D")
             if df is not None and not df.empty:
                 df.columns = [str(c).lower() for c in df.columns]
                 # Multiply by 1000 if vnstock3 returns thousands, usually vnstock returns actual price or /1000
@@ -55,7 +55,7 @@ def main():
         except Exception:
             logger.exception("[%s/%s] %s: price fetch failed", i + 1, len(tickers), ticker)
             
-        time.sleep(3) # Ensure we don't exceed 20 req/min
+        time.sleep(1.2) # Đảm bảo không vượt quá 55 req/min
         
     os.makedirs("data/raw", exist_ok=True)
     with open("data/raw/realtime_prices.json", "w") as f:

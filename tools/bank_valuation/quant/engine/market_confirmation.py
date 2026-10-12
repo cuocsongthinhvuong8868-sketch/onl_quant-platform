@@ -41,8 +41,8 @@ def fetch_vnstock_ohlcv(
     tickers: Iterable[str],
     market_data_folder: str,
     lookback_days: int = 730,
-    sleep_seconds: float = 0.25,
-    source: str = "VCI",
+    sleep_seconds: float = 1.15,
+    source: str = "KBS",
 ) -> pd.DataFrame:
     """
     Fetch daily OHLCV from vnstock using the same Quote.history pattern as
