@@ -408,7 +408,7 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
         else:
             failed.append(symbol)
         # Giãn cách nhẹ (rate_limiter đảm bảo không bao giờ vượt 52 req/phút)
-        time.sleep(1.12)
+        time.sleep(1.2)
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(close_list), len(stock_tickers))
