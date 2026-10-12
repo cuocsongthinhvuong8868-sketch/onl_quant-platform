@@ -6046,6 +6046,150 @@
   ],
   "scheduler": [
     {
+      "job_name": "daily-market",
+      "command_name": "data_quality_check",
+      "started_at": "2026-09-21 11:16:58",
+      "finished_at": "2026-09-21 11:16:58",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase5_quality_monitoring",
+      "started_at": "2026-09-21 11:16:50",
+      "finished_at": "2026-09-21 11:16:54",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "evaluate_p3_triggers",
+      "started_at": "2026-09-21 11:16:42",
+      "finished_at": "2026-09-21 11:16:46",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase3_event_exposure",
+      "started_at": "2026-09-21 11:16:38",
+      "finished_at": "2026-09-21 11:16:39",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "build_phase2_gold",
+      "started_at": "2026-09-21 11:15:58",
+      "finished_at": "2026-09-21 11:16:34",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "news_signals",
+      "started_at": "2026-09-21 11:15:48",
+      "finished_at": "2026-09-21 11:15:54",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnindex_valuation_24hmoney",
+      "started_at": "2026-09-21 11:15:43",
+      "finished_at": "2026-09-21 11:15:44",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "flows_24hmoney",
+      "started_at": "2026-09-21 11:15:37",
+      "finished_at": "2026-09-21 11:15:39",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "market_flows",
+      "started_at": "2026-09-21 11:15:30",
+      "finished_at": "2026-09-21 11:15:33",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_breadth",
+      "started_at": "2026-09-21 11:04:30",
+      "finished_at": "2026-09-21 11:15:26",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_futures",
+      "started_at": "2026-09-21 11:04:13",
+      "finished_at": "2026-09-21 11:04:26",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_financials",
+      "started_at": "2026-09-21 11:01:29",
+      "finished_at": "2026-09-21 11:04:09",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "vnstock_funds",
+      "started_at": "2026-09-21 11:01:12",
+      "finished_at": "2026-09-21 11:01:25",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "hnx_bonds",
+      "started_at": "2026-09-21 11:01:07",
+      "finished_at": "2026-09-21 11:01:09",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "scrape_folder_sources",
+      "started_at": "2026-09-21 11:00:58",
+      "finished_at": "2026-09-21 11:01:03",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "started_at": "2026-09-21 11:00:48",
+      "finished_at": "2026-09-21 11:00:50",
+      "status": "failed",
+      "error_message": "Traceback (most recent call last):\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 218, in <module>\n    main()\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 198, in main\n    payload = fetch_payload(dataset)\n              ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 102, in fetch_payload\n    response.raise_for_status()\n  File \"C:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\requests\\models.py\", line 1028, in raise_for_status\n    raise HTTPError(http_error_msg, response=self)\nrequests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://wichart.vn/wichartapi/macro/vn/thitruongtiente/thitruongmo/omoreverserepo?time_frame=daily&value_type=value\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 83, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 77, in main\n    _run_script(script)\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 56, in _run_script\n    raise RuntimeError(f\"{path.name} failed with exit code {completed.returncode}\")\nRuntimeError: scrape_omo_thi_truong_mo_widata.py failed with exit code 1"
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "sbv_snapshot",
+      "started_at": "2026-09-21 11:00:34",
+      "finished_at": "2026-09-21 11:00:44",
+      "status": "success",
+      "error_message": null
+    },
+    {
+      "job_name": "daily-market",
+      "command_name": "tradingview_yields",
+      "started_at": "2026-09-21 11:00:10",
+      "finished_at": "2026-09-21 11:00:30",
+      "status": "success",
+      "error_message": null
+    },
+    {
       "job_name": "weekly",
       "command_name": "build_phase5_quality_monitoring",
       "started_at": "2026-09-21 10:52:13",
@@ -6700,155 +6844,23 @@
       "finished_at": "2026-09-07 03:12:07",
       "status": "success",
       "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "refresh_widata_exports",
-      "started_at": "2026-09-07 03:11:52",
-      "finished_at": "2026-09-07 03:11:54",
-      "status": "failed",
-      "error_message": "Traceback (most recent call last):\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 218, in <module>\n    main()\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 198, in main\n    payload = fetch_payload(dataset)\n              ^^^^^^^^^^^^^^^^^^^^^^\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scrape\\scrape_omo_thi_truong_mo_widata.py\", line 102, in fetch_payload\n    response.raise_for_status()\n  File \"C:\\Users\\ADMIN\\AppData\\Local\\Programs\\Python\\Python311\\Lib\\site-packages\\requests\\models.py\", line 1028, in raise_for_status\n    raise HTTPError(http_error_msg, response=self)\nrequests.exceptions.HTTPError: 400 Client Error: Bad Request for url: https://wichart.vn/wichartapi/macro/vn/thitruongtiente/thitruongmo/omoreverserepo?time_frame=daily&value_type=value\nTraceback (most recent call last):\n  File \"<frozen runpy>\", line 198, in _run_module_as_main\n  File \"<frozen runpy>\", line 88, in _run_code\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 83, in <module>\n    raise SystemExit(main())\n                     ^^^^^^\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 77, in main\n    _run_script(script)\n  File \"C:\\Users\\ADMIN\\Desktop\\LTMM\\scripts\\refresh_widata_exports.py\", line 56, in _run_script\n    raise RuntimeError(f\"{path.name} failed with exit code {completed.returncode}\")\nRuntimeError: scrape_omo_thi_truong_mo_widata.py failed with exit code 1"
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "sbv_snapshot",
-      "started_at": "2026-09-07 03:11:37",
-      "finished_at": "2026-09-07 03:11:48",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "tradingview_yields",
-      "started_at": "2026-09-07 03:11:13",
-      "finished_at": "2026-09-07 03:11:33",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-macro",
-      "command_name": "imf_reserves",
-      "started_at": "2026-09-07 03:11:00",
-      "finished_at": "2026-09-07 03:11:02",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-macro",
-      "command_name": "fred",
-      "started_at": "2026-09-07 03:10:50",
-      "finished_at": "2026-09-07 03:10:56",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "build_phase5_quality_monitoring",
-      "started_at": "2026-08-31 02:03:15",
-      "finished_at": "2026-08-31 02:03:20",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "run_abm_pipeline",
-      "started_at": "2026-08-31 02:02:33",
-      "finished_at": "2026-08-31 02:03:09",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "build_phase2_gold",
-      "started_at": "2026-08-31 02:01:37",
-      "finished_at": "2026-08-31 02:02:28",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "hnx_distressed",
-      "started_at": "2026-08-31 02:01:29",
-      "finished_at": "2026-08-31 02:01:31",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "ssi_marginable_universe",
-      "started_at": "2026-08-31 02:01:06",
-      "finished_at": "2026-08-31 02:01:20",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "vbma_weekly",
-      "started_at": "2026-08-31 02:00:48",
-      "finished_at": "2026-08-31 02:00:58",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "cafef_deposit_hiking",
-      "started_at": "2026-08-31 02:00:42",
-      "finished_at": "2026-08-31 02:00:43",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "cafef_duckdb_validator",
-      "started_at": "2026-08-31 02:00:29",
-      "finished_at": "2026-08-31 02:00:36",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "weekly",
-      "command_name": "cafef_deposits",
-      "started_at": "2026-08-31 02:00:18",
-      "finished_at": "2026-08-31 02:00:23",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "data_quality_check",
-      "started_at": "2026-08-26 06:56:14",
-      "finished_at": "2026-08-26 06:56:14",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "build_phase5_quality_monitoring",
-      "started_at": "2026-08-26 06:56:06",
-      "finished_at": "2026-08-26 06:56:10",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "evaluate_p3_triggers",
-      "started_at": "2026-08-26 06:55:58",
-      "finished_at": "2026-08-26 06:56:02",
-      "status": "success",
-      "error_message": null
-    },
-    {
-      "job_name": "daily-market",
-      "command_name": "build_phase3_event_exposure",
-      "started_at": "2026-08-26 06:55:53",
-      "finished_at": "2026-08-26 06:55:54",
-      "status": "success",
-      "error_message": null
     }
   ],
   "alerts": [
     {
       "ts": "2026-09-21T10:33:17Z",
+      "severity": "HIGH",
+      "source": "scheduler",
+      "job_name": "daily-market",
+      "command_name": "refresh_widata_exports",
+      "message": "daily-market job failed: refresh_widata_exports",
+      "alert_type": "scheduler_command",
+      "subject": "daily-market/refresh_widata_exports",
+      "resolution_status": "active",
+      "resolution_reason": "latest scheduler run failed"
+    },
+    {
+      "ts": "2026-09-21T11:00:53Z",
       "severity": "HIGH",
       "source": "scheduler",
       "job_name": "daily-market",
@@ -8032,18 +8044,6 @@
       "message": "DQ Failure: sbv_central_rate: source transitioned to expired",
       "alert_type": "source_staleness",
       "subject": "sbv_central_rate",
-      "resolution_status": "resolved",
-      "resolution_reason": "latest source snapshot is fresh"
-    },
-    {
-      "ts": "2026-06-01T05:34:23Z",
-      "severity": "HIGH",
-      "source": "scheduler",
-      "job_name": "daily-market",
-      "command_name": "data_quality_check",
-      "message": "DQ Failure: sbv_interbank_by_tenor: source transitioned to expired",
-      "alert_type": "source_staleness",
-      "subject": "sbv_interbank_by_tenor",
       "resolution_status": "resolved",
       "resolution_reason": "latest source snapshot is fresh"
     }
