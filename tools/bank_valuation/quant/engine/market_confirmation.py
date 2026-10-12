@@ -59,8 +59,18 @@ def fetch_vnstock_ohlcv(
 
     for ticker in sorted({str(t).upper().strip() for t in tickers if str(t).strip()}):
         try:
-            quote = Quote(symbol=ticker, source=source)
-            raw = quote.history(start=start_date, end=end_date, interval="1D")
+            raw = None
+            try:
+                from vnstock import Market
+                mkt = Market()
+                if ticker in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+                    raw = mkt.index(ticker).ohlcv(start=start_date, end=end_date, interval="1D", source=source)
+                else:
+                    raw = mkt.equity(ticker).ohlcv(start=start_date, end=end_date, interval="1D", source=source)
+            except Exception:
+                from vnstock import Quote
+                quote = Quote(symbol=ticker, source=source)
+                raw = quote.history(start=start_date, end=end_date, interval="1D")
             if raw is None or raw.empty:
                 continue
 

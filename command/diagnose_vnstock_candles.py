@@ -205,13 +205,22 @@ def fetch_and_analyze(
 ) -> tuple[SourceCheck, pd.DataFrame | None]:
     started = time.perf_counter()
     try:
-        from vnstock import Quote
-
-        frame = Quote(symbol=symbol, source=source).history(
-            start=start,
-            end=end,
-            interval=interval,
-        )
+        frame = None
+        sym = str(symbol).strip().upper()
+        try:
+            from vnstock import Market
+            mkt = Market()
+            if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+                frame = mkt.index(sym).ohlcv(start=start, end=end, interval=interval, source=source)
+            else:
+                frame = mkt.equity(sym).ohlcv(start=start, end=end, interval=interval, source=source)
+        except Exception:
+            from vnstock import Quote
+            frame = Quote(symbol=symbol, source=source).history(
+                start=start,
+                end=end,
+                interval=interval,
+            )
     except Exception as exc:
         elapsed = round(time.perf_counter() - started, 3)
         return (

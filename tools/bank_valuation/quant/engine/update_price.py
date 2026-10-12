@@ -9,10 +9,13 @@ logging.basicConfig(level=os.getenv("LOGLEVEL", "INFO").upper(), format="%(level
 logger = logging.getLogger(__name__)
 
 try:
-    from vnstock import Quote
+    from vnstock import Market
 except ImportError:
-    logger.exception("vnstock is not installed. Run: pip install -U vnstock")
-    raise SystemExit(1)
+    try:
+        from vnstock import Quote
+    except ImportError:
+        logger.exception("vnstock is not installed. Run: pip install -U vnstock")
+        raise SystemExit(1)
 
 def main():
     tickers = [
@@ -29,8 +32,14 @@ def main():
     
     for i, ticker in enumerate(tickers):
         try:
-            df = Quote(symbol=ticker, source="VCI").history(start=start, end=end, interval="1D")
+            try:
+                from vnstock import Market
+                df = Market().equity(ticker).ohlcv(start=start, end=end, interval="1D", source="VCI")
+            except Exception:
+                from vnstock import Quote
+                df = Quote(symbol=ticker, source="VCI").history(start=start, end=end, interval="1D")
             if df is not None and not df.empty:
+                df.columns = [str(c).lower() for c in df.columns]
                 # Multiply by 1000 if vnstock3 returns thousands, usually vnstock returns actual price or /1000
                 price = float(df.iloc[-1]["close"]) 
                 

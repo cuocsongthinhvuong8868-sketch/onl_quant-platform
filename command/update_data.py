@@ -69,19 +69,43 @@ def load_tickers() -> list:
 def fetch_history(symbol: str, start: str, end: str, source: str = "VCI") -> pd.DataFrame | None:
     """
     Tải lịch sử OHLCV cho 1 mã, trả về DataFrame [close, volume] (index=date).
+    Hỗ trợ Unified UI (Market) của vnstock 4.0+ và fallback Quote cũ.
     Trả về None nếu không tải được — KHÔNG raise exception.
 
     Volume = NaN nếu nguồn không cung cấp (vd. KBS cho index có thể thiếu);
     caller phải xử lý NaN volume (vd. fill 0 hoặc skip).
     """
+    sym = str(symbol).strip().upper()
+    df = None
     try:
-        from vnstock import Quote
-        df = Quote(symbol=symbol, source=source).history(
-            start=start, end=end, interval="1D"
-        )
-        if df is None or df.empty:
-            logger.warning("%-6s — API trả về rỗng, bỏ qua.", symbol)
+        # Cách gọi mới (Unified UI: vnstock 4.0+)
+        from vnstock import Market
+        mkt = Market()
+        if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+            df = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+        else:
+            df = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+    except Exception as err:
+        logger.debug("%s Market API thử thất bại: %s — fallback sang Quote adapter", sym, err)
+
+    if df is None or df.empty:
+        try:
+            # Fallback sang Quote adapter cũ
+            from vnstock import Quote
+            df = Quote(symbol=sym, source=source).history(
+                start=start, end=end, interval="1D"
+            )
+        except Exception as e:
+            logger.warning("✗ %-8s [%s] — %s — bỏ qua.", sym, source, e)
             return None
+
+    try:
+        if df is None or df.empty:
+            logger.warning("%-6s — API trả về rỗng, bỏ qua.", sym)
+            return None
+
+        # Chuẩn hóa tên cột chữ thường
+        df.columns = [str(c).lower() for c in df.columns]
 
         keep_cols = ["time", "close"]
         if "volume" in df.columns:
@@ -93,13 +117,13 @@ def fetch_history(symbol: str, start: str, end: str, source: str = "VCI") -> pd.
 
         if "volume" not in out.columns:
             out["volume"] = np.nan
-            logger.info("✓ %-8s [%s] — %d ngày (volume thiếu, fill NaN)", symbol, source, len(out))
+            logger.info("✓ %-8s [%s] — %d ngày (volume thiếu, fill NaN)", sym, source, len(out))
         else:
-            logger.info("✓ %-8s [%s] — %d ngày (close+vol)", symbol, source, len(out))
+            logger.info("✓ %-8s [%s] — %d ngày (close+vol)", sym, source, len(out))
         return out[["close", "volume"]]
 
     except Exception as e:
-        logger.warning("✗ %-8s [%s] — %s — bỏ qua.", symbol, source, e)
+        logger.warning("✗ %-8s [%s] — %s — bỏ qua.", sym, source, e)
         return None
 
 

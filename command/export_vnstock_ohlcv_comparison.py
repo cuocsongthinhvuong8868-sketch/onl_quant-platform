@@ -96,13 +96,22 @@ def normalize_daily_ohlcv(
 def fetch_daily_ohlcv(*, symbol: str, source: str, start: str, end: str) -> FetchResult:
     started = time.perf_counter()
     try:
-        from vnstock import Quote
-
-        raw = Quote(symbol=symbol, source=source).history(
-            start=start,
-            end=end,
-            interval="1D",
-        )
+        raw = None
+        sym = str(symbol).strip().upper()
+        try:
+            from vnstock import Market
+            mkt = Market()
+            if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+                raw = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+            else:
+                raw = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+        except Exception:
+            from vnstock import Quote
+            raw = Quote(symbol=symbol, source=source).history(
+                start=start,
+                end=end,
+                interval="1D",
+            )
         api_rows = 0 if raw is None else len(raw)
         normalized = normalize_daily_ohlcv(raw, symbol, source)
         elapsed = round(time.perf_counter() - started, 3)
