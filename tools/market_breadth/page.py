@@ -1,7 +1,7 @@
 import pandas as pd
 import streamlit as st
 
-from shared.data_loader import load_close_prices, load_custom
+from shared.data_loader import load_close_prices, load_custom, load_volumes
 from shared.daily_cache import load_daily_cache, save_daily_cache
 from shared.llm_policy import completion_options
 from tools.market_breadth.quant.metrics import compute_breadth, top10_by_volume
@@ -31,6 +31,9 @@ except ImportError:
 
 @st.cache_data(show_spinner=False)
 def _load_optional_volume_cache() -> pd.DataFrame | None:
+    vols = load_volumes()
+    if vols is not None and not vols.empty:
+        return vols
     try:
         df = load_custom("market_breadth_cache.csv")
     except FileNotFoundError:
