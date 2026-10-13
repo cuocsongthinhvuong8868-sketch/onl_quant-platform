@@ -1,0 +1,44 @@
+<!-- ai-cio-cache-version: primary_issuance_equal_weight_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- - Bank yield: 8.66%
+- - Risk premium BĐS - Bank: 408.8 bps
+- - Thay đổi risk premium kỳ gần nhất: +31.3 bps
+- - Thay đổi risk premium trong 3 khoảng matched: +15.4 bps
+- - Percentile risk premium trong lịch sử matched: 100.0
+- - Z-score risk premium trong lịch sử matched: +0.92
+- | report_date | bank_yield_pct | real_estate_yield_pct | risk_premium_bps | bank_issuance_count | real_estate_issuance_count | direction |
+- - Risk premium = yield BĐS - yield Bank. Risk premium tăng là WIDENING; giảm là NARROWING.
+- - Nếu Data quality = LOW, kết luận phải hạ confidence và không đưa regime mạnh.
+- Nêu Bank yield, BĐS yield, risk premium và signed spread.
+
+=== AI CIO STRUCTURED METRICS: credit_spread_canonical ===
+Credit Spread Data Date: 22/08/2026
+Credit Spread Risk Premium: 408.8 bps
+Credit Spread Risk Premium Change: +31.3 bps
+Credit Spread Risk Premium 3P Change: +15.4 bps
+Credit Spread Risk Premium Percentile: 100.0
+Credit Spread Matched Periods: 26
+Credit Spread Bank Issuance Count: 8
+Credit Spread Real Estate Issuance Count: 2
+Credit Spread Direction: WIDENING
+Credit Spread Data Quality: MEDIUM
+
+=== AI CIO DIRECT METRICS: credit_spread ===
+```json
+{
+  "tool": "credit_spread",
+  "source": "direct_quantitative",
+  "metrics": {
+    "credit_spread_risk_premium_bps": 408.75000000000006,
+    "credit_spread_change_bps": 31.25000000000017,
+    "credit_spread_3p_change_bps": 15.416666666666686,
+    "credit_spread_percentile": 100.0,
+    "credit_spread_matched_periods": 26,
+    "credit_spread_bank_count": 8,
+    "credit_spread_real_estate_count": 2,
+    "direction": "WIDENING",
+    "trend_3p": "WIDENING_LATEST",
+    "data_quality": "MEDIUM"
+  }
+}
+```
