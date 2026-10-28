@@ -46,8 +46,19 @@ from config import (
     DEFAULT_LOOKBACK_DAYS,
 )
 
-os.environ["VNSTOCK_API_KEY"] = VNSTOCK_API_KEY
+if not VNSTOCK_API_KEY:
+    api_key_file = Path.home() / ".vnstock" / "api_key.json"
+    if api_key_file.exists():
+        try:
+            import json
+            with open(api_key_file, "r") as f:
+                data = json.load(f)
+                VNSTOCK_API_KEY = data.get("api_key", "")
+        except Exception:
+            pass
+
 if VNSTOCK_API_KEY:
+    os.environ["VNSTOCK_API_KEY"] = VNSTOCK_API_KEY
     try:
         from vnstock.core import setup_api_key
         setup_api_key(VNSTOCK_API_KEY)
@@ -65,7 +76,7 @@ class SafeRateLimiter:
     Bộ điều tiết tốc độ gọi API để không chạm trần Rate Limit (60 req/phút của Community tier,
     hoặc 20 req/phút của Guest tier) và tự động phục hồi khi bị vượt hạn mức.
     """
-    def __init__(self, max_requests_per_minute: int = 40, min_interval_seconds: float = 1.4):
+    def __init__(self, max_requests_per_minute: int = 45, min_interval_seconds: float = 1.35):
         self.max_requests_per_minute = max_requests_per_minute
         self.min_interval_seconds = min_interval_seconds
         self.timestamps: list[float] = []
@@ -104,7 +115,7 @@ class SafeRateLimiter:
         wait_seconds = float(retry_after) if (retry_after and retry_after > 0) else 65.0
         wait_seconds = max(wait_seconds, 65.0)
         logger.warning(
-            "⚠️ [Rate Limit 60/phút] vnstock yêu cầu tạm dừng. Đang đợi %.0f giây để hạn mức làm mới...",
+            "⚠️ [Rate Limit] vnstock/vnai yêu cầu tạm dừng. Đang đợi %.0f giây để hạn mức làm mới...",
             wait_seconds,
         )
         time.sleep(wait_seconds)
@@ -112,7 +123,34 @@ class SafeRateLimiter:
         self.last_call_time = time.time()
 
 
-rate_limiter = SafeRateLimiter(max_requests_per_minute=52, min_interval_seconds=1.15)
+def _init_rate_limiter() -> SafeRateLimiter:
+    rpm = 45
+    min_interval = 1.35
+    try:
+        import vnai
+        tier_info = vnai.get_user_tier()
+        limit_min = tier_info.get("limits", {}).get("per_minute", 60)
+        if limit_min <= 20:
+            rpm = 15
+            min_interval = 4.0
+        elif limit_min <= 60:
+            rpm = 45
+            min_interval = 1.35
+        else:
+            rpm = min(120, int(limit_min * 0.75))
+            min_interval = round(60.0 / rpm, 2)
+        logger.info(
+            "Rate Limiter khởi tạo: Tier=%s, Giới hạn an toàn=%d req/phút, Giãn cách tối thiểu=%.2fs",
+            tier_info.get("tier", "free"),
+            rpm,
+            min_interval,
+        )
+    except Exception as e:
+        logger.debug("Không thể lấy tier info từ vnai: %s — dùng mặc định 45 req/phút", e)
+    return SafeRateLimiter(max_requests_per_minute=rpm, min_interval_seconds=min_interval)
+
+
+rate_limiter = _init_rate_limiter()
 
 
 def _is_rate_limit_error(exc: Exception) -> bool:
@@ -152,8 +190,8 @@ def load_tickers() -> list:
 def fetch_history(symbol: str, start: str, end: str, source: str = "KBS", max_retries: int = 3) -> pd.DataFrame | None:
     """
     Tải lịch sử OHLCV cho 1 mã từ nguồn KBS (index=date).
-    Sử dụng Unified UI (Market) của vnstock 4.0+ và fallback Quote cũ.
-    Tích hợp SafeRateLimiter đảm bảo không vượt quá 55 req/phút.
+    Ưu tiên gọi trực tiếp Quote adapter để tránh bị tính lặp 2 lần request vào quota UI của vnai.
+    Tích hợp SafeRateLimiter tự động điều tiết theo tier, đảm bảo không chạm trần per-minute.
     Trả về None nếu không tải được — KHÔNG raise exception.
 
     Volume = NaN nếu nguồn không cung cấp (vd. KBS cho index có thể thiếu);
@@ -166,14 +204,12 @@ def fetch_history(symbol: str, start: str, end: str, source: str = "KBS", max_re
         df = None
         rate_limited = False
 
-        # Thử 1: Gọi Market API mới
+        # Thử 1: Gọi trực tiếp Quote adapter (chuẩn xác, tránh nhân đôi counter UI)
         try:
-            from vnstock import Market
-            mkt = Market()
-            if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
-                df = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
-            else:
-                df = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+            from vnstock import Quote
+            df = Quote(symbol=sym, source=source).history(
+                start=start, end=end, interval="1D"
+            )
         except Exception as err:
             if _is_rate_limit_error(err):
                 rate_limited = True
@@ -181,23 +217,25 @@ def fetch_history(symbol: str, start: str, end: str, source: str = "KBS", max_re
                 rate_limiter.handle_rate_limit_exceeded(wait_sec)
                 logger.info("  %s bị rate limit (lần %d/%d), đang thử lại...", sym, attempt, max_retries)
                 continue
-            logger.debug("%s Market API thử thất bại: %s — fallback sang Quote adapter", sym, err)
+            logger.debug("%s Quote adapter thử thất bại: %s — fallback sang Market UI", sym, err)
 
-        # Thử 2: Nếu Market không trả về và không bị rate limit, thử fallback Quote
+        # Thử 2: Nếu Quote không trả về và không bị rate limit, fallback sang Market UI
         if (df is None or df.empty) and not rate_limited:
             try:
                 rate_limiter.wait_if_needed()
-                from vnstock import Quote
-                df = Quote(symbol=sym, source=source).history(
-                    start=start, end=end, interval="1D"
-                )
+                from vnstock import Market
+                mkt = Market()
+                if sym in ("VNINDEX", "VN30", "HNX", "UPCOM"):
+                    df = mkt.index(sym).ohlcv(start=start, end=end, interval="1D", source=source)
+                else:
+                    df = mkt.equity(sym).ohlcv(start=start, end=end, interval="1D", source=source)
             except Exception as e:
                 if _is_rate_limit_error(e):
                     wait_sec = _extract_retry_after(e)
                     rate_limiter.handle_rate_limit_exceeded(wait_sec)
-                    logger.info("  %s Quote bị rate limit (lần %d/%d), đang thử lại...", sym, attempt, max_retries)
+                    logger.info("  %s Market bị rate limit (lần %d/%d), đang thử lại...", sym, attempt, max_retries)
                     continue
-                logger.debug("  %s Quote thất bại: %s", sym, e)
+                logger.debug("  %s Market thất bại: %s", sym, e)
 
         if df is not None and not df.empty:
             try:
@@ -407,8 +445,6 @@ def update(backfill_days: int | None = None, from_date: str | None = None):
             volume_list.append(df_hist["volume"].rename(symbol))
         else:
             failed.append(symbol)
-        # Giãn cách nhẹ (rate_limiter đảm bảo không bao giờ vượt 52 req/phút)
-        time.sleep(1.2)
 
     logger.info("─" * 50)
     logger.info("Thành công: %d / %d mã", len(close_list), len(stock_tickers))
