@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- - Z-Score của ON (Mượt MA5, rolling 252 ngày): -0.47
+- - Trạng thái Thanh khoản (Regime): NORMAL
+- ## 20-session trend context
+- - Số phiên Signal = STRESS/WARNING: 2
+- - Regime counts 20 phiên: EASY: 14, NORMAL: 6
+- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal
+- - Input của tool này chỉ gồm VNIBOR, spreads, Z-score, percentile, regime/signal và trend 20 phiên. Không có dữ liệu trực tiếp về OMO, tín phiếu, can thiệp tỷ giá, room tín dụng, dòng tiền Kho bạc, mùa vụ thuế hoặc giao dịch của từng ngân hàng.
+- - Vì vậy AI chỉ được kết luận trạng thái và xu hướng thanh khoản từ dữ liệu VNIBOR, không được gán nguyên nhân cụ thể cho SBV, tỷ giá, mùa vụ thuế, hay ngân hàng lớn nếu các dữ liệu đó không xuất hiện trong INPUT.
+- Làm mượt thanh khoản (Liquidity Smoothing):
+- - ON_ZScore, ON_Percentile và Trạng thái (Regime) tương ứng được tính toán dựa trên Trung bình trượt 5 phiên (MA5) của Lãi suất Qua đêm (ON) để triệt tiêu các nhiễu kỹ thuật ngắn hạn.
+
+=== AI CIO DIRECT METRICS: vnibor ===
+```json
+{
+  "tool": "vnibor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vnibor_on": 4.1,
+    "vnibor_zscore": -0.4674171690184108,
+    "vnibor_percentile": 0.3412698412698413,
+    "vnibor_impulse": -0.8000000000000007,
+    "vnibor_spread_1w": 1.1500000000000004,
+    "vnibor_spread_2w": 1.2000000000000002,
+    "vnibor_regime": "NORMAL",
+    "vnibor_signal": "NEUTRAL",
+    "vnibor_stress_warning_days_20d": "2"
+  }
+}
+```
