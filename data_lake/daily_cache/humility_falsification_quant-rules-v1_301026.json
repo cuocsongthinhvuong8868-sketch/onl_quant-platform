@@ -1,0 +1,271 @@
+{
+  "provider_key": "quant-rules-v1",
+  "generated_at": "2026-10-30T17:17:07",
+  "t_data_date": "2026-10-30",
+  "target_report_date": "2026-10-29",
+  "report_match": "exact",
+  "report_path": "/home/runner/work/onl_quant-platform/onl_quant-platform/data_lake/daily_cache/executive_summary_quant-rules-v1_291026.txt",
+  "report_name": "executive_summary_quant-rules-v1_291026.txt",
+  "report_mtime": "report:2026-10-30T17:14:31|sidecar:2026-10-30T17:14:31",
+  "report_signature": "report:executive_summary_quant-rules-v1_291026.txt:158773475a8ca9f10364cee63cb829ddc14647f8|sidecar:ai_cio_humility_rules_quant-rules-v1_291026.json:b29688bd9d555e871bca36d8da25f997a1f742d2",
+  "parsed": {
+    "report_date": "2026-10-29",
+    "composite_score": 32.0,
+    "regime": "FEAR / DISTRIBUTION",
+    "rules": [
+      {
+        "model": "VNIBOR Monitor",
+        "metric": "STRESS/WARNING sessions (20D)",
+        "threshold_operator": "<",
+        "threshold_value": 5.0,
+        "current_value": 2.0,
+        "unit": "sessions",
+        "description": "Liquidity pressure is no longer persistent if stressed funding sessions fall below 5 of the last 20 observations."
+      },
+      {
+        "model": "Market Breadth",
+        "metric": "Breadth MA20",
+        "threshold_operator": ">",
+        "threshold_value": 45.0,
+        "current_value": 42.11764705882353,
+        "unit": "%",
+        "description": "Internal participation materially improves when more than 45% of covered tickers trade above MA20."
+      },
+      {
+        "model": "ESR Monitor",
+        "metric": "Systemic Stress Index (SSI)",
+        "threshold_operator": "<",
+        "threshold_value": 55.0,
+        "current_value": 51.1574504103395,
+        "unit": "%",
+        "description": "Systemic stress cools if SSI drops below 55%."
+      },
+      {
+        "model": "Tail Risk (EVT)",
+        "metric": "EVT Xi Max (5%-15% thresholds)",
+        "threshold_operator": "<",
+        "threshold_value": 0.25,
+        "current_value": 0.3823232694485832,
+        "unit": "",
+        "description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25."
+      },
+      {
+        "model": "Manipulation / Coupling",
+        "metric": "Vingroup Slope Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 70.0,
+        "current_value": 17.93504604944256,
+        "unit": "th pct",
+        "description": "Index coupling risk eases when the Vingroup slope percentile falls below the 70th percentile."
+      },
+      {
+        "model": "Global Financial Conditions",
+        "metric": "CQS Percentile",
+        "threshold_operator": "<",
+        "threshold_value": 80.0,
+        "current_value": 99.66931216931218,
+        "unit": "th pct",
+        "description": "External credit-quality stress eases when CQS drops below the 80th percentile."
+      }
+    ],
+    "parse_mode": "sidecar JSON",
+    "raw_payload": {
+      "report_date": "2026-10-29",
+      "composite_score": 32.0,
+      "regime": "FEAR / DISTRIBUTION",
+      "falsification_rules": [
+        {
+          "model": "VNIBOR Monitor",
+          "metric": "STRESS/WARNING sessions (20D)",
+          "threshold_operator": "<",
+          "threshold_value": 5,
+          "unit": "sessions",
+          "description": "Liquidity pressure is no longer persistent if stressed funding sessions fall below 5 of the last 20 observations.",
+          "current_value": 2.0
+        },
+        {
+          "model": "Market Breadth",
+          "metric": "Breadth MA20",
+          "threshold_operator": ">",
+          "threshold_value": 45,
+          "unit": "%",
+          "description": "Internal participation materially improves when more than 45% of covered tickers trade above MA20.",
+          "current_value": 42.11764705882353
+        },
+        {
+          "model": "ESR Monitor",
+          "metric": "Systemic Stress Index (SSI)",
+          "threshold_operator": "<",
+          "threshold_value": 55,
+          "unit": "%",
+          "description": "Systemic stress cools if SSI drops below 55%.",
+          "current_value": 51.1574504103395
+        },
+        {
+          "model": "Tail Risk (EVT)",
+          "metric": "EVT Xi Max (5%-15% thresholds)",
+          "threshold_operator": "<",
+          "threshold_value": 0.25,
+          "unit": "",
+          "description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25.",
+          "current_value": 0.3823232694485832
+        },
+        {
+          "model": "Manipulation / Coupling",
+          "metric": "Vingroup Slope Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 70,
+          "unit": "th pct",
+          "description": "Index coupling risk eases when the Vingroup slope percentile falls below the 70th percentile.",
+          "current_value": 17.93504604944256
+        },
+        {
+          "model": "Global Financial Conditions",
+          "metric": "CQS Percentile",
+          "threshold_operator": "<",
+          "threshold_value": 80,
+          "unit": "th pct",
+          "description": "External credit-quality stress eases when CQS drops below the 80th percentile.",
+          "current_value": 99.66931216931218
+        }
+      ],
+      "provider_key": "quant-rules-v1",
+      "saved_at": "2026-10-29",
+      "source": "ai_cio_executive_summary"
+    }
+  },
+  "rows": [
+    {
+      "Model": "VNIBOR Monitor",
+      "Metric": "STRESS/WARNING sessions (20D)",
+      "T-1 threshold": "< 5 sessions",
+      "T-1 reported": "2 sessions",
+      "T actual": 2.0,
+      "T actual display": "2 sessions",
+      "Delta": 0.0,
+      "Delta display": "0 sessions",
+      "Status": "FALSIFIED",
+      "Data date": "2026-10-29",
+      "Description": "Liquidity pressure is no longer persistent if stressed funding sessions fall below 5 of the last 20 observations.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Market Breadth",
+      "Metric": "Breadth MA20",
+      "T-1 threshold": "> 45.0%",
+      "T-1 reported": "42.1%",
+      "T actual": 28.235294117647058,
+      "T actual display": "28.2%",
+      "Delta": -13.882352941176471,
+      "Delta display": "-13.9%",
+      "Status": "Intact",
+      "Data date": "2026-10-30",
+      "Description": "Internal participation materially improves when more than 45% of covered tickers trade above MA20.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "ESR Monitor",
+      "Metric": "Systemic Stress Index (SSI)",
+      "T-1 threshold": "< 55.0%",
+      "T-1 reported": "51.2%",
+      "T actual": 51.199400822511954,
+      "T actual display": "51.2%",
+      "Delta": 0.04195041217245432,
+      "Delta display": "+0.042%",
+      "Status": "FALSIFIED",
+      "Data date": "2026-10-30",
+      "Description": "Systemic stress cools if SSI drops below 55%.",
+      "Error": "",
+      "Falsified": true
+    },
+    {
+      "Model": "Tail Risk (EVT)",
+      "Metric": "EVT Xi Max (5%-15% thresholds)",
+      "T-1 threshold": "< 0.25",
+      "T-1 reported": "0.382",
+      "T actual": 0.35761351912574757,
+      "T actual display": "0.358",
+      "Delta": -0.024709750322835622,
+      "Delta display": "-0.025",
+      "Status": "Intact",
+      "Data date": "2026-10-30",
+      "Description": "Left-tail risk normalizes only when the upper sensitivity bound xi_max falls below 0.25.",
+      "Error": "",
+      "Falsified": false
+    },
+    {
+      "Model": "Manipulation / Coupling",
+      "Metric": "Vingroup Slope Percentile",
+      "T-1 threshold": "< 70.0 th pct",
+      "T-1 reported": "17.9 th pct",
+      "T actual": null,
+      "T actual display": "N/A",
+      "Delta": null,
+      "Delta display": "N/A",
+      "Status": "MISSING",
+      "Data date": "",
+      "Description": "Index coupling risk eases when the Vingroup slope percentile falls below the 70th percentile.",
+      "Error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv.",
+      "Falsified": false
+    },
+    {
+      "Model": "Global Financial Conditions",
+      "Metric": "CQS Percentile",
+      "T-1 threshold": "< 80.0 th pct",
+      "T-1 reported": "99.7 th pct",
+      "T actual": 99.66931216931218,
+      "T actual display": "99.7 th pct",
+      "Delta": 0.0,
+      "Delta display": "0 th pct",
+      "Status": "Intact",
+      "Data date": "2026-10-28",
+      "Description": "External credit-quality stress eases when CQS drops below the 80th percentile.",
+      "Error": "",
+      "Falsified": false
+    }
+  ],
+  "current_metrics": {
+    "vnibor": {
+      "value": 2,
+      "date": "2026-10-29",
+      "error": ""
+    },
+    "breadth": {
+      "value": 28.235294117647058,
+      "date": "2026-10-30",
+      "error": ""
+    },
+    "ssi": {
+      "value": 51.199400822511954,
+      "date": "2026-10-30",
+      "error": ""
+    },
+    "evt": {
+      "value": 0.27483146924217455,
+      "date": "2026-10-30",
+      "error": ""
+    },
+    "evt_xi_max": {
+      "value": 0.35761351912574757,
+      "date": "2026-10-30",
+      "error": ""
+    },
+    "coupling": {
+      "value": null,
+      "date": "",
+      "error": "Thiếu cột bắt buộc cho Manipulation Detection: ['VNINDEX']. Cần VIC/VHM/VRE từ market_data và VNINDEX từ vnindex_cache.csv."
+    },
+    "gfc": {
+      "value": 99.66931216931218,
+      "date": "2026-10-28",
+      "error": ""
+    }
+  },
+  "status_label": "WATCH",
+  "status_help": "Mot so dieu kien da bi kich hoat, nhung chua du nguong 3/6 de falsify toan bo thesis.",
+  "falsified": 2,
+  "available": 5,
+  "total": 6
+}
