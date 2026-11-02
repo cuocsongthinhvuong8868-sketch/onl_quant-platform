@@ -1,0 +1,31 @@
+<!-- ai-cio-cache-version: structured_20d_trend_v1 -->
+DETERMINISTIC CHILD CONTEXT - generated locally, no child LLM call.
+- - Z-Score của ON (Mượt MA5, rolling 252 ngày): -0.31
+- - Trạng thái Thanh khoản (Regime): NORMAL
+- - Tín hiệu Cảnh báo (Signal): STRESS
+- ## 20-session trend context
+- - Số phiên Signal = STRESS/WARNING: 3
+- - Regime counts 20 phiên: EASY: 12, NORMAL: 8
+- - Signal counts 20 phiên: NEUTRAL: 14, ACCOMMODATIVE: 3, WARNING: 2, STRESS: 1
+- date ON ON_MA5 Impulse Z Pct 1W_ON 2W_ON Regime Signal
+- 2026-10-30 5.79 4.56 +2.05 -0.31 0.431 -0.43 -0.29 NORMAL STRESS
+- - Input của tool này chỉ gồm VNIBOR, spreads, Z-score, percentile, regime/signal và trend 20 phiên. Không có dữ liệu trực tiếp về OMO, tín phiếu, can thiệp tỷ giá, room tín dụng, dòng tiền Kho bạc, mùa vụ thuế hoặc giao dịch của từng ngân hàng.
+
+=== AI CIO DIRECT METRICS: vnibor ===
+```json
+{
+  "tool": "vnibor",
+  "source": "direct_quantitative",
+  "metrics": {
+    "vnibor_on": 5.79,
+    "vnibor_zscore": -0.3052384118180873,
+    "vnibor_percentile": 0.4305555555555556,
+    "vnibor_impulse": 2.05,
+    "vnibor_spread_1w": -0.4299999999999997,
+    "vnibor_spread_2w": -0.29000000000000004,
+    "vnibor_regime": "NORMAL",
+    "vnibor_signal": "STRESS",
+    "vnibor_stress_warning_days_20d": "3"
+  }
+}
+```
