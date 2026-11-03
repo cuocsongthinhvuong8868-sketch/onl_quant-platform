@@ -2,9 +2,9 @@
   "metrics_version": "3.0",
   "provider": "quant-rules-v1",
   "report_mode": "deterministic",
-  "generated_at": "2026-11-02T20:56:38",
-  "report_date": "02/11/2026",
-  "data_date": "02/11/2026",
+  "generated_at": "2026-11-03T18:42:44",
+  "report_date": "03/11/2026",
+  "data_date": "03/11/2026",
   "authority_rules": [
     "This JSON is generated deterministically before report rendering.",
     "Metric authority is direct_quantitative > structured_tail_json > prose_regex_fallback; lower-priority mismatches are blocked and audited.",
@@ -24,40 +24,40 @@
     "resolved_regime": "PRE-CRASH / PANIC",
     "capitulation_override_active": false,
     "capitulation_state": {
-      "as_of": "2026-11-02T00:00:00",
+      "as_of": "2026-11-03T00:00:00",
       "phase": "FRAGILE",
       "sessions_after_three_gate_climax": null,
-      "stress_risk_score_uncalibrated": 51.4,
-      "liquidation_risk_score_uncalibrated": 44.3,
+      "stress_risk_score_uncalibrated": 58.7,
+      "liquidation_risk_score_uncalibrated": 37.7,
       "exhaustion_evidence_score_uncalibrated": 0.0,
       "features": {
-        "index_close": 1710.72,
-        "return_1d": -0.017742102180728248,
-        "return_3d": -0.031658789233860785,
-        "return_5d": -0.02995662158713952,
-        "downside_acceleration": 0.013916516735123174,
-        "ma200_gap": -0.04656774112178497,
-        "drawdown": -0.11266948141539679,
+        "index_close": 1699.62,
+        "return_1d": -0.0064884960718294415,
+        "return_3d": -0.03189204891747033,
+        "return_5d": -0.035331778167515204,
+        "downside_acceleration": 0.010232827802483038,
+        "ma200_gap": -0.05228476087813294,
+        "drawdown": -0.11842692199964733,
         "constituent_count": 396.0,
         "constituent_universe_size": 425.0,
-        "downside_participation": 0.1670886075949367,
-        "severe_downside_participation": 0.05063291139240506,
-        "breadth_ma20": 0.25510204081632654,
+        "downside_participation": 0.30808080808080807,
+        "severe_downside_participation": 0.047979797979797977,
+        "breadth_ma20": 0.2372448979591837,
         "breadth_ma20_coverage": 0.9223529411764706,
-        "breadth_ma60": 0.2653061224489796,
+        "breadth_ma60": 0.22193877551020408,
         "breadth_ma60_coverage": 0.9223529411764706,
-        "breadth_ma125": 0.15897435897435896,
+        "breadth_ma125": 0.14871794871794872,
         "breadth_ma125_coverage": 0.9176470588235294,
-        "breadth_ma252": 0.14805194805194805,
+        "breadth_ma252": 0.14545454545454545,
         "breadth_ma252_coverage": 0.9058823529411765,
-        "new_low_60": 0.22193877551020408,
-        "new_low_252": 0.15324675324675324,
-        "turnover": 1239438005182.08,
-        "turnover_coverage": 1.0,
-        "turnover_ratio_20": 1.3004748354157247,
-        "turnover_ratio_252": 0.8966339214482887,
-        "selling_volume_shock": 1.3004748354157247,
-        "esr_ssi": 0.5157129885258822,
+        "new_low_60": 0.24744897959183673,
+        "new_low_252": 0.17402597402597403,
+        "turnover": 11484574365.4,
+        "turnover_coverage": 0.9152941176470588,
+        "turnover_ratio_20": 0.8282630870643412,
+        "turnover_ratio_252": 0.5485342047125675,
+        "selling_volume_shock": 0.8282630870643412,
+        "esr_ssi": 0.5173227779166052,
         "esr_state": "ACTIVE STRESS",
         "abm_vulnerability": null,
         "abm_margin_distance": null,
@@ -67,14 +67,14 @@
         "recent_climax_sessions_ago": null
       },
       "percentiles": {
-        "daily_loss": 0.955026455026455,
-        "five_day_loss": 0.9232804232804233,
-        "downside_acceleration": 0.955026455026455,
-        "drawdown_stress": 0.417989417989418,
-        "downside_participation": 0.05291005291005291,
-        "severe_downside_participation": 0.656084656084656,
-        "new_low_252": 0.955026455026455,
-        "selling_volume_shock": 0.9338624338624338
+        "daily_loss": 0.8015873015873016,
+        "five_day_loss": 0.9404761904761905,
+        "downside_acceleration": 0.9259259259259259,
+        "drawdown_stress": 0.4285714285714286,
+        "downside_participation": 0.2777777777777778,
+        "severe_downside_participation": 0.6468253968253969,
+        "new_low_252": 0.9616402116402116,
+        "selling_volume_shock": 0.6772486772486772
       },
       "required_gates_met": {
         "price_shock": false,
@@ -85,18 +85,18 @@
         "post_climax_exhaustion": false
       },
       "trigger_reasons": [
-        "acute price pressure: 1d -1.8%, 5d -3.0%",
         "price_structure",
-        "weak_breadth"
+        "weak_breadth",
+        "turnover_dry_up"
       ],
       "confirmation_reasons": [],
       "data_quality": {
         "status": "LIMITED",
-        "index_observations": 2727,
+        "index_observations": 2728,
         "constituent_count": 396,
         "current_breadth_coverage": 0.9058823529411765,
-        "current_volume_coverage": 1.0,
-        "volume_source": "index_price_x_volume",
+        "current_volume_coverage": 0.9152941176470588,
+        "volume_source": "constituent_dollar_turnover",
         "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
         "available_features": [
           "return_1d",
@@ -123,20 +123,20 @@
       "score_interpretation": "Deterministic 0-100 evidence scores; uncalibrated and not probabilities.",
       "external_metric_freshness": {
         "esr_monitor": {
-          "packet_date": "02/11/2026",
+          "packet_date": "03/11/2026",
           "session_lag": 0,
           "status": "CURRENT",
           "used": true
         },
         "abm_simulator": {
           "packet_date": "2026-09-30",
-          "session_lag": 23,
+          "session_lag": 24,
           "status": "STALE",
           "used": false
         }
       },
-      "expected_as_of": "2026-11-02T00:00:00",
-      "report_as_of": "2026-11-02T00:00:00",
+      "expected_as_of": "2026-11-03T00:00:00",
+      "report_as_of": "2026-11-03T00:00:00",
       "market_data_lag_business_days": 0,
       "market_data_freshness_policy": "current or previous business session",
       "freshness_status": "CURRENT"
@@ -157,17 +157,17 @@
     },
     "score_band_reason": {
       "macro": [
-        "CQS >=85 (99.4)",
-        "VNIBOR ON >=5% (5.79%)",
+        "CQS >=85 (99.0)",
+        "VNIBOR ON >=4% (4.74%)",
         "LTMM transmission_breakdown trigger FIRE",
         "broad bearish evidence balance"
       ],
       "market_internal": [
-        "Breadth MA20 <25% (23.8%)",
+        "Breadth MA20 <25% (22.1%)",
         "current-tool consensus skewed bearish"
       ],
       "tail": [
-        "EVT elevated tail robust across thresholds: xi=0.275, xi_min=0.264",
+        "EVT elevated tail robust across thresholds: xi=0.275, xi_min=0.260",
         "ABM distance to cascade <=10% (10.00%)"
       ],
       "caps": [
@@ -176,10 +176,10 @@
       ]
     },
     "hard_constraints": [
-      "Breadth MA20 weak at 23.8%",
+      "Breadth MA20 weak at 22.1%",
       "Capitulation gate is FRAGILE; no bottom or short-closing override",
-      "EVT elevated tail robust across thresholds: xi=0.275, xi_min=0.264",
-      "Global FCI CQS high at 99.4"
+      "EVT elevated tail robust across thresholds: xi=0.275, xi_min=0.260",
+      "Global FCI CQS high at 99.0"
     ]
   },
   "consensus": {
@@ -190,7 +190,7 @@
           "tool": "global_financial_conditions",
           "tool_score": 20,
           "tool_regime": "PRE-CRASH / PANIC",
-          "reason": "CQS >=85 (99.4)"
+          "reason": "CQS >=85 (99.0)"
         },
         {
           "tool": "credit_spread",
@@ -200,9 +200,9 @@
         },
         {
           "tool": "vnibor",
-          "tool_score": 25,
-          "tool_regime": "PRE-CRASH / PANIC",
-          "reason": "VNIBOR ON >=5% (5.79%)"
+          "tool_score": 35,
+          "tool_regime": "FEAR / DISTRIBUTION",
+          "reason": "VNIBOR ON >=4% (4.74%)"
         },
         {
           "tool": "ltmm",
@@ -214,13 +214,13 @@
           "tool": "market_breadth",
           "tool_score": 18,
           "tool_regime": "PRE-CRASH / PANIC",
-          "reason": "Breadth MA20 <25% (23.8%)"
+          "reason": "Breadth MA20 <25% (22.1%)"
         },
         {
           "tool": "var_cvar_vnindex",
           "tool_score": 28,
           "tool_regime": "PRE-CRASH / PANIC",
-          "reason": "EVT elevated tail robust but not fat across thresholds: xi=0.275, xi_min=0.264"
+          "reason": "EVT elevated tail robust but not fat across thresholds: xi=0.275, xi_min=0.260"
         }
       ],
       "neutral_or_mixed": [
@@ -228,7 +228,7 @@
           "tool": "esr_monitor",
           "tool_score": 58,
           "tool_regime": "NEUTRAL / STOCK-PICKING",
-          "reason": "SSI below stress threshold (51.6%)"
+          "reason": "SSI below stress threshold (51.7%)"
         },
         {
           "tool": "abm_simulator",
@@ -343,7 +343,7 @@
     "fed_liquidity": {
       "tool": "fed_liquidity",
       "layer": "macro",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
@@ -393,18 +393,18 @@
     "global_financial_conditions": {
       "tool": "global_financial_conditions",
       "layer": "macro",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "cqs_percentile": 99.40476190476191,
-        "gfcm_pc1_percentile": 97.61904761904762,
-        "gfcm_pc1": 4.340880001125277,
-        "gfcm_ccc_oas": 13.25,
-        "vix": 17.2,
-        "move": 100.19760131835938,
-        "hy_oas": 3.26,
+        "cqs_percentile": 99.0079365079365,
+        "gfcm_pc1_percentile": 99.20634920634922,
+        "gfcm_pc1": 5.007065099611727,
+        "gfcm_ccc_oas": 13.27,
+        "vix": 19.42,
+        "move": 100.36150360107422,
+        "hy_oas": 3.44,
         "regime": "STRESS",
         "driver": "CCC_CREDIT_DRIVEN"
       },
@@ -414,7 +414,7 @@
       "tool_score": 20,
       "tool_regime": "PRE-CRASH / PANIC",
       "tool_bias": "bearish",
-      "score_reason": "CQS >=85 (99.4)",
+      "score_reason": "CQS >=85 (99.0)",
       "metric_provenance": {
         "cqs_percentile": "direct_quantitative",
         "gfcm_pc1_percentile": "direct_quantitative",
@@ -545,29 +545,29 @@
     "vnibor": {
       "tool": "vnibor",
       "layer": "macro",
-      "as_of": "2026-10-30",
+      "as_of": "2026-11-02",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "vnibor_on": 5.79,
-        "vnibor_zscore": -0.3052384118180873,
-        "vnibor_percentile": 0.4305555555555556,
-        "vnibor_impulse": 2.05,
-        "vnibor_spread_1w": -0.4299999999999997,
-        "vnibor_spread_2w": -0.29000000000000004,
+        "vnibor_on": 4.74,
+        "vnibor_zscore": -0.245917854641225,
+        "vnibor_percentile": 0.4642857142857143,
+        "vnibor_impulse": -1.0499999999999998,
+        "vnibor_spread_1w": 0.08000000000000007,
+        "vnibor_spread_2w": -0.009999999999999787,
         "vnibor_regime": "NORMAL",
-        "vnibor_signal": "STRESS",
+        "vnibor_signal": "NEUTRAL",
         "vnibor_stress_warning_days_20d": "3",
         "vnibor_trend_label": "tightening trend"
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
       "adapter_available": true,
-      "tool_score": 25,
-      "tool_regime": "PRE-CRASH / PANIC",
+      "tool_score": 35,
+      "tool_regime": "FEAR / DISTRIBUTION",
       "tool_bias": "bearish",
-      "score_reason": "VNIBOR ON >=5% (5.79%)",
+      "score_reason": "VNIBOR ON >=4% (4.74%)",
       "metric_provenance": {
         "vnibor_on": "direct_quantitative",
         "vnibor_zscore": "direct_quantitative",
@@ -733,16 +733,16 @@
     "fear_greed": {
       "tool": "fear_greed",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "fear_greed_score": 41.688880891986344,
-        "sentiment_regime": "SELL_OFF_WATCH / STOCK PICKING",
-        "signal_confidence": 0.5705474086883484,
-        "acute_shock": 0.9325396825396826,
-        "csv_rank": 0.45634920634920634,
+        "fear_greed_score": 38.479031291255296,
+        "sentiment_regime": "SELL_OFF_WATCH / FEAR",
+        "signal_confidence": 0.6378768095813631,
+        "acute_shock": 0.9404761904761905,
+        "csv_rank": 0.6468253968253969,
         "shock_regime_flag": "SELL_OFF_WATCH"
       },
       "scoring_eligible": true,
@@ -779,18 +779,18 @@
     "manipulation": {
       "tool": "manipulation",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "manip_slope": 0.2772688406936299,
-        "manip_corr": 0.670543062351856,
-        "manip_slope_percentile": 16.997578692493946,
-        "manip_corr_percentile": 32.639225181598064,
+        "manip_slope": 0.28899762645648264,
+        "manip_corr": 0.7001791301988307,
+        "manip_slope_percentile": 20.087124878993222,
+        "manip_corr_percentile": 39.25459825750242,
         "regime": "COUPLING",
-        "delta_corr_percentile": 0.9166666666666667,
-        "delta_slope_percentile": 0.9166666666666667
+        "delta_corr_percentile": 0.9666666666666667,
+        "delta_slope_percentile": 0.9833333333333333
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -827,16 +827,16 @@
     "dispersion": {
       "tool": "dispersion",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": "STOCK_PICKING",
       "key_metrics": {
-        "dispersion_spread_z": -2.2255096155181846,
+        "dispersion_spread_z": -0.5892297783012519,
         "dispersion_dpi_pct": 43.333333333333336,
-        "dispersion_avg_corr": 0.007362910476077025,
-        "dispersion_broad_stress_score": 19.747050223145422,
-        "downside_participation_pct": 9.16030534351145,
+        "dispersion_avg_corr": 0.012062773415564288,
+        "dispersion_broad_stress_score": 7.535029857859955,
+        "downside_participation_pct": 7.633587786259542,
         "macro_regime": "STOCK_PICKING",
         "broad_stress_level": "NORMAL"
       },
@@ -875,20 +875,20 @@
     "upside_ratio": {
       "tool": "upside_ratio",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "upside_current_pct": 1.5267175572519083,
-        "downside_current_pct": 9.16030534351145,
-        "p95_upside_pct": 18.044302986207615,
-        "p95_downside_pct": 21.93293311824633,
-        "phi_up": 0.13909586674807092,
-        "phi_down": 0.15515815784162812,
-        "breadth_stress_score": 44.084589866670676,
-        "net_sell_pressure_pct": 7.633587786259541,
-        "breadth_regime": "SELL_PRESSURE"
+        "upside_current_pct": 14.249363867684478,
+        "downside_current_pct": 7.633587786259542,
+        "p95_upside_pct": 18.046996443004478,
+        "p95_downside_pct": 22.67612561521334,
+        "phi_up": 0.12980274265664643,
+        "phi_down": 0.17468038894971857,
+        "breadth_stress_score": 27.272970727149826,
+        "net_sell_pressure_pct": -6.615776081424936,
+        "breadth_regime": "BUY_PRESSURE"
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -927,22 +927,22 @@
     "bank_valuation": {
       "tool": "bank_valuation",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bullish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
         "eligible_banks": 25,
         "bank_valuation_breadth_score": -0.24,
-        "median_valuation_gap_pct": -0.04600370373337581,
+        "median_valuation_gap_pct": -0.0616953674933155,
         "valuation_regime": "Trung tính",
         "overvalued_count": 9,
         "fair_count": 10,
         "undervalued_count": 6,
-        "best_ticker": "VAB",
-        "best_valuation_gap_pct": 0.539740671195041,
+        "best_ticker": "KLB",
+        "best_valuation_gap_pct": 0.5711829015293386,
         "worst_ticker": "NVB",
-        "worst_valuation_gap_pct": -0.9296808885989765
+        "worst_valuation_gap_pct": -0.9323926075244715
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -983,21 +983,21 @@
     "market_breadth": {
       "tool": "market_breadth",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "breadth_ma20_pct": 23.764705882352942,
-        "breadth_ma60_pct": 24.941176470588236,
-        "breadth_ma125_pct": 16.941176470588236,
-        "breadth_ma252_pct": 15.529411764705884,
-        "above_ma20_count": 101,
-        "above_ma60_count": 106,
-        "above_ma125_count": 72,
-        "above_ma252_count": 66,
+        "breadth_ma20_pct": 22.11764705882353,
+        "breadth_ma60_pct": 20.941176470588236,
+        "breadth_ma125_pct": 16.0,
+        "breadth_ma252_pct": 15.294117647058824,
+        "above_ma20_count": 94,
+        "above_ma60_count": 89,
+        "above_ma125_count": 68,
+        "above_ma252_count": 65,
         "breadth_universe_size": 425,
-        "snapshot_date": "02/11/2026"
+        "snapshot_date": "03/11/2026"
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -1005,7 +1005,7 @@
       "tool_score": 18,
       "tool_regime": "PRE-CRASH / PANIC",
       "tool_bias": "bearish",
-      "score_reason": "Breadth MA20 <25% (23.8%)",
+      "score_reason": "Breadth MA20 <25% (22.1%)",
       "metric_provenance": {
         "breadth_ma20_pct": "direct_quantitative",
         "breadth_ma60_pct": "direct_quantitative",
@@ -1037,19 +1037,19 @@
     "esr_monitor": {
       "tool": "esr_monitor",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "ssi_pct": 51.57129885258822,
-        "pca_concentration_pct": 38.20342682356002,
+        "ssi_pct": 51.73227779166052,
+        "pca_concentration_pct": 38.208805436223024,
         "market_state": "ACTIVE STRESS",
         "hmm_available": true,
         "production_regime_method": "hmm",
         "production_pillar_mode": "downside",
         "top_pillar": "S_LIQ",
-        "top_pillar_weight_pct": 34.975353137529446
+        "top_pillar_weight_pct": 34.96444251945375
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -1057,7 +1057,7 @@
       "tool_score": 58,
       "tool_regime": "NEUTRAL / STOCK-PICKING",
       "tool_bias": "neutral_or_mixed",
-      "score_reason": "SSI below stress threshold (51.6%)",
+      "score_reason": "SSI below stress threshold (51.7%)",
       "metric_provenance": {
         "ssi_pct": "direct_quantitative",
         "pca_concentration_pct": "direct_quantitative",
@@ -1087,15 +1087,15 @@
     "va_res": {
       "tool": "va_res",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "vares_stress_index_pct": 13.333333333333334,
-        "vares_complacency_pct": 8.411214953271028,
-        "vares_breach_count": 4,
-        "vares_mispriced_count": 9,
+        "vares_stress_index_pct": 3.3333333333333335,
+        "vares_complacency_pct": 6.5420560747663545,
+        "vares_breach_count": 1,
+        "vares_mispriced_count": 7,
         "valid_vn30_count": 30,
         "valid_market_count": 107,
         "vares_regime": "NO_VARES_STRESS",
@@ -1139,30 +1139,30 @@
     "var_cvar_vnindex": {
       "tool": "var_cvar_vnindex",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "bearish",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "historical_var_pct": -1.6747090759208625,
-        "expected_shortfall_pct": -2.946980413645519,
-        "tail_regime": "TAIL_STRESS_ACTIVE",
-        "tail_risk_level": "HIGH",
-        "var_breach_95": true,
-        "breach_margin_95_pp": 0.11542892778481466,
+        "historical_var_pct": -1.6864680329879342,
+        "expected_shortfall_pct": -2.9499254523750107,
+        "tail_regime": "ROBUST_HEAVY_TAIL",
+        "tail_risk_level": "ELEVATED",
+        "var_breach_95": false,
+        "breach_margin_95_pp": -1.035504246550006,
         "evt_xi": 0.27483146924217455,
         "evt_var_99_pct": -3.6444952938773256,
         "evt_es_99_pct": -5.656752755105695,
-        "hill_index": 0.4430987427985331,
-        "evt_xi_min": 0.2639614399383711,
-        "evt_xi_max": 0.35761351912574757,
-        "evt_xi_range": 0.09365207918737645,
-        "evt_var99_range_pp": 0.05773889256255049,
-        "evt_es99_range_pp": 0.319732237746307,
+        "hill_index": 0.44309874279853334,
+        "evt_xi_min": 0.2602133608293704,
+        "evt_xi_max": 0.347999952928583,
+        "evt_xi_range": 0.08778659209921258,
+        "evt_var99_range_pp": 0.05548312776765471,
+        "evt_es99_range_pp": 0.2886797768277091,
         "evt_threshold_stable": 1,
-        "evt_xi_p05": 0.1449888988515369,
-        "evt_xi_p50": 0.35819416127464776,
-        "evt_xi_p95": 0.5747788656613598
+        "evt_xi_p05": 0.14309408191536918,
+        "evt_xi_p50": 0.35015716914187434,
+        "evt_xi_p95": 0.5752812637851817
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -1170,7 +1170,7 @@
       "tool_score": 28,
       "tool_regime": "PRE-CRASH / PANIC",
       "tool_bias": "bearish",
-      "score_reason": "EVT elevated tail robust but not fat across thresholds: xi=0.275, xi_min=0.264",
+      "score_reason": "EVT elevated tail robust but not fat across thresholds: xi=0.275, xi_min=0.260",
       "metric_provenance": {
         "historical_var_pct": "direct_quantitative",
         "expected_shortfall_pct": "direct_quantitative",
@@ -1265,39 +1265,39 @@
     "sentiment_factor_news": {
       "tool": "sentiment_factor_news",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
-        "news_macro_composite_1d": 0.4036,
-        "news_confidence_1d": 0.966,
-        "news_count_1d": 190,
-        "news_regime_1d": "strong_risk_on",
+        "news_macro_composite_1d": 0.2255,
+        "news_confidence_1d": 0.7901,
+        "news_count_1d": 177,
+        "news_regime_1d": "risk_on",
         "news_source_counts_1d": {
-          "widata": 90,
+          "widata": 77,
           "mozyfin": 100
         },
-        "news_macro_composite_7d": 0.9321,
+        "news_macro_composite_7d": 0.7257,
         "news_confidence_7d": 1.0,
-        "news_count_7d": 967,
+        "news_count_7d": 1075,
         "news_regime_7d": "strong_risk_on",
         "news_source_counts_7d": {
-          "widata": 367,
-          "mozyfin": 600
+          "widata": 375,
+          "mozyfin": 700
         },
-        "news_macro_composite_30d": 0.4168,
+        "news_macro_composite_30d": 0.4132,
         "news_confidence_30d": 1.0,
-        "news_count_30d": 3133,
+        "news_count_30d": 3278,
         "news_regime_30d": "strong_risk_on",
         "news_source_counts_30d": {
-          "widata": 1056,
-          "mozyfin": 2074,
+          "widata": 1101,
+          "mozyfin": 2174,
           "mozyfin_social": 3
         },
-        "news_macro_composite": 0.4036,
-        "news_confidence": 0.966,
-        "news_count": 190
+        "news_macro_composite": 0.2255,
+        "news_confidence": 0.7901,
+        "news_count": 177
       },
       "scoring_eligible": true,
       "diagnostic_gate_only": false,
@@ -1345,15 +1345,15 @@
     "risk_adjusted_growth": {
       "tool": "risk_adjusted_growth",
       "layer": "current_tool",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
       "key_metrics": {
         "top_ticker": "SHB",
-        "top_economic_alpha_pct": 6.194063254554444,
-        "median_economic_alpha_pct": -2.1177889040358866,
-        "positive_alpha_count": 3,
+        "top_economic_alpha_pct": 6.616230007510543,
+        "median_economic_alpha_pct": -2.295254631541103,
+        "positive_alpha_count": 4,
         "bank_count": 16,
         "top_tickers": [
           "SHB",
@@ -1407,7 +1407,7 @@
     "pvgo": {
       "tool": "pvgo",
       "layer": "valuation",
-      "as_of": "02/11/2026",
+      "as_of": "03/11/2026",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": null,
@@ -1437,14 +1437,14 @@
     "capitulation_regime": {
       "tool": "capitulation_regime",
       "layer": "regime_gate",
-      "as_of": "2026-11-02T00:00:00",
+      "as_of": "2026-11-03T00:00:00",
       "bias": "neutral_or_mixed",
       "report_score": null,
       "report_regime": "FRAGILE",
       "key_metrics": {
         "phase": "FRAGILE",
-        "stress_risk_score_uncalibrated": 51.4,
-        "liquidation_risk_score_uncalibrated": 44.3,
+        "stress_risk_score_uncalibrated": 58.7,
+        "liquidation_risk_score_uncalibrated": 37.7,
         "exhaustion_evidence_score_uncalibrated": 0.0,
         "required_gates_met": {
           "price_shock": false,
@@ -1460,25 +1460,25 @@
         "market_data_lag_business_days": 0,
         "external_metric_freshness": {
           "esr_monitor": {
-            "packet_date": "02/11/2026",
+            "packet_date": "03/11/2026",
             "session_lag": 0,
             "status": "CURRENT",
             "used": true
           },
           "abm_simulator": {
             "packet_date": "2026-09-30",
-            "session_lag": 23,
+            "session_lag": 24,
             "status": "STALE",
             "used": false
           }
         },
         "data_quality": {
           "status": "LIMITED",
-          "index_observations": 2727,
+          "index_observations": 2728,
           "constituent_count": 396,
           "current_breadth_coverage": 0.9058823529411765,
-          "current_volume_coverage": 1.0,
-          "volume_source": "index_price_x_volume",
+          "current_volume_coverage": 0.9152941176470588,
+          "volume_source": "constituent_dollar_turnover",
           "percentile_method": "prior-only rolling empirical CDF (756 sessions)",
           "available_features": [
             "return_1d",
@@ -1501,19 +1501,19 @@
           ]
         },
         "price_structure": {
-          "return_1d": -0.017742102180728248,
-          "return_5d": -0.02995662158713952,
-          "drawdown": -0.11266948141539679,
-          "ma200_gap": -0.04656774112178497,
-          "downside_participation": 0.1670886075949367,
-          "new_low_252": 0.15324675324675324,
-          "breadth_ma20": 0.25510204081632654,
-          "turnover_ratio_20": 1.3004748354157247
+          "return_1d": -0.0064884960718294415,
+          "return_5d": -0.035331778167515204,
+          "drawdown": -0.11842692199964733,
+          "ma200_gap": -0.05228476087813294,
+          "downside_participation": 0.30808080808080807,
+          "new_low_252": 0.17402597402597403,
+          "breadth_ma20": 0.2372448979591837,
+          "turnover_ratio_20": 0.8282630870643412
         },
         "trigger_reasons": [
-          "acute price pressure: 1d -1.8%, 5d -3.0%",
           "price_structure",
-          "weak_breadth"
+          "weak_breadth",
+          "turnover_dry_up"
         ],
         "confirmation_reasons": []
       },
@@ -1533,16 +1533,6 @@
   "history": {
     "window_size": 30,
     "history_window": [
-      {
-        "date": "2026-08-24",
-        "score": 36,
-        "regime": "FEAR / DISTRIBUTION",
-        "source": "auto",
-        "provider": "deepseek-v4-pro",
-        "stress_regime": "FEAR / DISTRIBUTION",
-        "capitulation_phase": "REPAIR",
-        "capitulation_action_eligible": false
-      },
       {
         "date": "2026-08-25",
         "score": 31,
@@ -1832,22 +1822,32 @@
         "stress_regime": "FEAR / DISTRIBUTION",
         "capitulation_phase": "FRAGILE",
         "capitulation_action_eligible": false
+      },
+      {
+        "date": "2026-11-02",
+        "score": 22,
+        "regime": "PRE-CRASH / PANIC",
+        "source": "auto",
+        "provider": "quant-rules-v1",
+        "stress_regime": "PRE-CRASH / PANIC",
+        "capitulation_phase": "FRAGILE",
+        "capitulation_action_eligible": false
       }
     ],
     "rolling_summary": {
       "history_count": 30,
       "current_baseline_score": 22,
       "current_baseline_regime": "PRE-CRASH / PANIC",
-      "latest_prior_score": 32,
-      "score_avg_5d": 31.2,
-      "score_avg_10d": 33.9,
-      "score_avg_20d": 30.8,
-      "score_change_1d": -10.0,
-      "score_change_5d": -17.0,
+      "latest_prior_score": 22,
+      "score_avg_5d": 28.6,
+      "score_avg_10d": 33.4,
+      "score_avg_20d": 30.6,
+      "score_change_1d": 0.0,
+      "score_change_5d": -13.0,
       "score_change_10d": -5.0,
-      "days_below_30": 1,
+      "days_below_30": 2,
       "days_below_15": 0,
-      "current_regime_streak": 1,
+      "current_regime_streak": 2,
       "min_20d": 22,
       "max_20d": 39,
       "usage_rule": "Use for persistence/delta only. Do not anchor the final score to history."
