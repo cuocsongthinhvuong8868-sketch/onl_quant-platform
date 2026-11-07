@@ -1,6 +1,6 @@
 {
   "manifest_version": "1.0",
-  "catalog_signature": "8b63cb8b1d71399da9f696fb7b6681a82ad28eafe4876436d5432d09eb2267bd",
+  "catalog_signature": "62be99ee463ec1fbca8657d9ccceec160106ce7e7c0e0f1c9b9806a3c1944d7c",
   "root": ".",
   "entries": [
     {
@@ -27,42 +27,42 @@
     {
       "relative_path": "data_lake/abm_alert.csv",
       "suffix": ".csv",
-      "size_bytes": 16894,
+      "size_bytes": 17062,
       "readable": true,
       "schema_text": "csv columns: as_of_date, distance_to_cascade, regime_flag, early_warning_score, early_warning_level, warning_basis, alert_uses_quant_platform_panel, stress_confidence, input_quality_score, methodology_version"
     },
     {
       "relative_path": "data_lake/abm_behavioral_state.csv",
       "suffix": ".csv",
-      "size_bytes": 44003,
+      "size_bytes": 44459,
       "readable": true,
       "schema_text": "csv columns: as_of_date, pct_fundamental, pct_momentum, pct_foreign, pct_leveraged, avg_leverage_ratio, noise_std, pct_noise, calibration_method, input_quality_score, mli, liquidity_stress, valuation_gap, trend_z, breadth_z, foreign_flow_z, global_risk_z, global_risk_quality, margin_pressure_z, qp_downside_participation_z, qp_high_beta_sell_pressure_z, qp_sector_stress_z, margin_leverage_level, margin_call_trigger_pressure, cascade_vulnerability, latent_confidence_score, validation_quality, qp_panel_available, qp_panel_quality"
     },
     {
       "relative_path": "data_lake/abm_latent_state.csv",
       "suffix": ".csv",
-      "size_bytes": 107079,
+      "size_bytes": 108210,
       "readable": true,
       "schema_text": "csv columns: as_of_date, margin_leverage_level, margin_call_trigger_pressure, cascade_vulnerability, latent_proxy_agreement, latent_confidence_score, source_quality_score, validation_quality, validation_status, latent_components_json"
     },
     {
       "relative_path": "data_lake/abm_scenario_grid.csv",
       "suffix": ".csv",
-      "size_bytes": 151283,
+      "size_bytes": 152499,
       "readable": true,
       "schema_text": "csv columns: as_of_date, scenario_name, scenario_rank, shock_type, shock_magnitude, dd_total, dd_exogenous, dd_endogenous, panic_ratio, margin_calls, margin_call_events, min_price_mean, end_price_mean, dd_total_p10, dd_total_p90, panic_ratio_p10, panic_ratio_p90, simulation_runs, simulation_agents, steps_post_shock, stress_confidence"
     },
     {
       "relative_path": "data_lake/abm_stress_test.csv",
       "suffix": ".csv",
-      "size_bytes": 13840,
+      "size_bytes": 14028,
       "readable": true,
       "schema_text": "csv columns: as_of_date, dd_total, dd_exogenous, dd_endogenous, panic_ratio, dd_total_p10, dd_total_p90, panic_ratio_p10, panic_ratio_p90, margin_calls, margin_call_events, simulation_runs, stress_confidence, simulation_agents, steps_post_shock"
     },
     {
       "relative_path": "data_lake/abm_validation.csv",
       "suffix": ".csv",
-      "size_bytes": 13062,
+      "size_bytes": 13210,
       "readable": true,
       "schema_text": "csv columns: as_of_date, validation_status, validation_observations, validation_events, base_event_rate, top_decile_event_rate, lift_top_decile, auc, spearman_future_drawdown, event_drawdown_threshold, validation_quality"
     },
@@ -7832,7 +7832,7 @@
     {
       "relative_path": "data_lake/daily_cache/fear_greed_69b21fc5cfdaf8ad.pkl",
       "suffix": ".pkl",
-      "size_bytes": 708603,
+      "size_bytes": 709650,
       "readable": false,
       "schema_text": "pkl"
     },
@@ -17658,6 +17658,13 @@
       "schema_text": "json"
     },
     {
+      "relative_path": "data_lake/data_LTMM/sourse_raw/05112026.json",
+      "suffix": ".json",
+      "size_bytes": 1213582,
+      "readable": true,
+      "schema_text": "json"
+    },
+    {
       "relative_path": "data_lake/data_LTMM/sourse_raw/06062026.json",
       "suffix": ".json",
       "size_bytes": 286604,
@@ -17675,6 +17682,13 @@
       "relative_path": "data_lake/data_LTMM/sourse_raw/07092026.json",
       "suffix": ".json",
       "size_bytes": 1060575,
+      "readable": true,
+      "schema_text": "json"
+    },
+    {
+      "relative_path": "data_lake/data_LTMM/sourse_raw/07112026.json",
+      "suffix": ".json",
+      "size_bytes": 1235591,
       "readable": true,
       "schema_text": "json"
     },
@@ -18206,35 +18220,35 @@
     {
       "relative_path": "data_lake/sentiment_factor_news/feed/channel_scores.csv",
       "suffix": ".csv",
-      "size_bytes": 941131,
+      "size_bytes": 948114,
       "readable": true,
       "schema_text": "csv columns: generated_at, window, channel, score, item_count"
     },
     {
       "relative_path": "data_lake/sentiment_factor_news/feed/classified_news.jsonl",
       "suffix": ".jsonl",
-      "size_bytes": 76262076,
+      "size_bytes": 76718422,
       "readable": true,
       "schema_text": "jsonl keys: news_id, source_system, source_id, timestamp_utc, timestamp_vn, source_name, title, summary, url, language, raw_category, raw_tags, raw_topics, raw_impact, raw_importance, entities, sectors, country, macro_info, content_hash, macro_channel, sub_channel, event_type, sentiment_label, market_transmission, horizon, matched_rules_count, direction_score, magnitude, relevance, novelty, source_weight, confidence, time_decay, final_score"
     },
     {
       "relative_path": "data_lake/sentiment_factor_news/feed/latest.json",
       "suffix": ".json",
-      "size_bytes": 7867,
+      "size_bytes": 6580,
       "readable": true,
       "schema_text": "json"
     },
     {
       "relative_path": "data_lake/sentiment_factor_news/feed/latest_1d.json",
       "suffix": ".json",
-      "size_bytes": 7867,
+      "size_bytes": 6580,
       "readable": true,
       "schema_text": "json"
     },
     {
       "relative_path": "data_lake/sentiment_factor_news/feed/latest_30d.json",
       "suffix": ".json",
-      "size_bytes": 9310,
+      "size_bytes": 9313,
       "readable": true,
       "schema_text": "json"
     },
@@ -18262,7 +18276,7 @@
     {
       "relative_path": "data_lake/sentiment_factor_news/history/processed_news_ids.json",
       "suffix": ".json",
-      "size_bytes": 570130,
+      "size_bytes": 567938,
       "readable": true,
       "schema_text": "json"
     },
